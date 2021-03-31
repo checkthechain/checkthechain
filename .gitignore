@@ -1,0 +1,9 @@
+TODO.md
+*.pyc
+__pycache__/*
+*.egg-info
+
+data/*
+notebooks/*
+notes/*
+
