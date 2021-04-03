@@ -8,6 +8,7 @@ setuptools.setup(
         'numpy',
         'matplotlib',
         # 'numba',
+        'tooltime',
     ],
 )
 
