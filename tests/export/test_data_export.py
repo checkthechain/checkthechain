@@ -1,7 +1,8 @@
 import tempfile
 
+import ten
+
 import fei
-from fei.toolbox import json_utils
 
 
 n_blocks = 1000
@@ -35,7 +36,7 @@ def test_events_to_json():
 
     # assert event records match
     with open(tmp_path, 'r') as f:
-        event_data = json_utils.load_with_decimals(f)
+        event_data = ten.json_load(f)
 
     pairs = [
         [event_data['event_records'], simulation.event_records],
@@ -45,7 +46,7 @@ def test_events_to_json():
         [event_data['event_post_metadata_fields'], simulation.event_post_metadata_fields],
     ]
     for lhs, rhs in pairs:
-        lhs_serialized = json_utils.dumps_with_decimals(lhs, sort_keys=True)
-        rhs_serialized = json_utils.dumps_with_decimals(rhs, sort_keys=True)
+        lhs_serialized = ten.json_dumps(lhs, sort_keys=True)
+        rhs_serialized = ten.json_dumps(rhs, sort_keys=True)
         assert lhs_serialized == rhs_serialized
 
