@@ -3,10 +3,11 @@ import setuptools
 setuptools.setup(
     name='fei',
     version='0.0.1',
-    packages=['fei'],
+    packages=['fei', 'larp'],
     install_requires=[
-        'numpy',
         'matplotlib',
+        'numpy',
+        'pandas',
         # 'numba',
         'tooltime',
     ],
