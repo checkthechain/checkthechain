@@ -6,4 +6,5 @@ __pycache__/*
 data/*
 notebooks/*
 notes/*
+fei/config.yaml
 
