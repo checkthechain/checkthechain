@@ -7,4 +7,5 @@ data/*
 notebooks/*
 notes/*
 fei/config.yaml
+config.yaml
 
