@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 
+import argparse
+
 from fei.data import web3_utils
 from fei.data import etl
 import fei.report
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--dry', action='store_true')
+args = parser.parse_args()
+dry = args.dry
 
 
 chunk_size = 1000
@@ -15,6 +23,8 @@ latest_block_number = web3_utils.fetch_latest_block_number()
 end_block = int(latest_block_number / chunk_size) * chunk_size - 1
 
 # output
+if dry:
+    print('!! [DRY RUN] !!')
 print('last_exported_block:', fei.report.int_to_str(last_exported_block))
 print('latest_block_number:', fei.report.int_to_str(latest_block_number))
 print('        start_block:', fei.report.int_to_str(start_block))
@@ -23,8 +33,11 @@ print()
 
 # export chunks
 if start_block < end_block:
-    etl.export_as_chunks(start_block, end_block)
+    etl.export_as_chunks(start_block, end_block, dry=dry)
 else:
     wait_until = fei.report.int_to_str(end_block + chunk_size)
     print('not scraping yet, wait until block', wait_until)
+
+if dry:
+    print('!! [DRY RUN] !!')
 
