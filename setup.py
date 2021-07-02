@@ -8,6 +8,8 @@ setuptools.setup(
     package_dir={'': 'src'},
     install_requires=[
         'boto3',
+        'fsspec',
+        's3fs',
         'matplotlib',
         'numpy',
         'pandas',
