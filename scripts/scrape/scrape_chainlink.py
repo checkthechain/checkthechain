@@ -14,6 +14,7 @@ dry = args.dry
 save_feeds = [
     'ETH_USD',
     'FEI_ETH',
+    'FEI_USD',
     'FRAX_ETH',
     'DAI_USD',
     'SUSD_ETH',
