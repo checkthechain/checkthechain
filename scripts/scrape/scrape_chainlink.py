@@ -18,7 +18,9 @@ save_feeds = [
     'FRAX_ETH',
     'DAI_USD',
     'SUSD_ETH',
-    # 'RAI_ETH',
+    'RAI_ETH',
+    'DPI_ETH',
+    'DPI_USD',
 ]
 
 
