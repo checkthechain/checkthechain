@@ -21,6 +21,9 @@ save_feeds = [
     'RAI_ETH',
     'DPI_ETH',
     'DPI_USD',
+    'ADA_USD',
+    'BTC_USD',
+    'BTC_ETH',
 ]
 
 
