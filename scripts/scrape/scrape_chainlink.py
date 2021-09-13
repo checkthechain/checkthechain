@@ -24,6 +24,8 @@ save_feeds = [
     'ADA_USD',
     'BTC_USD',
     'BTC_ETH',
+    'FRAX_USD',
+    'LUSD_USD',
 ]
 
 
