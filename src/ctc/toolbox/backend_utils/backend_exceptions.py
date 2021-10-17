@@ -1,0 +1,4 @@
+
+class ScrapeNotFound(Exception):
+    pass
+

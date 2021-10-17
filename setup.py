@@ -13,7 +13,6 @@ setuptools.setup(
         'matplotlib',
         'numpy',
         'pandas',
-        # 'numba',
         'tooltime',
         'toolcache',
         'pyyaml',
