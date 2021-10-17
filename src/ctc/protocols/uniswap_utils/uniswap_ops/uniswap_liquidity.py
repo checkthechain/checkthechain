@@ -2,7 +2,7 @@ import decimal
 
 import numpy as np
 
-from fei.toolbox import validate_utils
+from ctc.toolbox import validate_utils
 
 
 def mint_liquidity(

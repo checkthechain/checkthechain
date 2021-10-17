@@ -1,6 +1,4 @@
-from fei.data import code
-from fei.data import directory
-from fei.data import web3_utils
+from ctc import evm
 
 
 def fetch_uni_v2_pool_state(
@@ -12,22 +10,24 @@ def fetch_uni_v2_pool_state(
     x_price=None,
     y_price=None,
     block=None,
+    normalize=True,
 ):
 
     # balances
-    x_balance = web3_utils.fetch_token_balance_of(
+    x_balance = evm.fetch_token_balance_of(
         token=x_address,
         address=pool_address,
         block=block,
+        normalize=normalize,
     )
-    y_balance = web3_utils.fetch_token_balance_of(
+    y_balance = evm.fetch_token_balance_of(
         token=y_address,
         address=pool_address,
         block=block,
+        normalize=normalize,
     )
-    lp_token_address = directory.uniswap_v2_pools[x_name + '_' + y_name]
-    lp_tokens = web3_utils.fetch_token_total_supply(
-        lp_token_address, block=block
+    lp_tokens = evm.fetch_token_total_supply(
+        pool_address, block=block, normalize=normalize
     )
 
     state = {
@@ -63,51 +63,54 @@ def fetch_swaps(
     blocks_per_chunk=2000,
     add_from_address=True,
 ):
-    if abi is None:
-        abi = code.fetch_abi(address)
 
-    # fetch events
-    swaps = web3_utils.fetch_events_as_chunks(
-        contract_address=address,
-        contract_name=None,
-        contract_abi=abi,
-        event_name='Swap',
-        start_block=start_block,
-        end_block=end_block,
-        blocks_per_chunk=blocks_per_chunk,
-        parallel_kwargs=parallel_kwargs,
-    )
+    raise NotImplementedError()
 
-    # rescale
-    swaps['arg__amount0In'] /= 10 ** x_decimals
-    swaps['arg__amount0Out'] /= 10 ** x_decimals
-    swaps['arg__amount1In'] /= 10 ** y_decimals
-    swaps['arg__amount1Out'] /= 10 ** y_decimals
+    # if abi is None:
+    #     abi = code.fetch_abi(address)
 
-    # compute price
-    sell_mask = swaps['arg__amount0In'] != 0
-    buy_mask = swaps['arg__amount1In'] != 0
-    swaps['sell_price'] = (
-        swaps[sell_mask]['arg__amount1Out'] / swaps[sell_mask]['arg__amount0In']
-    )
-    swaps['buy_price'] = (
-        swaps[buy_mask]['arg__amount1In'] / swaps[buy_mask]['arg__amount0Out']
-    )
-    swaps['price'] = swaps['sell_price'].add(swaps['buy_price'], fill_value=0)
+    # # fetch events
+    # swaps = web3_utils.fetch_events_as_chunks(
+    #     contract_address=address,
+    #     contract_name=None,
+    #     contract_abi=abi,
+    #     event_name='Swap',
+    #     start_block=start_block,
+    #     end_block=end_block,
+    #     blocks_per_chunk=blocks_per_chunk,
+    #     parallel_kwargs=parallel_kwargs,
+    # )
 
-    # add from_address
-    if add_from_address:
-        transaction_hashes = list(set(swaps['transaction_hash'].values))
-        transactions = web3_utils.fetch_transaction(
-            transaction_hashes=transaction_hashes,
-            parallel_kwargs=parallel_kwargs,
-        )
-        hash_to_transaction = dict(zip(transaction_hashes, transactions))
-        from_addresses = []
-        for transaction_hash in swaps['transaction_hash'].values:
-            from_address = hash_to_transaction[transaction_hash]['from']
-            from_addresses.append(from_address)
-        swaps['from_address'] = from_addresses
+    # # rescale
+    # swaps['arg__amount0In'] /= 10 ** x_decimals
+    # swaps['arg__amount0Out'] /= 10 ** x_decimals
+    # swaps['arg__amount1In'] /= 10 ** y_decimals
+    # swaps['arg__amount1Out'] /= 10 ** y_decimals
 
-    return swaps
+    # # compute price
+    # sell_mask = swaps['arg__amount0In'] != 0
+    # buy_mask = swaps['arg__amount1In'] != 0
+    # swaps['sell_price'] = (
+    #     swaps[sell_mask]['arg__amount1Out'] / swaps[sell_mask]['arg__amount0In']
+    # )
+    # swaps['buy_price'] = (
+    #     swaps[buy_mask]['arg__amount1In'] / swaps[buy_mask]['arg__amount0Out']
+    # )
+    # swaps['price'] = swaps['sell_price'].add(swaps['buy_price'], fill_value=0)
+
+    # # add from_address
+    # if add_from_address:
+    #     transaction_hashes = list(set(swaps['transaction_hash'].values))
+    #     transactions = web3_utils.fetch_transaction(
+    #         transaction_hashes=transaction_hashes,
+    #         parallel_kwargs=parallel_kwargs,
+    #     )
+    #     hash_to_transaction = dict(zip(transaction_hashes, transactions))
+    #     from_addresses = []
+    #     for transaction_hash in swaps['transaction_hash'].values:
+    #         from_address = hash_to_transaction[transaction_hash]['from']
+    #         from_addresses.append(from_address)
+    #     swaps['from_address'] = from_addresses
+
+    # return swaps
 

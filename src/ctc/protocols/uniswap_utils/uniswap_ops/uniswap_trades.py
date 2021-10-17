@@ -2,7 +2,7 @@ import decimal
 
 import tooltable
 
-from fei.toolbox import validate_utils
+from ctc.toolbox import validate_utils
 import fei.report
 
 from . import uniswap_spec
