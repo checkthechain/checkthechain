@@ -12,7 +12,7 @@ def fetch_token_total_supply(
 ):
 
     try:
-        total_supply = token_calls.token_contract_call(
+        total_supply = token_calls.call_token_contract(
             function='totalSupply',
             token=token,
             contract=contract,
@@ -41,7 +41,7 @@ def fetch_token_balance_of(
 ):
 
     try:
-        token_balance = token_calls.token_contract_call(
+        token_balance = token_calls.call_token_contract(
             function='balanceOf',
             token=token,
             contract=contract,

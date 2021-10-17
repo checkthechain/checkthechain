@@ -33,7 +33,7 @@ def get_token_address(token):
 def fetch_token_decimals(
     token=None, block=None, contract=None, **contract_kwargs
 ):
-    return token_calls.token_contract_call(
+    return token_calls.call_token_contract(
         function='decimals',
         token=token,
         contract=contract,
@@ -44,7 +44,7 @@ def fetch_token_decimals(
 
 @block_utils.parallelize_block_fetching()
 def fetch_token_name(token=None, block=None, contract=None, **contract_kwargs):
-    return token_calls.token_contract_call(
+    return token_calls.call_token_contract(
         function='name',
         token=token,
         contract=contract,
@@ -57,7 +57,7 @@ def fetch_token_name(token=None, block=None, contract=None, **contract_kwargs):
 def fetch_token_symbol(
     token=None, contract=None, block=None, **contract_kwargs
 ):
-    return token_calls.token_contract_call(
+    return token_calls.call_token_contract(
         function='symbol',
         token=token,
         contract=contract,

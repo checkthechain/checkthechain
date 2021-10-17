@@ -3,7 +3,7 @@ from .. import contract_abi_utils
 from .. import token_utils
 
 
-def token_contract_call(
+def call_token_contract(
     function,
     token=None,
     contract=None,
@@ -16,7 +16,7 @@ def token_contract_call(
     if contract is None:
         contract = _get_web3_token_contract(token=token, **contract_kwargs)
 
-    return web3_utils.contract_call(
+    return web3_utils.call_web3_contract(
         contract=contract,
         function=function,
         args=args,
