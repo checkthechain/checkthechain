@@ -1,3 +1,7 @@
+"""this module should be deprecated soon in favor of
+- raw contract_address <-> contract_abi storage
+- raw contract_address <-> contract_name storage
+"""
 import os
 import json
 import requests
@@ -10,7 +14,7 @@ from ctc import directory
 
 def get_named_contract_abi_root():
     config = config_utils.get_config()
-    return os.path.join(config['data_root'], '')
+    return os.path.join(config['evm_root'], 'named_contract_abis')
 
 
 @toolcache.cache('memory')
