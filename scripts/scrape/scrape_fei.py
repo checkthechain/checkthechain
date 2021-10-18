@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from fei.data import etl
-from fei.data import directory
+from ctc import directory
+from ctc.toolbox import etl_utils
 
 token_addresses = [
     directory.token_addresses['FEI'],
@@ -12,12 +12,14 @@ token_addresses = [
 ]
 
 # extract etl data relevant to fei
-etl.extract_token_subsets(
+etl_utils.extract_token_subsets(
     source_view='raw',
     target_view='fei_ecosystem',
     token_addresses=token_addresses,
 )
 
 # extract logs relevant to fei
-etl.export_receipts_and_logs_of_transactions(etl_view='fei_ecosystem')
+etl_utils.export_receipts_and_logs_of_transactions(
+    etl_utils_view='fei_ecosystem',
+)
 

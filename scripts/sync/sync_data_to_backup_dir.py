@@ -2,7 +2,7 @@
 
 import subprocess
 
-from fei import config_utils
+from ctc import config_utils
 
 
 config = config_utils.get_config()

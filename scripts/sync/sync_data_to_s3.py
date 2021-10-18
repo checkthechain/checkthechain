@@ -4,7 +4,7 @@ import argparse
 import os
 import subprocess
 
-from fei import config_utils
+from ctc import config_utils
 
 
 command_template = 'aws s3 sync {local_path} {s3_uri}'

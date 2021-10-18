@@ -2,7 +2,7 @@
 
 import argparse
 
-from fei.data.protocols import chainlink_data
+from ctc.protocols import chainlink_utils
 
 
 parser = argparse.ArgumentParser()
@@ -45,7 +45,7 @@ print()
 for feed in save_feeds:
     print('saving feed:', feed)
     print()
-    chainlink_data.save_feed_to_present(feed=feed, dry=dry)
+    chainlink_utils.save_feed_to_present(feed=feed, dry=dry)
     print()
     print()
 
