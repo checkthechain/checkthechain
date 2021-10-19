@@ -29,11 +29,16 @@ def get_web3_contract(
         raise Exception('unknown contract type')
 
     if contract_abi is None:
-        contract_abi = evm.load_named_contract_abi(
-            contract_address=contract_address,
-            contract_name=contract_name,
-            project=project,
-        )
+        if contract_address is not None:
+            contract_abi = evm.get_contract_abi(
+                contract_address=contract_address,
+            )
+        else:
+            contract_abi = evm.load_named_contract_abi(
+                contract_address=contract_address,
+                contract_name=contract_name,
+                project=project,
+            )
 
     if contract_address is None:
         if contract_name is not None:
