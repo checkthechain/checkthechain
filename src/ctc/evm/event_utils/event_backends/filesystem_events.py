@@ -5,7 +5,10 @@ import pandas as pd
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
 from ctc import config_utils
+from ... import block_utils
 from ... import contract_abi_utils
+from ... import event_abi_utils
+from ... import evm_spec
 
 
 #
@@ -45,13 +48,13 @@ def get_events_filepath(
 
         contract_address = contract_address.lower()
     event_hash = event_hash.lower()
-    subpath = scrape_config.path_templates['events'].format(
+    subpath = evm_spec.filesystem_layout['evm_events_path'].format(
         contract_address=contract_address,
         event_hash=event_hash,
         start_block=start_block,
         end_block=end_block,
     )
-    return os.path.join(scrape_config.get_scrape_root(), subpath)
+    return os.path.join(config_utils.get_config()['evm_root'], subpath)
 
 
 def _event_name_to_event_hash(event_name, contract_address):
@@ -65,7 +68,7 @@ def _event_name_to_event_hash(event_name, contract_address):
         if entry['type'] == 'event' and entry.get('name') == event_name:
             candidates.append(entry)
     if len(candidates) == 1:
-        return code.get_event_hash(event_abi=candidates[0])
+        return event_abi_utils.get_event_hash(event_abi=candidates[0])
     elif len(candidates) > 1:
         raise Exception('found multiple events with name: ' + str(event_name))
     else:
@@ -266,12 +269,22 @@ def get_events_from_filesystem(
             n_bytes = '0'
             n_files = '0'
         print('loading events (' + n_bytes + 'B', 'across', n_files, 'files)')
+        if verbose >= 2:
+            for path in events[event_hash]['paths']:
+                print('-', path)
     for path in events[event_hash]['paths'].keys():
         df = pd.read_csv(path)
         df = df.set_index(['block_number', 'transaction_index', 'log_index'])
         dfs.append(df)
     df = pd.concat(dfs, axis=0)
     df = df.sort_index()
+
+    if start_block == 'latest' or end_block == 'latest':
+        latest_block = block_utils.fetch_latest_block_number()
+        if start_block == 'latest':
+            start_block = latest_block
+        if end_block  == 'latest':
+            end_block = latest_block
 
     if start_block is not None:
         if start_block < events[event_hash]['block_range'][0]:

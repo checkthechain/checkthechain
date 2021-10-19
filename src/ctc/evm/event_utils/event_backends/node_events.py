@@ -13,17 +13,18 @@ def get_events_from_node(
     end_block='latest',
     blocks_per_chunk=2000,
     package_as_dataframe=True,
+    verbose=True,
     **kwargs
 ):
     """see fetch_events() for complete kwarg list"""
-
-    print('getting events from node')
 
     # create chunks
     if start_block == 'latest':
         start_block = block_utils.fetch_latest_block_number()
     if end_block == 'latest':
         end_block = block_utils.fetch_latest_block_number()
+    if verbose:
+        print('getting events from node, block range:', [start_block, end_block])
     if blocks_per_chunk is not None:
         chunks = etl_utils.get_chunks_in_range(
             start_block=start_block,
@@ -42,6 +43,7 @@ def get_events_from_node(
         block_ranges=chunks,
         package_as_dataframe=False,
         contract_abi=contract_abi,
+        verbose=verbose,
         **kwargs
     )
     entries = [
@@ -50,7 +52,13 @@ def get_events_from_node(
 
     # package as dataframe
     if package_as_dataframe:
-        entries = _package_exported_events(entries)
+        entries = _package_exported_events(
+            entries,
+            contract_address=kwargs.get('contract_address'),
+            contract_abi=kwargs.get('contract_abi'),
+            event_hash=kwargs.get('event_hash'),
+            event_name=kwargs.get('event_name'),
+        )
 
     return entries
 
@@ -64,12 +72,12 @@ def _get_chunk_of_events_from_node(
     end_block=None,
     event_name=None,
     event_hash=None,
-    contract=None,
     contract_address=None,
     contract_abi=None,
     contract_name=None,
     project=None,
     package_as_dataframe=True,
+    verbose=None,
 ):
     if contract_abi is None:
         contract_abi = contract_abi_utils.get_contract_abi(
@@ -77,20 +85,21 @@ def _get_chunk_of_events_from_node(
         )
 
     # create contract
-    if contract is None:
-        contract = web3_utils.get_contract(
-            contract_address=contract_address,
-            contract_abi=contract_abi,
-            contract_name=contract_name,
-            project=project,
-        )
+    contract = web3_utils.get_web3_contract(
+        contract_address=contract_address,
+        contract_abi=contract_abi,
+        contract_name=contract_name,
+        project=project,
+    )
 
-        # create event_filter
+    # create event_filter
     if event_name is None and event_hash is None:
         raise Exception('must specify event_name or event_hash')
     if event_name is None:
         event_name = event_abi_utils.get_event_abi(
-            event_hash=event_hash, contract_abi=contract_abi
+            event_hash=event_hash,
+            contract_abi=contract_abi,
+            contract_address=contract_address,
         )['name']
     if start_block is None and end_block is None:
         start_block, end_block = block_range
@@ -105,16 +114,28 @@ def _get_chunk_of_events_from_node(
 
     # package data into dataframe
     if package_as_dataframe:
-        entries = _package_exported_events(entries)
+        entries = _package_exported_events(
+            entries,
+            contract_abi=contract_abi,
+            event_hash=event_hash,
+            event_name=event_name,
+        )
 
     return entries
 
 
-def _package_exported_events(entries):
+def _package_exported_events(
+    entries, contract_address, contract_abi, event_hash, event_name
+):
 
     # TODO: return empty dataframe instead
     if len(entries) == 0:
-        return None
+        return create_empty_event_dataframe(
+            contract_address=contract_address,
+            contract_abi=contract_abi,
+            event_hash=event_hash,
+            event_name=event_name,
+        )
 
     formatted_entries = []
     for entry in entries:
@@ -132,6 +153,43 @@ def _package_exported_events(entries):
         formatted_entries.append(formatted_entry)
 
     df = pd.DataFrame(formatted_entries)
+    df = df.set_index(['block_number', 'transaction_index', 'log_index'])
+
+    return df
+
+
+def create_empty_event_dataframe(
+    *,
+    event_abi=None,
+    contract_address=None,
+    contract_abi=None,
+    event_hash=None,
+    event_name=None
+):
+
+    # standard columns
+    columns = [
+        'block_number',
+        'transaction_index',
+        'log_index',
+        'block_hash',
+        'transaction_hash',
+        'contract_address',
+        'event_name',
+    ]
+
+    # event-specific columns
+    if event_abi is None:
+        event_abi = event_abi_utils.get_event_abi(
+            contract_address=contract_address,
+            contract_abi=contract_abi,
+            event_hash=event_hash,
+            event_name=event_name,
+        )
+    for item in event_abi['inputs']:
+        columns.append('arg__' + item['name'])
+
+    df = pd.DataFrame(columns=columns)
     df = df.set_index(['block_number', 'transaction_index', 'log_index'])
 
     return df

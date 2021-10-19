@@ -1,4 +1,4 @@
 
-class ScrapeNotFound(Exception):
+class DataNotFound(Exception):
     pass
 

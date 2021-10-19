@@ -1,6 +1,7 @@
 from ctc.toolbox import backend_utils
 from .event_backends import filesystem_events
 from .event_backends import node_events
+from .. import block_utils
 
 
 def get_backend_functions():
@@ -43,7 +44,15 @@ def download_events(
     contract_address,
     event_hash=None,
     event_name=None,
+    verbose=True,
 ):
+
+    if start_block == 'latest' or end_block == 'latest':
+        latest_block = block_utils.fetch_latest_block_number()
+        if start_block == 'latest':
+            start_block = latest_block
+        if end_block == 'latest':
+            end_block = latest_block
 
     # get event hash
     if event_hash is None:
@@ -61,17 +70,20 @@ def download_events(
         download = {'start_block': start_block, 'end_block': end_block}
         downloads.append(download)
     else:
+
         block_range = listed_events[event_hash]['block_range']
         if start_block < block_range[0]:
             download = {
                 'start_block': start_block,
                 'end_block': block_range[0] - 1,
+                'common_kwargs': {'verbose': verbose},
             }
             downloads.append(download)
         if end_block > block_range[-1]:
             download = {
                 'start_block': block_range[-1] + 1,
                 'end_block': end_block,
+                'common_kwargs': {'verbose': verbose},
             }
             downloads.append(download)
 
