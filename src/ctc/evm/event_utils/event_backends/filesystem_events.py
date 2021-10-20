@@ -15,6 +15,7 @@ from ... import evm_spec
 # # paths
 #
 
+
 def get_events_root():
     config = config_utils.get_config()
     return os.path.join(config['evm_root'], 'events')
@@ -92,7 +93,7 @@ def list_events_contracts():
     return contracts
 
 
-def list_events(
+def list_contract_events(
     contract_address,
     event_hash=None,
     event_name=None,
@@ -147,14 +148,14 @@ def list_events(
         block_mask = np.zeros(n_blocks)
         for path, (start_block, end_block) in paths[event_hash].items():
             start_index = start_block - min_block
-            end_index = n_blocks - (max_block - end_block)
+            end_index = n_blocks - (max_block - end_block) + 1
             block_mask[start_index:end_index] += 1
         if (block_mask > 1).sum() > 0:
             raise Exception('overlapping chunks')
         block_mask = block_mask.astype(bool)
 
         # check if blocks missing
-        missing_blocks = block_mask.sum() == n_blocks
+        missing_blocks = block_mask.sum() != n_blocks
         if missing_blocks and not allow_missing_blocks:
             raise Exception('missing blocks')
 
@@ -168,10 +169,32 @@ def list_events(
     return events
 
 
+def list_events(
+    contract_address,
+    event_hash=None,
+    event_name=None,
+    allow_missing_blocks=False,
+):
+    if event_hash is None and event_name is None:
+        raise Exception('must specify either event_hash or event_name')
+
+    contract_events = list_contract_events(
+        contract_address=contract_address,
+        event_hash=event_hash,
+        event_name=event_name,
+        allow_missing_blocks=allow_missing_blocks,
+    )
+    if len(contract_events) == 1:
+        event_hash = list(contract_events.keys())[0]
+        return contract_events[event_hash]
+    else:
+        return None
+
+
 def list_contracts_events(**kwargs):
     contracts_events = {}
     for contract_address in list_events_contracts():
-        contracts_events[contract_address] = list_events(
+        contracts_events[contract_address] = list_contract_events(
             contract_address=contract_address, **kwargs
         )
     return contracts_events
@@ -256,7 +279,7 @@ def get_events_from_filesystem(
             event_name=event_name,
             contract_address=contract_address,
         )
-    events = list_events(
+    events = list_contract_events(
         contract_address=contract_address,
         event_hash=event_hash,
     )
@@ -287,7 +310,7 @@ def get_events_from_filesystem(
         latest_block = block_utils.fetch_latest_block_number()
         if start_block == 'latest':
             start_block = latest_block
-        if end_block  == 'latest':
+        if end_block == 'latest':
             end_block = latest_block
 
     if start_block is not None:

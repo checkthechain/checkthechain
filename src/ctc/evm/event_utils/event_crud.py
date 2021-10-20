@@ -46,6 +46,8 @@ def download_events(
     event_name=None,
     verbose=True,
 ):
+    if event_hash is None and event_name is None:
+        raise Exception('must specify either event_hash or event_name')
 
     contract_address = contract_address.lower()
 
@@ -68,12 +70,12 @@ def download_events(
         event_hash=event_hash,
     )
     downloads = []
-    if event_hash not in listed_events:
+    if listed_events is None:
         download = {'start_block': start_block, 'end_block': end_block}
         downloads.append(download)
     else:
 
-        block_range = listed_events[event_hash]['block_range']
+        block_range = listed_events['block_range']
         if start_block < block_range[0]:
             download = {
                 'start_block': start_block,
