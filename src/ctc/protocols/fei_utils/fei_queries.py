@@ -1,7 +1,7 @@
-from fei.data import directory
-from fei.data import web3_utils
-from .. import chainlink_data
-from .. import uniswap_data
+from ctc import directory
+from ctc import evm
+from ctc.protocols import chainlink_utils
+from ctc.protocols import uniswap_utils
 
 # see https://github.com/fei-protocol/fei-app/blob/master/src/providers/ethereum/feiProtocolWatcher.js
 
@@ -10,10 +10,10 @@ from .. import uniswap_data
 # # pcv holdings
 #
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_pcv_uniswap_balance(block=None, **kwargs):
     address = directory.get_fei_address('EthUniswapPCVDeposit', block=block)
-    lp_tokens = web3_utils.fetch_token_balance_of(
+    lp_tokens = evm.fetch_token_balance_of(
         token=directory.uniswap_v2_pools['FEI_ETH'],
         address=address,
         block=block,
@@ -22,37 +22,37 @@ def fetch_pcv_uniswap_balance(block=None, **kwargs):
     return {'lp_tokens': lp_tokens}
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_reserve_stabilizer_balance(block=None, **kwargs):
     address = directory.get_fei_address('EthReserveStabilizer', block=block)
-    return web3_utils.fetch_eth_balance(address, block=block, **kwargs)
+    return evm.fetch_eth_balance(address, block=block, **kwargs)
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_dripper_balance(block=None, **kwargs):
     address = directory.get_fei_address('EthPCVDripper', block=block)
-    return web3_utils.fetch_eth_balance(address, block=block, **kwargs)
+    return evm.fetch_eth_balance(address, block=block, **kwargs)
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_bonding_curve_balance(block=None, **kwargs):
     address = directory.get_fei_address('EthBondingCurve', block=block)
-    return web3_utils.fetch_eth_balance(address, block=block, **kwargs)
+    return evm.fetch_eth_balance(address, block=block, **kwargs)
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_pcv_steth_usd(block=None):
-    pcv_steth = web3_utils.fetch_token_balance_of(
+    pcv_steth = evm.fetch_token_balance_of(
         address=directory.get_fei_address('EthLidoPCVDeposit'),
         token='stETH',
         block=block,
     )
     # approximate using ETH price
-    steth_price_usd = chainlink_data.fetch_eth_price(block=block)
+    steth_price_usd = chainlink_utils.fetch_eth_price(block=block)
     return pcv_steth * steth_price_usd
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_pcv_holdings(asset, block=None):
 
     # some values hardcoded for now, around block 13102065
@@ -64,7 +64,7 @@ def fetch_pcv_holdings(asset, block=None):
         raise NotImplementedError()
 
     elif asset == 'stETH':
-        return web3_utils.fetch_token_balance_of(
+        return evm.fetch_token_balance_of(
             address=directory.get_fei_address('EthLidoPCVDeposit'),
             token='stETH',
             block=block,
@@ -93,36 +93,36 @@ def fetch_pcv_holdings(asset, block=None):
 #
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_fei_price(block=None, **kwargs):
     kwargs.update({'block': block, 'format': 'answer'})
     kwargs.setdefault('normalize', True)
-    usd_per_eth = chainlink_data.fetch_feed_datum('ETH_USD', **kwargs)
-    eth_per_fei = chainlink_data.fetch_feed_datum('FEI_ETH', **kwargs)
+    usd_per_eth = chainlink_utils.fetch_feed_datum('ETH_USD', **kwargs)
+    eth_per_fei = chainlink_utils.fetch_feed_datum('FEI_ETH', **kwargs)
     return usd_per_eth * eth_per_fei
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_tribe_price(block=None, **kwargs):
     kwargs.update({'block': block, 'format': 'answer'})
     kwargs.setdefault('normalize', True)
-    usd_per_eth = chainlink_data.fetch_feed_datum('ETH_USD', **kwargs)
-    eth_per_tribe = chainlink_data.fetch_feed_datum('TRIBE_ETH', **kwargs)
+    usd_per_eth = chainlink_utils.fetch_feed_datum('ETH_USD', **kwargs)
+    eth_per_tribe = chainlink_utils.fetch_feed_datum('TRIBE_ETH', **kwargs)
     return usd_per_eth * eth_per_tribe
 
 
-@web3_utils.parallelize_block_fetching()
+@evm.parallelize_block_fetching()
 def fetch_rari_protocol_owned_fei(block=None):
-    protocol_pool_tokens = web3_utils.fetch_token_balance_of(
+    protocol_pool_tokens = evm.fetch_token_balance_of(
         address=directory.get_fei_address('Fei DAO Timelock'),
         token=directory.rari_pool_tokens['pool_8__FEI'],
         block=block,
     )
-    total_pool_tokens = web3_utils.fetch_token_total_supply(
+    total_pool_tokens = evm.fetch_token_total_supply(
         token=directory.rari_pool_tokens['pool_8__FEI'],
         block=block,
     )
-    pool_fei = web3_utils.fetch_token_balance_of(
+    pool_fei = evm.fetch_token_balance_of(
         address=directory.rari_pool_tokens['pool_8__FEI'],
         token='FEI',
         block=block,
@@ -133,7 +133,7 @@ def fetch_rari_protocol_owned_fei(block=None):
         return protocol_pool_tokens / total_pool_tokens * pool_fei
 
 
-@web3_utils.parallelize_block_fetching(config={'to_dict_of_lists': True})
+@evm.parallelize_block_fetching(config={'to_dict_of_lists': True})
 def fetch_fei_metrics(block=None):
 
     weth_address = directory.token_addresses['WETH']
@@ -141,20 +141,20 @@ def fetch_fei_metrics(block=None):
     tribe_address = directory.token_addresses['TRIBE']
 
     # supply
-    fei_total_supply = web3_utils.fetch_token_total_supply(
+    fei_total_supply = evm.fetch_token_total_supply(
         fei_address, block=block
     )
-    tribe_total_supply = web3_utils.fetch_token_total_supply(
+    tribe_total_supply = evm.fetch_token_total_supply(
         tribe_address, block=block
     )
 
     # oracle prices
-    eth_price = chainlink_data.fetch_eth_price(block=block)
+    eth_price = chainlink_utils.fetch_eth_price(block=block)
     fei_price = None
     tribe_price = None
 
     # uni pool stats
-    uni_v2__fei_eth = uniswap_data.fetch_uni_v2_pool_state(
+    uni_v2__fei_eth = uniswap_utils.fetch_uni_v2_pool_state(
         pool_address=directory.uniswap_v2_pools['FEI_ETH'],
         x_name='FEI',
         x_address=fei_address,
@@ -164,7 +164,7 @@ def fetch_fei_metrics(block=None):
         y_price=eth_price,
         block=block,
     )
-    uni_v2__fei_tribe = uniswap_data.fetch_uni_v2_pool_state(
+    uni_v2__fei_tribe = uniswap_utils.fetch_uni_v2_pool_state(
         pool_address=directory.uniswap_v2_pools['FEI_TRIBE'],
         x_name='FEI',
         x_address=fei_address,

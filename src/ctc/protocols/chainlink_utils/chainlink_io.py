@@ -3,11 +3,11 @@ import os
 import numpy as np
 import pandas
 
-from fei import config_utils
-from fei.data import directory
-from fei.data import web3_utils
-from fei.data.etl import etl_list
-from fei.data.storage import s3_utils
+from ctc import config_utils
+from ctc import directory
+from ctc import evm
+from ctc.toolbox.etl_utils import etl_list
+from ctc.toolbox import s3_utils
 from . import chainlink_fetch
 from . import chainlink_helpers
 from . import chainlink_spec
@@ -61,7 +61,7 @@ def save_feed_to_present(
             start_block = int(np.ceil(first_block / chunk_size) * chunk_size)
 
     # get new block range
-    current_block = web3_utils.fetch_latest_block_number()
+    current_block = evm.fetch_latest_block_number()
     end_block = int(current_block / chunk_size) * chunk_size - 1
 
     save_feed_as_chunks(
@@ -185,7 +185,7 @@ def load_feed_data(feed):
 
 def get_chainlink_root():
     return os.path.join(
-        config_utils.get_config()['data_root'], 'protocols/chainlink',
+        config_utils.get_config()['data_root'], 'mainnet/protocols/chainlink',
     )
 
 

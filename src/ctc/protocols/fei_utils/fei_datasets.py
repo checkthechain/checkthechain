@@ -1,8 +1,8 @@
 import pandas as pd
 
-from fei.data import code
-from fei.data import directory
-from fei.data import etl
+from ctc import evm
+from ctc import directory
+from ctc.toolbox import etl_utils
 
 
 def load_fei_transactions(**load_kwargs):
@@ -25,11 +25,11 @@ def load_fei_etl(
     should really move all of this functionality into etl.load_data()
     """
 
-    export_list = etl.list_exported_data(
+    export_list = etl_utils.list_exported_data(
         rowtype, etl_view='fei_ecosystem', **load_kwargs
     )
 
-    df = etl.load_data(
+    df = etl_utils.load_data(
         rowtype,
         etl_view='fei_ecosystem',
         start_block=export_list['start_block'],
@@ -38,11 +38,11 @@ def load_fei_etl(
     )
 
     if format_values:
-        etl.format_raw_dataframe(
+        etl_utils.format_raw_dataframe(
             df, convert_to_type='decimal', rescale_factor=1e18,
         )
         if rowtype == 'logs':
-            df = etl.format_log_dataframe(df)
+            df = etl_utils.format_log_dataframe(df)
 
     if block_timestamps is not None:
         timestamps = pd.Series(block_timestamps)[df['block_number']].values
@@ -86,7 +86,7 @@ def get_bonding_curve_data(token, logs=None, include_genesis=False):
         raise Exception('unknown bonding curve: ' + str(token))
 
     # filter events
-    df = code.filter_events(
+    df = evm.filter_events(
         event_name='Purchase',
         contract_name=contract_name,
         protocol='fei',

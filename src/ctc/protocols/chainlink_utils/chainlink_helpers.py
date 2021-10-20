@@ -2,7 +2,7 @@ import eth_abi
 import numpy as np
 import web3
 
-from fei.data import web3_utils
+from ctc import evm
 from . import chainlink_fetch
 
 
@@ -19,7 +19,7 @@ def find_feed_first_block(
     if start_search is None:
         start_search = 0
     if end_search is None:
-        end_search = web3_utils.fetch_latest_block_number()
+        end_search = evm.fetch_latest_block_number()
 
     kwargs = {
         'feed': feed,

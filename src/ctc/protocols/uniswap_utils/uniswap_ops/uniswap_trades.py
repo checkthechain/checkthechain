@@ -1,9 +1,9 @@
 import decimal
 
 import tooltable
+import toolstr
 
 from ctc.toolbox import validate_utils
-import fei.report
 
 from . import uniswap_spec
 
@@ -141,7 +141,11 @@ def trade_to_target_reserves(
 
 
 def trade_to_price(
-    x_reserves, y_reserves, new_x_per_y=None, new_y_per_x=None, fee_rate=None,
+    x_reserves,
+    y_reserves,
+    new_x_per_y=None,
+    new_y_per_x=None,
+    fee_rate=None,
 ):
     """compute trade required to reach specific price"""
 
@@ -178,7 +182,10 @@ def trade_to_price(
 
 
 def compute_x_sold_to_reach_price(
-    x_reserves, y_reserves, new_x_per_y, fee_rate=None,
+    x_reserves,
+    y_reserves,
+    new_x_per_y,
+    fee_rate=None,
 ):
     """use quadratic formula to find trade size needed to reach new price
 
@@ -211,7 +218,10 @@ def compute_y_bought_when_x_sold(x_sold, x_reserves, y_reserves, fee_rate=None):
 
 
 def compute_x_sold_when_y_bought(
-    y_bought, x_reserves, y_reserves, fee_rate=None,
+    y_bought,
+    x_reserves,
+    y_reserves,
+    fee_rate=None,
 ):
     """compute amount of x that must be sold to buy y_bought amount of y"""
     if fee_rate is None:
@@ -247,20 +257,20 @@ def report_trade_summary(
     x_sold = trade_summary['trade_results']['x_sold']
     y_sold = trade_summary['trade_results']['y_sold']
 
-    indent = fei.report.indent_to_str(indent=indent)
+    indent = toolstr.indent_to_str(indent=indent)
 
     if x_sold == 0:
         print(indent + 'trade size of 0')
     elif x_sold > 0:
-        print(indent + '-', x_name, 'sold:', fei.report.amount_to_str(x_sold))
-        print(indent + '-', y_name, 'bought:', fei.report.amount_to_str(-y_sold))
+        print(indent + '-', x_name, 'sold:', toolstr.format(x_sold))
+        print(indent + '-', y_name, 'bought:', toolstr.format(-y_sold))
         fees = trade_summary['x_fees']
-        print(indent + '- fees:', fei.report.amount_to_str(fees), x_name)
+        print(indent + '- fees:', toolstr.format(fees), x_name)
     else:
-        print(indent + '-', x_name, 'bought:', fei.report.amount_to_str(-x_sold))
-        print(indent + '-', y_name, 'sold:', fei.report.amount_to_str(y_sold))
+        print(indent + '-', x_name, 'bought:', toolstr.format(-x_sold))
+        print(indent + '-', y_name, 'sold:', toolstr.format(y_sold))
         fees = trade_summary['y_fees']
-        print(indent + '- fees:', fei.report.amount_to_str(fees), y_name)
+        print(indent + '- fees:', toolstr.format(fees), y_name)
     print(indent + '- prices:')
     headers = [
         '',
@@ -273,24 +283,20 @@ def report_trade_summary(
     rows = []
     row = [
         x_name + ' / ' + y_name,
-        fei.report.price_to_str(trade_summary['mean_x_per_y']),
-        fei.report.price_to_str(trade_summary['x_per_y_start']),
-        fei.report.price_to_str(trade_summary['x_per_y_end']),
-        fei.report.signed_percent_to_str(
-            trade_summary['mean_slippage_x_per_y']
-        ),
-        fei.report.signed_percent_to_str(trade_summary['end_slippage_x_per_y']),
+        toolstr.format(trade_summary['mean_x_per_y']),
+        toolstr.format(trade_summary['x_per_y_start']),
+        toolstr.format(trade_summary['x_per_y_end']),
+        toolstr.format(trade_summary['mean_slippage_x_per_y']),
+        toolstr.format(trade_summary['end_slippage_x_per_y']),
     ]
     rows.append(row)
     row = [
         y_name + ' / ' + x_name,
-        fei.report.price_to_str(trade_summary['mean_y_per_x']),
-        fei.report.price_to_str(trade_summary['y_per_x_start']),
-        fei.report.price_to_str(trade_summary['y_per_x_end']),
-        fei.report.signed_percent_to_str(
-            trade_summary['mean_slippage_y_per_x']
-        ),
-        fei.report.signed_percent_to_str(trade_summary['end_slippage_y_per_x']),
+        toolstr.format(trade_summary['mean_y_per_x']),
+        toolstr.format(trade_summary['y_per_x_start']),
+        toolstr.format(trade_summary['y_per_x_end']),
+        toolstr.format(trade_summary['mean_slippage_y_per_x']),
+        toolstr.format(trade_summary['end_slippage_y_per_x']),
     ]
     rows.append(row)
     print()
@@ -309,15 +315,15 @@ def report_trade_summary(
     rows = [
         [
             x_name,
-            fei.report.amount_to_str(trade_kwargs['x_reserves']),
-            fei.report.amount_to_str(new_x_reserves),
-            fei.report.signed_percent_to_str(x_change),
+            toolstr.format(trade_kwargs['x_reserves']),
+            toolstr.format(new_x_reserves),
+            toolstr.format(x_change),
         ],
         [
             y_name,
-            fei.report.amount_to_str(trade_kwargs['y_reserves']),
-            fei.report.amount_to_str(new_y_reserves),
-            fei.report.signed_percent_to_str(y_change),
+            toolstr.format(trade_kwargs['y_reserves']),
+            toolstr.format(new_y_reserves),
+            toolstr.format(y_change),
         ],
     ]
     tooltable.print_table(

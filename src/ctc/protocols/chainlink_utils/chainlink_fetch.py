@@ -6,11 +6,11 @@
 
 import numpy as np
 import pandas
+import toolparallel
 
-from fei.data import code
-from fei.data import directory
-from fei.data import web3_utils
-from fei.toolbox import parallel_utils
+from ctc import directory
+from ctc import evm
+from ctc.toolbox import web3_utils
 
 
 aggregator_outputs = [
@@ -28,19 +28,19 @@ def fetch_feed_datum(
 ):
 
     if block is None:
-        block = web3_utils.fetch_latest_block_number()
+        block = evm.fetch_latest_block_number()
     if normalize is None:
         normalize = True
     if format is None:
         format = 'dict'
     if feed in directory.chainlink_feeds:
         feed = directory.chainlink_feeds[feed]
-    if not web3_utils.is_address_str(feed):
+    if not evm.is_address_str(feed):
         raise Exception('invalid address: ' + str(feed))
 
     raw = web3_utils.contract_call(
         contract=feed,
-        abi=code.load_abi(
+        abi=evm.load_named_abi(
             contract_name='AggregatorV3Interface', project='chainlink'
         ),
         function='latestRoundData',
@@ -84,7 +84,7 @@ def fetch_feed_data(
         parallel_kwargs = {}
 
     common = dict(contract_kwargs, feed=feed, format='full')
-    results = parallel_utils.parallel_map(
+    results = toolparallel.parallel_map(
         fetch_feed_datum,
         arg_list=blocks,
         arg_name='block',

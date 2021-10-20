@@ -3,14 +3,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import fei.report
-from fei.data import etl
+import toolplot
+
+from ctc.toolbox import etl_utils
 
 
 def plot_bonding_curve_summary(df, block_timestamps=None, token_name=None):
 
     if block_timestamps is None:
-        block_timestamps = etl.load_block_timestamps()
+        block_timestamps = etl_utils.load_block_timestamps()
 
     plot_bonding_curve_size_distribution(df, token_name=token_name)
     plt.show()
@@ -45,7 +46,7 @@ def plot_bonding_curve_size_distribution(df, token_name=None):
 def plot_bonding_curve_purchases_over_time(df, token_name=None):
     ai = _get_amount_in_series(df)
     plt.plot(ai / 1e18, 'xg', alpha=0.5)
-    fei.report.format_xticks_as_blocks()
+    toolplot.format_xticks_as_blocks()
     if token_name is None:
         token_name = 'Token'
     plt.ylabel(token_name + ' in')
@@ -56,8 +57,8 @@ def plot_bonding_curve_purchases_over_time(df, token_name=None):
 def plot_bonding_curve_cummulative_total(df, token_name=None):
     ai = _get_amount_in_series(df)
     plt.plot(np.cumsum(ai) / 1e18, 'g')
-    fei.report.format_xticks_as_blocks()
-    fei.report.format_yticks_as_numbers()
+    toolplot.format_xticks_as_blocks()
+    toolplot.format_yticks_as_numbers()
     if token_name is None:
         token_name = 'token',
     plt.ylabel('cummulative ' + token_name)
@@ -84,8 +85,8 @@ def plot_bonding_curve_by_day(df, block_timestamps=None, token_name=None):
     f = df.copy()
 
     kwargs = {'block_timestamps': block_timestamps}
-    f['datetime'] = etl.create_block_datetime_column(f, **kwargs)
-    f['date'] = etl.create_block_date_column(f, **kwargs)
+    f['datetime'] = etl_utils.create_block_datetime_column(f, **kwargs)
+    f['date'] = etl_utils.create_block_date_column(f, **kwargs)
 
     if 'amountIn' in f:
         f['amountIn'] = f['amountIn'].astype(float)
@@ -93,13 +94,13 @@ def plot_bonding_curve_by_day(df, block_timestamps=None, token_name=None):
         f['_amountIn'] = f['_amountIn'].astype(float)
     amount_in_series = _get_amount_in_series(f.groupby('date').sum())
 
-    bonding_curve_by_day = etl.add_missing_series_dates(
+    bonding_curve_by_day = etl_utils.add_missing_series_dates(
         amount_in_series,
         f['datetime'],
     )
 
     plt.plot(bonding_curve_by_day / 1e18, '.-g', markersize=10)
-    fei.report.format_yticks_as_numbers()
+    toolplot.format_yticks_as_numbers()
     plt.xticks(rotation=-90)
     plt.xlabel('day')
     if token_name is None:
@@ -113,8 +114,8 @@ def plot_bonding_curve_by_week(df, block_timestamps=None, token_name=None):
     f = df.copy()
 
     kwargs = {'block_timestamps': block_timestamps}
-    f['datetime'] = etl.create_block_datetime_column(f, **kwargs)
-    f['week'] = etl.create_block_week_column(f, **kwargs)
+    f['datetime'] = etl_utils.create_block_datetime_column(f, **kwargs)
+    f['week'] = etl_utils.create_block_week_column(f, **kwargs)
 
     if 'amountIn' in f:
         f['amountIn'] = f['amountIn'].astype(float)
@@ -122,13 +123,13 @@ def plot_bonding_curve_by_week(df, block_timestamps=None, token_name=None):
         f['_amountIn'] = f['_amountIn'].astype(float)
     amount_in_series = _get_amount_in_series(f.groupby('week').sum())
 
-    bonding_curve_by_week = etl.add_missing_series_weeks(
+    bonding_curve_by_week = etl_utils.add_missing_series_weeks(
         amount_in_series,
         f['datetime'],
     )
 
     plt.plot(bonding_curve_by_week / 1e18, '.-g', markersize=10)
-    fei.report.format_yticks_as_numbers()
+    toolplot.format_yticks_as_numbers()
     plt.xticks(rotation=-90)
     plt.xlabel('week')
     if token_name is None:

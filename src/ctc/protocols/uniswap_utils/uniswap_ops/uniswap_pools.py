@@ -1,6 +1,6 @@
+import toolstr
 import tooltable
 
-import fei.report
 from . import uniswap_trades
 
 
@@ -21,12 +21,12 @@ def report_pool_summary(
     if y_name is None:
         y_name = 'Y'
 
-    indent = fei.report.indent_to_str(indent)
+    indent = toolstr.indent_to_str(indent)
 
-    print(indent + '- ' + x_name + ' reserves:', fei.report.amount_to_str(x_reserves))
-    print(indent + '- ' + y_name + ' reserves:', fei.report.amount_to_str(y_reserves))
+    print(indent + '- ' + x_name + ' reserves:', toolstr.format(x_reserves))
+    print(indent + '- ' + y_name + ' reserves:', toolstr.format(y_reserves))
     if lp_total_supply is not None:
-        print(indent + '- total lp tokens:', fei.report.amount_to_str(lp_total_supply))
+        print(indent + '- total lp tokens:', toolstr.format(lp_total_supply))
     print(indent + '-', x_name, '/', y_name + ' price:', '%.6f' % (x_reserves / y_reserves))
     print(indent + '-', y_name, '/', x_name + ' price:', '%.6f' % (y_reserves / x_reserves))
     print(indent + '-', x_name + ' / ' + y_name, 'liquidity depth:')
@@ -91,7 +91,7 @@ def report_liquidity_depth(
 
         # new price
         new_x_per_y = type(current_x_per_y)(1 + depth) * current_x_per_y
-        trade.append(fei.report.price_to_str(new_x_per_y))
+        trade.append(toolstr.format(new_x_per_y))
         trade[-1] = trade[-1] + ' ' + x_name + ' / ' + y_name
 
         # buys and sells
@@ -112,6 +112,6 @@ def report_liquidity_depth(
             trade.append('none 0.00')
         trades.append(trade)
 
-    indent = ' ' * 4 + fei.report.indent_to_str(indent)
+    indent = ' ' * 4 + toolstr.indent_to_str(indent)
     tooltable.print_table(rows=trades, headers=headers, indent=indent)
 

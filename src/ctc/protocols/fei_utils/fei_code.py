@@ -1,9 +1,9 @@
 import json
 import os
 
-from fei import config_utils
-from fei.data import directory
-from fei.data import web3_utils
+from ctc import config_utils
+from ctc import directory
+from ctc.toolbox import web3_utils
 
 
 # should probably deprecate this code for more general functions
@@ -30,7 +30,7 @@ def contract_call(contract, function, **kwargs):
         contract_address = contract
         contract_name = directory.address_to_fei_name[contract]
 
-    return web3_utils.contract_call(
+    return web3_utils.call_web3_contract(
         contract=contract_address,
         abi=get_fei_abi(contract_name),
         function=function,

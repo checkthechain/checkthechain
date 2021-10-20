@@ -7,7 +7,7 @@ import pandas
 import requests
 import tooltime
 
-from fei import config_utils
+from ctc import config_utils
 
 
 vote_data_file_template = '{name}__{datatype}__{timestamp}.json'
@@ -26,7 +26,7 @@ url_templates = {
 }
 
 choice_names = {
-    'FIP_1': {1: 'no change', 2: '$1.00 / FEI', 3: '$0.90 / FEI',},
+    'FIP_1': {1: 'no change', 2: '$1.00 / FEI', 3: '$0.90 / FEI'},
 }
 
 
