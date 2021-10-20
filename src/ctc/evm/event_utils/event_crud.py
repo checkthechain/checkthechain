@@ -47,6 +47,8 @@ def download_events(
     verbose=True,
 ):
 
+    contract_address = contract_address.lower()
+
     if start_block == 'latest' or end_block == 'latest':
         latest_block = block_utils.fetch_latest_block_number()
         if start_block == 'latest':

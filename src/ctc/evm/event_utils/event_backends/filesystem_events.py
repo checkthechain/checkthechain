@@ -40,14 +40,15 @@ def get_events_event_dir(contract_address, event_hash=None, event_name=None):
 def get_events_filepath(
     contract_address, start_block, end_block, event_hash=None, event_name=None
 ):
+    contract_address = contract_address.lower()
+
     if event_hash is None:
         event_hash = _event_name_to_event_hash(
             contract_address=contract_address,
             event_name=event_name,
         )
-
-        contract_address = contract_address.lower()
     event_hash = event_hash.lower()
+
     subpath = evm_spec.filesystem_layout['evm_events_path'].format(
         contract_address=contract_address,
         event_hash=event_hash,
@@ -97,6 +98,7 @@ def list_events(
     event_name=None,
     allow_missing_blocks=False,
 ):
+    contract_address = contract_address.lower()
 
     query_event_hash = None
     if event_name is not None:
@@ -220,6 +222,8 @@ def save_events_to_filesystem(
     overwrite=False,
     verbose=True,
 ):
+    contract_address = contract_address.lower()
+
     # compute path
     path = get_events_filepath(
         contract_address=contract_address,
