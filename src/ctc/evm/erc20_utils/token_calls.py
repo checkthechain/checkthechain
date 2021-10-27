@@ -2,7 +2,6 @@ from ctc import directory
 from ctc.toolbox import web3_utils
 from .. import address_utils
 from .. import contract_abi_utils
-from .. import token_utils
 
 
 def call_token_contract(
@@ -42,7 +41,7 @@ def _get_web3_token_contract(
         )
 
     return web3_utils.get_web3_contract(
-        contract_address=token_utils.get_token_address(token),
+        contract_address=contract_address,
         contract_abi=contract_abi,
         **contract_kwargs
     )
