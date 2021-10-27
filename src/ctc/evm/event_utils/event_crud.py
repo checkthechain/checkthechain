@@ -2,6 +2,7 @@ from ctc.toolbox import backend_utils
 from .event_backends import filesystem_events
 from .event_backends import node_events
 from .. import block_utils
+from .. import contract_utils
 
 
 def get_backend_functions():
@@ -18,6 +19,10 @@ def get_backend_functions():
 
 
 def get_events(**query):
+    if query.get('start_block') == 'contract_start':
+        query['start_block'] = contract_utils.get_contract_creation_block(
+            contract_address=query['contract_address'],
+        )
     backend_order = query.get('backend_order')
     if backend_order is None:
         backend_order = ['filesystem', 'download']
@@ -57,6 +62,10 @@ def download_events(
             start_block = latest_block
         if end_block == 'latest':
             end_block = latest_block
+    if start_block == 'contract_start':
+        start_block = contract_utils.get_contract_creation_block(
+            contract_address=contract_address
+        )
 
     # get event hash
     if event_hash is None:

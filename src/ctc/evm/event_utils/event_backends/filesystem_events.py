@@ -6,6 +6,7 @@ from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
 from ctc import config_utils
 from ... import block_utils
+from ... import contract_utils
 from ... import contract_abi_utils
 from ... import event_abi_utils
 from ... import evm_spec
@@ -274,6 +275,11 @@ def get_events_from_filesystem(
     start_block=None,
     end_block=None,
 ):
+    if start_block == 'contract_start':
+        start_block = contract_utils.get_contract_creation_block(
+            contract_address=contract_address
+        )
+
     if event_hash is None:
         event_hash = _event_name_to_event_hash(
             event_name=event_name,

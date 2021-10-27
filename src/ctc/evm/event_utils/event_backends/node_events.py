@@ -18,6 +18,8 @@ def get_events_from_node(
 ):
     """see fetch_events() for complete kwarg list"""
 
+    blocks_per_chunk = max(100, blocks_per_chunk)
+
     # create chunks
     if start_block == 'latest':
         start_block = block_utils.fetch_latest_block_number()
@@ -64,7 +66,7 @@ def get_events_from_node(
 
 
 @toolparallel.parallelize_input(
-    singular_arg='block_range', plural_arg='block_ranges'
+    singular_arg='block_range', plural_arg='block_ranges', config={'n_workers': 10},
 )
 def _get_chunk_of_events_from_node(
     block_range=None,
