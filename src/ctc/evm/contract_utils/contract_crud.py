@@ -1,5 +1,6 @@
 from ctc.toolbox import search_utils
 from ctc.toolbox import web3_utils
+from .. import address_utils
 from .. import block_utils
 
 
@@ -13,6 +14,7 @@ def get_contract_creation_block(
     algorithm: perform a binary search across blocks, check code bytes in each
     """
 
+    contract_address = address_utils.get_address_checksum(contract_address)
     instance = web3_utils.create_web3_instance()
 
     if start_block == 'latest' or end_block == 'latest':
