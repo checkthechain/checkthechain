@@ -22,16 +22,22 @@ def get_event_abi(
             contract_address=contract_address,
         )
 
+    if event_name is None and event_hash is None:
+        raise Exception('specify event_name or event_hash')
+
     candidates = []
     for item in contract_abi:
         if item['type'] != 'event':
             continue
         if event_name is not None and item.get('name') != event_name:
             continue
-        if event_hash is not None and get_event_hash(item) != event_hash:
-            continue
-        else:
-            raise Exception('specify event_name or event_hash')
+        if event_hash is not None:
+            item_hash = get_event_hash(
+                event_abi=item, contract_abi=contract_abi
+            )
+            if item_hash != event_hash:
+                continue
+
         candidates.append(item)
 
     if len(candidates) == 0:
@@ -47,7 +53,7 @@ def get_event_abi(
 #
 
 
-def get_event_hash(output_format='prefix_hex', **abi_query):
+def get_event_hash(*, output_format='prefix_hex', **abi_query):
     """compute event hash from event's abi"""
     signature = get_event_signature(**abi_query)
     return binary_utils.keccak_text(signature, output_format=output_format)
