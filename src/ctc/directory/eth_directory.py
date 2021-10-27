@@ -31,10 +31,12 @@ token_addresses = {
     'ESD': '0x36f3fd68e7325a35eb768f1aedaae9ea0689d723',
     'WBTC': '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     'ALUSD': '0xbc6da0fe9ad5f3b0d58160288917aa56653660e9',
+    'RAI': '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919',
     # other
     'CHI': '0x0000000000004946c0e9f43f4dee607b0ef1fa1c',
     'AAVE': '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
     'O3': '0xee9801669c6138e84bd50deb500827b776777d28',
+    'DPI': '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b',
     '3CRV': '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490',
     'FXS': '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0',
     'ZKS': '0xe4815ae53b124e7263f08dcdbbb757d41ed658c6',
