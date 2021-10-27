@@ -1,4 +1,5 @@
 import toolcache
+import toolparallel
 import web3
 
 from ctc import evm
@@ -39,6 +40,7 @@ def get_web3_contract(
                 contract_name=contract_name,
                 project=project,
             )
+    contract_abi = [item for item in contract_abi if item['type'] != 'receive']
 
     if contract_address is None:
         if contract_name is not None:
@@ -50,11 +52,14 @@ def get_web3_contract(
     return web3_instance.eth.contract(contract_address, abi=contract_abi)
 
 
+@toolparallel.parallelize_input(singular_arg='block', plural_arg='blocks')
 def call_web3_contract(
-    contract, function, abi=None, args=None, block=None, **contract_kwargs
+    contract, function, abi=None, args=None, kwargs=None, block=None, **contract_kwargs
 ):
     if args is None:
-        args = {}
+        args = []
+    if kwargs is None:
+        kwargs = {}
     if block is None:
         block = 'latest'
 
@@ -62,5 +67,5 @@ def call_web3_contract(
         contract=contract, contract_abi=abi, **contract_kwargs
     )
 
-    return contract.functions[function](*args).call({}, block)
+    return contract.functions[function](*args, **kwargs).call({}, block)
 
