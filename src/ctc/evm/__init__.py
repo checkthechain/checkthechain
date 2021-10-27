@@ -4,7 +4,6 @@ from .block_utils import *
 from .contract_utils import *
 from .contract_abi_utils import *
 from .eth_utils import *
-from .event_abi_utils import *
 from .event_utils import *
 from .rpc_utils import *
 from .token_utils import *

@@ -5,7 +5,6 @@ from ctc.toolbox import etl_utils
 from ctc.toolbox import web3_utils
 from ... import block_utils
 from ... import contract_abi_utils
-from ... import event_abi_utils
 
 
 def get_events_from_node(
@@ -98,7 +97,7 @@ def _get_chunk_of_events_from_node(
     if event_name is None and event_hash is None:
         raise Exception('must specify event_name or event_hash')
     if event_name is None:
-        event_name = event_abi_utils.get_event_abi(
+        event_name = contract_abi_utils.get_event_abi(
             event_hash=event_hash,
             contract_abi=contract_abi,
             contract_address=contract_address,
@@ -182,7 +181,7 @@ def create_empty_event_dataframe(
 
     # event-specific columns
     if event_abi is None:
-        event_abi = event_abi_utils.get_event_abi(
+        event_abi = contract_abi_utils.get_event_abi(
             contract_address=contract_address,
             contract_abi=contract_abi,
             event_hash=event_hash,

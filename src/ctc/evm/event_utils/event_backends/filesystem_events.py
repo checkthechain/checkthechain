@@ -8,7 +8,6 @@ from ctc import config_utils
 from ... import block_utils
 from ... import contract_utils
 from ... import contract_abi_utils
-from ... import event_abi_utils
 from ... import evm_spec
 
 
@@ -71,7 +70,7 @@ def _event_name_to_event_hash(event_name, contract_address):
         if entry['type'] == 'event' and entry.get('name') == event_name:
             candidates.append(entry)
     if len(candidates) == 1:
-        return event_abi_utils.get_event_hash(event_abi=candidates[0])
+        return contract_abi_utils.get_event_hash(event_abi=candidates[0])
     elif len(candidates) > 1:
         raise Exception('found multiple events with name: ' + str(event_name))
     else:
