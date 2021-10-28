@@ -97,10 +97,29 @@ def get_function_signature(
             function_abi=function_abi, function_name=function_name, **abi_query
         )
 
+    parameter_types = [
+        get_function_selector_type(item)
+        for item in parameter_types
+    ]
+
     if function_name is None:
         function_name = function_abi['name']
 
     return function_name + '(' + ','.join(parameter_types) + ')'
+
+
+def get_function_selector_type(datatype):
+    """get the data name used for function selector"""
+    if datatype == 'uint':
+        return 'uint256'
+    elif datatype == 'int':
+        return 'int256'
+    elif datatype == 'ufixed':
+        return 'ufixed128x18'
+    elif datatype == 'fixed':
+        return 'fixed128x18'
+    else:
+        return datatype
 
 
 def get_function_selector(

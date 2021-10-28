@@ -1,5 +1,6 @@
 from .. import binary_utils
 from . import contract_abi_io
+from . import function_parsing
 
 
 #
@@ -62,7 +63,11 @@ def get_event_hash(*, output_format='prefix_hex', **abi_query):
 def get_event_signature(event_abi=None, **abi_query):
     if event_abi is None:
         event_abi = get_event_abi(**abi_query)
-    inputs = ','.join(var['type'] for var in event_abi['inputs'])
+    arg_types = [var['type'] for var in event_abi['inputs']]
+    arg_types = [
+        function_parsing.get_function_selector_type(item) for item in arg_types
+    ]
+    inputs = ','.join(arg_types)
     return event_abi['name'] + '(' + inputs + ')'
 
 

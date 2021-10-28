@@ -11,10 +11,14 @@ from . import event_parsing
 # # summaries
 #
 
-def summarize_contract_abi(contract_abi):
+
+def summarize_contract_abi(contract_abi=None, contract_address=None):
+    if contract_abi is None:
+        contract_abi = contract_abi_io.get_contract_abi(
+            contract_address=contract_address,
+        )
     df = contract_abi_to_dataframe(contract_abi, human_readable=True)
     IPython.display.display(df)
-    return df
 
 
 def summarize_contract_events(*, contract_abi=None, events=None):
@@ -49,6 +53,7 @@ def get_contract_events(contract_abi=None, **abi_query):
 #
 # # dataframes
 #
+
 
 def contract_abi_to_dataframe(contract_abi, human_readable):
     contract_abi = copy.deepcopy(contract_abi)
@@ -92,7 +97,16 @@ def contract_abi_to_dataframe(contract_abi, human_readable):
                 entry['stateMutability'] = ''
 
     df = pd.DataFrame(contract_abi)
-    df = df.reindex(columns=['type', 'name', 'inputs', 'outputs', 'stateMutability', 'anonymous'])
+    df = df.reindex(
+        columns=[
+            'type',
+            'name',
+            'inputs',
+            'outputs',
+            'stateMutability',
+            'anonymous',
+        ]
+    )
 
     return df
 
