@@ -4,36 +4,9 @@ from .. import binary_utils
 from . import function_parsing
 
 
-def encode_function_parameters(
-    parameters,
-    output_format=None,
-    parameter_types=None,
-    function_signature=None,
-    **abi_query,
-):
-
-    # get parameter types
-    if parameter_types is None:
-        parameter_types = function_parsing.get_function_parameter_types(
-            function_signature=function_signature,
-            n_parameters=len(parameters),
-            **abi_query,
-        )
-
-    # convert parameter dict to list
-    if isinstance(parameters, dict):
-        parameter_names = function_parsing.get_function_parameter_names(
-            n_parameters=len(parameters), **abi_query
-        )
-        parameters = (parameters[name] for name in parameter_names)
-
-    # encode
-    encoded_bytes = eth_abi.encode_single(
-        '(' + ','.join(parameter_types) + ')', parameters
-    )
-
-    # convert to output format
-    return binary_utils.convert_format(encoded_bytes, output_format)
+#
+# # call data
+#
 
 
 def encode_call_data(
@@ -52,33 +25,31 @@ def encode_call_data(
         )
 
     if encoded_parameters is None:
+        parameter_format = binary_utils.get_binary_format(function_selector)
+        if parameter_format == 'prefix_hex':
+            parameter_format = 'raw_hex'
         encoded_parameters = encode_function_parameters(
             parameters=parameters,
             parameter_types=parameter_types,
-            output_format=output_format,
+            output_format=parameter_format,
             **abi_query,
         )
-
-    function_selector = binary_utils.convert_format(
-        function_selector, output_format
-    )
-    encoded_parameters = binary_utils.convert_format(
-        encoded_parameters, output_format
-    )
 
     return function_selector + encoded_parameters
 
 
 def decode_call_data(call_data, output_format=None):
 
-    call_data_bytes = binary_utils.convert_format(call_data, 'binary')
+    call_data_bytes = binary_utils.convert_binary_format(call_data, 'binary')
 
     function_selector = call_data_bytes[:4]
-    function_selector = binary_utils.convert_format(function_selector, 'binary')
+    function_selector = binary_utils.convert_binary_format(
+        function_selector, 'binary'
+    )
 
     encoded_parameters = call_data_bytes[4:]
     decoded_parameters = decode_function_parameters(encoded_parameters)
-    decoded_parameters = binary_utils.convert_format(
+    decoded_parameters = binary_utils.convert_binary_format(
         function_selector, 'binary'
     )
 
@@ -88,9 +59,52 @@ def decode_call_data(call_data, output_format=None):
     }
 
 
+#
+# # function parameters
+#
+
+
+def encode_function_parameters(
+    parameters,
+    output_format=None,
+    parameter_types=None,
+    function_signature=None,
+    **abi_query,
+):
+    if parameters is None:
+        return binary_utils.convert_binary_format(
+            '0x', output_format=output_format
+        )
+    else:
+        n_parameters = len(parameters)
+
+    # get parameter types
+    if parameter_types is None:
+        parameter_types = function_parsing.get_function_parameter_types(
+            function_signature=function_signature,
+            n_parameters=n_parameters,
+            **abi_query,
+        )
+
+    # convert parameter dict to list
+    if isinstance(parameters, dict):
+        parameter_names = function_parsing.get_function_parameter_names(
+            n_parameters=n_parameters, **abi_query
+        )
+        parameters = (parameters[name] for name in parameter_names)
+
+    # encode
+    encoded_bytes = eth_abi.encode_single(
+        '(' + ','.join(parameter_types) + ')', parameters
+    )
+
+    # convert to output format
+    return binary_utils.convert_binary_format(encoded_bytes, output_format)
+
+
 def decode_function_parameters(encoded_parameters, parameter_types):
     parameter_types_str = '(' + ','.join(parameter_types) + ')'
-    encoded_parameters = binary_utils.convert_format(
+    encoded_parameters = binary_utils.convert_binary_format(
         encoded_parameters, 'binary'
     )
     parameters = eth_abi.decode_single(parameter_types_str, encoded_parameters)
@@ -118,11 +132,25 @@ def decode_function_named_parameters(
     }
 
 
-def decode_function_output(encoded_output, output_types=None, **abi_query):
+def decode_function_output(
+    encoded_output, output_types=None, delist_single_outputs=True, **abi_query
+):
+    # need to test case when function has no output
+
+    # get output types
     if output_types is None:
         output_types = function_parsing.get_function_output_types(**abi_query)
     output_types_str = '(' + ','.join(output_types) + ')'
-    encoded_output = binary_utils.convert_format(encoded_output, 'binary')
+
+    # decode
+    encoded_output = binary_utils.convert_binary_format(
+        encoded_output, 'binary'
+    )
     decoded_output = eth_abi.decode_single(output_types_str, encoded_output)
+
+    # delist
+    if delist_single_outputs and len(output_types) == 1:
+        decoded_output = decoded_output[0]
+
     return decoded_output
 

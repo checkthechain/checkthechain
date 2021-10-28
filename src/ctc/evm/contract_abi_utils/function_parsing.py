@@ -38,7 +38,7 @@ def get_function_abi(
                 continue
         if function_selector is not None:
             item_selector = get_function_selector(function_abi=item)
-            item_selector = binary_utils.match_format(
+            item_selector = binary_utils.match_binary_format(
                 format_this=item_selector,
                 like_this=function_selector,
             )
@@ -131,7 +131,7 @@ def get_function_selector(
 
     full_hash = sha3.keccak_256(function_signature.encode())
     head_bytes = full_hash.hexdigest()[:8]
-    return binary_utils.convert_format(head_bytes, output_format)
+    return binary_utils.convert_binary_format(head_bytes, output_format)
 
 
 def get_function_output_types(*, function_abi=None, **abi_query):
