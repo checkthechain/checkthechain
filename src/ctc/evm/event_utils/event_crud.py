@@ -2,7 +2,6 @@ from ctc.toolbox import backend_utils
 from .event_backends import filesystem_events
 from .event_backends import node_events
 from .. import block_utils
-from .. import contract_utils
 
 
 def get_backend_functions():
@@ -18,54 +17,79 @@ def get_backend_functions():
     }
 
 
-def get_events(**query):
-    if query.get('start_block') == 'contract_start':
-        query['start_block'] = contract_utils.get_contract_creation_block(
-            contract_address=query['contract_address'],
-        )
-    backend_order = query.get('backend_order')
+def get_events(
+    *,
+    contract_address,
+    start_block=None,
+    end_block=None,
+    backend_order=None,
+    **query
+):
+
+    start_block, end_block = block_utils.normalize_block_range(
+        contract_address=contract_address,
+        start_block=start_block,
+        end_block=end_block,
+    )
+
     if backend_order is None:
         backend_order = ['filesystem', 'download']
-        query['backend_order'] = backend_order
-    return backend_utils.run_on_backend(get_backend_functions()['get'], **query)
 
-
-def save_events(events, **query):
-    query['events'] = events
     return backend_utils.run_on_backend(
-        get_backend_functions()['save'], **query
+        get_backend_functions()['get'],
+        contract_address=contract_address,
+        start_block=start_block,
+        end_block=end_block,
+        backend_order=backend_order,
+        **query
     )
 
 
-def transfer_events(**kwargs):
+def save_events(events, **query):
+    return backend_utils.run_on_backend(
+        get_backend_functions()['save'], events=events, **query
+    )
+
+
+def transfer_events(
+    *, contract_address, start_block=None, end_block=None, **query
+):
+
+    start_block, end_block = block_utils.normalize_block_range(
+        contract_address=contract_address,
+        start_block=start_block,
+        end_block=end_block,
+    )
+
     return backend_utils.transfer_backends(
-        get=get_events, save=save_events, **kwargs
+        get=get_events,
+        save=save_events,
+        contract_address=contract_address,
+        start_block=start_block,
+        end_block=end_block,
+        **query
     )
 
 
 def download_events(
-    start_block,
-    end_block,
     contract_address,
     event_hash=None,
     event_name=None,
+    start_block=None,
+    end_block=None,
     verbose=True,
 ):
+
     if event_hash is None and event_name is None:
         raise Exception('must specify either event_hash or event_name')
 
     contract_address = contract_address.lower()
 
-    if start_block == 'latest' or end_block == 'latest':
-        latest_block = block_utils.fetch_latest_block_number()
-        if start_block == 'latest':
-            start_block = latest_block
-        if end_block == 'latest':
-            end_block = latest_block
-    if start_block == 'contract_start':
-        start_block = contract_utils.get_contract_creation_block(
-            contract_address=contract_address
-        )
+    start_block, end_block = block_utils.normalize_block_range(
+        contract_address=contract_address,
+        start_block=start_block,
+        end_block=end_block,
+    )
 
     # get event hash
     if event_hash is None:

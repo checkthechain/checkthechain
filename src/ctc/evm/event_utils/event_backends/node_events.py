@@ -17,15 +17,16 @@ def get_events_from_node(
 ):
     """see fetch_events() for complete kwarg list"""
 
-    blocks_per_chunk = max(100, blocks_per_chunk)
-
     # create chunks
-    if start_block == 'latest':
-        start_block = block_utils.fetch_latest_block_number()
-    if end_block == 'latest':
-        end_block = block_utils.fetch_latest_block_number()
+    start_block, end_block = block_utils.normalize_block_range(
+        start_block=start_block,
+        end_block=end_block,
+    )
     if verbose:
-        print('getting events from node, block range:', [start_block, end_block])
+        print(
+            'getting events from node, block range:', [start_block, end_block]
+        )
+    blocks_per_chunk = min(1000, blocks_per_chunk)
     if blocks_per_chunk is not None:
         chunks = etl_utils.get_chunks_in_range(
             start_block=start_block,
@@ -65,7 +66,9 @@ def get_events_from_node(
 
 
 @toolparallel.parallelize_input(
-    singular_arg='block_range', plural_arg='block_ranges', config={'n_workers': 10},
+    singular_arg='block_range',
+    plural_arg='block_ranges',
+    config={'n_workers': 60},
 )
 def _get_chunk_of_events_from_node(
     block_range=None,
@@ -104,6 +107,8 @@ def _get_chunk_of_events_from_node(
         )['name']
     if start_block is None and end_block is None:
         start_block, end_block = block_range
+
+    print('scraping block range:', start_block, end_block)
 
     event_filter = contract.events[event_name].createFilter(
         fromBlock=int(start_block),
