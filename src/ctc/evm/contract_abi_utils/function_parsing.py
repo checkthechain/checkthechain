@@ -139,3 +139,12 @@ def get_function_output_types(*, function_abi=None, **abi_query):
         function_abi = get_function_abi(**abi_query)
     return [output['type'] for output in function_abi['outputs']]
 
+
+def get_function_output_names(*, function_abi=None, **abi_query):
+    if function_abi is None:
+        function_abi = get_function_abi(**abi_query)
+    names = [output.get('name') for output in function_abi['outputs']]
+    if any(name is None for name in names):
+        names = None
+    return names
+

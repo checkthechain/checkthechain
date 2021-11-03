@@ -133,7 +133,11 @@ def decode_function_named_parameters(
 
 
 def decode_function_output(
-    encoded_output, output_types=None, delist_single_outputs=True, **abi_query
+    encoded_output,
+    output_types=None,
+    delist_single_outputs=True,
+    package_named_results=False,
+    **abi_query,
 ):
     # need to test case when function has no output
 
@@ -148,9 +152,24 @@ def decode_function_output(
     )
     decoded_output = eth_abi.decode_single(output_types_str, encoded_output)
 
+    # decode strings
+    if 'string' in output_types:
+        string_decoded_output = []
+        for output_type, item in zip(output_types, decoded_output):
+            if output_type == 'string':
+                item = item.decode()
+            string_decoded_output.append(item)
+        decoded_output = string_decoded_output
+
     # delist
     if delist_single_outputs and len(output_types) == 1:
         decoded_output = decoded_output[0]
+
+    # repackage
+    elif package_named_results and len(output_types) > 1:
+        names = function_parsing.function_function_output_names(**abi_query)
+        if names is not None:
+            decoded_output = dict(zip(names, decoded_output))
 
     return decoded_output
 
