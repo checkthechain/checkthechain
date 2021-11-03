@@ -21,7 +21,7 @@ def get_default_etl_chunk_root(etl_backend=None):
 
     # get chunk root
     if etl_backend == 'filesystem':
-        return config['etl_chunk_root_filesystem']
+        return config['etl_root']
     elif etl_backend == 's3':
         return config['etl_chunk_root_s3']
     else:
@@ -132,9 +132,7 @@ def list_chunk_paths(
     if etl_view is None:
         etl_view = 'raw'
     if etl_chunk_root is None:
-        etl_chunk_root = config_utils.get_default_etl_chunk_root(
-            etl_backend=etl_backend,
-        )
+        etl_chunk_root = get_default_etl_chunk_root(etl_backend=etl_backend)
 
     kwargs = {
         'etl_chunk_root': etl_chunk_root,
@@ -211,9 +209,7 @@ def get_block_slice(start_block, end_block, block_index):
 def get_path(exporttype, etl_chunk_root=None, etl_backend=None, **kwargs):
     kwargs.setdefault('columns', '')
     if etl_chunk_root is None:
-        etl_chunk_root = config_utils.get_default_etl_chunk_root(
-            etl_backend=etl_backend,
-        )
+        etl_chunk_root = get_default_etl_chunk_root(etl_backend=etl_backend)
     filename = etl_spec.path_templates[exporttype].format(**kwargs)
 
     path = os.path.join(etl_chunk_root, filename)
