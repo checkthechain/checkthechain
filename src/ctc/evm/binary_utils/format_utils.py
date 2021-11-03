@@ -11,6 +11,8 @@ def get_binary_format(data):
             return 'prefix_hex'
         else:
             return 'raw_hex'
+    elif isinstance(data, int):
+        return 'integer'
     else:
         raise Exception('could not detect format')
 
@@ -24,6 +26,11 @@ def get_binary_n_bytes(data):
             return len(data) / 2 - 1
         else:
             return len(data) / 2
+    elif isinstance(data, int):
+        # adapted from https://stackoverflow.com/a/30375198
+        if data < 0:
+            raise Exception('only positive integers allowed')
+        return (data.bit_length() + 7) // 8
     else:
         raise Exception('unknown data type: ' + str(data))
 
@@ -65,6 +72,8 @@ def convert_binary_format(
             return raw_data
         elif output_format == 'binary':
             return bytes.fromhex(raw_data)
+        elif output_format == 'integer':
+            return int(data, 16)
         else:
             raise Exception('invalid output_format: ' + str(output_format))
 
@@ -76,6 +85,29 @@ def convert_binary_format(
             return '0x' + data.hex()
         elif output_format == 'raw_hex':
             return data.hex()
+        elif output_format == 'integer':
+            return int.from_bytes(data, 'big')
+        else:
+            raise Exception('invalid output_format: ' + str(output_format))
+
+    elif isinstance(data, int):
+
+        if data < 0:
+            raise Exception('only positive integers allowed')
+
+        if padded_size is not None:
+            n_bytes = padded_size
+        else:
+            n_bytes = get_binary_n_bytes(data)
+
+        if output_format == 'binary':
+            return data.to_bytes(n_bytes, 'big')
+        elif output_format == 'prefix_hex':
+            return hex(data)
+        elif output_format == 'raw_hex':
+            return hex(data)[2:]
+        elif output_format == 'integer':
+            return data
         else:
             raise Exception('invalid output_format: ' + str(output_format))
 
