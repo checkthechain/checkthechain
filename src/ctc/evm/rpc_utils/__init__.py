@@ -1,1 +1,2 @@
-from .eth_functions import *
+from .rpc_backends import *
+from .rpc_methods import *
