@@ -13,6 +13,7 @@ def test_fetch_latest_block_number():
 
 @evm.parallelize_block_fetching()
 def get_token_total_supply(block):
+    """this is a helper function for the parallelize test below"""
     fei_address = '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
     return evm.fetch_token_total_supply(
         token=fei_address,
@@ -21,11 +22,18 @@ def get_token_total_supply(block):
     )
 
 
-def test_paralllelize_block_fetching():
+def test_parallelize_block_fetching():
     results = get_token_total_supply(blocks=[13430000, 13420000, 13410000])
     assert tuple(results) == (
         523898681781993861958312785,
         525899964299071436994307742,
         536187038961679805771891134,
     )
+
+
+def test_get_contract_creation_block():
+    contract = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+    result = evm.get_contract_creation_block(contract)
+    target = 8928158
+    assert result == target
 
