@@ -2,18 +2,23 @@ import pandas as pd
 import toolparallel
 
 from ctc.toolbox import etl_utils
-from ctc.toolbox import web3_utils
+
 from ... import block_utils
 from ... import contract_abi_utils
+from ... import rpc_utils
 
 
 def get_events_from_node(
     start_block='latest',
     end_block='latest',
+    event_name=None,
+    event_hash=None,
+    contract_address=None,
+    contract_abi=None,
     blocks_per_chunk=2000,
     package_as_dataframe=True,
     verbose=True,
-    **kwargs
+    parallel_kwargs=None,
 ):
     """see fetch_events() for complete kwarg list"""
 
@@ -37,16 +42,33 @@ def get_events_from_node(
     else:
         chunks = [[start_block, end_block]]
 
-    # fetch entries
-    contract_abi = contract_abi_utils.get_contract_abi(
-        contract_address=kwargs['contract_address'],
-    )
+    # gather metadata
+    if contract_abi is None:
+        contract_abi = contract_abi_utils.get_contract_abi(
+            contract_address=contract_address,
+        )
+    if event_name is None and event_hash is None:
+        raise Exception('must specify event_name or event_hash')
+    if event_name is None:
+        event_name = contract_abi_utils.get_event_abi(
+            event_hash=event_hash,
+            contract_abi=contract_abi,
+            contract_address=contract_address,
+        )['name']
+    if event_hash is None:
+        event_hash = contract_abi_utils.get_event_hash(
+            event_name=event_name,
+            contract_abi=contract_abi,
+            contract_address=contract_address,
+        )
+
+    # fetch events
     chunks_entries = _get_chunk_of_events_from_node(
         block_ranges=chunks,
-        package_as_dataframe=False,
-        contract_abi=contract_abi,
+        event_hash=event_hash,
+        contract_address=contract_address,
         verbose=verbose,
-        **kwargs
+        parallel_kwargs=parallel_kwargs,
     )
     entries = [
         entry for chunk_entries in chunks_entries for entry in chunk_entries
@@ -56,10 +78,10 @@ def get_events_from_node(
     if package_as_dataframe:
         entries = _package_exported_events(
             entries,
-            contract_address=kwargs.get('contract_address'),
-            contract_abi=kwargs.get('contract_abi'),
-            event_hash=kwargs.get('event_hash'),
-            event_name=kwargs.get('event_name'),
+            contract_address=contract_address,
+            contract_abi=contract_abi,
+            event_hash=event_hash,
+            event_name=event_name,
         )
 
     return entries
@@ -71,61 +93,23 @@ def get_events_from_node(
     config={'n_workers': 60},
 )
 def _get_chunk_of_events_from_node(
-    block_range=None,
-    start_block=None,
-    end_block=None,
-    event_name=None,
-    event_hash=None,
-    contract_address=None,
-    contract_abi=None,
-    contract_name=None,
-    project=None,
-    package_as_dataframe=True,
-    verbose=None,
+    block_range,
+    event_hash,
+    contract_address,
+    verbose,
 ):
-    if contract_abi is None:
-        contract_abi = contract_abi_utils.get_contract_abi(
-            contract_address=contract_address
-        )
 
-    # create contract
-    contract = web3_utils.get_web3_contract(
-        contract_address=contract_address,
-        contract_abi=contract_abi,
-        contract_name=contract_name,
-        project=project,
-    )
-
-    # create event_filter
-    if event_name is None and event_hash is None:
-        raise Exception('must specify event_name or event_hash')
-    if event_name is None:
-        event_name = contract_abi_utils.get_event_abi(
-            event_hash=event_hash,
-            contract_abi=contract_abi,
-            contract_address=contract_address,
-        )['name']
-    if start_block is None and end_block is None:
-        start_block, end_block = block_range
-
-    print('scraping block range:', start_block, end_block)
-
-    event_filter = contract.events[event_name].createFilter(
-        fromBlock=int(start_block),
-        toBlock=int(end_block),
-    )
+    if verbose > 1:
+        print('scraping block range: ' + str(block_range) + '\n', end='')
 
     # fetch entries
-    entries = event_filter.get_all_entries()
-
-    # package data into dataframe
-    if package_as_dataframe:
-        entries = _package_exported_events(
-            entries,
-            contract_abi=contract_abi,
-            event_hash=event_hash,
-            event_name=event_name,
-        )
+    start_block, end_block = block_range
+    entries = rpc_utils.eth_get_logs(
+        contract_address=contract_address,
+        topics=[event_hash],
+        start_block=start_block,
+        end_block=end_block,
+    )
 
     return entries
 
@@ -134,7 +118,6 @@ def _package_exported_events(
     entries, contract_address, contract_abi, event_hash, event_name
 ):
 
-    # TODO: return empty dataframe instead
     if len(entries) == 0:
         return create_empty_event_dataframe(
             contract_address=contract_address,
@@ -145,17 +128,13 @@ def _package_exported_events(
 
     formatted_entries = []
     for entry in entries:
-        formatted_entry = {
-            'block_number': entry['blockNumber'],
-            'transaction_index': entry['transactionIndex'],
-            'log_index': entry['logIndex'],
-            'block_hash': entry['blockHash'].hex(),
-            'transaction_hash': entry['transactionHash'].hex(),
-            'contract_address': entry['address'],
-            'event_name': entry['event'],
-        }
-        for arg_name, arg_value in entry['args'].items():
-            formatted_entry['arg__' + arg_name] = arg_value
+        formatted_entry = contract_abi_utils.normalize_event(
+            event=entry,
+            contract_address=contract_address,
+            contract_abi=contract_abi,
+            event_name=event_name,
+            event_hash=event_hash,
+        )
         formatted_entries.append(formatted_entry)
 
     df = pd.DataFrame(formatted_entries)

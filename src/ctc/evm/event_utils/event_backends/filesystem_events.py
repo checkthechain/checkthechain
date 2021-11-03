@@ -312,7 +312,7 @@ def get_events_from_filesystem(
     df = df.sort_index()
 
     if start_block == 'latest' or end_block == 'latest':
-        latest_block = block_utils.fetch_latest_block_number()
+        latest_block = block_utils.get_block_number('latest')
         if start_block == 'latest':
             start_block = latest_block
         if end_block == 'latest':

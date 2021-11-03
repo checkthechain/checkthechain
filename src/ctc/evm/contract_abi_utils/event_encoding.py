@@ -35,6 +35,7 @@ def decode_event_topics(
     # decode
     decoded_topics = []
     for topic, indexed_type in zip(topics[1:], indexed_types):
+        topic = binary_utils.convert_binary_format(topic, 'binary')
         decoded_topic = eth_abi.decode_single(indexed_type, topic)
         decoded_topics.append(decoded_topic)
 
@@ -47,7 +48,7 @@ def decode_event_topics(
         return dict(zip(indexed_names, decoded_topics))
 
 
-def decode_event_data(
+def decode_event_unindexed_data(
     data,
     unindexed_types=None,
     unindexed_names=None,
@@ -61,8 +62,8 @@ def decode_event_data(
         unindexed_types = event_parsing.get_event_unindexed_types(**abi_query)
 
     # decode data
-    data = binary_utils.convert_format(data, 'binary')
-    decoded = eth_abi.decode_single(unindexed_types, data)
+    data = binary_utils.convert_binary_format(data, 'binary')
+    decoded = eth_abi.decode_single('(' + ','.join(unindexed_types) + ')', data)
 
     # package outputs
     if not use_names:
@@ -73,6 +74,36 @@ def decode_event_data(
                 **abi_query
             )
         return dict(zip(unindexed_names, decoded))
+
+
+def normalize_event(event, arg_prefix='arg__', **abi_query):
+
+    # decode event args
+    decoded_topics = decode_event_topics(topics=event['topics'], **abi_query)
+    decoded_data = decode_event_unindexed_data(data=event['data'], **abi_query)
+
+    # remove keys
+    remove_keys = ['data', 'topics', 'removed']
+    event = {k: v for k, v in event.items() if k not in remove_keys}
+
+    # change keys
+    event['contract_address'] = event.pop('address')
+
+    # add additional keys
+    for key in ['event_name', 'event_hash']:
+        if key not in abi_query:
+            raise Exception('should specify ' + str(key))
+        event[key] = abi_query[key]
+
+    # add event args
+    for event_args in [decoded_topics, decoded_data]:
+        for arg_name, arg_value in event_args.items():
+            key = arg_prefix + arg_name
+            if key in event:
+                raise Exception('event key collision: ' + str(key))
+            event[key] = arg_value
+
+    return event
 
 
 #
