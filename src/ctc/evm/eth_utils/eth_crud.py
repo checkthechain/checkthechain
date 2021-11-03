@@ -1,8 +1,8 @@
 import requests
-import web3
 
-from ctc.toolbox import web3_utils
+from .. import address_utils
 from .. import block_utils
+from .. import rpc_utils
 
 
 def fetch_eth_total_supply():
@@ -13,16 +13,12 @@ def fetch_eth_total_supply():
 
 
 @block_utils.parallelize_block_fetching()
-def fetch_eth_balance(
-    address, normalize=True, web3_instance=None, provider=None, block=None
-):
+def fetch_eth_balance(address, normalize=True, provider=None, block=None):
     if block is None:
         block = 'latest'
-    if web3_instance is None:
-        web3_instance = web3_utils.create_web3_instance(provider=provider)
 
-    address = web3.Web3.toChecksumAddress(address)
-    balance = web3_instance.eth.getBalance(address, block)
+    address = address_utils.get_address_checksum(address)
+    balance = rpc_utils.eth_get_balance(address=address, block=block)
 
     if normalize:
         balance = balance / 1e18

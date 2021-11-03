@@ -1,18 +1,27 @@
 import toolparallel
 
-from ctc.toolbox import web3_utils
+from .. import rpc_utils
 
 
-def get_transactions(transaction_hashes):
-    return fetch_transaction(transaction_hashes=transaction_hashes)
+def get_transaction(transaction_hash, provider=None):
+    return fetch_transaction(
+        transaction_hash=transaction_hash, provider=provider
+    )
+
+
+def get_transactions(transaction_hashes, provider=None):
+    return fetch_transaction(
+        transaction_hashes=transaction_hashes, provider=provider
+    )
 
 
 @toolparallel.parallelize_input(
     singular_arg='transaction_hash',
     plural_arg='transaction_hashes',
 )
-def fetch_transaction(transaction_hash):
-    web3_instance = web3_utils.create_web3_instance()
-    transaction = web3_instance.eth.getTransaction(transaction_hash=transaction_hash)
-    return transaction
+def fetch_transaction(transaction_hash, provider=None):
+    return rpc_utils.eth_get_transaction_by_hash(
+        transaction_hash=transaction_hash,
+        provider=provider,
+    )
 
