@@ -38,9 +38,9 @@ def get_feed_data(
     if end_block is None:
         end_block = 'latest'
     if start_block == 'latest':
-        start_block = evm.fetch_latest_block_number()
+        start_block = evm.get_block_number('latest')
     if end_block == 'latest':
-        end_block = evm.fetch_latest_block_number()
+        end_block = evm.get_block_number('latest')
     if start_block is None:
 
         events_list = evm.list_events(

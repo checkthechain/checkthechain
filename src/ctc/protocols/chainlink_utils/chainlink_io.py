@@ -61,7 +61,7 @@ def save_feed_to_present(
             start_block = int(np.ceil(first_block / chunk_size) * chunk_size)
 
     # get new block range
-    current_block = evm.fetch_latest_block_number()
+    current_block = evm.get_block_number('latest')
     end_block = int(current_block / chunk_size) * chunk_size - 1
 
     save_feed_as_chunks(

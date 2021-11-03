@@ -10,7 +10,7 @@ import toolparallel
 
 from ctc import directory
 from ctc import evm
-from ctc.toolbox import web3_utils
+from ctc.evm import rpc_utils
 
 
 aggregator_outputs = [
@@ -28,7 +28,7 @@ def fetch_feed_datum(
 ):
 
     if block is None:
-        block = evm.fetch_latest_block_number()
+        block = evm.get_block_number('latest')
     if normalize is None:
         normalize = True
     if format is None:
@@ -38,20 +38,17 @@ def fetch_feed_datum(
     if not evm.is_address_str(feed):
         raise Exception('invalid address: ' + str(feed))
 
-    raw = web3_utils.contract_call(
-        contract=feed,
-        abi=evm.load_named_abi(
-            contract_name='AggregatorV3Interface', project='chainlink'
-        ),
-        function='latestRoundData',
+    raw = rpc_utils.eth_call(
+        to_address=feed,
+        function_name='latestRoundData',
         block=block,
-        **contract_kwargs
     )
 
     if normalize:
         name = directory.chainlink_address_to_feed[feed]
         decimals = directory.chainlink_feeds_decimals[name]
         answer_index = 1
+        raw = list(raw)
         raw[answer_index] = raw[answer_index] / (10 ** decimals)
 
     if format == 'full':
