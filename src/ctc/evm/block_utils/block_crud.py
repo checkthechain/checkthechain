@@ -1,17 +1,47 @@
-from ctc.toolbox import web3_utils
 from ctc.toolbox import search_utils
 from .. import address_utils
+from .. import rpc_utils
 
 
-def fetch_latest_block(web3_instance=None, provider=None):
-    if web3_instance is None:
-        web3_instance = web3_utils.create_web3_instance(provider=provider)
-    return web3_instance.eth.getBlock('latest')
+def get_block(
+    block, provider=None, include_full_transactions=False, **rpc_kwargs
+):
+
+    # convert to int if not an int or str (e.g. floats or numpy int32)
+    if not isinstance(block, (int, str)):
+        candidate = int(block)
+        if (block - candidate) ** 2 ** 0.5 > 0.001:
+            raise Exception()
+
+    # gather kwargs
+    kwargs = dict(
+        provider=provider,
+        include_full_transactions=include_full_transactions,
+        **rpc_kwargs
+    )
+
+    # rpc call
+    if isinstance(block, int):
+        return rpc_utils.eth_get_block_by_number(block_number=block, **kwargs)
+    elif isinstance(block, str):
+        if block in ['latest', 'earliest', 'pending']:
+            return rpc_utils.eth_get_block_by_number(block_number=block, **kwargs)
+        else:
+            return rpc_utils.eth_get_block_by_hash(block_hash=block, **kwargs)
+    else:
+        raise Exception('unknown block specifier: ' + str(block))
 
 
-def fetch_latest_block_number(provider=None):
-    block = fetch_latest_block(provider=provider)
-    return block['number']
+def get_block_number(block, provider=None, **rpc_kwargs):
+
+    # gather kwargs
+    kwargs = dict(provider=provider, **rpc_kwargs)
+
+    # rpc call
+    if block == 'latest':
+        return rpc_utils.eth_block_number(**kwargs)
+    else:
+        return get_block(block=block, **kwargs)['number']
 
 
 def normalize_block(block, contract_address=None):
@@ -19,7 +49,7 @@ def normalize_block(block, contract_address=None):
         raise Exception()
 
     if block == 'latest':
-        block = fetch_latest_block_number()
+        block = get_block_number('latest')
     if block == 'contract_start':
         block = get_contract_creation_block(contract_address=contract_address)
 
@@ -47,7 +77,7 @@ def normalize_block_range(start_block, end_block, contract_address=None):
             contract_address=contract_address
         )
     if 'latest' in [start_block, end_block]:
-        latest_block = fetch_latest_block_number()
+        latest_block = get_block_number('latest')
 
     # assign special values
     if start_block == 'latest':
@@ -68,8 +98,9 @@ def normalize_block_range(start_block, end_block, contract_address=None):
 
 def get_contract_creation_block(
     contract_address,
-    start_block=0,
-    end_block='latest',
+    start_block=None,
+    end_block=None,
+    provider=None,
     verbose=True,
 ):
     """get the block where a contract was created
@@ -78,10 +109,13 @@ def get_contract_creation_block(
     """
 
     contract_address = address_utils.get_address_checksum(contract_address)
-    instance = web3_utils.create_web3_instance()
 
+    if start_block is None:
+        start_block = 0
+    if end_block is None:
+        end_block = 'latest'
     if start_block == 'latest' or end_block == 'latest':
-        latest_block = fetch_latest_block_number()
+        latest_block = get_block_number('latest')
         if start_block == 'latest':
             start_block = latest_block
         if end_block == 'latest':
@@ -90,8 +124,10 @@ def get_contract_creation_block(
     def is_match(index):
         if verbose:
             print('trying block:', index)
-        code = instance.eth.getCode(contract_address, block_identifier=index)
-        return len(code) > 0
+        code = rpc_utils.eth_get_code(
+            address=contract_address, block=index, provider=provider
+        )
+        return len(code) > 3
 
     result = search_utils.binary_search(
         start_index=start_block,
