@@ -1,4 +1,3 @@
-# import web3
 from .. import binary_utils
 
 
@@ -44,7 +43,6 @@ def get_address_checksum(address):
 
     - adapted from eth_utils.to_checksum_address()
     """
-    # return web3.Web3.toChecksumAddress(address)
 
     # validate address
     address_format = binary_utils.get_binary_format(address)
@@ -53,7 +51,9 @@ def get_address_checksum(address):
     address = binary_utils.convert_binary_format(address, 'raw_hex')
 
     # compute address hash
-    address_hash = binary_utils.keccak_text(address, output_format='raw_hex')
+    address_hash = binary_utils.keccak_text(
+        address.lower(), output_format='raw_hex',
+    )
 
     # assemble checksum
     chars = []
@@ -61,7 +61,7 @@ def get_address_checksum(address):
         if int(hash_char, 16) > 7:
             chars.append(address_char.upper())
         else:
-            chars.append(address_char)
+            chars.append(address_char.lower())
     raw_checksum = ''.join(chars)
 
     # convert to output format
