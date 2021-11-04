@@ -1,13 +1,13 @@
 from ctc import evm
 
 
-def test_fetch_latest_block():
-    latest_block = evm.fetch_latest_block()
+def test_get_block():
+    latest_block = evm.get_block('latest')
     assert latest_block is not None
 
 
 def test_fetch_latest_block_number():
-    latest_block_number = evm.fetch_latest_block_number()
+    latest_block_number = evm.get_block_number('latest')
     assert isinstance(latest_block_number, int)
 
 
