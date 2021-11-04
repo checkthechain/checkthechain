@@ -87,7 +87,7 @@ def eth_get_filter_changes(
         provider=provider,
     )
 
-    if not include_removed:
+    if not include_removed and len(result) > 0 and isinstance(result[0], dict):
         result = [subresult for subresult in result if not subresult['removed']]
 
     if decode_result and len(result) > 0 and isinstance(result[0], dict):
