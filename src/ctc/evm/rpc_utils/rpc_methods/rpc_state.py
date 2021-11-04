@@ -1,16 +1,22 @@
+import toolparallel
+
 from ... import block_utils
 from ... import binary_utils
 from ... import contract_abi_utils
 from .. import rpc_backends
 
 
+@toolparallel.parallelize_input(
+    singular_arg='block_number',
+    plural_arg='block_numbers',
+)
 def eth_call(
     to_address,
     from_address=None,
     gas=None,
     gas_price=None,
     value_sent=None,
-    block='latest',
+    block_number=None,
     call_data=None,
     function_parameters=None,
     provider=None,
@@ -19,10 +25,12 @@ def eth_call(
     package_named_results=False,
     **function_abi_query
 ):
-    if block is None:
-        block = 'latest'
-    block = block_utils.normalize_block(block=block)
-    block = binary_utils.convert_binary_format(block, 'prefix_hex')
+    if block_number is None:
+        block_number = 'latest'
+    block_number = block_utils.normalize_block(block=block_number)
+    block_number = binary_utils.convert_binary_format(
+        block_number, 'prefix_hex'
+    )
 
     # encode call data
     if call_data is None:
@@ -46,7 +54,7 @@ def eth_call(
     # perform request
     result = rpc_backends.rpc_call(
         method='eth_call',
-        parameters=[call_object, block],
+        parameters=[call_object, block_number],
         provider=provider,
     )
 
@@ -107,13 +115,17 @@ def eth_estimate_gas(
     return result
 
 
-def eth_get_balance(address, block='latest', provider=None, decode_result=True):
-    block = block_utils.normalize_block(block=block)
-    block = binary_utils.convert_binary_format(block, 'prefix_hex')
+def eth_get_balance(
+    address, block_number='latest', provider=None, decode_result=True
+):
+    block_number = block_utils.normalize_block(block=block_number)
+    block_number = binary_utils.convert_binary_format(
+        block_number, 'prefix_hex'
+    )
 
     result = rpc_backends.rpc_call(
         method='eth_getBalance',
-        parameters=[address, block],
+        parameters=[address, block_number],
         provider=provider,
     )
 
@@ -123,22 +135,24 @@ def eth_get_balance(address, block='latest', provider=None, decode_result=True):
     return result
 
 
-def eth_get_storage_at(address, position, block='latest', provider=None):
+def eth_get_storage_at(address, position, block_number='latest', provider=None):
     position = binary_utils.convert_binary_format(position, 'prefix_hex')
 
     return rpc_backends.rpc_call(
         method='eth_getStorageAt',
-        parameters=[address, position, block],
+        parameters=[address, position, block_number],
         provider=provider,
     )
 
 
-def eth_get_code(address, block='latest', provider=None):
-    block = block_utils.normalize_block(block=block)
-    block = binary_utils.convert_binary_format(block, 'prefix_hex')
+def eth_get_code(address, block_number='latest', provider=None):
+    block_number = block_utils.normalize_block(block=block_number)
+    block_number = binary_utils.convert_binary_format(
+        block_number, 'prefix_hex'
+    )
     return rpc_backends.rpc_call(
         method='eth_getCode',
-        parameters=[address, block],
+        parameters=[address, block_number],
         provider=provider,
     )
 
