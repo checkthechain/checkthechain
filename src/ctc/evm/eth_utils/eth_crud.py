@@ -18,7 +18,7 @@ def fetch_eth_balance(address, normalize=True, provider=None, block=None):
         block = 'latest'
 
     address = address_utils.get_address_checksum(address)
-    balance = rpc_utils.eth_get_balance(address=address, block=block)
+    balance = rpc_utils.eth_get_balance(address=address, block_number=block)
 
     if normalize:
         balance = balance / 1e18

@@ -125,7 +125,7 @@ def get_contract_creation_block(
         if verbose:
             print('trying block:', index)
         code = rpc_utils.eth_get_code(
-            address=contract_address, block=index, provider=provider
+            address=contract_address, block_number=index, provider=provider
         )
         return len(code) > 3
 

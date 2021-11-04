@@ -28,7 +28,7 @@ def fetch_token_decimals(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
         to_address=get_token_address(token),
         function_name='decimals',
-        block=block,
+        block_number=block,
         **eth_call_kwargs
     )
 
@@ -38,7 +38,7 @@ def fetch_token_name(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
         to_address=get_token_address(token),
         function_name='name',
-        block=block,
+        block_number=block,
         **eth_call_kwargs
     )
 
@@ -48,7 +48,7 @@ def fetch_token_symbol(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
         to_address=get_token_address(token),
         function_name='symbol',
-        block=block,
+        block_number=block,
         **eth_call_kwargs
     )
 
