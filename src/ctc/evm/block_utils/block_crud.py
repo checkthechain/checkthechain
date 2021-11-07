@@ -1,8 +1,11 @@
+import toolparallel
+
 from ctc.toolbox import search_utils
 from .. import address_utils
 from .. import rpc_utils
 
 
+@toolparallel.parallelize_input(singular_arg='block', plural_arg='blocks')
 def get_block(
     block, provider=None, include_full_transactions=False, **rpc_kwargs
 ):
@@ -12,6 +15,7 @@ def get_block(
         candidate = int(block)
         if (block - candidate) ** 2 ** 0.5 > 0.001:
             raise Exception()
+        block = candidate
 
     # gather kwargs
     kwargs = dict(
@@ -25,9 +29,28 @@ def get_block(
         return rpc_utils.eth_get_block_by_number(block_number=block, **kwargs)
     elif isinstance(block, str):
         if block in ['latest', 'earliest', 'pending']:
-            return rpc_utils.eth_get_block_by_number(block_number=block, **kwargs)
+            return rpc_utils.eth_get_block_by_number(
+                block_number=block, **kwargs
+            )
+        elif block.startswith('0x'):
+            if len(block) == 66:
+                return rpc_utils.eth_get_block_by_hash(
+                    block_hash=block, **kwargs
+                )
+            else:
+                return rpc_utils.eth_get_block_by_number(
+                    block_number=block, **kwargs
+                )
+        elif len(block) == 64:
+            return rpc_utils.eth_get_block_by_hash(
+                block_hash=block, **kwargs
+            )
+        elif str.isnumeric(block):
+            return rpc_utils.eth_get_block_by_number(
+                block_number=int(block), **kwargs
+            )
         else:
-            return rpc_utils.eth_get_block_by_hash(block_hash=block, **kwargs)
+            raise Exception('unknown block str format: ' + str(block))
     else:
         raise Exception('unknown block specifier: ' + str(block))
 
@@ -54,6 +77,24 @@ def normalize_block(block, contract_address=None):
         block = get_contract_creation_block(contract_address=contract_address)
 
     return int(block)
+
+
+def normalize_blocks(blocks, contract_address=None):
+    kwargs = {'contract_address': contract_address}
+
+    special = {}
+    for block in blocks:
+        if block in ['latest', 'earliest', 'pending'] and block not in special:
+            special[block] = normalize_block(block, **kwargs)
+
+    normalized = []
+    for block in blocks:
+        if block in special:
+            normalized.append(special[block])
+        else:
+            normalized.append(normalize_block(block, **kwargs))
+
+    return normalized
 
 
 def normalize_block_range(start_block, end_block, contract_address=None):
