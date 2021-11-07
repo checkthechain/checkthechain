@@ -67,6 +67,27 @@ def eth_get_block_by_number(
     if snake_case_result:
         result = rpc_coding.rpc_keys_to_snake_case(result)
 
+    if include_full_transactions and (decode_result or snake_case_result):
+
+        transaction_quantities = rpc_spec.rpc_transaction_quantities
+        new_transactions = []
+        for transaction in result['transactions']:
+
+            new_transaction = transaction
+
+            if decode_result:
+                new_transaction = rpc_coding.decode_rpc_map(
+                    new_transaction, quantities=transaction_quantities
+                )
+
+            if snake_case_result:
+                new_transaction = rpc_coding.rpc_keys_to_snake_case(
+                    new_transaction
+                )
+            new_transactions.append(new_transaction)
+
+        result['transactions'] = new_transactions
+
     return result
 
 
