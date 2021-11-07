@@ -41,7 +41,7 @@ def fetch_feed_datum(
     raw = rpc_utils.eth_call(
         to_address=feed,
         function_name='latestRoundData',
-        block=block,
+        block_number=block,
     )
 
     if normalize:
