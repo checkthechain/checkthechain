@@ -4,6 +4,7 @@ import pandas as pd
 from ctc import directory
 from ctc import evm
 from ctc.toolbox import web3_utils
+from ctc.evm import rpc_utils
 
 
 #
@@ -34,38 +35,52 @@ def _get_co_address(wrapper):
 #
 
 
-def get_pcv_stats(block=None, blocks=None, wrapper=False):
+def get_pcv_stats(block=None, blocks=None, wrapper=False, parallel_kwargs=None):
+
+    if block is not None:
+        block = evm.normalize_block(block=block)
+    if blocks is not None:
+        blocks = evm.normalize_blocks(blocks=blocks)
 
     # assemble kwargs
     kwargs = {}
     if wrapper:
-        kwargs['contract'] = co_addresses[
+        kwargs['to_address'] = co_addresses[
             'CollateralizationOracleWrapper_TransparentUpgradeableProxy'
         ]
     else:
-        kwargs['contract'] = co_addresses['CollateralizationOracle']
+        kwargs['to_address'] = co_addresses['CollateralizationOracle']
     if block is not None:
-        kwargs['block'] = block
+        kwargs['block_number'] = block
     if blocks is not None:
-        kwargs['blocks'] = blocks
+        kwargs['block_numbers'] = blocks
+
+    # remove this later on with better concurrency controls
+    if parallel_kwargs is not None:
+        kwargs['parallel_kwargs'] = parallel_kwargs
 
     # fetch results
-    result = web3_utils.call_web3_contract(function='pcvStats', **kwargs)
+    result = rpc_utils.eth_call(function_name='pcvStats', **kwargs)
 
     # arrange results
     keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
-    transpose = list(zip(*result))
-    data = {}
-    for k, key in enumerate(keys):
-        data[key] = transpose[k]
-        data[key] = np.array(data[key])
-        if key in ['pcv', 'user_fei', 'protocol_equity']:
-            data[key] = data[key] / 1e18
 
-    # create dataframe
-    df = pd.DataFrame(data, index=blocks)
+    if blocks is not None:
+        transpose = list(zip(*result))
+        data = {}
+        for k, key in enumerate(keys):
+            data[key] = transpose[k]
+            data[key] = np.array(data[key])
+            if key in ['pcv', 'user_fei', 'protocol_equity']:
+                data[key] = data[key] / 1e18
 
-    return df
+        # create dataframe
+        df = pd.DataFrame(data, index=blocks)
+
+        return df
+
+    else:
+        return dict(zip(keys, result))
 
 
 #
