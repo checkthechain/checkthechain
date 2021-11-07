@@ -1,4 +1,5 @@
 rpc_block_quantities = [
+    'baseFeePerGas',
     'number',
     'difficulty',
     'totalDifficulty',
@@ -16,6 +17,8 @@ rpc_transaction_quantities = [
     'blockNumber',
     'gas',
     'gasPrice',
+    'maxFeePerGas',
+    'maxPriorityFeePerGas',
     'nonce',
     'transactionIndex',
     'value',
@@ -24,9 +27,11 @@ rpc_transaction_quantities = [
 rpc_transaction_receipt_quantities = [
     'transactionIndex',
     'blockNumber',
-    'cummulativeGasUsed',
+    'cumulativeGasUsed',
+    'effectiveGasPrice',
     'gasUsed',
     'quantity',
+    'status',
 ]
 
 rpc_result_scalar_quantities = [
