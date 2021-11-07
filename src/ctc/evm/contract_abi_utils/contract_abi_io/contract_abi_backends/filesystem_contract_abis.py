@@ -2,12 +2,14 @@ import json
 import os
 
 from ctc import config_utils
+from ctc.evm import contract_abi_utils
 from ctc.toolbox import backend_utils
 
 
 #
 # # paths
 #
+
 
 def get_contract_abis_root():
     config = config_utils.get_config()
@@ -53,7 +55,9 @@ def list_contract_abi_files(contract_address):
 def print_contract_abis_summary():
     contract_abi_contracts = list_contract_abi_contracts()
     print('## Contracts with ABI\'s (' + str(len(contract_abi_contracts)) + ')')
-    for contract_address, contract_dir in sorted(contract_abi_contracts.items()):
+    for contract_address, contract_dir in sorted(
+        contract_abi_contracts.items()
+    ):
         print(
             '-',
             contract_address,
@@ -87,6 +91,19 @@ def save_contract_abi_to_filesystem(
         json.dump(contract_abi, f)
 
     return contract_abi
+
+
+def save_proxy_contract_abi_to_filesystem(
+    contract_address, proxy_implementation, name='proxy_implementation',
+):
+    proxy_abi = contract_abi_utils.get_contract_abi(
+        contract_address=proxy_implementation
+    )
+    save_contract_abi_to_filesystem(
+        contract_abi=proxy_abi,
+        contract_address=contract_address,
+        name=name,
+    )
 
 
 def get_contract_abi_from_filesystem(contract_address, name=None):
