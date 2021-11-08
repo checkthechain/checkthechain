@@ -3,9 +3,6 @@
 - maybe
 
 """
-import eth_abi
-import pandas as pd
-
 from .. import binary_utils
 from . import event_parsing
 
@@ -36,7 +33,7 @@ def decode_event_topics(
     decoded_topics = []
     for topic, indexed_type in zip(topics[1:], indexed_types):
         topic = binary_utils.convert_binary_format(topic, 'binary')
-        decoded_topic = eth_abi.decode_single(indexed_type, topic)
+        decoded_topic = binary_utils.decode_evm_data(indexed_type, topic)
         decoded_topics.append(decoded_topic)
 
     # package output
@@ -63,7 +60,7 @@ def decode_event_unindexed_data(
 
     # decode data
     data = binary_utils.convert_binary_format(data, 'binary')
-    decoded = eth_abi.decode_single('(' + ','.join(unindexed_types) + ')', data)
+    decoded = binary_utils.decode_evm_data('(' + ','.join(unindexed_types) + ')', data)
 
     # package outputs
     if not use_names:
@@ -78,6 +75,14 @@ def decode_event_unindexed_data(
 
 def normalize_event(event, arg_prefix='arg__', **abi_query):
 
+    if abi_query.get('contract_address') is None:
+        abi_query['contract_address'] = event['address']
+    if abi_query.get('event_hash') is None:
+        abi_query['event_hash'] = event['topics'][0]
+    if abi_query.get('event_name') is None:
+        event_abi = event_parsing.get_event_abi(**abi_query)
+        abi_query['event_name'] = event_abi['name']
+
     # decode event args
     decoded_topics = decode_event_topics(topics=event['topics'], **abi_query)
     decoded_data = decode_event_unindexed_data(data=event['data'], **abi_query)
@@ -86,7 +91,7 @@ def normalize_event(event, arg_prefix='arg__', **abi_query):
     remove_keys = ['data', 'topics', 'removed']
     event = {k: v for k, v in event.items() if k not in remove_keys}
 
-    # change keys
+    # rename keys
     event['contract_address'] = event.pop('address')
 
     # add additional keys
@@ -96,12 +101,18 @@ def normalize_event(event, arg_prefix='arg__', **abi_query):
         event[key] = abi_query[key]
 
     # add event args
+    if arg_prefix is None:
+        arg_container = {}
+        event['args'] = arg_container
+        arg_prefix = ''
+    else:
+        arg_container = event
     for event_args in [decoded_topics, decoded_data]:
         for arg_name, arg_value in event_args.items():
             key = arg_prefix + arg_name
-            if key in event:
+            if key in arg_container:
                 raise Exception('event key collision: ' + str(key))
-            event[key] = arg_value
+            arg_container[key] = arg_value
 
     return event
 
@@ -157,7 +168,7 @@ def decode_events_dataframe(
             raise Exception('column name collision')
     decoded = {name: {} for name in unindexed_names}
     for index, value in df['data'].items():
-        decoded_data = decode_event_data(
+        decoded_data = decode_event_unindexed_data(
             data=value,
             unindexed_types=unindexed_types,
             unindexed_names=unindexed_names,
@@ -166,6 +177,8 @@ def decode_events_dataframe(
             decoded[name][index] = subvalue
 
     # concatenate
+    import pandas as pd
+
     new_df = pd.concat([df, pd.DataFrame(decoded)], axis=1)
     new_df = new_df.reindex(df.index)
     if delete_data_column:

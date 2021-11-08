@@ -1,5 +1,3 @@
-import eth_abi
-
 from .. import binary_utils
 from . import function_parsing
 
@@ -38,7 +36,7 @@ def encode_call_data(
     return function_selector + encoded_parameters
 
 
-def decode_call_data(call_data, output_format=None):
+def decode_call_data(call_data, output_format=None, **abi_query):
 
     call_data_bytes = binary_utils.convert_binary_format(call_data, 'binary')
 
@@ -48,9 +46,22 @@ def decode_call_data(call_data, output_format=None):
     )
 
     encoded_parameters = call_data_bytes[4:]
-    decoded_parameters = decode_function_parameters(encoded_parameters)
-    decoded_parameters = binary_utils.convert_binary_format(
-        function_selector, 'binary'
+    parameter_types = function_parsing.get_function_parameter_types(
+        function_selector=function_selector, **abi_query
+    )
+    decoded_parameters = decode_function_parameters(
+        encoded_parameters, parameter_types
+    )
+    parameter_names = function_parsing.get_function_parameter_names(
+        function_selector=function_selector, **abi_query
+    )
+    if len(parameter_names) == len(decoded_parameters):
+        decoded_parameters = dict(zip(parameter_names, decoded_parameters))
+
+    if output_format is None:
+        output_format = 'prefix_hex'
+    function_selector = binary_utils.convert_binary_format(
+        function_selector, output_format
     )
 
     return {
@@ -91,10 +102,10 @@ def encode_function_parameters(
         parameter_names = function_parsing.get_function_parameter_names(
             n_parameters=n_parameters, **abi_query
         )
-        parameters = (parameters[name] for name in parameter_names)
+        parameters = [parameters[name] for name in parameter_names]
 
     # encode
-    encoded_bytes = eth_abi.encode_single(
+    encoded_bytes = binary_utils.encode_evm_data(
         '(' + ','.join(parameter_types) + ')', parameters
     )
 
@@ -107,7 +118,9 @@ def decode_function_parameters(encoded_parameters, parameter_types):
     encoded_parameters = binary_utils.convert_binary_format(
         encoded_parameters, 'binary'
     )
-    parameters = eth_abi.decode_single(parameter_types_str, encoded_parameters)
+    parameters = binary_utils.decode_evm_data(
+        parameter_types_str, encoded_parameters
+    )
     return parameters
 
 
@@ -150,7 +163,9 @@ def decode_function_output(
     encoded_output = binary_utils.convert_binary_format(
         encoded_output, 'binary'
     )
-    decoded_output = eth_abi.decode_single(output_types_str, encoded_output)
+    decoded_output = binary_utils.decode_evm_data(
+        output_types_str, encoded_output
+    )
 
     # decode strings
     if 'string' in output_types:
