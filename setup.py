@@ -18,5 +18,8 @@ setuptools.setup(
         'pyyaml',
         'requests',
     ],
+    scripts=[
+        './scripts/ctc'
+    ]
 )
 
