@@ -74,7 +74,7 @@ def export_as_chunks(
     if chunk_size is None:
         chunk_size = config_utils.get_config()['export_chunk_size']
 
-    all_chunks = etl_list.get_chunks_in_range(
+    all_chunks = evm.get_chunks_in_range(
         start_block=start_block, end_block=end_block, chunk_size=chunk_size
     )
 
