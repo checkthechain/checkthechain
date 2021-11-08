@@ -1,4 +1,3 @@
-import requests
 
 from .. import address_utils
 from .. import block_utils
@@ -6,6 +5,7 @@ from .. import rpc_utils
 
 
 def fetch_eth_total_supply():
+    import requests
     url = 'http://api.etherscan.io/api?module=stats&action=ethsupply'
     response = requests.request(method='get', url=url)
     result_str = response.json()['result']

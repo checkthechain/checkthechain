@@ -1,6 +1,4 @@
 import os
-import numpy as np
-import pandas as pd
 
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
@@ -125,6 +123,8 @@ def list_contract_events(
             )
             paths.setdefault(event_hash, {})
             paths[event_hash][path] = [int(start_block), int(end_block)]
+
+    import numpy as np
 
     # create block_range and block_mask
     events = {}
@@ -304,6 +304,8 @@ def get_events_from_filesystem(
         if verbose >= 2:
             for path in events[event_hash]['paths']:
                 print('-', path)
+
+    import pandas as pd
     for path in events[event_hash]['paths'].keys():
         df = pd.read_csv(path)
         df = df.set_index(['block_number', 'transaction_index', 'log_index'])

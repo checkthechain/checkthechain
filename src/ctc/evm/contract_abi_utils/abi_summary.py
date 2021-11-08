@@ -1,8 +1,5 @@
 import copy
 
-import IPython
-import pandas as pd
-
 from . import contract_abi_io
 from . import event_parsing
 
@@ -18,6 +15,7 @@ def summarize_contract_abi(contract_abi=None, contract_address=None):
             contract_address=contract_address,
         )
     df = contract_abi_to_dataframe(contract_abi, human_readable=True)
+    import IPython
     IPython.display.display(df)
 
 
@@ -96,6 +94,8 @@ def contract_abi_to_dataframe(contract_abi, human_readable):
             if 'stateMutability' not in entry:
                 entry['stateMutability'] = ''
 
+    import pandas as pd
+
     df = pd.DataFrame(contract_abi)
     df = df.reindex(
         columns=[
@@ -148,6 +148,8 @@ def get_contract_events_dataframe(
                 event_row['topic' + str(n_topics) + '_name'] = var['name']
 
         event_rows.append(event_row)
+
+    import pandas as pd
 
     return pd.DataFrame(event_rows)
 

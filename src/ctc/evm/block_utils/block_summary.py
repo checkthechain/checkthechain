@@ -1,4 +1,3 @@
-import numpy as np
 import tooltime
 import toolstr
 
@@ -27,6 +26,7 @@ def print_block_summary(block):
             transaction['gas_price'] / 1e9
             for transaction in block['transactions']
         ]
+        import numpy as np
         gas_percentiles = np.percentile(
             gas_prices,
             percentiles,

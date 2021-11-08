@@ -1,7 +1,4 @@
-import pandas as pd
 import toolparallel
-
-from ctc.toolbox import etl_utils
 
 from ... import block_utils
 from ... import contract_abi_utils
@@ -33,7 +30,7 @@ def get_events_from_node(
         )
     blocks_per_chunk = min(1000, blocks_per_chunk)
     if blocks_per_chunk is not None:
-        chunks = etl_utils.get_chunks_in_range(
+        chunks = block_utils.get_chunks_in_range(
             start_block=start_block,
             end_block=end_block,
             chunk_size=blocks_per_chunk,
@@ -137,6 +134,7 @@ def _package_exported_events(
         )
         formatted_entries.append(formatted_entry)
 
+    import pandas as pd
     df = pd.DataFrame(formatted_entries)
     df = df.set_index(['block_number', 'transaction_index', 'log_index'])
 
@@ -174,6 +172,7 @@ def create_empty_event_dataframe(
     for item in event_abi['inputs']:
         columns.append('arg__' + item['name'])
 
+    import pandas as pd
     df = pd.DataFrame(columns=columns)
     df = df.set_index(['block_number', 'transaction_index', 'log_index'])
 

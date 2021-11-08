@@ -4,7 +4,6 @@ import os
 
 import numpy as np
 import pandas
-import requests
 import tooltime
 
 from ctc import config_utils
@@ -44,6 +43,7 @@ def request_raw_vote_data(name, save=True, overwrite=False, verbose=True):
         print('requesting proposal', name)
 
     # request data
+    import requests
     response = requests.get(url=url)
     data = response.json()
 
