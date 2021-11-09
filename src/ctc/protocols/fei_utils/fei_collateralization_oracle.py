@@ -1,10 +1,7 @@
-import numpy as np
-import pandas as pd
-
 from ctc import directory
 from ctc import evm
-from ctc.toolbox import web3_utils
 from ctc.evm import rpc_utils
+from ctc.protocols import chainlink_utils
 
 
 #
@@ -70,11 +67,13 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False, parallel_kwargs=None):
         data = {}
         for k, key in enumerate(keys):
             data[key] = transpose[k]
+            import numpy as np
             data[key] = np.array(data[key])
             if key in ['pcv', 'user_fei', 'protocol_equity']:
                 data[key] = data[key] / 1e18
 
         # create dataframe
+        import pandas as pd
         df = pd.DataFrame(data, index=blocks)
 
         return df
@@ -90,25 +89,19 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False, parallel_kwargs=None):
 
 def get_deposits_for_token(token, block=None, wrapper=False):
 
-    # assemble kwargs
-    kwargs = {}
     if wrapper:
-        kwargs['contract'] = co_addresses[
+        contract_address = co_addresses[
             'CollateralizationOracleWrapper_TransparentUpgradeableProxy'
         ]
     else:
-        kwargs['contract'] = co_addresses['CollateralizationOracle']
+        contract_address = co_addresses['CollateralizationOracle']
 
-    token = evm.get_address_checksum(token)
-
-    result = web3_utils.call_web3_contract(
-        function='getDepositsForToken',
-        kwargs={'_token': token},
-        block=block,
-        **kwargs
+    return rpc_utils.eth_call(
+        to_address=contract_address,
+        block_number=block,
+        function_name='getDepositsForToken',
+        function_parameters={'_token': token},
     )
-
-    return [item.lower() for item in result]
 
 
 def get_tokens_deposits():
@@ -120,14 +113,11 @@ def get_tokens_deposits():
 
 def get_deposit_token_balance(deposit_address, block=None):
 
-    deposit_address = evm.get_address_checksum(deposit_address)
-
-    balance = web3_utils.call_web3_contract(
-        contract=deposit_address,
-        function='balance',
-        block=block,
+    return rpc_utils.eth_call(
+        to_address=deposit_address,
+        function_name='balance',
+        block_number=block,
     )
-    return balance
 
 
 #
@@ -136,12 +126,11 @@ def get_deposit_token_balance(deposit_address, block=None):
 
 
 def get_tokens_in_pcv(block=None, wrapper=False):
-    tokens = web3_utils.call_web3_contract(
-        contract=_get_co_address(wrapper=wrapper),
-        function='getTokensInPcv',
-        block=block,
+    return rpc_utils.eth_call(
+        to_address=_get_co_address(wrapper=wrapper),
+        function_name='getTokensInPcv',
+        block_number=block,
     )
-    return [token.lower() for token in tokens]
 
 
 def get_pcv_token_balance(token, block=None):
@@ -166,17 +155,17 @@ def get_token_price_usd(token, block=None):
         # RAI composite oracle
         # RAI-ETH oracle
         rai_eth_oracle = directory.chainlink_feeds['RAI_ETH']
-        rai_eth = web3_utils.call_web3_contract(
-            contract=rai_eth_oracle, function='latestAnswer'
+        rai_eth = chainlink_utils.fetch_feed_value(
+            feed=rai_eth_oracle,
+            block=block
         )
-        rai_eth /= 1e18
 
         # ETH-USD oracle
         eth_usd_oracle = directory.chainlink_feeds['ETH_USD']
-        eth_usd = web3_utils.call_web3_contract(
-            contract=eth_usd_oracle, function='latestAnswer'
+        eth_usd = chainlink_utils.fetch_feed_value(
+            feed=eth_usd_oracle,
+            block=block,
         )
-        eth_usd /= 1e8
 
         rai_usd = rai_eth * eth_usd
 
@@ -192,13 +181,15 @@ def get_token_price_usd(token, block=None):
         oracle = token_to_oracle(token)
         oracle = evm.get_address_checksum(oracle)
 
-        chainlink_oracle = web3_utils.call_web3_contract(
-            contract=oracle, function='chainlinkOracle'
+        chainink_oracle = rpc_utils.eth_call(
+            to_address=oracle,
+            function_name='chainlinkOracle',
         )
 
         chainlink_oracle = evm.get_address_checksum(chainlink_oracle)
-        answer = web3_utils.call_web3_contract(
-            contract=chainlink_oracle, function='latestAnswer'
+        answer = rpc_utils.eth_call(
+            to_address=chainlink_oracle,
+            function='latestAnswer',
         )
 
         return answer / 1e8
@@ -211,12 +202,11 @@ def get_pcv_token_balance_usd(token, block=None):
 
 
 def token_to_oracle(token_address, block=None):
-    address = evm.get_address_checksum(co_addresses['CollateralizationOracle'])
-    return web3_utils.call_web3_contract(
-        contract=address,
-        function='tokenToOracle',
-        args=[evm.get_address_checksum(token_address)],
-        block=block,
+    return rpc_utils.eth_call(
+        to_address=co_addresses['CollateralizationOracle'],
+        function_name='tokenToOracle',
+        function_parameters=[token_address],
+        block_number=block,
     )
 
 
@@ -278,6 +268,9 @@ def get_deposits_dataframe(token_prices_usd=None, tokens_balances=None):
                 'token_address': token,
             }
             rows.append(row)
+
+    import pandas as pd
+
     df = pd.DataFrame(rows)
     return df
 
