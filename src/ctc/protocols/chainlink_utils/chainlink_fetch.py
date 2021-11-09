@@ -23,6 +23,10 @@ aggregator_outputs = [
 ]
 
 
+def fetch_feed_value(feed, block=None, **kwargs):
+    return fetch_feed_datum(feed=feed, block=block, **kwargs)['answer']
+
+
 def fetch_feed_datum(
     feed, block=None, format=None, normalize=None, **contract_kwargs
 ):

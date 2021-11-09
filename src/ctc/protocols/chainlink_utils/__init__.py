@@ -3,3 +3,4 @@ from .chainlink_io import *
 from .chainlink_fetch import *
 from .chainlink_spec import *
 from .chainlink_queries import *
+from .chainlink_summary import *
