@@ -140,5 +140,6 @@ def download_events(
         contract_address=contract_address,
         start_block=start_block,
         end_block=end_block,
+        verbose=verbose,
     )
 
