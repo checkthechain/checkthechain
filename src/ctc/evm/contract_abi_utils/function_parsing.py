@@ -83,7 +83,12 @@ def get_function_parameter_names(function_abi=None, **abi_query):
 
 
 def get_function_signature(
-    *, parameter_types=None, function_name=None, function_abi=None, **abi_query
+    *,
+    parameter_types=None,
+    function_name=None,
+    function_abi=None,
+    include_names=False,
+    **abi_query
 ):
     """
     Valid Input Sets:
@@ -98,14 +103,25 @@ def get_function_signature(
         )
 
     parameter_types = [
-        get_function_selector_type(item)
-        for item in parameter_types
+        get_function_selector_type(item) for item in parameter_types
     ]
+    if include_names:
+        parameter_names = get_function_parameter_names(
+            function_abi=function_abi, function_name=function_name, **abi_query
+        )
+        entries = [
+            type + ' ' + name
+            for type, name in zip(parameter_types, parameter_names)
+        ]
+        entries = ', '.join(entries)
+    else:
+        entries = parameter_types
+        entries = ','.join(entries)
 
     if function_name is None:
         function_name = function_abi['name']
 
-    return function_name + '(' + ','.join(parameter_types) + ')'
+    return function_name + '(' + entries + ')'
 
 
 def get_function_selector_type(datatype):
