@@ -1,16 +1,18 @@
 from ctc import directory
 from ctc import evm
-from ctc.toolbox import web3_utils
 
 
 def get_feed_aggregator(*, feed_name=None, feed_address=None):
+    # TODO:
+    # - condense inputs into one
+    # - add block number
 
     if feed_address is None:
         feed_address = directory.chainlink_feeds[feed_name]
 
-    return web3_utils.call_web3_contract(
-        contract=feed_address,
-        function='aggregator',
+    return evm.eth_call(
+        to_address=feed_address,
+        function_name='aggregator',
     )
 
 
@@ -22,6 +24,7 @@ def get_feed_data(
     end_block=None,
     normalize=True,
     answer_only=True,
+    verbose=True,
 ):
 
     # get feed address
@@ -29,9 +32,9 @@ def get_feed_data(
         feed_address = directory.chainlink_feeds[feed_name]
 
     # get aggregator
-    aggregator_address = web3_utils.call_web3_contract(
-        contract=feed_address,
-        function='aggregator',
+    aggregator_address = evm.eth_call(
+        to_address=feed_address,
+        function_name='aggregator',
     )
 
     # parse block
@@ -43,6 +46,9 @@ def get_feed_data(
         end_block = evm.get_block_number('latest')
     if start_block is None:
 
+        # once have eth_call storage should always just use genesis blocks here
+
+        # use first recorded block if any blocks exist in storage
         events_list = evm.list_events(
             contract_address=aggregator_address,
             event_name='AnswerUpdated',
@@ -67,6 +73,7 @@ def get_feed_data(
         contract_address=aggregator_address,
         start_block=start_block,
         end_block=end_block,
+        verbose=verbose,
     )
 
     if normalize:
