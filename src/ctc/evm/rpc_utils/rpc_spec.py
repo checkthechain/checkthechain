@@ -1,3 +1,16 @@
+
+
+contenttypes = {
+    'RpcProvider': {
+        'url': 'URL',
+    },
+}
+
+
+#
+# # rpc call schema
+#
+
 rpc_block_quantities = [
     'baseFeePerGas',
     'number',

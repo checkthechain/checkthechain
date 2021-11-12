@@ -1,6 +1,6 @@
 from ... import binary_utils
 from .. import rpc_backends
-from .. import rpc_coding
+from .. import rpc_crud
 from .. import rpc_spec
 
 
@@ -13,9 +13,9 @@ def eth_new_filter(
     decode_result=False,
 ):
     if start_block is not None:
-        start_block = rpc_coding.encode_rpc_block(start_block)
+        start_block = rpc_crud.encode_rpc_block(start_block)
     if end_block is not None:
-        end_block = rpc_coding.encode_rpc_block(end_block)
+        end_block = rpc_crud.encode_rpc_block(end_block)
 
     parameters = {
         'address': contract_address,
@@ -92,13 +92,13 @@ def eth_get_filter_changes(
 
     if decode_result and len(result) > 0 and isinstance(result[0], dict):
         result = [
-            rpc_coding.decode_rpc_map(subresult, rpc_spec.rpc_log_quantities)
+            rpc_crud.decode_rpc_map(subresult, rpc_spec.rpc_log_quantities)
             for subresult in result
         ]
 
     if snake_case_result and len(result) > 0 and isinstance(result[0], dict):
         result = [
-            rpc_coding.rpc_keys_to_snake_case(subresult) for subresult in result
+            rpc_crud.rpc_keys_to_snake_case(subresult) for subresult in result
         ]
 
     return result
@@ -119,13 +119,13 @@ def eth_get_filter_logs(
 
     if decode_result and len(result) > 0 and isinstance(result[0], dict):
         result = [
-            rpc_coding.decode_rpc_map(subresult, rpc_spec.rpc_log_quantities)
+            rpc_crud.decode_rpc_map(subresult, rpc_spec.rpc_log_quantities)
             for subresult in result
         ]
 
     if snake_case_result and len(result) > 0 and isinstance(result[0], dict):
         result = [
-            rpc_coding.rpc_keys_to_snake_case(subresult) for subresult in result
+            rpc_crud.rpc_keys_to_snake_case(subresult) for subresult in result
         ]
 
     return result
@@ -142,9 +142,9 @@ def eth_get_logs(
     include_removed=False,
 ):
     if start_block is not None:
-        start_block = rpc_coding.encode_rpc_block(start_block)
+        start_block = rpc_crud.encode_rpc_block(start_block)
     if end_block is not None:
-        end_block = rpc_coding.encode_rpc_block(end_block)
+        end_block = rpc_crud.encode_rpc_block(end_block)
 
     parameters = {
         'address': contract_address,
@@ -165,13 +165,13 @@ def eth_get_logs(
 
     if decode_result and len(result) > 0 and isinstance(result[0], dict):
         result = [
-            rpc_coding.decode_rpc_map(subresult, rpc_spec.rpc_log_quantities)
+            rpc_crud.decode_rpc_map(subresult, rpc_spec.rpc_log_quantities)
             for subresult in result
         ]
 
     if snake_case_result and len(result) > 0 and isinstance(result[0], dict):
         result = [
-            rpc_coding.rpc_keys_to_snake_case(subresult) for subresult in result
+            rpc_crud.rpc_keys_to_snake_case(subresult) for subresult in result
         ]
 
     return result

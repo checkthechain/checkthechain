@@ -1,6 +1,6 @@
 from ... import binary_utils
 from .. import rpc_backends
-from .. import rpc_coding
+from .. import rpc_crud
 
 
 def web3_client_version(provider=None):
@@ -63,7 +63,7 @@ def eth_syncing(provider=None, snake_case_result=True):
 
     if snake_case_result:
         if isinstance(result, dict):
-            result = rpc_coding.rpc_keys_to_snake_case(result)
+            result = rpc_crud.rpc_keys_to_snake_case(result)
 
     return result
 

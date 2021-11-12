@@ -1,6 +1,6 @@
 from ... import binary_utils
 from .. import rpc_backends
-from .. import rpc_coding
+from .. import rpc_crud
 from .. import rpc_spec
 
 
@@ -35,10 +35,10 @@ def eth_get_block_by_hash(
 
     if decode_result:
         quantities = rpc_spec.rpc_block_quantities
-        result = rpc_coding.decode_rpc_map(result, quantities=quantities)
+        result = rpc_crud.decode_rpc_map(result, quantities=quantities)
 
     if snake_case_result:
-        result = rpc_coding.rpc_keys_to_snake_case(result)
+        result = rpc_crud.rpc_keys_to_snake_case(result)
 
     return result
 
@@ -51,7 +51,7 @@ def eth_get_block_by_number(
     snake_case_result=True,
 ):
 
-    encoded_block_number = rpc_coding.encode_rpc_block(block_number)
+    encoded_block_number = rpc_crud.encode_rpc_block(block_number)
 
     parameters = [encoded_block_number, include_full_transactions]
     result = rpc_backends.rpc_call(
@@ -62,10 +62,10 @@ def eth_get_block_by_number(
 
     if decode_result:
         quantities = rpc_spec.rpc_block_quantities
-        result = rpc_coding.decode_rpc_map(result, quantities=quantities)
+        result = rpc_crud.decode_rpc_map(result, quantities=quantities)
 
     if snake_case_result:
-        result = rpc_coding.rpc_keys_to_snake_case(result)
+        result = rpc_crud.rpc_keys_to_snake_case(result)
 
     if include_full_transactions and (decode_result or snake_case_result):
 
@@ -76,12 +76,12 @@ def eth_get_block_by_number(
             new_transaction = transaction
 
             if decode_result:
-                new_transaction = rpc_coding.decode_rpc_map(
+                new_transaction = rpc_crud.decode_rpc_map(
                     new_transaction, quantities=transaction_quantities
                 )
 
             if snake_case_result:
-                new_transaction = rpc_coding.rpc_keys_to_snake_case(
+                new_transaction = rpc_crud.rpc_keys_to_snake_case(
                     new_transaction
                 )
             new_transactions.append(new_transaction)
@@ -110,7 +110,7 @@ def eth_get_uncle_count_by_block_hash(
 def eth_get_uncle_count_by_block_number(
     block_number, provider=None, decode_result=True
 ):
-    encoded_block_number = rpc_coding.encode_rpc_block(block_number)
+    encoded_block_number = rpc_crud.encode_rpc_block(block_number)
     result = rpc_backends.rpc_call(
         method='eth_getUncleCountByBlockNumber',
         parameters=[encoded_block_number],
@@ -144,10 +144,10 @@ def eth_get_uncle_by_block_hash_and_index(
 
     if decode_result:
         quantities = rpc_spec.rpc_block_quantities
-        result = rpc_coding.decode_rpc_map(result, quantities=quantities)
+        result = rpc_crud.decode_rpc_map(result, quantities=quantities)
 
     if snake_case_result:
-        result = rpc_coding.rpc_keys_to_snake_case(result)
+        result = rpc_crud.rpc_keys_to_snake_case(result)
 
     return result
 
@@ -160,7 +160,7 @@ def eth_get_uncle_by_block_number_and_index(
     snake_case_result=True,
 ):
 
-    encoded_block_number = rpc_coding.encode_rpc_block(block_number)
+    encoded_block_number = rpc_crud.encode_rpc_block(block_number)
     encoded_uncle_index = binary_utils.convert_binary_format(
         uncle_index, 'prefix_hex'
     )
@@ -173,10 +173,10 @@ def eth_get_uncle_by_block_number_and_index(
 
     if decode_result:
         quantities = rpc_spec.rpc_block_quantities
-        result = rpc_coding.decode_rpc_map(result, quantities=quantities)
+        result = rpc_crud.decode_rpc_map(result, quantities=quantities)
 
     if snake_case_result:
-        result = rpc_coding.rpc_keys_to_snake_case(result)
+        result = rpc_crud.rpc_keys_to_snake_case(result)
 
     return result
 

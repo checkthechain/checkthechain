@@ -1,6 +1,6 @@
 from ... import binary_utils
 from .. import rpc_backends
-from .. import rpc_coding
+from .. import rpc_crud
 
 
 def eth_gas_price(provider=None, decode_result=True):
@@ -62,7 +62,7 @@ def eth_sign_transaction(
     )
 
     if snake_case_result:
-        result = rpc_coding.rpc_keys_to_snake_case(result)
+        result = rpc_crud.rpc_keys_to_snake_case(result)
 
     return result
 
@@ -96,7 +96,7 @@ def eth_send_transaction(
     )
 
     if snake_case_result:
-        result = rpc_coding.rpc_keys_to_snake_case(result)
+        result = rpc_crud.rpc_keys_to_snake_case(result)
 
     return result
 
