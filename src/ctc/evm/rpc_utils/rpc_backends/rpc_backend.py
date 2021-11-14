@@ -4,6 +4,7 @@ from . import rpc_http
 
 
 def rpc_call(method, parameters, provider=None):
+    """deprecate this method"""
 
     if provider is None:
         config = config_utils.get_config()
