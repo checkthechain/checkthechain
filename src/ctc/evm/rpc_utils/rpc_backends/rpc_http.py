@@ -2,21 +2,12 @@ import json
 import os
 
 from ctc import config_utils
-from .. import rpc_crud
 
 
 _http_sessions = {}
 
 
-def rpc_call_http(
-    *,
-    rpc_data=None,
-    method=None,
-    parameters=None,
-    batch_methods=None,
-    batch_parameters=None,
-    provider=None,
-):
+def rpc_call_http(*, rpc_data, provider=None):
 
     if provider is None:
         provider = config_utils.get_config()['export_provider']
@@ -24,20 +15,11 @@ def rpc_call_http(
     # get session
     session = _get_http_session(provider=provider)
 
-    # build request data
-    if rpc_data is None:
-        rpc_data = rpc_crud.construct_rpc_data(
-            method=method,
-            parameters=parameters,
-            batch_methods=batch_methods,
-            batch_parameters=batch_parameters,
-        )
-
     # perform request
     response = session.post(url=provider, data=json.dumps(rpc_data))
     response_data = response.json()
 
-    if batch_parameters is not None:
+    if isinstance(rpc_data, (list, tuple)):
         results = sorted(response_data, key=lambda r: r['id'])
         return [result['result'] for result in results]
     else:
