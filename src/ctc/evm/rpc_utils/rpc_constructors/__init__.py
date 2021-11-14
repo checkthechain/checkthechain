@@ -5,4 +5,3 @@ from .rpc_node import *
 from .rpc_state import *
 from .rpc_submission import *
 from .rpc_transactions import *
-from .rpc_whisper import *

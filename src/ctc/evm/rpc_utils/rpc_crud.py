@@ -1,25 +1,7 @@
-import random
 import re
 
 from .. import binary_utils
 
-
-#
-# # rpc creation
-#
-
-def construct_rpc_call(method, parameters):
-    return {
-        'jsonrpc': '2.0',
-        'method': method,
-        'params': parameters,
-        'id': random.randint(1, 1e18),
-    }
-
-
-#
-# # rpc coding
-#
 
 def encode_rpc_block(block):
     if block in ['latest', 'earliest', 'pending']:
