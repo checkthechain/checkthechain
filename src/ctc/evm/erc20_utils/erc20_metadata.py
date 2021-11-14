@@ -9,7 +9,7 @@ from .. import rpc_utils
 #
 
 
-def get_token_address(token):
+def get_erc20_address(token):
     if address_utils.is_address_str(token):
         return token
     elif isinstance(token, str):
@@ -24,9 +24,9 @@ def get_token_address(token):
 
 
 @block_utils.parallelize_block_fetching()
-def fetch_token_decimals(token=None, block=None, **eth_call_kwargs):
+def get_erc20_decimals(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
-        to_address=get_token_address(token),
+        to_address=get_erc20_address(token),
         function_name='decimals',
         block_number=block,
         **eth_call_kwargs
@@ -34,9 +34,9 @@ def fetch_token_decimals(token=None, block=None, **eth_call_kwargs):
 
 
 @block_utils.parallelize_block_fetching()
-def fetch_token_name(token=None, block=None, **eth_call_kwargs):
+def get_erc20_name(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
-        to_address=get_token_address(token),
+        to_address=get_erc20_address(token),
         function_name='name',
         block_number=block,
         **eth_call_kwargs
@@ -44,9 +44,9 @@ def fetch_token_name(token=None, block=None, **eth_call_kwargs):
 
 
 @block_utils.parallelize_block_fetching()
-def fetch_token_symbol(token=None, block=None, **eth_call_kwargs):
+def get_erc20_symbol(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
-        to_address=get_token_address(token),
+        to_address=get_erc20_address(token),
         function_name='symbol',
         block_number=block,
         **eth_call_kwargs

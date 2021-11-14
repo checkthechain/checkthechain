@@ -7,15 +7,15 @@ from ctc import evm
 
 
 def get_pool_tokens(pool_address):
-    token0 = evm.eth_call(contract_address=pool_address, function_name='token0')
-    token1 = evm.eth_call(contract_address=pool_address, function_name='token1')
+    token0 = evm.eth_call(to_address=pool_address, function_name='token0')
+    token1 = evm.eth_call(to_address=pool_address, function_name='token1')
     return [token0, token1]
 
 
 def get_pool_metadata(pool_address):
     token_x, token_y = get_pool_tokens(pool_address=pool_address)
-    token_x_name = evm.fetch_token_name(token=token_x)
-    token_y_name = evm.fetch_token_name(token=token_y)
+    token_x_name = evm.get_erc20_name(token=token_x)
+    token_y_name = evm.get_erc20_name(token=token_y)
     return {
         'x_name': token_x_name,
         'y_name': token_y_name,
@@ -35,13 +35,13 @@ def get_v2_pool_state(pool_address, block='latest'):
     block = evm.normalize_block(block=block)
 
     token_x, token_y = get_pool_tokens(pool_address=pool_address)
-    token_x_reserves = evm.fetch_token_balance_of(
+    token_x_reserves = evm.get_erc20_balance_of(
         pool_address, token=token_x, block=block
     )
-    token_y_reserves = evm.fetch_token_balance_of(
+    token_y_reserves = evm.get_erc20_balance_of(
         pool_address, token=token_y, block=block
     )
-    lp_total_supply = evm.fetch_token_total_supply(
+    lp_total_supply = evm.get_erc20_total_supply(
         token=pool_address, block=block
     )
 
@@ -50,6 +50,10 @@ def get_v2_pool_state(pool_address, block='latest'):
         'y_reserves': token_y_reserves,
         'lp_total_supply': lp_total_supply,
     }
+
+
+# def get_v2_pool_state(pool_address, block=None, blocks=None):
+#     pass
 
 
 #

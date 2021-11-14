@@ -2,10 +2,10 @@ from .. import rpc_utils
 from . import erc20_metadata
 
 
-def fetch_token_total_supply(
+def get_erc20_total_supply(
     token, block=None, blocks=None, normalize=True, **contract_kwargs
 ):
-    contract_address = erc20_metadata.get_token_address(token)
+    contract_address = erc20_metadata.get_erc20_address(token)
 
     if block is None and blocks is None:
         block = 'latest'
@@ -19,14 +19,13 @@ def fetch_token_total_supply(
     )
 
     if normalize:
-        token_n_decimals = erc20_metadata.fetch_token_decimals(contract_address)
+        token_n_decimals = erc20_metadata.get_erc20_decimals(contract_address)
 
         if block is not None:
             total_supply = total_supply / (10 ** token_n_decimals)
         elif blocks is not None:
             total_supply = [
-                item / (10 ** token_n_decimals)
-                for item in total_supply
+                item / (10 ** token_n_decimals) for item in total_supply
             ]
         else:
             raise Exception()
@@ -34,7 +33,7 @@ def fetch_token_total_supply(
     return total_supply
 
 
-def fetch_token_balance_of(
+def get_erc20_balance_of(
     address,
     token=None,
     block=None,
@@ -43,7 +42,7 @@ def fetch_token_balance_of(
     **eth_call_kwargs
 ):
 
-    contract_address = erc20_metadata.get_token_address(token)
+    contract_address = erc20_metadata.get_erc20_address(token)
     token_balance = rpc_utils.eth_call(
         to_address=contract_address,
         function_name='balanceOf',
@@ -54,7 +53,7 @@ def fetch_token_balance_of(
     )
 
     if normalize:
-        token_n_decimals = erc20_metadata.fetch_token_decimals(contract_address)
+        token_n_decimals = erc20_metadata.get_erc20_decimals(contract_address)
         token_balance = token_balance / (10 ** token_n_decimals)
 
     return token_balance

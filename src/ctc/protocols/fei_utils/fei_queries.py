@@ -3,17 +3,16 @@ from ctc import evm
 from ctc.protocols import chainlink_utils
 from ctc.protocols import uniswap_utils
 
-# see https://github.com/fei-protocol/fei-app/blob/master/src/providers/ethereum/feiProtocolWatcher.js
-
 
 #
 # # pcv holdings
 #
 
+
 @evm.parallelize_block_fetching()
 def fetch_pcv_uniswap_balance(block=None, **kwargs):
     address = directory.get_fei_address('EthUniswapPCVDeposit', block=block)
-    lp_tokens = evm.fetch_token_balance_of(
+    lp_tokens = evm.get_erc20_balance_of(
         token=directory.uniswap_v2_pools['FEI_ETH'],
         address=address,
         block=block,
@@ -42,7 +41,7 @@ def fetch_bonding_curve_balance(block=None, **kwargs):
 
 @evm.parallelize_block_fetching()
 def fetch_pcv_steth_usd(block=None):
-    pcv_steth = evm.fetch_token_balance_of(
+    pcv_steth = evm.get_erc20_balance_of(
         address=directory.get_fei_address('EthLidoPCVDeposit'),
         token='stETH',
         block=block,
@@ -64,7 +63,7 @@ def fetch_pcv_holdings(asset, block=None):
         raise NotImplementedError()
 
     elif asset == 'stETH':
-        return evm.fetch_token_balance_of(
+        return evm.get_erc20_balance_of(
             address=directory.get_fei_address('EthLidoPCVDeposit'),
             token='stETH',
             block=block,
@@ -113,16 +112,16 @@ def fetch_tribe_price(block=None, **kwargs):
 
 @evm.parallelize_block_fetching()
 def fetch_rari_protocol_owned_fei(block=None):
-    protocol_pool_tokens = evm.fetch_token_balance_of(
+    protocol_pool_tokens = evm.get_erc20_balance_of(
         address=directory.get_fei_address('Fei DAO Timelock'),
         token=directory.rari_pool_tokens['pool_8__FEI'],
         block=block,
     )
-    total_pool_tokens = evm.fetch_token_total_supply(
+    total_pool_tokens = evm.get_erc20_total_supply(
         token=directory.rari_pool_tokens['pool_8__FEI'],
         block=block,
     )
-    pool_fei = evm.fetch_token_balance_of(
+    pool_fei = evm.get_erc20_balance_of(
         address=directory.rari_pool_tokens['pool_8__FEI'],
         token='FEI',
         block=block,
@@ -141,12 +140,8 @@ def fetch_fei_metrics(block=None):
     tribe_address = directory.token_addresses['TRIBE']
 
     # supply
-    fei_total_supply = evm.fetch_token_total_supply(
-        fei_address, block=block
-    )
-    tribe_total_supply = evm.fetch_token_total_supply(
-        tribe_address, block=block
-    )
+    fei_total_supply = evm.get_erc20_total_supply(fei_address, block=block)
+    tribe_total_supply = evm.get_erc20_total_supply(tribe_address, block=block)
 
     # oracle prices
     eth_price = chainlink_utils.fetch_eth_price(block=block)
