@@ -7,7 +7,7 @@ from ctc import config_utils
 _http_sessions = {}
 
 
-def rpc_call_http(*, rpc_data, provider=None):
+def rpc_call_http(*, rpc_request, provider=None):
 
     if provider is None:
         provider = config_utils.get_config()['export_provider']
@@ -16,12 +16,12 @@ def rpc_call_http(*, rpc_data, provider=None):
     session = _get_http_session(provider=provider)
 
     # perform request
-    response = session.post(url=provider, data=json.dumps(rpc_data))
+    response = session.post(url=provider, data=json.dumps(rpc_request))
     response_data = response.json()
 
-    if isinstance(rpc_data, (list, tuple)):
-        results = sorted(response_data, key=lambda r: r['id'])
-        return [result['result'] for result in results]
+    if isinstance(rpc_request, (list, tuple)):
+        responses_by_id = {r['id']: r['result'] for r in response_data}
+        return [responses_by_id[subrequest['id']] for subrequest in rpc_request]
     else:
         return response_data['result']
 
