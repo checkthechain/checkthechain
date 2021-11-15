@@ -143,6 +143,7 @@ def get_contract_creation_block(
     end_block=None,
     provider=None,
     verbose=True,
+    nary=None,
 ):
     """get the block where a contract was created
 
@@ -170,11 +171,19 @@ def get_contract_creation_block(
         )
         return len(code) > 3
 
-    result = search_utils.binary_search(
-        start_index=start_block,
-        end_index=end_block,
-        is_match=is_match,
-    )
+    if nary is None:
+        result = search_utils.binary_search(
+            start_index=start_block,
+            end_index=end_block,
+            is_match=is_match,
+        )
+    else:
+        result = search_utils.nary_search(
+            start_index=start_block,
+            end_index=end_block,
+            is_match=is_match,
+            nary=nary,
+        )
 
     if verbose:
         print('result:', result)

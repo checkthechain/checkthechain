@@ -1,4 +1,3 @@
-
 class NotFoundException(Exception):
     pass
 
@@ -41,31 +40,67 @@ def binary_search(
             return end_index
 
 
-def parallel_binary_search(is_match, start_index, end_index, n_workers=10):
-    # not super effective, since it has to evaluate the borders
-    # also need to move is_match to be a top level function
-    # more effective would be a parallel_nary_search, each round does n samples
-    # should just use cloudpickle as well
-    chunk_bounds = range(
-        int(start_index),
-        int(end_index),
-        int((end_index - start_index) / (n_workers + 1)),
-    )
-    chunk_bounds = list(chunk_bounds)
-    chunks = zip(chunk_bounds[:-1], [item - 1 for item in chunk_bounds[1:]])
-    chunks = list(chunks)
-    chunk_results = binary_search(
-        index_ranges=chunks,
-        is_match=is_match,
-        raise_if_not_found=False,
-    )
-    for chunk_result in chunk_results:
-        if chunk_result is not None:
-            return chunk_result
-    else:
-        return chunk_result
+def nary_search(
+    nary, start_index, end_index, is_match, debug=False, raise_if_not_found=True
+):
 
+    extra_probes = [start_index, end_index]
+    probe_min = start_index
+    probe_max = end_index
 
-def parallel_nary_search():
-    pass
+    while True:
+
+        if probe_max == probe_min + 1:
+            return probe_max
+
+        n_probes = min(nary - 1, probe_max - probe_min - 1)
+        d = (probe_max - probe_min) / (n_probes + 1)
+        probes = [probe_min + (p + 1) * d for p in range(n_probes)]
+        probes = [round(probe) for probe in probes]
+        probes = sorted(set(probes))
+        n_probes = len(probes)
+
+        all_probes = probes + extra_probes
+        all_results = is_match(all_probes)
+        results = all_results[:n_probes]
+        extra_results = all_results[n_probes:]
+
+        if len(extra_probes) > 0:
+            start_result, end_result = extra_results
+            if start_result:
+                return start_index
+            elif not end_result:
+                if raise_if_not_found:
+                    raise Exception('search range does not go high enough')
+                else:
+                    return None
+            extra_probes = []
+
+        # determine lowest successful probe
+        for p in range(len(probes)):
+            if results[p]:
+                break
+        else:
+            p += 1
+
+        if debug:
+            print('probe_min:', probe_min)
+            print('probe_max:', probe_max)
+            print('n_probes:', n_probes)
+            print('d:', d)
+            print('probes:', probes)
+            print('results:', results)
+            print('p:', p)
+            print()
+
+        # adjust search boundaries
+        if p == 0:
+            probe_min = probe_min
+            probe_max = probes[0]
+        elif p == len(probes):
+            probe_min = probes[-1]
+            probe_max = probe_max
+        else:
+            probe_min = probes[p - 1]
+            probe_max = probes[p]
 
