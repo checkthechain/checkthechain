@@ -1,9 +1,12 @@
+import ast
+import functools
 import os
 
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
 from ctc import config_utils
 from ... import block_utils
+from ... import binary_utils
 from ... import contract_abi_utils
 from ... import evm_spec
 
@@ -306,6 +309,7 @@ def get_events_from_filesystem(
                 print('-', path)
 
     import pandas as pd
+
     for path in events[event_hash]['paths'].keys():
         df = pd.read_csv(path)
         df = df.set_index(['block_number', 'transaction_index', 'log_index'])
@@ -313,6 +317,7 @@ def get_events_from_filesystem(
     df = pd.concat(dfs, axis=0)
     df = df.sort_index()
 
+    # trim unwanted
     if start_block == 'latest' or end_block == 'latest':
         latest_block = block_utils.get_block_number('latest')
         if start_block == 'latest':
@@ -334,6 +339,21 @@ def get_events_from_filesystem(
             )
         mask = df.index.get_level_values(level='block_number') <= end_block
         df = df[mask]
+
+    # convert any bytes
+    prefix = 'arg__'
+    event_abi = contract_abi_utils.get_event_abi(
+        contract_address=contract_address,
+        event_name=event_name,
+        event_hash=event_hash,
+    )
+    for arg in event_abi['inputs']:
+        if arg['type'] in ['bytes32']:
+            column = prefix + arg['name']
+            lam = functools.partial(
+                binary_utils.convert_binary_format, output_format='prefix_hex',
+            )
+            df[column] = df[column].map(ast.literal_eval).map(lam)
 
     return df
 

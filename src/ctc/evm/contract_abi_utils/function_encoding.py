@@ -104,6 +104,16 @@ def encode_function_parameters(
         )
         parameters = [parameters[name] for name in parameter_names]
 
+    # inefficient: convert prefix_hex binary to bytes
+    new_parameters = []
+    for parameter_type, parameter in zip(parameter_types, parameters):
+        if parameter_type == 'bytes32' and binary_utils.get_binary_format(parameter) != 'binary':
+            parameter = binary_utils.convert_binary_format(parameter, 'binary')
+        new_parameters.append(parameter)
+    parameters = new_parameters
+
+    parameters = new_parameters
+
     # encode
     encoded_bytes = binary_utils.encode_evm_data(
         '(' + ','.join(parameter_types) + ')', parameters
@@ -168,13 +178,14 @@ def decode_function_output(
     )
 
     # decode strings
-    if 'string' in output_types:
-        string_decoded_output = []
-        for output_type, item in zip(output_types, decoded_output):
-            if output_type == 'string':
-                item = item.decode()
-            string_decoded_output.append(item)
-        decoded_output = string_decoded_output
+    new_decoded_output = []
+    for output_type, item in zip(output_types, decoded_output):
+        if output_type == 'string':
+            item = item.decode()
+        elif output_type == 'bytes32':
+            item = binary_utils.convert_binary_format(item, 'prefix_hex')
+        new_decoded_output.append(item)
+    decoded_output = new_decoded_output
 
     # delist
     if delist_single_outputs and len(output_types) == 1:
@@ -182,7 +193,7 @@ def decode_function_output(
 
     # repackage
     elif package_named_results and len(output_types) > 1:
-        names = function_parsing.function_function_output_names(**abi_query)
+        names = function_parsing.get_function_output_names(**abi_query)
         if names is not None:
             decoded_output = dict(zip(names, decoded_output))
 
