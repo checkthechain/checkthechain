@@ -15,7 +15,7 @@ def test_fetch_latest_block_number():
 def get_token_total_supply(block):
     """this is a helper function for the parallelize test below"""
     fei_address = '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
-    return evm.fetch_token_total_supply(
+    return evm.get_erc20_total_supply(
         token=fei_address,
         block=block,
         normalize=False,
