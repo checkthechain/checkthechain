@@ -142,7 +142,7 @@ def rpc_digest(rpc_response, rpc_future):
             digest_kwargs = {}
         else:
             digest_kwargs = all_digest_kwargs
-        digested_call = digestor(response=response, **digest_kwargs)
+        digested_call = digestor(response=rpc_response, future=rpc_future, **digest_kwargs)
 
         return digested_call
 
