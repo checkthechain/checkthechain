@@ -74,6 +74,13 @@ for token_address in rari_directory.rari_pool_tokens.values():
     token_n_decimals[token_address] = 8
 
 
+token_name_to_symbol = {
+    'Fei USD': 'FEI',
+    'LUSD Stablecoin': 'LUSD',
+    'Tribe': 'TRIBE',
+}
+
+
 def get_token_n_decimals(token_symbol):
     """get number of decimals tracked for a given token"""
     return token_n_decimals.get(token_symbol, token_default_n_decimals)
