@@ -32,7 +32,7 @@ def _get_co_address(wrapper):
 #
 
 
-def get_pcv_stats(block=None, blocks=None, wrapper=False, parallel_kwargs=None):
+def get_pcv_stats(block=None, blocks=None, wrapper=False):
 
     if block is not None:
         block = evm.normalize_block(block=block)
@@ -47,22 +47,26 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False, parallel_kwargs=None):
         ]
     else:
         kwargs['to_address'] = co_addresses['CollateralizationOracle']
-    if block is not None:
-        kwargs['block_number'] = block
-    if blocks is not None:
-        kwargs['block_numbers'] = blocks
 
-    # remove this later on with better concurrency controls
-    if parallel_kwargs is not None:
-        kwargs['parallel_kwargs'] = parallel_kwargs
-
-    # fetch results
-    result = rpc_utils.eth_call(function_name='pcvStats', **kwargs)
-
-    # arrange results
     keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
 
-    if blocks is not None:
+    # fetch results
+    if block is not None or (block is None and blocks is None):
+        result = rpc_utils.eth_call(
+            function_name='pcvStats',
+            block_number=block,
+            **kwargs
+        )
+        return dict(zip(keys, result))
+
+    elif blocks is not None:
+        result = rpc_utils.eth_call(
+            function_name='pcvStats',
+            block_numbers=blocks,
+            **kwargs
+        )
+
+        # arrange results
         transpose = list(zip(*result))
         data = {}
         for k, key in enumerate(keys):
@@ -79,7 +83,7 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False, parallel_kwargs=None):
         return df
 
     else:
-        return dict(zip(keys, result))
+        raise Exception('must specify block or blocks')
 
 
 #
@@ -156,8 +160,7 @@ def get_token_price_usd(token, block=None):
         # RAI-ETH oracle
         rai_eth_oracle = directory.chainlink_feeds['RAI_ETH']
         rai_eth = chainlink_utils.fetch_feed_value(
-            feed=rai_eth_oracle,
-            block=block
+            feed=rai_eth_oracle, block=block
         )
 
         # ETH-USD oracle
