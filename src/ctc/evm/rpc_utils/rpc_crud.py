@@ -28,8 +28,15 @@ def rpc_keys_to_snake_case(map):
 
     adapted from https://stackoverflow.com/a/1176023
     """
-    return {
-        re.sub(r'(?<!^)(?=[A-Z])', '_', key).lower(): value
-        for key, value in map.items()
-    }
+    return {camel_case_to_snake_case(key): value for key, value in map.items()}
+
+
+def camel_case_to_snake_case(text):
+    """
+
+    not for general usage beyond the keys that appear in the EVM rpc spec
+
+    adapted from https://stackoverflow.com/a/1176023
+    """
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', text).lower()
 

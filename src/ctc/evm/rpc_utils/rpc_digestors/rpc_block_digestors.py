@@ -24,6 +24,7 @@ def digest_eth_get_block_by_hash(
 
 def digest_eth_get_block_by_number(
     response,
+    future,
     decode_response=True,
     snake_case_response=True,
 ):
@@ -36,8 +37,8 @@ def digest_eth_get_block_by_number(
         response = rpc_crud.rpc_keys_to_snake_case(response)
 
     include_full_transactions = len(
-        response['transactions'] > 0
-    ) and isinstance(response['transactions'][0], dict)
+        response['transactions']
+    ) > 0 and isinstance(response['transactions'][0], dict)
     if include_full_transactions and (decode_response or snake_case_response):
 
         transaction_quantities = rpc_spec.rpc_transaction_quantities

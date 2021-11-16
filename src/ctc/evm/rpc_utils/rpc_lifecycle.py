@@ -2,6 +2,7 @@ import random
 
 from ctc import config_utils
 from . import rpc_backends
+from . import rpc_crud
 from . import rpc_digestors
 
 
@@ -116,7 +117,6 @@ def rpc_digest(rpc_response, rpc_future):
 
             # get data specific to call
             response = rpc_response[r]
-            method = rpc_future['rpc_request'][r]['method']
             if all_digest_kwargs is not None:
                 if isinstance(all_digest_kwargs, dict):
                     digest_kwargs = all_digest_kwargs
@@ -126,6 +126,8 @@ def rpc_digest(rpc_response, rpc_future):
                 digest_kwargs = {}
 
             # call digestor
+            method = rpc_future['rpc_request'][r]['method']
+            method = rpc_crud.camel_case_to_snake_case(method)
             digestor = getattr(rpc_digestors, 'digest_' + method)
             digested_call = digestor(
                 response=response, future=rpc_future, **digest_kwargs
@@ -137,6 +139,7 @@ def rpc_digest(rpc_response, rpc_future):
     else:
 
         method = rpc_future['rpc_request']['method']
+        method = rpc_crud.camel_case_to_snake_case(method)
         digestor = getattr(rpc_digestors, 'digest_' + method)
         if all_digest_kwargs is None:
             digest_kwargs = {}
