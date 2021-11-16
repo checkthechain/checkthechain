@@ -41,8 +41,17 @@ def binary_search(
 
 
 def nary_search(
-    nary, start_index, end_index, is_match, debug=False, raise_if_not_found=True
+    nary,
+    start_index,
+    end_index,
+    is_match,
+    debug=False,
+    raise_if_not_found=True,
+    get_next_probes=None,
 ):
+
+    if get_next_probes is None:
+        get_next_probes = get_next_probes_linear
 
     extra_probes = [start_index, end_index]
     probe_min = start_index
@@ -50,21 +59,26 @@ def nary_search(
 
     while True:
 
+        # if probe range minimized, return result
         if probe_max == probe_min + 1:
             return probe_max
 
-        n_probes = min(nary - 1, probe_max - probe_min - 1)
-        d = (probe_max - probe_min) / (n_probes + 1)
-        probes = [probe_min + (p + 1) * d for p in range(n_probes)]
-        probes = [round(probe) for probe in probes]
+        # get next probes to test
+        probes = get_next_probes(
+            probe_min=probe_min, probe_max=probe_max, nary=nary
+        )
         probes = sorted(set(probes))
         n_probes = len(probes)
 
+        # add in extra probes for start_index and end_index
         all_probes = probes + extra_probes
+
+        # compute results
         all_results = is_match(all_probes)
         results = all_results[:n_probes]
         extra_results = all_results[n_probes:]
 
+        # separate start_index and end_index probes
         if len(extra_probes) > 0:
             start_result, end_result = extra_results
             if start_result:
@@ -83,11 +97,11 @@ def nary_search(
         else:
             p += 1
 
+        # print state
         if debug:
             print('probe_min:', probe_min)
             print('probe_max:', probe_max)
             print('n_probes:', n_probes)
-            print('d:', d)
             print('probes:', probes)
             print('results:', results)
             print('p:', p)
@@ -103,4 +117,12 @@ def nary_search(
         else:
             probe_min = probes[p - 1]
             probe_max = probes[p]
+
+
+def get_next_probes_linear(probe_min, probe_max, nary):
+    n_probes = min(nary - 1, probe_max - probe_min - 1)
+    d = (probe_max - probe_min) / (n_probes + 1)
+    probes = [probe_min + (p + 1) * d for p in range(n_probes)]
+    probes = [round(probe) for probe in probes]
+    return probes
 
