@@ -42,6 +42,8 @@ def export(
 
     paths = {}
     for exporttype in exporttypes:
+        if exporttype == 'blocks':
+            output = export_rows.export_blocks(**kwargs)
         if exporttype == 'blocks_and_transactions':
             output = export_rows.export_blocks_and_transactions(**kwargs)
         elif exporttype == 'token_transfers':

@@ -1,5 +1,6 @@
 contenttypes = {
     'Exporttype': [
+        'blocks',
         'blocks_and_transactions',
         'token_transfers',
         'traces',
@@ -23,6 +24,7 @@ contenttypes = {
 
 
 rowtypes_of_exporttypes = {
+    'blocks': ['blocks'],
     'blocks_and_transactions': ['blocks', 'transactions'],
     'token_transfers': ['token_transfers'],
     'traces': ['traces'],
@@ -42,6 +44,13 @@ path_templates = {
 
 
 command_templates = {
+    'blocks': """
+        python3 -m ethereumetl export_blocks_and_transactions \
+        --start-block {start_block} \
+        --end-block {end_block} \
+        --blocks-output {blocks_path} \
+        --provider-uri {provider}
+    """,
     'blocks_and_transactions': """
         python3 -m ethereumetl export_blocks_and_transactions \
         --start-block {start_block} \

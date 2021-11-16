@@ -6,6 +6,64 @@ from .. import etl_list
 from .. import etl_spec
 
 
+def export_blocks(
+    provider,
+    start_block,
+    end_block,
+    etl_chunk_root=None,
+    etl_backend=None,
+    etl_view=None,
+    overwrite=False,
+    verbose=True,
+    existing_row_datas=None,
+    dry=False,
+    indent='',
+):
+
+    # set output paths
+    kwargs = {
+        'start_block': start_block,
+        'end_block': end_block,
+        'etl_chunk_root': etl_chunk_root,
+        'etl_backend': etl_backend,
+        'etl_view': etl_view,
+    }
+    blocks_path = etl_list.get_path('blocks', **kwargs)
+    paths = {'blocks': blocks_path}
+
+    # build command
+    command = etl_spec.command_templates['blocks'].format(
+        provider=provider,
+        start_block=start_block,
+        end_block=end_block,
+        blocks_path=blocks_path,
+    )
+
+    skip = _should_skip_export(
+        exporttype='blocks',
+        overwrite=overwrite,
+        existing_row_datas=existing_row_datas,
+        paths=paths,
+        start_block=start_block,
+        end_block=end_block,
+    )
+
+    # run command
+    if verbose:
+        print(indent + 'exporting blocks')
+    if skip:
+        print(indent + 'files already exist, skipping')
+        return paths
+    if not dry:
+        subprocess.call(command, shell=True)
+    if verbose:
+        print(indent + 'done')
+        print()
+        print(indent + 'exported blocks to:', blocks_path)
+
+    return paths
+
+
 def export_blocks_and_transactions(
     provider,
     start_block,
