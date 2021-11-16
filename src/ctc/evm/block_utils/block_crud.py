@@ -1,8 +1,7 @@
 import toolparallel
 
-from ctc.toolbox import search_utils
-from .. import address_utils
 from .. import rpc_utils
+from . import block_search
 
 
 @toolparallel.parallelize_input(singular_arg='block', plural_arg='blocks')
@@ -42,9 +41,7 @@ def get_block(
                     block_number=block, **kwargs
                 )
         elif len(block) == 64:
-            return rpc_utils.eth_get_block_by_hash(
-                block_hash=block, **kwargs
-            )
+            return rpc_utils.eth_get_block_by_hash(block_hash=block, **kwargs)
         elif str.isnumeric(block):
             return rpc_utils.eth_get_block_by_number(
                 block_number=int(block), **kwargs
@@ -53,6 +50,23 @@ def get_block(
             raise Exception('unknown block str format: ' + str(block))
     else:
         raise Exception('unknown block specifier: ' + str(block))
+
+
+def get_blocks(blocks):
+
+    rpc_request = [
+        rpc_utils.construct_eth_get_block_by_number(
+            block_number=int(block),
+            include_full_transactions=False,
+        )
+        for block in blocks
+    ]
+
+    return rpc_utils.rpc_execute(rpc_request=rpc_request)
+
+
+def get_blocks_timestamps(blocks):
+    return {block['number']: block['timestamp'] for block in get_blocks(blocks)}
 
 
 def get_block_number(block, provider=None, **rpc_kwargs):
@@ -74,7 +88,9 @@ def normalize_block(block, contract_address=None):
     if block == 'latest':
         block = get_block_number('latest')
     if block == 'contract_start':
-        block = get_contract_creation_block(contract_address=contract_address)
+        block = block_search.get_contract_creation_block(
+            contract_address=contract_address
+        )
 
     return int(block)
 
@@ -114,7 +130,7 @@ def normalize_block_range(start_block, end_block, contract_address=None):
 
     # fill in special values
     if 'contract_start' in [start_block, end_block]:
-        contract_start = get_contract_creation_block(
+        contract_start = block_search.get_contract_creation_block(
             contract_address=contract_address
         )
     if 'latest' in [start_block, end_block]:
@@ -135,60 +151,6 @@ def normalize_block_range(start_block, end_block, contract_address=None):
     end_block = int(end_block)
 
     return (start_block, end_block)
-
-
-def get_contract_creation_block(
-    contract_address,
-    start_block=None,
-    end_block=None,
-    provider=None,
-    verbose=True,
-    nary=None,
-):
-    """get the block where a contract was created
-
-    algorithm: perform a binary search across blocks, check code bytes in each
-    """
-
-    contract_address = address_utils.get_address_checksum(contract_address)
-
-    if start_block is None:
-        start_block = 0
-    if end_block is None:
-        end_block = 'latest'
-    if start_block == 'latest' or end_block == 'latest':
-        latest_block = get_block_number('latest')
-        if start_block == 'latest':
-            start_block = latest_block
-        if end_block == 'latest':
-            end_block = latest_block
-
-    def is_match(index):
-        if verbose:
-            print('trying block:', index)
-        code = rpc_utils.eth_get_code(
-            address=contract_address, block_number=index, provider=provider
-        )
-        return len(code) > 3
-
-    if nary is None:
-        result = search_utils.binary_search(
-            start_index=start_block,
-            end_index=end_block,
-            is_match=is_match,
-        )
-    else:
-        result = search_utils.nary_search(
-            start_index=start_block,
-            end_index=end_block,
-            is_match=is_match,
-            nary=nary,
-        )
-
-    if verbose:
-        print('result:', result)
-
-    return result
 
 
 def get_chunks_in_range(start_block, end_block, chunk_size, trim_excess=False):
