@@ -36,8 +36,10 @@ def digest(
             digest_kwargs = {}
         return digestor(response=response, **digest_kwargs)
     elif isinstance(request, list) and isinstance(response, list):
-        for subresponse, subrequest in zip(response, request):
-            return [digest(subresponse, subrequest, digest_kwargs)]
+        return [
+            digest(subresponse, subrequest, digest_kwargs)
+            for subresponse, subrequest in zip(response, request)
+        ]
     else:
         raise Exception()
 

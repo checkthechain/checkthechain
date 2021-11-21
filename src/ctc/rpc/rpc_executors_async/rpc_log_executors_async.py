@@ -4,7 +4,7 @@ from .. import rpc_request
 
 
 async def async_eth_new_filter(
-    contract_address=None,
+    address=None,
     topics=None,
     start_block=None,
     end_block=None,
@@ -12,7 +12,7 @@ async def async_eth_new_filter(
     decode_response=False,
 ):
     request = rpc_constructors.construct_eth_new_filter(
-        contract_address=contract_address,
+        address=address,
         topics=topics,
         start_block=start_block,
         end_block=end_block,
@@ -90,20 +90,22 @@ async def async_eth_get_filter_logs(
 
 
 async def async_eth_get_logs(
-    contract_address=None,
+    address=None,
     topics=None,
     start_block=None,
     end_block=None,
+    block_hash=None,
     provider=None,
     decode_response=True,
     snake_case_response=True,
     include_removed=False,
 ):
     request = rpc_constructors.construct_eth_get_logs(
-        contract_address=contract_address,
+        address=address,
         topics=topics,
         start_block=start_block,
         end_block=end_block,
+        block_hash=block_hash,
     )
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_get_logs(

@@ -6,7 +6,12 @@ RpcPluralRequest = list[RpcSingularRequest]
 RpcRequest = typing.Union[RpcSingularRequest, RpcPluralRequest]
 
 
-RpcResponse = typing.Any
+RpcSingularResponse = typing.Any
+RpcPluralResponse = list[RpcSingularResponse]
+RpcResponse = typing.Union[RpcPluralResponse, RpcSingularResponse]
+
+RpcConstructor = typing.Callable[..., RpcSingularRequest]
+RpcDigestor = typing.Callable[..., RpcResponse]
 
 
 class Provider(typing.TypedDict):

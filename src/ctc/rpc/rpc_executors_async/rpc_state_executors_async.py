@@ -19,7 +19,7 @@ async def async_eth_call(
     package_named_outputs=False,
     **function_abi_query
 ):
-    request = rpc_constructors.construct_rpc_eth_call(
+    request = rpc_constructors.construct_eth_call(
         to_address=to_address,
         from_address=from_address,
         gas=gas,
