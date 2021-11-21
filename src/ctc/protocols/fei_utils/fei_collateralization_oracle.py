@@ -60,7 +60,7 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False):
         return dict(zip(keys, result))
 
     elif blocks is not None:
-        result = rpc_utils.eth_call(
+        result = rpc_utils.batch_eth_call(
             function_name='pcvStats',
             block_numbers=blocks,
             **kwargs
