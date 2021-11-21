@@ -8,7 +8,7 @@ from ctc import spec
 T = typing.TypeVar('T')
 
 
-def encode_block_number(block: typing.Union[int, str]) -> str:
+def encode_block_number(block: spec.BlockSpec) -> str:
     if isinstance(block, str) and block in ['latest', 'earliest', 'pending']:
         return block
     else:

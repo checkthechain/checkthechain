@@ -5,7 +5,7 @@ from ctc import spec
 from . import rpc_provider
 
 
-def create(method: str, parameters: list[typing.Any]) -> spec.RequestData:
+def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
     return {
         'jsonrpc': '2.0',
         'method': method,
@@ -15,10 +15,10 @@ def create(method: str, parameters: list[typing.Any]) -> spec.RequestData:
 
 
 def send(
-    request: spec.RequestData,
+    request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderSpec] = None,
     chunk: bool = True,
-) -> spec.ResponseData:
+) -> spec.RpcResponse:
 
     # get provider
     provider = rpc_provider.get_provider(provider)
@@ -63,9 +63,9 @@ def send(
 
 
 async def async_send(
-    request: spec.RequestData,
+    request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderSpec] = None,
-) -> spec.ResponseData:
+) -> spec.RpcResponse:
     provider = rpc_provider.get_provider(provider)
 
     if provider['type'] == 'http':
@@ -99,9 +99,9 @@ async def async_send(
 
 
 def reorder_response(
-    response: spec.ResponseData,
-    request: spec.RequestData,
-) -> spec.ResponseData:
+    response: spec.RpcResponse,
+    request: spec.RpcRequest,
+) -> spec.RpcResponse:
     if isinstance(request, dict):
         return response
     elif isinstance(request, list) and isinstance(response, list):

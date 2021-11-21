@@ -1,3 +1,6 @@
+import typing
+
+from ctc import spec
 from ctc.evm import block_utils
 from ctc.evm import binary_utils
 from ctc.evm import contract_abi_utils
@@ -5,17 +8,17 @@ from .. import rpc_request
 
 
 def construct_rpc_eth_call(
-    to_address,
-    from_address=None,
-    gas=None,
-    gas_price=None,
-    value_sent=None,
-    block_number=None,
-    block_numbers=None,
-    call_data=None,
-    function_parameters=None,
+    to_address: spec.BinaryData,
+    from_address: spec.BinaryData = None,
+    gas: spec.BinaryData = None,
+    gas_price: spec.BinaryData = None,
+    value_sent: spec.BinaryData = None,
+    block_number: spec.BlockSpec = None,
+    block_numbers: list[spec.BlockSpec] = None,
+    call_data: spec.BinaryData = None,
+    function_parameters: typing.Optional[typing.Union[list, dict]] = None,
     **function_abi_query
-):
+) -> spec.RpcResponse:
     if block_number is None and block_numbers is None:
         block_number = 'latest'
     if block_number is not None:
@@ -62,15 +65,15 @@ def construct_rpc_eth_call(
 
 
 def construct_eth_estimate_gas(
-    to_address,
-    from_address=None,
-    gas=None,
-    gas_price=None,
-    value_sent=None,
-    call_data=None,
-    function_parameters=None,
+    to_address: spec.BinaryData,
+    from_address: spec.BinaryData = None,
+    gas: spec.BinaryData = None,
+    gas_price: spec.BinaryData = None,
+    value_sent: spec.BinaryData = None,
+    call_data: spec.BinaryData = None,
+    function_parameters: typing.Optional[typing.Union[list, dict]] = None,
     **function_abi_query
-):
+) -> spec.RpcResponse:
     # encode call data
     if call_data is None:
         call_data = contract_abi_utils.encode_call_data(
@@ -93,7 +96,10 @@ def construct_eth_estimate_gas(
     return rpc_request.create('eth_estimateGas', [call_object])
 
 
-def construct_eth_get_balance(address, block_number='latest'):
+def construct_eth_get_balance(
+    address,
+    block_number='latest',
+) -> spec.RpcResponse:
 
     block_number = block_utils.normalize_block(block=block_number)
     block_number = binary_utils.convert_binary_format(
@@ -103,7 +109,11 @@ def construct_eth_get_balance(address, block_number='latest'):
     return rpc_request.create('eth_getBalance', [address, block_number])
 
 
-def construct_eth_get_storage_at(address, position, block_number='latest'):
+def construct_eth_get_storage_at(
+    address: spec.BinaryData,
+    position: spec.BinaryData,
+    block_number='latest',
+) -> spec.RpcResponse:
     position = binary_utils.convert_binary_format(position, 'prefix_hex')
 
     return rpc_request.create(
@@ -111,7 +121,10 @@ def construct_eth_get_storage_at(address, position, block_number='latest'):
     )
 
 
-def construct_eth_get_code(address, block_number='latest'):
+def construct_eth_get_code(
+    address: spec.BinaryData,
+    block_number: spec.BlockSpec = 'latest',
+) -> spec.RpcResponse:
 
     block_number = block_utils.normalize_block(block=block_number)
     block_number = binary_utils.convert_binary_format(

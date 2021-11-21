@@ -1,19 +1,22 @@
+from ctc import spec
 from ctc.evm import binary_utils
 from .. import rpc_format
 from .. import rpc_spec
 
 
-def digest_eth_block_number(response, decode_response=True):
+def digest_eth_block_number(
+    response: spec.RpcResponse, decode_response: bool = True
+) -> spec.RpcResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
 def digest_eth_get_block_by_hash(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcResponse:
     if decode_response:
         quantities = rpc_spec.rpc_block_quantities
         response = rpc_format.decode_response(response, quantities=quantities)
@@ -25,10 +28,10 @@ def digest_eth_get_block_by_hash(
 
 
 def digest_eth_get_block_by_number(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcResponse:
 
     if decode_response:
         quantities = rpc_spec.rpc_block_quantities
@@ -62,23 +65,27 @@ def digest_eth_get_block_by_number(
     return response
 
 
-def digest_eth_get_uncle_count_by_block_hash(response, decode_response=True):
+def digest_eth_get_uncle_count_by_block_hash(
+    response: spec.RpcResponse, decode_response: bool = True
+):
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
-def digest_eth_get_uncle_count_by_block_number(response, decode_response=True):
+def digest_eth_get_uncle_count_by_block_number(
+    response: spec.RpcResponse, decode_response: bool = True
+) -> spec.RpcResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
 def digest_eth_get_uncle_by_block_hash_and_index(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcResponse:
     if decode_response:
         quantities = rpc_spec.rpc_block_quantities
         response = rpc_format.decode_response(response, quantities=quantities)
@@ -90,10 +97,10 @@ def digest_eth_get_uncle_by_block_hash_and_index(
 
 
 def digest_eth_get_uncle_by_block_number_and_index(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcResponse:
     if decode_response:
         quantities = rpc_spec.rpc_block_quantities
         response = rpc_format.decode_response(response, quantities=quantities)

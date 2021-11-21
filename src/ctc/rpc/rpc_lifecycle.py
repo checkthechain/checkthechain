@@ -11,7 +11,7 @@ def construct(
     batch_parameter: typing.Optional[str] = None,
     batch_values: typing.Optional[list[typing.Any]] = None,
     **parameters
-) -> spec.RequestData:
+) -> spec.RpcRequest:
     """create an rpc request according to a specific method"""
     constructor = rpc_registry.get_constructors()[method]
     if batch_parameter is not None and batch_values is not None:
@@ -24,10 +24,10 @@ def construct(
 
 
 def digest(
-    response: spec.RequestData,
-    request: spec.ResponseData,
+    response: spec.RpcRequest,
+    request: spec.RpcResponse,
     digest_kwargs: typing.Optional[dict] = None,
-) -> spec.ResponseData:
+) -> spec.RpcResponse:
     """process an rpc response"""
 
     if isinstance(request, dict):
@@ -43,20 +43,20 @@ def digest(
 
 
 def execute(
-    request: spec.RequestData,
+    request: spec.RpcRequest,
     provider: spec.ProviderSpec = None,
     digest_kwargs: typing.Optional[dict] = None,
-) -> spec.ResponseData:
+) -> spec.RpcResponse:
     """send an rpc request and digest the corresponding response"""
     response = rpc_request.send(request=request, provider=provider)
     return digest(response, request=request, digest_kwargs=digest_kwargs)
 
 
 async def async_execute(
-    request: spec.RequestData,
+    request: spec.RpcRequest,
     provider: spec.ProviderSpec = None,
     digest_kwargs: typing.Optional[dict] = None,
-) -> spec.ResponseData:
+) -> spec.RpcResponse:
     response = await rpc_request.async_send(request=request, provider=provider)
     return digest(response, request=request, digest_kwargs=digest_kwargs)
 

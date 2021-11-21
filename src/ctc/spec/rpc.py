@@ -1,21 +1,12 @@
 import typing
 
 
-SingularRequestData = dict[str, typing.Any]
-PluralRequestData = list[SingularRequestData]
-RequestData = typing.Union[SingularRequestData, PluralRequestData]
+RpcSingularRequest = dict[str, typing.Any]
+RpcPluralRequest = list[RpcSingularRequest]
+RpcRequest = typing.Union[RpcSingularRequest, RpcPluralRequest]
 
 
-# class RawRequestData(typing.TypedDict):
-#     jsonrpc: str
-#     method: str
-#     params: list[typing.Any]
-
-
-# SingularResponseData = dict[str, typing.Any]
-# PluralResponseData = list[SingularResponseData]
-# ResponseData = typing.Union[SingularResponseData, PluralResponseData]
-ResponseData = typing.Any
+RpcResponse = typing.Any
 
 
 class Provider(typing.TypedDict):

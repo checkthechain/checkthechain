@@ -1,38 +1,47 @@
+from ctc import spec
 from ctc.evm import binary_utils
 from .. import rpc_format
 from .. import rpc_spec
 
 
-def digest_eth_new_filter(response, decode_response=False):
+def digest_eth_new_filter(
+    response: spec.RpcResponse, decode_response: bool = False
+) -> spec.RpcResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
-def digest_eth_new_block_filter(response, decode_response=False):
+def digest_eth_new_block_filter(
+    response: spec.RpcResponse, decode_response: bool = False
+) -> spec.RpcResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
-def digest_eth_new_pending_transaction_filter(response, decode_response=False):
+def digest_eth_new_pending_transaction_filter(
+    response: spec.RpcResponse, decode_response: bool = False
+) -> spec.RpcResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
-def digest_eth_uninstall_filter(response, decode_response=False):
+def digest_eth_uninstall_filter(
+    response: spec.RpcResponse, decode_response: bool = False
+) -> spec.RpcResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
 def digest_eth_get_filter_changes(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-    include_removed=False,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+    include_removed: bool = False,
+) -> spec.RpcResponse:
     if (
         not include_removed
         and len(response) > 0
@@ -64,11 +73,11 @@ def digest_eth_get_filter_changes(
 
 
 def digest_eth_get_filter_logs(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-    include_removed=False,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+    include_removed: bool = False,
+) -> spec.RpcResponse:
 
     if not include_removed:
         response = [
@@ -97,11 +106,11 @@ def digest_eth_get_filter_logs(
 
 
 def digest_eth_get_logs(
-    response,
-    decode_response=True,
-    snake_case_response=True,
-    include_removed=False,
-):
+    response: spec.RpcResponse,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+    include_removed: bool = False,
+) -> spec.RpcResponse:
     if not include_removed:
         response = [
             subresponse

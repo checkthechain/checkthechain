@@ -9,8 +9,8 @@ _http_sessions: dict[spec.ProviderKey, aiohttp.ClientSession] = {}
 
 
 async def async_send_http(
-    request: spec.RequestData, provider: spec.Provider
-) -> spec.ResponseData:
+    request: spec.RpcRequest, provider: spec.Provider
+) -> spec.RpcResponse:
     provider = rpc_provider.get_provider(provider)
     session = get_async_http_session(provider=provider)
     async with session.post(provider['url'], json=request) as response:
