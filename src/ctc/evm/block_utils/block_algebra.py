@@ -1,10 +1,6 @@
 # need to update many of these functions
 # need to not import pandas at top level
 
-import pandas as pd
-import numpy as np
-
-
 # contenttypes = {
 #     'BlockSeries': [
 #         {'start_block': 'BlockNumber', 'end_block': 'BlockNumber'},
@@ -14,7 +10,6 @@ import numpy as np
 #         {'__type': 'DataFrame'},
 #     ]
 # }
-
 
 def interpolate_block_series(
     *,
@@ -26,6 +21,9 @@ def interpolate_block_series(
     output_format=None,
 ):
     """should probably turn this into a content-agnostic pandas function"""
+
+    import pandas as pd
+    import numpy as np
 
     #
     if output_format is None:

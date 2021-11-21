@@ -2,7 +2,6 @@ import functools
 
 from ctc.toolbox import search_utils
 from .. import address_utils
-from .. import rpc_utils
 from . import block_crud
 
 
@@ -35,10 +34,9 @@ def get_contract_creation_block(
     def is_match(index):
         if verbose:
             print('trying block:', index)
-        code = rpc_utils.eth_get_code(
-            address=contract_address, block_number=index, provider=provider
+        return address_utils.is_contract_address(
+            address=contract_address, block=index, provider=provider
         )
-        return len(code) > 3
 
     if nary is None:
         result = search_utils.binary_search(
@@ -60,7 +58,76 @@ def get_contract_creation_block(
     return result
 
 
-def get_block_of_timestamp(timestamp, nary=None, cache=None):
+def get_blocks_of_timestamps(
+    timestamps,
+    block_timestamps=None,
+    block_number_array=None,
+    block_timestamp_array=None,
+    nary=None,
+    cache=None,
+):
+    """once parallel node search created, use that"""
+    import numpy as np
+
+    if (
+        block_timestamps is not None
+        and block_number_array is None
+        and block_timestamp_array is None
+    ):
+        block_timestamp_array = np.array(list(block_timestamps.values()))
+        block_number_array = np.array(list(block_timestamps.keys()))
+
+    blocks = []
+    for timestamp in timestamps:
+        block = get_block_of_timestamp(
+            timestamp=timestamp,
+            nary=nary,
+            cache=cache,
+            block_timestamps=block_timestamps,
+            block_timestamp_array=block_timestamp_array,
+            block_number_array=block_number_array,
+        )
+        blocks.append(block)
+
+    return blocks
+
+
+def get_block_of_timestamp(
+    timestamp,
+    nary=None,
+    cache=None,
+    block_timestamps=None,
+    block_timestamp_array=None,
+    block_number_array=None,
+):
+    if (
+        block_timestamps is not None
+        or block_timestamp_array is not None
+        and block_number_array is not None
+    ):
+        return get_block_of_timestamp_from_arrays(
+            timestamp=timestamp,
+            block_timestamp_array=block_timestamp_array,
+            block_number_array=block_number_array,
+        )
+    else:
+        return get_block_of_timestamp_from_node(
+            timestamp=timestamp,
+            nary=nary,
+            cache=cache,
+        )
+
+
+def get_block_of_timestamp_from_arrays(
+    timestamp, block_timestamp_array, block_number_array
+):
+    import numpy as np
+
+    index = np.searchsorted(block_timestamp_array, timestamp)
+    return block_number_array[index]
+
+
+def get_block_of_timestamp_from_node(timestamp, nary=None, cache=None):
     """
     - could make this efficiently parallelizable to multiple timestamps by sharing cache
         - would need to remove the initializing key from the shared cache
@@ -72,18 +139,21 @@ def get_block_of_timestamp(timestamp, nary=None, cache=None):
     if cache is None:
         cache = {'initializing': {timestamp: True}, 'timestamps': {}}
 
+    is_match = functools.partial(
+        _is_match_block_of_timestamp, timestamp=timestamp, cache=cache
+    )
+    get_next_probes = functools.partial(
+        _get_next_probes_block_of_timestamp,
+        timestamp=timestamp,
+        cache=cache,
+    )
+
     return search_utils.nary_search(
         nary=nary,
         start_index=1,
-        end_index=int(13e6),
-        is_match=functools.partial(
-            _is_match_block_of_timestamp, timestamp=timestamp, cache=cache
-        ),
-        get_next_probes=functools.partial(
-            _get_next_probes_block_of_timestamp,
-            timestamp=timestamp,
-            cache=cache,
-        ),
+        end_index=block_crud.get_block_number('latest'),
+        is_match=is_match,
+        get_next_probes=get_next_probes,
     )
 
 
@@ -162,13 +232,13 @@ def _get_next_probes_block_of_timestamp(
 #
 
 
-async def get_blocks_of_timestamps(timestamps, nary=None):
-    if cache is None:
-        cache = {
-            'initializing': {timestamp: True for timestamp in timestamps},
-            'timestamps': {},
-        }
+# async def get_blocks_of_timestamps(timestamps, nary=None):
+#     if cache is None:
+#         cache = {
+#             'initializing': {timestamp: True for timestamp in timestamps},
+#             'timestamps': {},
+#         }
 
-    # for timestamp in timestamps:
-    #     asyncio.create_task(async_get_block_of_timestamp)
+#     # for timestamp in timestamps:
+#     #     asyncio.create_task(async_get_block_of_timestamp)
 
