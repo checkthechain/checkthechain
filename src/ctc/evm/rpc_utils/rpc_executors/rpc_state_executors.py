@@ -136,6 +136,10 @@ def eth_get_balance(
 
 
 def eth_get_storage_at(address, position, block_number='latest', provider=None):
+    block_number = block_utils.normalize_block(block=block_number)
+    block_number = binary_utils.convert_binary_format(
+        block_number, 'prefix_hex'
+    )
     position = binary_utils.convert_binary_format(position, 'prefix_hex')
 
     return rpc_backends.rpc_call(

@@ -43,3 +43,40 @@ def batch_eth_call(
         digest_kwargs=digest_kwargs,
     )
 
+
+def batch_eth_get_code(
+    address=None, block_number=None, addresses=None, block_numbers=None, provider=None,
+):
+    if addresses is None and address is None:
+        raise Exception('must specify address or addresses')
+    if block_number is None and block_numbers is None:
+        raise Exception('must specify block_number or block_numbers')
+
+    if addresses is None:
+        addresses = [address]
+    if block_numbers is None:
+        block_numbers = [block_number]
+
+    rpc_request = []
+    for block_number in block_numbers:
+        for address in addresses:
+            call = rpc_constructors.construct_eth_get_code(
+                address=address, block_number=block_number
+            )
+            rpc_request.append(call)
+
+    result = rpc_lifecycle.rpc_execute(
+        rpc_request=rpc_request,
+        provider=provider,
+        digest_kwargs={},
+    )
+
+    packaged = {}
+    result_iter = iter(result)
+    for block_number in block_numbers:
+        packaged.setdefault(block_number, {})
+        for address in addresses:
+            packaged[block_number][address] = next(result_iter)
+
+    return packaged
+

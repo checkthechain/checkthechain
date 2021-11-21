@@ -80,7 +80,7 @@ def rpc_send(rpc_request, digest_kwargs=None, sync=True, provider=None):
 
     if isinstance(provider, str) and provider.startswith('http'):
         receipt = rpc_backends.rpc_call_http(
-            rpc_request=rpc_request, provider=provider
+            rpc_request=rpc_request, provider=provider,
         )
     else:
         raise Exception('unknown provider format: ' + str(provider))

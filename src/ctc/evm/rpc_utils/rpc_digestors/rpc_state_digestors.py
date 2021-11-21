@@ -43,6 +43,6 @@ def digest_eth_get_storage_at(response):
     return response
 
 
-def digest_eth_get_code(response):
+def digest_eth_get_code(response, future):
     return response
 

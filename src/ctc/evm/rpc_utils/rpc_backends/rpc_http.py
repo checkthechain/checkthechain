@@ -32,7 +32,7 @@ def _get_http_session(provider):
     pid = os.getpid()
     session_id = (pid, provider)
 
-    if provider not in _http_sessions:
+    if session_id not in _http_sessions:
         import requests
         from requests.adapters import HTTPAdapter
         from requests.packages.urllib3.util.retry import Retry
