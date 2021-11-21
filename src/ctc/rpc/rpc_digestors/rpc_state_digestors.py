@@ -4,13 +4,13 @@ from ctc.evm import contract_abi_utils
 
 
 def digest_eth_call(
-    response: spec.RpcResponse,
+    response: spec.RpcSingularResponse,
     to_address: spec.BinaryData,
     function_abi_query: dict,
     decode_response: bool = True,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
-) -> spec.RpcResponse:
+) -> spec.RpcSingularResponse:
 
     if function_abi_query is None:
         raise NotImplementedError('parse function_abi from rpc_response')
@@ -28,25 +28,29 @@ def digest_eth_call(
 
 
 def digest_eth_estimate_gas(
-    response: spec.RpcResponse, decode_response: bool = True
-) -> spec.RpcResponse:
+    response: spec.RpcSingularResponse, decode_response: bool = True
+) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
 def digest_eth_get_balance(
-    response: spec.RpcResponse, decode_response: bool = True
-) -> spec.RpcResponse:
+    response: spec.RpcSingularResponse, decode_response: bool = True
+) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary_utils.convert_binary_format(response, 'integer')
     return response
 
 
-def digest_eth_get_storage_at(response: spec.RpcResponse) -> spec.RpcResponse:
+def digest_eth_get_storage_at(
+    response: spec.RpcSingularResponse,
+) -> spec.RpcSingularResponse:
     return response
 
 
-def digest_eth_get_code(response: spec.RpcResponse) -> spec.RpcResponse:
+def digest_eth_get_code(
+    response: spec.RpcSingularResponse,
+) -> spec.RpcSingularResponse:
     return response
 
