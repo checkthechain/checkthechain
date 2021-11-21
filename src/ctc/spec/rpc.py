@@ -12,9 +12,10 @@ RequestData = typing.Union[SingularRequestData, PluralRequestData]
 #     params: list[typing.Any]
 
 
-SingularResponseData = dict[str, typing.Any]
-PluralResponseData = list[SingularResponseData]
-ResponseData = typing.Union[SingularResponseData, PluralResponseData]
+# SingularResponseData = dict[str, typing.Any]
+# PluralResponseData = list[SingularResponseData]
+# ResponseData = typing.Union[SingularResponseData, PluralResponseData]
+ResponseData = typing.Any
 
 
 class Provider(typing.TypedDict):
@@ -24,6 +25,6 @@ class Provider(typing.TypedDict):
 
 
 ProviderShortcut = str
-ProviderSpec = typing.Union[Provider, ProviderShortcut]
+ProviderSpec = typing.Union[Provider, ProviderShortcut, None]
 ProviderKey = tuple[int, str, tuple[tuple[typing.Any, typing.Any], ...]]
 

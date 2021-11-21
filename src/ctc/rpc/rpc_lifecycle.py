@@ -1,8 +1,17 @@
+import typing
+
+from ctc import spec
 from . import rpc_registry
 from . import rpc_request
 
 
-def construct(method, *, batch_parameter=None, batch_values=None, **parameters):
+def construct(
+    method: str,
+    *,
+    batch_parameter: typing.Optional[str] = None,
+    batch_values: typing.Optional[list[typing.Any]] = None,
+    **parameters
+) -> spec.RequestData:
     """create an rpc request according to a specific method"""
     constructor = rpc_registry.get_constructors()[method]
     if batch_parameter is not None and batch_values is not None:
@@ -14,25 +23,40 @@ def construct(method, *, batch_parameter=None, batch_values=None, **parameters):
         return constructor(**parameters)
 
 
-def digest(response, request, digest_kwargs=None):
+def digest(
+    response: spec.RequestData,
+    request: spec.ResponseData,
+    digest_kwargs: typing.Optional[dict] = None,
+) -> spec.ResponseData:
     """process an rpc response"""
+
     if isinstance(request, dict):
         digestor = rpc_registry.get_digestors()[request['method']]
+        if digest_kwargs is None:
+            digest_kwargs = {}
         return digestor(response=response, **digest_kwargs)
-    elif isinstance(request, list):
+    elif isinstance(request, list) and isinstance(response, list):
         for subresponse, subrequest in zip(response, request):
             return [digest(subresponse, subrequest, digest_kwargs)]
     else:
         raise Exception()
 
 
-def execute(request, provider=None, digest_kwargs=None):
+def execute(
+    request: spec.RequestData,
+    provider: spec.ProviderSpec = None,
+    digest_kwargs: typing.Optional[dict] = None,
+) -> spec.ResponseData:
     """send an rpc request and digest the corresponding response"""
     response = rpc_request.send(request=request, provider=provider)
     return digest(response, request=request, digest_kwargs=digest_kwargs)
 
 
-async def async_execute(request, provider=None, **digest_kwargs):
+async def async_execute(
+    request: spec.RequestData,
+    provider: spec.ProviderSpec = None,
+    digest_kwargs: typing.Optional[dict] = None,
+) -> spec.ResponseData:
     response = await rpc_request.async_send(request=request, provider=provider)
-    return digest(response, **digest_kwargs)
+    return digest(response, request=request, digest_kwargs=digest_kwargs)
 

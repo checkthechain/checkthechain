@@ -14,7 +14,11 @@ def create(method: str, parameters: list[typing.Any]) -> spec.RequestData:
     }
 
 
-def send(request, provider=None, chunk=True):
+def send(
+    request: spec.RequestData,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+    chunk: bool = True,
+) -> spec.ResponseData:
 
     # get provider
     provider = rpc_provider.get_provider(provider)
@@ -32,39 +36,14 @@ def send(request, provider=None, chunk=True):
     if provider['type'] == 'http':
         from .rpc_backends import rpc_http
 
-        response = rpc_http.call_http(
+        response = rpc_http.send_http(
             request=request,
             provider=provider,
         )
     elif provider['type'] == 'websocket':
         from .rpc_backends import rpc_websocket
 
-        response = rpc_websocket.call_websocket(
-            request=request,
-            provider=provider,
-        )
-    else:
-        raise Exception('unknown provider type: ' + str(provider['type']))
-
-    response = reorder_response(response, request)
-
-    return [subresponse['result'] for subresponse in response]
-
-
-async def async_send(request, provider=None):
-    provider = rpc_provider.get_provider(provider)
-
-    if provider['type'] == 'http':
-        from .rpc_backends import rpc_http_async
-
-        response = await rpc_http_async.async_call_http(
-            request=request,
-            provider=provider,
-        )
-    elif provider['type'] == 'websocket':
-        from .rpc_backends import rpc_websocket_async
-
-        response = await rpc_websocket_async.async_call_websocket(
+        response = rpc_websocket.send_websocket(
             request=request,
             provider=provider,
         )
@@ -83,10 +62,49 @@ async def async_send(request, provider=None):
     return response
 
 
-def reorder_response(response, request):
+async def async_send(
+    request: spec.RequestData,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+) -> spec.ResponseData:
+    provider = rpc_provider.get_provider(provider)
+
+    if provider['type'] == 'http':
+        from .rpc_backends import rpc_http_async
+
+        response = await rpc_http_async.async_send_http(
+            request=request,
+            provider=provider,
+        )
+    elif provider['type'] == 'websocket':
+        from .rpc_backends import rpc_websocket_async
+
+        response = await rpc_websocket_async.async_send_websocket(
+            request=request,
+            provider=provider,
+        )
+
+    else:
+        raise Exception('unknown provider type: ' + str(provider['type']))
+
+    response = reorder_response(response, request)
+
+    if isinstance(response, list):
+        response = [subresponse['result'] for subresponse in response]
+    elif isinstance(response, dict):
+        response = response['result']
+    else:
+        raise Exception('unknown response type: ' + str(type(response)))
+
+    return response
+
+
+def reorder_response(
+    response: spec.ResponseData,
+    request: spec.RequestData,
+) -> spec.ResponseData:
     if isinstance(request, dict):
         return response
-    elif isinstance(request, list):
+    elif isinstance(request, list) and isinstance(response, list):
         responses_by_id = {
             subresponse['id']: subresponse for subresponse in response
         }
