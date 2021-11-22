@@ -63,7 +63,7 @@ async def async_eth_estimate_gas(
         **function_abi_query
     )
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_eth_get_code(
+    return rpc_digestors.digest_eth_estimate_gas(
         response,
         decode_response=decode_response,
     )
@@ -80,7 +80,7 @@ async def async_eth_get_balance(
         block_number=block_number,
     )
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_eth_get_code(
+    return rpc_digestors.digest_eth_get_balance(
         response,
         decode_response=decode_response,
     )
@@ -98,7 +98,7 @@ async def async_eth_get_storage_at(
         block_number=block_number,
     )
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_eth_get_code(response)
+    return rpc_digestors.digest_eth_get_storage_at(response)
 
 
 async def async_eth_get_code(address, block_number=None, provider=None):
