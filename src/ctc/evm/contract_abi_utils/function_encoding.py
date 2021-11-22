@@ -159,7 +159,7 @@ def decode_function_output(
     encoded_output,
     output_types=None,
     delist_single_outputs=True,
-    package_named_results=False,
+    package_named_outputs=False,
     **abi_query,
 ):
     # need to test case when function has no output
@@ -192,7 +192,7 @@ def decode_function_output(
         decoded_output = decoded_output[0]
 
     # repackage
-    elif package_named_results and len(output_types) > 1:
+    elif package_named_outputs and len(output_types) > 1:
         names = function_parsing.get_function_output_names(**abi_query)
         if names is not None:
             decoded_output = dict(zip(names, decoded_output))

@@ -113,7 +113,7 @@ def _separate_execution_kwargs(
         else:
             constructor_kwargs[key] = value
 
-    # add extra args
+    # add args that are passed to both constructors and digestors
     if method == 'eth_call':
         function_abi_query = [
             'function_name',
@@ -123,9 +123,12 @@ def _separate_execution_kwargs(
             'parameter_types',
             'function_selector',
         ]
-        for arg in function_abi_query:
-            if arg in kwargs:
-                digestor_kwargs[arg] = kwargs[arg]
+        constructor_kwargs['to_address'] = kwargs['to_address']
+        digestor_kwargs['function_abi_query'] = {
+            arg: kwargs[arg]
+            for arg in function_abi_query
+            if arg in kwargs
+        }
 
     return constructor_kwargs, digestor_kwargs
 

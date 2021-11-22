@@ -10,7 +10,6 @@ async def async_eth_call(
     gas_price=None,
     value_sent=None,
     block_number=None,
-    block_numbers=None,
     call_data=None,
     function_parameters=None,
     provider=None,
@@ -26,7 +25,6 @@ async def async_eth_call(
         gas_price=gas_price,
         value_sent=value_sent,
         block_number=block_number,
-        block_numbers=block_numbers,
         call_data=call_data,
         function_parameters=function_parameters,
         **function_abi_query
@@ -34,6 +32,8 @@ async def async_eth_call(
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_call(
         response,
+        to_address=to_address,
+        function_abi_query=function_abi_query,
         decode_response=decode_response,
         delist_single_outputs=delist_single_outputs,
         package_named_outputs=package_named_outputs,
