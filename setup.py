@@ -17,6 +17,7 @@ setuptools.setup(
         'toolcache',
         'pyyaml',
         'requests',
+        'pysha3',  # for sha3
     ],
     scripts=[
         './scripts/ctc'
