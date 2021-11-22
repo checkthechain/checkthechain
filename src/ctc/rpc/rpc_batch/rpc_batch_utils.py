@@ -1,12 +1,11 @@
 """
-digestors are simpler than constructors and do not have batch versions
+digestors are simpler than constructors and so they do not have batch versions
 """
 
 import inspect
 import typing
 
 from ctc import spec
-from .. import rpc_digestors
 from .. import rpc_registry
 from .. import rpc_request
 from .. import rpc_spec
@@ -64,7 +63,7 @@ def _get_batch_constructor_inputs(method: str) -> dict[str, str]:
 
 
 def batch_execute(
-    *, method: str, provider: spec.Provider, **kwargs
+    method: str, *, provider: spec.Provider = None, **kwargs
 ) -> spec.RpcPluralResponse:
 
     constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(
@@ -80,7 +79,7 @@ def batch_execute(
 
 
 async def async_batch_execute(
-    *, method: str, provider: spec.Provider, **kwargs
+    method: str, *, provider: spec.Provider = None, **kwargs
 ) -> spec.RpcPluralResponse:
 
     constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(
@@ -129,17 +128,4 @@ def _separate_execution_kwargs(
                 digestor_kwargs[arg] = kwargs[arg]
 
     return constructor_kwargs, digestor_kwargs
-
-
-#
-# # examples
-#
-
-
-def batch_eth_call(**kwargs):
-    return batch_execute(method='eth_call', **kwargs)
-
-
-async def async_batch_eth_call(**kwargs):
-    return await async_batch_execute(method='eth_call', **kwargs)
 
