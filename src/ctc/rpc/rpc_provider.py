@@ -1,3 +1,4 @@
+import copy
 import os
 
 from ctc import config_utils
@@ -11,7 +12,22 @@ def get_provider(provider: spec.ProviderSpec) -> spec.Provider:
         provider = config['export_provider']
 
     if isinstance(provider, dict):
-        pass
+        for key in ['type', 'url', 'session_kwargs', 'chunk_size']:
+            if key not in provider:
+                provider = copy.copy(provider)
+        if 'type' not in provider:
+            if 'url' not in provider:
+                config = config_utils.get_config()
+                default_provider = get_provider(config['export_provider'])
+            else:
+                default_provider = get_provider(provider['url'])
+            provider['url'] = default_provider['url']
+            provider['type'] = default_provider['type']
+        if 'url' not in provider:
+            raise Exception('malformed provider spec')
+        provider.setdefault('session_kwargs', {})
+        provider.setdefault('chunk_size', None)
+
     elif isinstance(provider, str):
         if provider.startswith('http'):
             provider = {

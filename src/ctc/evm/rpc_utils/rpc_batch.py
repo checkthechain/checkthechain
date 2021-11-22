@@ -14,7 +14,7 @@ def batch_eth_call(
     provider=None,
     decode_response=True,
     delist_single_outputs=True,
-    package_named_results=False,
+    package_named_outputs=False,
     **function_abi_query
 ):
     rpc_request = rpc_constructors.construct_rpc_eth_call(
@@ -33,7 +33,7 @@ def batch_eth_call(
         to_address=to_address,
         decode_response=decode_response,
         delist_single_outputs=delist_single_outputs,
-        package_named_results=package_named_results,
+        package_named_outputs=package_named_outputs,
         function_abi_query=function_abi_query,
     )
 

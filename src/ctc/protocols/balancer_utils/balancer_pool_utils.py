@@ -20,7 +20,7 @@ def get_pool_tokens(*, pool_address=None, pool_id=None, block=None, vault=None):
         function_name='getPoolTokens',
         function_parameters=[pool_id],
         block_number=block,
-        package_named_results=True,
+        package_named_outputs=True,
     )
 
     token_names = tuple(

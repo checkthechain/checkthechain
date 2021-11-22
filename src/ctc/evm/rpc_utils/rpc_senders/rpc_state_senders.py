@@ -22,7 +22,7 @@ def eth_call(
     provider=None,
     decode_result=True,
     delist_single_outputs=True,
-    package_named_results=False,
+    package_named_outputs=False,
     **function_abi_query
 ):
     if block_number is None:
@@ -64,7 +64,7 @@ def eth_call(
             encoded_output=result,
             contract_address=to_address,
             delist_single_outputs=delist_single_outputs,
-            package_named_results=package_named_results,
+            package_named_outputs=package_named_outputs,
             **function_abi_query
         )
 
