@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import math
 import random
 import typing
@@ -61,9 +62,7 @@ def send_raw(
     ...
 
 
-def send_raw(
-    request: spec.RpcRequest, provider
-) -> spec.RpcResponseRaw:
+def send_raw(request: spec.RpcRequest, provider) -> spec.RpcResponseRaw:
 
     if provider['type'] == 'http':
         from .rpc_backends import rpc_http
@@ -139,6 +138,8 @@ async def async_send_raw(
     provider: spec.Provider,
 ) -> spec.RpcResponseRaw:
 
+    _log_request(request=request, provider=provider)
+
     if provider['type'] == 'http':
         from .rpc_backends import rpc_http_async
 
@@ -157,6 +158,22 @@ async def async_send_raw(
 
     else:
         raise Exception('unknown provider type: ' + str(provider['type']))
+
+
+def _log_request(request: spec.RpcRequest, provider: spec.Provider) -> None:
+    logger = logging.getLogger()
+    if isinstance(request, dict):
+        logger.info('singular request: ' + request['method'])
+    elif isinstance(request, list):
+        methods = [subrequest['method'] for subrequest in request]
+        logger.info(
+            'plural request: '
+            + str(len(request))
+            + ' calls, '
+            + str(set(methods))
+        )
+    else:
+        raise Exception('unknown request type: ' + str(type(request)))
 
 
 def reorder_response_chunks(
