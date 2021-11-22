@@ -1,9 +1,13 @@
+import typing
+
+from ctc import spec
+
 #
 # # binary data reading
 #
 
 
-def get_binary_format(data):
+def get_binary_format(data: spec.BinaryInteger) -> spec.BinaryFormat:
     if isinstance(data, bytes):
         return 'binary'
     elif isinstance(data, str):
@@ -17,15 +21,17 @@ def get_binary_format(data):
         raise Exception('could not detect format')
 
 
-def get_binary_n_bytes(data):
+def get_binary_n_bytes(data: spec.BinaryInteger) -> int:
 
     if isinstance(data, bytes):
         return len(data)
     elif isinstance(data, str):
+        if len(data) % 2 != 0:
+            raise Exception('hex data must have even number of characters')
         if data.startswith('0x'):
-            return len(data) / 2 - 1
+            return int(len(data) / 2) - 1
         else:
-            return len(data) / 2
+            return int(len(data) / 2)
     elif isinstance(data, int):
         # adapted from https://stackoverflow.com/a/30375198
         if data < 0:
@@ -40,9 +46,34 @@ def get_binary_n_bytes(data):
 #
 
 
+@typing.overload
 def convert_binary_format(
-    data, output_format=None, padded_size=None, pad_side=None
-):
+    data: spec.BinaryInteger,
+    output_format: typing.Literal['binary'],
+) -> bytes:
+    ...
+
+
+@typing.overload
+def convert_binary_format(
+    data: spec.BinaryInteger,
+    output_format: typing.Literal['integer'],
+) -> int:
+    ...
+
+
+@typing.overload
+def convert_binary_format(
+    data: spec.BinaryInteger,
+    output_format: typing.Optional[typing.Literal['prefix_hex', 'raw_hex']],
+) -> str:
+    ...
+
+
+def convert_binary_format(
+    data: spec.BinaryInteger,
+    output_format: typing.Optional[spec.BinaryFormat] = None,
+) -> spec.BinaryInteger:
     """convert {hex str or bytes} into {hex str or bytes}
 
     function should not be used with general text data
@@ -55,10 +86,6 @@ def convert_binary_format(
 
     if output_format is None:
         output_format = 'prefix_hex'
-
-    # add pad
-    if padded_size is not None or pad_side is not None:
-        data = add_binary_pad(data, padded_size=padded_size, pad_side=pad_side)
 
     if isinstance(data, str):
         if data.startswith('0x'):
@@ -95,10 +122,7 @@ def convert_binary_format(
         if data < 0:
             raise Exception('only positive integers allowed')
 
-        if padded_size is not None:
-            n_bytes = padded_size
-        else:
-            n_bytes = get_binary_n_bytes(data)
+        n_bytes = get_binary_n_bytes(data)
 
         if output_format == 'binary':
             return data.to_bytes(n_bytes, 'big')
@@ -116,7 +140,11 @@ def convert_binary_format(
         raise Exception('unknown input data format: ' + str(type(data)))
 
 
-def add_binary_pad(data, pad_side=None, padded_size=None):
+def add_binary_pad(
+    data: spec.BinaryInteger,
+    pad_side: typing.Literal['left', 'right', None] = None,
+    padded_size: int = None,
+) -> spec.BinaryInteger:
     """add pad of zeros to left or right side of binary data"""
 
     # default arguments
@@ -134,6 +162,8 @@ def add_binary_pad(data, pad_side=None, padded_size=None):
 
     if binary_format == 'binary':
 
+        data = typing.cast(bytes, data)
+
         if pad_side == 'left':
             return bytes(0) * pad_bytes + data
         elif pad_side == 'right':
@@ -143,6 +173,8 @@ def add_binary_pad(data, pad_side=None, padded_size=None):
 
     elif binary_format == 'prefix_hex':
 
+        data = typing.cast(str, data)
+
         if pad_side == 'left':
             return '0x' + '0' * 2 * pad_bytes + data[2:]
         elif pad_side == 'right':
@@ -151,6 +183,8 @@ def add_binary_pad(data, pad_side=None, padded_size=None):
             raise Exception('invalid pad side: ' + str(pad_side))
 
     elif binary_format == 'raw_hex':
+
+        data = typing.cast(str, data)
 
         if pad_side == 'left':
             return '0' * 2 * pad_bytes + data
@@ -164,22 +198,25 @@ def add_binary_pad(data, pad_side=None, padded_size=None):
         raise Exception('invalid binary format: ' + str(binary_format))
 
 
-def match_binary_format(format_this, like_this, match_pad=False):
+def match_binary_format(
+    format_this: spec.BinaryInteger,
+    like_this: spec.BinaryInteger,
+    match_pad: bool = False,
+) -> spec.BinaryInteger:
     """
 
     will only match left pads, because pad size cannot be reliably determined
     """
 
     output_format = get_binary_format(like_this)
+    output = convert_binary_format(
+        data=format_this,
+        output_format=output_format,
+    )
 
     if match_pad:
         padded_size = get_binary_n_bytes(like_this)
-    else:
-        padded_size = None
+        output = add_binary_pad(output, padded_size=padded_size)
 
-    return convert_binary_format(
-        data=format_this,
-        output_format=output_format,
-        padded_size=padded_size,
-    )
+    return output
 
