@@ -63,7 +63,7 @@ def _get_batch_constructor_inputs(method: str) -> dict[str, str]:
 
 
 def batch_execute(
-    method: str, *, provider: spec.Provider = None, **kwargs
+    method: str, *, provider: spec.ProviderSpec = None, **kwargs
 ) -> spec.RpcPluralResponse:
 
     constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(
@@ -79,7 +79,7 @@ def batch_execute(
 
 
 async def async_batch_execute(
-    method: str, *, provider: spec.Provider = None, **kwargs
+    method: str, *, provider: spec.ProviderSpec = None, **kwargs
 ) -> spec.RpcPluralResponse:
 
     constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(

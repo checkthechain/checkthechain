@@ -23,7 +23,14 @@ RpcConstructor = typing.Callable[..., RpcSingularRequest]
 RpcDigestor = typing.Callable[..., RpcResponse]
 
 
-class Provider(typing.TypedDict):
+class PartialProvider(typing.TypedDict, total=False):
+    type: str
+    url: str
+    session_kwargs: dict
+    chunk_size: typing.Optional[int]
+
+
+class Provider(PartialProvider, total=True):
     type: str
     url: str
     session_kwargs: dict
@@ -31,6 +38,6 @@ class Provider(typing.TypedDict):
 
 
 ProviderShortcut = str
-ProviderSpec = typing.Union[Provider, ProviderShortcut, None]
+ProviderSpec = typing.Union[ProviderShortcut, PartialProvider, Provider, None]
 ProviderKey = tuple[int, str, tuple[tuple[typing.Any, typing.Any], ...]]
 

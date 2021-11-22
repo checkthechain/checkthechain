@@ -21,20 +21,20 @@ def send(
     request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderSpec] = None,
 ) -> spec.RpcResponse:
-    provider = rpc_provider.get_provider(provider)
+    full_provider = rpc_provider.get_provider(provider)
 
     if isinstance(request, dict):
-        response = send_raw(request=request, provider=provider)
+        response = send_raw(request=request, provider=full_provider)
         return response['result']
 
     elif isinstance(request, list):
 
         # chunk request
-        request_chunks = chunk_request(request=request, provider=provider)
+        request_chunks = chunk_request(request=request, provider=full_provider)
 
         # send request chunks
         response_chunks = [
-            send_raw(request=request_chunk, provider=provider)
+            send_raw(request=request_chunk, provider=full_provider)
             for request_chunk in request_chunks
         ]
 
@@ -88,23 +88,23 @@ async def async_send(
     request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderSpec] = None,
 ) -> spec.RpcResponse:
-    provider = rpc_provider.get_provider(provider)
+    full_provider = rpc_provider.get_provider(provider)
 
     if isinstance(request, dict):
-        response = await async_send_raw(request=request, provider=provider)
+        response = await async_send_raw(request=request, provider=full_provider)
         return response['result']
 
     elif isinstance(request, list):
 
         # chunk request
-        request_chunks = chunk_request(request=request, provider=provider)
+        request_chunks = chunk_request(request=request, provider=full_provider)
 
         # send request chunks
         coroutines = []
         for request_chunk in request_chunks:
             coroutine = async_send_raw(
                 request=request_chunk,
-                provider=provider,
+                provider=full_provider,
             )
             coroutines.append(coroutine)
         response_chunks = await asyncio.gather(*coroutines)

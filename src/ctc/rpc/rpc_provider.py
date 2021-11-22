@@ -12,25 +12,30 @@ def get_provider(provider: spec.ProviderSpec) -> spec.Provider:
         provider = config['export_provider']
 
     if isinstance(provider, dict):
-        for key in ['type', 'url', 'session_kwargs', 'chunk_size']:
-            if key not in provider:
-                provider = copy.copy(provider)
-        if 'type' not in provider:
-            if 'url' not in provider:
-                config = config_utils.get_config()
-                default_provider = get_provider(config['export_provider'])
+
+        url = provider.get('url')
+        if url is None:
+            config = config_utils.get_config()
+            default_provider = get_provider(config['export_provider'])
+            if isinstance(default_provider, str):
+                url = default_provider
+            elif isinstance(provider, dict):
+                url = default_provider['url']
             else:
-                default_provider = get_provider(provider['url'])
-            provider['url'] = default_provider['url']
-            provider['type'] = default_provider['type']
-        if 'url' not in provider:
-            raise Exception('malformed provider spec')
-        provider.setdefault('session_kwargs', {})
-        provider.setdefault('chunk_size', None)
+                raise Exception('could not determine url')
+
+        other_provider = get_provider(url)
+
+        return {
+            'type': other_provider['type'],
+            'url': url,
+            'session_kwargs': provider.get('session_kwargs', {}),
+            'chunk_size': provider.get('chunk_size', None),
+        }
 
     elif isinstance(provider, str):
         if provider.startswith('http'):
-            provider = {
+            return {
                 'type': 'http',
                 'url': provider,
                 'session_kwargs': {},
@@ -40,15 +45,6 @@ def get_provider(provider: spec.ProviderSpec) -> spec.Provider:
             raise Exception('unknown provider format: ' + str(provider))
     else:
         raise Exception('unknown provider type: ' + str(type(provider)))
-
-    # validate provider
-    assert isinstance(provider, dict)
-    assert 'type' in provider
-    assert 'url' in provider
-    assert 'session_kwargs' in provider
-    assert 'chunk_size' in provider
-
-    return provider
 
 
 def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
