@@ -14,7 +14,12 @@ def get_provider(provider: spec.ProviderSpec) -> spec.Provider:
         pass
     elif isinstance(provider, str):
         if provider.startswith('http'):
-            provider = {'type': 'http', 'url': provider, 'session_kwargs': {}}
+            provider = {
+                'type': 'http',
+                'url': provider,
+                'session_kwargs': {},
+                'chunk_size': None,
+            }
         else:
             raise Exception('unknown provider format: ' + str(provider))
     else:
@@ -23,9 +28,9 @@ def get_provider(provider: spec.ProviderSpec) -> spec.Provider:
     # validate provider
     assert isinstance(provider, dict)
     assert 'type' in provider
-    if provider['type'] == 'http':
-        assert 'url' in provider
-        assert 'session_kwargs' in provider
+    assert 'url' in provider
+    assert 'session_kwargs' in provider
+    assert 'chunk_size' in provider
 
     return provider
 

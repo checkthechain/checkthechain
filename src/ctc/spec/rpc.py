@@ -6,6 +6,15 @@ RpcPluralRequest = list[RpcSingularRequest]
 RpcRequest = typing.Union[RpcSingularRequest, RpcPluralRequest]
 
 
+class RpcSingularResponseRaw(typing.TypedDict):
+    id: str
+    jsonrpc: str
+    result: typing.Any
+
+
+RpcPluralResponseRaw = list[RpcSingularResponseRaw]
+RpcResponseRaw = typing.Union[RpcSingularResponseRaw, RpcPluralResponseRaw]
+
 RpcSingularResponse = typing.Any
 RpcPluralResponse = list[RpcSingularResponse]
 RpcResponse = typing.Union[RpcPluralResponse, RpcSingularResponse]
@@ -18,6 +27,7 @@ class Provider(typing.TypedDict):
     type: str
     url: str
     session_kwargs: dict
+    chunk_size: typing.Optional[int]
 
 
 ProviderShortcut = str

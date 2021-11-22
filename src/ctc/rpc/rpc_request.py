@@ -1,3 +1,5 @@
+import asyncio
+import math
 import random
 import typing
 
@@ -17,49 +19,70 @@ def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
 def send(
     request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderSpec] = None,
-    chunk: bool = True,
 ) -> spec.RpcResponse:
-
-    # get provider
     provider = rpc_provider.get_provider(provider)
 
-    # send as chunks if specified
-    if chunk and isinstance(request, list):
-        request_chunks = chunk_request(request)
-        chunk_responses = []
-        for request_chunk in request_chunks:
-            chunk_response = send(request_chunk, provider=provider, chunk=False)
-            chunk_responses.append(chunk_response)
-        return reorder_response_chunks(chunk_responses, request)
+    if isinstance(request, dict):
+        response = send_raw(request=request, provider=provider)
+        return response['result']
 
-    # send request according to provider type
+    elif isinstance(request, list):
+
+        # chunk request
+        request_chunks = chunk_request(request=request, provider=provider)
+
+        # send request chunks
+        response_chunks = [
+            send_raw(request=request_chunk, provider=provider)
+            for request_chunk in request_chunks
+        ]
+
+        # reorder chunks
+        plural_response = reorder_response_chunks(response_chunks, request)
+
+        return [subresponse['result'] for subresponse in plural_response]
+
+    else:
+
+        raise Exception('unknown request type: ' + str(type(request)))
+
+
+@typing.overload
+def send_raw(
+    request: spec.RpcSingularRequest, provider
+) -> spec.RpcSingularResponseRaw:
+    ...
+
+
+@typing.overload
+def send_raw(
+    request: spec.RpcPluralRequest, provider
+) -> spec.RpcPluralResponseRaw:
+    ...
+
+
+def send_raw(
+    request: spec.RpcRequest, provider
+) -> spec.RpcResponseRaw:
+
     if provider['type'] == 'http':
         from .rpc_backends import rpc_http
 
-        response = rpc_http.send_http(
+        return rpc_http.send_http(
             request=request,
             provider=provider,
         )
+
     elif provider['type'] == 'websocket':
         from .rpc_backends import rpc_websocket
 
-        response = rpc_websocket.send_websocket(
+        return rpc_websocket.send_websocket(
             request=request,
             provider=provider,
         )
+
     else:
         raise Exception('unknown provider type: ' + str(provider['type']))
-
-    response = reorder_response(response, request)
-
-    if isinstance(response, list):
-        response = [subresponse['result'] for subresponse in response]
-    elif isinstance(response, dict):
-        response = response['result']
-    else:
-        raise Exception('unknown response type: ' + str(type(response)))
-
-    return response
 
 
 async def async_send(
@@ -68,17 +91,66 @@ async def async_send(
 ) -> spec.RpcResponse:
     provider = rpc_provider.get_provider(provider)
 
+    if isinstance(request, dict):
+        response = await async_send_raw(request=request, provider=provider)
+        return response['result']
+
+    elif isinstance(request, list):
+
+        # chunk request
+        request_chunks = chunk_request(request=request, provider=provider)
+
+        # send request chunks
+        coroutines = []
+        for request_chunk in request_chunks:
+            coroutine = async_send_raw(
+                request=request_chunk,
+                provider=provider,
+            )
+            coroutines.append(coroutine)
+        response_chunks = await asyncio.gather(*coroutines)
+
+        # reorder chunks
+        plural_response = reorder_response_chunks(response_chunks, request)
+
+        return [subresponse['result'] for subresponse in plural_response]
+
+    else:
+
+        raise Exception('unknown request type: ' + str(type(request)))
+
+
+@typing.overload
+async def async_send_raw(
+    request: spec.RpcSingularRequest, provider
+) -> spec.RpcSingularResponseRaw:
+    ...
+
+
+@typing.overload
+async def async_send_raw(
+    request: spec.RpcPluralRequest, provider
+) -> spec.RpcPluralResponseRaw:
+    ...
+
+
+async def async_send_raw(
+    request: spec.RpcRequest,
+    provider: spec.Provider,
+) -> spec.RpcResponseRaw:
+
     if provider['type'] == 'http':
         from .rpc_backends import rpc_http_async
 
-        response = await rpc_http_async.async_send_http(
+        return await rpc_http_async.async_send_http(
             request=request,
             provider=provider,
         )
+
     elif provider['type'] == 'websocket':
         from .rpc_backends import rpc_websocket_async
 
-        response = await rpc_websocket_async.async_send_websocket(
+        return await rpc_websocket_async.async_send_websocket(
             request=request,
             provider=provider,
         )
@@ -86,31 +158,18 @@ async def async_send(
     else:
         raise Exception('unknown provider type: ' + str(provider['type']))
 
-    response = reorder_response(response, request)
 
-    if isinstance(response, list):
-        response = [subresponse['result'] for subresponse in response]
-    elif isinstance(response, dict):
-        response = response['result']
-    else:
-        raise Exception('unknown response type: ' + str(type(response)))
+def reorder_response_chunks(
+    response_chunks: list[spec.RpcPluralResponseRaw],
+    request: spec.RpcPluralRequest,
+) -> spec.RpcPluralResponse:
 
-    return response
-
-
-def reorder_response(
-    response: spec.RpcResponse,
-    request: spec.RpcRequest,
-) -> spec.RpcResponse:
-    if isinstance(request, dict):
-        return response
-    elif isinstance(request, list) and isinstance(response, list):
-        responses_by_id = {
-            subresponse['id']: subresponse for subresponse in response
-        }
-        return [responses_by_id[subrequest['id']] for subrequest in request]
-    else:
-        raise Exception()
+    responses_by_id = {
+        response['id']: response
+        for response_chunk in response_chunks
+        for response in response_chunk
+    }
+    return [responses_by_id[subrequest['id']] for subrequest in request]
 
 
 #
@@ -118,22 +177,31 @@ def reorder_response(
 #
 
 
-def chunk_request(request):
-    return [request]
+def chunk_request(
+    request: spec.RpcPluralRequest, provider: spec.Provider
+) -> list[spec.RpcPluralRequest]:
+
+    if provider['chunk_size'] is not None:
+        return chunk_request_by_size(request, provider['chunk_size'])
+    else:
+        return [request]
+
+
+def chunk_request_by_size(
+    request: spec.RpcPluralRequest, chunk_size: int
+) -> list[spec.RpcPluralRequest]:
+
+    n_chunks = math.ceil(len(request) / chunk_size)
+    return [
+        request[slice(c * chunk_size, (c + 1) * chunk_size)]
+        for c in range(n_chunks)
+    ]
 
 
 def chunk_request_by_method(request):
     raise NotImplementedError()
 
 
-def chunk_request_by_size(request):
-    raise NotImplementedError()
-
-
 def chunk_request_by_block_range(request):
-    raise NotImplementedError()
-
-
-def reorder_response_chunks(response_chunks, request):
     raise NotImplementedError()
 
