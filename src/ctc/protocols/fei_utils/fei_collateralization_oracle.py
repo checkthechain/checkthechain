@@ -1,5 +1,8 @@
+import asyncio
+
 from ctc import directory
 from ctc import evm
+from ctc import rpc
 from ctc.evm import rpc_utils
 from ctc.protocols import chainlink_utils
 
@@ -31,8 +34,7 @@ def _get_co_address(wrapper):
 # # summary
 #
 
-
-def get_pcv_stats(block=None, blocks=None, wrapper=False):
+async def async_get_pcv_stats(block=None, blocks=None, wrapper=False, provider=None):
 
     if block is not None:
         block = evm.normalize_block(block=block)
@@ -48,21 +50,25 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False):
     else:
         kwargs['to_address'] = co_addresses['CollateralizationOracle']
 
-    keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
+    provider = rpc.get_provider(provider)
+    provider.setdefault('chunk_size', 1)
 
     # fetch results
+    keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
     if block is not None or (block is None and blocks is None):
-        result = rpc_utils.eth_call(
+        result = await rpc.async_eth_call(
             function_name='pcvStats',
             block_number=block,
+            provider=provider,
             **kwargs
         )
         return dict(zip(keys, result))
 
     elif blocks is not None:
-        result = rpc_utils.batch_eth_call(
+        result = await rpc.async_batch_eth_call(
             function_name='pcvStats',
             block_numbers=blocks,
+            provider=provider,
             **kwargs
         )
 
@@ -91,7 +97,7 @@ def get_pcv_stats(block=None, blocks=None, wrapper=False):
 #
 
 
-def get_deposits_for_token(token, block=None, wrapper=False):
+async def async_get_deposits_for_token(token, block=None, wrapper=False):
 
     if wrapper:
         contract_address = co_addresses[
@@ -100,7 +106,7 @@ def get_deposits_for_token(token, block=None, wrapper=False):
     else:
         contract_address = co_addresses['CollateralizationOracle']
 
-    return rpc_utils.eth_call(
+    return await rpc.async_eth_call(
         to_address=contract_address,
         block_number=block,
         function_name='getDepositsForToken',
@@ -108,14 +114,19 @@ def get_deposits_for_token(token, block=None, wrapper=False):
     )
 
 
-def get_tokens_deposits():
+async def async_get_tokens_deposits():
     tokens_deposits = {}
-    for token in get_tokens_in_pcv():
-        tokens_deposits[token] = get_deposits_for_token(token)
+    coroutines = []
+    tokens_in_pcv = get_tokens_in_pcv()
+    for token in tokens_in_pcv:
+        coroutine = async_get_deposits_for_token(token)
+        coroutines.append(coroutine)
+    results = asyncio.gather(*coroutines)
+    tokens_deposits = dict(zip(tokens_in_pcv, results))
     return tokens_deposits
 
 
-def get_deposit_token_balance(deposit_address, block=None):
+async def async_get_deposit_token_balance(deposit_address, block=None):
 
     return rpc_utils.eth_call(
         to_address=deposit_address,
