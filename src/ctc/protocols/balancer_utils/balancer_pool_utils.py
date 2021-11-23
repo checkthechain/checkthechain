@@ -5,6 +5,7 @@ import pandas as pd
 
 from ctc import evm
 from ctc import directory
+from ctc import rpc
 from ctc.evm import rpc_utils
 
 
@@ -69,7 +70,7 @@ def get_pool_address(pool_id, block=None, vault=None):
     return pool[0]
 
 
-def get_pool_id(pool_address, block=None):
+def async_get_pool_id(pool_address, block=None):
     return rpc_utils.eth_call(
         to_address=pool_address,
         function_name='getPoolId',
@@ -77,10 +78,12 @@ def get_pool_id(pool_address, block=None):
     )
 
 
-def get_pool_weights(pool_address, block=None, blocks=None, normalize=True):
+async def async_get_pool_weights(
+    pool_address, block=None, blocks=None, normalize=True
+):
 
     if block is not None or block is None and blocks is None:
-        weights = evm.eth_call(
+        weights = await rpc.async_eth_call(
             to_address=pool_address,
             function_name='getNormalizedWeights',
             block_number=block,
@@ -90,7 +93,7 @@ def get_pool_weights(pool_address, block=None, blocks=None, normalize=True):
         return weights
 
     else:
-        weights = evm.batch_eth_call(
+        weights = await rpc.async_batch_eth_call(
             to_address=pool_address,
             function_name='getNormalizedWeights',
             block_numbers=blocks,
@@ -103,17 +106,11 @@ def get_pool_weights(pool_address, block=None, blocks=None, normalize=True):
         return pd.DataFrame(weights, index=blocks)
 
 
-def summarize_pool_swaps(swaps, as_dataframe=True):
+def summarize_pool_swaps(swaps, weights, as_dataframe=True):
 
     trade_pairs = set()
     for i, row in swaps[['arg__tokenIn', 'arg__tokenOut']].iterrows():
         trade_pairs.add(tuple(row.values))
-
-    blocks = swaps.index.get_level_values('block_number').values
-    if len(swaps) > 0:
-        pool_id = swaps.iloc[0]['arg__poolId']
-        pool_address = get_pool_address(pool_id)
-        weights = get_pool_weights(pool_address, blocks=blocks)
 
     pair_data = {}
     for token_in, token_out in trade_pairs:
@@ -122,13 +119,11 @@ def summarize_pool_swaps(swaps, as_dataframe=True):
             swaps['arg__tokenOut'] == token_out
         )
         pair_swaps = swaps[mask]
-        blocks = pair_swaps.index.get_level_values('block_number').values
-
         pair_weights = weights[mask.values]
-        in_amounts = swaps['arg__amountIn'].map(
+        in_amounts = pair_swaps['arg__amountIn'].map(
             decimal.Decimal
         ) / decimal.Decimal('1e18')
-        out_amounts = swaps['arg__amountOut'].map(
+        out_amounts = pair_swaps['arg__amountOut'].map(
             decimal.Decimal
         ) / decimal.Decimal('1e18')
         price_in_per_out = in_amounts / out_amounts

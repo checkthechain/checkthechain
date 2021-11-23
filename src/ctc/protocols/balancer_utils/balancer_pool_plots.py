@@ -6,6 +6,7 @@ from . import balancer_pool_utils
 
 def plot_lbp_summary(
     swaps,
+    weights,
     pool_name,
     pool_address,
     price_range=None,
@@ -13,7 +14,7 @@ def plot_lbp_summary(
     oracle_data=None,
 ):
 
-    summary = balancer_pool_utils.summarize_pool_swaps(swaps=swaps)
+    summary = balancer_pool_utils.summarize_pool_swaps(swaps=swaps, weights=weights)
 
     for pair in summary.keys():
 
