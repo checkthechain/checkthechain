@@ -1,3 +1,4 @@
+import math
 import re
 import typing
 
@@ -9,6 +10,15 @@ T = typing.TypeVar('T')
 
 
 def encode_block_number(block: spec.BlockSpec) -> str:
+    if type(block).__name__ in ['int64', 'int32']:
+        block = int(block)
+    if type(block) in ['float', 'float32', 'float64']:
+        float_block = int(block)
+        if math.isclose(float_block, block):
+            block = float_block
+        else:
+            raise Exception('block cannot have a fractional value')
+
     if isinstance(block, str) and block in ['latest', 'earliest', 'pending']:
         return block
     else:

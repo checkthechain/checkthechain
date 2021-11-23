@@ -1,12 +1,15 @@
 from ctc import spec
 from ctc.evm import binary_utils
 from .. import rpc_request
+from .. import rpc_format
 
 
 def construct_eth_get_transaction_count(
     from_address: spec.BinaryData,
     block_number: spec.BlockSpec = 'latest',
 ) -> spec.RpcRequest:
+
+    block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create(
         'eth_getTransactionCount',
         [from_address, block_number],
@@ -37,9 +40,7 @@ def construct_eth_get_transaction_by_block_number_and_index(
     block_number: spec.BlockSpec,
     transaction_index: spec.BinaryData,
 ) -> spec.RpcRequest:
-    block_number = binary_utils.convert_binary_format(
-        block_number, 'prefix_hex'
-    )
+    block_number = rpc_format.encode_block_number(block_number)
     transaction_index = binary_utils.convert_binary_format(
         transaction_index, 'prefix_hex'
     )
@@ -71,10 +72,8 @@ def construct_eth_get_block_transaction_count_by_hash(
 def construct_eth_get_block_transaction_count_by_number(
     block_number: spec.BlockSpec,
 ) -> spec.RpcRequest:
-    block_number = binary_utils.convert_binary_format(
-        block_number, 'prefix_hex'
-    )
 
+    block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create(
         'eth_getBlockTransactionCountByNumber',
         [block_number],

@@ -5,6 +5,7 @@ from ctc.evm import block_utils
 from ctc.evm import binary_utils
 from ctc.evm import contract_abi_utils
 from .. import rpc_request
+from .. import rpc_format
 
 
 def construct_eth_call(
@@ -21,11 +22,7 @@ def construct_eth_call(
 
     if block_number is None:
         block_number = 'latest'
-    # block_number = block_utils.normalize_block(block=block_number)
-    if isinstance(block_number, int):
-        block_number = binary_utils.convert_binary_format(
-            block_number, 'prefix_hex'
-        )
+    block_number = rpc_format.encode_block_number(block_number)
 
     # encode call data
     if call_data is None:
@@ -59,6 +56,7 @@ def construct_eth_estimate_gas(
     function_parameters: typing.Optional[typing.Union[list, dict]] = None,
     **function_abi_query
 ) -> spec.RpcResponse:
+
     # encode call data
     if call_data is None:
         call_data = contract_abi_utils.encode_call_data(
@@ -86,11 +84,7 @@ def construct_eth_get_balance(
     block_number='latest',
 ) -> spec.RpcResponse:
 
-    block_number = block_utils.normalize_block(block=block_number)
-    block_number = binary_utils.convert_binary_format(
-        block_number, 'prefix_hex'
-    )
-
+    block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create('eth_getBalance', [address, block_number])
 
 
@@ -99,8 +93,9 @@ def construct_eth_get_storage_at(
     position: spec.BinaryData,
     block_number='latest',
 ) -> spec.RpcResponse:
-    position = binary_utils.convert_binary_format(position, 'prefix_hex')
 
+    position = binary_utils.convert_binary_format(position, 'prefix_hex')
+    block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create(
         'eth_getStorageAt', [address, position, block_number]
     )
@@ -111,10 +106,6 @@ def construct_eth_get_code(
     block_number: spec.BlockSpec = 'latest',
 ) -> spec.RpcResponse:
 
-    block_number = block_utils.normalize_block(block=block_number)
-    block_number = binary_utils.convert_binary_format(
-        block_number, 'prefix_hex'
-    )
-
+    block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create('eth_getCode', [address, block_number])
 
