@@ -1,4 +1,5 @@
 from .. import rpc_utils
+from . import contract_abi_utils
 
 
 eip_897_abi = [
@@ -63,6 +64,14 @@ def get_eip1967_proxy_logic_address(contract_address, block=None):
     )
 
     return '0x' + result[-40:]
+
+
+def save_eip897_abi(contract_address):
+    eip897_address = get_eip897_implementation(contract_address)
+    contract_abi_utils.save_proxy_contract_abi_to_filesystem(
+        contract_address=contract_address,
+        proxy_implementation=eip897_address,
+    )
 
 
 def get_eip1967_proxy_beacon_address(contract_address, block=None):
