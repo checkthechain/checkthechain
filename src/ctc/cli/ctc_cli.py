@@ -27,6 +27,7 @@ def create_ctc_cli():
         ],
         'ctc.protocols.fei_utils.cli': [('fei', 'eth')],
         'ctc.protocols.chainlink_utils.cli': [('chainlink',)],
+        'ctc.protocols.rari_utils.cli': [('rari', 'fuse')],
     }
 
     cli = toolcli.BaseCLI(
