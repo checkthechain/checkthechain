@@ -17,6 +17,8 @@ def interpolate_block_series(
     as_dict=None,
     blocks=None,
     values=None,
+    pre_fill_value=None,
+    start_block=None,
     end_block=None,
     output_format=None,
 ):
@@ -46,16 +48,31 @@ def interpolate_block_series(
             raise Exception('must specify series, as_dict, or {blocks, values}')
 
     # initialize datastructures
+    if start_block is None:
+        start_block = blocks[0]
     if end_block is None:
         end_block = blocks[-1]
-    interpolated_blocks = np.arange(blocks[0], end_block + 1, 1, dtype=int)
+
+    # map current blocks to values
+    blocks_to_values = dict(zip(blocks, values))
+    if start_block < blocks[0]:
+        if pre_fill_value is None:
+            raise Exception('must specify pre_fill_value for early start_block')
+        blocks_to_values[start_block] = pre_fill_value
+
+    # find first value
+    for block, value in zip(blocks, values):
+        if start_block <= block:
+            current_value = value
+            break
+    else:
+        raise Exception('could not find starting value')
+
+    # interpolate values
+    interpolated_blocks = np.arange(start_block, end_block + 1, 1, dtype=int)
     interpolated_values = np.zeros(
         len(interpolated_blocks), dtype=type(values[0])
     )
-
-    # interpolate values
-    blocks_to_values = dict(zip(blocks, values))
-    current_value = values[0]
     for b, block in enumerate(interpolated_blocks):
         if block in blocks_to_values:
             current_value = blocks_to_values[block]
