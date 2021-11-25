@@ -114,10 +114,10 @@ async def async_get_deposits_for_token(token, block=None, wrapper=False):
     )
 
 
-async def async_get_tokens_deposits():
+async def async_get_tokens_deposits(block):
     tokens_deposits = {}
     coroutines = []
-    tokens_in_pcv = get_tokens_in_pcv()
+    tokens_in_pcv = await async_get_tokens_in_pcv(block)
     for token in tokens_in_pcv:
         coroutine = async_get_deposits_for_token(token)
         coroutines.append(coroutine)
@@ -128,7 +128,7 @@ async def async_get_tokens_deposits():
 
 async def async_get_deposit_token_balance(deposit_address, block=None):
 
-    return rpc_utils.eth_call(
+    return await rpc.async_eth_call(
         to_address=deposit_address,
         function_name='balance',
         block_number=block,
@@ -140,24 +140,25 @@ async def async_get_deposit_token_balance(deposit_address, block=None):
 #
 
 
-def get_tokens_in_pcv(block=None, wrapper=False):
-    return rpc_utils.eth_call(
+async def async_get_tokens_in_pcv(block=None, wrapper=False):
+    return await rpc.async_eth_call(
         to_address=_get_co_address(wrapper=wrapper),
         function_name='getTokensInPcv',
         block_number=block,
     )
 
 
-def get_pcv_token_balance(token, block=None):
+async def async_get_pcv_token_balance(token, block=None):
 
     # assemble kwargs
     kwargs = {}
     kwargs['contract'] = co_addresses['CollateralizationOracle']
 
-    deposits = get_deposits_for_token(token=token, block=block)
+    deposits = await async_get_deposits_for_token(token=token, block=block)
     pcv_token_balance = 0
     for deposit in deposits:
-        pcv_token_balance += get_deposit_token_balance(
+        # NEED TO AWAIT
+        pcv_token_balance += async_get_deposit_token_balance(
             deposit_address=deposit, block=block
         )
 
