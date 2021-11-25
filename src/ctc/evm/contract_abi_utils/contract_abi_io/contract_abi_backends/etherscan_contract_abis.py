@@ -13,6 +13,7 @@ def get_contract_abi_from_etherscan(contract_address):
     """fetch contract abi using etherscan"""
 
     import requests
+    print('fetching abi from etherscan:', contract_address)
 
     # ratelimit
     cadence = 6
