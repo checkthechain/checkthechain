@@ -1,11 +1,10 @@
-import copy
 import os
 
 from ctc import config_utils
 from ctc import spec
 
 
-def get_provider(provider: spec.ProviderSpec) -> spec.Provider:
+def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
 
     if provider is None:
         config = config_utils.get_config()
