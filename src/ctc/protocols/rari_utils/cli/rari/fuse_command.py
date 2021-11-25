@@ -19,8 +19,18 @@ def fuse_command(pool, block, **kwargs):
         block = int(block)
 
     if pool is not None:
-        pool_index = int(pool)
-        asyncio.run(summarize_fuse_pool(pool_index=pool_index, block=block))
+
+        try:
+            pool_index = int(pool)
+            arg_type = 'pool_index'
+        except Exception as e:
+            token = pool
+            arg_type = 'token'
+
+        if arg_type == 'pool_index':
+            asyncio.run(summarize_fuse_pool(pool_index=pool_index, block=block))
+        elif arg_type == 'token':
+            asyncio.run(summarize_fuse_token(token, block))
 
     else:
         asyncio.run(summarize_all_fuse_pools(block=block))
@@ -56,3 +66,10 @@ async def summarize_all_fuse_pools(block):
     provider = rpc.get_provider()
     await rpc_http_async.async_close_session(provider=provider)
 
+
+async def summarize_fuse_token(token, block):
+    await rari_utils.async_print_fuse_token_summary(token=token, block=block)
+
+    from ctc.rpc.rpc_backends import rpc_http_async
+    provider = rpc.get_provider()
+    await rpc_http_async.async_close_session(provider=provider)
