@@ -9,12 +9,14 @@ from ctc import rpc
 from ctc.evm import rpc_utils
 
 
-def get_pool_tokens(*, pool_address=None, pool_id=None, block=None, vault=None):
+async def async_get_pool_tokens(
+    *, pool_address=None, pool_id=None, block=None, vault=None
+):
 
     if vault is None:
         vault = directory.balancer_v2_vault
     if pool_id is None:
-        pool_id = get_pool_id(pool_address)
+        pool_id = async_get_pool_id(pool_address)
 
     pool_tokens = rpc_utils.eth_call(
         to_address=vault,
@@ -97,6 +99,7 @@ async def async_get_pool_weights(
             to_address=pool_address,
             function_name='getNormalizedWeights',
             block_numbers=blocks,
+            provider={'chunk_size': 100},
         )
         if normalize:
             weights = [

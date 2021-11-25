@@ -8,6 +8,7 @@ def plot_lbp_summary(
     swaps,
     weights,
     pool_name,
+    pool_tokens,
     pool_address,
     price_range=None,
     premium_range=None,
@@ -20,9 +21,6 @@ def plot_lbp_summary(
 
         blocks = summary[pair].index.get_level_values('block_number')
 
-        pool_tokens = balancer_pool_utils.get_pool_tokens(
-            pool_address=pool_address
-        )
         token_0, token_1 = pool_tokens['token_names']
         if token_0 in directory.token_name_to_symbol:
             token_0 = directory.token_name_to_symbol[token_0]
