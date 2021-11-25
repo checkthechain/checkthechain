@@ -181,7 +181,8 @@ def decode_function_output(
     new_decoded_output = []
     for output_type, item in zip(output_types, decoded_output):
         if output_type == 'string':
-            item = item.decode()
+            # item = item.decode()
+            item = item
         elif output_type == 'bytes32':
             item = binary_utils.convert_binary_format(item, 'prefix_hex')
         new_decoded_output.append(item)
