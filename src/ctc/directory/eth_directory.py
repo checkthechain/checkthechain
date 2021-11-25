@@ -45,6 +45,8 @@ token_addresses = {
     'MKR': '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
     'AUDIO': '0x18aaa7115705e8be94bffebde57af9bfc265b998',
     'DODO': '0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd',
+    'OHM': '0x383518188c0c6d7730d91b2c03a03c837814a899',
+    'sOHM': '0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f',
 }
 
 # add uniswap tokens
