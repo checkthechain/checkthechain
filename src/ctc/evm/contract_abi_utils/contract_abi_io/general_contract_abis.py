@@ -1,4 +1,5 @@
 from ctc.toolbox import backend_utils
+from ... import address_utils
 from . import contract_abi_backends
 
 
@@ -50,7 +51,17 @@ def download_contract_abi(contract_address, name=None, **kwargs):
     kwargs['save_kwargs'] = dict(kwargs['save_kwargs'])
     kwargs['save_kwargs'].update(save_kwargs)
 
-    return transfer_contract_abi(
+    contract_abi = transfer_contract_abi(
         from_backend='etherscan', to_backend='filesystem', **kwargs
     )
+
+    try:
+        address_utils.save_eip897_abi(contract_address=contract_address)
+        contract_abi = contract_abi_backends.get_contract_abi_from_filesystem(
+            contract_address=contract_address
+        )
+    except Exception as e:
+        pass
+
+    return contract_abi
 
