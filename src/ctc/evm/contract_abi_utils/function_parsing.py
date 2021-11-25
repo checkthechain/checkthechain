@@ -51,6 +51,11 @@ def get_function_abi(
     elif len(candidates) == 0:
         raise Exception('could not find function abi')
     elif len(candidates) > 0:
+        import json
+        as_json = [json.dumps(candidate) for candidate in candidates]
+        if all(as_json[0] == entry for entry in as_json[1:]):
+            return candidates[0]
+
         raise Exception('too many candidates found for function abi')
     else:
         raise Exception('internal error')
@@ -153,7 +158,12 @@ def get_function_selector(
 def get_function_output_types(*, function_abi=None, **abi_query):
     if function_abi is None:
         function_abi = get_function_abi(**abi_query)
-    return [output['type'] for output in function_abi['outputs']]
+    import eth_utils
+    output_types = []
+    for output in function_abi['outputs']:
+        output_type = eth_utils.abi.collapse_if_tuple(output)
+        output_types.append(output_type)
+    return output_types
 
 
 def get_function_output_names(*, function_abi=None, **abi_query):
