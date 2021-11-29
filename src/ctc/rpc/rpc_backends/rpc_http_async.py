@@ -1,5 +1,10 @@
+import logging
+import random
+
 import anyio
 import aiohttp
+
+# import aiohttp_retry
 
 from ctc import spec
 from .. import rpc_provider
@@ -9,12 +14,33 @@ _http_sessions: dict[spec.ProviderKey, aiohttp.ClientSession] = {}
 
 
 async def async_send_http(
-    request: spec.RpcRequest, provider: spec.ProviderSpec
+    request: spec.RpcRequest,
+    provider: spec.ProviderSpec,
+    n_attempts: int = 8,
 ) -> spec.RpcResponse:
     provider = rpc_provider.get_provider(provider)
     session = get_async_http_session(provider=provider)
-    async with session.post(provider['url'], json=request) as response:
-        return await response.json()
+
+    for attempt in range(n_attempts):
+
+        async with session.post(provider['url'], json=request) as response:
+            if response.status != 200:
+                t_sleep = 2 ** attempt + random.random()
+                print('sleeping for ' + str(t_sleep))
+                await anyio.sleep(t_sleep)
+                continue
+            return await response.json()
+
+    else:
+        message = (
+            'http rpc request failed after '
+            + str(n_attempts)
+            + ' retries, status_code = '
+            + str(response.status)
+        )
+        logger = logging.getLogger()
+        logger.info(message)
+        raise Exception(message)
 
 
 def get_async_http_session(

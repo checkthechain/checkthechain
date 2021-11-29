@@ -99,6 +99,15 @@ async def async_send(
         # chunk request
         request_chunks = chunk_request(request=request, provider=full_provider)
 
+        logger = logging.getLogger()
+        logger.info(
+            'chunking batch of '
+            + str(len(request))
+            + ' calls into '
+            + str(len(request_chunks))
+            + ' chunks'
+        )
+
         # send request chunks
         coroutines = []
         for request_chunk in request_chunks:
