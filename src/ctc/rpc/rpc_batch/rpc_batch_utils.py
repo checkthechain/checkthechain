@@ -33,6 +33,8 @@ def batch_construct(method: str, **constructor_kwargs) -> spec.RpcPluralRequest:
 
 def _get_batch_parameter(kwargs, batch_inputs):
 
+    kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
     # find suitable candidates
     candidates = []
     for plural_name, singular_name in batch_inputs.items():

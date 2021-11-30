@@ -1,5 +1,6 @@
 import toolparallel
 
+from ctc import rpc
 from .. import rpc_utils
 from . import block_search
 
@@ -50,6 +51,16 @@ def get_block(
             raise Exception('unknown block str format: ' + str(block))
     else:
         raise Exception('unknown block specifier: ' + str(block))
+
+
+async def async_get_blocks(
+    blocks, include_full_transactions=False, chunk_size=500
+):
+    return await rpc.async_batch_eth_get_block_by_number(
+        block_numbers=blocks,
+        include_full_transactions=include_full_transactions,
+        provider={'chunk_size': chunk_size},
+    )
 
 
 def get_blocks(blocks):
