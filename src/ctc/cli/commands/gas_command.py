@@ -6,5 +6,8 @@ def get_command_spec():
 
 
 def gas_command(**kwargs):
+    from ctc import config_utils
+    # config = config_utils.get_config()
+
     print('hi')
 

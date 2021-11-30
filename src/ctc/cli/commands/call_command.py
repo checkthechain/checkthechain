@@ -4,7 +4,7 @@ from ctc.evm import rpc_utils
 def get_command_spec():
     return {
         'f': call_command,
-        'options': [
+        'args': [
             {'name': 'to_address'},
             {'name': 'function_name'},
             {'name': 'args', 'kwargs': {'nargs': '*'}},

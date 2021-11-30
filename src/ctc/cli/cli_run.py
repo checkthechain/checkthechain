@@ -1,6 +1,33 @@
 import toolcli
 
 
+def run_cli(raw_command=None, **toolcli_kwargs):
+
+    command_index = {
+        (): 'ctc.cli.root_command',
+        ('block',): 'ctc.cli.commands.block_command',
+        ('gas',): 'ctc.cli.commands.gas_command',
+        ('transaction',): 'ctc.cli.commands.transaction_command',
+        ('address',): 'ctc.cli.commands.address_command',
+        ('token',): 'ctc.cli.commands.token_command',
+        ('call',): 'ctc.cli.commands.call_command',
+        ('fei',): 'ctc.protocols.fei_utils.cli.fei_command',
+        ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.fuse_command',
+        ('chainlink'): 'ctc.protocols.chainlink_utils.chainlink_command',
+    }
+
+    toolcli.run_cli(
+        raw_command=raw_command,
+        command_index=command_index,
+        **toolcli_kwargs
+    )
+
+
+#
+# # old
+#
+
+
 def create_ctc_cli():
 
     # hardcode this for speed

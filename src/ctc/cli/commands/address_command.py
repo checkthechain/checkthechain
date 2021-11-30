@@ -6,7 +6,7 @@ from ctc import evm
 def get_command_spec():
     return {
         'f': address_command,
-        'options': [
+        'args': [
             {'name': 'address'},
             {'name': ['-v', '--verbose'], 'kwargs': {'action': 'store_true'}},
         ],

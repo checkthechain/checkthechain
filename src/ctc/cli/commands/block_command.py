@@ -4,7 +4,7 @@ from ctc import evm
 def get_command_spec():
     return {
         'f': block_command,
-        'options': [
+        'args': [
             {'name': 'block'},
             {'name': '--verbose', 'kwargs': {'action': 'store_true'}},
         ],

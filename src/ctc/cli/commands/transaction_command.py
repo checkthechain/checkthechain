@@ -4,7 +4,7 @@ from ctc import evm
 def get_command_spec():
     return {
         'f': transaction_command,
-        'options': [
+        'args': [
             {'name': 'transaction'},
             {'name': '--sort'},
         ],
