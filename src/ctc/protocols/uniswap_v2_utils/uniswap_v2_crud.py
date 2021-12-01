@@ -1,3 +1,5 @@
+import asyncio
+
 from ctc import evm
 
 
@@ -61,7 +63,52 @@ def get_v2_pool_state(pool_address, block='latest'):
 #
 
 
-def get_v2_pool_swaps(pool_address, start_block=None, end_block=None):
+async def async_get_pool_swaps(
+    pool_address, start_block=None, end_block=None, replace_names=False, normalize=True
+):
+    if normalize or replace_names:
+        metadata_task = asyncio.create_task(async_get_pool_metadata(pool_address))
+
+    swaps = evm.get_events(
+        event_name='Swap',
+        contract_address=pool_address,
+        start_block=start_block,
+        end_block=end_block,
+    )
+
+    if normalize or replace_names:
+        metadata = await metadata_task
+
+    # rename columns
+    if replace_names:
+        x_name = metadata['x_name']
+        y_name = metadata['y_name']
+    else:
+        x_name = 'x'
+        y_name = 'y'
+    columns = {
+        'arg__amount0In': x_name + '_sold',
+        'arg__amount0Out': x_name + '_bought',
+        'arg__amount1In': y_name + '_sold',
+        'arg__amount1Out': y_name + '_bought',
+    }
+    swaps = swaps.rename(columns=columns)
+
+    # normalize columns
+    if normalize:
+        x_decimals = metadata['x_address']
+        y_decimals = metadata['y_address']
+        await evm.async_get_erc20_decimals(
+            token='0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+        )
+        await evm.async_get_erc20_decimals(
+            token='0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
+        )
+
+    return swaps
+
+
+def get_pool_swaps(pool_address, start_block=None, end_block=None):
 
     return evm.get_events(
         event_name='Swap',
@@ -71,7 +118,7 @@ def get_v2_pool_swaps(pool_address, start_block=None, end_block=None):
     )
 
 
-def get_v2_pool_mints(pool_address, start_block=None, end_block=None):
+def get_pool_mints(pool_address, start_block=None, end_block=None):
 
     return evm.get_events(
         event_name='Mint',
@@ -81,7 +128,7 @@ def get_v2_pool_mints(pool_address, start_block=None, end_block=None):
     )
 
 
-def get_v2_pool_burns(pool_address, start_block=None, end_block=None):
+def get_pool_burns(pool_address, start_block=None, end_block=None):
 
     return evm.get_events(
         event_name='Burn',

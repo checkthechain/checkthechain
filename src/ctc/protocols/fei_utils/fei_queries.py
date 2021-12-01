@@ -1,7 +1,7 @@
 from ctc import directory
 from ctc import evm
 from ctc.protocols import chainlink_utils
-from ctc.protocols import uniswap_utils
+from ctc.protocols import uniswap_v2_utils
 
 
 #
@@ -149,7 +149,7 @@ def fetch_fei_metrics(block=None):
     tribe_price = None
 
     # uni pool stats
-    uni_v2__fei_eth = uniswap_utils.fetch_uni_v2_pool_state(
+    uni_v2__fei_eth = uniswap_v2_utils.fetch_uni_v2_pool_state(
         pool_address=directory.uniswap_v2_pools['FEI_ETH'],
         x_name='FEI',
         x_address=fei_address,
@@ -159,7 +159,7 @@ def fetch_fei_metrics(block=None):
         y_price=eth_price,
         block=block,
     )
-    uni_v2__fei_tribe = uniswap_utils.fetch_uni_v2_pool_state(
+    uni_v2__fei_tribe = uniswap_v2_utils.fetch_uni_v2_pool_state(
         pool_address=directory.uniswap_v2_pools['FEI_TRIBE'],
         x_name='FEI',
         x_address=fei_address,
