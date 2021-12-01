@@ -17,6 +17,7 @@ from .. import rpc_spec
 
 
 def batch_construct(method: str, **constructor_kwargs) -> spec.RpcPluralRequest:
+    """construct a batch of rpc calls"""
     batch_inputs = _get_batch_constructor_inputs(method=method)
     if len(batch_inputs) == 0:
         raise Exception('no batch inputs available for method: ' + str(method))
@@ -32,6 +33,10 @@ def batch_construct(method: str, **constructor_kwargs) -> spec.RpcPluralRequest:
 
 
 def _get_batch_parameter(kwargs, batch_inputs):
+    """identify the batch parameter given in kwargs
+
+    return (singular_parameter, parameter_value, other_kwargs)
+    """
 
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
@@ -67,6 +72,7 @@ def _get_batch_constructor_inputs(method: str) -> dict[str, str]:
 def batch_execute(
     method: str, *, provider: spec.ProviderSpec = None, **kwargs
 ) -> spec.RpcPluralResponse:
+    """execute batch rpc call synchronously"""
 
     constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(
         method=method,
@@ -74,15 +80,13 @@ def batch_execute(
     )
     request = batch_construct(method=method, **constructor_kwargs)
     response = rpc_request.send(request=request, provider=provider)
-    digestor = rpc_registry.get_digestor(method)
-    return [
-        digestor(subresponse, **digestor_kwargs) for subresponse in response
-    ]
+    return batch_digest(response=response, method=method, **digestor_kwargs)
 
 
 async def async_batch_execute(
     method: str, *, provider: spec.ProviderSpec = None, **kwargs
 ) -> spec.RpcPluralResponse:
+    """execute batch rpc call asynchronously"""
 
     constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(
         method=method,
@@ -90,16 +94,14 @@ async def async_batch_execute(
     )
     request = batch_construct(method=method, **constructor_kwargs)
     response = await rpc_request.async_send(request=request, provider=provider)
-    digestor = rpc_registry.get_digestor(method)
-    return [
-        digestor(subresponse, **digestor_kwargs) for subresponse in response
-    ]
+    return batch_digest(response=response, method=method, **digestor_kwargs)
 
 
 def _separate_execution_kwargs(
     method: str,
     kwargs: dict[str, typing.Any],
 ) -> tuple[dict[str, typing.Any], dict[str, typing.Any]]:
+    """separate constructor kwargs from digestor kwargs"""
 
     # compile digestor kwargs
     digestor = rpc_registry.get_digestor(method)
@@ -125,12 +127,38 @@ def _separate_execution_kwargs(
             'parameter_types',
             'function_selector',
         ]
-        constructor_kwargs['to_address'] = kwargs['to_address']
         digestor_kwargs['function_abi_query'] = {
-            arg: kwargs[arg]
-            for arg in function_abi_query
-            if arg in kwargs
+            arg: kwargs[arg] for arg in function_abi_query if arg in kwargs
         }
+        if kwargs.get('to_address') is not None:
+            constructor_kwargs['to_address'] = kwargs['to_address']
+        if kwargs['to_addresses'] is not None:
+            digestor_kwargs['to_addresses'] = kwargs['to_addresses']
 
     return constructor_kwargs, digestor_kwargs
+
+
+#
+# # batch digestion
+#
+
+
+def batch_digest(
+    response: spec.RpcPluralResponse,
+    method: str,
+    to_addresses: typing.Optional[list[str]],
+    **digestor_kwargs
+) -> spec.RpcPluralResponse:
+
+    digestor = rpc_registry.get_digestor(method)
+    results = []
+    for s, subresponse in enumerate(response):
+        if to_addresses is not None:
+            result = digestor(
+                subresponse, to_address=to_addresses[s], **digestor_kwargs
+            )
+        else:
+            result = digestor(subresponse, **digestor_kwargs)
+        results.append(result)
+    return results
 
