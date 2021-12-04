@@ -12,7 +12,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         ('token',): 'ctc.cli.commands.token_command',
         ('call',): 'ctc.cli.commands.call_command',
         ('fei',): 'ctc.protocols.fei_utils.cli.fei_command',
-        ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.fuse_command',
+        ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
         ('chainlink'): 'ctc.protocols.chainlink_utils.chainlink_command',
     }
 
