@@ -1,5 +1,6 @@
 import json
 
+from ctc import spec
 from .... import address_utils
 
 
@@ -32,7 +33,10 @@ def get_contract_abi_from_etherscan(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
     url_template = 'http://api.etherscan.io/api?module=contract&action=getabi&address={address}&format=raw'
     abi_endpoint = url_template.format(address=contract_address)
-    abi = json.loads(requests.get(abi_endpoint).text)
+    content = requests.get(abi_endpoint).text
+    if content == 'Contract source code not verified':
+        raise spec.AbiNotFoundException()
+    abi = json.loads(content)
     if isinstance(abi, dict) and abi.get('status') == '0':
         raise Exception(
             'could not obtain contract abi from etherscan for '
