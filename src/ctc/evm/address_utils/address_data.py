@@ -9,6 +9,34 @@ def is_address_str(some_str):
     )
 
 
+def get_created_address(
+    sender, nonce=None, salt=None, init_code=None, output_format=None
+):
+    # see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md
+    # see https://ethereum.stackexchange.com/a/761
+    if nonce is not None:
+        # create
+        sender = binary_utils.convert_binary_format(sender, 'binary')
+        data = binary_utils.rlp_encode([sender, nonce])
+    elif salt is not None and init_code is not None:
+        # create2
+        data = (
+            binary_utils.convert_binary_format('0xff', 'raw_hex')
+            + binary_utils.convert_binary_format(sender, 'raw_hex')
+            + binary_utils.convert_binary_format(salt, 'raw_hex')
+            + binary_utils.convert_binary_format(binary_utils.keccak(init_code), 'raw_hex')
+        )
+    else:
+        raise Exception('specify either {nonce} or {salt, init_code}')
+
+    result = binary_utils.keccak(data, output_format='prefix_hex')
+    result = '0x' + result[26:]
+    if output_format is not None and output_format != 'prefix_hex':
+        result = binary_utils.keccak(data=result, output_format=output_format)
+
+    return result
+
+
 def create_hash_preview(
     hash_data,
     show_start=True,
@@ -52,7 +80,8 @@ def get_address_checksum(address):
 
     # compute address hash
     address_hash = binary_utils.keccak_text(
-        address.lower(), output_format='raw_hex',
+        address.lower(),
+        output_format='raw_hex',
     )
 
     # assemble checksum
