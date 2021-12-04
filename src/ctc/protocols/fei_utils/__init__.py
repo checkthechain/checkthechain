@@ -1,3 +1,4 @@
+from .analytics import *
 from .fei_collateralization_oracle import *
 from .fei_datasets import *
 from .fei_queries import *

@@ -51,7 +51,8 @@ async def async_get_pcv_stats(block=None, blocks=None, wrapper=False, provider=N
         kwargs['to_address'] = co_addresses['CollateralizationOracle']
 
     provider = rpc.get_provider(provider)
-    provider.setdefault('chunk_size', 1)
+    if provider['chunk_size'] is None:
+        provider['chunk_size'] = 1
 
     # fetch results
     keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
