@@ -1,10 +1,37 @@
 import asyncio
 
 from ctc import evm
+from ctc import rpc
 
 
 #
 # # metadata
+#
+
+
+async def async_get_pool_tokens(pool_address, **rpc_kwargs):
+    kwargs = dict(rpc_kwargs, to_address=pool_address)
+    return await asyncio.gather(
+        rpc.async_eth_call(function_name='token0', **kwargs),
+        rpc.async_eth_call(function_name='token1', **kwargs),
+    )
+
+
+async def async_get_pool_metadata(pool_address, **rpc_kwargs):
+    x_address, y_address = await async_get_pool_tokens(pool_address=pool_address)
+    x_symbol, y_symbol = await evm.async_get_erc20_symbol(
+        tokens=[x_address, y_address], **rpc_kwargs
+    )
+    return {
+        'x_symbol': x_symbol,
+        'y_symbol': y_symbol,
+        'x_address': x_address,
+        'y_address': y_address,
+    }
+
+
+#
+# # old sync functions
 #
 
 
@@ -16,11 +43,11 @@ def get_pool_tokens(pool_address):
 
 def get_pool_metadata(pool_address):
     token_x, token_y = get_pool_tokens(pool_address=pool_address)
-    token_x_name = evm.get_erc20_name(token=token_x)
-    token_y_name = evm.get_erc20_name(token=token_y)
+    token_x_symbol = evm.get_erc20_symbol(token=token_x)
+    token_y_symbol = evm.get_erc20_symbol(token=token_y)
     return {
-        'x_name': token_x_name,
-        'y_name': token_y_name,
+        'x_symbol': token_x_symbol,
+        'y_symbol': token_y_symbol,
         'x_address': token_x,
         'y_address': token_y,
     }
@@ -32,7 +59,7 @@ def get_pool_metadata(pool_address):
 
 
 @evm.parallelize_block_fetching()
-def get_v2_pool_state(pool_address, block='latest'):
+def get_pool_state(pool_address, block='latest'):
 
     block = evm.normalize_block(block=block)
 
@@ -64,10 +91,16 @@ def get_v2_pool_state(pool_address, block='latest'):
 
 
 async def async_get_pool_swaps(
-    pool_address, start_block=None, end_block=None, replace_names=False, normalize=True
+    pool_address,
+    start_block=None,
+    end_block=None,
+    replace_symbols=False,
+    normalize=True,
 ):
-    if normalize or replace_names:
-        metadata_task = asyncio.create_task(async_get_pool_metadata(pool_address))
+    if normalize or replace_symbols:
+        metadata_task = asyncio.create_task(
+            async_get_pool_metadata(pool_address)
+        )
 
     swaps = evm.get_events(
         event_name='Swap',
@@ -76,33 +109,40 @@ async def async_get_pool_swaps(
         end_block=end_block,
     )
 
-    if normalize or replace_names:
+    if normalize or replace_symbols:
         metadata = await metadata_task
 
     # rename columns
-    if replace_names:
-        x_name = metadata['x_name']
-        y_name = metadata['y_name']
+    if replace_symbols:
+        x_symbol = metadata['x_symbol']
+        y_symbol = metadata['y_symbol']
     else:
-        x_name = 'x'
-        y_name = 'y'
+        x_symbol = 'x'
+        y_symbol = 'y'
     columns = {
-        'arg__amount0In': x_name + '_sold',
-        'arg__amount0Out': x_name + '_bought',
-        'arg__amount1In': y_name + '_sold',
-        'arg__amount1Out': y_name + '_bought',
+        'arg__amount0In': x_symbol + '_sold',
+        'arg__amount0Out': x_symbol + '_bought',
+        'arg__amount1In': y_symbol + '_sold',
+        'arg__amount1Out': y_symbol + '_bought',
     }
     swaps = swaps.rename(columns=columns)
 
     # normalize columns
     if normalize:
-        x_decimals = metadata['x_address']
-        y_decimals = metadata['y_address']
-        await evm.async_get_erc20_decimals(
-            token='0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+        x_decimals, y_decimals = await evm.async_get_erc20_decimals(
+            tokens=[metadata['x_address'], metadata['y_address']],
         )
-        await evm.async_get_erc20_decimals(
-            token='0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
+        swaps[columns['arg__amount0In']] = (
+            swaps[columns['arg__amount0In']].astype(float) / (10 ** x_decimals)
+        )
+        swaps[columns['arg__amount0Out']] = (
+            swaps[columns['arg__amount0Out']].astype(float) / (10 ** x_decimals)
+        )
+        swaps[columns['arg__amount1In']] = (
+            swaps[columns['arg__amount1In']].astype(float) / (10 ** y_decimals)
+        )
+        swaps[columns['arg__amount1Out']] = (
+            swaps[columns['arg__amount1Out']].astype(float) / (10 ** y_decimals)
         )
 
     return swaps
