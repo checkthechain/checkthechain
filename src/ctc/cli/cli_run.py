@@ -5,6 +5,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
 
     command_index = {
         (): 'ctc.cli.root_command',
+        ('add_proxy_abi',): 'ctc.cli.commands.add_proxy_abi_command',
         ('block',): 'ctc.cli.commands.block_command',
         ('gas',): 'ctc.cli.commands.gas_command',
         ('transaction',): 'ctc.cli.commands.transaction_command',
