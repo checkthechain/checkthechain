@@ -132,7 +132,7 @@ def _separate_execution_kwargs(
         }
         if kwargs.get('to_address') is not None:
             constructor_kwargs['to_address'] = kwargs['to_address']
-        if kwargs['to_addresses'] is not None:
+        if kwargs.get('to_addresses') is not None:
             digestor_kwargs['to_addresses'] = kwargs['to_addresses']
 
     return constructor_kwargs, digestor_kwargs
@@ -146,7 +146,7 @@ def _separate_execution_kwargs(
 def batch_digest(
     response: spec.RpcPluralResponse,
     method: str,
-    to_addresses: typing.Optional[list[str]],
+    to_addresses: typing.Optional[list[str]] = None,
     **digestor_kwargs
 ) -> spec.RpcPluralResponse:
 
