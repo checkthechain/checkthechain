@@ -6,23 +6,31 @@ from . import spec
 
 
 async def async_create_payload(
-    timescale: spec.Timescale,
+    *,
+    blocks=None,
+    timestamps=None,
+    timescale: spec.Timescale = None,
     end_time: spec.Timestamp = None,
 ) -> spec.AnalyticsPayload:
     """create data payload from scratch"""
 
-    if end_time is None:
-        end_time = time.time()
+    if blocks is None and timestamps is None:
 
-    timestamps = timestamp_crud.get_timestamps(
-        timescale=timescale, end_time=end_time
-    )
-    blocks = timestamp_crud.get_timestamps_blocks(timestamps=timestamps)
+        if timescale is None:
+            raise Exception('must specify timescale or {blocks, timestamps}')
+
+        if end_time is None:
+            end_time = time.time()
+
+        timestamps = timestamp_crud.get_timestamps(
+            timescale=timescale, end_time=end_time
+        )
+        blocks = timestamp_crud.get_timestamps_blocks(timestamps=timestamps)
+
     metrics = await metric_crud.async_get_metrics(blocks=blocks)
 
     return {
         'version': '0.0',
-        'created_at_timestamp': end_time,
         'timestamps': timestamps,
         'block_numbers': blocks,
         'metrics': metrics,

@@ -14,7 +14,7 @@ async def async_compute_pcv_stats(
         fei_utils.async_get_pcv_stats(blocks=blocks)
     )
     total_supply_task = asyncio.create_task(
-        evm.async_batch_get_erc20_total_supply(token='FEI', blocks=blocks)
+        evm.async_get_erc20_total_supply(token='FEI', blocks=blocks)
     )
 
     pcv_stats = await pcv_stats_task
@@ -43,25 +43,25 @@ async def async_compute_pcv_stats(
 
 async def async_compute_pcv_by_asset(blocks, verbose=False):
     return {
-        'ETH': [9999] * len(blocks),
-        'RAI': [9999] * len(blocks),
-        'LUSD': [9999] * len(blocks),
-        'DAI': [9999] * len(blocks),
-        'DPI': [9999] * len(blocks),
-        'INDEX': [9999] * len(blocks),
-        'BAL': [9999] * len(blocks),
+        'ETH': {'values': [9999] * len(blocks)},
+        'RAI': {'values': [9999] * len(blocks)},
+        'LUSD': {'values': [9999] * len(blocks)},
+        'DAI': {'values': [9999] * len(blocks)},
+        'DPI': {'values': [9999] * len(blocks)},
+        'INDEX': {'values': [9999] * len(blocks)},
+        'BAL': {'values': [9999] * len(blocks)},
     }
 
 
 async def async_compute_pcv_by_deployment(blocks, verbose=False):
     return {
-        'Tokemak': [9999] * len(blocks),
-        'Lido': [9999] * len(blocks),
-        'Uniswap': [9999] * len(blocks),
-        'Rari': [9999] * len(blocks),
-        'Sushi': [9999] * len(blocks),
-        'Fei': [9999] * len(blocks),
-        'Aave': [9999] * len(blocks),
-        'Compound': [9999] * len(blocks),
+        'Tokemak': {'values': [9999] * len(blocks)},
+        'Lido': {'values': [9999] * len(blocks)},
+        'Uniswap': {'values': [9999] * len(blocks)},
+        'Rari': {'values': [9999] * len(blocks)},
+        'Sushi': {'values': [9999] * len(blocks)},
+        'Fei': {'values': [9999] * len(blocks)},
+        'Aave': {'values': [9999] * len(blocks)},
+        'Compound': {'values': [9999] * len(blocks)},
     }
 

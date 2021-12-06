@@ -48,5 +48,8 @@ def compute_tribe_buybacks_usd(blocks, swaps=None):
     else:
         net_tribe_buys = cummulative_tribe_buys
 
-    return [net_tribe_buys[block] for block in blocks]
+    return {
+        'values': [net_tribe_buys[block] for block in blocks],
+        'units': 'FEI',
+    }
 
