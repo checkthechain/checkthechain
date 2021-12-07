@@ -39,5 +39,5 @@ class Provider(PartialProvider, total=True):
 
 ProviderShortcut = str
 ProviderSpec = typing.Union[ProviderShortcut, PartialProvider, Provider, None]
-ProviderKey = tuple[int, str, tuple[tuple[typing.Any, typing.Any], ...]]
+ProviderKey = tuple[int, str, typing.Tuple[tuple[typing.Any, typing.Any], ...]]
 

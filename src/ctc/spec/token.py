@@ -1,6 +1,7 @@
 import typing
 
 
+Address = str
 ContractAddress = str
 TokenAddress = ContractAddress
 TokenSymbol = str
