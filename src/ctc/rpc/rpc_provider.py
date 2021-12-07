@@ -54,3 +54,13 @@ def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
         tuple(provider['session_kwargs'].items()),
     )
 
+
+def add_provider_parameters(
+    provider: spec.ProviderSpec,
+    parameters: spec.PartialProvider,
+) -> spec.Provider:
+    # TODO: decide whether parameters with value=None should be included
+    provider = get_provider(provider)
+    provider = dict(provider, **parameters)
+    return provider
+

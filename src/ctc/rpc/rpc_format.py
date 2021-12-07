@@ -1,8 +1,9 @@
-import math
+# import math
 import re
 import typing
 
 from ctc.evm import binary_utils
+from ctc.evm import block_utils
 from ctc import spec
 
 
@@ -10,18 +11,12 @@ T = typing.TypeVar('T')
 
 
 def encode_block_number(block: spec.BlockSpec) -> str:
-    if type(block).__name__ in ['int64', 'int32']:
-        block = int(block)
-    if type(block) in ['float', 'float32', 'float64']:
-        float_block = int(block)
-        if math.isclose(float_block, block):
-            block = float_block
-        else:
-            raise Exception('block cannot have a fractional value')
 
     if isinstance(block, str) and block in ['latest', 'earliest', 'pending']:
         return block
     else:
+        if isinstance(block, typing.SupportsInt):
+            block = block_utils.raw_block_number_to_int(block)
         return binary_utils.convert_binary_format(block, 'prefix_hex')
 
 

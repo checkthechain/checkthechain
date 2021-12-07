@@ -23,6 +23,10 @@ RpcConstructor = typing.Callable[..., RpcSingularRequest]
 RpcDigestor = typing.Callable[..., RpcResponse]
 
 
+#
+# # provider
+#
+
 class PartialProvider(typing.TypedDict, total=False):
     type: str
     url: str

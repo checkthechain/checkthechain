@@ -9,3 +9,9 @@ BlockSpec = typing.Union[
 
 BinaryFormat = typing.Literal['binary', 'prefix_hex', 'raw_hex', 'integer']
 
+IntegerData = int
+
+PrefixHexData = str
+RawHexData = str
+HexData = typing.Union[PrefixHexData, RawHexData]
+

@@ -1,7 +1,6 @@
 import typing
 
 from ctc import spec
-from ctc.evm import block_utils
 from ctc.evm import binary_utils
 from ctc.evm import contract_abi_utils
 from .. import rpc_request

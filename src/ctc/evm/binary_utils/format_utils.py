@@ -2,10 +2,6 @@ import typing
 
 from ctc import spec
 
-#
-# # binary data reading
-#
-
 
 def get_binary_format(data: spec.BinaryInteger) -> spec.BinaryFormat:
     if isinstance(data, bytes):
