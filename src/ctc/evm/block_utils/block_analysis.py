@@ -1,4 +1,9 @@
-def bin_by_blocks(data, blocks):
+from ctc import spec
+
+
+def bin_by_blocks(
+    data: 'pandas.DataFrame', blocks: list[spec.BlockReference]
+) -> 'pandas.DataFrame':
     import numpy as np
     import pandas as pd
 

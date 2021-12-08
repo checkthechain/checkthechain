@@ -1,8 +1,92 @@
+import typing
+
 import toolparallel
 
 from ctc import rpc
+from ctc import spec
 from .. import rpc_utils
-from . import block_search
+from . import block_normalize
+
+
+async def async_get_block(
+    block: spec.BlockReference,
+    include_full_transactions: bool = False,
+    provider: spec.ProviderSpec = None,
+) -> spec.Block:
+
+    if spec.is_block_number_reference(block):
+
+        return await rpc.async_eth_get_block_by_number(
+            block_number=block_normalize.standardize_block_number(block),
+            provider=provider,
+            include_full_transactions=include_full_transactions,
+        )
+
+    elif spec.is_block_hash(block):
+
+        return await rpc.async_eth_get_block_by_hash(
+            block_hash=block,
+            provider=provider,
+            include_full_transactions=include_full_transactions,
+        )
+
+    else:
+        raise Exception('unknown block specifier: ' + str(block))
+
+
+async def async_get_blocks(
+    blocks: list[spec.BlockReference],
+    include_full_transactions: bool = False,
+    chunk_size: int = 500,
+    provider: spec.ProviderSpec = None,
+) -> spec.Block:
+
+    provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
+
+    if all(spec.is_block_number_reference(block) for block in blocks):
+
+        standardized = [
+            block_normalize.standardize_block_number(block) for block in blocks
+        ]
+
+        return await rpc.async_batch_eth_get_block_by_number(
+            block_numbers=standardized,
+            include_full_transactions=include_full_transactions,
+            provider=provider,
+        )
+
+    elif all(spec.is_block_hash(block) for block in blocks):
+
+        return await rpc.async_batch_eth_get_block_by_number(
+            block_hashes=blocks,
+            include_full_transactions=include_full_transactions,
+            provider=provider,
+        )
+
+    else:
+        raise Exception(
+            'blocks should be all block number references or all block hashes'
+        )
+
+
+async def async_get_latest_block_number(
+    provider: typing.Optional[spec.Provider] = None,
+) -> int:
+    return await rpc.async_eth_block_number(provider=provider)
+
+
+async def get_blocks_timestamps(
+    blocks: list[spec.BlockReference], **get_blocks_kwargs
+) -> list[int]:
+    return [
+        block['timestamp']
+        for block in await async_get_blocks(blocks=blocks, **get_blocks_kwargs)
+    ]
+
+
+#
+# # old
+#
 
 
 @toolparallel.parallelize_input(singular_arg='block', plural_arg='blocks')
@@ -53,16 +137,6 @@ def get_block(
         raise Exception('unknown block specifier: ' + str(block))
 
 
-async def async_get_blocks(
-    blocks, include_full_transactions=False, chunk_size=500
-):
-    return await rpc.async_batch_eth_get_block_by_number(
-        block_numbers=blocks,
-        include_full_transactions=include_full_transactions,
-        provider={'chunk_size': chunk_size},
-    )
-
-
 def get_blocks(blocks):
 
     rpc_request = [
@@ -80,86 +154,14 @@ def get_blocks_timestamps(blocks):
     return {block['number']: block['timestamp'] for block in get_blocks(blocks)}
 
 
-def get_block_number(block, provider=None, **rpc_kwargs):
+# def get_block_number(block, provider=None, **rpc_kwargs):
 
-    # gather kwargs
-    kwargs = dict(provider=provider, **rpc_kwargs)
+#     # gather kwargs
+#     kwargs = dict(provider=provider, **rpc_kwargs)
 
-    # rpc call
-    if block == 'latest':
-        return rpc_utils.eth_block_number(**kwargs)
-    else:
-        return get_block(block=block, **kwargs)['number']
-
-
-def normalize_block(block, contract_address=None):
-    if block is None:
-        raise Exception()
-
-    if block == 'latest':
-        block = get_block_number('latest')
-    if block == 'contract_start':
-        block = block_search.get_contract_creation_block(
-            contract_address=contract_address
-        )
-
-    return int(block)
-
-
-def normalize_blocks(blocks, contract_address=None):
-    kwargs = {'contract_address': contract_address}
-
-    special = {}
-    for block in blocks:
-        if block in ['latest', 'earliest', 'pending'] and block not in special:
-            special[block] = normalize_block(block, **kwargs)
-
-    normalized = []
-    for block in blocks:
-        if block in special:
-            normalized.append(special[block])
-        else:
-            normalized.append(normalize_block(block, **kwargs))
-
-    return normalized
-
-
-def normalize_block_range(start_block, end_block, contract_address=None):
-    """fill in special values and defaults for block range
-
-    - must fill in dynamic 'latest' values when using a range in multiple calls
-    """
-
-    # fill in default values
-    if start_block is None:
-        if contract_address is not None:
-            start_block = 'contract_start'
-        else:
-            start_block = 'latest'
-    if end_block is None:
-        end_block = 'latest'
-
-    # fill in special values
-    if 'contract_start' in [start_block, end_block]:
-        contract_start = block_search.get_contract_creation_block(
-            contract_address=contract_address
-        )
-    if 'latest' in [start_block, end_block]:
-        latest_block = get_block_number('latest')
-
-    # assign special values
-    if start_block == 'latest':
-        start_block = latest_block
-    if start_block == 'contract_start':
-        start_block = contract_start
-    if end_block == 'latest':
-        end_block = latest_block
-    if end_block == 'contract_start':
-        end_block = contract_start
-
-    # convert to int
-    start_block = int(start_block)
-    end_block = int(end_block)
-
-    return (start_block, end_block)
+#     # rpc call
+#     if block == 'latest':
+#         return rpc_utils.eth_block_number(**kwargs)
+#     else:
+#         return get_block(block=block, **kwargs)['number']
 
