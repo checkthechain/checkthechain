@@ -18,7 +18,9 @@ async def async_get_pool_tokens(pool_address, **rpc_kwargs):
 
 
 async def async_get_pool_metadata(pool_address, **rpc_kwargs):
-    x_address, y_address = await async_get_pool_tokens(pool_address=pool_address)
+    x_address, y_address = await async_get_pool_tokens(
+        pool_address=pool_address
+    )
     x_symbol, y_symbol = await evm.async_get_erc20_symbol(
         tokens=[x_address, y_address], **rpc_kwargs
     )
@@ -56,6 +58,40 @@ def get_pool_metadata(pool_address):
 #
 # # state
 #
+
+
+async def async_get_pool_state(pool_address, block='latest'):
+    block = await evm.async_block_number_to_int(block)
+
+    # reserves
+    token_x, token_y = await async_get_pool_tokens(pool_address=pool_address)
+    reserves_coroutine = evm.async_get_erc20s_balance_of(
+        address=pool_address,
+        tokens=[token_x, token_y],
+        block=block,
+    )
+    reserves_coroutine = asyncio.create_task(reserves_coroutine)
+
+    # total supply
+    lp_total_supply_coroutine = evm.async_get_erc20_total_supply(
+        token=pool_address,
+        block=block,
+    )
+    lp_total_supply_coroutine = asyncio.create_task(lp_total_supply_coroutine)
+
+    # await results
+    token_x_reserves, token_y_reserves = await reserves_coroutine
+    lp_total_supply = await lp_total_supply_coroutine
+
+    return {
+        'x_reserves': token_x_reserves,
+        'y_reserves': token_y_reserves,
+        'lp_total_supply': lp_total_supply,
+    }
+
+
+async def async_get_pool_state_by_block():
+    raise NotImplementedError()
 
 
 @evm.parallelize_block_fetching()
@@ -132,18 +168,18 @@ async def async_get_pool_swaps(
         x_decimals, y_decimals = await evm.async_get_erc20_decimals(
             tokens=[metadata['x_address'], metadata['y_address']],
         )
-        swaps[columns['arg__amount0In']] = (
-            swaps[columns['arg__amount0In']].astype(float) / (10 ** x_decimals)
-        )
-        swaps[columns['arg__amount0Out']] = (
-            swaps[columns['arg__amount0Out']].astype(float) / (10 ** x_decimals)
-        )
-        swaps[columns['arg__amount1In']] = (
-            swaps[columns['arg__amount1In']].astype(float) / (10 ** y_decimals)
-        )
-        swaps[columns['arg__amount1Out']] = (
-            swaps[columns['arg__amount1Out']].astype(float) / (10 ** y_decimals)
-        )
+        swaps[columns['arg__amount0In']] = swaps[
+            columns['arg__amount0In']
+        ].astype(float) / (10 ** x_decimals)
+        swaps[columns['arg__amount0Out']] = swaps[
+            columns['arg__amount0Out']
+        ].astype(float) / (10 ** x_decimals)
+        swaps[columns['arg__amount1In']] = swaps[
+            columns['arg__amount1In']
+        ].astype(float) / (10 ** y_decimals)
+        swaps[columns['arg__amount1Out']] = swaps[
+            columns['arg__amount1Out']
+        ].astype(float) / (10 ** y_decimals)
 
     return swaps
 
