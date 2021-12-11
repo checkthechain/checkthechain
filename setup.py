@@ -18,6 +18,7 @@ setuptools.setup(
         'pyyaml',
         'requests',
         'pysha3',  # for sha3
+        'pandas-stubs',
     ],
     scripts=[
         './scripts/ctc'
