@@ -75,7 +75,7 @@ async def async_get_latest_block_number(
     return await rpc.async_eth_block_number(provider=provider)
 
 
-async def get_blocks_timestamps(
+async def async_get_blocks_timestamps(
     blocks: list[spec.BlockReference], **get_blocks_kwargs
 ) -> list[int]:
     return [
@@ -154,14 +154,14 @@ def get_blocks_timestamps(blocks):
     return {block['number']: block['timestamp'] for block in get_blocks(blocks)}
 
 
-# def get_block_number(block, provider=None, **rpc_kwargs):
+def get_block_number(block, provider=None, **rpc_kwargs):
 
-#     # gather kwargs
-#     kwargs = dict(provider=provider, **rpc_kwargs)
+    # gather kwargs
+    kwargs = dict(provider=provider, **rpc_kwargs)
 
-#     # rpc call
-#     if block == 'latest':
-#         return rpc_utils.eth_block_number(**kwargs)
-#     else:
-#         return get_block(block=block, **kwargs)['number']
+    # rpc call
+    if block == 'latest':
+        return rpc_utils.eth_block_number(**kwargs)
+    else:
+        return get_block(block=block, **kwargs)['number']
 

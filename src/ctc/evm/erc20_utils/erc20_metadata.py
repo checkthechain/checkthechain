@@ -1,107 +1,120 @@
 import typing
 
-from ctc import directory
-from ctc import rpc
 from ctc import spec
-from .. import address_utils
 from .. import block_utils
 from .. import rpc_utils
+from . import erc20_generic
 
 
 #
-# # token metadata functions
+# # decimals
 #
-
-
-def get_erc20_address(token):
-    if address_utils.is_address_str(token):
-        return token
-    elif isinstance(token, str):
-        return directory.token_addresses[token]
-    else:
-        raise Exception('could not get token address')
-
-
-#
-# # async queries
-#
-
-
-async def async_erc20_eth_call(
-    function_name: str,
-    token: typing.Optional[spec.TokenReference] = None,
-    tokens: typing.Optional[list[spec.TokenReference]] = None,
-    block: typing.Optional[int] = None,
-    blocks: typing.Optional[int] = None,
-    **rpc_kwargs
-):
-    if tokens is not None and blocks is not None:
-        raise NotImplementedError('specify one batch parameter at a time')
-
-    if blocks is not None:
-        return await rpc.async_batch_eth_call(
-            to_addresses=get_erc20_address(token),
-            function_name=function_name,
-            block_numbers=blocks,
-            **rpc_kwargs
-        )
-
-    elif tokens is not None:
-        return await rpc.async_batch_eth_call(
-            to_addresses=[get_erc20_address(token) for token in tokens],
-            function_name=function_name,
-            block_number=block,
-            **rpc_kwargs
-        )
-
-    elif token is not None:
-        return await rpc.async_eth_call(
-            to_address=get_erc20_address(token),
-            function_name=function_name,
-            block_number=block,
-            **rpc_kwargs
-        )
-
-    else:
-        raise Exception('could not process inputs')
 
 
 async def async_get_erc20_decimals(
-    token=None, *, tokens=None, block=None, blocks=None, **rpc_kwargs
-):
-    return await async_erc20_eth_call(
-        function_name='decimals',
-        token=token,
-        tokens=tokens,
-        block=block,
-        blocks=blocks,
-        **rpc_kwargs
+    token: spec.TokenReference,
+    block: spec.BlockNumberReference = 'latest',
+    **rpc_kwargs
+) -> int:
+    """get decimals of an erc20"""
+    return await erc20_generic.async_erc20_eth_call(
+        function_name='decimals', token=token, block=block, **rpc_kwargs
     )
+
+
+async def async_get_erc20s_decimals(
+    tokens: typing.Iterable[spec.TokenReference],
+    block: spec.BlockNumberReference = 'latest',
+    **rpc_kwargs
+) -> list[int]:
+    """get decimals of multiple erc20s"""
+    return await erc20_generic.async_erc20s_eth_calls(
+        function_name='decimals', tokens=tokens, block=block, **rpc_kwargs
+    )
+
+
+async def async_get_erc20_decimals_by_block(
+    token: spec.TokenReference, blocks=None, **rpc_kwargs
+) -> list[int]:
+    """get decimals of an erc20 across multiple blocks"""
+    return await erc20_generic.async_erc20_eth_call_by_block(
+        function_name='decimals', token=token, blocks=blocks, **rpc_kwargs
+    )
+
+
+#
+# # name
+#
 
 
 async def async_get_erc20_name(
-    token=None, *, tokens=None, block=None, blocks=None, **rpc_kwargs
-):
-    return await async_erc20_eth_call(
-        function_name='name',
-        token=token,
-        tokens=tokens,
-        block=block,
-        blocks=blocks,
-        **rpc_kwargs
+    token: spec.TokenReference,
+    block: spec.BlockNumberReference = 'latest',
+    **rpc_kwargs
+) -> str:
+    """get name of an erc20"""
+    return await erc20_generic.async_erc20_eth_call(
+        function_name='name', token=token, block=block, **rpc_kwargs
     )
 
 
+async def async_get_erc20s_names(
+    tokens: typing.Iterable[spec.TokenReference],
+    block: spec.BlockNumberReference = 'latest',
+    **rpc_kwargs
+) -> list[str]:
+    """get name of multiple erc20s"""
+    return await erc20_generic.async_erc20s_eth_calls(
+        function_name='name', tokens=tokens, block=block, **rpc_kwargs
+    )
+
+
+async def async_get_erc20_name_by_block(
+    token: spec.TokenReference,
+    blocks: typing.Iterable[spec.BlockNumberReference],
+    **rpc_kwargs
+) -> list[str]:
+    """get name of an erc20 across multiple blocks"""
+    return await erc20_generic.async_erc20_eth_call_by_block(
+        function_name='name', token=token, blocks=blocks, **rpc_kwargs
+    )
+
+
+#
+# # symbol
+#
+
+
 async def async_get_erc20_symbol(
-    token=None, *, tokens=None, block=None, blocks=None, **rpc_kwargs
+    token: spec.TokenReference,
+    block: spec.BlockNumberReference = 'latest',
+    **rpc_kwargs
 ):
-    return await async_erc20_eth_call(
-        function_name='symbol',
-        token=token,
-        tokens=tokens,
-        block=block,
-        blocks=blocks,
-        **rpc_kwargs
+    """get symbol of an erc20"""
+    return await erc20_generic.async_erc20_eth_call(
+        function_name='symbol', token=token, block=block, **rpc_kwargs
+    )
+
+
+async def async_get_erc20s_symbols(
+    tokens: typing.Iterable[spec.TokenReference],
+    block: spec.BlockNumberReference = 'latest',
+    **rpc_kwargs
+):
+    """get symbol of multiple erc20s"""
+    return await erc20_generic.async_erc20s_eth_calls(
+        function_name='symbol', tokens=tokens, block=block, **rpc_kwargs
+    )
+
+
+async def async_get_erc20_symbol_by_block(
+    token: spec.TokenReference,
+    blocks: typing.Iterable[spec.BlockNumberReference],
+    **rpc_kwargs
+):
+    """get symbol of an erc20 across multiple blocks"""
+    return await erc20_generic.async_erc20_eth_call_by_block(
+        function_name='symbol', token=token, blocks=blocks, **rpc_kwargs
     )
 
 
@@ -113,7 +126,7 @@ async def async_get_erc20_symbol(
 @block_utils.parallelize_block_fetching()
 def get_erc20_decimals(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
-        to_address=get_erc20_address(token),
+        to_address=erc20_generic.get_erc20_address(token),
         function_name='decimals',
         block_number=block,
         **eth_call_kwargs
@@ -123,7 +136,7 @@ def get_erc20_decimals(token=None, block=None, **eth_call_kwargs):
 @block_utils.parallelize_block_fetching()
 def get_erc20_name(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
-        to_address=get_erc20_address(token),
+        to_address=erc20_generic.get_erc20_address(token),
         function_name='name',
         block_number=block,
         **eth_call_kwargs
@@ -133,7 +146,7 @@ def get_erc20_name(token=None, block=None, **eth_call_kwargs):
 @block_utils.parallelize_block_fetching()
 def get_erc20_symbol(token=None, block=None, **eth_call_kwargs):
     return rpc_utils.eth_call(
-        to_address=get_erc20_address(token),
+        to_address=erc20_generic.get_erc20_address(token),
         function_name='symbol',
         block_number=block,
         **eth_call_kwargs

@@ -1,13 +1,19 @@
+import typing
+
+from ctc import spec
 from .. import event_utils
 from . import erc20_metadata
 
 
+# import pandas
+
+
 def get_erc20_transfers(
-    token_address,
-    start_block=None,
-    end_block='latest',
+    token_address: spec.TokenAddress,
+    start_block: typing.Optional[spec.BlockNumberReference] = None,
+    end_block: typing.Optional[spec.BlockNumberReference] = 'latest',
     **event_kwargs
-):
+) -> spec.DataFrame:
     return event_utils.get_events(
         contract_address=token_address,
         event_name='Transfer',
@@ -17,7 +23,12 @@ def get_erc20_transfers(
     )
 
 
-def get_erc20_balances(transfers, block=None, dtype=float, normalize=True):
+def get_erc20_balances_from_transfers(
+    transfers: spec.DataFrame,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    dtype: spec.DType = float,
+    normalize: bool = True,
+) -> spec.DataFrame:
 
     # filter block
     if block is not None:

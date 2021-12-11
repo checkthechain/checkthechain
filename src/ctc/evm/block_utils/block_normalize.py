@@ -1,3 +1,4 @@
+import asyncio
 import typing
 
 from ctc import spec
@@ -12,7 +13,7 @@ from . import block_crud
 
 async def async_block_number_to_int(
     block: spec.BlockNumberReference,
-    provider: typing.Optional[spec.Provider] = None,
+    provider: spec.ProviderSpec = None,
 ) -> int:
     """resolve block number reference to int (e.g. converting 'latest' to int)
 
@@ -54,6 +55,35 @@ def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
             pass
 
     raise Exception('unknown block number specification: ' + str(block))
+
+
+#
+# # plural versions
+#
+
+
+async def async_block_numbers_to_int(
+    blocks: typing.Iterable[spec.BlockNumberReference],
+    provider: spec.ProviderSpec,
+) -> list[int]:
+    coroutines = [
+        async_block_number_to_int(block=block, provider=provider)
+        for block in blocks
+    ]
+    return await asyncio.gather(*coroutines)
+
+
+def standardize_block_numbers(
+    blocks: typing.Iterable[spec.BlockNumberReference],
+) -> list[spec.StandardBlockNumber]:
+    """standardize an iterable of block number references"""
+    return [standardize_block_number(block) for block in blocks]
+
+
+def raw_block_number_to_ints(
+    blocks: typing.Iterable[spec.RawBlockNumber],
+) -> list[int]:
+    return [raw_block_number_to_int(block) for block in blocks]
 
 
 #
@@ -114,7 +144,7 @@ def normalize_block_range(start_block, end_block, contract_address=None):
             contract_address=contract_address
         )
     if 'latest' in [start_block, end_block]:
-        latest_block = get_block_number('latest')
+        latest_block = block_crud.get_block_number('latest')
 
     # assign special values
     if start_block == 'latest':
