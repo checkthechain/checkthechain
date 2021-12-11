@@ -3,6 +3,7 @@ from typing_extensions import TypeGuard
 
 from ctc.evm import binary_utils
 from ..types import block_types
+from . import binary_typeguards
 
 
 def is_block_number_name(
@@ -16,7 +17,7 @@ def is_raw_block_number(
 ) -> TypeGuard[block_types.RawBlockNumber]:
     return isinstance(
         block, typing.SupportsInt
-    ) or binary_utils.is_hex_binary_data(block)
+    ) or binary_typeguards.is_hex_data(block)
 
 
 def is_standard_block_number(
@@ -33,7 +34,7 @@ def is_block_number_reference(
 
 def is_block_hash(block: typing.Any) -> TypeGuard[block_types.BlockHash]:
     return (
-        binary_utils.is_hex_binary_data(block)
+        binary_typeguards.is_hex_data(block)
         and binary_utils.get_binary_n_bytes(block) == 32
     )
 
