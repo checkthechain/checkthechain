@@ -1,10 +1,11 @@
 import toolplot
 from ctc import directory
+from ctc import evm
 
-from . import balancer_pool_utils
+from . import pool_summary
 
 
-def plot_lbp_summary(
+async def plot_lbp_summary(
     swaps,
     weights,
     pool_name,
@@ -15,19 +16,21 @@ def plot_lbp_summary(
     oracle_data=None,
 ):
 
-    summary = balancer_pool_utils.summarize_pool_swaps(swaps=swaps, weights=weights)
+    summary = pool_summary.summarize_pool_swaps(
+        swaps=swaps, weights=weights
+    )
 
     for pair in summary.keys():
 
         blocks = summary[pair].index.get_level_values('block_number')
 
-        token_0, token_1 = pool_tokens['token_names']
+        token_0, token_1 = await evm.async_get_erc20s_names(pool_tokens)
         if token_0 in directory.token_name_to_symbol:
             token_0 = directory.token_name_to_symbol[token_0]
         if token_1 in directory.token_name_to_symbol:
             token_1 = directory.token_name_to_symbol[token_1]
         in_address, out_address = pair
-        if in_address == pool_tokens['token_addresses'][0]:
+        if in_address == pool_tokens[0]:
             in_token = token_0
             out_token = token_1
             in_weights = summary[pair]['weight_0']

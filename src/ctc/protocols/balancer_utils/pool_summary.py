@@ -3,36 +3,40 @@ import decimal
 import numpy as np
 import pandas as pd
 
-from ctc import evm
 from ctc import directory
-from ctc import rpc
-from ctc.evm import rpc_utils
+from ctc import evm
+
+from . import pool_metadata
+from . import pool_state
 
 
-async def async_get_pool_tokens(
-    *, pool_address=None, pool_id=None, block=None, vault=None
-):
+async def async_summarize_pool_state(balancer_pool, block='latest'):
 
-    if vault is None:
-        vault = directory.balancer_v2_vault
-    if pool_id is None:
-        pool_id = async_get_pool_id(pool_address)
+    block = await evm.async_block_number_to_int(block)
 
-    pool_tokens = rpc_utils.eth_call(
-        to_address=vault,
-        function_name='getPoolTokens',
-        function_parameters=[pool_id],
-        block_number=block,
-        package_named_outputs=True,
+    pool_tokens_coroutine = await pool_metadata.async_get_pool_tokens(
+        pool_address=balancer_pool,
+        block=block,
     )
-
-    token_names = tuple(
-        evm.get_erc20_name(address) for address in pool_tokens['tokens']
+    pool_fees_coroutine = await pool_state.async_get_pool_fees(
+        pool_address=balancer_pool,
+        block=block,
+    )
+    pool_weights_coroutine = await pool_state.async_get_pool_weights(
+        pool_address=balancer_pool,
+        block=block,
+    )
+    pool_balances_coroutine = await pool_state.async_get_pool_balances(
+        pool_address=balancer_pool,
+        block=block,
     )
 
     return {
-        'token_addresses': pool_tokens['tokens'],
-        'token_names': token_names,
+        'pool_tokens': pool_tokens_coroutine,
+        'pool_fees': pool_fees_coroutine,
+        'pool_weights': pool_weights_coroutine,
+        'pool_balances': pool_balances_coroutine,
+        'block': block,
     }
 
 
@@ -57,56 +61,6 @@ def get_pool_swaps(
         swaps = swaps[swaps['arg__poolId'].str.startswith(pool_address)]
 
     return swaps
-
-
-def get_pool_address(pool_id, block=None, vault=None):
-    if vault is None:
-        vault = directory.balancer_v2_vault
-
-    pool = rpc_utils.eth_call(
-        to_address=vault,
-        function_name='getPool',
-        function_parameters=[pool_id],
-        block_number=block,
-    )
-    return pool[0]
-
-
-def async_get_pool_id(pool_address, block=None):
-    return rpc_utils.eth_call(
-        to_address=pool_address,
-        function_name='getPoolId',
-        block_number=block,
-    )
-
-
-async def async_get_pool_weights(
-    pool_address, block=None, blocks=None, normalize=True
-):
-
-    if block is not None or block is None and blocks is None:
-        weights = await rpc.async_eth_call(
-            to_address=pool_address,
-            function_name='getNormalizedWeights',
-            block_number=block,
-        )
-        if normalize:
-            weights = [weight / 1e18 for weight in weights]
-        return weights
-
-    else:
-        weights = await rpc.async_batch_eth_call(
-            to_address=pool_address,
-            function_name='getNormalizedWeights',
-            block_numbers=blocks,
-            provider={'chunk_size': 100},
-        )
-        if normalize:
-            weights = [
-                [block_weight / 1e18 for block_weight in block_weights]
-                for block_weights in weights
-            ]
-        return pd.DataFrame(weights, index=blocks)
 
 
 def summarize_pool_swaps(swaps, weights, as_dataframe=True):
