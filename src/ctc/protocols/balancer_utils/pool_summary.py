@@ -5,6 +5,7 @@ import pandas as pd
 
 from ctc import directory
 from ctc import evm
+from ctc import spec
 
 from . import pool_metadata
 from . import pool_state
@@ -42,7 +43,7 @@ async def async_summarize_pool_state(balancer_pool, block='latest'):
 
 def get_pool_swaps(
     pool_address=None, start_block=None, end_block=None, vault=None
-):
+) -> spec.DataFrame:
 
     if vault is None:
         vault = directory.balancer_v2_vault

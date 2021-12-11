@@ -1,8 +1,10 @@
+import typing
+
 from ctc import spec
 
 
 def bin_by_blocks(
-    data: 'pandas.DataFrame', blocks: list[spec.BlockReference]
+    data: 'pandas.DataFrame', blocks: typing.Sequence[spec.BlockReference]
 ) -> 'pandas.DataFrame':
     import numpy as np
     import pandas as pd

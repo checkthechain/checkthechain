@@ -1,3 +1,4 @@
+from ctc import spec
 from ctc.toolbox import backend_utils
 from .event_backends import filesystem_events
 from .event_backends import node_events
@@ -24,7 +25,7 @@ def get_events(
     end_block=None,
     backend_order=None,
     **query
-):
+) -> spec.DataFrame:
 
     start_block, end_block = block_utils.normalize_block_range(
         contract_address=contract_address,
