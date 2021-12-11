@@ -6,6 +6,11 @@ import typing
 import pandas as pd
 
 
+#
+# # gathering
+#
+
+
 async def gather_dict(
     d: dict[typing.Any, typing.Coroutine]
 ) -> dict[typing.Any, typing.Any]:
@@ -23,9 +28,9 @@ async def gather_nested(
     tasks = {}
     for key, value in nested.items():
         if isinstance(value, dict):
-            tasks[key] = gather_dict(value)
+            tasks[key] = gather_nested(value)
         elif hasattr(value, '__await__'):
-            pass
+            tasks[key] = value
 
     # await results
     results = await gather_dict(tasks)
@@ -39,6 +44,28 @@ async def gather_nested(
             output[key] = value
 
     return output
+
+
+##
+## # parallelizing
+##
+
+#from typing_extensions import ParamSpec
+#ParamSpec = ParamSpec('P')
+#T = typing.TypeVar('T')
+
+
+#async def parallelize(
+#    arg: str,
+#    values: list[typing.Any],
+#    function: typing.Callable[P, T],
+#    kwargs: P.kwargs,
+#) -> list[T]:
+#    coroutines = []
+#    for value in values:
+#        coroutine = function(**{arg: value}, **kwargs)
+#        coroutines.append(coroutine)
+#    return await asyncio.gather(*coroutines)
 
 
 #
@@ -59,6 +86,7 @@ async def gather_nested(
 #    - pandas's read_csv is faster than other python csv libs
 #    - the bottleneck is cpu after data is loaded, NOT diskio
 #    - if crossing process boundary, data transfers will become an issue
+
 
 async def async_read_csv(path, mode=None, **kwargs):
 
