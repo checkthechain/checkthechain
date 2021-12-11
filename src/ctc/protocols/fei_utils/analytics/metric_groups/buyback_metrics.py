@@ -1,16 +1,27 @@
+import typing
+
 from ctc import evm
+from ctc import spec
 from ctc.protocols import balancer_utils
 
-from .. import spec
+from .. import analytics_spec
 
 
-async def async_compute_buybacks(blocks, verbose=False) -> spec.MetricGroup:
+async def async_compute_buybacks(
+    blocks: list[int], verbose: bool = False
+) -> analytics_spec.MetricGroup:
+
     return {
-        'fei_spent': compute_tribe_buybacks_usd(blocks)
+        'name': 'Buybacks',
+        'metrics': [
+            compute_tribe_buybacks_usd(blocks)
+        ],
     }
 
 
-def compute_tribe_buybacks_usd(blocks, swaps=None):
+def compute_tribe_buybacks_usd(
+    blocks: list[int], swaps: typing.Optional[spec.DataFrame] = None
+) -> analytics_spec.MetricData:
 
     # load swaps
     if swaps is None:
@@ -21,7 +32,7 @@ def compute_tribe_buybacks_usd(blocks, swaps=None):
 
     # filter tribe buys
     fei = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
-    tribe_buys = swaps[swaps['arg__tokenOut'] == fei]
+    tribe_buys: typing.Any = swaps[swaps['arg__tokenOut'] == fei]  # type: ignore
     tribe_buys = tribe_buys['arg__amountOut'].map(float) / 1e18
     cummulative_tribe_buys = tribe_buys.cumsum()
     cummulative_tribe_buys = evm.interpolate_block_series(
@@ -32,7 +43,7 @@ def compute_tribe_buybacks_usd(blocks, swaps=None):
     )
 
     # filter tribe sells
-    tribe_sells = swaps[swaps['arg__tokenIn'] == fei]
+    tribe_sells = swaps[swaps['arg__tokenIn'] == fei]  # type: ignore
     if len(tribe_sells) > 0:
         tribe_sells = tribe_sells['arg__amountIn'].map(float) / 1e18
         cummulative_tribe_sells = tribe_sells.cumsum()
@@ -49,6 +60,7 @@ def compute_tribe_buybacks_usd(blocks, swaps=None):
         net_tribe_buys = cummulative_tribe_buys
 
     return {
+        'name': 'Buybacks USD',
         'values': [net_tribe_buys[block] for block in blocks],
         'units': 'FEI',
     }

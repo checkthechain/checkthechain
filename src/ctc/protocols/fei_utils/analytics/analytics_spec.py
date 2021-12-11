@@ -1,5 +1,8 @@
 import typing
 
+from ctc import spec
+
+
 #
 # # types
 #
@@ -13,32 +16,20 @@ class Timescale(typing.TypedDict):
 Timestamp = int
 Timestamps = list[int]
 
-MetricGroupName = typing.Literal[
-    # section: PCV
-    'pcv_stats',  # entries = pcv total and CR
-    'pcv_by_asset',  # entries = tokens
-    'pcv_by_deployment',  # entries = deployments
-    # section: FEI
-    'prices',  # entry = FEI_USD chainlink
-    'dex_volume',  # entries = dex pools
-    'dex_tvls',  # entries = dex pools
-    'circulating_fei',  # entries = uFEI and pFEI
-    'pfei_by_deployment',  # entries = pFEI deployment
-    # section: buybacks
-    'buybacks',  # entry = FEI spent
-]
 MetricName = str
-MetricSeries = list[typing.SupportsFloat]
+MetricSeries = list[float]
 
 
 class MetricData(typing.TypedDict, total=False):
-    values: list[typing.SupportsFloat]
+    values: list[float]
     name: str
     link: str
     units: str
 
 
-MetricGroup = dict[MetricName, MetricData]
+class MetricGroup(typing.TypedDict):
+    name: str
+    metrics: list[MetricData]
 
 
 class AnalyticsPayload(typing.TypedDict):
@@ -49,13 +40,28 @@ class AnalyticsPayload(typing.TypedDict):
 
     # timing data
     n_samples: int
-    sample_interval: str
-    sample_window: str
+    interval_size: str
+    window_size: str
     timestamps: list[Timestamp]
     block_numbers: list[int]
 
     # metrics
-    metrics: dict[MetricGroupName, MetricGroup]
+    data: dict[str, MetricGroup]
+
+
+MetricGroupCreator = typing.Callable[[list[int], bool], MetricGroup]
+MetricGroupCreatorCoroutine = typing.Callable[
+    [list[int], bool],
+    typing.Coroutine[typing.Any, typing.Any, MetricGroup],
+]
+MultiMetricGroupCreator = typing.Callable[
+    [list[int], bool],
+    dict[str, MetricGroup],
+]
+MultiMetricGroupCreatorCoroutine = typing.Callable[
+    [list[int], bool],
+    typing.Coroutine[typing.Any, typing.Any, dict[str, MetricGroup]],
+]
 
 
 #
@@ -71,7 +77,15 @@ payload_timescales = [
 ]
 
 
-dex_pools = {
+class DexPoolMetadata(typing.TypedDict, total=False):
+    platform: str
+    address: spec.ContractAddress
+    other_assets: list[str]
+    fei_index: int
+    event_name: str
+
+
+dex_pools: dict[str, DexPoolMetadata] = {
     'uniswap_v2__fei_eth': {
         'platform': 'Uniswap V2',
         'address': '0x94b0a3d511b6ecdb17ebf877278ab030acb0a878',

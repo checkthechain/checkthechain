@@ -1,11 +1,14 @@
 import asyncio
+import typing
 
 from ctc import evm
 from ctc.protocols import chainlink_utils
-from .. import spec
+from .. import analytics_spec
 
 
-async def async_compute_prices(blocks, verbose=False):
+async def async_compute_prices(
+    blocks: list[int], verbose: bool = False
+) -> analytics_spec.MetricGroup:
     feed_data = chainlink_utils.get_feed_data(
         feed_name='FEI_USD', start_block=blocks[0] - 10000
     )
@@ -16,24 +19,33 @@ async def async_compute_prices(blocks, verbose=False):
     result = [feed_data[block] for block in blocks]
 
     return {
-        'USD_FEI Chainlink': {
-            'values': result,
-            'units': 'USD_FEI',
-        },
+        'name': 'Prices',
+        'metrics': [
+            {
+                'name': 'USD_FEI Chainlink',
+                'values': result,
+                'units': 'USD_FEI',
+            },
+        ],
     }
 
 
-async def async_compute_pfei_by_deployment(blocks, verbose=False):
+async def async_compute_pfei_by_deployment(
+    blocks: list[int], verbose: bool = False
+) -> analytics_spec.MetricGroup:
     return {
-        'Uniswap': {'values': [9999] * len(blocks)},
-        'Sushi Swap': {'values': [9999] * len(blocks)},
-        'Balancer': {'values': [9999] * len(blocks)},
-        'Sushi Kashi': {'values': [9999] * len(blocks)},
-        'Ondo': {'values': [9999] * len(blocks)},
-        'Rari': {'values': [9999] * len(blocks)},
-        'Aave': {'values': [9999] * len(blocks)},
-        'Cream': {'values': [9999] * len(blocks)},
-        'OA': {'values': [9999] * len(blocks)},
+        'name': 'Protocol FEI Deployments',
+        'metrics': [
+            {'name': 'Uniswap', 'values': [9999] * len(blocks)},
+            {'name': 'Sushi Swap', 'values': [9999] * len(blocks)},
+            {'name': 'Balancer', 'values': [9999] * len(blocks)},
+            {'name': 'Sushi Kashi', 'values': [9999] * len(blocks)},
+            {'name': 'Ondo', 'values': [9999] * len(blocks)},
+            {'name': 'Rari', 'values': [9999] * len(blocks)},
+            {'name': 'Aave', 'values': [9999] * len(blocks)},
+            {'name': 'Cream', 'values': [9999] * len(blocks)},
+            {'name': 'OA', 'values': [9999] * len(blocks)},
+        ],
     }
 
 
@@ -44,31 +56,31 @@ async def async_compute_pfei_by_deployment(blocks, verbose=False):
 
 async def async_compute_dex_tvls(
     blocks: list[int],
-    _chunk_by_blocks: bool = False,
-    verbose=False,
-) -> spec.MetricGroup:
+    verbose: bool = False,
+) -> analytics_spec.MetricGroup:
 
-    pools = spec.dex_pools
+    pools = analytics_spec.dex_pools
 
     names = list(pools.keys())
     addresses = [pool['address'] for pool in pools.values()]
 
+    _chunk_by_blocks = False
     if _chunk_by_blocks:
-        tasks = []
+        tasks: list[asyncio.Task[typing.Union[list[int], list[float]]]] = []
         for block in blocks:
-            task = evm.async_get_erc20_balance_of(
+            task = evm.async_get_erc20_balance_of_addresses(
                 addresses=addresses,
                 token='FEI',
                 block=block,
             )
             tasks.append(asyncio.create_task(task))
         results = await asyncio.gather(*tasks)
-        results = zip(*results)
+        results = list(zip(*results))
 
     else:
         tasks = []
         for address in addresses:
-            task = evm.async_get_erc20_balance_of(
+            task = evm.async_get_erc20_balance_of_by_block(
                 address=address,
                 token='FEI',
                 blocks=blocks,
@@ -85,7 +97,7 @@ async def async_compute_dex_tvls(
 
     # sum by platform
     tvl_by_platform = {}
-    for pool_name, pool_info in spec.dex_pools.items():
+    for pool_name, pool_info in analytics_spec.dex_pools.items():
         pool_tvl = tvl_by_pool[pool_name]
         platform = pool_info['platform']
         if platform not in tvl_by_platform:
@@ -100,5 +112,10 @@ async def async_compute_dex_tvls(
                 )
             ]
 
-    return tvl_by_platform
+    metrics = list(tvl_by_platform.values())
+
+    return {
+        'name': 'DEX TVL by Platform',
+        'metrics': metrics,
+    }
 

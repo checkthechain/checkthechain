@@ -1,45 +1,53 @@
 import asyncio
 
 from ctc import evm
-from .. import spec
+from ctc import spec
+from .. import analytics_spec
 
 
-async def async_compute_dex_volume(blocks, verbose=False):
+async def async_compute_dex_volume(
+    blocks: list[int], verbose: bool = False
+) -> analytics_spec.MetricGroup:
 
     volume_tasks = []
-    for pool_name, pool_info in spec.dex_pools.items():
+    for pool_name, pool_info in analytics_spec.dex_pools.items():
         platform = pool_info['platform']
-        kwargs = {'pool_address': pool_info['address'], 'blocks': blocks}
+        address = pool_info['address']
         if platform == 'Uniswap V2':
-            task = async_compute_uniswap_v2_volume(**kwargs)
+            task = async_compute_uniswap_v2_volume(address, blocks)
         elif platform == 'Uniswap V3':
-            task = async_compute_uniswap_v3_volume(**kwargs)
+            task = async_compute_uniswap_v3_volume(address, blocks)
         elif platform == 'Curve':
             task = async_compute_curve_volume(
+                address,
+                blocks,
                 fei_index=pool_info['fei_index'],
                 event_name=pool_info['event_name'],
-                **kwargs
             )
         elif platform == 'Sushi':
-            task = async_compute_sushiswap_volume(**kwargs)
+            task = async_compute_sushiswap_volume(address, blocks)
         elif platform == 'Saddle':
             fei_index = pool_info['fei_index']
-            task = async_compute_saddle_volume(fei_index=fei_index, **kwargs)
+            task = async_compute_saddle_volume(
+                address, blocks, fei_index=fei_index
+            )
         else:
             raise Exception('unknown platform: ' + str())
         volume_tasks.append(asyncio.create_task(task))
 
-    names = list(spec.dex_pools.keys())
+    names = list(analytics_spec.dex_pools.keys())
     volumes = await asyncio.gather(*volume_tasks)
     volume_by_pool = dict(zip(names, volumes))
 
     # sum by platform
     volume_by_platform = {}
-    for pool_name, pool_info in spec.dex_pools.items():
+    for pool_name, pool_info in analytics_spec.dex_pools.items():
         pool_volume = volume_by_pool[pool_name]
         platform = pool_info['platform']
+
         if platform not in volume_by_platform:
             volume_by_platform[platform] = pool_volume
+            volume_by_platform[platform]['name'] = platform
         else:
             assert pool_volume['units'] == volume_by_platform[platform]['units']
             volume_by_platform[platform]['values'] = [
@@ -50,10 +58,18 @@ async def async_compute_dex_volume(blocks, verbose=False):
                 )
             ]
 
-    return volume_by_platform
+    # entries
+    entries = list(volume_by_platform.values())
+
+    return {
+        'name': 'Volume By Platform',
+        'metrics': entries,
+    }
 
 
-async def async_compute_uniswap_v2_volume(pool_address, blocks):
+async def async_compute_uniswap_v2_volume(
+    pool_address: spec.ContractAddress, blocks: list[int]
+) -> analytics_spec.MetricData:
     from ctc.protocols import uniswap_v2_utils
 
     swaps = await uniswap_v2_utils.async_get_pool_swaps(
@@ -69,7 +85,9 @@ async def async_compute_uniswap_v2_volume(pool_address, blocks):
     }
 
 
-async def async_compute_uniswap_v3_volume(pool_address, blocks):
+async def async_compute_uniswap_v3_volume(
+    pool_address: spec.ContractAddress, blocks: list[int]
+) -> analytics_spec.MetricData:
     import numpy as np
     from ctc.protocols import uniswap_v3_utils
 
@@ -90,8 +108,11 @@ async def async_compute_sushiswap_volume(pool_address, blocks):
 
 
 async def async_compute_curve_volume(
-    pool_address, fei_index, event_name, blocks
-):
+    pool_address: spec.ContractAddress,
+    blocks: list[int],
+    fei_index: int,
+    event_name: str,
+) -> analytics_spec.MetricData:
 
     swaps = evm.get_events(
         contract_address=pool_address,
@@ -114,7 +135,9 @@ async def async_compute_curve_volume(
     }
 
 
-async def async_compute_saddle_volume(pool_address, blocks, fei_index):
+async def async_compute_saddle_volume(
+    pool_address: spec.ContractAddress, blocks: list[int], fei_index: int
+) -> analytics_spec.MetricData:
 
     swaps = evm.get_events(
         contract_address=pool_address,
@@ -132,6 +155,7 @@ async def async_compute_saddle_volume(pool_address, blocks, fei_index):
     result = fei_bought_by_day + fei_sold_by_day
 
     return {
+        'name': 'Saddle D4',
         'values': list(result.values),
         'units': 'FEI',
     }
