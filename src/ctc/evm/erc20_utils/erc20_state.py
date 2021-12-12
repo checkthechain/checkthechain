@@ -186,75 +186,105 @@ async def async_get_erc20_balance_of_by_block(
     return balances
 
 
-# async def async_get_erc20_balance_of(
-#     *,
-#     address=None,
-#     addresses=None,
-#     token=None,
-#     tokens=None,
-#     block=None,
-#     blocks=None,
-#     normalize=True,
-#     **rpc_kwargs
-# ):
+#
+# # allowance
+#
 
-#     if address is None and addresses is None:
-#         raise Exception('specify address or addresses')
-#     if token is None and tokens is None:
-#         raise Exception('specify token or tokens')
-#     if [addresses, tokens, blocks].count(None) < 2:
-#         raise NotImplementedError('specify only one batch parameter at once')
 
-#     if addresses is None and blocks is None and tokens is None:
-#         balance = await rpc.async_eth_call(
-#             to_address=erc20_metadata.get_erc20_address(token),
-#             function_name='balanceOf',
-#             block_number=block,
-#             function_parameters=[address],
-#             **rpc_kwargs
-#         )
+async def async_get_erc20_allowance(
+    token: spec.TokenReference,
+    address: spec.Address,
+    block: spec.BlockNumberReference,
+    normalize: bool = True,
+    provider: spec.ProviderSpec = None,
+) -> typing.Union[int, float]:
 
-#     elif blocks is not None:
-#         balance = await rpc.async_batch_eth_call(
-#             to_address=erc20_metadata.get_erc20_address(token),
-#             function_name='balanceOf',
-#             block_numbers=blocks,
-#             function_parameters=[address],
-#             **rpc_kwargs
-#         )
+    allowance = await erc20_generic.async_erc20_eth_call(
+        token=token,
+        function_name='allowance',
+        block=block,
+        function_parameters=[address],
+        provider=provider,
+    )
 
-#     elif addresses is not None:
-#         balance = await rpc.async_batch_eth_call(
-#             to_address=erc20_metadata.get_erc20_address(token),
-#             function_name='balanceOf',
-#             block_numbers=blocks,
-#             function_parameter_list=[[address] for address in addresses],
-#             **rpc_kwargs
-#         )
+    if normalize:
+        allowance = erc20_normalize.async_normalize_erc20_quantity(
+            quantity=allowance, token=token, provider=provider, block=block
+        )
 
-#     elif tokens is not None:
-#         to_addresses = [
-#             erc20_metadata.get_erc20_address(token) for token in tokens
-#         ]
-#         balance = await rpc.async_batch_eth_call(
-#             to_addresses=to_addresses,
-#             function_name='balanceOf',
-#             block_numbers=blocks,
-#             function_parameters=[address],
-#             **rpc_kwargs
-#         )
+    return allowance
 
-#     else:
-#         raise Exception('must specify block or blocks')
 
-#     if normalize:
-#         balance = await async_normalize_erc20_quantity(
-#             token=token,
-#             tokens=tokens,
-#             quantity=balance,
-#         )
+async def async_get_erc20_allowance_by_block(
+    token: spec.TokenReference,
+    address: spec.Address,
+    blocks: typing.Iterable[spec.BlockNumberReference],
+    normalize: bool = True,
+    provider: spec.ProviderSpec = None,
+) -> typing.Union[list[int], list[float]]:
 
-#     return balance
+    allowances = await erc20_generic.async_erc20_eth_call_by_block(
+        token=token,
+        function_name='allowance',
+        blocks=blocks,
+        function_parameters=[address],
+        provider=provider,
+    )
+
+    if normalize:
+        allowances = await erc20_normalize.async_normalize_erc20_quantities(
+            quantities=allowances, token=token, provider=provider, blocks=blocks
+        )
+
+    return allowances
+
+
+async def async_get_erc20s_allowances(
+    tokens: typing.Iterable[spec.TokenReference],
+    address: spec.Address,
+    block: spec.BlockNumberReference,
+    normalize: bool = True,
+    provider: spec.ProviderSpec = None,
+) -> typing.Union[list[int], list[float]]:
+
+    allowances = await erc20_generic.async_erc20s_eth_calls(
+        tokens=tokens,
+        function_name='allowance',
+        block=block,
+        function_parameters=[address],
+        provider=provider,
+    )
+
+    if normalize:
+        allowances = await erc20_normalize.async_normalize_erc20_quantities(
+            quantities=allowances, tokens=tokens, provider=provider, block=block
+        )
+
+    return allowances
+
+
+async def async_get_erc20s_allowances_by_address(
+    token: spec.TokenReference,
+    addresses: typing.Iterable[spec.Address],
+    block: spec.BlockNumberReference,
+    normalize: bool = True,
+    provider: spec.ProviderSpec = None,
+):
+
+    allowances = await rpc.async_batch_eth_call(
+        to_address=token,
+        function_name='allowance',
+        block_number=block,
+        function_parameter_list=[[address] for address in addresses],
+        provider=provider,
+    )
+
+    if normalize:
+        allowances = await erc20_normalize.async_normalize_erc20_quantities(
+            quantities=allowances, token=token, provider=provider, block=block
+        )
+
+    return allowances
 
 
 #
