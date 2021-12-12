@@ -10,6 +10,7 @@ def get_events_from_node(
     end_block='latest',
     event_name=None,
     event_hash=None,
+    event_abi=None,
     contract_address=None,
     contract_abi=None,
     blocks_per_chunk=2000,
@@ -40,24 +41,35 @@ def get_events_from_node(
         chunks = [[start_block, end_block]]
 
     # gather metadata
-    if contract_abi is None:
+    if contract_abi is None and event_abi is None:
         contract_abi = contract_abi_utils.get_contract_abi(
             contract_address=contract_address,
         )
-    if event_name is None and event_hash is None:
-        raise Exception('must specify event_name or event_hash')
+    if event_name is None and event_hash is None and event_abi is None:
+        raise Exception('must specify event_name or event_hash or event_abi')
     if event_name is None:
-        event_name = contract_abi_utils.get_event_abi(
-            event_hash=event_hash,
-            contract_abi=contract_abi,
-            contract_address=contract_address,
-        )['name']
+        if event_abi is None:
+            event_abi = contract_abi_utils.get_event_abi(
+                event_hash=event_hash,
+                contract_abi=contract_abi,
+                contract_address=contract_address,
+            )
+        event_name = event_abi['name']
     if event_hash is None:
-        event_hash = contract_abi_utils.get_event_hash(
-            event_name=event_name,
-            contract_abi=contract_abi,
-            contract_address=contract_address,
-        )
+        if event_name is not None:
+            event_hash = contract_abi_utils.get_event_hash(
+                event_name=event_name,
+                event_abi=event_abi,
+                contract_abi=contract_abi,
+                contract_address=contract_address,
+            )
+        elif event_abi is not None:
+            event_hash = contract_address.get_event_hash(
+                event_abi=event_abi,
+            )
+
+        else:
+            raise Exception('must specify event_name, event_abi, or event_hash')
 
     # fetch events
     chunks_entries = _get_chunk_of_events_from_node(
@@ -79,6 +91,7 @@ def get_events_from_node(
             contract_abi=contract_abi,
             event_hash=event_hash,
             event_name=event_name,
+            event_abi=event_abi,
         )
 
     return entries
@@ -112,7 +125,7 @@ def _get_chunk_of_events_from_node(
 
 
 def _package_exported_events(
-    entries, contract_address, contract_abi, event_hash, event_name
+    entries, contract_address, contract_abi, event_hash, event_name, event_abi
 ):
 
     if len(entries) == 0:
@@ -121,6 +134,7 @@ def _package_exported_events(
             contract_abi=contract_abi,
             event_hash=event_hash,
             event_name=event_name,
+            event_abi=event_abi,
         )
 
     formatted_entries = []
@@ -131,6 +145,7 @@ def _package_exported_events(
             contract_abi=contract_abi,
             event_name=event_name,
             event_hash=event_hash,
+            event_abi=event_abi,
         )
         formatted_entries.append(formatted_entry)
 
@@ -147,7 +162,7 @@ def create_empty_event_dataframe(
     contract_address=None,
     contract_abi=None,
     event_hash=None,
-    event_name=None
+    event_name=None,
 ):
 
     # standard columns

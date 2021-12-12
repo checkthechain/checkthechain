@@ -272,6 +272,7 @@ def get_events_from_filesystem(
     contract_address,
     event_hash=None,
     event_name=None,
+    event_abi=None,
     verbose=True,
     start_block=None,
     end_block=None,

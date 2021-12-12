@@ -14,8 +14,12 @@ def get_event_abi(
     contract_abi=None,
     event_name=None,
     event_hash=None,
+    event_abi=None,
 ):
     """get event abi from contract abi"""
+
+    if event_abi is not None:
+        return event_abi
 
     # get contract abi
     if contract_abi is None:
