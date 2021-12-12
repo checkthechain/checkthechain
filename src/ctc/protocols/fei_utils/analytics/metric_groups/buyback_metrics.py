@@ -13,9 +13,9 @@ async def async_compute_buybacks(
 
     return {
         'name': 'Buybacks',
-        'metrics': [
-            compute_tribe_buybacks_usd(blocks)
-        ],
+        'metrics': {
+            'buybacks_usd': compute_tribe_buybacks_usd(blocks),
+        },
     }
 
 

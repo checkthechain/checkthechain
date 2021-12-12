@@ -20,13 +20,13 @@ async def async_compute_prices(
 
     return {
         'name': 'Prices',
-        'metrics': [
-            {
+        'metrics': {
+            'usd_fei_chainlink': {
                 'name': 'USD_FEI Chainlink',
                 'values': result,
                 'units': 'USD_FEI',
             },
-        ],
+        },
     }
 
 
@@ -35,17 +35,17 @@ async def async_compute_pfei_by_deployment(
 ) -> analytics_spec.MetricGroup:
     return {
         'name': 'Protocol FEI Deployments',
-        'metrics': [
-            {'name': 'Uniswap', 'values': [9999] * len(blocks)},
-            {'name': 'Sushi Swap', 'values': [9999] * len(blocks)},
-            {'name': 'Balancer', 'values': [9999] * len(blocks)},
-            {'name': 'Sushi Kashi', 'values': [9999] * len(blocks)},
-            {'name': 'Ondo', 'values': [9999] * len(blocks)},
-            {'name': 'Rari', 'values': [9999] * len(blocks)},
-            {'name': 'Aave', 'values': [9999] * len(blocks)},
-            {'name': 'Cream', 'values': [9999] * len(blocks)},
-            {'name': 'OA', 'values': [9999] * len(blocks)},
-        ],
+        'metrics': {
+            'uniswap': {'name': 'Uniswap', 'values': [9999] * len(blocks)},
+            'sushi_swap': {'name': 'Sushi Swap', 'values': [9999] * len(blocks)},
+            'balancer': {'name': 'Balancer', 'values': [9999] * len(blocks)},
+            'sushi_kashi': {'name': 'Sushi Kashi', 'values': [9999] * len(blocks)},
+            'ondo': {'name': 'Ondo', 'values': [9999] * len(blocks)},
+            'rari': {'name': 'Rari', 'values': [9999] * len(blocks)},
+            'aave': {'name': 'Aave', 'values': [9999] * len(blocks)},
+            'cream': {'name': 'Cream', 'values': [9999] * len(blocks)},
+            'oa': {'name': 'OA', 'values': [9999] * len(blocks)},
+        },
     }
 
 
@@ -112,10 +112,8 @@ async def async_compute_dex_tvls(
                 )
             ]
 
-    metrics = list(tvl_by_platform.values())
-
     return {
         'name': 'DEX TVL by Platform',
-        'metrics': metrics,
+        'metrics': tvl_by_platform,
     }
 

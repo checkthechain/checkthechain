@@ -58,12 +58,9 @@ async def async_compute_dex_volume(
                 )
             ]
 
-    # entries
-    entries = list(volume_by_platform.values())
-
     return {
         'name': 'Volume By Platform',
-        'metrics': entries,
+        'metrics': volume_by_platform,
     }
 
 

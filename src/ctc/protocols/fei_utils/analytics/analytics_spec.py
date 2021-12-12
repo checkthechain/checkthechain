@@ -27,9 +27,13 @@ class MetricData(typing.TypedDict, total=False):
     units: str
 
 
-class MetricGroup(typing.TypedDict):
+class MetricGroupStrict(typing.TypedDict):
     name: str
-    metrics: list[MetricData]
+    metrics: dict[str, MetricData]
+
+
+class MetricGroup(MetricGroupStrict, total=False):
+    order: list[str]
 
 
 class AnalyticsPayload(typing.TypedDict):

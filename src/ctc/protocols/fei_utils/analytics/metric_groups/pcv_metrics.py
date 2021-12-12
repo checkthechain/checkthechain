@@ -32,17 +32,29 @@ async def async_compute_pcv_stats(
     return {
         'pcv_stats': {
             'name': 'PCV Statistics',
-            'metrics': [
-                {'name': 'PCV Total', 'values': list(pcv_total.values)},
-                {'name': 'Collateralization Ratio', 'values': list(cr.values)},
-            ],
+            'metrics': {
+                'pcv_total': {
+                    'name': 'PCV Total',
+                    'values': list(pcv_total.values),
+                },
+                'cr': {
+                    'name': 'Collateralization Ratio',
+                    'values': list(cr.values),
+                },
+            },
         },
         'circulating_fei': {
             'name': 'Circulating FEI',
-            'metrics': [
-                {'name': 'User FEI', 'values': list(user_fei.values)},
-                {'name': 'Protocol FEI', 'values': protocol_fei},
-            ],
+            'metrics': {
+                'user_fei': {
+                    'name': 'User FEI',
+                    'values': list(user_fei.values),
+                },
+                'protocol_fei': {
+                    'name': 'Protocol FEI',
+                    'values': protocol_fei,
+                },
+            },
         },
     }
 
@@ -50,15 +62,15 @@ async def async_compute_pcv_stats(
 async def async_compute_pcv_by_asset(
     blocks: list[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
-    metrics: list[analytics_spec.MetricData] = [
-        {'name': 'ETH', 'values': [9999] * len(blocks)},
-        {'name': 'RAI', 'values': [9999] * len(blocks)},
-        {'name': 'LUSD', 'values': [9999] * len(blocks)},
-        {'name': 'DAI', 'values': [9999] * len(blocks)},
-        {'name': 'DPI', 'values': [9999] * len(blocks)},
-        {'name': 'INDEX', 'values': [9999] * len(blocks)},
-        {'name': 'BAL', 'values': [9999] * len(blocks)},
-    ]
+    metrics: dict[str, analytics_spec.MetricData] = {
+        'eth': {'name': 'ETH', 'values': [9999] * len(blocks)},
+        'rai': {'name': 'RAI', 'values': [9999] * len(blocks)},
+        'lusd': {'name': 'LUSD', 'values': [9999] * len(blocks)},
+        'dai': {'name': 'DAI', 'values': [9999] * len(blocks)},
+        'dpi': {'name': 'DPI', 'values': [9999] * len(blocks)},
+        'index': {'name': 'INDEX', 'values': [9999] * len(blocks)},
+        'bal': {'name': 'BAL', 'values': [9999] * len(blocks)},
+    }
     return {
         'name': 'PCV By Asset',
         'metrics': metrics,
@@ -68,16 +80,16 @@ async def async_compute_pcv_by_asset(
 async def async_compute_pcv_by_deployment(
     blocks: list[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
-    metrics: list[analytics_spec.MetricData] = [
-        {'name': 'Tokemak', 'values': [9999] * len(blocks)},
-        {'name': 'Lido', 'values': [9999] * len(blocks)},
-        {'name': 'Uniswap', 'values': [9999] * len(blocks)},
-        {'name': 'Rari', 'values': [9999] * len(blocks)},
-        {'name': 'Sushi', 'values': [9999] * len(blocks)},
-        {'name': 'Fei', 'values': [9999] * len(blocks)},
-        {'name': 'Aave', 'values': [9999] * len(blocks)},
-        {'name': 'Compound', 'values': [9999] * len(blocks)},
-    ]
+    metrics: dict[str, analytics_spec.MetricData] = {
+        'tokemak': {'name': 'Tokemak', 'values': [9999] * len(blocks)},
+        'lido': {'name': 'Lido', 'values': [9999] * len(blocks)},
+        'uniswap': {'name': 'Uniswap', 'values': [9999] * len(blocks)},
+        'rari': {'name': 'Rari', 'values': [9999] * len(blocks)},
+        'sushi': {'name': 'Sushi', 'values': [9999] * len(blocks)},
+        'fei': {'name': 'Fei', 'values': [9999] * len(blocks)},
+        'aave': {'name': 'Aave', 'values': [9999] * len(blocks)},
+        'compound': {'name': 'Compound', 'values': [9999] * len(blocks)},
+    }
 
     return {
         'name': 'PCV by Deployment',

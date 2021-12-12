@@ -41,5 +41,24 @@ async def async_get_metrics(
         for key, value in mmg_result.items():
             payload[key] = value
 
+    # add missing orders
+    for key, metric_group in payload.items():
+        if 'order' not in metric_group:
+            metric_group['order'] = order_metrics_in_group(
+                metric_group['metrics']
+            )
+
     return payload
+
+
+def order_metrics_in_group(
+    metrics: dict[str, analytics_spec.MetricData]
+) -> list[str]:
+    """order metrics in descending order by their final values"""
+    pairs = [
+        (metric_data['values'][-1], metric_name)
+        for metric_name, metric_data in metrics.items()
+    ]
+    pairs = sorted(pairs, reverse=True)
+    return [pair[-1] for pair in pairs]
 
