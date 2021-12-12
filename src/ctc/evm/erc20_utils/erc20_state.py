@@ -218,7 +218,7 @@ async def async_get_erc20_allowance(
 async def async_get_erc20_allowance_by_block(
     token: spec.TokenReference,
     address: spec.Address,
-    blocks: typing.Iterable[spec.BlockNumberReference],
+    blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
 ) -> typing.Union[list[int], list[float]]:
@@ -240,7 +240,7 @@ async def async_get_erc20_allowance_by_block(
 
 
 async def async_get_erc20s_allowances(
-    tokens: typing.Iterable[spec.TokenReference],
+    tokens: typing.Sequence[spec.TokenReference],
     address: spec.Address,
     block: spec.BlockNumberReference,
     normalize: bool = True,
@@ -265,7 +265,7 @@ async def async_get_erc20s_allowances(
 
 async def async_get_erc20s_allowances_by_address(
     token: spec.TokenReference,
-    addresses: typing.Iterable[spec.Address],
+    addresses: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,

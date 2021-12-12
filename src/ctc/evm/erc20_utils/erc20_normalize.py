@@ -54,8 +54,6 @@ async def async_normalize_erc20_quantities(
 
     # query decimals if need be
     if decimals is None:
-        if blocks is None and block is None:
-            block = 'latest'
 
         if token is not None:
 
@@ -66,17 +64,20 @@ async def async_normalize_erc20_quantities(
                     blocks=blocks,
                 )
 
-            elif block is not None:
+            else:
+
+                if block is None:
+                    block = 'latest'
                 decimals = await erc20_metadata.async_get_erc20_decimals(
                     token=token,
                     provider=provider,
                     block=block,
                 )
 
-            else:
-                raise Exception('block or blocks must be set')
-
         elif tokens is not None:
+
+            if block is None:
+                block = 'latest'
             decimals = await erc20_metadata.async_get_erc20s_decimals(
                 tokens=tokens,
                 provider=provider,
