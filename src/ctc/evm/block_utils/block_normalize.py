@@ -64,7 +64,7 @@ def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
 
 async def async_block_numbers_to_int(
     blocks: typing.Iterable[spec.BlockNumberReference],
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderSpec = None,
 ) -> list[int]:
     coroutines = [
         async_block_number_to_int(block=block, provider=provider)

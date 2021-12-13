@@ -26,7 +26,7 @@ async def async_get_tokens_in_pcv(
 
 
 async def async_get_tokens_deposits(
-    tokens: typing.Optional[spec.TokenAddress] = None,
+    tokens: typing.Optional[typing.Sequence[spec.TokenAddress]] = None,
     block: spec.BlockReference = 'latest',
     provider: spec.ProviderSpec = None,
 ) -> dict[spec.TokenAddress, typing.Tuple[spec.ContractAddress, ...]]:

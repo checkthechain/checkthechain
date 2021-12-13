@@ -28,7 +28,7 @@ async def async_get_token_oracle(
 
 async def async_get_token_oracle_by_block(
     token: spec.TokenAddress,
-    blocks: list[spec.BlockNumberReference],
+    blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
 ) -> list[spec.ContractAddress]:
 
@@ -44,7 +44,7 @@ async def async_get_token_oracle_by_block(
 
 
 async def async_get_tokens_oracles(
-    tokens: list[spec.TokenAddress],
+    tokens: typing.Sequence[spec.TokenAddress],
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
 ) -> list[spec.ContractAddress]:
@@ -94,7 +94,7 @@ async def async_get_token_price(
 
 async def async_get_token_price_by_block(
     token: spec.TokenAddress,
-    blocks: list[spec.BlockNumberReference],
+    blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
@@ -113,7 +113,7 @@ async def async_get_token_price_by_block(
 
 
 async def async_get_tokens_prices(
-    tokens: list[spec.TokenAddress],
+    tokens: typing.Sequence[spec.TokenAddress],
     block: spec.BlockReference = 'latest',
     provider: spec.ProviderSpec = None,
     normalize: bool = True,

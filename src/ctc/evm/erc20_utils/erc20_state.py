@@ -52,8 +52,10 @@ async def async_get_erc20s_total_supplies(
     )
 
     if normalize:
-        total_supplies = await erc20_normalize.async_normalize_erc20_quantities(
-            tokens=tokens, quantities=total_supplies, provider=provider
+        total_supplies = (
+            await erc20_normalize.async_normalize_erc20s_quantities(
+                tokens=tokens, quantities=total_supplies, provider=provider
+            )
         )
 
     return total_supplies
@@ -76,8 +78,13 @@ async def async_get_erc20_total_supply_by_block(
     )
 
     if normalize:
-        total_supplies = await erc20_normalize.async_normalize_erc20_quantities(
-            token=token, quantities=total_supplies, provider=provider
+        total_supplies = (
+            await erc20_normalize.async_normalize_erc20_quantities_by_block(
+                token=token,
+                quantities=total_supplies,
+                provider=provider,
+                blocks=blocks,
+            )
         )
 
     return total_supplies
@@ -154,7 +161,7 @@ async def async_get_erc20s_balance_of(
     )
 
     if normalize:
-        balances = await erc20_normalize.async_normalize_erc20_quantities(
+        balances = await erc20_normalize.async_normalize_erc20s_quantities(
             quantities=balances, tokens=tokens, provider=provider, block=block
         )
 
@@ -179,8 +186,13 @@ async def async_get_erc20_balance_of_by_block(
     )
 
     if normalize:
-        balances = await erc20_normalize.async_normalize_erc20_quantities(
-            quantities=balances, token=token, provider=provider, blocks=blocks
+        balances = (
+            await erc20_normalize.async_normalize_erc20_quantities_by_block(
+                quantities=balances,
+                token=token,
+                provider=provider,
+                blocks=blocks,
+            )
         )
 
     return balances
@@ -232,8 +244,13 @@ async def async_get_erc20_allowance_by_block(
     )
 
     if normalize:
-        allowances = await erc20_normalize.async_normalize_erc20_quantities(
-            quantities=allowances, token=token, provider=provider, blocks=blocks
+        allowances = (
+            await erc20_normalize.async_normalize_erc20_quantities_by_block(
+                quantities=allowances,
+                token=token,
+                provider=provider,
+                blocks=blocks,
+            )
         )
 
     return allowances
@@ -256,7 +273,7 @@ async def async_get_erc20s_allowances(
     )
 
     if normalize:
-        allowances = await erc20_normalize.async_normalize_erc20_quantities(
+        allowances = await erc20_normalize.async_normalize_erc20s_quantities(
             quantities=allowances, tokens=tokens, provider=provider, block=block
         )
 
