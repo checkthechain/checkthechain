@@ -99,6 +99,7 @@ def get_block_of_timestamp(
     block_timestamps=None,
     block_timestamp_array=None,
     block_number_array=None,
+    verbose: bool = True,
 ):
     if (
         block_timestamps is not None
@@ -109,12 +110,14 @@ def get_block_of_timestamp(
             timestamp=timestamp,
             block_timestamp_array=block_timestamp_array,
             block_number_array=block_number_array,
+            verbose=verbose,
         )
     else:
         return get_block_of_timestamp_from_node(
             timestamp=timestamp,
             nary=nary,
             cache=cache,
+            verbose=verbose,
         )
 
 
@@ -127,7 +130,9 @@ def get_block_of_timestamp_from_arrays(
     return block_number_array[index]
 
 
-def get_block_of_timestamp_from_node(timestamp, nary=None, cache=None):
+def get_block_of_timestamp_from_node(
+    timestamp, nary=None, cache=None, verbose: bool = True
+):
     """
     - could make this efficiently parallelizable to multiple timestamps by sharing cache
         - would need to remove the initializing key from the shared cache
@@ -146,6 +151,7 @@ def get_block_of_timestamp_from_node(timestamp, nary=None, cache=None):
         _get_next_probes_block_of_timestamp,
         timestamp=timestamp,
         cache=cache,
+        debug=verbose,
     )
 
     return search_utils.nary_search(
