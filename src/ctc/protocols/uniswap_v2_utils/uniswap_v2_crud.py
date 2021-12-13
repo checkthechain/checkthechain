@@ -21,7 +21,7 @@ async def async_get_pool_metadata(pool_address, **rpc_kwargs):
     x_address, y_address = await async_get_pool_tokens(
         pool_address=pool_address
     )
-    x_symbol, y_symbol = await evm.async_get_erc20_symbol(
+    x_symbol, y_symbol = await evm.async_get_erc20s_symbols(
         tokens=[x_address, y_address], **rpc_kwargs
     )
     return {
@@ -165,7 +165,7 @@ async def async_get_pool_swaps(
 
     # normalize columns
     if normalize:
-        x_decimals, y_decimals = await evm.async_get_erc20_decimals(
+        x_decimals, y_decimals = await evm.async_get_erc20s_decimals(
             tokens=[metadata['x_address'], metadata['y_address']],
         )
         swaps[columns['arg__amount0In']] = swaps[

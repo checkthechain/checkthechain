@@ -27,9 +27,9 @@ async def async_get_metrics(
 
     # create coroutines
     mg_coroutines = [f(blocks, verbose) for f in f_metric_group.values()]
-    mg_task = asyncio.create_task(asyncio.gather(*mg_coroutines))
+    mg_task = asyncio.gather(*mg_coroutines)
     mmg_coroutines = [f(blocks, verbose) for f in f_multi_metric_group.values()]
-    mmg_task = asyncio.create_task(asyncio.gather(*mmg_coroutines))
+    mmg_task = asyncio.gather(*mmg_coroutines)
 
     # build payload
     payload = {}

@@ -1,3 +1,5 @@
+import asyncio
+
 from ctc import evm
 from ctc import rpc
 from . import coracle_spec
@@ -13,10 +15,6 @@ async def async_get_pcv_stats(
         blocks = evm.normalize_blocks(blocks=blocks)
 
     # assemble kwargs
-    to_address = coracle_spec.get_cora_address(
-        wrapper, block=block, blocks=blocks
-    )
-    kwargs = {'to_address': to_address}
     provider = rpc.get_provider(provider)
     if provider['chunk_size'] is None:
         provider['chunk_size'] = 1
@@ -24,21 +22,31 @@ async def async_get_pcv_stats(
     # fetch results
     keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
     if block is not None or (block is None and blocks is None):
+        to_address = coracle_spec.get_coracle_address(
+            wrapper, block=block,
+        )
         result = await rpc.async_eth_call(
             function_name='pcvStats',
             block_number=block,
             provider=provider,
-            **kwargs
+            to_address=to_address,
         )
         return dict(zip(keys, result))
 
     elif blocks is not None:
-        result = await rpc.async_batch_eth_call(
-            function_name='pcvStats',
-            block_numbers=blocks,
-            provider=provider,
-            **kwargs
-        )
+        coroutines = []
+        for block in blocks:
+            to_address = coracle_spec.get_coracle_address(
+                wrapper, block=block,
+            )
+            coroutine = rpc.async_eth_call(
+                function_name='pcvStats',
+                block_number=block,
+                provider=provider,
+                to_address=to_address,
+            )
+            coroutines.append(coroutine)
+        result = await asyncio.gather(*coroutines)
 
         # arrange results
         transpose = list(zip(*result))

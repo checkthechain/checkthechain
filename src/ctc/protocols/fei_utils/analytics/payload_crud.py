@@ -42,7 +42,7 @@ async def async_create_payload(
     metrics = await metric_crud.async_get_metrics(blocks=blocks)
 
     return {
-        'version': '0.0',
+        'version': '0.1.0',
         'timestamps': timestamps,
         'block_numbers': blocks,
         'n_samples': len(blocks),
