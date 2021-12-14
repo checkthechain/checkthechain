@@ -6,61 +6,64 @@ import typing
 import pandas as pd
 
 
+T = typing.TypeVar('T')
+R = typing.TypeVar('R')
+
 #
 # # gathering
 #
 
 
 async def gather_dict(
-    d: dict[typing.Any, typing.Coroutine]
-) -> dict[typing.Any, typing.Any]:
+    d: typing.Mapping[T, typing.Coroutine[typing.Any, typing.Any, R]]
+) -> dict[T, R]:
 
     tasks = list(d.values())
     results = await asyncio.gather(*tasks)
     return dict(zip(d.keys(), results))
 
 
-async def gather_nested(
-    nested: dict[typing.Any, typing.Any],
-) -> dict[typing.Any, typing.Any]:
+# async def gather_nested(
+#     nested: dict[typing.Any, typing.Any],
+# ) -> dict[typing.Any, typing.Any]:
 
-    # compile tasks
-    tasks = {}
-    for key, value in nested.items():
-        if isinstance(value, dict):
-            tasks[key] = gather_nested(value)
-        elif hasattr(value, '__await__'):
-            tasks[key] = value
+#     # compile tasks
+#     tasks = {}
+#     for key, value in nested.items():
+#         if isinstance(value, dict):
+#             tasks[key] = gather_nested(value)
+#         elif hasattr(value, '__await__'):
+#             tasks[key] = value
 
-    # await results
-    results = await gather_dict(tasks)
+#     # await results
+#     results = await gather_dict(tasks)
 
-    # compile output
-    output = {}
-    for key, value in nested.items():
-        if key in results:
-            output[key] = results[key]
-        else:
-            output[key] = value
+#     # compile output
+#     output = {}
+#     for key, value in nested.items():
+#         if key in results:
+#             output[key] = results[key]
+#         else:
+#             output[key] = value
 
-    return output
+#     return output
 
 
 ##
 ## # parallelizing
 ##
 
-#from typing_extensions import ParamSpec
-#ParamSpec = ParamSpec('P')
-#T = typing.TypeVar('T')
+# from typing_extensions import ParamSpec
+# ParamSpec = ParamSpec('P')
+# T = typing.TypeVar('T')
 
 
-#async def parallelize(
+# async def parallelize(
 #    arg: str,
 #    values: list[typing.Any],
 #    function: typing.Callable[P, T],
 #    kwargs: P.kwargs,
-#) -> list[T]:
+# ) -> list[T]:
 #    coroutines = []
 #    for value in values:
 #        coroutine = function(**{arg: value}, **kwargs)
