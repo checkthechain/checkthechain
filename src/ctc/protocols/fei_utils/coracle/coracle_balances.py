@@ -1,11 +1,14 @@
 import asyncio
 import typing
 
+from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc import spec
+from . import coracle_tokens
 from . import coracle_oracles
 from . import coracle_deposits
+from . import coracle_spec
 
 
 #
@@ -76,11 +79,16 @@ async def async_get_token_balance(
     balance: typing.Union[int, float] = sum(balances)
 
     if normalize:
-        balance = await evm.async_normalize_erc20_quantity(
-            quantity=balance,
-            provider=provider,
-            token=token,
-        )
+        if token == coracle_spec.usd_token:
+            balance = balance / 1e18
+        elif balance == 0:
+            pass
+        else:
+            balance = await evm.async_normalize_erc20_quantity(
+                quantity=balance,
+                provider=provider,
+                token=token,
+            )
 
     if usd:
         if not normalize:
@@ -116,46 +124,6 @@ async def async_get_token_balance_by_block(
     ]
     return await asyncio.gather(*coroutines)
 
-    # blocks = await evm.async_block_numbers_to_int(blocks, provider=provider)
-    # blocks_deposits = await coracle_deposits.async_get_token_deposits_by_block(
-    #     token=token, blocks=blocks, provider=provider
-    # )
-    # coroutines = []
-    # for block, block_deposits in zip(blocks, blocks_deposits):
-    #     coroutine = async_get_deposits_balances(
-    #         deposits=block_deposits,
-    #         provider=provider,
-    #         block=block,
-    #     )
-    #     coroutines.append(coroutine)
-    # blocks_balances = asyncio.gather(*coroutines)
-
-    # token_balances = [sum(block_balance) for block_balance in blocks_balances]
-
-    # if normalize:
-    #     token_balances = await evm.async_normalize_erc20_quantities_by_block(
-    #         quantities=token_balances,
-    #         provider=provider,
-    #         token=token,
-    #         blocks=blocks,
-    #     )
-
-    # if usd:
-    #     if not normalize:
-    #         raise Exception('must normalize for usd conversion')
-    #     token_prices = await coracle_oracles.async_get_token_price_by_block(
-    #         token=token,
-    #         blocks=blocks,
-    #         provider=provider,
-    #         normalize=True,
-    #     )
-    #     token_balances = [
-    #         token_balance * token_price
-    #         for token_balance, token_price in zip(token_balances, token_prices)
-    #     ]
-
-    # return token_balances
-
 
 async def async_get_tokens_balances(
     tokens: typing.Sequence[spec.TokenAddress] = None,
@@ -163,18 +131,29 @@ async def async_get_tokens_balances(
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,
+    exclude_fei: bool = True,
 ) -> typing.Union[dict[spec.TokenAddress, int], dict[spec.TokenAddress, float]]:
 
     block = await evm.async_block_number_to_int(block=block, provider=provider)
 
+    # use all tokens in pcv by default
     if tokens is None:
-        tokens = await coracle_deposits.async_get_tokens_in_pcv(
+        tokens = await coracle_tokens.async_get_tokens_in_pcv(
             block=block, provider=provider
         )
+    if exclude_fei:
+        tokens = [
+            token
+            for token in tokens
+            if token != directory.token_addresses['FEI']
+        ]
 
+    # get deposits for each token
     tokens_deposits = await coracle_deposits.async_get_tokens_deposits(
         tokens=tokens, block=block, provider=provider
     )
+
+    # get deposit balances
     all_deposits = [
         deposit
         for token_deposits in tokens_deposits.values()
@@ -192,19 +171,34 @@ async def async_get_tokens_balances(
         for _ in token_deposits:
             deposits_balances[token].append(next(all_balances_iter))
 
+    # sum deposits balances of each token
     tokens_balances: dict[str, typing.Union[int, float]] = {
         token: sum(token_balances)
         for token, token_balances in deposits_balances.items()
     }
 
+    # normalize
     if normalize:
+
+        # normalize only non-usd tokens with non-zero balance
+        normalize_tokens = []
+        for token in tokens:
+            if token != coracle_spec.usd_token and tokens_balances[token] > 0:
+                normalize_tokens.append(token)
+
+        # normalize and replace
         normalized = await evm.async_normalize_erc20s_quantities(
-            quantities=list(tokens_balances.values()),
-            tokens=tokens,
+            quantities=[tokens_balances[token] for token in normalize_tokens],
+            tokens=normalize_tokens,
             block=block,
             provider=provider,
         )
-        tokens_balances = dict(zip(tokens_balances.keys(), normalized))
+        for token, normalized_balance in zip(normalize_tokens, normalized):
+            tokens_balances[token] = normalized_balance
+
+        # normalize usd balance
+        if coracle_spec.usd_token in tokens:
+            tokens_balances[coracle_spec.usd_token] /= 1e18
 
     if usd:
         if not normalize:
@@ -225,76 +219,37 @@ async def async_get_tokens_balances(
 
 async def async_get_tokens_balances_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
-    tokens: spec.TokenAddress = None,
+    tokens: typing.Optional[typing.Sequence[spec.TokenAddress]] = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,
+    exclude_fei: bool = True,
 ) -> typing.Union[
     dict[spec.TokenAddress, list[int]],
     dict[spec.TokenAddress, list[float]],
 ]:
 
-    # query data
-    coroutines = []
-    for block in blocks:
-        coroutine = async_get_tokens_balances(
+    coroutines = [
+        async_get_tokens_balances(
             tokens=tokens,
-            block=block,
             provider=provider,
+            normalize=normalize,
+            block=block,
+            usd=usd,
+            exclude_fei=exclude_fei,
         )
-        coroutines.append(coroutine)
-    results = await asyncio.gather(*coroutines)
+        for block in blocks
+    ]
+    block_token_balances = await asyncio.gather(*coroutines)
 
-    # get list of all tokens
-    all_tokens = []
-    for result in results:
-        for token in result.keys():
-            all_tokens.append(token)
-    all_tokens = list(set(all_tokens))
+    all_tokens = set()
+    for block_data in block_token_balances:
+        all_tokens |= block_data.keys()
 
-    # combine results into dict of lists
-    tokens_balances: dict[str, list[typing.Union[int, float]]] = {
-        token: [] for token in all_tokens
-    }
-    for result in results:
+    token_block_balances = {token: [] for token in all_tokens}
+    for block_data in block_token_balances:
         for token in all_tokens:
-            balance = result.get(token, 0)
-            tokens_balances[token].append(balance)
+            token_block_balances[token].append(block_data.get(token, 0))
 
-    # normalize
-    if normalize:
-        normalize_coroutines = []
-        for token, token_balances in tokens_balances.items():
-            normalize_coroutine = evm.async_normalize_erc20_quantities_by_block(
-                token=token,
-                quantities=token_balances,
-                provider=provider,
-                blocks=blocks,
-            )
-            normalize_coroutines.append(normalize_coroutine)
-        normalized = await asyncio.gather(*normalize_coroutines)
-        tokens_balances = dict(zip(all_tokens, normalized))
-
-    if usd:
-        if not normalize:
-            raise Exception('must normalize for usd conversion')
-
-        blocks_tokens = []
-        usd_coroutines = []
-        for block, result in zip(blocks, results):
-            block_tokens = list(result.keys())
-            blocks_tokens.append(block_tokens)
-            usd_coroutine = coracle_oracles.async_get_tokens_prices(
-                tokens=block_tokens,
-                block=block,
-                provider=provider,
-                normalize=True,
-            )
-            usd_coroutines.append(usd_coroutine)
-        tokens_prices_per_block = await asyncio.gather(*usd_coroutines)
-        for b, block_tokens in enumerate(blocks_tokens):
-            for t, token in enumerate(blocks_tokens):
-                tokens_balances[token][b] *= tokens_prices_per_block[t]
-
-    return tokens_balances
+    return token_block_balances
 

@@ -1,3 +1,7 @@
+
+usd_token = '0x1111111111111111111111111111111111111111'
+
+
 coracle_addresses = {
     'StaticPCVDepositWrapper': '0x8B41DcEfAe6064E6bc2A9B3ae20141d23EFD6cbd',
     'CollateralizationOracle': '0xFF6f59333cfD8f4Ebc14aD0a0E181a83e655d257',

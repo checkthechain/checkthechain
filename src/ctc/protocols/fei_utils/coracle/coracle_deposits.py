@@ -5,24 +5,7 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 from . import coracle_spec
-
-
-async def async_get_tokens_in_pcv(
-    block: spec.BlockReference = 'latest',
-    wrapper: bool = False,
-    provider: spec.ProviderSpec = None,
-) -> list[spec.TokenAddress]:
-    """get list of all tokens in pcv"""
-
-    block = evm.standardize_block_number(block)
-    coracle = coracle_spec.get_coracle_address(wrapper=wrapper, block=block)
-
-    return await rpc.async_eth_call(
-        to_address=coracle,
-        function_name='getTokensInPcv',
-        block_number=block,
-        provider=provider,
-    )
+from . import coracle_tokens
 
 
 async def async_get_tokens_deposits(
@@ -36,7 +19,9 @@ async def async_get_tokens_deposits(
 
     # get tokens in pcv
     if tokens is None:
-        tokens = await async_get_tokens_in_pcv(block=block, provider=provider)
+        tokens = await coracle_tokens.async_get_tokens_in_pcv(
+            block=block, provider=provider
+        )
 
     # get deposits of each token
     coroutines = []
