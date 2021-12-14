@@ -112,7 +112,7 @@ async def async_get_erc20_balance_of(
     )
 
     if normalize:
-        balance = erc20_normalize.async_normalize_erc20_quantity(
+        balance = await erc20_normalize.async_normalize_erc20_quantity(
             quantity=balance, token=token, provider=provider, block=block
         )
 
@@ -220,7 +220,7 @@ async def async_get_erc20_allowance(
     )
 
     if normalize:
-        allowance = erc20_normalize.async_normalize_erc20_quantity(
+        allowance = await erc20_normalize.async_normalize_erc20_quantity(
             quantity=allowance, token=token, provider=provider, block=block
         )
 
