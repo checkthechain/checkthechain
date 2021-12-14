@@ -1,6 +1,7 @@
 import asyncio
 
 from ctc import evm
+from ctc import spec
 from ctc.protocols import fei_utils
 from .. import analytics_spec
 
@@ -60,21 +61,33 @@ async def async_compute_pcv_stats(
 
 
 async def async_compute_pcv_by_asset(
-    blocks: list[int], verbose: bool = False
-) -> analytics_spec.MetricGroup:
-    metrics: dict[str, analytics_spec.MetricData] = {
-        'eth': {'name': 'ETH', 'values': [9999] * len(blocks)},
-        'rai': {'name': 'RAI', 'values': [9999] * len(blocks)},
-        'lusd': {'name': 'LUSD', 'values': [9999] * len(blocks)},
-        'dai': {'name': 'DAI', 'values': [9999] * len(blocks)},
-        'dpi': {'name': 'DPI', 'values': [9999] * len(blocks)},
-        'index': {'name': 'INDEX', 'values': [9999] * len(blocks)},
-        'bal': {'name': 'BAL', 'values': [9999] * len(blocks)},
-    }
-    return {
-        'name': 'PCV By Asset',
-        'metrics': metrics,
-    }
+    blocks: list[int], verbose: bool = False, provider: spec.ProviderSpec = None
+):
+
+    tokens_balances = await fei_utils.async_get_tokens_balances_by_block(
+        blocks=blocks,
+        usd=True,
+        exclude_fei=True,
+    )
+
+    tokens = list(tokens_balances.keys())
+
+    symbols = await fei_utils.async_get_pcv_tokens_symbols(
+        tokens=tokens,
+        provider=provider,
+        block=blocks[-1],
+    )
+
+    metrics = {}
+    for token in tokens:
+        symbol = symbols[token]
+        metrics[symbol] = {
+            'name': symbol,
+            'values': tokens_balances[token],
+            'units': 'USD',
+        }
+
+    return {'name': 'PCV by Asset', 'metrics': metrics}
 
 
 async def async_compute_pcv_by_deployment(
