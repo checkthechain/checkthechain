@@ -3,6 +3,7 @@ import typing
 
 from ctc import evm
 from ctc.protocols import chainlink_utils
+from ctc.protocols import fei_utils
 from .. import analytics_spec
 
 
@@ -30,22 +31,29 @@ async def async_compute_prices(
     }
 
 
-async def async_compute_pfei_by_deployment(
+async def async_compute_pfei_by_platform(
     blocks: list[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
+
+    deposit_balances = await fei_utils.async_get_fei_deposit_balances_by_block(
+        blocks=blocks,
+    )
+
+    platform_balances = fei_utils.fei_deposits_to_deployments_by_block(
+        deposit_balances
+    )
+
+    metrics: dict[str, analytics_spec.MetricData] = {}
+    for name, values in platform_balances.items():
+        metrics[name] = {
+            'name': name,
+            'values': values,
+            'units': 'FEI',
+        }
+
     return {
-        'name': 'Protocol FEI Deployments',
-        'metrics': {
-            'uniswap': {'name': 'Uniswap', 'values': [9999] * len(blocks)},
-            'sushi_swap': {'name': 'Sushi Swap', 'values': [9999] * len(blocks)},
-            'balancer': {'name': 'Balancer', 'values': [9999] * len(blocks)},
-            'sushi_kashi': {'name': 'Sushi Kashi', 'values': [9999] * len(blocks)},
-            'ondo': {'name': 'Ondo', 'values': [9999] * len(blocks)},
-            'rari': {'name': 'Rari', 'values': [9999] * len(blocks)},
-            'aave': {'name': 'Aave', 'values': [9999] * len(blocks)},
-            'cream': {'name': 'Cream', 'values': [9999] * len(blocks)},
-            'oa': {'name': 'OA', 'values': [9999] * len(blocks)},
-        },
+        'name': 'Protocol FEI By Platform',
+        'metrics': metrics,
     }
 
 

@@ -6,11 +6,10 @@ from . import metric_groups
 
 f_metric_group: dict[str, analytics_spec.MetricGroupCreatorCoroutine] = {
     'pcv_by_asset': metric_groups.async_compute_pcv_by_asset,
-    'pcv_by_deployment': metric_groups.async_compute_pcv_by_deployment,
     'prices': metric_groups.async_compute_prices,
     'dex_volume': metric_groups.async_compute_dex_volume,
     'dex_tvls': metric_groups.async_compute_dex_tvls,
-    'pfei_by_deployment': metric_groups.async_compute_pfei_by_deployment,
+    'pfei_by_platform': metric_groups.async_compute_pfei_by_platform,
     'buybacks': metric_groups.async_compute_buybacks,
 }
 f_multi_metric_group: dict[

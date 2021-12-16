@@ -62,7 +62,7 @@ async def async_compute_pcv_stats(
 
 async def async_compute_pcv_by_asset(
     blocks: list[int], verbose: bool = False, provider: spec.ProviderSpec = None
-):
+) -> analytics_spec.MetricGroup:
 
     tokens_balances = await fei_utils.async_get_tokens_balances_by_block(
         blocks=blocks,
@@ -78,7 +78,7 @@ async def async_compute_pcv_by_asset(
         block=blocks[-1],
     )
 
-    metrics = {}
+    metrics: dict[str, analytics_spec.MetricData] = {}
     for token in tokens:
         symbol = symbols[token]
         metrics[symbol] = {
@@ -88,24 +88,4 @@ async def async_compute_pcv_by_asset(
         }
 
     return {'name': 'PCV by Asset', 'metrics': metrics}
-
-
-async def async_compute_pcv_by_deployment(
-    blocks: list[int], verbose: bool = False
-) -> analytics_spec.MetricGroup:
-    metrics: dict[str, analytics_spec.MetricData] = {
-        'tokemak': {'name': 'Tokemak', 'values': [9999] * len(blocks)},
-        'lido': {'name': 'Lido', 'values': [9999] * len(blocks)},
-        'uniswap': {'name': 'Uniswap', 'values': [9999] * len(blocks)},
-        'rari': {'name': 'Rari', 'values': [9999] * len(blocks)},
-        'sushi': {'name': 'Sushi', 'values': [9999] * len(blocks)},
-        'fei': {'name': 'Fei', 'values': [9999] * len(blocks)},
-        'aave': {'name': 'Aave', 'values': [9999] * len(blocks)},
-        'compound': {'name': 'Compound', 'values': [9999] * len(blocks)},
-    }
-
-    return {
-        'name': 'PCV by Deployment',
-        'metrics': metrics,
-    }
 

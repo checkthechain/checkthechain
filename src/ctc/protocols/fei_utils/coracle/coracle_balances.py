@@ -5,6 +5,8 @@ from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc import spec
+from ctc.toolbox import async_utils
+from ctc.toolbox import nested_utils
 from . import coracle_tokens
 from . import coracle_oracles
 from . import coracle_deposits
@@ -225,8 +227,8 @@ async def async_get_tokens_balances_by_block(
     usd: bool = False,
     exclude_fei: bool = True,
 ) -> typing.Union[
-    dict[spec.TokenAddress, list[int]],
-    dict[spec.TokenAddress, list[float]],
+    typing.Mapping[spec.TokenAddress, list[int]],
+    typing.Mapping[spec.TokenAddress, list[float]],
 ]:
 
     coroutines = [
@@ -240,16 +242,14 @@ async def async_get_tokens_balances_by_block(
         )
         for block in blocks
     ]
-    block_token_balances = await asyncio.gather(*coroutines)
+    block_token_balances = await async_utils.gather_coroutines(*coroutines)
 
-    all_tokens = set()
-    for block_data in block_token_balances:
-        all_tokens |= block_data.keys()
-
-    token_block_balances = {token: [] for token in all_tokens}
-    for block_data in block_token_balances:
-        for token in all_tokens:
-            token_block_balances[token].append(block_data.get(token, 0))
-
-    return token_block_balances
+    if normalize:
+        int_type = list[dict[spec.TokenAddress, int]]
+        int_result = typing.cast(int_type, block_token_balances)
+        return nested_utils.list_of_dicts_to_dict_of_lists(int_result)
+    else:
+        float_type = list[dict[spec.TokenAddress, float]]
+        float_result = typing.cast(float_type, block_token_balances)
+        return nested_utils.list_of_dicts_to_dict_of_lists(float_result)
 

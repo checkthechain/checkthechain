@@ -21,7 +21,7 @@ MetricSeries = list[float]
 
 
 class MetricData(typing.TypedDict, total=False):
-    values: list[float]
+    values: typing.Union[list[float], list[int]]
     name: str
     link: str
     units: str
