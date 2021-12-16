@@ -14,6 +14,13 @@ R = typing.TypeVar('R')
 #
 
 
+async def gather_coroutines(
+    *coroutines: typing.Coroutine[typing.Any, typing.Any, R]
+) -> list[R]:
+    """gather without erasing type information"""
+    return await asyncio.gather(*coroutines)
+
+
 async def gather_dict(
     d: typing.Mapping[T, typing.Coroutine[typing.Any, typing.Any, R]]
 ) -> dict[T, R]:
