@@ -70,7 +70,7 @@ async def async_get_blocks(
 
 
 async def async_get_latest_block_number(
-    provider: typing.Optional[spec.Provider] = None,
+    provider: spec.ProviderSpec = None,
 ) -> int:
     return await rpc.async_eth_block_number(provider=provider)
 

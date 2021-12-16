@@ -1,3 +1,4 @@
+import copy
 import os
 
 from ctc import config_utils
@@ -61,6 +62,7 @@ def add_provider_parameters(
 ) -> spec.Provider:
     # TODO: decide whether parameters with value=None should be included
     provider = get_provider(provider)
-    provider = dict(provider, **parameters)
+    provider = copy.copy(provider)
+    provider.update(parameters)
     return provider
 

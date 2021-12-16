@@ -34,7 +34,7 @@ def standardize_block_number(
     """
 
     if block in spec.block_number_names:
-        return block
+        return typing.cast(spec.BlockNumberName, block)
     else:
         return raw_block_number_to_int(block)
 
@@ -44,7 +44,7 @@ def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
     if isinstance(block, typing.SupportsInt):
         if not isinstance(block, int):
             as_int = int(round(block))
-            if abs(as_int - block) > 0.0001:
+            if abs(as_int - int(block)) > 0.0001:
                 raise Exception('must specify integer blocks')
             block = as_int
         return block
