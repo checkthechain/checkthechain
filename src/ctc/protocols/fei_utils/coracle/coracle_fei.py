@@ -61,12 +61,14 @@ async def async_get_fei_deposit_balances_by_block(
 # # fei platforms
 #
 
+T = typing.TypeVar('T', int, float)
+
 
 def fei_deposits_to_deployments(
-    deposit_balances: dict[str, int]
-) -> dict[str, int]:
+    deposit_balances: dict[str, T]
+) -> dict[str, T]:
 
-    deployment_balances: dict[str, int] = {}
+    deployment_balances: dict[str, T] = {}
     for deposit, value in deposit_balances.items():
 
         if deposit in coracle_spec.deposit_metadata:
@@ -74,17 +76,17 @@ def fei_deposits_to_deployments(
         else:
             deployment = 'Other'
 
-        deployment_balances.setdefault(deployment, 0)
+        deployment_balances.setdefault(deployment, type(value)())
         deployment_balances[deployment] += value
 
     return deployment_balances
 
 
 def fei_deposits_to_deployments_by_block(
-    deposit_balances_by_block: dict[str, list[int]]
-) -> dict[str, list[int]]:
+    deposit_balances_by_block: dict[str, list[T]]
+) -> dict[str, list[T]]:
 
-    deployment_balances_by_block: dict[str, list[int]] = {}
+    deployment_balances_by_block: dict[str, list[T]] = {}
 
     for deposit, value in deposit_balances_by_block.items():
 
@@ -94,7 +96,7 @@ def fei_deposits_to_deployments_by_block(
             deployment = 'Other'
 
         n_blocks = len(value)
-        empty = [0 for i in range(n_blocks)]
+        empty = [type(value[i])() for i in range(n_blocks)]
         deployment_balances_by_block.setdefault(deployment, empty)
         deployment_balances_by_block[deployment] = [
             lhs + rhs

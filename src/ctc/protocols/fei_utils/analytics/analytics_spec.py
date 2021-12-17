@@ -20,6 +20,15 @@ MetricName = str
 MetricSeries = list[float]
 
 
+class TimeData(typing.TypedDict):
+    timestamps: list[int]
+    block_numbers: list[int]
+    n_samples: int
+    window_size: str
+    interval_size: str
+    created_at_timestamp: int
+
+
 class MetricData(typing.TypedDict, total=False):
     values: typing.Union[list[float], list[int]]
     name: str

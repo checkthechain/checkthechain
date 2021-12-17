@@ -5,7 +5,52 @@ import toolstr
 import tooltime
 
 from ctc import evm
+from ctc import spec
 from . import analytics_spec
+
+
+async def async_get_time_data(
+    blocks: typing.Sequence[spec.BlockNumberReference] = None,
+    timestamps: typing.Sequence[int] = None,
+    timescale: typing.Optional[analytics_spec.Timescale] = None,
+    end_time: typing.Optional[analytics_spec.Timestamp] = None,
+    window_size: str = None,
+    interval_size: str = None,
+    provider: spec.ProviderSpec = None,
+) -> analytics_spec.TimeData:
+
+    if (
+        blocks is None
+        or timestamps is None
+        or window_size is None
+        or interval_size is None
+    ):
+        if timescale is None:
+            raise Exception('must specify timescale or {blocks, timestamps}')
+        if timestamps is None:
+            if end_time is None:
+                end_time = round(time.time())
+            timestamps = get_timestamps(timescale=timescale, end_time=end_time)
+        if blocks is None:
+            blocks = get_timestamps_blocks(timestamps=timestamps)
+        if interval_size is None:
+            interval_size = timescale['interval_size']
+        if window_size is None:
+            window_size = timescale['window_size']
+
+    timestamps = list(timestamps)
+    blocks = await evm.async_block_numbers_to_int(
+        blocks=blocks, provider=provider
+    )
+
+    return {
+        'timestamps': timestamps,
+        'block_numbers': blocks,
+        'n_samples': len(blocks),
+        'window_size': window_size,
+        'interval_size': interval_size,
+        'created_at_timestamp': int(time.time()),
+    }
 
 
 def get_timestamps(
@@ -23,7 +68,9 @@ def get_timestamps(
     )
 
 
-def get_timestamps_blocks(timestamps: analytics_spec.Timestamps, **kwargs) -> list[int]:
+def get_timestamps_blocks(
+    timestamps: typing.Sequence[analytics_spec.Timestamp], **kwargs
+) -> list[int]:
     return evm.get_blocks_of_timestamps(timestamps, **kwargs)
 
 

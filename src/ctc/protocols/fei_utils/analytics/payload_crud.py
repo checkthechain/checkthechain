@@ -1,6 +1,6 @@
-import time
 import typing
 
+from ctc import spec
 from . import timestamp_crud
 from . import metric_crud
 from . import analytics_spec
@@ -8,48 +8,43 @@ from . import analytics_spec
 
 async def async_create_payload(
     *,
-    blocks=None,
-    timestamps=None,
+    blocks: typing.Sequence[spec.BlockNumberReference] = None,
+    timestamps: typing.Sequence[int] = None,
     timescale: typing.Optional[analytics_spec.Timescale] = None,
     end_time: typing.Optional[analytics_spec.Timestamp] = None,
     window_size: str = None,
     interval_size: str = None,
+    provider: spec.ProviderSpec = None,
 ) -> analytics_spec.AnalyticsPayload:
     """create data payload from scratch"""
 
-    # parse missing inputs from timescale
-    if (
-        blocks is None
-        or timestamps is None
-        or window_size is None
-        or interval_size is None
-    ):
-        if timescale is None:
-            raise Exception('must specify timescale or {blocks, timestamps}')
-        if timestamps is None:
-            if end_time is None:
-                end_time = round(time.time())
-            timestamps = timestamp_crud.get_timestamps(
-                timescale=timescale, end_time=end_time
-            )
-        if blocks is None:
-            blocks = timestamp_crud.get_timestamps_blocks(timestamps=timestamps)
-        if interval_size is None:
-            interval_size = timescale['interval_size']
-        if window_size is None:
-            window_size = timescale['window_size']
+    time_data = await timestamp_crud.async_get_time_data(
+        blocks=blocks,
+        timestamps=timestamps,
+        timescale=timescale,
+        end_time=end_time,
+        window_size=window_size,
+        interval_size=interval_size,
+    )
 
-    metrics = await metric_crud.async_get_metrics(blocks=blocks)
+    # get data
+    data = await metric_crud.async_get_metrics(
+        blocks=time_data['block_numbers']
+    )
 
     return {
         'version': '0.1.0',
-        'timestamps': timestamps,
-        'block_numbers': blocks,
-        'n_samples': len(blocks),
-        'window_size': window_size,
-        'interval_size': interval_size,
-        'created_at_timestamp': int(time.time()),
-        'data': metrics,
+        #
+        # time data
+        'n_samples': time_data['n_samples'],
+        'window_size': time_data['window_size'],
+        'interval_size': time_data['interval_size'],
+        'timestamps': time_data['timestamps'],
+        'block_numbers': time_data['block_numbers'],
+        'created_at_timestamp': time_data['created_at_timestamp'],
+        #
+        # metric data
+        'data': data,
     }
 
 
