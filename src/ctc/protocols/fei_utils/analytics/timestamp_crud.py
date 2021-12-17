@@ -32,7 +32,9 @@ async def async_get_time_data(
                 end_time = round(time.time())
             timestamps = get_timestamps(timescale=timescale, end_time=end_time)
         if blocks is None:
-            blocks = get_timestamps_blocks(timestamps=timestamps)
+            blocks = get_timestamps_blocks(
+                timestamps=timestamps, provider=provider
+            )
         if interval_size is None:
             interval_size = timescale['interval_size']
         if window_size is None:
@@ -69,9 +71,11 @@ def get_timestamps(
 
 
 def get_timestamps_blocks(
-    timestamps: typing.Sequence[analytics_spec.Timestamp], **kwargs
+    timestamps: typing.Sequence[analytics_spec.Timestamp],
+    provider: spec.ProviderSpec,
+    **kwargs
 ) -> list[int]:
-    return evm.get_blocks_of_timestamps(timestamps, **kwargs)
+    return evm.get_blocks_of_timestamps(timestamps, provider=provider, **kwargs)
 
 
 def summarize_timestamps(

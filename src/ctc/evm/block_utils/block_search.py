@@ -67,6 +67,7 @@ def get_blocks_of_timestamps(
     block_timestamp_array=None,
     nary=None,
     cache=None,
+    provider=None,
 ):
     """once parallel node search created, use that"""
 
@@ -114,6 +115,7 @@ def get_block_of_timestamp(
     block_timestamp_array=None,
     block_number_array=None,
     verbose: bool = True,
+    provider=None,
 ):
     if (
         block_timestamps is not None
@@ -145,7 +147,7 @@ def get_block_of_timestamp_from_arrays(
 
 
 def get_block_of_timestamp_from_node(
-    timestamp, nary=None, cache=None, verbose: bool = True
+    timestamp, nary=None, cache=None, provider=None, verbose: bool = True
 ):
     """
     - could make this efficiently parallelizable to multiple timestamps by sharing cache
@@ -177,7 +179,9 @@ def get_block_of_timestamp_from_node(
     )
 
 
-def _is_match_block_of_timestamp(block_numbers, timestamp, cache):
+def _is_match_block_of_timestamp(
+    block_numbers, timestamp, cache, provider=None
+):
 
     # retrieve values not in cache
     not_in_cache = [

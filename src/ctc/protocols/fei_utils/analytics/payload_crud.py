@@ -25,6 +25,7 @@ async def async_create_payload(
         end_time=end_time,
         window_size=window_size,
         interval_size=interval_size,
+        provider=provider,
     )
 
     # get data
