@@ -1,4 +1,3 @@
-import asyncio
 import typing
 
 from ctc import directory
@@ -34,7 +33,6 @@ async def async_get_fei_deposit_balances(
         provider=provider,
     )
 
-
     result: typing.Union[list[int], list[float]]
     if normalize:
         result = [balance / 1e18 for balance in fei_balances]
@@ -64,9 +62,7 @@ async def async_get_fei_deposit_balances_by_block(
 T = typing.TypeVar('T', int, float)
 
 
-def fei_deposits_to_deployments(
-    deposit_balances: dict[str, T]
-) -> dict[str, T]:
+def fei_deposits_to_deployments(deposit_balances: dict[str, T]) -> dict[str, T]:
 
     deployment_balances: dict[str, T] = {}
     for deposit, value in deposit_balances.items():
