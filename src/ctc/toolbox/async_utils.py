@@ -30,6 +30,25 @@ async def gather_dict(
     return dict(zip(d.keys(), results))
 
 
+P = typing.ParamSpec('P')
+
+
+def sync_wrap(f: typing.Callable[P, R]) -> typing.Function:
+    """decorator to create synchronous versions of asynchronous functions
+
+    - see if anyio has the capability for this already
+
+    - if currently in an eventloop, f should run in that eventloop
+    - if not currently in an eventloop, f should start one
+    """
+
+    @functools.wraps(f)
+    def new_f(*args: P.args, **kwargs: P.kwrags) -> R:
+        return asyncio.run(f(*args, **kwargs))
+
+    return new_f
+
+
 # async def gather_nested(
 #     nested: dict[typing.Any, typing.Any],
 # ) -> dict[typing.Any, typing.Any]:
