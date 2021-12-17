@@ -1,5 +1,7 @@
 import functools
 
+import toolparallel
+
 from ctc.toolbox import search_utils
 from .. import address_utils
 from . import block_crud
@@ -67,31 +69,43 @@ def get_blocks_of_timestamps(
     cache=None,
 ):
     """once parallel node search created, use that"""
-    import numpy as np
 
     if (
         block_timestamps is not None
         and block_number_array is None
         and block_timestamp_array is None
     ):
+        import numpy as np
+
         block_timestamp_array = np.array(list(block_timestamps.values()))
         block_number_array = np.array(list(block_timestamps.keys()))
 
-    blocks = []
-    for timestamp in timestamps:
-        block = get_block_of_timestamp(
-            timestamp=timestamp,
-            nary=nary,
-            cache=cache,
-            block_timestamps=block_timestamps,
-            block_timestamp_array=block_timestamp_array,
-            block_number_array=block_number_array,
+        blocks = []
+        for timestamp in timestamps:
+            block = get_block_of_timestamp(
+                timestamp=timestamp,
+                nary=nary,
+                cache=cache,
+                block_timestamps=block_timestamps,
+                block_timestamp_array=block_timestamp_array,
+                block_number_array=block_number_array,
+            )
+            blocks.append(block)
+
+        return blocks
+
+    else:
+
+        return get_block_of_timestamp(
+            timestamps=timestamps,
+            verbose=False,
+            parallel_kwargs={'n_workers': len(timestamps)},
         )
-        blocks.append(block)
-
-    return blocks
 
 
+@toolparallel.parallelize_input(
+    singular_arg='timestamp', plural_arg='timestamps'
+)
 def get_block_of_timestamp(
     timestamp,
     nary=None,
