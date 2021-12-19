@@ -2,7 +2,9 @@ import asyncio
 import concurrent.futures
 import functools
 import typing
+import types
 
+from typing_extensions import ParamSpec
 import pandas as pd
 
 
@@ -30,23 +32,26 @@ async def gather_dict(
     return dict(zip(d.keys(), results))
 
 
-P = typing.ParamSpec('P')
+# typing_extensions does not support ParamSpec properly
 
 
-def sync_wrap(f: typing.Callable[P, R]) -> typing.Function:
-    """decorator to create synchronous versions of asynchronous functions
+# P = ParamSpec('P')
 
-    - see if anyio has the capability for this already
 
-    - if currently in an eventloop, f should run in that eventloop
-    - if not currently in an eventloop, f should start one
-    """
+# def sync_wrap(f: typing.Callable[P, R]) -> types.FunctionType:
+#     """decorator to create synchronous versions of asynchronous functions
 
-    @functools.wraps(f)
-    def new_f(*args: P.args, **kwargs: P.kwrags) -> R:
-        return asyncio.run(f(*args, **kwargs))
+#     - see if anyio has the capability for this already
 
-    return new_f
+#     - if currently in an eventloop, f should run in that eventloop
+#     - if not currently in an eventloop, f should start one
+#     """
+
+#     @functools.wraps(f)
+#     def new_f(*args: P.args, **kwargs: P.kwrags) -> R:
+#         return asyncio.run(f(*args, **kwargs))
+
+#     return new_f
 
 
 # async def gather_nested(
