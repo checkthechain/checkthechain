@@ -69,6 +69,10 @@ config_key_variables = {
 }
 
 
+def get_config_path():
+    return toolconfig.get_config_path(config_path_env_var=config_path_env_var)
+
+
 def get_config():
 
     # set default data root to be subdir of package dir
