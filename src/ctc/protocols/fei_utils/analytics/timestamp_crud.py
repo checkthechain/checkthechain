@@ -12,7 +12,7 @@ from . import analytics_spec
 async def async_get_time_data(
     blocks: typing.Sequence[spec.BlockNumberReference] = None,
     timestamps: typing.Sequence[int] = None,
-    timescale: typing.Optional[analytics_spec.Timescale] = None,
+    timescale: typing.Optional[analytics_spec.TimescaleSpec] = None,
     end_time: typing.Optional[analytics_spec.Timestamp] = None,
     window_size: str = None,
     interval_size: str = None,
@@ -27,12 +27,13 @@ async def async_get_time_data(
     ):
         if timescale is None:
             raise Exception('must specify timescale or {blocks, timestamps}')
+        timescale = resolve_timescale(timescale)
         if timestamps is None:
             if end_time is None:
                 end_time = round(time.time())
             timestamps = get_timestamps(timescale=timescale, end_time=end_time)
         if blocks is None:
-            blocks = get_timestamps_blocks(
+            blocks = await async_get_timestamps_blocks(
                 timestamps=timestamps, provider=provider
             )
         if interval_size is None:
@@ -55,6 +56,25 @@ async def async_get_time_data(
     }
 
 
+def resolve_timescale(
+    timescale: analytics_spec.TimescaleSpec,
+) -> analytics_spec.Timescale:
+    if (
+        isinstance(timescale, dict)
+        and set(timescale.keys()) == {'window_size', 'interval_size'}
+    ):
+        return timescale
+
+    elif isinstance(timescale, str) and timescale.count(',') == 1:
+        window_size, interval_size = timescale.split(',')
+        window_size = window_size.strip()
+        interval_size = interval_size.strip()
+        return {'window_size': window_size, 'interval_size': interval_size}
+
+    else:
+        raise Exception('could not resolve timescale: ' + str(timescale))
+
+
 def get_timestamps(
     timescale: analytics_spec.Timescale,
     end_time: typing.Optional[analytics_spec.Timestamp] = None,
@@ -70,12 +90,35 @@ def get_timestamps(
     )
 
 
-def get_timestamps_blocks(
+async def async_get_timestamps_blocks(
     timestamps: typing.Sequence[analytics_spec.Timestamp],
     provider: spec.ProviderSpec,
     **kwargs
 ) -> list[int]:
-    return evm.get_blocks_of_timestamps(timestamps, provider=provider, **kwargs)
+
+    # use latest block if last timestamp is greater than latest block timestamp
+    latest_block = evm.get_block('latest', provider=provider)
+    if latest_block['timestamp'] <= timestamps[-1]:
+        timestamps = timestamps[:-1]
+        latest_block_swapped = True
+    else:
+        latest_block_swapped = False
+
+    # allow only the last timestamp to exceed the latest block time
+    for timestamp in timestamps:
+        if timestamp > latest_block['timestamp']:
+            raise Exception('timestamps are greater that latest block time')
+
+    # get blocks of timestamps
+    blocks = evm.get_blocks_of_timestamps(
+        timestamps, provider=provider, **kwargs
+    )
+
+    # append latest block if swapped in for last timestamp
+    if latest_block_swapped:
+        blocks.append(latest_block['number'])
+
+    return blocks
 
 
 def summarize_timestamps(

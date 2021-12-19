@@ -10,7 +10,7 @@ async def async_create_payload(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference] = None,
     timestamps: typing.Sequence[int] = None,
-    timescale: typing.Optional[analytics_spec.Timescale] = None,
+    timescale: typing.Optional[analytics_spec.TimescaleSpec] = None,
     end_time: typing.Optional[analytics_spec.Timestamp] = None,
     window_size: str = None,
     interval_size: str = None,

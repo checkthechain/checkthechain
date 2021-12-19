@@ -13,6 +13,10 @@ class Timescale(typing.TypedDict):
     interval_size: str
 
 
+TimescaleShorthand = str
+TimescaleSpec = typing.Union[Timescale, TimescaleShorthand]
+
+
 Timestamp = int
 Timestamps = list[int]
 
