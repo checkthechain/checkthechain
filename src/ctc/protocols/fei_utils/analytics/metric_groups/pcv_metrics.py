@@ -81,6 +81,10 @@ async def async_compute_pcv_by_asset(
     metrics: dict[str, analytics_spec.MetricData] = {}
     for token in tokens:
         symbol = symbols[token]
+
+        if symbol in fei_utils.token_aliases:
+            symbol = fei_utils.token_aliases[symbol]
+
         metrics[symbol] = {
             'name': symbol,
             'values': tokens_balances[token],

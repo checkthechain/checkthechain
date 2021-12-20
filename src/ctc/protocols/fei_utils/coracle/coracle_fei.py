@@ -33,6 +33,13 @@ async def async_get_fei_deposit_balances(
         provider=provider,
     )
 
+    non_fei_balances = await _async_get_non_fei_deposits_fei_balances(
+        block=block, provider=provider
+    )
+    fei_deposits = list(fei_deposits)
+    fei_deposits.extend(non_fei_balances.keys())
+    fei_balances.extend(non_fei_balances.values())
+
     result: typing.Union[list[int], list[float]]
     if normalize:
         result = [balance / 1e18 for balance in fei_balances]
@@ -40,6 +47,28 @@ async def async_get_fei_deposit_balances(
         result = fei_balances
 
     return dict(zip(fei_deposits, result))
+
+
+async def _async_get_non_fei_deposits_fei_balances(block, provider=None):
+
+    tokens_deposits = await coracle_deposits.async_get_tokens_deposits(
+        block=block
+    )
+
+    non_fei_deposits = []
+    for token, deposits in tokens_deposits.items():
+        non_fei_deposits.extend(deposits)
+
+    balances = (
+        await coracle_balances.async_get_deposits_resistant_balances_and_fei(
+            deposits=non_fei_deposits,
+            block=block,
+        )
+    )
+
+    fei_balances = [balance[1] for balance in balances]
+
+    return dict(zip(non_fei_deposits, fei_balances))
 
 
 async def async_get_fei_deposit_balances_by_block(

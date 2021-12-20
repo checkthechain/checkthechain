@@ -58,6 +58,46 @@ async def async_get_deposit_balance_by_block(
     )
 
 
+async def async_get_deposit_resistant_balance_and_fei(
+    deposit: spec.ContractAddress,
+    block: spec.BlockReference = 'latest',
+    provider: spec.ProviderSpec = None,
+) -> typing.Union[int, list[int]]:
+    """get token balance of a particular deposit"""
+    return await rpc.async_eth_call(
+        to_address=deposit,
+        function_name='resistantBalanceAndFei',
+        block_number=block,
+        provider=provider,
+    )
+
+
+async def async_get_deposits_resistant_balances_and_fei(
+    deposits: typing.Sequence[spec.ContractAddress],
+    block: spec.BlockReference = 'latest',
+    provider: spec.ProviderSpec = None,
+) -> list[int]:
+    return await rpc.async_batch_eth_call(
+        to_addresses=deposits,
+        function_name='resistantBalanceAndFei',
+        block_number=block,
+        provider=provider,
+    )
+
+
+async def async_get_deposit_resistant_balance_and_fei_by_block(
+    deposit: spec.ContractAddress,
+    blocks: typing.Sequence[spec.BlockReference],
+    provider: spec.ProviderSpec = None,
+) -> list[int]:
+    return await rpc.async_batch_eth_call(
+        to_address=deposit,
+        function_name='resistantBalanceAndFei',
+        block_numbers=blocks,
+        provider=provider,
+    )
+
+
 #
 # # token balance getters
 #

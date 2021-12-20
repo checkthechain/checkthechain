@@ -11,6 +11,9 @@ coracle_addresses = {
 }
 coracle_addresses = {k: v.lower() for k, v in coracle_addresses.items()}
 
+token_aliases = {
+    'WETH': 'ETH',
+}
 
 deposit_metadata = {
     '0xb4ffd10c4c290dc13e8e30bf186f1509001515fd': {
@@ -78,8 +81,8 @@ deposit_metadata = {
         'platform': 'Rari Fuse',
     },
     '0x7eb88140af813294aedce981b6ac08fcd139d408': {
-        'name': 'Collection',
-        'platform': 'Collection',
+        'name': 'OA Account',
+        'platform': 'OA Account',
     },
     '0x508f6fbd78b6569c29e9d75986a51558de9e5865': {
         'name': 'Fuse Harvest Pool 24',
