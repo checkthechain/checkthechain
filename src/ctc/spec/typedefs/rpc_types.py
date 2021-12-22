@@ -34,7 +34,7 @@ class PartialProvider(typing.TypedDict, total=False):
     chunk_size: typing.Optional[int]
 
 
-class Provider(PartialProvider, total=True):
+class Provider(typing.TypedDict, total=True):
     type: str
     url: str
     session_kwargs: dict

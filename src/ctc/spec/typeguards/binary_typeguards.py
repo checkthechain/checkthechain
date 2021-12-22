@@ -1,7 +1,15 @@
 import typing
 from typing_extensions import TypeGuard
 
-from ..types import binary_types
+from ..typedefs import binary_types
+
+
+def is_data(data: typing.Any) -> TypeGuard[binary_types.Data]:
+    return (
+        is_integer_data(data)
+        or is_binary_data(data)
+        or is_hex_data(data)
+    )
 
 
 def is_integer_data(data: typing.Any) -> TypeGuard[binary_types.IntegerData]:

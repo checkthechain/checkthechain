@@ -2,7 +2,7 @@ import typing
 from typing_extensions import TypeGuard
 
 from ctc.evm import binary_utils
-from ..types import block_types
+from ..typedefs import block_types
 from . import binary_typeguards
 
 

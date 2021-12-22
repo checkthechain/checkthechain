@@ -15,3 +15,5 @@ PrefixHexData = str
 RawHexData = str
 HexData = typing.Union[PrefixHexData, RawHexData]
 
+Data = typing.Union[IntegerData, BinaryData, HexData]
+
