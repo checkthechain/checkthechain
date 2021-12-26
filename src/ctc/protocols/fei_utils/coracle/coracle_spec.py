@@ -13,7 +13,11 @@ coracle_addresses = {k: v.lower() for k, v in coracle_addresses.items()}
 
 token_aliases = {
     'WETH': 'ETH',
+    'USD': 'Misc',
 }
+skip_tokens = [
+    'CREAM',
+]
 
 deposit_metadata = {
     '0xb4ffd10c4c290dc13e8e30bf186f1509001515fd': {
@@ -68,10 +72,10 @@ deposit_metadata = {
         'name': 'Fuse Liquity Pool 91',
         'platform': 'Rari Fuse',
     },
-    '0xff419bc27483edb94b7ad5c97b7fab5db323c7e0': {
-        'name': 'CREAM',
-        'platform': 'CREAM',
-    },
+    # '0xff419bc27483edb94b7ad5c97b7fab5db323c7e0': {
+    #     'name': 'CREAM',
+    #     'platform': 'CREAM',
+    # },
     '0x7e39bba9d0d967ee55524fae9e54900b02d9889a': {
         'name': 'Fuse Index Coop Pool 19',
         'platform': 'Rari Fuse',
@@ -103,6 +107,26 @@ deposit_metadata = {
     '0xfac571b6054619053ac311da8112939c9a374a85': {
         'name': 'Aave V2 FEI Pool',
         'platform': 'Aave',
+    },
+    '0x15958381e9e6dc98bd49655e36f524d2203a28bd': {
+        'name': 'Uniswap FEI-ETH',
+        'platform': 'Uniswap V2',
+    },
+    '0x5ae217de26f6ff5f481c6e10ec48b2cf2fc857c8': {
+        'name': 'Curve d3',
+        'platform': 'Curve',
+    },
+    '0x902199755219a9f8209862d09f1891cfb34f59a3': {
+        'name': 'Sushiswap FEI-DPI',
+        'platform': 'Sushi',
+    },
+    '0x1f05b337cb16cea2a1c638ba9b9571f0cf4a5612': {
+        'name': 'Balancer FEI-USD',
+        'platform': 'Balancer',
+    },
+    '0x7ac2ab8143634419c5bc230a9f9955c3e29f64ef': {
+        'name': 'Uniswap FEI-agEUR',
+        'platform': 'Uniswap V2',
     },
 }
 
