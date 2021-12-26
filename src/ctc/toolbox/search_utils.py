@@ -1,5 +1,57 @@
+import typing
+
+
 class NotFoundException(Exception):
     pass
+
+
+M = typing.TypeVar('M', bound=typing.Mapping)
+
+
+def get_matching_entries(sequence: typing.Sequence[M], **query) -> list[M]:
+    matches: list[M] = []
+    for item in sequence:
+        for key, value in query.items():
+            if item.get(key) != value:
+                break
+        else:
+            matches.append(item)
+    return matches
+
+
+@typing.overload
+def get_matching_entry(
+    sequence: typing.Sequence[M],
+    raise_if_not_found: typing.Literal[False],
+    **query: typing.Any
+) -> typing.Optional[M]:
+    ...
+
+
+@typing.overload
+def get_matching_entry(
+    sequence: typing.Sequence[M],
+    raise_if_not_found: typing.Literal[True] = True,
+    **query: typing.Any
+) -> M:
+    ...
+
+
+def get_matching_entry(
+    sequence: typing.Sequence[M], raise_if_not_found: bool = True, **query
+) -> typing.Optional[M]:
+    matches = get_matching_entries(
+        sequence=sequence,
+    )
+    if len(matches) == 1:
+        return matches[0]
+    elif len(matches) > 1:
+        raise LookupError('more than one match found in sequence')
+    else:
+        if raise_if_not_found:
+            raise LookupError('no matches found in sequence')
+        else:
+            return None
 
 
 def binary_search(
