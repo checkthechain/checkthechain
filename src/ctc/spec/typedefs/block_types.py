@@ -1,6 +1,6 @@
 import typing
 
-from . import token_types
+from . import address_types
 from . import binary_types
 
 
@@ -31,23 +31,27 @@ class RawTransaction(typing.TypedDict):
     pass
 
 
-class Transaction(typing.TypedDict):
-    hash: TransactionHash
-    block_hash: BlockHash
-    block_number: int
-    chain_id: binary_types.PrefixHexData
-    # from: token_types.Address
-    gas: int
-    gas_price: int
-    input: binary_types.PrefixHexData
-    nonce: int
-    r: binary_types.PrefixHexData
-    s: binary_types.PrefixHexData
-    to: token_types.Address
-    transaction_index: int
-    type: binary_types.PrefixHexData
-    v: int
-    value: int
+Transaction = typing.TypedDict(
+    'Transaction',
+    {
+        'hash': TransactionHash,
+        'block_hash': BlockHash,
+        'block_number': int,
+        'chain_id': binary_types.PrefixHexData,
+        'from': address_types.Address,
+        'gas': int,
+        'gas_price': int,
+        'input': binary_types.PrefixHexData,
+        'nonce': int,
+        'r': binary_types.PrefixHexData,
+        's': binary_types.PrefixHexData,
+        'to': address_types.Address,
+        'transaction_index': int,
+        'type': binary_types.PrefixHexData,
+        'v': int,
+        'value': int,
+    },
+)
 
 
 class RawBlock(typing.TypedDict):
@@ -62,7 +66,7 @@ class Block(typing.TypedDict):
     gas_used: int
     hash: BlockHash
     logs_bloom: binary_types.PrefixHexData
-    miner: token_types.Address
+    miner: address_types.Address
     mix_hash: BlockHash
     nonce: binary_types.PrefixHexData
     parent_hash: BlockHash
