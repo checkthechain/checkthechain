@@ -13,6 +13,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         ('gas',): 'ctc.cli.commands.gas_command',
         ('transaction',): 'ctc.cli.commands.transaction_command',
         ('address',): 'ctc.cli.commands.address_command',
+        ('setup',): 'ctc.cli.commands.setup_command',
         ('token',): 'ctc.cli.commands.token_command',
         ('call',): 'ctc.cli.commands.call_command',
         ('fei',): 'ctc.protocols.fei_utils.cli.fei_command',
