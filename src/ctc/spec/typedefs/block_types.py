@@ -31,6 +31,7 @@ class RawTransaction(typing.TypedDict):
     pass
 
 
+# use literal definition because 'from' is a python keyword
 Transaction = typing.TypedDict(
     'Transaction',
     {
