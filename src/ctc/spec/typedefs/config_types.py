@@ -18,9 +18,6 @@ from . import rpc_types
 import typing
 
 
-config_path_env_var = 'CTC_CONFIG_PATH'
-
-
 class PartialConfigSpec(typing.TypedDict, total=False):
     data_root: str
     default_network: network_types.NetworkName
