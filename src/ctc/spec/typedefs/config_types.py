@@ -2,7 +2,7 @@
 
 ## Config Keys
 - data_root: root directory for storing ctc data
-- defeault_network: default network to use when none specified
+- default_network: default network to use when none specified
 - providers: default provider for each network
 - custom_networks: custom user-defined networks
 
@@ -21,10 +21,10 @@ import typing
 class PartialConfigSpec(typing.TypedDict, total=False):
     data_root: str
     default_network: network_types.NetworkName
-    providers: dict[network_types.NetworkName, rpc_types.ProviderSpec]
     custom_networks: dict[
-        network_types.NetworkName, network_types.NetworkMetadata
+        network_types.NetworkReference, network_types.NetworkSettings
     ]
+    providers: dict[str, rpc_types.ProviderSpec]
 
 
 class ConfigSpec(typing.TypedDict):

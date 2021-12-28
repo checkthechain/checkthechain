@@ -27,7 +27,10 @@ RpcDigestor = typing.Callable[..., RpcResponse]
 # # provider
 #
 
+ProviderName = str
+
 class PartialProvider(typing.TypedDict, total=False):
+    name: ProviderName
     type: str
     url: str
     session_kwargs: dict
@@ -35,6 +38,7 @@ class PartialProvider(typing.TypedDict, total=False):
 
 
 class Provider(typing.TypedDict, total=True):
+    # name: ProviderName
     type: str
     url: str
     session_kwargs: dict
