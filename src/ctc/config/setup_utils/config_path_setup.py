@@ -6,7 +6,7 @@ from .. import config_read
 from .. import config_spec
 
 
-def setup_config_path() -> tuple[str, bool]:
+def setup_config_path(styles: dict[str, str]) -> tuple[str, bool]:
     # TODO: for each "where" question offer a default path
     # e.g. ~/.config/ctc/config.json
 
@@ -19,11 +19,12 @@ def setup_config_path() -> tuple[str, bool]:
         'prompt': 'Where should config be created? Specify a file path or directory path',
         'default_directory': default_config_path,
         'default_filename': 'config.json',
+        'style': styles['question'],
     }
 
     print()
     print()
-    print('## Config Path')
+    toolcli.print('## Config Path', style=styles['header'])
 
     if os.path.isfile(old_config_path):
         # case: config file already exists
@@ -34,7 +35,10 @@ def setup_config_path() -> tuple[str, bool]:
             print(env_var, '=', env_var_value)
         elif old_config_path == default_config_path:
             print()
-            print('Using default config path', default_config_path)
+            toolcli.print(
+                'Using default config path',
+                toolcli.add_style(default_config_path, style=styles['path']),
+            )
         else:
             raise Exception('unknown config path source')
         print()
@@ -43,7 +47,9 @@ def setup_config_path() -> tuple[str, bool]:
         # ask whether to change config path
         print()
         answer = toolcli.input_yes_or_no(
-            'Keep config at this location?', default='yes'
+            'Keep config at this location?',
+            default='yes',
+            style=styles['question'],
         )
         if answer:
             new_config_path = old_config_path
@@ -65,7 +71,9 @@ def setup_config_path() -> tuple[str, bool]:
             print()
             print('Config path is set but config file does not exist')
             print()
-            answer = toolcli.input_yes_or_no('Create config at this path? ')
+            answer = toolcli.input_yes_or_no(
+                'Create config at this path? ', style=styles['question']
+            )
 
         else:
             # case: set by default
@@ -76,6 +84,7 @@ def setup_config_path() -> tuple[str, bool]:
                 + default_config_path
                 + ')',
                 default='yes',
+                style=styles['question'],
             )
 
         # ask whether to change config path

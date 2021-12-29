@@ -7,15 +7,16 @@ from .. import config_read
 from .. import config_values
 
 
-def setup_data_root() -> tuple[str, bool]:
+def setup_data_root(styles: dict[str, str]) -> tuple[str, bool]:
 
     print()
     print()
-    print('## Data Root Directory')
+    toolcli.print('## Data Root Directory', style=styles['header'])
 
     input_kwargs: toolcli.InputFilenameOrDirectoryKwargs = {
         'prompt': 'Where should ctc store data? (specify a directory path)\n> ',
         'create_directory': 'prompt_and_require',
+        'style': styles['question'],
     }
 
     # data_root
@@ -27,7 +28,10 @@ def setup_data_root() -> tuple[str, bool]:
     else:
         old_data_root = config_values.get_data_root_directory()
         print()
-        print('Data directory currently set to:', old_data_root)
+        toolcli.print(
+            'Data directory currently set to:',
+            toolcli.add_style(old_data_root, styles['path']),
+        )
 
         if not isinstance(old_data_root, str):
             print()
@@ -54,7 +58,11 @@ def setup_data_root() -> tuple[str, bool]:
 
         else:
             print()
-            if toolcli.input_yes_or_no('Keep storing data in this directory?'):
+            if toolcli.input_yes_or_no(
+                'Keep storing data in this directory? ',
+                style=styles['question'],
+                default='yes',
+            ):
                 new_data_root = old_data_root
                 create_new_config = False
             else:
@@ -70,7 +78,7 @@ def setup_data_root() -> tuple[str, bool]:
     else:
         initialized = config_data.initialize_data_root(new_data_root)
         if not initialized:
-            return setup_data_root()
+            return setup_data_root(styles=styles)
 
     return new_data_root, create_new_config
 

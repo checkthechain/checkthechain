@@ -9,6 +9,7 @@ def write_config_file(
     config_data: spec.ConfigSpec,
     path: str,
     overwrite: bool = False,
+    style: typing.Optional[str] = None
 ) -> None:
 
     toolconfig.write_config_file(
@@ -18,5 +19,6 @@ def write_config_file(
         ),
         path=path,
         overwrite=overwrite,
+        style=style,
     )
 

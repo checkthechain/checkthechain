@@ -14,10 +14,10 @@ class _NetworkData(typing.TypedDict):
     providers: dict[spec.ProviderName, spec.ProviderSpec]
 
 
-def setup_networks() -> tuple[_NetworkData, bool]:
+def setup_networks(styles: dict[str, str]) -> tuple[_NetworkData, bool]:
     print()
     print()
-    print('## Network Setup')
+    toolcli.print('## Network Setup', style=styles['header'])
 
     print()
     print('The following networks are already installed:')
@@ -28,11 +28,15 @@ def setup_networks() -> tuple[_NetworkData, bool]:
     # add new networks
     networks: dict[spec.NetworkName, spec.NetworkMetadata] = {}
     while toolcli.input_yes_or_no(
-        '\nWould you like to add additional networks?\n'
+        '\nWould you like to add additional networks?',
+        style=styles['question'],
+        default='no',
     ):
-        name = toolcli.input_prompt('Network name? ')
-        network_id = toolcli.input_int('Network id? ')
-        block_explorer = toolcli.input_prompt('Network explorer? ')
+        name = toolcli.input_prompt('Network name? ', style=styles['question'])
+        network_id = toolcli.input_int('Network id? ', style=styles['question'])
+        block_explorer = toolcli.input_prompt(
+            'Network explorer? ', style=styles['question']
+        )
         if name in networks:
             print('Overwriting network with name', name)
         networks[name] = {
@@ -49,6 +53,7 @@ def setup_networks() -> tuple[_NetworkData, bool]:
         prompt='Which network to use as default?',
         choices=choices,
         default='mainnet',
+        style=styles['question'],
     )
     default_network = choices[default_network_index]
 
