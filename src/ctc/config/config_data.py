@@ -32,7 +32,9 @@ def is_data_root_initialized(data_root_path: str) -> bool:
         for file in files:
             default_data_file_path = os.path.join(root, file)
             file_path = os.path.join(check_root, file)
-            if not filecmp.cmp(file_path, default_data_file_path):
+            if not os.path.isfile(file_path) or not filecmp.cmp(
+                file_path, default_data_file_path
+            ):
                 return False
 
     return True
