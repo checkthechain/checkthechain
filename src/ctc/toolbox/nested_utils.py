@@ -41,3 +41,11 @@ def list_of_dicts_to_dict_of_lists(
 
     return dict_of_lists
 
+
+def is_equal(nested_lhs: typing.Mapping, nested_rhs: typing.Mapping) -> bool:
+    import json
+
+    return json.dumps(nested_lhs, sort_keys=True) == json.dumps(
+        nested_rhs, sort_keys=True
+    )
+
