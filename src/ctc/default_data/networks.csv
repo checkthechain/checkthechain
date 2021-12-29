@@ -1,0 +1,10 @@
+name,network_id,block_explorer
+mainnet,1,etherscan.io
+ropsten,3,ropsten.etherscan.io
+rinkeby,4,rinkeby.etherscan.io
+goerli,5,goerli.etherscan.io
+kovan,42,kovan.etherscan.io
+polygon,137,polygonscan.com
+fantom,250,ftmscan.com
+arbitrum,42161,arbiscan.io
+optimism,10,optimistic.etherscan.io
