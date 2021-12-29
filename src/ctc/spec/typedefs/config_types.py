@@ -1,10 +1,11 @@
 """
 
 ## Config Keys
-- data_root: root directory for storing ctc data
+- version: version of config schema
+- data_root_directory: root directory for storing ctc data
 - default_network: default network to use when none specified
 - providers: default provider for each network
-- custom_networks: custom user-defined networks
+- networks: custom user-defined networks
 
 
 ## TODO
@@ -19,19 +20,17 @@ import typing
 
 
 class PartialConfigSpec(typing.TypedDict, total=False):
-    data_root: str
+    version: str
+    data_root_directory: str
     default_network: network_types.NetworkName
-    custom_networks: dict[
-        network_types.NetworkReference, network_types.NetworkSettings
-    ]
-    providers: dict[str, rpc_types.ProviderSpec]
+    providers: dict[rpc_types.ProviderName, rpc_types.ProviderSpec]
+    networks: dict[network_types.NetworkName, network_types.NetworkSettings]
 
 
 class ConfigSpec(typing.TypedDict):
-    data_root: str
+    version: str
+    data_root_directory: str
     default_network: network_types.NetworkName
-    providers: dict[network_types.NetworkName, rpc_types.ProviderSpec]
-    custom_networks: dict[
-        network_types.NetworkName, network_types.NetworkMetadata
-    ]
+    providers: dict[rpc_types.ProviderName, rpc_types.ProviderSpec]
+    networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
 

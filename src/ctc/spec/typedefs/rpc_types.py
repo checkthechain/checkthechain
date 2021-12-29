@@ -29,6 +29,7 @@ RpcDigestor = typing.Callable[..., RpcResponse]
 
 ProviderName = str
 
+
 class PartialProvider(typing.TypedDict, total=False):
     name: ProviderName
     type: str
