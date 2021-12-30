@@ -1,5 +1,7 @@
 import typing
 
+from . import network_types
+
 
 RpcSingularRequest = dict[str, typing.Any]
 RpcPluralRequest = list[RpcSingularRequest]
@@ -31,7 +33,8 @@ ProviderName = str
 
 
 class PartialProvider(typing.TypedDict, total=False):
-    name: ProviderName
+    name: typing.Optional[ProviderName]
+    network: typing.Optional[network_types.NetworkName]
     type: str
     url: str
     session_kwargs: dict
@@ -39,7 +42,8 @@ class PartialProvider(typing.TypedDict, total=False):
 
 
 class Provider(typing.TypedDict, total=True):
-    # name: ProviderName
+    name: typing.Optional[ProviderName]
+    network: typing.Optional[network_types.NetworkName]
     type: str
     url: str
     session_kwargs: dict

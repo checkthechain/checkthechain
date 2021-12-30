@@ -1,6 +1,7 @@
 import copy
 import os
 
+import ctc.config
 from ctc import config_utils
 from ctc import spec
 
@@ -27,6 +28,8 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
         other_provider = get_provider(url)
 
         return {
+            'name': provider.get('name'),
+            'network': provider.get('network'),
             'type': other_provider['type'],
             'url': url,
             'session_kwargs': provider.get('session_kwargs', {}),
@@ -34,8 +37,15 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
         }
 
     elif isinstance(provider, str):
-        if provider.startswith('http'):
+        # check if provider matches provider name in config
+        if ctc.config.has_provider(name=provider):
+            return ctc.config.get_provider(name=provider)
+
+        # otherwise use as url
+        elif provider.startswith('http'):
             return {
+                'name': None,
+                'network': None,
                 'type': 'http',
                 'url': provider,
                 'session_kwargs': {},
