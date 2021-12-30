@@ -1,7 +1,11 @@
 import typing
 
 
-class NotFoundException(Exception):
+class NoMatchFound(LookupError):
+    pass
+
+
+class MultipleMatchesFoundException(LookupError):
     pass
 
 
@@ -46,10 +50,10 @@ def get_matching_entry(
     if len(matches) == 1:
         return matches[0]
     elif len(matches) > 1:
-        raise LookupError('more than one match found in sequence')
+        raise MultipleMatchesFound('more than one match found in sequence')
     else:
         if raise_if_not_found:
-            raise LookupError('no matches found in sequence')
+            raise NoMatchFound('no matches found in sequence')
         else:
             return None
 
@@ -74,7 +78,7 @@ def binary_search(
         return start_index
     if not is_match(end_index):
         if raise_if_not_found:
-            raise NotFoundException('could not find match')
+            raise NoMatchFound('could not find match')
         else:
             return None
 
