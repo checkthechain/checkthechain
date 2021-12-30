@@ -6,6 +6,7 @@ from . import final_setup
 from . import network_setup
 from . import validation_setup
 
+
 styles = {
     'header': '#ce93f9 bold',
     'path': '#b9f29f bold',
@@ -39,6 +40,9 @@ def setup_ctc() -> None:
         styles=styles
     )
 
+    # TODO: prompt whether to keep any other old config settings
+    pass
+
     # create new config file if need be
     create_new_config = any(
         [
@@ -47,13 +51,15 @@ def setup_ctc() -> None:
             create_because_networks,
         ]
     )
+
     config: spec.ConfigSpec = {
         'version': '0.1.0',
         'data_root_directory': data_root,
-        'default_network': network_data['default_network'],
         'networks': network_data['networks'],
         'providers': network_data['providers'],
+        'network_defaults': network_data['network_defaults'],
     }
+
     final_setup.finalize_setup(
         create_new_config=create_new_config,
         config_path=config_path,

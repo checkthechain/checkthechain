@@ -16,10 +16,15 @@ def ensure_valid(styles: dict[str, str]) -> None:
         print()
         print('Config should conform to the following spec:')
         print()
-        print('{')
+        toolcli.print('{', style=styles['quote'])
         for key, value in spec.ConfigSpec.__annotations__.items():
-            print('    ' + key + ':', value)
-        print('}')
+            toolcli.print(
+                '    ' + key + ':',
+                value,
+                highlight=False,
+                style=styles['quote'],
+            )
+        toolcli.print('}', style=styles['quote'])
         print()
         config_path = config_read.get_config_path(raise_if_dne=False)
         toolcli.print(

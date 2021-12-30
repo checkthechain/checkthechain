@@ -27,7 +27,7 @@ class ConfigNetworkDefaults(typing.TypedDict):
 class PartialConfigSpec(typing.TypedDict, total=False):
     version: str
     data_root_directory: str
-    providers: dict[rpc_types.ProviderName, rpc_types.ProviderSpec]
+    providers: dict[rpc_types.ProviderName, rpc_types.Provider]
     networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
     network_defaults: ConfigNetworkDefaults
 
@@ -35,7 +35,7 @@ class PartialConfigSpec(typing.TypedDict, total=False):
 class ConfigSpec(typing.TypedDict):
     version: str
     data_root_directory: str
-    providers: dict[rpc_types.ProviderName, rpc_types.ProviderSpec]
+    providers: dict[rpc_types.ProviderName, rpc_types.Provider]
     networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
     network_defaults: ConfigNetworkDefaults
 

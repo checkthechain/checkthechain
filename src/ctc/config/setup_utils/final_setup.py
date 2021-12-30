@@ -23,7 +23,7 @@ def finalize_setup(create_new_config, config, config_path, styles):
 
         print()
         toolcli.print(
-            'Config file created at:',
+            'Config file created at',
             toolcli.add_style(config_path, styles['path']),
         )
 

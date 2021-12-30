@@ -19,14 +19,22 @@ def setup_data_root(styles: dict[str, str]) -> tuple[str, bool]:
         'style': styles['question'],
     }
 
+    if config_read.config_path_exists():
+        try:
+            config = config_read.get_config(validate=False)
+            old_data_root = config['data_root_directory']
+        except Exception:
+            old_data_root = None
+    else:
+        old_data_root = None
+
     # data_root
-    if not config_read.config_path_exists or not config_read.config_is_valid():
+    if old_data_root is None:
         print()
         new_data_root = toolcli.input_filename_or_directory(**input_kwargs)
         create_new_config = True
 
     else:
-        old_data_root = config_values.get_data_root_directory()
         print()
         toolcli.print(
             'Data directory currently set to:',
