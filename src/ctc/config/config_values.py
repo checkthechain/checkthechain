@@ -10,10 +10,10 @@ def get_config_version() -> str:
     return config_read.get_config()['version']
 
 
-def get_data_root_directory() -> str:
-    data_root_directory = config_read.get_config()['data_root_directory']
-    data_root_directory = os.path.expanduser(data_root_directory)
-    return data_root_directory
+def get_data_dir() -> str:
+    data_dir = config_read.get_config()['data_dir']
+    data_dir = os.path.expanduser(data_dir)
+    return data_dir
 
 
 def get_networks() -> dict[spec.NetworkName, spec.NetworkMetadata]:

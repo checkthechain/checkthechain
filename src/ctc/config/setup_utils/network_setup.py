@@ -57,7 +57,7 @@ def setup_networks(styles: dict[str, str]) -> tuple[_NetworkData, bool]:
         if go_back:
             break
 
-        network_id = toolcli.input_int('Network id? ', style=styles['question'])
+        network_id = toolcli.input_int('Network chain_id? ', style=styles['question'])
         block_explorer = toolcli.input_prompt(
             'Network block explorer? ', style=styles['question']
         )
@@ -68,7 +68,7 @@ def setup_networks(styles: dict[str, str]) -> tuple[_NetworkData, bool]:
 
         networks[name] = {
             'name': name,
-            'network_id': network_id,
+            'chain_id': network_id,
             'block_explorer': block_explorer,
         }
 
@@ -149,6 +149,7 @@ def specify_providers(
 
     # check whether to keep old providers
     if len(old_providers) > 0:
+        print()
         print('Currently installed providers:')
         for provider_name, provider in old_providers.items():
             network_value = provider.get('network')
@@ -156,10 +157,10 @@ def specify_providers(
                 network_name = network_value
             else:
                 network_name = 'UNKNOWN'
-            print(provider_name, '(network=' + network_name + ')')
+            print('-', provider_name, '(network=' + network_name + ')')
         print()
         if toolcli.input_yes_or_no(
-            'Would you like to keep these providers?',
+            'Keep these providers? ',
             default='yes',
             style=styles['question'],
         ):
@@ -170,7 +171,6 @@ def specify_providers(
         providers = {}
 
     # check whether default network has a provider
-    print()
     default_network_has_providers = False
     for provider_metadata in providers.values():
         if provider_metadata['network'] == default_network:
@@ -182,6 +182,7 @@ def specify_providers(
             + default_network
             + '? '
         )
+        print()
         if toolcli.input_yes_or_no(
             prompt=prompt, default='no', style=styles['question']
         ):
