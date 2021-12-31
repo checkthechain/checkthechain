@@ -1,4 +1,4 @@
-name,network_id,block_explorer
+name,chain_id,block_explorer
 mainnet,1,etherscan.io
 ropsten,3,ropsten.etherscan.io
 rinkeby,4,rinkeby.etherscan.io
