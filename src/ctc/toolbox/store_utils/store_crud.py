@@ -4,46 +4,87 @@ import typing
 import toolcache
 
 
+formats = ['json', 'ast', 'csv', 'yaml', 'toml']
+DataFormat = typing.Literal['json', 'ast', 'csv', 'yaml', 'toml']
+
+
+def get_path_data_format(path: str) -> DataFormat:
+
+    extension = os.path.splitext(path)[-1]
+    extension = extension[1:]
+
+    if extension in typing.get_args(DataFormat):
+        return typing.cast(DataFormat, extension)
+    else:
+        raise Exception('unknown file type: ' + str(extension))
+
+
 @toolcache.cache(cachetype='memory')
-def load_file_data(path: str) -> typing.Any:
-    if path.endswith('.json'):
+def load_file_data(
+    path: str, format: typing.Optional[DataFormat]
+) -> typing.Any:
+
+    if format is None:
+        format = get_path_data_format(path=path)
+    with open(path, 'r') as f:
+        return load_buffer_data(buffer=f, format=format)
+
+
+def load_buffer_data(buffer: typing.TextIO, format: DataFormat) -> typing.Any:
+    if format == 'json':
         import json
 
-        with open(path, 'r') as f:
-            return json.load(f)
-    elif path.endswith('.ast'):
+        return json.load(buffer)
+    elif format == 'ast':
         import ast
 
-        with open(path, 'r') as f:
-            return ast.literal_eval(f.read())
-    elif path.endswith('.csv'):
+        return ast.literal_eval(buffer.read())
+    elif format == 'csv':
         import pandas as pd
 
-        df = pd.read_csv(path)
+        df = pd.read_csv(buffer)
         return df.to_dict(orient='records')
-    elif path.endswith('.yaml'):
+    elif format == 'yaml':
         import yaml
 
-        with open(path, 'r') as f:
-            return yaml.safe_load(f)
-    elif path.endswith('.toml'):
+        return yaml.safe_load(buffer)
+    elif format == 'toml':
         import toml
 
-        with open(path, 'r') as f:
-            return toml.load(f)
+        return toml.load(buffer)
     else:
-        raise Exception('unknown file type: ' + str(path))
+        raise Exception('unknown format: ' + str(format))
 
 
 def write_file_data(
     path: str,
     data: typing.Union[list[dict], dict[typing.Any, dict]],
+    format: typing.Optional[DataFormat] = None,
     overwrite: bool = False,
     index_field: typing.Optional[str] = None,
 ) -> None:
 
+    if format is None:
+        format = get_path_data_format(path=path)
+
     if os.path.isfile(path) and not overwrite:
         raise Exception('file already exists, use overwrite=True')
+
+    with open(path, 'w') as f:
+        write_buffer_data(
+            buffer=f,
+            data=data,
+            index_field=index_field,
+            format=format,
+        )
+
+
+def write_buffer_data(
+    buffer: typing.TextIO,
+    data: typing.Union[list[dict], dict[typing.Any, dict]],
+    format: DataFormat,
+    index_field: typing.Optional[str] = None,
+) -> None:
 
     if index_field is not None:
         if not isinstance(data, dict):
@@ -52,28 +93,24 @@ def write_file_data(
             dict(datum, **{index_field: index}) for index, datum in data.items()
         ]
 
-    if path.endswith('.json'):
+    if format == 'json':
         import json
 
-        with open(path, 'w') as f:
-            json.dump(data, f)
-    elif path.endswith('.ast'):
-        with open(path, 'w') as f:
-            f.write(str(data))
-    elif path.endswith('.toml'):
+        json.dump(data, buffer)
+    elif format == 'ast':
+        buffer.write(str(data))
+    elif format == 'toml':
         import toml
 
         if isinstance(data, list):
             raise Exception('can only write mappings to toml, not sequences')
 
-        with open(path, 'w') as f:
-            toml.dump(data, f)
-    elif path.endswith('.yaml'):
+        toml.dump(data, buffer)
+    elif format == 'yaml':
         import yaml
 
-        with open(path, 'w') as f:
-            yaml.dump(data, f)
-    elif path.endswith('.csv'):
+        yaml.dump(data, buffer)
+    elif format == 'csv':
         import csv
 
         # gather fields
@@ -87,10 +124,9 @@ def write_file_data(
         field_set = {key for datum in dataiter for key in datum.keys()}
         fields = sorted(field_set)
 
-        with open(path, 'w') as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            writer.writerows(data)
+        writer = csv.DictWriter(buffer, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(data)
     else:
-        raise Exception('unknown file type: ' + str(path))
+        raise Exception('unknown format: ' + str(format))
 
