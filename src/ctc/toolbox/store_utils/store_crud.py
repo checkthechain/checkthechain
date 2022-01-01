@@ -58,7 +58,10 @@ def load_buffer_data(buffer: typing.TextIO, format: DataFormat) -> typing.Any:
 
 def write_file_data(
     path: str,
-    data: typing.Union[list[dict], dict[typing.Any, dict]],
+    data: typing.Union[
+        typing.Sequence[typing.Mapping],
+        typing.Mapping[typing.Any, typing.Mapping],
+    ],
     format: typing.Optional[DataFormat] = None,
     overwrite: bool = False,
     index_field: typing.Optional[str] = None,
