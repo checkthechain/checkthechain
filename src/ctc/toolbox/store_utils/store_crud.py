@@ -21,7 +21,7 @@ def get_path_data_format(path: str) -> DataFormat:
 
 @toolcache.cache(cachetype='memory')
 def load_file_data(
-    path: str, format: typing.Optional[DataFormat]
+    path: str, format: typing.Optional[DataFormat] = None
 ) -> typing.Any:
 
     if format is None:
