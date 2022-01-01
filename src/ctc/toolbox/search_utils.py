@@ -5,7 +5,7 @@ class NoMatchFound(LookupError):
     pass
 
 
-class MultipleMatchesFoundException(LookupError):
+class MultipleMatchesFound(LookupError):
     pass
 
 
@@ -44,9 +44,7 @@ def get_matching_entry(
 def get_matching_entry(
     sequence: typing.Sequence[M], raise_if_not_found: bool = True, **query
 ) -> typing.Optional[M]:
-    matches = get_matching_entries(
-        sequence=sequence,
-    )
+    matches = get_matching_entries(sequence=sequence, **query)
     if len(matches) == 1:
         return matches[0]
     elif len(matches) > 1:
