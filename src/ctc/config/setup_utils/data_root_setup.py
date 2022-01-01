@@ -4,7 +4,6 @@ import toolcli
 
 from .. import config_data
 from .. import config_read
-from .. import config_values
 
 
 def setup_data_root(styles: dict[str, str]) -> tuple[str, bool]:
@@ -22,7 +21,7 @@ def setup_data_root(styles: dict[str, str]) -> tuple[str, bool]:
     if config_read.config_path_exists():
         try:
             config = config_read.get_config(validate=False)
-            old_data_root = config['data_root_directory']
+            old_data_root = config['data_dir']
         except Exception:
             old_data_root = None
     else:

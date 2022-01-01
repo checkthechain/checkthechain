@@ -2,7 +2,7 @@
 
 ## Config Keys
 - version: version of config schema
-- data_root_directory: root directory for storing ctc data
+- data_dir: root directory for storing ctc data
 - default_network: default network to use when none specified
 - providers: default provider for each network
 - networks: custom user-defined networks
@@ -26,7 +26,7 @@ class ConfigNetworkDefaults(typing.TypedDict):
 
 class PartialConfigSpec(typing.TypedDict, total=False):
     version: str
-    data_root_directory: str
+    data_dir: str
     providers: dict[rpc_types.ProviderName, rpc_types.Provider]
     networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
     network_defaults: ConfigNetworkDefaults
@@ -34,7 +34,7 @@ class PartialConfigSpec(typing.TypedDict, total=False):
 
 class ConfigSpec(typing.TypedDict):
     version: str
-    data_root_directory: str
+    data_dir: str
     providers: dict[rpc_types.ProviderName, rpc_types.Provider]
     networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
     network_defaults: ConfigNetworkDefaults
