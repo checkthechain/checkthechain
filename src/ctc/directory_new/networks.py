@@ -34,13 +34,13 @@ def get_network_metadata(
     if isinstance(network, int):
         return search_utils.get_matching_entry(
             sequence=network_list,
-            chain_id=network,
+            query={'chain_id': network},
         )
 
     elif isinstance(network, str):
         return search_utils.get_matching_entry(
             sequence=network_list,
-            name=network,
+            query={'name': network},
         )
 
     else:

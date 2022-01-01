@@ -32,5 +32,5 @@ class OracleFeedMetadata(AddressMetadata, total=True):
 
 class TokenMetadata(AddressMetadata):
     symbol: str
-    decimals: str
+    decimals: int
 

@@ -52,11 +52,13 @@ def get_oracle_feed_metadata(
     oracle_feeds = load_oracle_feeds(network=network, protocol=protocol)
     if name is not None:
         return search_utils.get_matching_entry(
-            list(oracle_feeds.values()), name=name
+            list(oracle_feeds.values()),
+            query={'name': name},
         )
     elif address is not None:
         return search_utils.get_matching_entry(
-            list(oracle_feeds.values()), address=address.lower()
+            list(oracle_feeds.values()),
+            query={'address': address.lower()},
         )
     else:
         raise Exception('must specify name or address')

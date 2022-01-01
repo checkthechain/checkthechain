@@ -9,10 +9,14 @@ class MultipleMatchesFound(LookupError):
     pass
 
 
-M = typing.TypeVar('M', bound=typing.Mapping)
+M = typing.TypeVar('M')
+# M = typing.TypeVar('M', bound=typing.Mapping)
 
 
-def get_matching_entries(sequence: typing.Sequence[M], **query) -> list[M]:
+def get_matching_entries(
+    sequence: typing.Sequence[M],
+    query: typing.Mapping[typing.Any, typing.Any],
+) -> list[M]:
     matches: list[M] = []
     for item in sequence:
         for key, value in query.items():
@@ -26,8 +30,8 @@ def get_matching_entries(sequence: typing.Sequence[M], **query) -> list[M]:
 @typing.overload
 def get_matching_entry(
     sequence: typing.Sequence[M],
+    query: typing.Mapping[typing.Any, typing.Any],
     raise_if_not_found: typing.Literal[False],
-    **query: typing.Any
 ) -> typing.Optional[M]:
     ...
 
@@ -35,14 +39,16 @@ def get_matching_entry(
 @typing.overload
 def get_matching_entry(
     sequence: typing.Sequence[M],
-    raise_if_not_found: typing.Literal[True] = True,
-    **query: typing.Any
+    query: typing.Mapping[typing.Any, typing.Any],
+    raise_if_not_found: bool = True,
 ) -> M:
     ...
 
 
 def get_matching_entry(
-    sequence: typing.Sequence[M], raise_if_not_found: bool = True, **query
+    sequence: typing.Sequence[M],
+    query: typing.Mapping[typing.Any, typing.Any],
+    raise_if_not_found: bool = True,
 ) -> typing.Optional[M]:
     matches = get_matching_entries(sequence=sequence, **query)
     if len(matches) == 1:

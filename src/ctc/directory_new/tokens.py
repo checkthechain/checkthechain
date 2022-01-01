@@ -40,7 +40,7 @@ def get_token_metadata(
         if label is None:
             label = default_token_label
         if isinstance(label, str):
-            label_list = [label]
+            label_list: _LabelGroup = [label]
         else:
             label_list = label
 
@@ -57,7 +57,7 @@ def get_token_metadata(
             try:
                 token_data = search_utils.get_matching_entry(
                     tokens_data,
-                    **query
+                    query=query,
                 )
                 return token_data
             except search_utils.NoMatchFound:
