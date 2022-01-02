@@ -7,7 +7,7 @@ import toolcli
 import ctc
 
 
-def get_default_data_root() -> str:
+def get_default_data_dir() -> str:
     return os.path.abspath(os.path.join(ctc.__path__[0], 'default_data'))
 
 
@@ -15,14 +15,14 @@ def is_data_root_initialized(data_root_path: str) -> bool:
     """a data root is considered initialized if it contains all default data"""
 
     data_root_path = os.path.abspath(data_root_path)
-    default_data_root = get_default_data_root()
+    default_data_dir = get_default_data_dir()
 
-    for root, subdirs, files in os.walk(default_data_root):
+    for root, subdirs, files in os.walk(default_data_dir):
 
-        if root == default_data_root:
+        if root == default_data_dir:
             check_root = data_root_path
         else:
-            root_relpath = os.path.relpath(root, default_data_root)
+            root_relpath = os.path.relpath(root, default_data_dir)
             check_root = os.path.join(data_root_path, root_relpath)
 
         for subdir in subdirs:
@@ -44,7 +44,7 @@ def initialize_data_root(
     path: str, confirm: bool = False, raise_if_unconfirmed: bool = True
 ) -> bool:
 
-    default_data_root = get_default_data_root()
+    default_data_dir = get_default_data_dir()
 
     # validate directory name
     if os.path.splitext(path)[-1] != '':
@@ -66,15 +66,15 @@ def initialize_data_root(
 
     else:
         overwritten = []
-        for root, subdirs, files in os.walk(default_data_root):
+        for root, subdirs, files in os.walk(default_data_dir):
 
-            if root == default_data_root:
+            if root == default_data_dir:
                 check_root = path
             else:
-                root_relpath = os.path.relpath(root, default_data_root)
+                root_relpath = os.path.relpath(root, default_data_dir)
                 check_root = os.path.join(path, root_relpath)
 
-            # root_relpath = os.path.relpath(root, default_data_root)
+            # root_relpath = os.path.relpath(root, default_data_dir)
             # check_root = os.path.join(path, root_relpath)
             for file in files:
                 filepath = os.path.join(check_root, file)
@@ -97,6 +97,6 @@ def initialize_data_root(
                     return False
 
     # create directory
-    shutil.copytree(default_data_root, path, dirs_exist_ok=True)
+    shutil.copytree(default_data_dir, path, dirs_exist_ok=True)
     return True
 

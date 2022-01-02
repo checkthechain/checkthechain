@@ -67,7 +67,7 @@ def load_networks_from_disk(
 
 def get_networks_file_path(use_default: bool = False) -> str:
     if use_default:
-        data_root = config.get_default_data_root()
+        data_root = config.get_default_data_dir()
     else:
         data_root = config.get_data_dir()
     return os.path.join(data_root, 'networks.csv')

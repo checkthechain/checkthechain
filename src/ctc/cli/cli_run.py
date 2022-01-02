@@ -7,6 +7,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         (): 'ctc.cli.root_command',
         ('add_proxy_abi',): 'ctc.cli.commands.add_proxy_abi_command',
         ('block',): 'ctc.cli.commands.block_command',
+        ('cd',): 'ctc.cli.commands.cd_command',
         ('config',): 'ctc.cli.commands.config_command',
         ('config', 'edit'): 'ctc.cli.commands.config.edit_command',
         ('config', 'create'): 'ctc.cli.commands.config.create_command',
@@ -21,6 +22,9 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
         ('chainlink',): 'ctc.protocols.chainlink_utils.chainlink_command',
     }
+
+    config = {'include_cd': True, 'include_debug': True}
+    toolcli_kwargs = {'config': config}
 
     toolcli.run_cli(
         raw_command=raw_command,
