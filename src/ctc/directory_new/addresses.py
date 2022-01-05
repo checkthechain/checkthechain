@@ -113,8 +113,19 @@ def load_filesystem_label_addresses(
 def get_filesystem_address_path(
     label: str,
     network: spec.NetworkReference,
+    root: typing.Optional[spec.FilesystemRoot] = None,
 ) -> str:
+
+    if root is None:
+        root = 'root'
+
+    if root == 'root':
+        data_dir = ctc.config.get_data_dir()
+    elif root == 'default':
+        data_dir = ctc.config.get_default_data_dir()
+    else:
+        raise Exception()
+
     network_name = networks.get_network_name(network=network)
-    data_dir = ctc.config.get_data_dir()
     return os.path.join(data_dir, network_name, 'addresses', label + '.csv')
 
