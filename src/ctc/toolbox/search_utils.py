@@ -50,7 +50,7 @@ def get_matching_entry(
     query: typing.Mapping[typing.Any, typing.Any],
     raise_if_not_found: bool = True,
 ) -> typing.Optional[M]:
-    matches = get_matching_entries(sequence=sequence, **query)
+    matches = get_matching_entries(sequence=sequence, query=query)
     if len(matches) == 1:
         return matches[0]
     elif len(matches) > 1:

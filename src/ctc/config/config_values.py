@@ -54,7 +54,7 @@ def get_provider(
     if network is None:
         query['network_id'] = network
 
-    return search_utils.get_matching_entry(sequence=providers, **query)
+    return search_utils.get_matching_entry(sequence=providers, query=query)
 
 
 def get_default_network() -> spec.NetworkName:
