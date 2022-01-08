@@ -14,7 +14,7 @@ from . import erc20_generic
 
 
 async def async_get_erc20_total_supply(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
@@ -39,7 +39,7 @@ async def async_get_erc20_total_supply(
 
 
 async def async_get_erc20s_total_supplies(
-    tokens: typing.Sequence[spec.TokenReference],
+    tokens: typing.Sequence[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
@@ -62,7 +62,7 @@ async def async_get_erc20s_total_supplies(
 
 
 async def async_get_erc20_total_supply_by_block(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
@@ -97,7 +97,7 @@ async def async_get_erc20_total_supply_by_block(
 
 async def async_get_erc20_balance_of(
     address: spec.Address,
-    token: spec.TokenAddress,
+    token: spec.ERC20Address,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
@@ -121,7 +121,7 @@ async def async_get_erc20_balance_of(
 
 async def async_get_erc20_balance_of_addresses(
     addresses: typing.Sequence[spec.Address],
-    token: spec.TokenAddress,
+    token: spec.ERC20Address,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
@@ -145,7 +145,7 @@ async def async_get_erc20_balance_of_addresses(
 
 async def async_get_erc20s_balance_of(
     address: spec.Address,
-    tokens: typing.Sequence[spec.TokenAddress],
+    tokens: typing.Sequence[spec.ERC20Address],
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
@@ -170,7 +170,7 @@ async def async_get_erc20s_balance_of(
 
 async def async_get_erc20_balance_of_by_block(
     address: spec.Address,
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize=True,
     provider: spec.ProviderSpec = None,
@@ -204,7 +204,7 @@ async def async_get_erc20_balance_of_by_block(
 
 
 async def async_get_erc20_allowance(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     address: spec.Address,
     block: spec.BlockNumberReference,
     normalize: bool = True,
@@ -228,7 +228,7 @@ async def async_get_erc20_allowance(
 
 
 async def async_get_erc20_allowance_by_block(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     address: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
@@ -257,7 +257,7 @@ async def async_get_erc20_allowance_by_block(
 
 
 async def async_get_erc20s_allowances(
-    tokens: typing.Sequence[spec.TokenReference],
+    tokens: typing.Sequence[spec.ERC20Reference],
     address: spec.Address,
     block: spec.BlockNumberReference,
     normalize: bool = True,
@@ -281,7 +281,7 @@ async def async_get_erc20s_allowances(
 
 
 async def async_get_erc20s_allowances_by_address(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     addresses: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference,
     normalize: bool = True,

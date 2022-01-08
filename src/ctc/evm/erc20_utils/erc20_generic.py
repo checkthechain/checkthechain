@@ -6,7 +6,7 @@ from ctc import spec
 from .. import address_utils
 
 
-def get_erc20_address(token: spec.TokenReference) -> spec.TokenAddress:
+def get_erc20_address(token: spec.ERC20Reference) -> spec.ERC20Address:
     """return address of input token, input as either symbol or address"""
     if address_utils.is_address_str(token):
         return token
@@ -23,7 +23,7 @@ def get_erc20_address(token: spec.TokenReference) -> spec.TokenAddress:
 
 async def async_erc20_eth_call(
     function_name: str,
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ) -> typing.Any:
@@ -39,7 +39,7 @@ async def async_erc20_eth_call(
 
 async def async_erc20s_eth_calls(
     function_name: str,
-    tokens: typing.Iterable[spec.TokenReference],
+    tokens: typing.Iterable[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ) -> list[typing.Any]:
@@ -55,7 +55,7 @@ async def async_erc20s_eth_calls(
 
 async def async_erc20_eth_call_by_block(
     function_name: str,
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     blocks: typing.Iterable[spec.BlockNumberReference],
     **rpc_kwargs
 ) -> list[typing.Any]:

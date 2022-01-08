@@ -7,7 +7,7 @@ from . import erc20_metadata
 
 async def async_normalize_erc20_quantity(
     quantity: typing.SupportsFloat,
-    token: typing.Optional[spec.TokenReference],
+    token: typing.Optional[spec.ERC20Address],
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: spec.BlockNumberReference = 'latest',
@@ -30,7 +30,7 @@ async def async_normalize_erc20_quantity(
 
 async def async_normalize_erc20_quantities(
     quantities: typing.Sequence[typing.SupportsInt],
-    token: spec.TokenReference,
+    token: spec.ERC20Address,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: spec.BlockNumberReference = 'latest',
@@ -52,7 +52,7 @@ async def async_normalize_erc20_quantities(
 
 async def async_normalize_erc20s_quantities(
     quantities: typing.Sequence[typing.SupportsInt],
-    tokens: typing.Optional[typing.Sequence[spec.TokenReference]] = None,
+    tokens: typing.Optional[typing.Sequence[spec.ERC20Address]] = None,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
     block: spec.BlockNumberReference = 'latest',
@@ -80,7 +80,7 @@ async def async_normalize_erc20s_quantities(
 
 async def async_normalize_erc20_quantities_by_block(
     quantities: typing.Sequence[typing.SupportsInt],
-    token: typing.Optional[spec.TokenReference] = None,
+    token: typing.Optional[spec.ERC20Address] = None,
     decimals: typing.Optional[list[typing.SupportsInt]] = None,
     provider: spec.ProviderSpec = None,
     blocks: typing.Optional[typing.Iterable[spec.BlockNumberReference]] = None,
@@ -108,8 +108,8 @@ async def async_normalize_erc20_quantities_by_block(
 
 # async def async_normalize_erc20_quantities(
 #     quantities: typing.Sequence[typing.SupportsInt],
-#     token: typing.Optional[spec.TokenReference] = None,
-#     tokens: typing.Optional[typing.Sequence[spec.TokenReference]] = None,
+#     token: typing.Optional[spec.ERC20Address] = None,
+#     tokens: typing.Optional[typing.Sequence[spec.ERC20Address]] = None,
 #     provider: spec.ProviderSpec = None,
 #     decimals: typing.Union[
 #         typing.SupportsInt,

@@ -9,7 +9,7 @@ from . import erc20_metadata
 
 
 def get_erc20_transfers(
-    token_address: spec.TokenAddress,
+    token_address: spec.ERC20Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = 'latest',
     **event_kwargs

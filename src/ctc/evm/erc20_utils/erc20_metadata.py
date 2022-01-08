@@ -12,7 +12,7 @@ from . import erc20_generic
 
 
 async def async_get_erc20_decimals(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ) -> int:
@@ -23,7 +23,7 @@ async def async_get_erc20_decimals(
 
 
 async def async_get_erc20s_decimals(
-    tokens: typing.Iterable[spec.TokenReference],
+    tokens: typing.Iterable[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ) -> list[int]:
@@ -34,7 +34,7 @@ async def async_get_erc20s_decimals(
 
 
 async def async_get_erc20_decimals_by_block(
-    token: spec.TokenReference, blocks=None, **rpc_kwargs
+    token: spec.ERC20Reference, blocks=None, **rpc_kwargs
 ) -> list[int]:
     """get decimals of an erc20 across multiple blocks"""
     return await erc20_generic.async_erc20_eth_call_by_block(
@@ -48,7 +48,7 @@ async def async_get_erc20_decimals_by_block(
 
 
 async def async_get_erc20_name(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ) -> str:
@@ -59,7 +59,7 @@ async def async_get_erc20_name(
 
 
 async def async_get_erc20s_names(
-    tokens: typing.Iterable[spec.TokenReference],
+    tokens: typing.Iterable[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ) -> list[str]:
@@ -70,7 +70,7 @@ async def async_get_erc20s_names(
 
 
 async def async_get_erc20_name_by_block(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     blocks: typing.Iterable[spec.BlockNumberReference],
     **rpc_kwargs
 ) -> list[str]:
@@ -86,7 +86,7 @@ async def async_get_erc20_name_by_block(
 
 
 async def async_get_erc20_symbol(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ):
@@ -97,7 +97,7 @@ async def async_get_erc20_symbol(
 
 
 async def async_get_erc20s_symbols(
-    tokens: typing.Iterable[spec.TokenReference],
+    tokens: typing.Iterable[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     **rpc_kwargs
 ):
@@ -108,7 +108,7 @@ async def async_get_erc20s_symbols(
 
 
 async def async_get_erc20_symbol_by_block(
-    token: spec.TokenReference,
+    token: spec.ERC20Reference,
     blocks: typing.Iterable[spec.BlockNumberReference],
     **rpc_kwargs
 ):

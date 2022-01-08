@@ -3,9 +3,9 @@ import typing
 
 Address = str
 ContractAddress = str
-TokenAddress = ContractAddress
-TokenSymbol = str
-TokenReference = typing.Union[TokenAddress, TokenSymbol]
+ERC20Address = ContractAddress
+ERC20Symbol = str
+ERC20Reference = typing.Union[ERC20Address, ERC20Symbol]
 
 
 class AddressRequiredMetadata(typing.TypedDict):
@@ -30,7 +30,7 @@ class OracleFeedMetadata(AddressMetadata, total=True):
     decimals: int
 
 
-class TokenMetadata(AddressMetadata):
+class ERC20Metadata(AddressMetadata):
     symbol: str
     decimals: int
 

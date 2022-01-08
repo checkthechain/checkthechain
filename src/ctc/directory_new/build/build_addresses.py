@@ -17,7 +17,7 @@ def import_addresses(
     backend: spec.StorageBackend = 'Filesystem',
     verbose: bool = True,
     root: typing.Optional[spec.FilesystemRoot] = None,
-):
+) -> None:
 
     if backend != 'Filesystem':
         raise NotImplementedError('storage backend: ' + str(backend))
@@ -29,9 +29,9 @@ def import_addresses(
     data = []
     for name, address in addresses.items():
         if isinstance(address, str):
-            datum = {'name': name, 'address': address.lower()}
+            datum: spec.AddressMetadata = {'name': name, 'address': address.lower()}
         elif isinstance(address, dict):
-            datum: spec.AddressMetadata = {
+            datum = {
                 'name': address['name'],
                 'address': address['address'],
             }
@@ -39,8 +39,10 @@ def import_addresses(
             for key, value in address.items():
                 if key in ['name', 'address']:
                     pass
-                elif key in ['first_block', 'contract_name']:
-                    datum[key] = value
+                elif key == 'first_block':
+                    datum['first_block'] = typing.cast(typing.Optional[int], value)
+                elif key == 'contract_name':
+                    datum['contract_name'] = typing.cast(typing.Optional[str], value)
                 elif key == 'label':
                     assert value == label
                 else:
