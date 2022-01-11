@@ -15,15 +15,44 @@ def get_oracle_address(
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
 ):
-    if oracle_type == 'feed':
-        oracle = get_oracle_feed_metadata(
-            name=name,
-            network=network,
-            protocol=protocol,
+    oracle = get_oracle_metadata(
+        name=name,
+        network=network,
+        protocol=protocol,
+        oracle_type=oracle_type,
+    )
+    return oracle['address']
+
+
+def get_oracle_name(
+    address: spec.Address,
+    network: spec.NetworkName = 'mainnet',
+    protocol: str = 'chainlink',
+    oracle_type: spec.Oracletype = 'feed',
+):
+    oracle = get_oracle_metadata(
+        address=address,
+        network=network,
+        protocol=protocol,
+        oracle_type=oracle_type,
+    )
+    return oracle['name']
+
+
+def has_oracle_metadata(
+    name: typing.Optional[str] = None,
+    *,
+    address: typing.Optional[spec.Address] = None,
+    network: spec.NetworkName = 'mainnet',
+    protocol: str = 'chainlink',
+) -> bool:
+    try:
+        get_oracle_metadata(
+            name=name, address=address, network=network, protocol=protocol
         )
-        return oracle['address']
-    else:
-        raise Exception('unknown oracle type: ' + str(oracle_type))
+        return True
+    except LookupError:
+        return False
 
 
 def get_oracle_metadata(
@@ -32,13 +61,17 @@ def get_oracle_metadata(
     address: typing.Optional[spec.Address] = None,
     network: spec.NetworkName = 'mainnet',
     protocol: str = 'chainlink',
+    oracle_type: spec.Oracletype = 'feed',
 ) -> spec.OracleFeedMetadata:
-    return get_oracle_feed_metadata(
-        name=name,
-        address=address,
-        network=network,
-        protocol=protocol,
-    )
+    if oracle_type == 'feed':
+        return get_oracle_feed_metadata(
+            name=name,
+            address=address,
+            network=network,
+            protocol=protocol,
+        )
+    else:
+        raise Exception('unknown oracle type: ' + str(oracle_type))
 
 
 def get_oracle_feed_metadata(
@@ -62,6 +95,11 @@ def get_oracle_feed_metadata(
         )
     else:
         raise Exception('must specify name or address')
+
+
+#
+# # backend functions
+#
 
 
 @toolcache.cache(cachetype='memory')

@@ -91,6 +91,19 @@ def get_erc20_address(
     return metadata['address']
 
 
+def has_erc20_metadata(
+    address: typing.Optional[spec.ERC20Address] = None,
+    symbol: typing.Optional[spec.ERC20Symbol] = None,
+    **kwargs,
+) -> bool:
+
+    try:
+        get_erc20_metadata(address=address, symbol=symbol, **kwargs)
+        return True
+    except LookupError:
+        return False
+
+
 def get_erc20_symbol(
     address: typing.Optional[spec.ERC20Address] = None,
     *,

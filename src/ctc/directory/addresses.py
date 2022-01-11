@@ -84,6 +84,31 @@ def get_address_metadata(
         raise NotImplementedError('storage backend: ' + str(backend))
 
 
+def get_address_first_block(
+    *,
+    label: str,
+    address: typing.Optional[spec.Address] = None,
+    name: typing.Optional[str] = None,
+    contract_name: typing.Optional[str] = None,
+    network: typing.Optional[spec.NetworkReference] = None,
+    backend: spec.StorageBackend = 'Filesystem',
+) -> spec.AddressMetadata:
+
+    metadata = get_address_metadata(
+        address=address,
+        name=name,
+        contract_name=contract_name,
+        label=label,
+        network=network,
+        backend=backend,
+    )
+
+    if metadata.get('first_block') is not None:
+        return metadata['first_block']
+    else:
+        raise Exception('first block not specified for addresss')
+
+
 def get_address(
     *,
     label: str,
@@ -91,6 +116,8 @@ def get_address(
     name: typing.Optional[str] = None,
     contract_name: typing.Optional[str] = None,
     block: spec.BlockNumberReference = None,
+    network: typing.Optional[spec.NetworkReference] = None,
+    backend: spec.StorageBackend = 'Filesystem',
 ) -> spec.Address:
 
     return get_address_metadata(
@@ -99,6 +126,8 @@ def get_address(
         contract_name=contract_name,
         block=block,
         label=label,
+        network=network,
+        backend=backend,
     )['address']
 
 
