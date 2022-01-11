@@ -1,6 +1,6 @@
 import os
 
-from ctc import config_utils
+import ctc.config
 
 
 def get_command_spec():
@@ -11,7 +11,7 @@ def get_command_spec():
 
 def config_command():
 
-    env_var = config_utils.config_path_env_var
+    env_var = ctc.config.config_path_env_var
 
     print('# Config Summary')
     print('- config env variable:', env_var)
@@ -26,7 +26,7 @@ def config_command():
 
     print()
     print('## Config Values')
-    config = config_utils.get_config()
+    config = ctc.config.get_config()
     for key in sorted(config.keys()):
         print('-', str(key) + ':', config[key])
 

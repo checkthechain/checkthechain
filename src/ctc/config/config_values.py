@@ -61,12 +61,20 @@ def get_default_network() -> spec.NetworkName:
     return config_read.get_config()['network_defaults']['default_network']
 
 
-def get_default_provider(network: spec.NetworkName) -> spec.Provider:
-    defaults = config_read.get_config()['network_defaults']['default_providers']
-    if network not in defaults:
+def get_default_provider(
+    network: typing.Optional[spec.NetworkName] = None,
+) -> spec.ProviderSpec:
+
+    if network is None:
+        network = get_default_network()
+
+    config = config_read.get_config()
+    default_providers = config['network_defaults']['default_providers']
+
+    if network in default_providers:
+        return default_providers[network]
+    else:
         raise Exception(
             'no default provider specified for network ' + str(network)
         )
-    else:
-        return get_provider(name=defaults[network])
 

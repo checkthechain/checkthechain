@@ -1,7 +1,7 @@
 import json
 import os
 
-from ctc import config_utils
+import ctc.config
 from ctc.evm import contract_abi_utils
 from ctc.toolbox import backend_utils
 
@@ -12,8 +12,7 @@ from ctc.toolbox import backend_utils
 
 
 def get_contract_abis_root():
-    config = config_utils.get_config()
-    return os.path.join(config['evm_root'], 'contract_abis')
+    return os.path.join(ctc.config.get_data_dir(), 'contract_abis')
 
 
 def get_contract_abi_dir(contract_address):

@@ -66,6 +66,8 @@ def initialize_data_root(
 
     else:
         overwritten = []
+        new_files = []
+        unchanged_files = []
         for root, subdirs, files in os.walk(default_data_dir):
 
             if root == default_data_dir:
@@ -79,8 +81,23 @@ def initialize_data_root(
             for file in files:
                 filepath = os.path.join(check_root, file)
                 if os.path.isfile(filepath):
-                    # overwritten.append(os.path.relpath(filepath, path))
-                    overwritten.append(filepath)
+                    with open(filepath, 'r') as f:
+                        old_file_data = f.read()
+                    with open(os.path.join(root, file), 'r') as f:
+                        new_file_data = f.read()
+                    if old_file_data == new_file_data:
+                        unchanged_files.append(filepath)
+                    else:
+                        overwritten.append(filepath)
+                else:
+                    new_files.append(filepath)
+
+        if len(new_files) > 0:
+            print()
+            print('Writing', len(new_files), 'new files')
+            for new_file in new_files:
+                print('-', new_file)
+
         if len(overwritten) > 0:
             print()
             print('Will overwrite the following files:')

@@ -2,57 +2,45 @@ import copy
 import os
 
 import ctc.config
-from ctc import config_utils
 from ctc import spec
 
 
 def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
 
     if provider is None:
-        config = config_utils.get_config()
-        provider = config['export_provider']
 
-    if isinstance(provider, dict):
-
-        url = provider.get('url')
-        if url is None:
-            config = config_utils.get_config()
-            default_provider = get_provider(config['export_provider'])
-            if isinstance(default_provider, str):
-                url = default_provider
-            elif isinstance(provider, dict):
-                url = default_provider['url']
-            else:
-                raise Exception('could not determine url')
-
-        other_provider = get_provider(url)
-
-        return {
-            'name': provider.get('name'),
-            'network': provider.get('network'),
-            'type': other_provider['type'],
-            'url': url,
-            'session_kwargs': provider.get('session_kwargs', {}),
-            'chunk_size': provider.get('chunk_size', None),
-        }
+        # case: return default provider
+        return ctc.config.get_default_provider()
 
     elif isinstance(provider, str):
-        # check if provider matches provider name in config
-        if ctc.config.has_provider(name=provider):
-            return ctc.config.get_provider(name=provider)
 
-        # otherwise use as url
-        elif provider.startswith('http'):
+        # case: provider specified as url
+        if provider.startswith('http'):
             return {
                 'name': None,
                 'network': None,
-                'type': 'http',
+                'protocol': 'http',
                 'url': provider,
                 'session_kwargs': {},
                 'chunk_size': None,
             }
+
+        # case: provider specified as name in config
+        elif ctc.config.has_provider(name=provider):
+            return ctc.config.get_provider(name=provider)
+
         else:
             raise Exception('unknown provider format: ' + str(provider))
+
+    elif isinstance(provider, dict):
+
+        # case: partial provider
+        if set(provider.keys()) != spec.provider_keys:
+            default_provider = ctc.config.get_default_provider()
+            provider = copy.copy(default_provider).update(provider)
+
+        return provider
+
     else:
         raise Exception('unknown provider type: ' + str(type(provider)))
 

@@ -1,7 +1,7 @@
 import json
 import os
 
-from ctc import config_utils
+import ctc.config
 
 
 def get_command_spec():
@@ -20,7 +20,7 @@ def create_config_command(provider, path, overwrite):
     if provider is None:
         provider = input('Provider URL? ')
 
-    env_var = config_utils.config_path_env_var
+    env_var = ctc.config.config_path_env_var
     if path is None:
         if env_var not in os.environ or os.environ.get(env_var) in ['', None]:
             print(env_var, 'not set')

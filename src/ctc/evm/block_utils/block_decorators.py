@@ -1,11 +1,8 @@
 import toolparallel
 
-from ctc import config_utils
-
 
 def parallelize_block_fetching(config=None, **kwargs):
 
-    # parallel_fetch_config = config_utils.get_config()['parallel_fetch_config']
     parallel_fetch_config = {}
     if config is None:
         config = {}

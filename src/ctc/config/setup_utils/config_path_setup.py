@@ -47,7 +47,7 @@ def setup_config_path(styles: dict[str, str]) -> tuple[str, bool]:
         # ask whether to change config path
         print()
         answer = toolcli.input_yes_or_no(
-            'Keep config at this location?',
+            'Keep config at this location? ',
             default='yes',
             style=styles['question'],
         )

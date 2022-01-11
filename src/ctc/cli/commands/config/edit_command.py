@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from ctc import config_utils
+import ctc.config
 
 
 def get_command_spec():
@@ -15,7 +15,7 @@ def edit_config_command():
     if editor is None or editor == '':
         raise Exception('set $EDITOR env var')
 
-    config_path = config_utils.get_config_path()
+    config_path = ctc.config.get_config_path()
 
     print('editing config in editor')
     print('- editor:', editor)
