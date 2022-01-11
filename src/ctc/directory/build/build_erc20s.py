@@ -4,7 +4,7 @@ ERC20 lists obtained from https://erc20lists.org/
 
 import typing
 
-from ctc import directory_new as directory
+from ctc import directory
 from ctc import spec
 from ctc.toolbox import store_utils
 

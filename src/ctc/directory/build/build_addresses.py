@@ -1,7 +1,7 @@
 import typing
 
 import ctc.config
-from ctc import directory_new as directory
+from ctc import directory
 from ctc import spec
 from ctc.toolbox import store_utils
 

@@ -64,7 +64,7 @@ def send_raw(
 
 def send_raw(request: spec.RpcRequest, provider) -> spec.RpcResponseRaw:
 
-    if provider['type'] == 'http':
+    if provider['protocol'] == 'http':
         from .rpc_backends import rpc_http
 
         return rpc_http.send_http(
@@ -72,7 +72,7 @@ def send_raw(request: spec.RpcRequest, provider) -> spec.RpcResponseRaw:
             provider=provider,
         )
 
-    elif provider['type'] == 'websocket':
+    elif provider['protocol'] == 'websocket':
         from .rpc_backends import rpc_websocket
 
         return rpc_websocket.send_websocket(
@@ -81,7 +81,7 @@ def send_raw(request: spec.RpcRequest, provider) -> spec.RpcResponseRaw:
         )
 
     else:
-        raise Exception('unknown provider type: ' + str(provider['type']))
+        raise Exception('unknown provider protocol: ' + str(provider['protocol']))
 
 
 async def async_send(
@@ -149,7 +149,7 @@ async def async_send_raw(
 
     _log_request(request=request, provider=provider)
 
-    if provider['type'] == 'http':
+    if provider['protocol'] == 'http':
         from .rpc_backends import rpc_http_async
 
         return await rpc_http_async.async_send_http(
@@ -157,7 +157,7 @@ async def async_send_raw(
             provider=provider,
         )
 
-    elif provider['type'] == 'websocket':
+    elif provider['protocol'] == 'websocket':
         from .rpc_backends import rpc_websocket_async
 
         return await rpc_websocket_async.async_send_websocket(
@@ -166,7 +166,7 @@ async def async_send_raw(
         )
 
     else:
-        raise Exception('unknown provider type: ' + str(provider['type']))
+        raise Exception('unknown provider protocol: ' + str(provider['protocol']))
 
 
 def _log_request(request: spec.RpcRequest, provider: spec.Provider) -> None:

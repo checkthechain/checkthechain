@@ -72,7 +72,8 @@ def get_default_provider(
     default_providers = config['network_defaults']['default_providers']
 
     if network in default_providers:
-        return default_providers[network]
+        provider_name = default_providers[network]
+        return get_provider(name=provider_name)
     else:
         raise Exception(
             'no default provider specified for network ' + str(network)

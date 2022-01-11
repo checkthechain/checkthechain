@@ -37,9 +37,10 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
         # case: partial provider
         if set(provider.keys()) != spec.provider_keys:
             default_provider = ctc.config.get_default_provider()
-            provider = copy.copy(default_provider).update(provider)
+            default_provider = copy.copy(default_provider)
+            default_provider.update(provider)
 
-        return provider
+        return default_provider
 
     else:
         raise Exception('unknown provider type: ' + str(type(provider)))

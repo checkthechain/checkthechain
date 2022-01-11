@@ -5,7 +5,7 @@ import toolcli
 
 from ctc import rpc
 from ctc import spec
-from ctc import directory_new as directory
+from ctc import directory
 from ctc.toolbox import nested_utils
 from .. import config_read
 
