@@ -116,7 +116,7 @@ async def async_get_pool_balances(
 ]:
 
     if vault is None:
-        vault = directory.balancer_v2_vault
+        vault = directory.get_address(name='Vault', label='balancer')
     if pool_id is None:
         pool_id = await pool_metadata.async_get_pool_id(
             pool_address, block=block

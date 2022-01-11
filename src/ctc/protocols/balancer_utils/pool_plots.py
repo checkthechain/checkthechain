@@ -24,11 +24,7 @@ async def plot_lbp_summary(
 
         blocks = summary[pair].index.get_level_values('block_number')
 
-        token_0, token_1 = await evm.async_get_erc20s_names(pool_tokens)
-        if token_0 in directory.token_name_to_symbol:
-            token_0 = directory.token_name_to_symbol[token_0]
-        if token_1 in directory.token_name_to_symbol:
-            token_1 = directory.token_name_to_symbol[token_1]
+        token_0, token_1 = await evm.async_get_erc20s_symbols(pool_tokens)
         in_address, out_address = pair
         if in_address == pool_tokens[0]:
             in_token = token_0

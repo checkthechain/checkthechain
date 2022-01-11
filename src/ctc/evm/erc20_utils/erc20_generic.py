@@ -11,7 +11,7 @@ def get_erc20_address(token: spec.ERC20Reference) -> spec.ERC20Address:
     if address_utils.is_address_str(token):
         return token
     elif isinstance(token, str):
-        return directory.token_addresses[token]
+        return directory.get_erc20_address(token)
     else:
         raise Exception('could not get token address')
 

@@ -6,8 +6,6 @@ import numpy as np
 import pandas
 import tooltime
 
-from ctc import config_utils
-
 
 vote_data_file_template = '{name}__{datatype}__{timestamp}.json'
 
@@ -69,9 +67,9 @@ def request_raw_vote_data(name, save=True, overwrite=False, verbose=True):
 #
 
 
-def get_vote_data_dir():
-    data_dir = config_utils.get_config()['data_root']
-    return os.path.join(data_dir, 'market/votes')
+# def get_vote_data_dir():
+#     data_dir = config_utils.get_config()['data_root']
+#     return os.path.join(data_dir, 'market/votes')
 
 
 def get_vote_data_path(name, datatype, timestamp):

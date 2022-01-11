@@ -277,8 +277,8 @@ async def async_get_token_pool_stats(
 
 async def async_print_fuse_token_summary(token, block='latest'):
 
-    if token in directory.token_addresses:
-        token = directory.token_addresses[token]
+    if directory.has_erc20_metadata(symbol=token):
+        token = directory.get_erc20_address(symbol=token)
 
     block = await rpc.async_eth_get_block_by_number(block)
     multipool_stats = await async_get_token_multipool_stats(

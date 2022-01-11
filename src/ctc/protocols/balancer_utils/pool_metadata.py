@@ -12,7 +12,7 @@ async def async_get_pool_id(pool_address, block=None):
 
 async def async_get_pool_address(pool_id, block=None, vault=None):
     if vault is None:
-        vault = directory.balancer_v2_vault
+        vault = directory.get_address(name='Vault', label='balancer')
 
     pool = await rpc.async_eth_call(
         to_address=vault,
@@ -28,7 +28,7 @@ async def async_get_pool_tokens(
 ):
 
     if vault is None:
-        vault = directory.balancer_v2_vault
+        vault = directory.get_address(name='Vault', label='balancer')
     if pool_id is None:
         pool_id = await async_get_pool_id(pool_address)
 

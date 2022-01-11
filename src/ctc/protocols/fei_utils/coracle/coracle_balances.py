@@ -184,11 +184,8 @@ async def async_get_tokens_balances(
             block=block, provider=provider
         )
     if exclude_fei:
-        tokens = [
-            token
-            for token in tokens
-            if token != directory.token_addresses['FEI']
-        ]
+        FEI = directory.get_erc20_address(symbol='FEI')
+        tokens = [token for token in tokens if token != FEI]
 
     # get deposits for each token
     tokens_deposits = await coracle_deposits.async_get_tokens_deposits(

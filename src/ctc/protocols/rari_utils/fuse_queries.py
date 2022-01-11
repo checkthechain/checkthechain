@@ -191,7 +191,9 @@ async def async_get_blocks_per_year(interest_rate_model, block='latest'):
         to_address=interest_rate_model,
         function_name='blocksPerYear',
         block_number=block,
-        function_abi=rari_abis.interest_rate_model_function_abis['blocksPerYear'],
+        function_abi=rari_abis.interest_rate_model_function_abis[
+            'blocksPerYear'
+        ],
     )
 
 
@@ -336,10 +338,10 @@ async def async_get_pool_summary_data(comptroller, block='latest'):
     for underlying in underlyings.values():
         if underlying == '0x0000000000000000000000000000000000000000':
             token_name = 'ETH'
-        elif underlying in directory.address_to_symbol:
-            token_name = directory.address_to_symbol[underlying]
+        elif directory.has_erc20_metadata(address=underlying):
+            token_name = directory.get_erc20_symbol(address=underlying)
         else:
-            token_name = evm.get_erc20_symbol(underlying)
+            token_name = await evm.async_get_erc20_symbol(address=underlying)
         token_names.append(token_name)
 
     # get pricing data

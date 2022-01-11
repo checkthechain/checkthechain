@@ -1,10 +1,13 @@
 import ast
 import functools
 import os
+import typing
 
+import ctc.config
+from ctc import spec
+from ctc import directory
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
-from ctc import config_utils
 from ... import block_utils
 from ... import binary_utils
 from ... import contract_abi_utils
@@ -16,9 +19,9 @@ from ... import evm_spec
 #
 
 
-def get_events_root():
-    config = config_utils.get_config()
-    return os.path.join(config['evm_root'], 'events')
+def get_events_root(network: typing.Optional[spec.NetworkName] = None):
+    network_name = directory.get_network_name(network)
+    return os.path.join(ctc.config.get_data_dir(), network_name, 'events')
 
 
 def get_events_contract_dir(contract_address):
@@ -39,7 +42,12 @@ def get_events_event_dir(contract_address, event_hash=None, event_name=None):
 
 
 def get_events_filepath(
-    contract_address, start_block, end_block, event_hash=None, event_name=None
+    contract_address,
+    start_block,
+    end_block,
+    event_hash=None,
+    event_name=None,
+    network: typing.Optional[spec.NetworkReference] = None,
 ):
     contract_address = contract_address.lower()
 
@@ -56,7 +64,8 @@ def get_events_filepath(
         start_block=start_block,
         end_block=end_block,
     )
-    return os.path.join(config_utils.get_config()['evm_root'], subpath)
+    network_name = directory.get_network_name(network)
+    return os.path.join(ctc.config.get_data_dir(), network_name, subpath)
 
 
 def _event_name_to_event_hash(event_name, contract_address):
@@ -352,7 +361,8 @@ def get_events_from_filesystem(
         if arg['type'] in ['bytes32']:
             column = prefix + arg['name']
             lam = functools.partial(
-                binary_utils.convert_binary_format, output_format='prefix_hex',
+                binary_utils.convert_binary_format,
+                output_format='prefix_hex',
             )
             df[column] = df[column].map(ast.literal_eval).map(lam)
 

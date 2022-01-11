@@ -37,8 +37,8 @@ def fetch_feed_datum(
         normalize = True
     if format is None:
         format = 'dict'
-    if feed in directory.chainlink_feeds:
-        feed = directory.chainlink_feeds[feed]
+    if directory.has_oracle_metadata(name=feed):
+        feed = directory.get_oracle_address(name=feed)
     if not evm.is_address_str(feed):
         raise Exception('invalid address: ' + str(feed))
 
@@ -49,8 +49,9 @@ def fetch_feed_datum(
     )
 
     if normalize:
-        name = directory.chainlink_address_to_feed[feed]
-        decimals = directory.chainlink_feeds_decimals[name]
+        decimals = directory.get_oracle_decimals(
+            address=feed, protocol='chainlink'
+        )
         answer_index = 1
         raw = list(raw)
         raw[answer_index] = raw[answer_index] / (10 ** decimals)

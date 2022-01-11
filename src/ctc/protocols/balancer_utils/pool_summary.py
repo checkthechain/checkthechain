@@ -46,10 +46,12 @@ def get_pool_swaps(
 ) -> spec.DataFrame:
 
     if vault is None:
-        vault = directory.balancer_v2_vault
+        vault = directory.get_address(name='Vault', label='balancer')
 
     if start_block is None:
-        start_block = directory.balancer_blocks['vault_creation']
+        start_block = directory.get_address_first_block(
+            name='Vault', label='balancer'
+        )
 
     swaps = evm.get_events(
         contract_address=vault,

@@ -13,8 +13,8 @@ def fetch_eth_price(**kwargs):
 def find_feed_first_block(
     feed, start_search=None, end_search=None, verbose=True
 ):
-    if feed in directory.chainlink_feeds:
-        feed = directory.chainlink_feeds[feed]
+    if not evm.is_address_str(feed):
+        feed = directory.get_oracle_address(name=feed, protocol='chainlink')
     return evm.get_contract_creation_block(
         contract_address=feed,
         start_block=start_search,

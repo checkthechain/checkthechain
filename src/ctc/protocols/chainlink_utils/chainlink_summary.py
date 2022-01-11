@@ -14,8 +14,10 @@ def summarize_feed(feed, n_recent=10):
 
     if evm.is_address_str(feed):
         feed_address = feed
-    elif feed in directory.chainlink_feeds[feed]:
-        feed_address = directory.chainlink_feeds[feed]
+    elif isinstance(feed, str):
+        feed_address = directory.get_oracle_address(
+            name=feed, protocol='chainlink'
+        )
     else:
         raise Exception('unknown feed specification: ' + str(feed))
 
@@ -25,7 +27,9 @@ def summarize_feed(feed, n_recent=10):
     aggregator = rpc_utils.eth_call(function_name='aggregator', **call_kwargs)
 
     data = chainlink_utils.get_feed_data(
-        feed_address=feed_address, answer_only=False, verbose=False,
+        feed_address=feed_address,
+        answer_only=False,
+        verbose=False,
     )
     most_recent = data.iloc[-1]
     timestamp = most_recent['arg__updatedAt']

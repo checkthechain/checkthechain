@@ -8,7 +8,9 @@ def get_feed_aggregator(*, feed_name=None, feed_address=None):
     # - add block number
 
     if feed_address is None:
-        feed_address = directory.chainlink_feeds[feed_name]
+        feed_address = directory.get_oracle_address(
+            name=feed_name, protocol='chainlink'
+        )
 
     return evm.eth_call(
         to_address=feed_address,
@@ -29,7 +31,9 @@ def get_feed_data(
 
     # get feed address
     if feed_address is None:
-        feed_address = directory.chainlink_feeds[feed_name]
+        feed_address = directory.get_oracle_address(
+            name=feed_name, protocol='chainlink'
+        )
 
     # get aggregator
     aggregator_address = evm.eth_call(
