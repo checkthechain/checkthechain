@@ -31,6 +31,9 @@ def get_network_metadata(
     all_network_data = dict(default_network_data, **config_network_data)
     network_list = list(all_network_data.values())
 
+    if network is None:
+        network = config.get_default_network()
+
     if isinstance(network, int):
         return search_utils.get_matching_entry(
             sequence=network_list,

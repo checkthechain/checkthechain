@@ -1,15 +1,15 @@
-from ctc.evm import rpc_utils
+from ctc import rpc
 
 
-def is_contract_address(address, block='latest', provider=None):
-    code = rpc_utils.eth_get_code(
+async def async_is_contract_address(address, block='latest', provider=None):
+    code = await rpc.async_eth_get_code(
         address=address, block_number=block, provider=provider,
     )
     return len(code) > 3
 
 
-def are_contract_addresses(addresses, block='latest', provider=None):
-    codes = rpc_utils.batch_eth_get_code(
+async def async_are_contract_addresses(addresses, block='latest', provider=None):
+    codes = await rpc.async_batch_eth_get_code(
         addresses=addresses, block_number=block, provider=provider,
     )
     block = list(codes.keys())[0]

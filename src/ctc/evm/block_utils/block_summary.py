@@ -5,10 +5,10 @@ from .. import binary_utils
 from . import block_crud
 
 
-def print_block_summary(block):
+async def async_print_block_summary(block, provider=None):
 
     if not isinstance(block, dict):
-        block = block_crud.get_block(block=block)
+        block = await block_crud.async_get_block(block=block, provider=provider)
 
     full_transactions = len(block['transactions']) > 0 and isinstance(
         block['transactions'][0], dict

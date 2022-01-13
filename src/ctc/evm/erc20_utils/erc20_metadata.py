@@ -1,8 +1,6 @@
 import typing
 
 from ctc import spec
-from .. import block_utils
-from .. import rpc_utils
 from . import erc20_generic
 
 
@@ -115,40 +113,5 @@ async def async_get_erc20_symbol_by_block(
     """get symbol of an erc20 across multiple blocks"""
     return await erc20_generic.async_erc20_eth_call_by_block(
         function_name='symbol', token=token, blocks=blocks, **rpc_kwargs
-    )
-
-
-#
-# # old sync versions
-#
-
-
-@block_utils.parallelize_block_fetching()
-def get_erc20_decimals(token=None, block=None, **eth_call_kwargs):
-    return rpc_utils.eth_call(
-        to_address=erc20_generic.get_erc20_address(token),
-        function_name='decimals',
-        block_number=block,
-        **eth_call_kwargs
-    )
-
-
-@block_utils.parallelize_block_fetching()
-def get_erc20_name(token=None, block=None, **eth_call_kwargs):
-    return rpc_utils.eth_call(
-        to_address=erc20_generic.get_erc20_address(token),
-        function_name='name',
-        block_number=block,
-        **eth_call_kwargs
-    )
-
-
-@block_utils.parallelize_block_fetching()
-def get_erc20_symbol(token=None, block=None, **eth_call_kwargs):
-    return rpc_utils.eth_call(
-        to_address=erc20_generic.get_erc20_address(token),
-        function_name='symbol',
-        block_number=block,
-        **eth_call_kwargs
     )
 

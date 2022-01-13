@@ -1,10 +1,6 @@
-import typing
-
-import toolparallel
 
 from ctc import rpc
 from ctc import spec
-from .. import rpc_utils
 from . import block_normalize
 
 
@@ -82,86 +78,4 @@ async def async_get_blocks_timestamps(
         block['timestamp']
         for block in await async_get_blocks(blocks=blocks, **get_blocks_kwargs)
     ]
-
-
-#
-# # old
-#
-
-
-@toolparallel.parallelize_input(singular_arg='block', plural_arg='blocks')
-def get_block(
-    block, provider=None, include_full_transactions=False, **rpc_kwargs
-):
-
-    # convert to int if not an int or str (e.g. floats or numpy int32)
-    if not isinstance(block, (int, str)):
-        candidate = int(block)
-        if (block - candidate) ** 2 ** 0.5 > 0.001:
-            raise Exception()
-        block = candidate
-
-    # gather kwargs
-    kwargs = dict(
-        provider=provider,
-        include_full_transactions=include_full_transactions,
-        **rpc_kwargs
-    )
-
-    # rpc call
-    if isinstance(block, int):
-        return rpc_utils.eth_get_block_by_number(block_number=block, **kwargs)
-    elif isinstance(block, str):
-        if block in ['latest', 'earliest', 'pending']:
-            return rpc_utils.eth_get_block_by_number(
-                block_number=block, **kwargs
-            )
-        elif block.startswith('0x'):
-            if len(block) == 66:
-                return rpc_utils.eth_get_block_by_hash(
-                    block_hash=block, **kwargs
-                )
-            else:
-                return rpc_utils.eth_get_block_by_number(
-                    block_number=block, **kwargs
-                )
-        elif len(block) == 64:
-            return rpc_utils.eth_get_block_by_hash(block_hash=block, **kwargs)
-        elif str.isnumeric(block):
-            return rpc_utils.eth_get_block_by_number(
-                block_number=int(block), **kwargs
-            )
-        else:
-            raise Exception('unknown block str format: ' + str(block))
-    else:
-        raise Exception('unknown block specifier: ' + str(block))
-
-
-def get_blocks(blocks):
-
-    rpc_request = [
-        rpc_utils.construct_eth_get_block_by_number(
-            block_number=int(block),
-            include_full_transactions=False,
-        )
-        for block in blocks
-    ]
-
-    return rpc_utils.rpc_execute(rpc_request=rpc_request)
-
-
-def get_blocks_timestamps(blocks):
-    return {block['number']: block['timestamp'] for block in get_blocks(blocks)}
-
-
-def get_block_number(block, provider=None, **rpc_kwargs):
-
-    # gather kwargs
-    kwargs = dict(provider=provider, **rpc_kwargs)
-
-    # rpc call
-    if block == 'latest':
-        return rpc_utils.eth_block_number(**kwargs)
-    else:
-        return get_block(block=block, **kwargs)['number']
 

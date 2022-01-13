@@ -94,7 +94,7 @@ async def async_get_pool_prices(
     prices = await asyncio.gather(*coroutines)
 
     if to_usd:
-        eth_price = chainlink_utils.fetch_eth_price(block=block)
+        eth_price = await chainlink_utils.async_fetch_eth_price(block=block)
         prices = [price * eth_price for price in prices]
 
     return dict(zip(ctokens, prices))
@@ -133,7 +133,7 @@ async def get_pool_tvl_and_tvb(
             comptroller=comptroller, block=block
         )
 
-    eth_price = chainlink_utils.fetch_eth_price(block=block)
+    eth_price = await chainlink_utils.async_fetch_eth_price(block=block)
 
     ctokens_stats = [
         asyncio.create_task(

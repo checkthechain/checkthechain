@@ -1,4 +1,7 @@
+import asyncio
+
 from ctc import evm
+from ctc import rpc
 
 
 def get_command_spec():
@@ -19,5 +22,14 @@ def block_command(block, timestamp, verbose=False, **kwargs):
         print('found block', block)
         print()
 
-    evm.print_block_summary(block=block)
+    asyncio.run(run(block=block))
+
+
+async def run(block):
+
+    await evm.async_print_block_summary(block=block)
+
+    from ctc.rpc.rpc_backends import rpc_http_async
+    provider = rpc.get_provider()
+    await rpc_http_async.async_close_session(provider=provider)
 

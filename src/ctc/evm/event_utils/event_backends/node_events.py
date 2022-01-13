@@ -1,11 +1,13 @@
+import asyncio
+
 import toolparallel
 
+from ctc import rpc
 from ... import block_utils
 from ... import contract_abi_utils
-from ... import rpc_utils
 
 
-def get_events_from_node(
+async def async_get_events_from_node(
     start_block='latest',
     end_block='latest',
     event_name=None,
@@ -16,14 +18,12 @@ def get_events_from_node(
     blocks_per_chunk=2000,
     package_as_dataframe=True,
     verbose=True,
-    parallel_kwargs=None,
 ):
     """see fetch_events() for complete kwarg list"""
 
     # create chunks
-    start_block, end_block = block_utils.normalize_block_range(
-        start_block=start_block,
-        end_block=end_block,
+    start_block, end_block = await block_utils.async_block_numbers_to_int(
+        blocks=[start_block, end_block],
     )
     if verbose:
         print(
@@ -72,13 +72,16 @@ def get_events_from_node(
             raise Exception('must specify event_name, event_abi, or event_hash')
 
     # fetch events
-    chunks_entries = _get_chunk_of_events_from_node(
-        block_ranges=chunks,
-        event_hash=event_hash,
-        contract_address=contract_address,
-        verbose=verbose,
-        parallel_kwargs=parallel_kwargs,
-    )
+    coroutines = []
+    for chunk in chunks:
+        coroutine = await _async_get_chunk_of_events_from_node(
+            block_range=chunk,
+            event_hash=event_hash,
+            contract_address=contract_address,
+            verbose=verbose,
+        )
+        coroutines.append(coroutine)
+    chunks_entries = await asyncio.gather(*coroutines)
     entries = [
         entry for chunk_entries in chunks_entries for entry in chunk_entries
     ]
@@ -97,12 +100,7 @@ def get_events_from_node(
     return entries
 
 
-@toolparallel.parallelize_input(
-    singular_arg='block_range',
-    plural_arg='block_ranges',
-    config={'n_workers': 60},
-)
-def _get_chunk_of_events_from_node(
+async def _async_get_chunk_of_events_from_node(
     block_range,
     event_hash,
     contract_address,
@@ -114,7 +112,7 @@ def _get_chunk_of_events_from_node(
 
     # fetch entries
     start_block, end_block = block_range
-    entries = rpc_utils.eth_get_logs(
+    entries = await rpc.async_eth_get_logs(
         contract_address=contract_address,
         topics=[event_hash],
         start_block=start_block,

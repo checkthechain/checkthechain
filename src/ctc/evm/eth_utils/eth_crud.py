@@ -1,27 +1,94 @@
+import asyncio
+import typing
 
-from .. import address_utils
-from .. import block_utils
-from .. import rpc_utils
+from ctc import rpc
+from ctc import spec
 
 
-def fetch_eth_total_supply():
-    import requests
+async def async_get_eth_total_supply():
+    import aiohttp
+
     url = 'http://api.etherscan.io/api?module=stats&action=ethsupply'
-    response = requests.request(method='get', url=url)
-    result_str = response.json()['result']
-    return int(result_str)
+    session = aiohttp.ClientSession()
+    async with session.get(url) as response:
+        if response.status != 200:
+            raise Exception('could not get result')
+        result = await response.json()
+        return int(result['result'])
 
 
-@block_utils.parallelize_block_fetching()
-def fetch_eth_balance(address, normalize=True, provider=None, block=None):
-    if block is None:
-        block = 'latest'
+@typing.overload
+async def async_get_eth_balance(
+    address: spec.Address,
+    normalize: typing.Literal[False],
+    provider: typing.Optional[spec.ProviderSpec] = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> int:
+    ...
 
-    address = address_utils.get_address_checksum(address)
-    balance = rpc_utils.eth_get_balance(address=address, block_number=block)
+
+@typing.overload
+async def async_get_eth_balance(
+    address: spec.Address,
+    normalize: bool = True,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> float:
+    ...
+
+
+async def async_get_eth_balance(
+    address: spec.Address,
+    normalize: bool = True,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> typing.Union[int, float]:
+
+    balance = await rpc.async_eth_get_balance(
+        address=address,
+        provider=provider,
+        block_number=block,
+    )
 
     if normalize:
-        balance = balance / 1e18
+        balance /= 1e18
 
     return balance
+
+
+@typing.overload
+async def async_get_eth_balance_by_block(
+    address: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    normalize: typing.Literal[False],
+    provider: typing.Optional[spec.ProviderSpec] = None,
+) -> list[int]:
+    ...
+
+
+@typing.overload
+async def async_get_eth_balance_by_block(
+    address: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    normalize: typing.Literal[True] = True,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+) -> list[float]:
+    ...
+
+
+async def async_get_eth_balance_by_block(
+    address: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    normalize: bool = True,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+) -> typing.Union[list[int], list[float]]:
+
+    coroutines = []
+    for block in blocks:
+        coroutine = async_get_eth_balance(
+            address=address, provider=provider, block=block, normalize=normalize
+        )
+        coroutines.append(coroutine)
+
+    return await asyncio.gather(*coroutines)
 

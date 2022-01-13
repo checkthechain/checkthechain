@@ -1,8 +1,9 @@
 from ctc import directory
 from ctc import evm
+from ctc import rpc
 
 
-def get_feed_aggregator(*, feed_name=None, feed_address=None):
+async def async_get_feed_aggregator(*, feed_name=None, feed_address=None):
     # TODO:
     # - condense inputs into one
     # - add block number
@@ -12,13 +13,13 @@ def get_feed_aggregator(*, feed_name=None, feed_address=None):
             name=feed_name, protocol='chainlink'
         )
 
-    return evm.eth_call(
+    return await rpc.async_eth_call(
         to_address=feed_address,
         function_name='aggregator',
     )
 
 
-def get_feed_data(
+async def async_get_feed_data(
     *,
     feed_name=None,
     feed_address=None,
@@ -36,7 +37,7 @@ def get_feed_data(
         )
 
     # get aggregator
-    aggregator_address = evm.eth_call(
+    aggregator_address = await rpc.async_eth_call(
         to_address=feed_address,
         function_name='aggregator',
     )
@@ -45,9 +46,9 @@ def get_feed_data(
     if end_block is None:
         end_block = 'latest'
     if start_block == 'latest':
-        start_block = evm.get_block_number('latest')
+        start_block = await evm.get_latest_block_number()
     if end_block == 'latest':
-        end_block = evm.get_block_number('latest')
+        end_block = evm.get_latest_block_number()
     if start_block is None:
 
         # once have eth_call storage should always just use genesis blocks here
@@ -67,7 +68,7 @@ def get_feed_data(
             start_block = events_list['block_range'][0]
         else:
             # use aggregator creation block
-            start_block = evm.get_contract_creation_block(
+            start_block = await evm.async_get_contract_creation_block(
                 contract_address=aggregator_address
             )
 

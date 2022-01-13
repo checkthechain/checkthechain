@@ -97,7 +97,7 @@ async def async_get_timestamps_blocks(
 ) -> list[int]:
 
     # use latest block if last timestamp is greater than latest block timestamp
-    latest_block = evm.get_block('latest', provider=provider)
+    latest_block = await evm.async_get_block('latest', provider=provider)
     if latest_block['timestamp'] <= timestamps[-1]:
         timestamps = timestamps[:-1]
         latest_block_swapped = True

@@ -10,9 +10,9 @@ async def async_get_pcv_stats(
 ):
 
     if block is not None:
-        block = evm.normalize_block(block=block)
+        block = await evm.async_block_number_to_int(block=block)
     if blocks is not None:
-        blocks = evm.normalize_blocks(blocks=blocks)
+        blocks = await evm.async_block_numbers_to_int(blocks=blocks)
 
     # assemble kwargs
     provider = rpc.get_provider(provider)

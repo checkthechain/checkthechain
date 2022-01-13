@@ -23,7 +23,7 @@ def get_erc20_transfers(
     )
 
 
-def get_erc20_balances_from_transfers(
+async def async_get_erc20_balances_from_transfers(
     transfers: spec.DataFrame,
     block: typing.Optional[spec.BlockNumberReference] = None,
     dtype: spec.DType = float,
@@ -55,7 +55,9 @@ def get_erc20_balances_from_transfers(
     if normalize:
         block = transfers.index[-1][0]
         address = transfers['contract_address'].iloc[0]
-        decimals = erc20_metadata.get_erc20_decimals(token=address, block=block)
+        decimals = await erc20_metadata.async_get_erc20_decimals(
+            token=address, block=block
+        )
         balances = balances / dtype('1e' + str(decimals))
 
     # sort

@@ -10,10 +10,11 @@ import time
 _last_request = {'time': None}
 
 
-def get_contract_abi_from_etherscan(contract_address):
+async def async_get_contract_abi_from_etherscan(contract_address):
     """fetch contract abi using etherscan"""
 
-    import requests
+    import aiohttp
+
     print('fetching abi from etherscan:', contract_address)
 
     # ratelimit
@@ -32,8 +33,10 @@ def get_contract_abi_from_etherscan(contract_address):
     if not address_utils.is_address_str(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
     url_template = 'http://api.etherscan.io/api?module=contract&action=getabi&address={address}&format=raw'
+    session = aiohttp.ClientSession()
     abi_endpoint = url_template.format(address=contract_address)
-    content = requests.get(abi_endpoint).text
+    async with session.get(abi_endpoint) as response:
+        content = await response.text()
     if content == 'Contract source code not verified':
         raise spec.AbiNotFoundException()
     abi = json.loads(content)

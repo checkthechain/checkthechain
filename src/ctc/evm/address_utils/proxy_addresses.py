@@ -1,4 +1,4 @@
-from .. import rpc_utils
+from ctc import rpc
 from . import contract_abi_utils
 
 
@@ -22,29 +22,29 @@ eip_897_abi = [
 ]
 
 
-def get_eip897_proxy_type(contract_address):
+async def async_get_eip897_proxy_type(contract_address):
 
     function_abi = eip_897_abi[0]
     assert function_abi['name'] == 'proxyType'
 
-    return rpc_utils.eth_call(
+    return await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
     )
 
 
-def get_eip897_implementation(contract_address):
+async def async_get_eip897_implementation(contract_address):
 
     function_abi = eip_897_abi[1]
     assert function_abi['name'] == 'implementation'
 
-    return rpc_utils.eth_call(
+    return await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
     )
 
 
-def get_eip1967_proxy_logic_address(contract_address, block=None):
+async def async_get_eip1967_proxy_logic_address(contract_address, block=None):
     """get a contract's logic address
 
     storage position obtained as:
@@ -57,7 +57,7 @@ def get_eip1967_proxy_logic_address(contract_address, block=None):
         '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
     )
 
-    result = rpc_utils.eth_get_storage_at(
+    result = await rpc.async_eth_get_storage_at(
         address=contract_address,
         position=position,
         block_number=block,
@@ -66,15 +66,15 @@ def get_eip1967_proxy_logic_address(contract_address, block=None):
     return '0x' + result[-40:]
 
 
-def save_eip897_abi(contract_address):
-    eip897_address = get_eip897_implementation(contract_address)
-    contract_abi_utils.save_proxy_contract_abi_to_filesystem(
+async def async_save_eip897_abi(contract_address):
+    eip897_address = await async_get_eip897_implementation(contract_address)
+    contract_abi_utils.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
         proxy_implementation=eip897_address,
     )
 
 
-def get_eip1967_proxy_beacon_address(contract_address, block=None):
+async def async_get_eip1967_proxy_beacon_address(contract_address, block=None):
     """get a contract's logic address
 
     storage position obtained as:
@@ -87,7 +87,7 @@ def get_eip1967_proxy_beacon_address(contract_address, block=None):
         '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'
     )
 
-    result = rpc_utils.eth_get_storage_at(
+    result = await rpc.async_eth_get_storage_at(
         address=contract_address,
         position=position,
         block_number=block,
@@ -96,7 +96,7 @@ def get_eip1967_proxy_beacon_address(contract_address, block=None):
     return '0x' + result[-40:]
 
 
-def get_eip1967_proxy_admin_address(contract_address, block=None):
+async def async_get_eip1967_proxy_admin_address(contract_address, block=None):
     """get a contract's logic address
 
     storage position obtained as:
@@ -109,7 +109,7 @@ def get_eip1967_proxy_admin_address(contract_address, block=None):
         '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'
     )
 
-    result = rpc_utils.eth_get_storage_at(
+    result = await rpc.async_eth_get_storage_at(
         address=contract_address,
         position=position,
         block_number=block,

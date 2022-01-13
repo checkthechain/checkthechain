@@ -6,11 +6,10 @@
 
 import numpy as np
 import pandas
-import toolparallel
 
 from ctc import directory
 from ctc import evm
-from ctc.evm import rpc_utils
+from ctc import rpc
 
 
 aggregator_outputs = [
@@ -23,16 +22,18 @@ aggregator_outputs = [
 ]
 
 
-def fetch_feed_value(feed, block=None, **kwargs):
-    return fetch_feed_datum(feed=feed, block=block, **kwargs)['answer']
+async def async_fetch_feed_value(feed, block=None, **kwargs):
+    return await async_fetch_feed_datum(feed=feed, block=block, **kwargs)[
+        'answer'
+    ]
 
 
-def fetch_feed_datum(
+async def async_fetch_feed_datum(
     feed, block=None, format=None, normalize=None, **contract_kwargs
 ):
 
     if block is None:
-        block = evm.get_block_number('latest')
+        block = await evm.async_get_latest_block_number()
     if normalize is None:
         normalize = True
     if format is None:
@@ -42,18 +43,19 @@ def fetch_feed_datum(
     if not evm.is_address_str(feed):
         raise Exception('invalid address: ' + str(feed))
 
-    raw = rpc_utils.eth_call(
+    raw = await rpc.async_eth_call(
         to_address=feed,
         function_name='latestRoundData',
         block_number=block,
     )
 
     if normalize:
-        decimals = directory.get_oracle_decimals(
+        metadata = directory.get_oracle_metadata(
             address=feed, protocol='chainlink'
         )
         answer_index = 1
         raw = list(raw)
+        decimals = metadata['decimals']
         raw[answer_index] = raw[answer_index] / (10 ** decimals)
 
     if format == 'full':
@@ -69,39 +71,39 @@ def fetch_feed_datum(
         raise Exception('unknown format: ' + str(format))
 
 
-def fetch_feed_data(
-    feed,
-    start_block,
-    end_block,
-    as_dataframe=True,
-    remove_redundant=True,
-    parallel_kwargs=None,
-    **contract_kwargs
-):
-    """fetch feed data for range of blocks and return as dataframe"""
+# def fetch_feed_data(
+#     feed,
+#     start_block,
+#     end_block,
+#     as_dataframe=True,
+#     remove_redundant=True,
+#     parallel_kwargs=None,
+#     **contract_kwargs
+# ):
+#     """fetch feed data for range of blocks and return as dataframe"""
 
-    # query contract
-    blocks = list(range(start_block, end_block + 1))
-    if parallel_kwargs is None:
-        parallel_kwargs = {}
+#     # query contract
+#     blocks = list(range(start_block, end_block + 1))
+#     if parallel_kwargs is None:
+#         parallel_kwargs = {}
 
-    common = dict(contract_kwargs, feed=feed, format='full')
-    results = toolparallel.parallel_map(
-        fetch_feed_datum,
-        arg_list=blocks,
-        arg_name='block',
-        common=common,
-        n_workers=60,
-    )
+#     common = dict(contract_kwargs, feed=feed, format='full')
+#     results = toolparallel.parallel_map(
+#         fetch_feed_datum,
+#         arg_list=blocks,
+#         arg_name='block',
+#         common=common,
+#         n_workers=60,
+#     )
 
-    if remove_redundant:
-        results = _remove_redundant_data(results)
+#     if remove_redundant:
+#         results = _remove_redundant_data(results)
 
-    if as_dataframe:
-        results = pandas.DataFrame(results, columns=aggregator_outputs)
-        results.set_index('block', inplace=True)
+#     if as_dataframe:
+#         results = pandas.DataFrame(results, columns=aggregator_outputs)
+#         results.set_index('block', inplace=True)
 
-    return results
+#     return results
 
 
 def _remove_redundant_data(results):
@@ -131,31 +133,4 @@ def expand_redundant_data(results, start_block, end_block):
     reindexed = results.reindex(all_blocks, fill_value=pandas.NA)
     reindexed = reindexed.fillna(method='ffill')
     return reindexed
-
-
-def chainlink_chunk(args):
-    return fetch_feed_data(*args)
-
-
-def metaparallel_fetch_feed_data(
-    feed_name, start_block, end_block, n_processes=None
-):
-    """probably delete this after implementing eth batch calls"""
-
-    import multiprocessing
-
-    if n_processes is None:
-        n_processes = 4
-
-    bounds = np.linspace(start_block, end_block + 1, n_processes + 1).astype(
-        int
-    )
-    starts, ends = bounds[:-1], bounds[1:]
-
-    pool = multiprocessing.pool.Pool(n_processes)
-    arglists = [[feed_name, starts[p], ends[p]] for p in range(n_processes)]
-    result = pool.map_async(chainlink_chunk, arglists)
-    result = result.get()
-
-    return result
 

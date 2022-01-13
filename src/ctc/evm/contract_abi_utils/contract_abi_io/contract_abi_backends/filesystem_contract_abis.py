@@ -70,7 +70,7 @@ def print_contract_abis_summary():
 #
 
 
-def save_contract_abi_to_filesystem(
+async def async_save_contract_abi_to_filesystem(
     contract_abi, contract_address, name=None, overwrite=False
 ):
     contract_address = contract_address.lower()
@@ -92,13 +92,13 @@ def save_contract_abi_to_filesystem(
     return contract_abi
 
 
-def save_proxy_contract_abi_to_filesystem(
+async def async_save_proxy_contract_abi_to_filesystem(
     contract_address, proxy_implementation, name='proxy_implementation',
 ):
     proxy_abi = contract_abi_utils.get_contract_abi(
         contract_address=proxy_implementation
     )
-    save_contract_abi_to_filesystem(
+    await async_save_contract_abi_to_filesystem(
         contract_abi=proxy_abi,
         contract_address=contract_address,
         name=name,

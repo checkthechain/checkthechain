@@ -1,7 +1,7 @@
 from ctc import evm
 
 
-def fetch_uni_v2_pool_state(
+async def async_get_uni_v2_pool_state(
     pool_address,
     x_address,
     y_address,
@@ -14,19 +14,19 @@ def fetch_uni_v2_pool_state(
 ):
 
     # balances
-    x_balance = evm.get_erc20_balance_of(
+    x_balance = evm.async_get_erc20_balance_of(
         token=x_address,
         address=pool_address,
         block=block,
         normalize=normalize,
     )
-    y_balance = evm.get_erc20_balance_of(
+    y_balance = evm.async_get_erc20_balance_of(
         token=y_address,
         address=pool_address,
         block=block,
         normalize=normalize,
     )
-    lp_tokens = evm.get_erc20_total_supply(
+    lp_tokens = evm.async_get_erc20_total_supply(
         pool_address, block=block, normalize=normalize
     )
 

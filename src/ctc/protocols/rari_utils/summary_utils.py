@@ -164,7 +164,7 @@ async def _async_get_all_pools_stats(all_pools, block):
 async def async_get_token_multipool_stats(token, block='latest'):
     pools = await fuse_queries.async_get_all_pools(block=block)
 
-    eth_price = chainlink_utils.fetch_eth_price()
+    eth_price = await chainlink_utils.async_fetch_eth_price()
     pools_stats = [
         asyncio.create_task(
             async_get_token_pool_stats(

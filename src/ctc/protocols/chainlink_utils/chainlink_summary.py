@@ -6,11 +6,11 @@ import toolstr
 
 from ctc import directory
 from ctc import evm
-from ctc.evm import rpc_utils
+from ctc import rpc
 from ctc.protocols import chainlink_utils
 
 
-def summarize_feed(feed, n_recent=10):
+async def async_summarize_feed(feed, n_recent=10):
 
     if evm.is_address_str(feed):
         feed_address = feed
@@ -22,9 +22,11 @@ def summarize_feed(feed, n_recent=10):
         raise Exception('unknown feed specification: ' + str(feed))
 
     call_kwargs = {'to_address': feed_address}
-    name = rpc_utils.eth_call(function_name='description', **call_kwargs)
-    decimals = rpc_utils.eth_call(function_name='decimals', **call_kwargs)
-    aggregator = rpc_utils.eth_call(function_name='aggregator', **call_kwargs)
+    name = await rpc.async_eth_call(function_name='description', **call_kwargs)
+    decimals = await rpc.async_eth_call(function_name='decimals', **call_kwargs)
+    aggregator = await rpc.async_eth_call(
+        function_name='aggregator', **call_kwargs
+    )
 
     data = chainlink_utils.get_feed_data(
         feed_address=feed_address,

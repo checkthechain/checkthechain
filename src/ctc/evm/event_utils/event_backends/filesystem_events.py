@@ -246,7 +246,7 @@ def print_events_summary_filesystem():
             )
 
 
-def save_events_to_filesystem(
+async def async_save_events_to_filesystem(
     events,
     contract_address,
     start_block,
@@ -277,7 +277,7 @@ def save_events_to_filesystem(
     events.to_csv(path)
 
 
-def get_events_from_filesystem(
+async def async_get_events_from_filesystem(
     contract_address,
     event_hash=None,
     event_name=None,
@@ -287,9 +287,8 @@ def get_events_from_filesystem(
     end_block=None,
 ):
 
-    start_block, end_block = block_utils.normalize_block_range(
-        start_block=start_block,
-        end_block=end_block,
+    start_block, end_block = await block_utils.async_block_numbers_to_int(
+        blocks=[start_block, end_block],
     )
 
     if event_hash is None:
@@ -329,7 +328,7 @@ def get_events_from_filesystem(
 
     # trim unwanted
     if start_block == 'latest' or end_block == 'latest':
-        latest_block = block_utils.get_block_number('latest')
+        latest_block = await block_utils.async_get_latest_block_number()
         if start_block == 'latest':
             start_block = latest_block
         if end_block == 'latest':

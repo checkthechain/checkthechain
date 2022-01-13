@@ -1,6 +1,6 @@
 import toolparallel
 
-from .. import rpc_utils
+from ctc import rpc
 
 
 def get_transaction(transaction_hash, provider=None):
@@ -20,7 +20,7 @@ def get_transactions(transaction_hashes, provider=None):
     plural_arg='transaction_hashes',
 )
 def fetch_transaction(transaction_hash, provider=None):
-    return rpc_utils.eth_get_transaction_by_hash(
+    return await rpc.async_eth_get_transaction_by_hash(
         transaction_hash=transaction_hash,
         provider=provider,
     )

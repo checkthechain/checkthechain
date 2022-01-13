@@ -1,24 +1,25 @@
 import toolstr
 import tooltime
 
+from ctc import rpc
+from ctc import spec
 from .. import binary_utils
 from .. import block_utils
 from .. import contract_abi_utils
-from .. import rpc_utils
 from . import transaction_crud
 
 
-def print_transaction_summary(transaction_hash, sort_logs_by=None):
+async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
     transaction = transaction_crud.get_transaction(transaction_hash=transaction_hash)
-    transaction_receipt = rpc_utils.eth_get_transaction_receipt(
+    transaction_receipt = await rpc.async_eth_get_transaction_receipt(
         transaction_hash=transaction_hash
     )
-    block = block_utils.get_block(
+    block = await block_utils.async_get_block(
         transaction['block_number'], include_full_transactions=False
     )
 
     from ctc.protocols import chainlink_utils
-    eth_usd = chainlink_utils.fetch_eth_price(block=transaction['block_number'])
+    eth_usd = await chainlink_utils.async_fetch_eth_price(block=transaction['block_number'])
 
     print('Transaction')
     print('-----------')
@@ -69,6 +70,16 @@ def print_transaction_summary(transaction_hash, sort_logs_by=None):
         print('---------')
         print('[none]')
     else:
+        try:
+            contract_abi_utils.get_contract_abi(contract_address=transaction['to'])
+        except spec.AbiNotFoundException:
+            print()
+            print()
+            print('No Contract ABI Available')
+            print('-------------------------')
+            return
+
+
         function_abi = contract_abi_utils.get_function_abi(
             contract_address=transaction['to'],
             function_selector=transaction['input'][:10],

@@ -5,5 +5,4 @@ from .contract_abi_utils import *
 from .erc20_utils import *
 from .eth_utils import *
 from .event_utils import *
-from .rpc_utils import *
 from .transaction_utils import *

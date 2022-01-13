@@ -1,13 +1,12 @@
+import asyncio
 import functools
-
-import toolparallel
 
 from ctc.toolbox import search_utils
 from .. import address_utils
 from . import block_crud
 
 
-def get_contract_creation_block(
+async def async_get_contract_creation_block(
     contract_address,
     start_block=None,
     end_block=None,
@@ -27,16 +26,16 @@ def get_contract_creation_block(
     if end_block is None:
         end_block = 'latest'
     if start_block == 'latest' or end_block == 'latest':
-        latest_block = block_crud.get_block_number('latest')
+        latest_block = await block_crud.async_get_latest_block_number()
         if start_block == 'latest':
             start_block = latest_block
         if end_block == 'latest':
             end_block = latest_block
 
-    def is_match(index):
+    async def is_match(index):
         if verbose:
             print('trying block:', index)
-        return address_utils.is_contract_address(
+        return await address_utils.async_is_contract_address(
             address=contract_address, block=index, provider=provider
         )
 
@@ -60,7 +59,7 @@ def get_contract_creation_block(
     return result
 
 
-def get_blocks_of_timestamps(
+async def async_get_blocks_of_timestamps(
     timestamps,
     block_timestamps=None,
     block_number_array=None,
@@ -83,7 +82,7 @@ def get_blocks_of_timestamps(
 
         blocks = []
         for timestamp in timestamps:
-            block = get_block_of_timestamp(
+            block = get_block_of_timestamp_from_arrays(
                 timestamp=timestamp,
                 nary=nary,
                 cache=cache,
@@ -97,17 +96,21 @@ def get_blocks_of_timestamps(
 
     else:
 
-        return get_block_of_timestamp(
-            timestamps=timestamps,
-            verbose=False,
-            parallel_kwargs={'n_workers': len(timestamps)},
-        )
+        coroutines = []
+        for timestamp in timestamps:
+            coroutine = async_get_block_of_timestamp(
+                timestamp=timestamp,
+                verbose=False,
+            )
+            coroutines.append(coroutine)
+
+        return await asyncio.gather(*coroutines)
 
 
-@toolparallel.parallelize_input(
-    singular_arg='timestamp', plural_arg='timestamps'
-)
-def get_block_of_timestamp(
+# @toolparallel.parallelize_input(
+#     singular_arg='timestamp', plural_arg='timestamps'
+# )
+async def async_get_block_of_timestamp(
     timestamp,
     nary=None,
     cache=None,
@@ -129,7 +132,7 @@ def get_block_of_timestamp(
             verbose=verbose,
         )
     else:
-        return get_block_of_timestamp_from_node(
+        return await async_get_block_of_timestamp_from_node(
             timestamp=timestamp,
             nary=nary,
             cache=cache,
@@ -146,7 +149,7 @@ def get_block_of_timestamp_from_arrays(
     return block_number_array[index]
 
 
-def get_block_of_timestamp_from_node(
+async def async_get_block_of_timestamp_from_node(
     timestamp, nary=None, cache=None, provider=None, verbose: bool = True
 ):
     """
@@ -160,8 +163,8 @@ def get_block_of_timestamp_from_node(
     if cache is None:
         cache = {'initializing': {timestamp: True}, 'timestamps': {}}
 
-    is_match = functools.partial(
-        _is_match_block_of_timestamp, timestamp=timestamp, cache=cache
+    async_is_match = functools.partial(
+        _async_is_match_block_of_timestamp, timestamp=timestamp, cache=cache
     )
     get_next_probes = functools.partial(
         _get_next_probes_block_of_timestamp,
@@ -170,16 +173,16 @@ def get_block_of_timestamp_from_node(
         debug=verbose,
     )
 
-    return search_utils.nary_search(
+    return await search_utils.async_nary_search(
         nary=nary,
         start_index=1,
-        end_index=block_crud.get_block_number('latest'),
-        is_match=is_match,
+        end_index=(await block_crud.async_get_latest_block_number()),
+        async_is_match=async_is_match,
         get_next_probes=get_next_probes,
     )
 
 
-def _is_match_block_of_timestamp(
+async def _async_is_match_block_of_timestamp(
     block_numbers, timestamp, cache, provider=None
 ):
 
@@ -189,7 +192,7 @@ def _is_match_block_of_timestamp(
         for block_number in block_numbers
         if block_number not in cache['timestamps']
     ]
-    gotten = block_crud.get_blocks(not_in_cache)
+    gotten = await block_crud.async_get_blocks(not_in_cache)
     for block_number, block in zip(not_in_cache, gotten):
         cache['timestamps'][block_number] = block['timestamp']
 

@@ -1,9 +1,9 @@
-from .. import rpc_utils
+from ctc import rpc
 from .. import contract_abi_utils
 from . import address_data
 
 
-def print_address_summary(address, verbose=0, max_width=80):
+async def async_print_address_summary(address, verbose=0, max_width=80):
     """
 
     TODO (with more data)
@@ -11,11 +11,11 @@ def print_address_summary(address, verbose=0, max_width=80):
     - transfers
     """
 
-    eth_balance = rpc_utils.eth_get_balance(address)
-    transaction_count = rpc_utils.eth_get_transaction_count(address)
+    eth_balance = await rpc.async_eth_get_balance(address)
+    transaction_count = await rpc.async_eth_get_transaction_count(address)
 
     # contract data
-    code = rpc_utils.eth_get_code(address)
+    code = await rpc.async_eth_get_code(address)
     is_contract = code != '0x'
     if is_contract:
         address_type = 'contract'

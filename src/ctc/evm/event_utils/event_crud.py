@@ -8,17 +8,17 @@ from .. import block_utils
 def get_backend_functions():
     return {
         'get': {
-            'filesystem': filesystem_events.get_events_from_filesystem,
-            'download': download_events,
-            'node': node_events.get_events_from_node,
+            'filesystem': filesystem_events.async_get_events_from_filesystem,
+            'download': async_download_events,
+            'node': node_events.async_get_events_from_node,
         },
         'save': {
-            'filesystem': filesystem_events.save_events_to_filesystem,
+            'filesystem': filesystem_events.async_save_events_to_filesystem,
         },
     }
 
 
-def get_events(
+async def async_get_events(
     *,
     contract_address,
     start_block=None,
@@ -27,16 +27,14 @@ def get_events(
     **query
 ) -> spec.DataFrame:
 
-    start_block, end_block = block_utils.normalize_block_range(
-        contract_address=contract_address,
-        start_block=start_block,
-        end_block=end_block,
+    start_block, end_block = await block_utils.async_block_numbers_to_int(
+        blocks=[start_block, end_block],
     )
 
     if backend_order is None:
         backend_order = ['filesystem', 'download']
 
-    return backend_utils.run_on_backend(
+    return await backend_utils.async_run_on_backend(
         get_backend_functions()['get'],
         contract_address=contract_address,
         start_block=start_block,
@@ -46,25 +44,23 @@ def get_events(
     )
 
 
-def save_events(events, **query):
-    return backend_utils.run_on_backend(
+async def async_save_events(events, **query):
+    return await backend_utils.async_run_on_backend(
         get_backend_functions()['save'], events=events, **query
     )
 
 
-def transfer_events(
+async def async_transfer_events(
     *, contract_address, start_block=None, end_block=None, **query
 ):
 
-    start_block, end_block = block_utils.normalize_block_range(
-        contract_address=contract_address,
-        start_block=start_block,
-        end_block=end_block,
+    start_block, end_block = await block_utils.async_block_numbers_to_int(
+        blocks=[start_block, end_block],
     )
 
-    return backend_utils.transfer_backends(
-        get=get_events,
-        save=save_events,
+    return await backend_utils.async_transfer_backends(
+        get=async_get_events,
+        save=async_save_events,
         contract_address=contract_address,
         start_block=start_block,
         end_block=end_block,
@@ -72,7 +68,7 @@ def transfer_events(
     )
 
 
-def download_events(
+async def async_download_events(
     contract_address,
     event_hash=None,
     event_name=None,
@@ -86,10 +82,8 @@ def download_events(
 
     contract_address = contract_address.lower()
 
-    start_block, end_block = block_utils.normalize_block_range(
-        contract_address=contract_address,
-        start_block=start_block,
-        end_block=end_block,
+    start_block, end_block = await block_utils.async_block_numbers_to_int(
+        blocks=[start_block, end_block],
     )
 
     # get event hash
@@ -127,7 +121,7 @@ def download_events(
 
     # perform downloads
     for download in downloads:
-        transfer_events(
+        await async_transfer_events(
             from_backend='node',
             to_backend='filesystem',
             event_hash=event_hash,
@@ -136,7 +130,7 @@ def download_events(
         )
 
     # load from filesystem
-    return filesystem_events.get_events_from_filesystem(
+    return await filesystem_events.get_events_from_filesystem(
         event_hash=event_hash,
         contract_address=contract_address,
         start_block=start_block,
