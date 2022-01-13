@@ -100,6 +100,44 @@ def binary_search(
             return end_index
 
 
+async def async_binary_search(
+    *,
+    async_is_match,
+    start_index=None,
+    end_index=None,
+    index_range=None,
+    raise_if_not_found=True
+):
+    """return the first index for which match returns True"""
+
+    if start_index is None and end_index is None:
+        start_index, end_index = index_range
+
+    start_index = int(start_index)
+    end_index = int(end_index)
+
+    if await async_is_match(start_index):
+        return start_index
+    if not await async_is_match(end_index):
+        if raise_if_not_found:
+            raise NoMatchFound('could not find match')
+        else:
+            return None
+
+    while True:
+
+        midpoint = (start_index + end_index) / 2
+        midpoint = int(midpoint)
+
+        if await async_is_match(midpoint):
+            end_index = midpoint
+        else:
+            start_index = midpoint
+
+        if start_index + 1 == end_index:
+            return end_index
+
+
 def nary_search(
     nary,
     start_index,
