@@ -5,6 +5,12 @@ from ctc import spec
 from . import function_parsing
 
 
+_Parameters = typing.Union[
+    typing.Sequence[typing.Any],
+    typing.Mapping[str, typing.Any],
+]
+
+
 #
 # # call data
 #
@@ -14,15 +20,17 @@ def encode_call_data(
     *,
     function_selector: typing.Optional[str] = None,
     parameter_types: typing.Optional[spec.ABIDatumType] = None,
-    parameters: typing.Optional[typing.Sequence[typing.Any]] = None,
+    parameters: typing.Optional[_Parameters] = None,
     encoded_parameters: typing.Optional[spec.BinaryData] = None,
     function_abi: typing.Optional[spec.FunctionABI] = None,
 ) -> str:
 
+    # encode function selector
     if function_selector is None:
         function_selector = function_parsing.get_function_selector(function_abi)
     function_selector = binary.convert(function_selector, 'prefix_hex')
 
+    # encode parameters
     if encoded_parameters is None:
         encoded_parameters = encode_function_parameters(
             parameters=parameters,
@@ -31,6 +39,7 @@ def encode_call_data(
         )
     encoded_parameters = binary.convert(encoded_parameters, 'raw_hex')
 
+    # join function selector with parameters
     return function_selector + encoded_parameters
 
 
@@ -76,11 +85,6 @@ def decode_call_data(
 #
 # # function parameters
 #
-
-_Parameters = typing.Union[
-    typing.Sequence[typing.Any],
-    typing.Mapping[str, typing.Any],
-]
 
 
 def encode_function_parameters(

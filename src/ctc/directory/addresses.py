@@ -92,7 +92,7 @@ def get_address_first_block(
     contract_name: typing.Optional[str] = None,
     network: typing.Optional[spec.NetworkReference] = None,
     backend: spec.StorageBackend = 'Filesystem',
-) -> spec.AddressMetadata:
+) -> int:
 
     metadata = get_address_metadata(
         address=address,
@@ -103,8 +103,9 @@ def get_address_first_block(
         backend=backend,
     )
 
-    if metadata.get('first_block') is not None:
-        return metadata['first_block']
+    first_block = metadata.get('first_block')
+    if first_block is not None:
+        return first_block
     else:
         raise Exception('first block not specified for addresss')
 

@@ -48,11 +48,12 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
 
 def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
     """return a unique identifier for provider within this process"""
-    return (
-        os.getpid(),
-        provider['url'],
-        tuple(provider['session_kwargs'].items()),
-    )
+
+    session_kwargs = provider.get('session_kwargs')
+    if session_kwargs is None:
+        session_kwargs = {}
+
+    return (os.getpid(), provider['url'], tuple(session_kwargs.items()))
 
 
 def add_provider_parameters(

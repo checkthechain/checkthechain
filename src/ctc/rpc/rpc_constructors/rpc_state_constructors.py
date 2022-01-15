@@ -15,7 +15,7 @@ def construct_eth_call(
     block_number: spec.BlockSpec = None,
     call_data: spec.BinaryData = None,
     function_parameters: typing.Optional[typing.Union[list, dict]] = None,
-    **function_abi_query
+    function_abi: typing.Optional[spec.FunctionABI] = None,
 ) -> spec.RpcResponse:
 
     if block_number is None:
@@ -26,8 +26,7 @@ def construct_eth_call(
     if call_data is None:
         call_data = binary.encode_call_data(
             parameters=function_parameters,
-            contract_address=to_address,
-            **function_abi_query
+            function_abi=function_abi,
         )
 
     # assemble request data
@@ -52,15 +51,14 @@ def construct_eth_estimate_gas(
     value_sent: spec.BinaryData = None,
     call_data: spec.BinaryData = None,
     function_parameters: typing.Optional[typing.Union[list, dict]] = None,
-    **function_abi_query
+    function_abi: typing.Optional[spec.FunctionABI] = None,
 ) -> spec.RpcResponse:
 
     # encode call data
     if call_data is None:
         call_data = binary.encode_call_data(
             parameters=function_parameters,
-            contract_address=to_address,
-            **function_abi_query
+            function_abi=function_abi,
         )
 
     # assemble call data

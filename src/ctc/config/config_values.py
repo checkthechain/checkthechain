@@ -62,8 +62,8 @@ def get_default_network() -> spec.NetworkName:
 
 
 def get_default_provider(
-    network: typing.Optional[spec.NetworkName] = None,
-) -> spec.ProviderSpec:
+    network: typing.Optional[spec.NetworkName] = None
+) -> spec.Provider:
 
     if network is None:
         network = get_default_network()

@@ -1,3 +1,4 @@
+from ctc import evm
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
@@ -18,6 +19,13 @@ async def async_eth_call(
     package_named_outputs=False,
     **function_abi_query
 ):
+
+    function_abi = await evm.async_get_function_abi(
+        contract_address=to_address,
+        **function_abi_query
+    )
+
+    # construct request
     request = rpc_constructors.construct_eth_call(
         to_address=to_address,
         from_address=from_address,
@@ -27,13 +35,16 @@ async def async_eth_call(
         block_number=block_number,
         call_data=call_data,
         function_parameters=function_parameters,
-        **function_abi_query
+        function_abi=function_abi,
     )
+
+    # make request
     response = await rpc_request.async_send(request, provider=provider)
+
+    # digest response
     return rpc_digestors.digest_eth_call(
         response,
-        to_address=to_address,
-        function_abi_query=function_abi_query,
+        function_abi=function_abi,
         decode_response=decode_response,
         delist_single_outputs=delist_single_outputs,
         package_named_outputs=package_named_outputs,

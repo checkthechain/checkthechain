@@ -50,6 +50,8 @@ def get_async_http_session(
     if key not in _http_sessions:
         if create:
             kwargs = provider['session_kwargs']
+            if kwargs is None:
+                kwargs = {}
             _http_sessions[key] = aiohttp.ClientSession(**kwargs)
         else:
             raise Exception('no session, must create')
