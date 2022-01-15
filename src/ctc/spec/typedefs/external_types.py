@@ -1,9 +1,17 @@
 import typing
 
+
 if typing.TYPE_CHECKING:
     import numpy
     import pandas
 
+    DataFrame = pandas.core.frame.DataFrame
+    DType = numpy.typing.DTypeLike
+    NumpyArray = numpy.typing.NDArray
 
-DataFrame = typing.Type['pandas.core.frame.DataFrame']
-DType = typing.Type['numpy.typing.DTypeLike']
+else:
+
+    DataFrame = typing.Any
+    DType = typing.Any
+    NumpyArray = typing.Any
+

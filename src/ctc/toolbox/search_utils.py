@@ -9,8 +9,7 @@ class MultipleMatchesFound(LookupError):
     pass
 
 
-M = typing.TypeVar('M')
-# M = typing.TypeVar('M', bound=typing.Mapping)
+M = typing.TypeVar('M', bound=typing.Mapping)
 
 
 def get_matching_entries(
@@ -40,7 +39,7 @@ def get_matching_entry(
 def get_matching_entry(
     sequence: typing.Sequence[M],
     query: typing.Mapping[typing.Any, typing.Any],
-    raise_if_not_found: bool = True,
+    raise_if_not_found: typing.Literal[True] = True,
 ) -> M:
     ...
 

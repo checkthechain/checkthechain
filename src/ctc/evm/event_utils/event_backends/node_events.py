@@ -2,8 +2,8 @@ import asyncio
 
 from ctc import rpc
 from ctc import binary
+from ... import abi_utils
 from ... import block_utils
-from ... import contract_abi_utils
 
 
 async def async_get_events_from_node(
@@ -41,14 +41,14 @@ async def async_get_events_from_node(
 
     # gather metadata
     if contract_abi is None and event_abi is None:
-        contract_abi = contract_abi_utils.get_contract_abi(
+        contract_abi = await abi_utils.async_get_contract_abi(
             contract_address=contract_address,
         )
     if event_name is None and event_hash is None and event_abi is None:
         raise Exception('must specify event_name or event_hash or event_abi')
     if event_name is None:
         if event_abi is None:
-            event_abi = contract_abi_utils.get_event_abi(
+            event_abi = await abi_utils.async_get_event_abi(
                 event_hash=event_hash,
                 contract_abi=contract_abi,
                 contract_address=contract_address,
@@ -56,13 +56,13 @@ async def async_get_events_from_node(
         event_name = event_abi['name']
     if event_hash is None:
         if event_abi is None:
-            event_abi = contract_abi_utils.get_event_abi(
+            event_abi = await abi_utils.async_get_event_abi(
                 event_hash=event_hash,
                 contract_abi=contract_abi,
                 contract_address=contract_address,
             )
         if event_name is not None:
-            event_hash = contract_abi_utils.get_event_hash(event_abi=event_abi)
+            event_hash = binary.get_event_hash(event_abi=event_abi)
         elif event_abi is not None:
             event_hash = contract_address.get_event_hash(event_abi=event_abi)
 
@@ -136,13 +136,14 @@ async def _package_exported_events(
 
     formatted_entries = []
     for entry in entries:
-        formatted_entry = contract_abi_utils.normalize_event(
+        formatted_entry = binary.normalize_event(
             event=entry,
             contract_abi=contract_abi,
         )
         formatted_entries.append(formatted_entry)
 
     import pandas as pd
+
     df = pd.DataFrame(formatted_entries)
     df = df.set_index(['block_number', 'transaction_index', 'log_index'])
 
@@ -169,6 +170,7 @@ def create_empty_event_dataframe(
         columns.append('arg__' + item['name'])
 
     import pandas as pd
+
     df = pd.DataFrame(columns=columns)
     df = df.set_index(['block_number', 'transaction_index', 'log_index'])
 

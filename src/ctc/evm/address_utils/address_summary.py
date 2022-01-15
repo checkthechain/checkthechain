@@ -1,5 +1,6 @@
+from ctc import binary
 from ctc import rpc
-from .. import contract_abi_utils
+from .. import abi_utils
 from . import address_data
 
 
@@ -35,10 +36,10 @@ async def async_print_address_summary(address, verbose=0, max_width=80):
         print()
         print()
 
-        contract_abi = contract_abi_utils.get_contract_abi(
+        contract_abi = await abi_utils.async_get_contract_abi(
             contract_address=address
         )
-        df = contract_abi_utils.contract_abi_to_dataframe(
+        df = abi_utils.contract_abi_to_dataframe(
             contract_abi=contract_abi, human_readable=False
         )
 
@@ -61,7 +62,7 @@ async def async_print_address_summary(address, verbose=0, max_width=80):
                     output_str = '(' + output_str + ')'
 
             if not verbose:
-                signature = contract_abi_utils.get_function_signature(
+                signature = binary.get_function_signature(
                     function_abi=function, include_names=True
                 )
             else:
@@ -98,11 +99,11 @@ async def async_print_address_summary(address, verbose=0, max_width=80):
         if len(events) == 0:
             print('[none]')
         for i, (e, event) in enumerate(events.iterrows()):
-            event_hash = contract_abi_utils.get_event_hash(event_abi=event)
-            signature = contract_abi_utils.get_event_signature(event_abi=event)
+            event_hash = binary.get_event_hash(event_abi=event)
+            signature = binary.get_event_signature(event_abi=event)
             line = str(i + 1) + '. ' + signature
             if len(line) > max_width:
-                line = line[:max_width - 3] + '...'
+                line = line[: max_width - 3] + '...'
             print(line)
             if verbose:
                 print('  ', event_hash)

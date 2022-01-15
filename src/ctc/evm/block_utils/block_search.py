@@ -141,7 +141,7 @@ async def async_get_block_of_timestamp(
 
 
 def get_block_of_timestamp_from_arrays(
-    timestamp, block_timestamp_array, block_number_array
+    timestamp, block_timestamp_array, block_number_array, verbose
 ):
     import numpy as np
 
@@ -252,20 +252,4 @@ def _get_next_probes_block_of_timestamp(
             probes = [target_index + i for i in range(-half, n_probes - half)]
 
             return probes
-
-
-#
-# # async versions
-#
-
-
-# async def get_blocks_of_timestamps(timestamps, nary=None):
-#     if cache is None:
-#         cache = {
-#             'initializing': {timestamp: True for timestamp in timestamps},
-#             'timestamps': {},
-#         }
-
-#     # for timestamp in timestamps:
-#     #     asyncio.create_task(async_get_block_of_timestamp)
 

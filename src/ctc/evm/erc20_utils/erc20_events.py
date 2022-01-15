@@ -8,13 +8,13 @@ from . import erc20_metadata
 # import pandas
 
 
-def get_erc20_transfers(
+async def async_get_erc20_transfers(
     token_address: spec.ERC20Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = 'latest',
     **event_kwargs
 ) -> spec.DataFrame:
-    return event_utils.get_events(
+    return await event_utils.async_get_events(
         contract_address=token_address,
         event_name='Transfer',
         start_block=start_block,
@@ -26,7 +26,7 @@ def get_erc20_transfers(
 async def async_get_erc20_balances_from_transfers(
     transfers: spec.DataFrame,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    dtype: spec.DType = float,
+    dtype: typing.Union[typing.Type[int], typing.Type[float]] = float,
     normalize: bool = True,
 ) -> spec.DataFrame:
 
@@ -54,6 +54,8 @@ async def async_get_erc20_balances_from_transfers(
     # normalize
     if normalize:
         block = transfers.index[-1][0]
+        if block is None:
+            raise Exception('could not determine any valid block')
         address = transfers['contract_address'].iloc[0]
         decimals = await erc20_metadata.async_get_erc20_decimals(
             token=address, block=block

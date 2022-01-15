@@ -174,8 +174,8 @@ async def async_read_csv_threads(path, pool=None):
 
 
 async def async_read_csv_dask(path):
-    import dask.dataframe as dd
-    import dask.distributed
+    import dask.dataframe as dd  # type: ignore
+    import dask.distributed  # type: ignore
 
     client = await dask.distributed.Client(asynchronous=True)
     g = dd.read_csv(path, dtype='object')

@@ -16,7 +16,9 @@ def get_command_spec():
 
 def call_command(to_address, function_name, args):
 
-    asyncio.run(run(to_address=to_address, function_name=function_name, args=args)
+    asyncio.run(
+        run(to_address=to_address, function_name=function_name, args=args)
+    )
 
 
 async def run(to_address, function_name, args):

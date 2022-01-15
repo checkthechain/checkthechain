@@ -1,5 +1,5 @@
 from ctc import rpc
-from . import contract_abi_utils
+from . import abi_utils
 
 
 eip_897_abi = [
@@ -68,7 +68,7 @@ async def async_get_eip1967_proxy_logic_address(contract_address, block=None):
 
 async def async_save_eip897_abi(contract_address):
     eip897_address = await async_get_eip897_implementation(contract_address)
-    contract_abi_utils.async_save_proxy_contract_abi_to_filesystem(
+    abi_utils.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
         proxy_implementation=eip897_address,
     )

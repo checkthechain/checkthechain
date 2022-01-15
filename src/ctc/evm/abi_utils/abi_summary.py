@@ -1,7 +1,7 @@
 import copy
 
 from . import abi_io
-from . import event_parsing
+from .. import event_utils
 
 
 #
@@ -9,20 +9,23 @@ from . import event_parsing
 #
 
 
-async def async_summarize_contract_abi(contract_abi=None, contract_address=None):
+async def async_summarize_contract_abi(
+    contract_abi=None, contract_address=None
+):
     if contract_abi is None:
-        contract_abi = abi_storage.async_get_contract_abi(
+        contract_abi = abi_io.async_get_contract_abi(
             contract_address=contract_address,
         )
     df = contract_abi_to_dataframe(contract_abi, human_readable=True)
     import IPython  # type: ignore
+
     IPython.display.display(df)
 
 
 def summarize_contract_events(*, contract_abi=None, events=None):
 
     if events is None:
-        events = event_parsing.get_contract_events(contract_abi=contract_abi)
+        events = get_contract_events(contract_abi=contract_abi)
 
     print(len(events), 'events:')
     for event in events.values():
@@ -42,7 +45,7 @@ def get_contract_events(contract_abi=None, **abi_query):
         contract_abi = abi_io.get_contract_abi(**abi_query)
 
     return {
-        event_parsing.get_event_hash(event_abi=abi_item): abi_item
+        binary.get_event_hash(event_abi=abi_item): abi_item
         for abi_item in contract_abi
         if abi_item['type'] == 'event'
     }
@@ -114,12 +117,14 @@ def contract_abi_to_dataframe(contract_abi, human_readable):
 def get_contract_events_dataframe(
     contract_abi, contract_name=None, contract_address=None, protocol_name=None
 ):
-    event_abis = event_parsing.get_contract_events(contract_abi=contract_abi)
+    event_abis = event_utils.async_get_contract_events(
+        contract_abi=contract_abi
+    )
     event_rows = []
     for event_hash, event_abi in event_abis.items():
 
-        data_types = event_parsing.get_event_data_types(event_abi=event_abi)
-        data_names = event_parsing.get_event_data_names(event_abi=event_abi)
+        data_types = binary.get_event_data_types(event_abi=event_abi)
+        data_names = binary.get_event_data_names(event_abi=event_abi)
         data_signature = [
             data_type + ' ' + data_name
             for data_type, data_name in zip(data_types, data_names)

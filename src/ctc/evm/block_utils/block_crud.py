@@ -35,7 +35,7 @@ async def async_get_blocks(
     include_full_transactions: bool = False,
     chunk_size: int = 500,
     provider: spec.ProviderSpec = None,
-) -> spec.Block:
+) -> list[spec.Block]:
 
     provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
 

@@ -84,7 +84,10 @@ def write_file_data(
 
 def write_buffer_data(
     buffer: typing.TextIO,
-    data: typing.Union[list[dict], dict[typing.Any, dict]],
+    data: typing.Union[
+        typing.Sequence[typing.Mapping],
+        typing.Mapping[typing.Any, typing.Mapping],
+    ],
     format: DataFormat,
     index_field: typing.Optional[str] = None,
 ) -> None:
@@ -105,7 +108,7 @@ def write_buffer_data(
     elif format == 'toml':
         import toml
 
-        if isinstance(data, list):
+        if not isinstance(data, typing.Mapping):
             raise Exception('can only write mappings to toml, not sequences')
 
         toml.dump(data, buffer)

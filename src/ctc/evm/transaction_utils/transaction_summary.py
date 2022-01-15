@@ -5,11 +5,10 @@ from ctc import binary
 from ctc import rpc
 from ctc import spec
 from .. import block_utils
-from . import transaction_crud
 
 
 async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
-    transaction = transaction_crud.get_transaction(transaction_hash=transaction_hash)
+    transaction = await rpc.async_eth_get_transaction_by_hash(transaction_hash)
     transaction_receipt = await rpc.async_eth_get_transaction_receipt(
         transaction_hash=transaction_hash
     )
@@ -18,7 +17,10 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
     )
 
     from ctc.protocols import chainlink_utils
-    eth_usd = await chainlink_utils.async_fetch_eth_price(block=transaction['block_number'])
+
+    eth_usd = await chainlink_utils.async_fetch_eth_price(
+        block=transaction['block_number']
+    )
 
     print('Transaction')
     print('-----------')
@@ -77,7 +79,6 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             print('No Contract ABI Available')
             print('-------------------------')
             return
-
 
         function_abi = binary.get_function_abi(
             contract_address=transaction['to'],
