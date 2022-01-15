@@ -81,3 +81,31 @@ class Block(typing.TypedDict):
     transactions_root: binary_types.PrefixHexData
     uncles: list[BlockHash]
 
+
+class RawLog(typing.TypedDict):
+    removed: bool
+    logIndex: int
+    transactionIndex: int
+    transactionHash: TransactionHash
+    blockHash: BlockHash
+    blockNumber: int
+    address: address_types.Address
+    data: binary_types.PrefixHexData
+    topics: list[binary_types.PrefixHexData]
+
+
+class PendingRawLog(typing.TypedDict):
+    # many log fields are nullable if a log is pending
+    removed: bool
+    logIndex: typing.Union[None, int]
+    transactionIndex: typing.Union[None, int]
+    transactionHash: typing.Union[None, TransactionHash]
+    blockHash: typing.Union[None, BlockHash]
+    blockNumber: typing.Union[None, int]
+    address: address_types.Address
+    data: binary_types.PrefixHexData
+    topics: list[binary_types.PrefixHexData]
+
+
+NormalizedLog = dict[str, typing.Any]
+
