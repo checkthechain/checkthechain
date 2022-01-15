@@ -1,8 +1,7 @@
 import typing
 
+from ctc import binary
 from ctc import spec
-from ctc.evm import binary_utils
-from ctc.evm import contract_abi_utils
 from .. import rpc_request
 from .. import rpc_format
 
@@ -25,7 +24,7 @@ def construct_eth_call(
 
     # encode call data
     if call_data is None:
-        call_data = contract_abi_utils.encode_call_data(
+        call_data = binary.encode_call_data(
             parameters=function_parameters,
             contract_address=to_address,
             **function_abi_query
@@ -58,7 +57,7 @@ def construct_eth_estimate_gas(
 
     # encode call data
     if call_data is None:
-        call_data = contract_abi_utils.encode_call_data(
+        call_data = binary.encode_call_data(
             parameters=function_parameters,
             contract_address=to_address,
             **function_abi_query
@@ -93,7 +92,7 @@ def construct_eth_get_storage_at(
     block_number='latest',
 ) -> spec.RpcResponse:
 
-    position = binary_utils.convert_binary_format(position, 'prefix_hex')
+    position = binary.convert(position, 'prefix_hex')
     block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create(
         'eth_getStorageAt', [address, position, block_number]

@@ -1,7 +1,7 @@
 import tooltime
 import toolstr
 
-from .. import binary_utils
+from ctc import binary
 from . import block_crud
 
 
@@ -27,6 +27,7 @@ async def async_print_block_summary(block, provider=None):
             for transaction in block['transactions']
         ]
         import numpy as np
+
         gas_percentiles = np.percentile(
             gas_prices,
             percentiles,
@@ -62,7 +63,7 @@ async def async_print_block_summary(block, provider=None):
 
     message = block['extra_data']
     try:
-        message = binary_utils.convert_binary_format(message, 'binary').decode()
+        message = binary.convert(message, 'binary').decode()
     except Exception as e:
         if len(message) > 80:
             message = message[:77] + '...'

@@ -1,5 +1,5 @@
 from ctc import spec
-from ctc.evm import binary_utils
+from ctc import binary
 from .. import rpc_format
 from .. import rpc_spec
 
@@ -8,7 +8,7 @@ def digest_eth_block_number(
     response: spec.RpcSingularResponse, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 
@@ -69,7 +69,7 @@ def digest_eth_get_uncle_count_by_block_hash(
     response: spec.RpcSingularResponse, decode_response: bool = True
 ):
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 
@@ -77,7 +77,7 @@ def digest_eth_get_uncle_count_by_block_number(
     response: spec.RpcSingularResponse, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 

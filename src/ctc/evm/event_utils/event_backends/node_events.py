@@ -1,8 +1,7 @@
 import asyncio
 
-import toolparallel
-
 from ctc import rpc
+from ctc import binary
 from ... import block_utils
 from ... import contract_abi_utils
 
@@ -56,17 +55,16 @@ async def async_get_events_from_node(
             )
         event_name = event_abi['name']
     if event_hash is None:
-        if event_name is not None:
-            event_hash = contract_abi_utils.get_event_hash(
-                event_name=event_name,
-                event_abi=event_abi,
+        if event_abi is None:
+            event_abi = contract_abi_utils.get_event_abi(
+                event_hash=event_hash,
                 contract_abi=contract_abi,
                 contract_address=contract_address,
             )
+        if event_name is not None:
+            event_hash = contract_abi_utils.get_event_hash(event_abi=event_abi)
         elif event_abi is not None:
-            event_hash = contract_address.get_event_hash(
-                event_abi=event_abi,
-            )
+            event_hash = contract_address.get_event_hash(event_abi=event_abi)
 
         else:
             raise Exception('must specify event_name, event_abi, or event_hash')
@@ -88,7 +86,7 @@ async def async_get_events_from_node(
 
     # package as dataframe
     if package_as_dataframe:
-        entries = _package_exported_events(
+        entries = _async_package_exported_events(
             entries,
             contract_address=contract_address,
             contract_abi=contract_abi,
@@ -122,28 +120,25 @@ async def _async_get_chunk_of_events_from_node(
     return entries
 
 
-def _package_exported_events(
+async def _package_exported_events(
     entries, contract_address, contract_abi, event_hash, event_name, event_abi
 ):
-
-    if len(entries) == 0:
-        return create_empty_event_dataframe(
+    if event_abi is None:
+        event_abi = await binary.async_get_event_abi(
             contract_address=contract_address,
             contract_abi=contract_abi,
             event_hash=event_hash,
             event_name=event_name,
-            event_abi=event_abi,
         )
+
+    if len(entries) == 0:
+        return create_empty_event_dataframe(event_abi=event_abi)
 
     formatted_entries = []
     for entry in entries:
         formatted_entry = contract_abi_utils.normalize_event(
             event=entry,
-            contract_address=contract_address,
             contract_abi=contract_abi,
-            event_name=event_name,
-            event_hash=event_hash,
-            event_abi=event_abi,
         )
         formatted_entries.append(formatted_entry)
 
@@ -155,12 +150,7 @@ def _package_exported_events(
 
 
 def create_empty_event_dataframe(
-    *,
     event_abi=None,
-    contract_address=None,
-    contract_abi=None,
-    event_hash=None,
-    event_name=None,
 ):
 
     # standard columns
@@ -175,13 +165,6 @@ def create_empty_event_dataframe(
     ]
 
     # event-specific columns
-    if event_abi is None:
-        event_abi = contract_abi_utils.get_event_abi(
-            contract_address=contract_address,
-            contract_abi=contract_abi,
-            event_hash=event_hash,
-            event_name=event_name,
-        )
     for item in event_abi['inputs']:
         columns.append('arg__' + item['name'])
 

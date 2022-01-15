@@ -1,5 +1,5 @@
 from ctc import spec
-from ctc.evm import binary_utils
+from ctc import binary
 from .. import rpc_format
 from .. import rpc_spec
 
@@ -8,7 +8,7 @@ def digest_eth_new_filter(
     response: spec.RpcSingularResponse, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 
@@ -16,7 +16,7 @@ def digest_eth_new_block_filter(
     response: spec.RpcSingularResponse, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 
@@ -24,7 +24,7 @@ def digest_eth_new_pending_transaction_filter(
     response: spec.RpcSingularResponse, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 
@@ -32,7 +32,7 @@ def digest_eth_uninstall_filter(
     response: spec.RpcSingularResponse, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 

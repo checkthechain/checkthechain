@@ -1,11 +1,10 @@
 import toolstr
 import tooltime
 
+from ctc import binary
 from ctc import rpc
 from ctc import spec
-from .. import binary_utils
 from .. import block_utils
-from .. import contract_abi_utils
 from . import transaction_crud
 
 
@@ -71,7 +70,7 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
         print('[none]')
     else:
         try:
-            contract_abi_utils.get_contract_abi(contract_address=transaction['to'])
+            binary.get_contract_abi(contract_address=transaction['to'])
         except spec.AbiNotFoundException:
             print()
             print()
@@ -80,13 +79,13 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             return
 
 
-        function_abi = contract_abi_utils.get_function_abi(
+        function_abi = binary.get_function_abi(
             contract_address=transaction['to'],
             function_selector=transaction['input'][:10],
         )
-        call_data = contract_abi_utils.decode_call_data(
+        call_data = binary.decode_call_data(
             call_data=transaction['input'],
-            contract_address=transaction['to'],
+            function_abi=function_abi,
             output_format='prefix_hex',
         )
         print()
@@ -96,7 +95,7 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
         print(
             call_data['function_selector'],
             '-->',
-            contract_abi_utils.get_function_signature(function_abi=function_abi),
+            binary.get_function_signature(function_abi=function_abi),
         )
         for p, (name, value) in enumerate(call_data['parameters'].items()):
             if (
@@ -115,26 +114,27 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
         print('[none]')
 
     else:
-        if sort_logs_by == 'signature':
-            logs = sorted(
-                logs,
-                key=lambda log: contract_abi_utils.get_event_signature(
-                    contract_address=log['address'],
-                    event_hash=log['topics'][0],
-                ),
-            )
+        # if sort_logs_by == 'signature':
+        #     logs = sorted(
+        #         logs,
+        #         key=lambda log: binary.get_event_signature(
+        #             contract_address=log['address'],
+        #             event_hash=log['topics'][0],
+        #         ),
+        #     )
         for l, log in enumerate(logs):
             if l != 0:
                 print()
 
-            normalized_event = contract_abi_utils.normalize_event(
+            normalized_event = binary.normalize_event(
                 event=log,
                 arg_prefix=None,
             )
-            event_signature = contract_abi_utils.get_event_signature(
+            event_abi = binary.async_get_event_abi(
                 contract_address=log['address'],
                 event_hash=log['topics'][0],
             )
+            event_signature = binary.get_event_signature(event_abi=event_abi)
             print(event_signature, '-->', log['address'])
             for e, (name, value) in enumerate(normalized_event['args'].items()):
                 if (
@@ -145,7 +145,7 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
 
                 # not sure if this is what should be done
                 if isinstance(value, bytes):
-                    value = binary_utils.convert_binary_format(value, 'prefix_hex')
+                    value = binary.convert(value, 'prefix_hex')
 
                 print('    ' + str(e + 1) + '.', name, '=', value)
 

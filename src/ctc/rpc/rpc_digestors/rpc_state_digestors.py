@@ -1,6 +1,5 @@
 from ctc import spec
-from ctc.evm import binary_utils
-from ctc.evm import contract_abi_utils
+from ctc import binary
 
 
 def digest_eth_call(
@@ -16,7 +15,7 @@ def digest_eth_call(
         raise NotImplementedError('parse function_abi from rpc_response')
 
     if decode_response:
-        response = contract_abi_utils.decode_function_output(
+        response = binary.decode_function_output(
             encoded_output=response,
             contract_address=to_address,
             delist_single_outputs=delist_single_outputs,
@@ -31,7 +30,7 @@ def digest_eth_estimate_gas(
     response: spec.RpcSingularResponse, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 
@@ -39,7 +38,7 @@ def digest_eth_get_balance(
     response: spec.RpcSingularResponse, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary_utils.convert_binary_format(response, 'integer')
+        response = binary.convert(response, 'integer')
     return response
 
 

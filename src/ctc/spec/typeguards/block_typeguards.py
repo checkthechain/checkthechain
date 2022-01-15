@@ -1,7 +1,7 @@
 import typing
 from typing_extensions import TypeGuard
 
-from ctc.evm import binary_utils
+from ctc import binary
 from ..typedefs import block_types
 from . import binary_typeguards
 
@@ -35,7 +35,7 @@ def is_block_number_reference(
 def is_block_hash(block: typing.Any) -> TypeGuard[block_types.BlockHash]:
     return (
         binary_typeguards.is_hex_data(block)
-        and binary_utils.get_binary_n_bytes(block) == 32
+        and binary.get_binary_n_bytes(block) == 32
     )
 
 

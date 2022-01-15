@@ -43,7 +43,7 @@ def get_binary_n_bytes(data: spec.BinaryInteger) -> int:
 
 
 @typing.overload
-def convert_binary_format(
+def convert(
     data: spec.BinaryInteger,
     output_format: typing.Literal['binary'],
 ) -> bytes:
@@ -51,7 +51,7 @@ def convert_binary_format(
 
 
 @typing.overload
-def convert_binary_format(
+def convert(
     data: spec.BinaryInteger,
     output_format: typing.Literal['integer'],
 ) -> int:
@@ -59,14 +59,14 @@ def convert_binary_format(
 
 
 @typing.overload
-def convert_binary_format(
+def convert(
     data: spec.BinaryInteger,
     output_format: typing.Optional[typing.Literal['prefix_hex', 'raw_hex']],
 ) -> str:
     ...
 
 
-def convert_binary_format(
+def convert(
     data: spec.BinaryInteger,
     output_format: typing.Optional[spec.BinaryFormat] = None,
 ) -> spec.BinaryInteger:
@@ -194,7 +194,7 @@ def add_binary_pad(
         raise Exception('invalid binary format: ' + str(binary_format))
 
 
-def match_binary_format(
+def match_format(
     format_this: spec.BinaryInteger,
     like_this: spec.BinaryInteger,
     match_pad: bool = False,
@@ -205,10 +205,7 @@ def match_binary_format(
     """
 
     output_format = get_binary_format(like_this)
-    output = convert_binary_format(
-        data=format_this,
-        output_format=output_format,
-    )
+    output = convert(data=format_this, output_format=output_format)
 
     if match_pad:
         padded_size = get_binary_n_bytes(like_this)

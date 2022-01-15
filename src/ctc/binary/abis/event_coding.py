@@ -1,39 +1,34 @@
-"""
+import typing
 
-- maybe
-
-"""
-from .. import binary_utils
+from ctc import spec
+from .. import formats
+from . import abi_coding
 from . import event_parsing
 
 
-def encode_event_topics():
-    raise NotImplementedError()
-
-
-def encode_event_data(data, unindexed_types=None, output_format=None):
-    raise NotImplementedError()
-
-
 def decode_event_topics(
-    topics, indexed_types=None, indexed_names=None, use_names=True, **abi_query
+    topics: typing.Sequence[spec.BinaryData],
+    event_abi: typing.Optional[spec.EventABI] = None,
+    indexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    indexed_names: typing.Optional[list[str]] = None,
+    use_names: bool = True,
 ):
     """
-
-
     remaining edgecase:
     - variable data in indexed topic?
     """
 
     # get abi
     if indexed_types is None:
-        indexed_types = event_parsing.get_event_indexed_types(**abi_query)
+        if event_abi is None:
+            raise Exception('must specify event_abi')
+        indexed_types = event_parsing.get_event_indexed_types(event_abi)
 
     # decode
     decoded_topics = []
     for topic, indexed_type in zip(topics[1:], indexed_types):
-        topic = binary_utils.convert_binary_format(topic, 'binary')
-        decoded_topic = binary_utils.decode_evm_data(indexed_type, topic)
+        topic = formats.convert(topic, 'binary')
+        decoded_topic = abi_coding.abi_decode(topic, indexed_type)
         decoded_topics.append(decoded_topic)
 
     # package output
@@ -41,72 +36,74 @@ def decode_event_topics(
         return decoded_topics
     else:
         if indexed_names is None:
-            indexed_names = event_parsing.get_event_indexed_names(**abi_query)
+            if event_abi is None:
+                raise Exception('must specify event_abi')
+            indexed_names = event_parsing.get_event_indexed_names(event_abi)
         return dict(zip(indexed_names, decoded_topics))
 
 
 def decode_event_unindexed_data(
-    data,
-    unindexed_types=None,
-    unindexed_names=None,
-    use_names=True,
-    **abi_query
+    data: spec.BinaryData,
+    event_abi: typing.Optional[spec.EventABI] = None,
+    unindexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    unindexed_names: typing.Optional[list[str]] = None,
+    use_names: bool = True,
 ):
     """decode the unindexed data of event"""
 
     # gather metadata
     if unindexed_types is None:
-        unindexed_types = event_parsing.get_event_unindexed_types(**abi_query)
+        if event_abi is None:
+            raise Exception('must specify event_abi')
+        unindexed_types = event_parsing.get_event_unindexed_types(event_abi)
 
     # decode data
-    data = binary_utils.convert_binary_format(data, 'binary')
-    decoded = binary_utils.decode_evm_data('(' + ','.join(unindexed_types) + ')', data)
+    data = formats.convert(data, 'binary')
+    decoded = abi_coding.abi_decode(data, '(' + ','.join(unindexed_types) + ')')
 
     # package outputs
     if not use_names:
         return decoded
     else:
         if unindexed_names is None:
-            unindexed_names = event_parsing.get_event_unindexed_names(
-                **abi_query
-            )
+            if event_abi is None:
+                raise Exception('must specify event_abi')
+            unindexed_names = event_parsing.get_event_unindexed_names(event_abi)
         return dict(zip(unindexed_names, decoded))
 
 
-def normalize_event(event, arg_prefix='arg__', **abi_query):
-
-    if abi_query.get('contract_address') is None:
-        abi_query['contract_address'] = event['address']
-    if abi_query.get('event_hash') is None:
-        abi_query['event_hash'] = event['topics'][0]
-    if abi_query.get('event_name') is None:
-        event_abi = event_parsing.get_event_abi(**abi_query)
-        abi_query['event_name'] = event_abi['name']
+def normalize_event(
+    event: spec.RawLog,
+    event_abi: spec.EventABI,
+    arg_prefix: str = 'arg__',
+) -> spec.NormalizedLog:
 
     # decode event args
-    decoded_topics = decode_event_topics(topics=event['topics'], **abi_query)
-    decoded_data = decode_event_unindexed_data(data=event['data'], **abi_query)
+    decoded_topics = decode_event_topics(
+        topics=event['topics'], event_abi=event_abi
+    )
+    decoded_data = decode_event_unindexed_data(
+        data=event['data'], event_abi=event_abi
+    )
 
     # remove keys
     remove_keys = ['data', 'topics', 'removed']
-    event = {k: v for k, v in event.items() if k not in remove_keys}
+    normalized = {k: v for k, v in event.items() if k not in remove_keys}
 
     # rename keys
-    event['contract_address'] = event.pop('address')
+    normalized['contract_address'] = normalized['address']
 
     # add additional keys
-    for key in ['event_name', 'event_hash']:
-        if key not in abi_query:
-            raise Exception('should specify ' + str(key))
-        event[key] = abi_query[key]
+    normalized['event_name'] = event_abi['name']
+    normalized['event_hash'] = event['topics'][0]
 
     # add event args
     if arg_prefix is None:
         arg_container = {}
-        event['args'] = arg_container
+        normalized['args'] = arg_container
         arg_prefix = ''
     else:
-        arg_container = event
+        arg_container = normalized
     for event_args in [decoded_topics, decoded_data]:
         for arg_name, arg_value in event_args.items():
             key = arg_prefix + arg_name
@@ -114,7 +111,7 @@ def normalize_event(event, arg_prefix='arg__', **abi_query):
                 raise Exception('event key collision: ' + str(key))
             arg_container[key] = arg_value
 
-    return event
+    return normalized
 
 
 #
@@ -123,8 +120,10 @@ def normalize_event(event, arg_prefix='arg__', **abi_query):
 
 
 def decode_events_dataframe(
-    df, event_abi=None, delete_data_column=True, **abi_query
-):
+    df: spec.DataFrame,
+    event_abi: spec.EventABI,
+    delete_data_column: bool = True,
+) -> spec.DataFrame:
     """decode dataframe that contains raw event data
 
     ## Replaces Columns
@@ -141,9 +140,6 @@ def decode_events_dataframe(
     """
 
     raise Exception('need to figure out if this could be rewritten better')
-
-    if event_abi is None:
-        event_abi = event_parsing.get_event_abi(**abi_query)
 
     # validate data
     if len(df) > 0:

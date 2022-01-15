@@ -2,27 +2,25 @@
 see https://eth.wiki/en/fundamentals/rlp
 """
 
-from . import format_utils
+from . import formats
 
 
 def rlp_encode(data, output_format='prefix_hex'):
-    import rlp
+    import rlp  # type: ignore
 
     rlp_data = rlp.encode(data)
-    return format_utils.convert_binary_format(rlp_data, output_format)
+    return formats.convert(rlp_data, output_format)
 
 
 def rlp_decode(data):
-    import rlp
+    import rlp  # type: ignore
 
-    binary_data = format_utils.convert_binary_format(data, 'binary')
+    binary_data = formats.convert(data, 'binary')
 
     return rlp.decode(binary_data)
 
 
-
-
-#def rlp_encode(input):
+# def rlp_encode(input):
 #    if isinstance(input, str):
 #        if len(input) == 1 and ord(input) < 0x80:
 #            return input
@@ -35,7 +33,7 @@ def rlp_decode(data):
 #        return encode_length(len(output), 0xC0) + output
 
 
-#def encode_length(L, offset):
+# def encode_length(L, offset):
 #    if L < 56:
 #        return chr(L + offset)
 #    elif L < 256 ** 8:
@@ -45,7 +43,7 @@ def rlp_decode(data):
 #        raise Exception("input too long")
 
 
-#def to_binary(x):
+# def to_binary(x):
 #    if x == 0:
 #        return ''
 #    else:
@@ -55,7 +53,7 @@ def rlp_decode(data):
 ##
 ## # decode
 ##
-#def rlp_decode(input):
+# def rlp_decode(input):
 #    if len(input) == 0:
 #        return
 #    output = ''
@@ -68,7 +66,7 @@ def rlp_decode(data):
 #    return output
 
 
-#def decode_length(input):
+# def decode_length(input):
 #    length = len(input)
 #    if length == 0:
 #        raise Exception("input is null")
@@ -101,7 +99,7 @@ def rlp_decode(data):
 #        raise Exception("input don't conform RLP encoding form")
 
 
-#def to_integer(b):
+# def to_integer(b):
 #    length = len(b)
 #    if length == 0:
 #        raise Exception("input is null")
@@ -111,7 +109,7 @@ def rlp_decode(data):
 #        return ord(substr(b, -1)) + to_integer(substr(b, 0, -1)) * 256
 
 
-#def substr(s, beginning, length=None):
+# def substr(s, beginning, length=None):
 #    if length is None:
 #        return s[beginning:]
 #    else:

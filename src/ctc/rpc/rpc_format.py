@@ -2,8 +2,7 @@
 import re
 import typing
 
-from ctc.evm import binary_utils
-from ctc.evm import block_utils
+from ctc import binary
 from ctc import spec
 
 
@@ -16,8 +15,8 @@ def encode_block_number(block: spec.BlockSpec) -> str:
         return block
     else:
         if isinstance(block, typing.SupportsInt):
-            block = block_utils.raw_block_number_to_int(block)
-        return binary_utils.convert_binary_format(block, 'prefix_hex')
+            block = int(block)
+        return binary.convert(block, 'prefix_hex')
 
 
 def decode_response(
@@ -29,7 +28,7 @@ def decode_response(
     decoded = {}
     for key, value in response.items():
         if key in quantities:
-            value = binary_utils.convert_binary_format(value, 'integer')
+            value = binary.convert(value, 'integer')
         decoded[key] = value
     return decoded
 

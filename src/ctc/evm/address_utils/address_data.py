@@ -1,4 +1,4 @@
-from .. import binary_utils
+from ctc import binary
 
 
 def is_address_str(some_str):
@@ -16,23 +16,23 @@ def get_created_address(
     # see https://ethereum.stackexchange.com/a/761
     if nonce is not None:
         # create
-        sender = binary_utils.convert_binary_format(sender, 'binary')
-        data = binary_utils.rlp_encode([sender, nonce])
+        sender = binary.convert(sender, 'binary')
+        data = binary.rlp_encode([sender, nonce])
     elif salt is not None and init_code is not None:
         # create2
         data = (
-            binary_utils.convert_binary_format('0xff', 'raw_hex')
-            + binary_utils.convert_binary_format(sender, 'raw_hex')
-            + binary_utils.convert_binary_format(salt, 'raw_hex')
-            + binary_utils.convert_binary_format(binary_utils.keccak(init_code), 'raw_hex')
+            binary.convert('0xff', 'raw_hex')
+            + binary.convert(sender, 'raw_hex')
+            + binary.convert(salt, 'raw_hex')
+            + binary.convert(binary.keccak(init_code), 'raw_hex')
         )
     else:
         raise Exception('specify either {nonce} or {salt, init_code}')
 
-    result = binary_utils.keccak(data, output_format='prefix_hex')
+    result = binary.keccak(data, output_format='prefix_hex')
     result = '0x' + result[26:]
     if output_format is not None and output_format != 'prefix_hex':
-        result = binary_utils.keccak(data=result, output_format=output_format)
+        result = binary.keccak(data=result, output_format=output_format)
 
     return result
 
@@ -73,13 +73,13 @@ def get_address_checksum(address):
     """
 
     # validate address
-    address_format = binary_utils.get_binary_format(address)
+    address_format = binary.get_binary_format(address)
     if address_format not in ['prefix_hex', 'raw_hex']:
         raise Exception('checksum only relevant to hex formatted addresses')
-    address = binary_utils.convert_binary_format(address, 'raw_hex')
+    address = binary.convert(address, 'raw_hex')
 
     # compute address hash
-    address_hash = binary_utils.keccak_text(
+    address_hash = binary.keccak_text(
         address.lower(),
         output_format='raw_hex',
     )
@@ -97,7 +97,7 @@ def get_address_checksum(address):
     if address_format == 'raw_hex':
         return raw_checksum
     elif address_format == 'prefix_hex':
-        return binary_utils.convert_binary_format(raw_checksum, 'prefix_hex')
+        return binary.convert(raw_checksum, 'prefix_hex')
     else:
         raise Exception('checksum only relevant to hex formatted addresses')
 
