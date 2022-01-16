@@ -1,5 +1,5 @@
 import toolstr
-import tooltable
+import tooltable  # type: ignore
 
 from . import uniswap_trades
 

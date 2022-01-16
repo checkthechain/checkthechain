@@ -111,8 +111,8 @@ async def async_get_pool_balances(
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
 ) -> typing.Union[
-    dict[spec.TokenAddress, int],
-    dict[spec.TokenAddress, float],
+    dict[spec.Address, int],
+    dict[spec.Address, float],
 ]:
 
     if vault is None:

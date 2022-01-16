@@ -37,8 +37,7 @@ async def async_get_fei_deposit_balances(
     non_fei_balances = await _async_get_non_fei_deposits_fei_balances(
         block=block, provider=provider
     )
-    fei_deposits = list(fei_deposits)
-    fei_deposits.extend(non_fei_balances.keys())
+    fei_deposits = fei_deposits + tuple(non_fei_balances.keys())
     fei_balances.extend(non_fei_balances.values())
 
     result: typing.Union[list[int], list[float]]

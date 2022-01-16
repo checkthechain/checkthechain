@@ -10,7 +10,7 @@ from .. import analytics_spec
 async def async_compute_prices(
     blocks: list[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
-    feed_data = chainlink_utils.get_feed_data(
+    feed_data = await chainlink_utils.async_get_feed_data(
         feed_name='FEI_USD', start_block=blocks[0] - 10000
     )
     feed_data = feed_data / 1e8

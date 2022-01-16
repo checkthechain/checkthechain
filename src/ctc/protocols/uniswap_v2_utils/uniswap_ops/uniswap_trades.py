@@ -1,6 +1,6 @@
 import decimal
 
-import tooltable
+import tooltable  # type: ignore
 import toolstr
 
 from ctc.toolbox import validate_utils

@@ -110,7 +110,7 @@ async def async_get_timestamps_blocks(
             raise Exception('timestamps are greater that latest block time')
 
     # get blocks of timestamps
-    blocks = evm.get_blocks_of_timestamps(
+    blocks = evm.async_get_blocks_of_timestamps(
         timestamps, provider=provider, **kwargs
     )
 

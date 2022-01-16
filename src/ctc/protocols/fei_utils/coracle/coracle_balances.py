@@ -104,7 +104,7 @@ async def async_get_deposit_resistant_balance_and_fei_by_block(
 
 
 async def async_get_token_balance(
-    token: spec.TokenAddress,
+    token: spec.Address,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
@@ -147,7 +147,7 @@ async def async_get_token_balance(
 
 
 async def async_get_token_balance_by_block(
-    token: spec.TokenAddress,
+    token: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
@@ -168,13 +168,13 @@ async def async_get_token_balance_by_block(
 
 
 async def async_get_tokens_balances(
-    tokens: typing.Sequence[spec.TokenAddress] = None,
+    tokens: typing.Sequence[spec.Address] = None,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,
     exclude_fei: bool = True,
-) -> typing.Union[dict[spec.TokenAddress, int], dict[spec.TokenAddress, float]]:
+) -> typing.Union[dict[spec.Address, int], dict[spec.Address, float]]:
 
     block = await evm.async_block_number_to_int(block=block, provider=provider)
 
@@ -258,14 +258,14 @@ async def async_get_tokens_balances(
 
 async def async_get_tokens_balances_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
-    tokens: typing.Optional[typing.Sequence[spec.TokenAddress]] = None,
+    tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,
     exclude_fei: bool = True,
 ) -> typing.Union[
-    typing.Mapping[spec.TokenAddress, list[int]],
-    typing.Mapping[spec.TokenAddress, list[float]],
+    typing.Mapping[spec.Address, list[int]],
+    typing.Mapping[spec.Address, list[float]],
 ]:
 
     coroutines = [
@@ -282,11 +282,11 @@ async def async_get_tokens_balances_by_block(
     block_token_balances = await async_utils.gather_coroutines(*coroutines)
 
     if normalize:
-        int_type = list[dict[spec.TokenAddress, int]]
+        int_type = list[dict[spec.Address, int]]
         int_result = typing.cast(int_type, block_token_balances)
         return nested_utils.list_of_dicts_to_dict_of_lists(int_result)
     else:
-        float_type = list[dict[spec.TokenAddress, float]]
+        float_type = list[dict[spec.Address, float]]
         float_result = typing.cast(float_type, block_token_balances)
         return nested_utils.list_of_dicts_to_dict_of_lists(float_result)
 

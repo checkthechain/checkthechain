@@ -1,6 +1,6 @@
 import time
 
-import tooltable
+import tooltable  # type: ignore
 import tooltime
 import toolstr
 

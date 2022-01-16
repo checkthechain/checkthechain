@@ -13,7 +13,7 @@ from . import coracle_spec
 
 
 async def async_get_token_oracle(
-    token: spec.TokenAddress,
+    token: spec.Address,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
     replace_missing: bool = True,
@@ -44,7 +44,7 @@ async def async_get_token_oracle(
 
 
 async def async_get_tokens_oracles(
-    tokens: typing.Sequence[spec.TokenAddress],
+    tokens: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
     replace_missing: bool = True,
@@ -78,7 +78,7 @@ async def async_get_tokens_oracles(
 
 
 async def async_get_token_oracle_by_block(
-    token: spec.TokenAddress,
+    token: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
 ) -> list[spec.ContractAddress]:
@@ -100,7 +100,7 @@ async def async_get_token_oracle_by_block(
 
 
 async def async_get_token_price(
-    token: spec.TokenAddress,
+    token: spec.Address,
     block: spec.BlockReference = 'latest',
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
@@ -128,7 +128,7 @@ async def async_get_token_price(
 
 
 async def async_get_token_price_by_block(
-    token: spec.TokenAddress,
+    token: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
@@ -148,7 +148,7 @@ async def async_get_token_price_by_block(
 
 
 async def async_get_tokens_prices(
-    tokens: typing.Sequence[spec.TokenAddress],
+    tokens: typing.Sequence[spec.Address],
     block: spec.BlockReference = 'latest',
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
@@ -181,7 +181,7 @@ async def async_get_tokens_prices(
 
 def _ensure_oracle_valid(
     oracle: spec.ContractAddress,
-    token: spec.TokenAddress,
+    token: spec.Address,
     block: spec.BlockNumberReference,
 ) -> None:
     if oracle == '0x0000000000000000000000000000000000000000':
@@ -197,10 +197,10 @@ def _ensure_oracle_valid(
 
 async def _async_replace_missing_oracle(
     oracle: spec.ContractAddress,
-    token: spec.TokenAddress,
+    token: spec.Address,
     provider: spec.ProviderSpec,
     replacement_block: spec.BlockNumberReference,
-) -> spec.TokenAddress:
+) -> spec.Address:
 
     if oracle == '0x0000000000000000000000000000000000000000':
         return await async_get_token_oracle(
@@ -216,10 +216,10 @@ async def _async_replace_missing_oracle(
 
 async def _async_replace_missing_oracles(
     oracles: typing.Sequence[spec.ContractAddress],
-    tokens: typing.Sequence[spec.TokenAddress],
+    tokens: typing.Sequence[spec.Address],
     provider: spec.ProviderSpec,
     replacement_block: spec.BlockNumberReference,
-) -> typing.Sequence[spec.TokenAddress]:
+) -> typing.Sequence[spec.Address]:
     missing = [
         [oracle, token]
         for oracle, token in zip(oracles, tokens)

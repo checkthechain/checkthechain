@@ -1,4 +1,4 @@
-import toolplot
+import toolplot  # type: ignore
 from ctc import directory
 from ctc import evm
 

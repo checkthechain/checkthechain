@@ -41,7 +41,7 @@ async def async_summarize_pool_state(balancer_pool, block='latest'):
     }
 
 
-def get_pool_swaps(
+async def async_get_pool_swaps(
     pool_address=None, start_block=None, end_block=None, vault=None
 ) -> spec.DataFrame:
 
@@ -53,7 +53,7 @@ def get_pool_swaps(
             name='Vault', label='balancer'
         )
 
-    swaps = evm.get_events(
+    swaps = await evm.async_get_events(
         contract_address=vault,
         event_name='Swap',
         start_block=start_block,

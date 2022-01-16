@@ -4,12 +4,19 @@ from ctc import spec
 
 
 def bin_by_blocks(
-    data: spec.DataFrame, blocks: typing.Sequence[typing.SupportsInt]
+    data: spec.DataFrame,
+    blocks: typing.Sequence[typing.SupportsInt],
+    block_index_name: typing.Optional[str]='block_number',
 ) -> spec.DataFrame:
+    """TODO: deprecate
+    - either:
+        - refactor using pd.cut() https://stackoverflow.com/a/33761120
+        - kill this whole function
+    """
     import numpy as np
     import pandas as pd
 
-    if len(data.index.names) > 1:
+    if block_index_name is not None and len(data.index.names) > 1:
         for index_name in data.index.names:
             if index_name != 'block_number':
                 data = typing.cast(spec.DataFrame, data.droplevel(index_name))

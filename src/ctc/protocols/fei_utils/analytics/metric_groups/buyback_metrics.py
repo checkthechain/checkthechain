@@ -14,21 +14,24 @@ async def async_compute_buybacks(
     return {
         'name': 'Buybacks',
         'metrics': {
-            'buybacks_usd': compute_tribe_buybacks_usd(blocks),
+            'buybacks_usd': (await compute_tribe_buybacks_usd(blocks)),
         },
     }
 
 
-def compute_tribe_buybacks_usd(
+async def compute_tribe_buybacks_usd(
     blocks: list[int], swaps: typing.Optional[spec.DataFrame] = None
 ) -> analytics_spec.MetricData:
 
     # load swaps
     if swaps is None:
-        swaps = balancer_utils.get_pool_swaps(
+        swaps = await balancer_utils.async_get_pool_swaps(
             pool_address='0xc1382fe6e17bcdbc3d35f73f5317fbf261ebeecd'
         )
-    swaps = swaps.droplevel('transaction_index').droplevel('log_index')
+    swaps = typing.cast(
+        spec.DataFrame,
+        swaps.droplevel('transaction_index').droplevel('log_index'),
+    )
 
     # filter tribe buys
     fei = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
@@ -43,9 +46,9 @@ def compute_tribe_buybacks_usd(
     )
 
     # filter tribe sells
-    tribe_sells = swaps[swaps['arg__tokenIn'] == fei]  # type: ignore
-    if len(tribe_sells) > 0:
-        tribe_sells = tribe_sells['arg__amountIn'].map(float) / 1e18
+    tribe_sells_df = swaps[swaps['arg__tokenIn'] == fei]  # type: ignore
+    if len(tribe_sells_df) > 0:
+        tribe_sells = tribe_sells_df['arg__amountIn'].map(float) / 1e18
         cummulative_tribe_sells = tribe_sells.cumsum()
         cummulative_tribe_sells = evm.interpolate_block_series(
             start_block=min(blocks),

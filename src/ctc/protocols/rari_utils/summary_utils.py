@@ -3,7 +3,7 @@ import math
 
 import toolstr
 import tooltime
-import tooltable
+import tooltable  # type: ignore
 
 from ctc import directory
 from ctc import rpc

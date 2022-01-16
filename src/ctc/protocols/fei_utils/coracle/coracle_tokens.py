@@ -8,7 +8,7 @@ async def async_get_tokens_in_pcv(
     block: spec.BlockReference = 'latest',
     wrapper: bool = False,
     provider: spec.ProviderSpec = None,
-) -> list[spec.TokenAddress]:
+) -> list[spec.Address]:
     """get list of all tokens in pcv"""
 
     block = evm.standardize_block_number(block)
@@ -23,7 +23,7 @@ async def async_get_tokens_in_pcv(
 
 
 async def async_get_pcv_tokens_symbols(
-    tokens: list[spec.TokenReference],
+    tokens: list[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
 ):
