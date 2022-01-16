@@ -1,4 +1,7 @@
+import typing
+
 from ctc import rpc
+from ctc import spec
 from . import abi_utils
 
 
@@ -22,7 +25,7 @@ eip_897_abi = [
 ]
 
 
-async def async_get_eip897_proxy_type(contract_address):
+async def async_get_eip897_proxy_type(contract_address: spec.Address) -> int:
 
     function_abi = eip_897_abi[0]
     assert function_abi['name'] == 'proxyType'
@@ -33,7 +36,9 @@ async def async_get_eip897_proxy_type(contract_address):
     )
 
 
-async def async_get_eip897_implementation(contract_address):
+async def async_get_eip897_implementation(
+    contract_address: spec.Address,
+) -> spec.Address:
 
     function_abi = eip_897_abi[1]
     assert function_abi['name'] == 'implementation'
@@ -44,7 +49,10 @@ async def async_get_eip897_implementation(contract_address):
     )
 
 
-async def async_get_eip1967_proxy_logic_address(contract_address, block=None):
+async def async_get_eip1967_proxy_logic_address(
+    contract_address: spec.Address,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> spec.Address:
     """get a contract's logic address
 
     storage position obtained as:
@@ -66,7 +74,7 @@ async def async_get_eip1967_proxy_logic_address(contract_address, block=None):
     return '0x' + result[-40:]
 
 
-async def async_save_eip897_abi(contract_address):
+async def async_save_eip897_abi(contract_address: spec.Address) -> None:
     eip897_address = await async_get_eip897_implementation(contract_address)
     abi_utils.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
@@ -74,7 +82,10 @@ async def async_save_eip897_abi(contract_address):
     )
 
 
-async def async_get_eip1967_proxy_beacon_address(contract_address, block=None):
+async def async_get_eip1967_proxy_beacon_address(
+    contract_address: spec.Address,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> spec.Address:
     """get a contract's logic address
 
     storage position obtained as:
@@ -96,7 +107,10 @@ async def async_get_eip1967_proxy_beacon_address(contract_address, block=None):
     return '0x' + result[-40:]
 
 
-async def async_get_eip1967_proxy_admin_address(contract_address, block=None):
+async def async_get_eip1967_proxy_admin_address(
+    contract_address: spec.Address,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> spec.Address:
     """get a contract's logic address
 
     storage position obtained as:
