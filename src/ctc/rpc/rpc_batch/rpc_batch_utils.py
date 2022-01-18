@@ -119,17 +119,8 @@ def _separate_execution_kwargs(
 
     # add args that are passed to both constructors and digestors
     if method == 'eth_call':
-        function_abi_query = [
-            'function_name',
-            'contract_abi',
-            'contract_address',
-            'n_parameters',
-            'parameter_types',
-            'function_selector',
-        ]
-        digestor_kwargs['function_abi_query'] = {
-            arg: kwargs[arg] for arg in function_abi_query if arg in kwargs
-        }
+        if kwargs.get('function_abi') is not None:
+            constructor_kwargs['function_abi'] = kwargs['function_abi']
         if kwargs.get('to_address') is not None:
             constructor_kwargs['to_address'] = kwargs['to_address']
         if kwargs.get('to_addresses') is not None:

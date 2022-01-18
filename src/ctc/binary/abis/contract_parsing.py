@@ -49,7 +49,7 @@ def get_function_abi(
     if len(candidates) == 1:
         return candidates[0]
     elif len(candidates) == 0:
-        raise Exception('could not find function abi')
+        raise LookupError('could not find function abi')
     elif len(candidates) > 0:
         import json
 
@@ -57,7 +57,7 @@ def get_function_abi(
         if all(as_json[0] == entry for entry in as_json[1:]):
             return candidates[0]
 
-        raise Exception('too many candidates found for function abi')
+        raise LookupError('too many candidates found for function abi')
     else:
         raise Exception('internal error')
 
