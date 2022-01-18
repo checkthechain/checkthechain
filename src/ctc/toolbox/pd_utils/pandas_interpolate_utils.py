@@ -30,6 +30,9 @@ def interpolate_series(
         series = series.copy()
         series.index = keep_level(old_index, level)
 
+    # remove duplicate index values, keeping last value of each duplicate
+    series = series[~series.index.duplicated(keep='last')]
+
     # build new index
     if start_index is None:
         start_index = series.index.values[0]
@@ -70,6 +73,9 @@ def interpolate_dataframe(
             raise Exception('must specify which index level to use')
         df = df.copy()
         df.index = keep_level(old_index, level)
+
+    # remove duplicate index values, keeping last value of each duplicate
+    df = df[~df.index.duplicated(keep='last')]
 
     # build new index
     if start_index is None:
