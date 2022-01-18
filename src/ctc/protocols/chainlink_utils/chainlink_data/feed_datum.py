@@ -89,12 +89,20 @@ async def async_get_feed_datum(
 
     elif fields == 'full':
 
-        full = await rpc.async_eth_call(
+        data = await rpc.async_eth_call(
             to_address=feed,
             function_name='latestRoundData',
             block_number=block,
             provider=provider,
         )
+
+        round_id, answer, _started_at, updated_at, _answered_in_round_id = data
+
+        full = {
+            'answer': answer,
+            'timestamp': updated_at,
+            'round_id': round_id,
+        }
 
         if normalize:
             decimals = chainlink_metadata.get_feed_decimals(feed)

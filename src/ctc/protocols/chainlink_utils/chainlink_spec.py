@@ -9,19 +9,15 @@ _FeedReference = typing.Union[spec.Address, str]
 
 
 class FeedRoundData(typing.TypedDict):
-    roundId: int
-    answer: typing.Union[int, float]
-    startedAt: int
-    updatedAt: int
-    answeredInRound: int
+    answer: int
+    round_id: int
+    timestamp: int
 
 
 class FeedRoundDataNormalized(typing.TypedDict):
-    roundId: int
     answer: float
-    startedAt: int
-    updatedAt: int
-    answeredInRound: int
+    round_id: int
+    timestamp: int
 
 
 path_templates = {

@@ -6,6 +6,7 @@ from ctc.toolbox import pd_utils
 
 from .. import chainlink_metadata
 from .. import chainlink_spec
+from . import feed_datum
 
 
 async def async_get_full_feed_event_data(
@@ -42,6 +43,15 @@ async def async_get_full_feed_event_data(
         end_block=end_block,
     )
 
+    # rename columns
+    new_columns = {
+        'arg__current': 'answer',
+        'arg__updatedAt': 'timestamp',
+        'arg__roundId': 'round_id',
+    }
+    df = df.rename(columns=new_columns)
+    df = df[['answer', 'timestamp', 'round_id']]
+
     # normalize
     if normalize:
         decimals = chainlink_metadata.get_feed_decimals(
@@ -51,7 +61,23 @@ async def async_get_full_feed_event_data(
 
     # interpolate
     if interpolate:
-        df = pd_utils.interpolate_dataframe(df, level='block_number')
+
+        # add initial data
+        if start_block < df.index.values[0][0]:
+            import pandas as pd
+
+            initial_data = await feed_datum.async_get_feed_datum(
+                feed=feed,
+                block=start_block,
+                provider=provider,
+                normalize=normalize,
+                fields='full',
+            )
+            df.index = pd_utils.keep_level(df.index, level='block_number')
+            initial_df = pd.DataFrame(initial_data, index=[start_block])
+            df = pd.concat([initial_df, df])
+
+        df = pd_utils.interpolate_dataframe(df, end_index=end_block)
 
     return df
 
