@@ -72,7 +72,7 @@ async def async_get_events_from_node(
     # fetch events
     coroutines = []
     for chunk in chunks:
-        coroutine = await _async_get_chunk_of_events_from_node(
+        coroutine = _async_get_chunk_of_events_from_node(
             block_range=chunk,
             event_hash=event_hash,
             contract_address=contract_address,
@@ -86,7 +86,7 @@ async def async_get_events_from_node(
 
     # package as dataframe
     if package_as_dataframe:
-        entries = _async_package_exported_events(
+        entries = await _async_package_exported_events(
             entries,
             contract_address=contract_address,
             contract_abi=contract_abi,
@@ -111,7 +111,7 @@ async def _async_get_chunk_of_events_from_node(
     # fetch entries
     start_block, end_block = block_range
     entries = await rpc.async_eth_get_logs(
-        contract_address=contract_address,
+        address=contract_address,
         topics=[event_hash],
         start_block=start_block,
         end_block=end_block,
@@ -120,7 +120,7 @@ async def _async_get_chunk_of_events_from_node(
     return entries
 
 
-async def _package_exported_events(
+async def _async_package_exported_events(
     entries, contract_address, contract_abi, event_hash, event_name, event_abi
 ):
     if event_abi is None:
@@ -138,7 +138,7 @@ async def _package_exported_events(
     for entry in entries:
         formatted_entry = binary.normalize_event(
             event=entry,
-            contract_abi=contract_abi,
+            event_abi=event_abi,
         )
         formatted_entries.append(formatted_entry)
 

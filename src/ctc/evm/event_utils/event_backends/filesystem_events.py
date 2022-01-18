@@ -183,7 +183,7 @@ def list_events(
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     allow_missing_blocks: bool = False,
-) -> _ListEventsResult:
+) -> typing.Optional[_ListEventsResult]:
 
     contract_events = list_contract_events(
         contract_address=contract_address,
@@ -196,7 +196,7 @@ def list_events(
         event_hash = list(contract_events.keys())[0]
         return contract_events[event_hash]
     else:
-        raise Exception('no events found')
+        return None
 
 
 def list_contracts_events(**kwargs) -> dict[str, dict[str, _ListEventsResult]]:
@@ -259,7 +259,9 @@ async def async_save_events_to_filesystem(
 
     if event_abi is None:
         event_abi = await abi_utils.async_get_event_abi(
-            contract_address=contract_address, event_name=event_name
+            contract_address=contract_address,
+            event_name=event_name,
+            event_hash=event_hash,
         )
 
     # compute path

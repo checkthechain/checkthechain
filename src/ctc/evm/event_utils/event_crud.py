@@ -140,7 +140,7 @@ async def async_download_events(
         )
 
     # load from filesystem
-    return await filesystem_events.get_events_from_filesystem(
+    return await filesystem_events.async_get_events_from_filesystem(
         event_hash=event_hash,
         contract_address=contract_address,
         start_block=start_block,

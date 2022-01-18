@@ -105,7 +105,7 @@ async def async_save_proxy_contract_abi_to_filesystem(
     )
 
 
-def get_contract_abi_from_filesystem(contract_address, name=None):
+async def async_get_contract_abi_from_filesystem(contract_address, name=None):
     """concatenate all abi files unless a specific name is given"""
     contract_address = contract_address.lower()
 
