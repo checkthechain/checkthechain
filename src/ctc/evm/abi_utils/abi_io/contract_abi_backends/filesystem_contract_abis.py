@@ -93,9 +93,13 @@ async def async_save_contract_abi_to_filesystem(
 
 
 async def async_save_proxy_contract_abi_to_filesystem(
-    contract_address, proxy_implementation, name='proxy_implementation',
+    contract_address,
+    proxy_implementation,
+    name='proxy_implementation',
 ):
-    proxy_abi = binary.get_contract_abi(
+    from ctc import evm
+
+    proxy_abi = await evm.async_get_contract_abi(
         contract_address=proxy_implementation
     )
     await async_save_contract_abi_to_filesystem(
