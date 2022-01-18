@@ -2,6 +2,7 @@ import typing
 
 from ctc import spec
 
+from .. import formats
 from . import function_parsing
 from . import event_parsing
 
@@ -13,6 +14,9 @@ def get_function_abi(
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_selector: typing.Optional[spec.FunctionSelector] = None,
 ) -> spec.FunctionABI:
+
+    if function_selector is not None:
+        function_selector = formats.convert(function_selector, 'prefix_hex')
 
     candidates = []
     for item in contract_abi:
@@ -37,6 +41,7 @@ def get_function_abi(
                 continue
         if function_selector is not None:
             item_selector = function_parsing.get_function_selector(function_abi)
+            item_selector = formats.convert(item_selector, 'prefix_hex')
             if item_selector != function_selector:
                 continue
         candidates.append(function_abi)

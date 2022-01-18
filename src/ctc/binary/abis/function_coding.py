@@ -2,6 +2,8 @@ import typing
 
 from ctc import binary
 from ctc import spec
+
+from . import contract_parsing
 from . import function_parsing
 
 
@@ -45,12 +47,22 @@ def encode_call_data(
 
 def decode_call_data(
     call_data: spec.BinaryData,
-    function_abi: spec.FunctionABI,
+    function_abi: typing.Optional[spec.FunctionABI] = None,
+    contract_abi: typing.Optional[spec.ContractABI] = None,
 ) -> spec.DecodedCallData:
 
     # get function selector
     call_data_bytes = binary.convert(call_data, 'binary')
     function_selector = binary.convert(call_data_bytes[:4], 'prefix_hex')
+
+    # get function abi
+    if function_abi is None:
+        if contract_abi is None:
+            raise Exception('must specify function_abi or contract_abi')
+        function_abi = contract_parsing.get_function_abi(
+            contract_abi=contract_abi,
+            function_selector=function_selector,
+        )
 
     # decode parameters
     encoded_parameters = call_data_bytes[4:]
@@ -76,6 +88,7 @@ def decode_call_data(
         named_parameters = None
 
     return {
+        'function_abi': function_abi,
         'function_selector': function_selector,
         'parameters': decoded_parameters,
         'named_parameters': named_parameters,
