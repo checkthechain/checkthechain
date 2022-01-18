@@ -1,22 +1,13 @@
+import asyncio
+import typing
+
 from ctc import directory
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
-
-async def async_get_feed_aggregator(*, feed_name=None, feed_address=None):
-    # TODO:
-    # - condense inputs into one
-    # - add block number
-
-    if feed_address is None:
-        feed_address = directory.get_oracle_address(
-            name=feed_name, protocol='chainlink'
-        )
-
-    return await rpc.async_eth_call(
-        to_address=feed_address,
-        function_name='aggregator',
-    )
+from . import chainlink_metadata
+from . import chainlink_spec
 
 
 async def async_get_feed_data(

@@ -14,12 +14,15 @@ def get_oracle_address(
     network: spec.NetworkName = 'mainnet',
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
+    block: spec.BlockNumberReference = 'latest',
 ):
+
     oracle = get_oracle_metadata(
         name=name,
         network=network,
         protocol=protocol,
         oracle_type=oracle_type,
+        block=block,
     )
     return oracle['address']
 
@@ -29,12 +32,14 @@ def get_oracle_name(
     network: spec.NetworkName = 'mainnet',
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
+    block: spec.BlockNumberReference = 'latest',
 ):
     oracle = get_oracle_metadata(
         address=address,
         network=network,
         protocol=protocol,
         oracle_type=oracle_type,
+        block=block,
     )
     return oracle['name']
 
@@ -62,6 +67,7 @@ def get_oracle_metadata(
     network: spec.NetworkName = 'mainnet',
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
+    block: spec.BlockNumberReference = 'latest',
 ) -> spec.OracleFeedMetadata:
     if oracle_type == 'feed':
         return get_oracle_feed_metadata(
@@ -69,6 +75,7 @@ def get_oracle_metadata(
             address=address,
             network=network,
             protocol=protocol,
+            block=block,
         )
     else:
         raise Exception('unknown oracle type: ' + str(oracle_type))
@@ -80,7 +87,10 @@ def get_oracle_feed_metadata(
     address: typing.Optional[spec.Address] = None,
     network: spec.NetworkName = 'mainnet',
     protocol: str = 'chainlink',
+    block: spec.BlockNumberReference = 'latest',
 ) -> spec.OracleFeedMetadata:
+
+    # block currently not used
 
     oracle_feeds = load_oracle_feeds(network=network, protocol=protocol)
     if name is not None:
