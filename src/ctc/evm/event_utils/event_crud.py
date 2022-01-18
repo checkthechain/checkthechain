@@ -1,8 +1,11 @@
+from ctc import binary
 from ctc import spec
 from ctc.toolbox import backend_utils
+
 from .event_backends import filesystem_events
 from .event_backends import node_events
 from .. import block_utils
+from .. import abi_utils
 
 
 def get_backend_functions():
@@ -72,6 +75,7 @@ async def async_download_events(
     contract_address,
     event_hash=None,
     event_name=None,
+    event_abi=None,
     start_block=None,
     end_block=None,
     verbose=True,
@@ -88,9 +92,15 @@ async def async_download_events(
 
     # get event hash
     if event_hash is None:
-        event_hash = filesystem_events._event_name_to_event_hash(
-            event_name=event_name, contract_address=contract_address
-        )
+        if event_abi is None:
+            if event_name is None:
+                raise Exception('must specify more event information')
+            event_abi = await abi_utils.async_get_event_abi(
+                contract_address=contract_address,
+                event_name=event_name,
+            )
+
+        event_hash = binary.get_event_hash(event_abi)
 
     # determine what needs to be downloaded
     listed_events = filesystem_events.list_events(

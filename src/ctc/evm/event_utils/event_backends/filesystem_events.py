@@ -34,7 +34,6 @@ def get_events_contract_dir(contract_address: spec.Address) -> str:
 def get_events_event_dir(
     contract_address: spec.Address,
     event_hash: typing.Optional[str] = None,
-    event_name: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
 ) -> str:
     contract_address = contract_address.lower()
@@ -74,24 +73,6 @@ def get_events_filepath(
     # add parent directory
     network_name = directory.get_network_name(network)
     return os.path.join(ctc.config.get_data_dir(), network_name, subpath)
-
-
-async def _async_event_name_to_event_hash(event_name, contract_address):
-    if event_name is None:
-        raise Exception('must specify event_name')
-    contract_abi = await abi_utils.async_get_contract_abi(
-        contract_address=contract_address
-    )
-    candidates = []
-    for entry in contract_abi:
-        if entry['type'] == 'event' and entry.get('name') == event_name:
-            candidates.append(entry)
-    if len(candidates) == 1:
-        return binary.get_event_hash(event_abi=candidates[0])
-    elif len(candidates) > 1:
-        raise Exception('found multiple events with name: ' + str(event_name))
-    else:
-        raise Exception('could not find hash for event: ' + str(event_name))
 
 
 #
@@ -315,16 +296,18 @@ async def async_get_events_from_filesystem(
             blocks=[start_block, end_block],
         )
 
+    # get event hash
     if event_hash is None:
-        if event_abi is not None:
-            event_hash = binary.get_event_hash(event_abi)
-        elif event_name is not None:
-            event_hash = await _async_event_name_to_event_hash(
-                event_name=event_name,
+        if event_abi is None:
+            if event_name is None:
+                raise Exception('must specify more event information')
+            event_abi = await abi_utils.async_get_event_abi(
                 contract_address=contract_address,
+                event_name=event_name,
             )
-        else:
-            raise Exception('must specify more event information')
+
+        event_hash = binary.get_event_hash(event_abi)
+
     events = list_contract_events(
         contract_address=contract_address,
         event_abi=event_abi,
