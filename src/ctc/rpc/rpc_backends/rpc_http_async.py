@@ -4,8 +4,6 @@ import random
 import anyio
 import aiohttp
 
-# import aiohttp_retry
-
 from ctc import spec
 from .. import rpc_provider
 
@@ -58,7 +56,8 @@ def get_async_http_session(
     return _http_sessions[key]
 
 
-async def async_close_session(provider: spec.Provider) -> None:
+async def async_close_http_session(provider: spec.ProviderSpec = None) -> None:
+    provider = rpc_provider.get_provider(provider)
     session = get_async_http_session(provider=provider)
     await anyio.sleep(0)
     await session.close()
