@@ -1,5 +1,6 @@
 import typing
 
+from ctc import directory
 from ctc import rpc
 from ctc import spec
 from . import abi_utils
@@ -25,7 +26,9 @@ eip_897_abi = [
 ]
 
 
-async def async_get_eip897_proxy_type(contract_address: spec.Address) -> int:
+async def async_get_eip897_proxy_type(
+    contract_address: spec.Address, provider: spec.ProviderSpec = None
+) -> int:
 
     function_abi = eip_897_abi[0]
     assert function_abi['name'] == 'proxyType'
@@ -33,11 +36,12 @@ async def async_get_eip897_proxy_type(contract_address: spec.Address) -> int:
     return await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
+        provider=provider,
     )
 
 
 async def async_get_eip897_implementation(
-    contract_address: spec.Address,
+    contract_address: spec.Address, provider: spec.ProviderSpec = None
 ) -> spec.Address:
 
     function_abi = eip_897_abi[1]
@@ -46,12 +50,14 @@ async def async_get_eip897_implementation(
     return await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
+        provider=provider,
     )
 
 
 async def async_get_eip1967_proxy_logic_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderSpec = None,
 ) -> spec.Address:
     """get a contract's logic address
 
@@ -69,16 +75,30 @@ async def async_get_eip1967_proxy_logic_address(
         address=contract_address,
         position=position,
         block_number=block,
+        provider=provider,
     )
 
     return '0x' + result[-40:]
 
 
-async def async_save_eip897_abi(contract_address: spec.Address) -> None:
-    eip897_address = await async_get_eip897_implementation(contract_address)
+async def async_save_eip897_abi(
+    contract_address: spec.Address, provider: spec.ProviderSpec = None
+) -> None:
+
+    provider = rpc.get_provider(provider)
+    eip897_address = await async_get_eip897_implementation(
+        contract_address,
+        provider=provider,
+    )
+
+    network = provider['network']
+    if network is None:
+        raise Exception('could not determine network')
+
     abi_utils.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
         proxy_implementation=eip897_address,
+        network=network,
     )
 
 

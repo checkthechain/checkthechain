@@ -40,7 +40,10 @@ def has_provider(
 
 
 def get_provider(
-    *, name=typing.Optional[str], network=typing.Optional[str]
+    *,
+    name: typing.Optional[str] = None,
+    network: typing.Optional[str] = None,
+    protocol: typing.Optional[str] = None,
 ) -> spec.Provider:
 
     providers = list(get_providers().values())
@@ -48,11 +51,13 @@ def get_provider(
     # build query
     query = {}
     if name is None and network is None:
-        raise Exception('specify network name or network_id')
+        raise Exception('specify network name or network')
     if name is not None:
         query['name'] = name
-    if network is None:
-        query['network_id'] = network
+    if network is not None:
+        query['network'] = network
+    if protocol is not None:
+        query['protocol'] = protocol
 
     return search_utils.get_matching_entry(sequence=providers, query=query)
 
@@ -62,7 +67,7 @@ def get_default_network() -> spec.NetworkName:
 
 
 def get_default_provider(
-    network: typing.Optional[spec.NetworkName] = None
+    network: typing.Optional[spec.NetworkName] = None,
 ) -> spec.Provider:
 
     if network is None:

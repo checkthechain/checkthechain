@@ -1,8 +1,10 @@
 import json
 import os
+import typing
 
 from ctc import config
-from ctc import binary
+from ctc import directory
+from ctc import spec
 from ctc.toolbox import backend_utils
 
 
@@ -11,20 +13,32 @@ from ctc.toolbox import backend_utils
 #
 
 
-def get_contract_abis_root():
-    return os.path.join(config.get_data_dir(), 'contract_abis')
+def get_contract_abis_root(
+    network: typing.Optional[spec.NetworkReference] = None,
+):
+    network_name = directory.get_network_name(network)
+    return os.path.join(config.get_data_dir(), network_name, 'contract_abis')
 
 
-def get_contract_abi_dir(contract_address):
+def get_contract_abi_dir(
+    contract_address: spec.Address,
+    network: typing.Optional[spec.NetworkReference] = None,
+):
     contract_address = contract_address.lower()
     return os.path.join(
-        get_contract_abis_root(), 'contract__' + contract_address
+        get_contract_abis_root(network=network), 'contract__' + contract_address
     )
 
 
-def get_contract_abi_filepath(contract_address, name):
+def get_contract_abi_filepath(
+    contract_address,
+    name,
+    network: typing.Optional[spec.NetworkReference] = None,
+):
     filename = name + '.json'
-    return os.path.join(get_contract_abi_dir(contract_address), filename)
+    return os.path.join(
+        get_contract_abi_dir(contract_address, network=network), filename
+    )
 
 
 #
@@ -32,8 +46,8 @@ def get_contract_abi_filepath(contract_address, name):
 #
 
 
-def list_contract_abi_contracts():
-    root = get_contract_abis_root()
+def list_contract_abi_contracts(network):
+    root = get_contract_abis_root(network=network)
     contracts = {}
     for filename in os.listdir(root):
         _, contract_address = filename.split('__')
@@ -41,8 +55,13 @@ def list_contract_abi_contracts():
     return contracts
 
 
-def list_contract_abi_files(contract_address):
-    contract_abi_dir = get_contract_abi_dir(contract_address=contract_address)
+def list_contract_abi_files(
+    contract_address,
+    network: typing.Optional[spec.NetworkReference] = None,
+):
+    contract_abi_dir = get_contract_abi_dir(
+        contract_address=contract_address, network=network
+    )
     paths = []
     if os.path.isdir(contract_abi_dir):
         for filename in sorted(os.listdir(contract_abi_dir)):
@@ -51,8 +70,10 @@ def list_contract_abi_files(contract_address):
     return paths
 
 
-def print_contract_abis_summary():
-    contract_abi_contracts = list_contract_abi_contracts()
+def print_contract_abis_summary(
+    network: typing.Optional[spec.NetworkReference] = None,
+):
+    contract_abi_contracts = list_contract_abi_contracts(network=network)
     print('## Contracts with ABI\'s (' + str(len(contract_abi_contracts)) + ')')
     for contract_address, contract_dir in sorted(
         contract_abi_contracts.items()
@@ -71,7 +92,11 @@ def print_contract_abis_summary():
 
 
 async def async_save_contract_abi_to_filesystem(
-    contract_abi, contract_address, name=None, overwrite=False
+    contract_abi,
+    contract_address,
+    name=None,
+    overwrite=False,
+    network: typing.Optional[spec.NetworkReference] = None,
 ):
     contract_address = contract_address.lower()
 
@@ -80,6 +105,7 @@ async def async_save_contract_abi_to_filesystem(
     path = get_contract_abi_filepath(
         contract_address=contract_address,
         name=name,
+        network=network,
     )
     if not overwrite and os.path.exists(path):
         raise Exception('path already exists, use overwrite=True')
@@ -96,29 +122,41 @@ async def async_save_proxy_contract_abi_to_filesystem(
     contract_address,
     proxy_implementation,
     name='proxy_implementation',
+    network: typing.Optional[spec.NetworkReference] = None,
 ):
     from ctc import evm
 
     proxy_abi = await evm.async_get_contract_abi(
-        contract_address=proxy_implementation
+        contract_address=proxy_implementation,
+        network=network,
     )
     await async_save_contract_abi_to_filesystem(
         contract_abi=proxy_abi,
         contract_address=contract_address,
         name=name,
+        network=network,
     )
 
 
-async def async_get_contract_abi_from_filesystem(contract_address, name=None):
+async def async_get_contract_abi_from_filesystem(
+    contract_address,
+    name=None,
+    network: typing.Optional[spec.NetworkReference] = None,
+):
     """concatenate all abi files unless a specific name is given"""
     contract_address = contract_address.lower()
 
     # gather paths
     if name is None:
-        paths = list_contract_abi_files(contract_address=contract_address)
+        paths = list_contract_abi_files(
+            contract_address=contract_address,
+            network=network,
+        )
     else:
         path = get_contract_abi_filepath(
-            contract_address=contract_address, name=name
+            contract_address=contract_address,
+            name=name,
+            network=network,
         )
         paths = [path]
 

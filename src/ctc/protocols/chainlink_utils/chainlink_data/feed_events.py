@@ -77,6 +77,9 @@ async def async_get_full_feed_event_data(
             initial_df = pd.DataFrame(initial_data, index=[start_block])
             df = pd.concat([initial_df, df])
 
+        end_block = await evm.async_block_number_to_int(
+            end_block, provider=provider
+        )
         df = pd_utils.interpolate_dataframe(df, end_index=end_block)
 
     return df

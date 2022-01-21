@@ -1,10 +1,14 @@
 from ctc import binary
 from ctc import rpc
+from ctc import spec
+
 from .. import abi_utils
 from . import address_data
 
 
-async def async_print_address_summary(address, verbose=0, max_width=80):
+async def async_print_address_summary(
+    address, verbose=0, max_width=80, provider: spec.ProviderSpec = None
+):
     """
 
     TODO (with more data)
@@ -12,11 +16,13 @@ async def async_print_address_summary(address, verbose=0, max_width=80):
     - transfers
     """
 
-    eth_balance = await rpc.async_eth_get_balance(address)
-    transaction_count = await rpc.async_eth_get_transaction_count(address)
+    eth_balance = await rpc.async_eth_get_balance(address, provider=provider)
+    transaction_count = await rpc.async_eth_get_transaction_count(
+        address, provider=provider
+    )
 
     # contract data
-    code = await rpc.async_eth_get_code(address)
+    code = await rpc.async_eth_get_code(address, provider=provider)
     is_contract = code != '0x'
     if is_contract:
         address_type = 'contract'
@@ -37,7 +43,7 @@ async def async_print_address_summary(address, verbose=0, max_width=80):
         print()
 
         contract_abi = await abi_utils.async_get_contract_abi(
-            contract_address=address
+            contract_address=address, provider=provider,
         )
         df = abi_utils.contract_abi_to_dataframe(
             contract_abi=contract_abi, human_readable=False
@@ -53,11 +59,11 @@ async def async_print_address_summary(address, verbose=0, max_width=80):
             if len(function['outputs']) == 0:
                 output_str = '[none]'
             else:
-                output_str = [
+                output_str_list = [
                     item['type'] + ' ' + item['name']
                     for item in function['outputs']
                 ]
-                output_str = ', '.join(output_str)
+                output_str = ', '.join(output_str_list)
                 if len(function['outputs']) > 1:
                     output_str = '(' + output_str + ')'
 

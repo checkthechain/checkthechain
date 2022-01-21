@@ -13,7 +13,7 @@ async def async_get_feed_datum(
     *,
     fields: typing.Literal['full'],
     normalize: typing.Literal[False],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> chainlink_spec.FeedRoundData:
     ...
@@ -24,10 +24,25 @@ async def async_get_feed_datum(
     feed: chainlink_spec._FeedReference,
     *,
     fields: typing.Literal['full'],
-    normalize: bool = True,
-    block: spec.BlockNumberReference = 'latest',
+    normalize: typing.Literal[True],
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> chainlink_spec.FeedRoundDataNormalized:
+    ...
+
+
+# overloading in python is a mess...
+@typing.overload
+async def async_get_feed_datum(
+    feed: chainlink_spec._FeedReference,
+    *,
+    fields: typing.Literal['full'],
+    normalize: bool = True,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderSpec = None,
+) -> typing.Union[
+    chainlink_spec.FeedRoundData, chainlink_spec.FeedRoundDataNormalized
+]:
     ...
 
 
@@ -37,7 +52,7 @@ async def async_get_feed_datum(
     *,
     fields: typing.Literal['answer'] = 'answer',
     normalize: typing.Literal[False],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> int:
     ...
@@ -49,7 +64,7 @@ async def async_get_feed_datum(
     *,
     fields: typing.Literal['answer'] = 'answer',
     normalize: bool = True,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> float:
     ...
@@ -58,10 +73,10 @@ async def async_get_feed_datum(
 async def async_get_feed_datum(
     feed: chainlink_spec._FeedReference,
     *,
-    block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
-    normalize: bool = True,
     fields: typing.Literal['answer', 'full'] = 'answer',
+    normalize: bool = True,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderSpec = None,
 ) -> typing.Union[
     int,
     float,
@@ -69,6 +84,9 @@ async def async_get_feed_datum(
     chainlink_spec.FeedRoundDataNormalized,
 ]:
     """get feed data for a single block"""
+
+    if block is None:
+        block = 'latest'
 
     feed = await chainlink_metadata.async_resolve_feed_address(feed)
 
@@ -98,7 +116,7 @@ async def async_get_feed_datum(
 
         round_id, answer, _started_at, updated_at, _answered_in_round_id = data
 
-        full = {
+        full: chainlink_spec.FeedRoundData = {
             'answer': answer,
             'timestamp': updated_at,
             'round_id': round_id,
@@ -107,8 +125,11 @@ async def async_get_feed_datum(
         if normalize:
             decimals = chainlink_metadata.get_feed_decimals(feed)
             full['answer'] /= 10 ** decimals
+            return full
 
-        return full
+        else:
+
+            return full
 
     else:
         raise Exception('unknown fields type: ' + str(fields))

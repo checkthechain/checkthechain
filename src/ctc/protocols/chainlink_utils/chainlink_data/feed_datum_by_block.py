@@ -59,10 +59,10 @@ async def async_get_feed_full_datum_by_block(
     for block in int_blocks:
         coroutine = feed_datum.async_get_feed_datum(
             feed=feed,
-            fields='full',
-            normalize=normalize,
             block=block,
             provider=provider,
+            normalize=normalize,
+            fields='full',
         )
         coroutines.append(coroutine)
     result = await asyncio.gather(*coroutines)

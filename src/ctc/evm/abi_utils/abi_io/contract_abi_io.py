@@ -1,4 +1,9 @@
+import typing
+
+from ctc import rpc
+from ctc import spec
 from ctc.toolbox import backend_utils
+
 from ... import address_utils
 from . import contract_abi_backends
 
@@ -39,14 +44,24 @@ async def async_transfer_contract_abi(**kwargs):
     )
 
 
-async def async_download_contract_abi(contract_address, name=None, **kwargs):
+async def async_download_contract_abi(
+    contract_address,
+    name=None,
+    provider: spec.ProviderSpec = None,
+    **kwargs
+):
 
-    common_kwargs = {'contract_address': contract_address}
+    provider = rpc.get_provider(provider)
+    network = provider['network']
+    if network is None:
+        raise Exception('could not determine network')
+
+    common_kwargs = {'contract_address': contract_address, 'network': network}
     kwargs.setdefault('common_kwargs', {})
     kwargs['common_kwargs'] = dict(kwargs['common_kwargs'])
     kwargs['common_kwargs'].update(common_kwargs)
 
-    save_kwargs = {'name': name}
+    save_kwargs = {'name': name, 'network': network}
     kwargs.setdefault('save_kwargs', {})
     kwargs['save_kwargs'] = dict(kwargs['save_kwargs'])
     kwargs['save_kwargs'].update(save_kwargs)
@@ -57,11 +72,11 @@ async def async_download_contract_abi(contract_address, name=None, **kwargs):
 
     try:
         await address_utils.async_save_eip897_abi(
-            contract_address=contract_address
+            contract_address=contract_address, provider=provider,
         )
         contract_abi = (
             await contract_abi_backends.async_get_contract_abi_from_filesystem(
-                contract_address=contract_address
+                contract_address=contract_address, network=network,
             )
         )
     except Exception:

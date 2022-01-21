@@ -219,12 +219,10 @@ def specify_providers(
         go_back = False
         valid_answer = False
         while not valid_answer:
+            print()
+            print('Adding new provider node...')
             provider_network = toolcli.input_prompt(
-                prompt=(
-                    'Provider node network?'
-                    + ' (see list of networks above)\n'
-                    + '(enter blank line to go back) '
-                ),
+                prompt='Network of provider? (see list of networks above) ',
                 style=styles['question'],
             )
             if provider_network == '':
@@ -239,7 +237,7 @@ def specify_providers(
 
         # specify url
         provider_url = toolcli.input_prompt(
-            prompt='Provider node URL? (enter blank line to go back) ',
+            prompt='Provider URL? (enter blank line to go back) ',
             style=styles['question'],
         )
         if provider_url == '':
@@ -252,7 +250,7 @@ def specify_providers(
         valid_answer = False
         while not valid_answer:
             provider_name = toolcli.input_prompt(
-                'Provider node name? (enter blank line to go back) ',
+                'Provider name? (enter blank line to go back) ',
                 style=styles['question'],
                 default=default_name,
             )

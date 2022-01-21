@@ -11,12 +11,14 @@ async def async_get_event_abi(
     event_name: typing.Optional[str] = None,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
+    network: typing.Optional[spec.NetworkReference] = None,
 ):
 
     # get contract abi
     if contract_abi is None:
         contract_abi = await contract_abi_io.async_get_contract_abi(
             contract_address=contract_address,
+            network=network,
         )
 
     return binary.get_event_abi(
