@@ -1,5 +1,6 @@
 import json
 
+from ctc import config
 from ctc import spec
 from .... import address_utils
 
@@ -10,8 +11,13 @@ import time
 _last_request = {'time': None}
 
 
-async def async_get_contract_abi_from_etherscan(contract_address):
+async def async_get_contract_abi_from_etherscan(contract_address, network=None):
     """fetch contract abi using etherscan"""
+
+    if network is None:
+        network = config.get_default_network()
+    if network != 'mainnet':
+        raise Exception('etherscan is only for mainnnet')
 
     import aiohttp
 
