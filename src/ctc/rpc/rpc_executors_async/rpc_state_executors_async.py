@@ -17,6 +17,8 @@ async def async_eth_call(
     decode_response=True,
     delist_single_outputs=True,
     package_named_outputs=False,
+    fill_empty = False,
+    empty_token=None,
     **function_abi_query
 ):
 
@@ -48,6 +50,8 @@ async def async_eth_call(
         decode_response=decode_response,
         delist_single_outputs=delist_single_outputs,
         package_named_outputs=package_named_outputs,
+        fill_empty=fill_empty,
+        empty_token=empty_token,
     )
 
 
@@ -112,7 +116,7 @@ async def async_eth_get_storage_at(
     return rpc_digestors.digest_eth_get_storage_at(response)
 
 
-async def async_eth_get_code(address, block_number=None, provider=None):
+async def async_eth_get_code(address, block_number='latest', provider=None):
     request = rpc_constructors.construct_eth_get_code(
         address=address,
         block_number=block_number,
