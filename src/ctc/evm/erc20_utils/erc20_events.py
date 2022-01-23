@@ -1,6 +1,7 @@
 import typing
 
 from ctc import spec
+
 from .. import event_utils
 from . import erc20_metadata
 

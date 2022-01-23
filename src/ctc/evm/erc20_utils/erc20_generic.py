@@ -4,6 +4,7 @@ from ctc import directory
 from ctc import rpc
 from ctc import spec
 from .. import address_utils
+from .. import evm_spec
 
 
 def get_erc20_address(token: spec.ERC20Reference) -> spec.ERC20Address:
@@ -31,7 +32,7 @@ async def async_erc20_eth_call(
 
     return await rpc.async_eth_call(
         to_address=get_erc20_address(token),
-        function_name=function_name,
+        function_abi=evm_spec.erc20_abis[function_name],
         block_number=block,
         **rpc_kwargs
     )
@@ -47,7 +48,7 @@ async def async_erc20s_eth_calls(
 
     return await rpc.async_batch_eth_call(
         to_addresses=[get_erc20_address(token) for token in tokens],
-        function_name=function_name,
+        function_abi=evm_spec.erc20_abis[function_name],
         block_number=block,
         **rpc_kwargs
     )
@@ -63,7 +64,7 @@ async def async_erc20_eth_call_by_block(
 
     return await rpc.async_batch_eth_call(
         to_address=get_erc20_address(token),
-        function_name=function_name,
+        function_abi=evm_spec.erc20_abis[function_name],
         block_numbers=blocks,
         **rpc_kwargs
     )
