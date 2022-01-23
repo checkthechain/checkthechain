@@ -32,6 +32,7 @@ async def async_get_total_borrowed(ctoken, block='latest'):
         to_address=ctoken,
         block_number=block,
         function_abi=rari_abis.ctoken_function_abis['totalBorrows'],
+        empty_token=0,
     )
 
 
@@ -40,6 +41,7 @@ async def async_get_total_liquidity(ctoken, block='latest'):
         to_address=ctoken,
         block_number=block,
         function_abi=rari_abis.ctoken_function_abis['getCash'],
+        empty_token=0,
     )
 
 
@@ -49,6 +51,21 @@ async def async_get_reserves(ctoken, block='latest'):
         block_number=block,
         function_abi=rari_abis.ctoken_function_abis['totalReserves'],
     )
+
+
+async def async_get_ctoken_utilization(ctoken, block='latest'):
+    borrowed_coroutine = async_get_total_borrowed(ctoken, block)
+    liquidity_coroutine = async_get_total_liquidity(ctoken, block)
+
+    borrowed = await borrowed_coroutine
+    liquidity = await liquidity_coroutine
+
+    total = borrowed + liquidity
+
+    if total == 0:
+        return 0
+    else:
+        return borrowed / total
 
 
 async def async_get_supply_interest_per_block(
@@ -84,9 +101,7 @@ async def async_get_supply_apy(ctoken, blocks_per_year=None, block='latest'):
         normalize=True,
     )
     if blocks_per_year is None:
-        irm = await token_metadata.async_get_ctoken_irm(
-            ctoken, block=block
-        )
+        irm = await token_metadata.async_get_ctoken_irm(ctoken, block=block)
         blocks_per_year = await irm_metadata.async_get_irm_blocks_per_year(
             irm,
             block=block,
@@ -104,9 +119,7 @@ async def async_get_borrow_apy(ctoken, blocks_per_year=None, block='latest'):
     )
 
     if blocks_per_year is None:
-        irm = await token_metadata.async_get_ctoken_irm(
-            ctoken, block=block
-        )
+        irm = await token_metadata.async_get_ctoken_irm(ctoken, block=block)
         blocks_per_year = await irm_metadata.async_get_irm_blocks_per_year(
             irm,
             block=block,
@@ -116,7 +129,11 @@ async def async_get_borrow_apy(ctoken, blocks_per_year=None, block='latest'):
 
 
 async def async_get_ctoken_tvl_and_tvb(
-    ctoken, oracle=None, eth_price=None, block='latest', in_usd=True,
+    ctoken,
+    oracle=None,
+    eth_price=None,
+    block='latest',
+    in_usd=True,
 ):
     if not in_usd:
         borrowed = asyncio.create_task(
