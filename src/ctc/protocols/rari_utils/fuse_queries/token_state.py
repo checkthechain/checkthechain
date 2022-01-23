@@ -116,8 +116,22 @@ async def async_get_borrow_apy(ctoken, blocks_per_year=None, block='latest'):
 
 
 async def async_get_ctoken_tvl_and_tvb(
-    ctoken, oracle=None, eth_price=None, block='latest'
+    ctoken, oracle=None, eth_price=None, block='latest', in_usd=True,
 ):
+    if not in_usd:
+        borrowed = asyncio.create_task(
+            async_get_total_borrowed(ctoken=ctoken, block=block)
+        )
+        liquidity = asyncio.create_task(
+            async_get_total_liquidity(ctoken=ctoken, block=block)
+        )
+
+        borrowed = await borrowed
+        borrowed /= 1e18
+        liquidity = await liquidity
+        liquidity /= 1e18
+
+        return {'tvb': borrowed, 'tvl': borrowed + liquidity}
 
     if oracle is None:
         oracle = await _async_get_ctoken_oracle(ctoken)
