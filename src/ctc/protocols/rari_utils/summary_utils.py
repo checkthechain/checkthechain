@@ -120,11 +120,17 @@ async def print_all_pool_summary(block='latest', n_display=15):
         rows.append(row)
 
     block_data = await rpc.async_eth_get_block_by_number(block)
-    timestamp = tooltime.timestamp_to_iso(block_data['timestamp']).replace('T', ' ')
+    timestamp = tooltime.timestamp_to_iso(block_data['timestamp']).replace(
+        'T', ' '
+    )
 
     toolstr.print_header('Rari Fuse')
-    print('- TVL:', toolstr.format(total_tvl, prefix='$', order_of_magnitude=True))
-    print('- TVB:', toolstr.format(total_tvb, prefix='$', order_of_magnitude=True))
+    print(
+        '- TVL:', toolstr.format(total_tvl, prefix='$', order_of_magnitude=True)
+    )
+    print(
+        '- TVB:', toolstr.format(total_tvb, prefix='$', order_of_magnitude=True)
+    )
     print('- block:', block)
     # print('- time:', timestamp)
     print()
@@ -164,7 +170,7 @@ async def _async_get_all_pools_stats(all_pools, block):
 async def async_get_token_multipool_stats(token, block='latest'):
     pools = await fuse_queries.async_get_all_pools(block=block)
 
-    eth_price = await chainlink_utils.async_fetch_eth_price()
+    eth_price = await chainlink_utils.async_get_eth_price(block=block)
     pools_stats = [
         asyncio.create_task(
             async_get_token_pool_stats(
@@ -205,14 +211,12 @@ async def async_get_token_multipool_stats(token, block='latest'):
         blocks_per_year = None
         for p, (comptroller, pool_stats) in enumerate(per_pool.items()):
 
-            interest_rate_model = (
-                await fuse_queries.async_get_interest_rate_model(
-                    ctoken=pool_stats['ctoken'],
-                    block=block,
-                )
+            irm = await fuse_queries.async_get_ctoken_irm(
+                ctoken=pool_stats['ctoken'],
+                block=block,
             )
-            blocks_per_year = await fuse_queries.async_get_blocks_per_year(
-                interest_rate_model=interest_rate_model,
+            blocks_per_year = await fuse_queries.async_get_irm_blocks_per_year(
+                irm,
                 block=block,
             )
 
@@ -250,10 +254,12 @@ async def async_get_token_pool_stats(
     ctokens = await fuse_queries.async_get_pool_ctokens(
         comptroller=comptroller, block=block
     )
-    underlyings = await fuse_queries.async_get_pool_tokens(
+    underlyings = await fuse_queries.async_get_pool_underlying_tokens(
         ctokens=ctokens, block=block
     )
-    oracle = await fuse_queries.async_get_pool_oracle(comptroller=comptroller, block=block)
+    oracle = await fuse_queries.async_get_pool_oracle(
+        comptroller=comptroller, block=block
+    )
 
     tvl = 0
     tvb = 0
@@ -262,7 +268,10 @@ async def async_get_token_pool_stats(
         if underlying == token:
             matches.append(ctoken)
             stats = await fuse_queries.async_get_ctoken_tvl_and_tvb(
-                ctoken, oracle, eth_price, block=block,
+                ctoken,
+                oracle,
+                eth_price,
+                block=block,
             )
             tvl += stats['tvl']
             tvb += stats['tvb']
@@ -279,6 +288,10 @@ async def async_print_fuse_token_summary(token, block='latest'):
 
     if directory.has_erc20_metadata(symbol=token):
         token = directory.get_erc20_address(symbol=token)
+    if token == '0x0000000000000000000000000000000000000000':
+        symbol = 'ETH'
+    else:
+        symbol = directory.get_erc20_symbol(token)
 
     block = await rpc.async_eth_get_block_by_number(block)
     multipool_stats = await async_get_token_multipool_stats(
@@ -308,8 +321,12 @@ async def async_print_fuse_token_summary(token, block='latest'):
             util = pool_stats['tvb'] / pool_stats['tvl']
         row = [
             pool_stats['name'],
-            toolstr.format(pool_stats['tvl'], order_of_magnitude=True, prefix='$'),
-            toolstr.format(pool_stats['tvb'], order_of_magnitude=True, prefix='$'),
+            toolstr.format(
+                pool_stats['tvl'], order_of_magnitude=True, prefix='$'
+            ),
+            toolstr.format(
+                pool_stats['tvb'], order_of_magnitude=True, prefix='$'
+            ),
             toolstr.format(pool_stats['supply_apy'], percentage=True),
             toolstr.format(pool_stats['borrow_apy'], percentage=True),
             toolstr.format(util, percentage=True),
@@ -323,10 +340,11 @@ async def async_print_fuse_token_summary(token, block='latest'):
         tvb += pool_stats['tvb']
     timestamp = tooltime.timestamp_to_iso(block['timestamp']).replace('T', ' ')
 
-    toolstr.print_header('FEI Token Fuse Usage')
+    toolstr.print_header(symbol + ' Token Fuse Usage')
     print('- TVL:', toolstr.format(tvl, order_of_magnitude=True, prefix='$'))
     print('- TVB:', toolstr.format(tvb, order_of_magnitude=True, prefix='$'))
     print('- block:', block['number'])
     # print('- time:', timestamp)
     print()
     tooltable.print_table(rows, headers=headers)
+
