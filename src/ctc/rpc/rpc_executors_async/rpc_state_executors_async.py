@@ -17,15 +17,16 @@ async def async_eth_call(
     decode_response=True,
     delist_single_outputs=True,
     package_named_outputs=False,
-    fill_empty = False,
+    fill_empty=False,
     empty_token=None,
+    function_abi=None,
     **function_abi_query
 ):
 
-    function_abi = await evm.async_get_function_abi(
-        contract_address=to_address,
-        **function_abi_query
-    )
+    if function_abi is None:
+        function_abi = await evm.async_get_function_abi(
+            contract_address=to_address, **function_abi_query
+        )
 
     # construct request
     request = rpc_constructors.construct_eth_call(
