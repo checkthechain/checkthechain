@@ -1,12 +1,11 @@
+import asyncio
 import json
+import time
 
 from ctc import config
 from ctc import spec
 from .... import address_utils
 
-
-# temporary ratelimit, use toolratelimit in future
-import time
 
 _last_request = {'time': None}
 
@@ -33,7 +32,7 @@ async def async_get_contract_abi_from_etherscan(contract_address, network=None):
         sleep_time = _last_request['time'] + cadence - current_time
         sleep_time = max(0, sleep_time)
         print('sleeping', sleep_time, 'seconds for etherscan ratelimit')
-        time.sleep(sleep_time)
+        asyncio.sleep(sleep_time)
     _last_request['time'] = time.time()
 
     if not address_utils.is_address_str(contract_address):
