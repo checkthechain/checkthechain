@@ -19,7 +19,7 @@ async def async_get_erc20_total_supply(
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
-    **rpc_kwargs
+    **rpc_kwargs,
 ) -> typing.Union[int, float]:
     """"""
 
@@ -28,7 +28,7 @@ async def async_get_erc20_total_supply(
         function_name='totalSupply',
         block=block,
         provider=provider,
-        **rpc_kwargs
+        **rpc_kwargs,
     )
 
     if normalize:
@@ -44,7 +44,7 @@ async def async_get_erc20s_total_supplies(
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
-    **rpc_kwargs
+    **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
     """"""
 
@@ -67,7 +67,7 @@ async def async_get_erc20_total_supply_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
-    **rpc_kwargs
+    **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
 
     total_supplies = await erc20_generic.async_erc20_eth_call_by_block(
@@ -75,7 +75,7 @@ async def async_get_erc20_total_supply_by_block(
         function_name='totalSupply',
         blocks=blocks,
         provider=provider,
-        **rpc_kwargs
+        **rpc_kwargs,
     )
 
     if normalize:
