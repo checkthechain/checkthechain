@@ -1,6 +1,8 @@
 from ctc import binary
 from ctc import spec
+from ctc import rpc
 from ctc.toolbox import backend_utils
+from ctc.toolbox import pd_utils
 
 from .event_backends import filesystem_events
 from .event_backends import node_events
@@ -27,8 +29,16 @@ async def async_get_events(
     start_block=None,
     end_block=None,
     backend_order=None,
+    keep_multiindex=True,
     **query
 ) -> spec.DataFrame:
+
+    if start_block is None:
+        start_block = await block_utils.async_get_contract_creation_block(
+            contract_address
+        )
+    if end_block is None:
+        end_block = 'latest'
 
     start_block, end_block = await block_utils.async_block_numbers_to_int(
         blocks=[start_block, end_block],
@@ -37,7 +47,7 @@ async def async_get_events(
     if backend_order is None:
         backend_order = ['filesystem', 'download']
 
-    return await backend_utils.async_run_on_backend(
+    events = await backend_utils.async_run_on_backend(
         get_backend_functions()['get'],
         contract_address=contract_address,
         start_block=start_block,
@@ -45,6 +55,13 @@ async def async_get_events(
         backend_order=backend_order,
         **query
     )
+
+    if not keep_multiindex:
+        events.index = pd_utils.keep_level(
+            index=events.index, level='block_number'
+        )
+
+    return events
 
 
 async def async_save_events(events, **query):
@@ -78,6 +95,7 @@ async def async_download_events(
     event_abi=None,
     start_block=None,
     end_block=None,
+    provider=None,
     verbose=True,
 ):
 
@@ -88,7 +106,13 @@ async def async_download_events(
 
     start_block, end_block = await block_utils.async_block_numbers_to_int(
         blocks=[start_block, end_block],
+        provider=provider,
     )
+
+    provider = rpc.get_provider(provider)
+    network = provider['network']
+    if network is None:
+        raise Exception('could not determine network')
 
     # get event hash
     if event_hash is None:
@@ -98,6 +122,7 @@ async def async_download_events(
             event_abi = await abi_utils.async_get_event_abi(
                 contract_address=contract_address,
                 event_name=event_name,
+                network=network,
             )
 
         event_hash = binary.get_event_hash(event_abi)
@@ -136,6 +161,7 @@ async def async_download_events(
             to_backend='filesystem',
             event_hash=event_hash,
             contract_address=contract_address,
+            provider=provider,
             **download
         )
 
@@ -146,5 +172,6 @@ async def async_download_events(
         start_block=start_block,
         end_block=end_block,
         verbose=verbose,
+        provider=provider,
     )
 
