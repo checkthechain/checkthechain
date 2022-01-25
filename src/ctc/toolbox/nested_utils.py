@@ -12,6 +12,8 @@ def list_of_dicts_to_dict_of_lists(
 
     uses union of all keys across all dicts
     - any dicts that have missing values will use a fill value (e.g. 0 for ints)
+
+    # TODO: would be nice if could work with list of TypedDict's
     """
 
     # gather all keys
