@@ -3,6 +3,7 @@ import typing
 from ctc import evm
 from ctc import spec
 from ctc.protocols import balancer_utils
+from ctc.toolbox import pd_utils
 
 from .. import analytics_spec
 
@@ -38,11 +39,17 @@ async def compute_tribe_buybacks_usd(
     tribe_buys: typing.Any = swaps[swaps['arg__tokenOut'] == fei]  # type: ignore
     tribe_buys = tribe_buys['arg__amountOut'].map(float) / 1e18
     cummulative_tribe_buys = tribe_buys.cumsum()
-    cummulative_tribe_buys = evm.interpolate_block_series(
-        start_block=min(blocks),
-        pre_fill_value=0,
+    # cummulative_tribe_buys = evm.interpolate_block_series(
+    #     start_block=min(blocks),
+    #     pre_fill_value=0,
+    #     series=cummulative_tribe_buys,
+    #     end_block=max(blocks),
+    # )
+    cummulative_tribe_buys = pd_utils.interpolate_series(
         series=cummulative_tribe_buys,
-        end_block=max(blocks),
+        start_index=min(blocks),
+        end_index=max(blocks),
+        pre_fill_value=0,
     )
 
     # filter tribe sells
@@ -50,11 +57,17 @@ async def compute_tribe_buybacks_usd(
     if len(tribe_sells_df) > 0:
         tribe_sells = tribe_sells_df['arg__amountIn'].map(float) / 1e18
         cummulative_tribe_sells = tribe_sells.cumsum()
-        cummulative_tribe_sells = evm.interpolate_block_series(
-            start_block=min(blocks),
-            pre_fill_value=0,
+        # cummulative_tribe_sells = evm.interpolate_block_series(
+        #     start_block=min(blocks),
+        #     pre_fill_value=0,
+        #     series=cummulative_tribe_sells,
+        #     end_block=max(blocks),
+        # )
+        cummulative_tribe_sells = pd_utils.interpolate_series(
             series=cummulative_tribe_sells,
-            end_block=max(blocks),
+            start_index=min(blocks),
+            end_index=max(blocks),
+            pre_fill_value=0,
         )
 
         net_tribe_buys = cummulative_tribe_buys - cummulative_tribe_sells

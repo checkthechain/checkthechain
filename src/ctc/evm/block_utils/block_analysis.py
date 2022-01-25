@@ -25,14 +25,16 @@ def bin_by_blocks(
                 data.index = data.index.droplevel(index_name)
 
     standard_blocks = [int(block) for block in blocks]
-    data = data.groupby(np.digitize(data.index.values, standard_blocks)).sum()
-    data = pd.Series([0] * len(blocks), index=range(1, len(blocks) + 1)).add(
-        data, fill_value=0
-    )
-    if data.index[0] < standard_blocks[0]:
-        data = data.iloc[1:]
-    data.index = pd.Index(standard_blocks)
-    data.index.name = 'gte_this_block'  # type: ignore
+    new_data = data.groupby(
+        np.digitize(data.index.values, standard_blocks)
+    ).sum()
+    new_data = pd.Series(
+        [0] * len(blocks), index=range(1, len(blocks) + 1)
+    ).add(new_data, fill_value=0)
+    # if new_data.index[0] < standard_blocks[0]:
+    #     new_data = new_data.iloc[1:]
+    new_data.index = pd.Index(standard_blocks)
+    new_data.index.name = 'gte_this_block'  # type: ignore
 
-    return data
+    return new_data
 

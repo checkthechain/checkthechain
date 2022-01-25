@@ -117,6 +117,7 @@ async def async_compute_curve_volume(
         contract_address=pool_address,
         event_name=event_name,
         start_block=blocks[0],
+        keep_multiindex=False,
     )
 
     fei_sells = swaps[swaps['arg__sold_id'] == fei_index]
@@ -124,12 +125,12 @@ async def async_compute_curve_volume(
     fei_buys = swaps[swaps['arg__bought_id'] == fei_index]
     fei_bought = fei_buys['arg__tokens_bought'].map(float) / 1e18
 
-    fei_bought_groups = pd.cut(fei_bought.index, blocks, right=False)
-    fei_bought_by_day = fei_bought.groupby(fei_bought_groups).sum()
-    fei_sold_groups = pd.cut(fei_sold.index, blocks, right=False)
-    fei_sold_by_day = fei_sold.groupby(fei_sold_groups).sum()
-    # fei_bought_by_day = evm.bin_by_blocks(data=fei_bought, blocks=blocks)
-    # fei_sold_by_day = evm.bin_by_blocks(data=fei_sold, blocks=blocks)
+    # fei_bought_groups = pd.cut(fei_bought.index, blocks, right=False)
+    # fei_bought_by_day = fei_bought.groupby(fei_bought_groups).sum()
+    # fei_sold_groups = pd.cut(fei_sold.index, blocks, right=False)
+    # fei_sold_by_day = fei_sold.groupby(fei_sold_groups).sum()
+    fei_bought_by_day = evm.bin_by_blocks(data=fei_bought, blocks=blocks)
+    fei_sold_by_day = evm.bin_by_blocks(data=fei_sold, blocks=blocks)
     result = fei_bought_by_day + fei_sold_by_day
 
     return {
@@ -146,6 +147,7 @@ async def async_compute_saddle_volume(
         contract_address=pool_address,
         event_name='TokenSwap',
         start_block=blocks[0],
+        keep_multiindex=False,
     )
 
     fei_sells = swaps[swaps['arg__soldId'] == fei_index]
@@ -153,12 +155,12 @@ async def async_compute_saddle_volume(
     fei_buys = swaps[swaps['arg__boughtId'] == fei_index]
     fei_bought = fei_buys['arg__tokensBought'].map(float) / 1e18
 
-    fei_bought_groups = pd.cut(fei_bought.index, blocks, right=False)
-    fei_bought_by_day = fei_bought.groupby(fei_bought_groups).sum()
-    fei_sold_groups = pd.cut(fei_sold.index, blocks, right=False)
-    fei_sold_by_day = fei_sold.groupby(fei_sold_groups).sum()
-    # fei_bought_by_day = evm.bin_by_blocks(data=fei_bought, blocks=blocks)
-    # fei_sold_by_day = evm.bin_by_blocks(data=fei_sold, blocks=blocks)
+    # fei_bought_groups = pd.cut(fei_bought.index, blocks, right=False)
+    # fei_bought_by_day = fei_bought.groupby(fei_bought_groups).sum()
+    # fei_sold_groups = pd.cut(fei_sold.index, blocks, right=False)
+    # fei_sold_by_day = fei_sold.groupby(fei_sold_groups).sum()
+    fei_bought_by_day = evm.bin_by_blocks(data=fei_bought, blocks=blocks)
+    fei_sold_by_day = evm.bin_by_blocks(data=fei_sold, blocks=blocks)
     result = fei_bought_by_day + fei_sold_by_day
 
     return {

@@ -4,6 +4,8 @@ import typing
 from ctc import evm
 from ctc.protocols import chainlink_utils
 from ctc.protocols import fei_utils
+from ctc.toolbox import pd_utils
+
 from .. import analytics_spec
 
 
@@ -14,8 +16,12 @@ async def async_compute_prices(
         feed='FEI_USD', start_block=blocks[0] - 10000
     )
     feed_data = feed_data / 1e8
-    feed_data = evm.interpolate_block_series(
-        series=feed_data, end_block=blocks[-1]
+    # feed_data = evm.interpolate_block_series(
+    #     series=feed_data, end_block=blocks[-1]
+    # )
+    feed_data = pd_utils.interpolate_series(
+        series=feed_data,
+        end_index=blocks[-1],
     )
     result = [feed_data[block] for block in blocks]
 
