@@ -26,26 +26,3 @@ class PoolStateByBlock(typing.TypedDict):
     y_reserves: list[typing.Union[int, float]]
     lp_total_supply: list[typing.Union[int, float]]
 
-# class PoolState(typing.TypedDict):
-#     x_reserves: int
-#     y_reserves: int
-#     lp_total_supply: int
-
-
-# class PoolStateNormalized(typing.TypedDict):
-#     x_reserves: float
-#     y_reserves: float
-#     lp_total_supply: float
-
-
-# class PoolStateByBlock(typing.TypedDict):
-#     x_reserves: list[int]
-#     y_reserves: list[int]
-#     lp_total_supply: list[int]
-
-
-# class PoolStateNormalizedByBock(typing.TypedDict):
-#     x_reserves: list[float]
-#     y_reserves: list[float]
-#     lp_total_supply: list[float]
-

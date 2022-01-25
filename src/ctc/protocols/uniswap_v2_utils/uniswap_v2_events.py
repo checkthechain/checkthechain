@@ -41,8 +41,7 @@ async def async_get_pool_swaps(
 
     # rename columns
     if replace_symbols:
-        x_symbol = symbols
-        y_symbol = symbols
+        x_symbol, y_symbol = symbols
     else:
         x_symbol = 'x'
         y_symbol = 'y'

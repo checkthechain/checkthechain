@@ -9,9 +9,10 @@ from ctc import spec
 # # metadata
 #
 
+
 async def download_pool_abi(pool_address):
     example_pool = '0x8f8ef111b67c04eb1641f5ff19ee54cda062f163'
-    evm.save_proxy_contract_abi_to_filesystem(
+    await evm.async_save_proxy_contract_abi_to_filesystem(
         contract_address=pool_address,
         proxy_implementation=example_pool,
     )
@@ -19,7 +20,7 @@ async def download_pool_abi(pool_address):
 
 async def ensure_pool_abi(pool_address):
     try:
-        evm.get_contract_abi(contract_address=pool_address)
+        await evm.async_get_contract_abi(contract_address=pool_address)
     except spec.AbiNotFoundException:
         await download_pool_abi(pool_address)
 
@@ -35,7 +36,9 @@ async def async_get_pool_tokens(pool_address, **rpc_kwargs):
 async def async_get_pool_metadata(pool_address, **rpc_kwargs):
     await ensure_pool_abi(pool_address)
 
-    x_address, y_address = await async_get_pool_tokens(pool_address=pool_address)
+    x_address, y_address = await async_get_pool_tokens(
+        pool_address=pool_address
+    )
     x_symbol, y_symbol = await evm.async_get_erc20s_symbols(
         tokens=[x_address, y_address], **rpc_kwargs
     )
@@ -51,6 +54,7 @@ async def async_get_pool_metadata(pool_address, **rpc_kwargs):
 # # events
 #
 
+
 async def async_get_pool_swaps(
     pool_address,
     start_block=None,
@@ -65,7 +69,7 @@ async def async_get_pool_swaps(
             async_get_pool_metadata(pool_address)
         )
 
-    swaps = evm.get_events(
+    swaps = await evm.async_get_events(
         event_name='Swap',
         contract_address=pool_address,
         start_block=start_block,
@@ -93,12 +97,12 @@ async def async_get_pool_swaps(
         x_decimals, y_decimals = await evm.async_get_erc20s_decimals(
             tokens=[metadata['x_address'], metadata['y_address']],
         )
-        swaps[columns['arg__amount0']] = (
-            swaps[columns['arg__amount0']].astype(float) / (10 ** x_decimals)
-        )
-        swaps[columns['arg__amount1']] = (
-            swaps[columns['arg__amount1']].astype(float) / (10 ** y_decimals)
-        )
+        swaps[columns['arg__amount0']] = swaps[columns['arg__amount0']].astype(
+            float
+        ) / (10 ** x_decimals)
+        swaps[columns['arg__amount1']] = swaps[columns['arg__amount1']].astype(
+            float
+        ) / (10 ** y_decimals)
 
     return swaps
 
