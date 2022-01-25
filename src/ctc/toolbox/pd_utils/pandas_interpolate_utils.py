@@ -41,13 +41,18 @@ def interpolate_series(
     new_index = np.arange(start_index, end_index + 1, 1, dtype=int)
 
     # create new series
-    new_series = typing.cast(pd.Series, series.reindex(new_index, fill_value=pd.NA))
+    new_series = typing.cast(
+        pd.Series, series.reindex(new_index, fill_value=pd.NA)
+    )
 
     # insert pre fill value
     if start_index < series.index.values[0]:
         if pre_fill_value is None:
             raise Exception('for early start must specify pre_fill_value')
         new_series.iloc[0] = pre_fill_value
+    elif start_index > series.index.values[-1]:
+        # case: indicies start after the series ends
+        new_series.iloc[0] = series.values[-1]
     elif start_index > series.index.values[0]:
         # fill in any initial values that were cut off
         fill_index = np.nonzero(series.index > start_index)[0][0] - 1  # type: ignore
