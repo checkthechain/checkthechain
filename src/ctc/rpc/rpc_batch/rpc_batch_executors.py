@@ -1,4 +1,7 @@
+from ctc import evm
 from ctc import spec
+
+from .. import rpc_provider
 from . import rpc_batch_utils
 
 
@@ -24,8 +27,47 @@ def batch_eth_call(**kwargs) -> spec.RpcPluralResponse:
     return rpc_batch_utils.batch_execute('eth_call', **kwargs)
 
 
-async def async_batch_eth_call(**kwargs) -> spec.RpcPluralResponse:
-    return await rpc_batch_utils.async_batch_execute('eth_call', **kwargs)
+async def async_batch_eth_call(
+    function_abi=None,
+    function_name=None,
+    function_selector=None,
+    provider=None,
+    to_address=None,
+    to_addresses=None,
+    **kwargs,
+) -> spec.RpcPluralResponse:
+
+    if function_abi is None:
+
+        if to_address is not None:
+            contract_address = to_address
+        elif to_addresses is not None:
+            contract_address = to_addresses[0]
+        else:
+            raise Exception(
+                'must specify contract_address or contract_addresses'
+            )
+
+        provider = rpc_provider.get_provider(provider)
+        network = provider['network']
+        if network is None:
+            raise Exception('could not determine network')
+
+        function_abi = await evm.async_get_function_abi(
+            contract_address=contract_address,
+            function_name=function_name,
+            function_selector=function_selector,
+            network=network,
+        )
+
+    return await rpc_batch_utils.async_batch_execute(
+        'eth_call',
+        function_abi=function_abi,
+        provider=provider,
+        to_address=to_address,
+        to_addresses=to_addresses,
+        **kwargs,
+    )
 
 
 def batch_eth_coinbase(**kwargs) -> spec.RpcPluralResponse:

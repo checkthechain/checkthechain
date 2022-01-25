@@ -121,10 +121,6 @@ def _separate_execution_kwargs(
     if method == 'eth_call':
         if kwargs.get('function_abi') is not None:
             constructor_kwargs['function_abi'] = kwargs['function_abi']
-        if kwargs.get('to_address') is not None:
-            constructor_kwargs['to_address'] = kwargs['to_address']
-        if kwargs.get('to_addresses') is not None:
-            digestor_kwargs['to_addresses'] = kwargs['to_addresses']
 
     return constructor_kwargs, digestor_kwargs
 
@@ -135,21 +131,13 @@ def _separate_execution_kwargs(
 
 
 def batch_digest(
-    response: spec.RpcPluralResponse,
-    method: str,
-    to_addresses: typing.Optional[list[str]] = None,
-    **digestor_kwargs
+    response: spec.RpcPluralResponse, method: str, **digestor_kwargs
 ) -> spec.RpcPluralResponse:
 
     digestor = rpc_registry.get_digestor(method)
     results = []
     for s, subresponse in enumerate(response):
-        if to_addresses is not None:
-            result = digestor(
-                subresponse, to_address=to_addresses[s], **digestor_kwargs
-            )
-        else:
-            result = digestor(subresponse, **digestor_kwargs)
+        result = digestor(subresponse, **digestor_kwargs)
         results.append(result)
     return results
 
