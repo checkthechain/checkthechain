@@ -2,8 +2,6 @@ import decimal
 
 from ctc.toolbox import validate_utils
 
-from . import uniswap_spec
-
 
 def trade(
     x_reserves,
@@ -36,7 +34,7 @@ def trade(
 
     # validate inputs
     if fee_rate is None:
-        fee_rate = uniswap_spec.default_trade_fee
+        fee_rate = 0.003
     value = validate_utils._ensure_exactly_one(
         x_sold, x_bought, y_sold, y_bought, new_x_reserves, new_y_reserves
     )
@@ -189,7 +187,7 @@ def compute_x_sold_to_reach_price(
     - see wolframalpha.com/input/?i=g+x%5E2+%2B+%281+%2B+g%29+x+%2B+C+%3D+0
     """
     if fee_rate is None:
-        fee_rate = uniswap_spec.default_trade_fee
+        fee_rate = 0.003
     gamma = 1 - fee_rate
     C = 1 - new_x_per_y * y_reserves / x_reserves
     alpha = (gamma + 1) ** 2 - 4 * C * gamma
@@ -206,7 +204,7 @@ def compute_x_sold_to_reach_price(
 def compute_y_bought_when_x_sold(x_sold, x_reserves, y_reserves, fee_rate=None):
     """compute amount of y bought when selling x_sold amount of x"""
     if fee_rate is None:
-        fee_rate = uniswap_spec.default_trade_fee
+        fee_rate = 0.003
     validate_utils._ensure_non_negative(x_sold)
     alpha = x_sold / x_reserves
     gamma = 1 - fee_rate
@@ -222,7 +220,7 @@ def compute_x_sold_when_y_bought(
 ):
     """compute amount of x that must be sold to buy y_bought amount of y"""
     if fee_rate is None:
-        fee_rate = uniswap_spec.default_trade_fee
+        fee_rate = 0.003
     validate_utils._ensure_non_negative(y_bought)
     beta = y_bought / y_reserves
     gamma = 1 - fee_rate
