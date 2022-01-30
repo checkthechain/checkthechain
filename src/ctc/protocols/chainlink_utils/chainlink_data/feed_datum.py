@@ -97,9 +97,11 @@ async def async_get_feed_datum(
             function_name='latestAnswer',
             block_number=block,
             provider=provider,
+            fill_empty=True,
+            empty_token=None,
         )
 
-        if normalize:
+        if normalize and answer is not None:
             decimals = chainlink_metadata.get_feed_decimals(feed)
             answer /= 10 ** decimals
 
@@ -112,6 +114,8 @@ async def async_get_feed_datum(
             function_name='latestRoundData',
             block_number=block,
             provider=provider,
+            fill_empty=True,
+            empty_token=None,
         )
 
         round_id, answer, _started_at, updated_at, _answered_in_round_id = data
@@ -122,7 +126,7 @@ async def async_get_feed_datum(
             'round_id': round_id,
         }
 
-        if normalize:
+        if normalize and answer is not None:
             decimals = chainlink_metadata.get_feed_decimals(feed)
             full['answer'] /= 10 ** decimals
             return full
