@@ -65,19 +65,16 @@ async def async_rechunk_events(
         start_block = await evm.async_block_number_to_int(start_block)
     if end_block is not None:
         end_block = await evm.async_block_number_to_int(end_block)
-    events = await filesystem_events.async_get_events_from_filesystem(
-        contract_address=contract_address,
-        event_hash=event_hash,
-        start_block=start_block,
-        end_block=end_block,
-        network=network,
-    )
 
     # get event range
     if start_block is None:
-        start_block = events.index.values[0][0]
+        start_block = min(
+            path_start for path_start, path_end in event_list['paths'].values()
+        )
     if end_block is None:
-        end_block = events.index.values[-1][0]
+        end_block = max(
+            path_end for path_start, path_end in event_list['paths'].values()
+        )
     start_block = typing.cast(int, start_block)
     end_block = typing.cast(int, end_block)
 
@@ -126,11 +123,6 @@ async def async_rechunk_events(
         min_block_start = min(path_start, min_block_start)
         max_block_end = max(path_end, max_block_end)
 
-    # trim loaded data to trimmed paths
-    block_index = pd_utils.keep_level(events.index, level='block_number').values
-    row_mask = (min_block_start <= block_index) * (block_index < max_block_end)
-    events = events[row_mask]
-
     # compute total bytes across all files
     data_bytes = 0
     for original_path in original_paths:
@@ -141,8 +133,18 @@ async def async_rechunk_events(
     # compute number of chunks
     n_chunks = math.ceil(data_bytes / chunk_target_bytes)
 
+    # load events
+    if len(original_paths) > 0:
+        events = await filesystem_events.async_get_events_from_filesystem(
+            contract_address=contract_address,
+            event_hash=event_hash,
+            start_block=min_block_start,
+            end_block=max_block_end,
+            network=network,
+        )
+
     # split into chunks
-    if len(events) > 0:
+    if len(original_paths) > 0 and len(events) > 0:
         event_chunks = typing.cast(
             typing.Sequence[spec.DataFrame],
             np.array_split(events, n_chunks),
