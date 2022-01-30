@@ -8,16 +8,22 @@ def get_command_spec():
     return {
         'f': rechunk_command,
         'args': [
-            {'name': 'contract_address', 'nargs': '?'},
-            {'name': 'event', 'nargs': '?'},
+            {'name': 'contract_address', 'kwargs': {'nargs': '?'}},
+            {'name': 'event', 'kwargs': {'nargs': '?', 'default': None}},
             {'name': '--network'},
-            {'name': '--all_events', 'action': 'store_true'},
-            {'name': '--start_block', 'type': int},
-            {'name': '--end_block', 'type': int},
-            {'name': '--n_chunks', 'type': int},
-            {'name': '--chunk_target_bytes', 'type': float},
-            {'name': '--dry', 'action': 'store_true'},
-            {'name': '--verbose', 'action': 'store_true'},
+            {
+                'name': '--all',
+                'kwargs': {'action': 'store_true', 'dest': 'all_events'},
+            },
+            {'name': '--start_block', 'kwargs': {'type': int}},
+            {'name': '--end_block', 'kwargs': {'type': int}},
+            {'name': '--n_chunks', 'kwargs': {'type': int}},
+            {
+                'name': '--chunk_target_bytes',
+                'kwargs': {'type': float, 'required': True},
+            },
+            {'name': '--dry', 'kwargs': {'action': 'store_true'}},
+            {'name': '--verbose', 'kwargs': {'action': 'store_true'}},
         ],
     }
 
@@ -64,7 +70,7 @@ async def run(
 
     if all_events:
 
-        await evm.async_rechunk_all(
+        await evm.async_rechunk_all_events(
             network=network,
             start_block=start_block,
             end_block=end_block,
@@ -93,6 +99,11 @@ async def run(
             chunk_target_bytes=chunk_target_bytes,
             dry=dry,
             verbose=verbose,
+        )
+
+    else:
+        raise Exception(
+            'usage either `ctc rechunk --all` or `ctc rechunk contract_address event_hash`'
         )
 
     await rpc.async_close_http_session()
