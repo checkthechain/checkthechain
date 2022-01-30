@@ -10,8 +10,12 @@ def get_function_parameter_types(
 ) -> list[spec.ABIDatumType]:
 
     if function_abi is not None:
-        return [item['type'] for item in function_abi.get('inputs', [])]
+        import eth_utils
 
+        return [
+            eth_utils.abi.collapse_if_tuple(item)
+            for item in function_abi.get('inputs', [])
+        ]
     elif function_signature is not None:
         parameter_str = function_signature.split('(')[1]
         parameter_str = parameter_str[:-1]
