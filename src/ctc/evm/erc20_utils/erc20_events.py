@@ -2,6 +2,7 @@ import typing
 
 from ctc import spec
 
+from .. import block_utils
 from .. import event_utils
 from . import erc20_metadata
 
@@ -13,9 +14,11 @@ async def async_get_erc20_transfers(
     token_address: spec.ERC20Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = 'latest',
+    normalize: bool = True,
     **event_kwargs
 ) -> spec.DataFrame:
-    return await event_utils.async_get_events(
+
+    transfers = await event_utils.async_get_events(
         contract_address=token_address,
         event_name='Transfer',
         start_block=start_block,
@@ -23,12 +26,32 @@ async def async_get_erc20_transfers(
         **event_kwargs
     )
 
+    if normalize:
+
+        # get block
+        if start_block is not None:
+            block = start_block
+        elif end_block != 'latest':
+            block = end_block
+        else:
+            block = await block_utils.async_get_latest_block_number()
+
+        decimals = await erc20_metadata.async_get_erc20_decimals(
+            token=token_address, block=block
+        )
+        dtype = float
+        transfers['arg__value'] = transfers['arg__value'] / dtype(
+            '1e' + str(decimals)
+        )
+
+    return transfers
+
 
 async def async_get_erc20_balances_from_transfers(
     transfers: spec.DataFrame,
     block: typing.Optional[spec.BlockNumberReference] = None,
     dtype: typing.Union[typing.Type[int], typing.Type[float]] = float,
-    normalize: bool = True,
+    # normalize: bool = True,
 ) -> spec.DataFrame:
 
     # filter block
@@ -52,16 +75,16 @@ async def async_get_erc20_balances_from_transfers(
     to_transfers = transfers.groupby('arg__to')[amount_key].sum()
     balances = to_transfers.sub(from_transfers, fill_value=0)
 
-    # normalize
-    if normalize:
-        block = transfers.index[-1][0]
-        if block is None:
-            raise Exception('could not determine any valid block')
-        address = transfers['contract_address'].iloc[0]
-        decimals = await erc20_metadata.async_get_erc20_decimals(
-            token=address, block=block
-        )
-        balances = balances / dtype('1e' + str(decimals))
+    # # normalize
+    # if normalize:
+    #     block = transfers.index[-1][0]
+    #     if block is None:
+    #         raise Exception('could not determine any valid block')
+    #     address = transfers['contract_address'].iloc[0]
+    #     decimals = await erc20_metadata.async_get_erc20_decimals(
+    #         token=address, block=block
+    #     )
+    #     balances = balances / dtype('1e' + str(decimals))
 
     # sort
     balances = balances.sort_values(ascending=False)

@@ -5,6 +5,8 @@ import functools
 import os
 import typing
 
+import toolstr
+
 import ctc.config
 from ctc import binary
 from ctc import directory
@@ -22,7 +24,9 @@ from ... import evm_spec
 #
 
 
-def get_events_root(network: typing.Optional[spec.NetworkReference] = None) -> str:
+def get_events_root(
+    network: typing.Optional[spec.NetworkReference] = None,
+) -> str:
     network_name = directory.get_network_name(network)
     return os.path.join(ctc.config.get_data_dir(), network_name, 'events')
 
@@ -123,7 +127,7 @@ def list_contract_events(
     elif event_abi is not None:
         query_event_hash = binary.get_event_hash(event_abi)
     else:
-        raise Exception()
+        query_event_hash = None
 
     # compile path data
     contract_address = contract_address.lower()
@@ -212,8 +216,7 @@ def list_events(
 
 
 def list_contracts_events(
-    network: typing.Optional[spec.NetworkReference] = None,
-    **kwargs
+    network: typing.Optional[spec.NetworkReference] = None, **kwargs
 ) -> dict[str, dict[str, _ListEventsResult]]:
     contracts_events = {}
     for contract_address in list_events_contracts(network=network):
@@ -248,7 +251,7 @@ def print_events_summary_filesystem() -> None:
             dirpath = get_events_event_dir(
                 contract_address=contract_address, event_hash=event_hash
             )
-            n_bytes = filesystem_utils.get_directory_nbytes(dirpath)
+            n_bytes = filesystem_utils.get_directory_nbytes_human(dirpath)
             short_hash = event_hash[:6] + '...' + event_hash[-6:]
             print(
                 '    -',
@@ -269,12 +272,16 @@ async def async_save_events_to_filesystem(
     overwrite: bool = False,
     verbose: bool = True,
     provider: spec.ProviderSpec = None,
-) -> None:
+    network: typing.Optional[spec.NetworkReference] = None,
+) -> str:
 
-    provider = rpc.get_provider(provider)
-    network = provider['network']
     if network is None:
-        raise Exception('could not determine network')
+        provider = rpc.get_provider(provider)
+        network = provider['network']
+        if network is None:
+            raise Exception('could not determine network')
+    else:
+        network = directory.get_network_name(network)
 
     contract_address = contract_address.lower()
 
@@ -305,6 +312,8 @@ async def async_save_events_to_filesystem(
     os.makedirs(os.path.dirname(path), exist_ok=True)
     events.to_csv(path)
 
+    return path
+
 
 async def async_get_events_from_filesystem(
     contract_address: spec.ContractAddress,
@@ -315,16 +324,27 @@ async def async_get_events_from_filesystem(
     start_block: typing.Optional[int] = None,
     end_block: typing.Optional[int] = None,
     provider: spec.ProviderSpec = None,
+    network: spec.NetworkReference = None,
 ) -> spec.DataFrame:
 
-    provider = rpc.get_provider(provider)
-    network = provider['network']
+    # get network
     if network is None:
-        raise Exception('could not determine network')
+        provider = rpc.get_provider(provider)
+        network = provider['network']
+        if network is None:
+            raise Exception('could not determine network')
+    else:
+        network = directory.get_network_name(network)
 
-    if start_block is not None and end_block is not None:
-        start_block, end_block = await block_utils.async_block_numbers_to_int(
-            blocks=[start_block, end_block],
+    # resolve start_block and end_block
+    if start_block is not None:
+        start_block = await block_utils.async_block_number_to_int(
+            start_block,
+            provider=provider,
+        )
+    if end_block is not None:
+        end_block = await block_utils.async_block_number_to_int(
+            end_block,
             provider=provider,
         )
 
@@ -347,26 +367,41 @@ async def async_get_events_from_filesystem(
         event_hash=event_hash,
         network=network,
     )
-    dfs = []
     if event_hash not in events or len(events[event_hash]['paths']) == 0:
         raise backend_utils.DataNotFound('no files for event')
+
+    # get paths to load
+    paths_to_load = []
+    for path, (path_start, path_end) in events[event_hash]['paths'].items():
+        if start_block is not None:
+            if path_end < start_block:
+                continue
+        if end_block is not None:
+            if end_block < path_start:
+                continue
+        paths_to_load.append(path)
+    if len(paths_to_load) == 0:
+        raise backend_utils.DataNotFound('no files for event')
+
+    # print summary
     if verbose:
-        if len(events[event_hash]['paths']) > 0:
-            example_path = list(events[event_hash]['paths'].keys())[0]
-            dirpath = os.path.dirname(example_path)
-            n_bytes = filesystem_utils.get_directory_nbytes(dirpath)
-            n_files = len(events[event_hash]['paths'])
+        if len(paths_to_load) > 0:
+            n_files = len(paths_to_load)
+            n_bytes_int = sum(os.path.getsize(path) for path in paths_to_load)
+            n_bytes = toolstr.format(n_bytes_int / 1024 / 1024) + 'M'
         else:
             n_bytes = '0'
             n_files = 0
         print('loading events (' + n_bytes + 'B', 'across', n_files, 'files)')
         if verbose >= 2:
-            for path in events[event_hash]['paths']:
+            for path in paths_to_load:
                 print('-', path)
 
     import pandas as pd
 
-    for path in events[event_hash]['paths'].keys():
+    # load paths
+    dfs = []
+    for path in paths_to_load:
         df = pd.read_csv(path)
         df = df.set_index(['block_number', 'transaction_index', 'log_index'])
         dfs.append(df)
@@ -374,13 +409,6 @@ async def async_get_events_from_filesystem(
     df = df.sort_index()
 
     # trim unwanted
-    if start_block == 'latest' or end_block == 'latest':
-        latest_block = await block_utils.async_get_latest_block_number(provider=provider)
-        if start_block == 'latest':
-            start_block = latest_block
-        if end_block == 'latest':
-            end_block = latest_block
-
     if start_block is not None:
         if start_block < events[event_hash]['block_range'][0]:
             raise backend_utils.DataNotFound(
