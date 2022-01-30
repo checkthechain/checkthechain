@@ -47,7 +47,7 @@ async def async_get_token_deposits(
 ) -> typing.Tuple[spec.ContractAddress, ...]:
     """get list of a token's deposits"""
 
-    block = evm.standardize_block_number(block)
+    block = await evm.async_block_number_to_int(block=block, provider=provider)
     coracle = coracle_spec.get_coracle_address(wrapper=wrapper, block=block)
     return await rpc.async_eth_call(
         to_address=coracle,
@@ -63,7 +63,7 @@ async def async_get_deposit_token(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
 ) -> spec.Address:
-    """get token associated with a balance"""
+    """get the token address of a deposit"""
     return await rpc.async_eth_call(
         to_address=deposit,
         block_number=block,

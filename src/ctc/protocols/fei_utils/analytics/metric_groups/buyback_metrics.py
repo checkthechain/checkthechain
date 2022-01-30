@@ -1,6 +1,5 @@
 import typing
 
-from ctc import evm
 from ctc import spec
 from ctc.protocols import balancer_utils
 from ctc.toolbox import pd_utils
@@ -15,12 +14,12 @@ async def async_compute_buybacks(
     return {
         'name': 'Buybacks',
         'metrics': {
-            'buybacks_usd': (await compute_tribe_buybacks_usd(blocks)),
+            'buybacks_usd': (await async_compute_tribe_buybacks_usd(blocks)),
         },
     }
 
 
-async def compute_tribe_buybacks_usd(
+async def async_compute_tribe_buybacks_usd(
     blocks: list[int], swaps: typing.Optional[spec.DataFrame] = None
 ) -> analytics_spec.MetricData:
 
