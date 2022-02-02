@@ -7,7 +7,6 @@ import toolstr
 from ctc import evm
 from ctc import binary
 from ctc import spec
-from ctc.toolbox import pd_utils
 
 from . import filesystem_events
 from ... import abi_utils
@@ -15,12 +14,11 @@ from ... import abi_utils
 
 async def async_rechunk_events(
     contract_address: spec.Address,
+    chunk_target_bytes: int,
     event_name: typing.Optional[str] = None,
     event_hash: typing.Optional[str] = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    n_chunks: typing.Optional[int] = None,
-    chunk_target_bytes: typing.Optional[int] = None,
     chunk_size_tolerance: float = 0.1,
     verbose: bool = True,
     dry: bool = False,

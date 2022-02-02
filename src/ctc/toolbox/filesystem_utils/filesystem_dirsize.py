@@ -4,8 +4,8 @@ import subprocess
 def get_directory_nbytes(dirpath: str) -> int:
     cmd = 'du -sb ' + dirpath
     cmd_pieces = cmd.split(' ')
-    output = subprocess.check_output(cmd_pieces)
-    output = output.split(b'\t')[0].decode()
+    output_bytes = subprocess.check_output(cmd_pieces)
+    output = output_bytes.split(b'\t')[0].decode()
     return int(output)
 
 

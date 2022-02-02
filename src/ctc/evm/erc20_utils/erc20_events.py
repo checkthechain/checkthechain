@@ -13,7 +13,7 @@ from . import erc20_metadata
 async def async_get_erc20_transfers(
     token_address: spec.ERC20Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
-    end_block: typing.Optional[spec.BlockNumberReference] = 'latest',
+    end_block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     **event_kwargs
 ) -> spec.DataFrame:
@@ -30,9 +30,9 @@ async def async_get_erc20_transfers(
 
         # get block
         if start_block is not None:
-            block = start_block
-        elif end_block != 'latest':
-            block = end_block
+            block = block_utils.standardize_block_number(start_block)
+        elif end_block != 'latest' and end_block is not None:
+            block = block_utils.standardize_block_number(end_block)
         else:
             block = await block_utils.async_get_latest_block_number()
 

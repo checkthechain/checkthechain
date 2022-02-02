@@ -12,10 +12,14 @@ def get_function_parameter_types(
     if function_abi is not None:
         import eth_utils
 
-        return [
-            eth_utils.abi.collapse_if_tuple(item)
-            for item in function_abi.get('inputs', [])
-        ]
+        output = []
+        for item in function_abi.get('inputs', []):
+            cast_item = typing.cast(dict[str, typing.Any], item)
+            collapsed = eth_utils.abi.collapse_if_tuple(cast_item)
+            output.append(collapsed)
+
+        return output
+
     elif function_signature is not None:
         parameter_str = function_signature.split('(')[1]
         parameter_str = parameter_str[:-1]
