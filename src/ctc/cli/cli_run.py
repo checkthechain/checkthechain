@@ -17,6 +17,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
         ('fei',): 'ctc.protocols.fei_utils.cli.fei_command',
         ('gas',): 'ctc.cli.commands.gas_command',
+        ('keccak',): 'ctc.cli.commands.keccak_command',
         ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
         ('rechunk_events',): 'ctc.cli.commands.rechunk_command',
         ('setup',): 'ctc.cli.commands.setup_command',
