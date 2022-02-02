@@ -1,7 +1,7 @@
+import asyncio
 import logging
 import random
 
-import anyio
 import aiohttp
 
 from ctc import spec
@@ -25,7 +25,7 @@ async def async_send_http(
             if response.status != 200:
                 t_sleep = 2 ** attempt + random.random()
                 print('sleeping for ' + str(t_sleep))
-                await anyio.sleep(t_sleep)
+                await asyncio.sleep(t_sleep)
                 continue
             return await response.json()
 
@@ -59,6 +59,6 @@ def get_async_http_session(
 async def async_close_http_session(provider: spec.ProviderSpec = None) -> None:
     provider = rpc_provider.get_provider(provider)
     session = get_async_http_session(provider=provider)
-    await anyio.sleep(0)
+    await asyncio.sleep(0)
     await session.close()
 
