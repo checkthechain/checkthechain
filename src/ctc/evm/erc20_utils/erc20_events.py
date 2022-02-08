@@ -25,6 +25,7 @@ async def async_get_erc20_transfers(
         end_block=end_block,
         **event_kwargs
     )
+    transfers['arg__value'] = transfers['arg__value'].map(int)
 
     if normalize:
 
