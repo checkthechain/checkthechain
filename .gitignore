@@ -3,10 +3,3 @@ TODO.md
 __pycache__/*
 *.egg-info
 
-data/*
-notebooks/*
-experimental/*
-notes/*
-fei/config.yaml
-config.yaml
-
