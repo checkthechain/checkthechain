@@ -1,8 +1,8 @@
 import setuptools
 
 setuptools.setup(
-    name='fei',
-    version='0.0.1',
+    name='checkthechain',
+    version='0.2.0',
     # packages=['fei', 'larp'],
     packages=setuptools.find_packages("./src"),
     package_dir={'': 'src'},
@@ -36,7 +36,7 @@ setuptools.setup(
         'rlp',  # for create2 address computation
     ],
     scripts=[
-        './scripts/ctc'
+        './scripts/ctc',
     ]
 )
 
