@@ -113,9 +113,19 @@ dex_pools: dict[str, DexPoolMetadata] = {
         'address': '0x9928e4046d7c6513326ccea028cd3e7a91c7590a',
         'other_assets': ['TRIBE'],
     },
+    'uniswap_v3__fei_usdc_1': {
+        'platform': 'Uniswap V3',
+        'address': '0xdf50fbde8180c8785842c8e316ebe06f542d3443',
+        'other_assets': ['USDC'],
+    },
     'uniswap_v3__fei_usdc_5': {
         'platform': 'Uniswap V3',
         'address': '0x8c54aa2a32a779e6f6fbea568ad85a19e0109c26',
+        'other_assets': ['USDC'],
+    },
+    'uniswap_v3__fei_usdc_30': {
+        'platform': 'Uniswap V3',
+        'address': '0x5180545835bd68810fb7e11c7160bb7ea4ae8744',
         'other_assets': ['USDC'],
     },
     'uniswap_v3__fei_dai_5': {
@@ -123,6 +133,11 @@ dex_pools: dict[str, DexPoolMetadata] = {
         'address': '0xbb2e5c2ff298fd96e166f90c8abacaf714df14f8',
         'other_assets': ['DAI'],
     },
+    # 'balancer_v2': {
+    #     'platform': 'Balancer',
+    #     'address': '0xba12222222228d8ba445958a75a0704d566bf2c8',
+    #     'other_assets': ['ETH', 'TRIBE'],
+    # },
     'curve__fei_3crv': {
         'platform': 'Curve',
         'address': '0x06cb22615BA53E60D67Bf6C341a0fD5E718E1655',
