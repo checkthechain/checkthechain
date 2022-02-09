@@ -59,7 +59,7 @@ async def async_get_erc20_transfers(
     return transfers
 
 
-async def async_get_erc20_balances_from_transfers(
+def get_erc20_holdings_from_transfers(
     transfers: spec.DataFrame,
     block: typing.Optional[spec.BlockNumberReference] = None,
     dtype: typing.Union[typing.Type[int], typing.Type[float]] = float,
@@ -72,12 +72,7 @@ async def async_get_erc20_balances_from_transfers(
         mask = blocks <= block
         transfers = transfers[mask]
 
-    if 'arg__amount' in transfers.columns:
-        amount_key = 'arg__amount'
-    elif 'arg__value' in transfers.columns:
-        amount_key = 'arg__value'
-    else:
-        raise Exception('could not detect a transfer amout key in transfers')
+    amount_key = get_token_amount_column(transfers)
 
     # convert to float
     transfers[amount_key] = transfers[amount_key].map(dtype)
@@ -86,17 +81,6 @@ async def async_get_erc20_balances_from_transfers(
     from_transfers = transfers.groupby('arg__from')[amount_key].sum()
     to_transfers = transfers.groupby('arg__to')[amount_key].sum()
     balances = to_transfers.sub(from_transfers, fill_value=0)
-
-    # # normalize
-    # if normalize:
-    #     block = transfers.index[-1][0]
-    #     if block is None:
-    #         raise Exception('could not determine any valid block')
-    #     address = transfers['contract_address'].iloc[0]
-    #     decimals = await erc20_metadata.async_get_erc20_decimals(
-    #         token=address, block=block
-    #     )
-    #     balances = balances / dtype('1e' + str(decimals))
 
     # sort
     balances = balances.sort_values(ascending=False)
