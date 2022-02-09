@@ -1,8 +1,8 @@
-# Check the Chain (`ctc`)
+# ⛓🔍 Check the Chain (`ctc`) 🔎⛓
 
-`ctc` is a python library for historical data analysis for Ethereum and other EVM chains
+`ctc` is a cli tool and python library for historical data analysis of Ethereum and other EVM chains
 
-*`ctc` is in beta, please report bugs to the issue tracker*
+###### *`ctc` is in beta, please report bugs to the issue tracker*
 
 
 ## Features
@@ -13,21 +13,22 @@
 - **protocol specific**: includes functionality for protocols like Chainlink, Uniswap, ERC20's, DAO Governors, and more
 - **command line interface**: performs many block explorer tasks even if you're not a python user
 
+for details check out [the docs](/docs)
 
 ## Why does `ctc` exist?
-- **Treat historical data as a first-class feature**: This means having functionality for historical data fetching+storage+interpretation well-integrated into the rest of the API.
+- **Treat historical data as a first-class feature**: This means having historical data features well-integrated into each part of the of the API.
 - **Clean api that emphasizes UX**: With `ctc` most data queries can be obtained with a single function call. No need to instantiate objects. RPC inputs/outputs are automatically encoded/decoded by default.
 
 
 ## Contents
-1. [Example Usage]()
-2. [Installation]()
-3. [Related Projects]()
+1. [Example Usage](#example-usage)
+2. [Installation](#installation)
+3. [Related Projects](#related-projects)
 
 
 ## Example Usage
 
-for complete list of examples see [examples]() in the docs
+for complete list of examples see [examples](/docs/examples) in the docs
 
 
 #### Get all token transfers of an ERC20
@@ -69,7 +70,7 @@ feed_data = await chainlink_utils.async_get_feed_data(feed_address)
 ```
 
 
-#### Get DAO votes and proposals
+#### Get DAO proposals and votes
 
 ```python
 from ctc import evm
@@ -94,7 +95,7 @@ Two steps:
 1. `pip install checkthechain`
 2. run `ctc setup` command in terminal to specify data provider and data storage path
 
-If your shell path does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
+If your shell's `PATH` does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
 
 
 ## Related Projects
@@ -105,5 +106,4 @@ If your shell path does not include python scripts you may need to do something 
 - [`eth-abi`](https://github.com/sslivkoff/eth-abi-lite) python library for encoding/decoding EVM data
 - [`eth-utils`](https://github.com/ethereum/eth-utils) general python libraries for interacting with Ethereum
 - [`brownie`](https://github.com/eth-brownie/brownie) SDK for EVM smart contract development
-- [`riemann-ether`](https://github.com/summa-tx/riemann-ether)
-
+- [`riemann-ether`](https://github.com/summa-tx/riemann-ether) ethereum rapid prototyping toolbox
