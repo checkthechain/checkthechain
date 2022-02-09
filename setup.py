@@ -1,10 +1,12 @@
 import setuptools
 
+
 setuptools.setup(
     name='checkthechain',
     version='0.2.0',
     packages=setuptools.find_packages("./src"),
     package_dir={'': 'src'},
+    package_data={'ctc': ['default_data/*']},
     install_requires=[
         #
         # data science
@@ -42,6 +44,6 @@ setuptools.setup(
     },
     scripts=[
         './scripts/ctc',
-    ]
+    ],
 )
 
