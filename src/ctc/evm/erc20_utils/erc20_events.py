@@ -7,7 +7,15 @@ from .. import event_utils
 from . import erc20_metadata
 
 
-# import pandas
+def get_token_amount_column(df):
+    if 'arg__value' in df:
+        return 'arg__value'
+    elif 'arg__amount' in df:
+        return 'arg__amount'
+    elif 'arg__wad' in df:
+        return 'arg__wad'
+    else:
+        raise Exception('could not detect amount column')
 
 
 async def async_get_erc20_transfers(
@@ -25,7 +33,10 @@ async def async_get_erc20_transfers(
         end_block=end_block,
         **event_kwargs
     )
-    transfers['arg__value'] = transfers['arg__value'].map(int)
+
+    # detect amount column
+    column = get_token_amount_column(df=transfers)
+    transfers[column] = transfers[column].map(int)
 
     if normalize:
 
@@ -41,7 +52,7 @@ async def async_get_erc20_transfers(
             token=token_address, block=block
         )
         dtype = float
-        transfers['arg__value'] = transfers['arg__value'] / dtype(
+        transfers[column] = transfers[column] / dtype(
             '1e' + str(decimals)
         )
 
