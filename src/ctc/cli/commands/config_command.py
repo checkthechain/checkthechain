@@ -28,5 +28,15 @@ def config_command():
     print('## Config Values')
     config = ctc.config.get_config()
     for key in sorted(config.keys()):
-        print('-', str(key) + ':', config[key])
+        if isinstance(config[key], dict) and len(config[key]) > 0:
+            print('-', str(key) + ':')
+            for subkey, subvalue in config[key].items():
+                if isinstance(subvalue, dict) and len(subvalue) > 0:
+                    print('    -', str(subkey) + ':')
+                    for subsubkey, subsubvalue in subvalue.items():
+                        print('        -', str(subsubkey) + ':', subsubvalue)
+                else:
+                    print('    -', str(subkey) + ':', subvalue)
+        else:
+            print('-', str(key) + ':', config[key])
 
