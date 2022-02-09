@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name='checkthechain',
-    version='0.2.0',
+    version='0.2.1',
     packages=setuptools.find_packages("./src"),
     package_dir={'': 'src'},
     package_data={'ctc': ['default_data/*']},
