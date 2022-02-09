@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 import typing
-from typing_extensions import TypeGuard
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypeGuard
 
 from ctc import binary
 from ..typedefs import block_types

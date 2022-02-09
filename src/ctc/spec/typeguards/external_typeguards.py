@@ -1,9 +1,11 @@
+from __future__ import annotations
 
 import typing
-from typing_extensions import TypeGuard
 
 if typing.TYPE_CHECKING:
     import pandas
+
+    from typing_extensions import TypeGuard
 
 
 def is_dataframe(candidate) -> TypeGuard['pandas.core.frame.DataFrame']:
