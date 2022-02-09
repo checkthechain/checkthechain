@@ -4,7 +4,7 @@ from .. import rpc_request
 
 
 def construct_eth_new_filter(
-    contract_address: spec.BinaryData = None,
+    address: spec.BinaryData = None,
     topics: list[spec.BinaryData] = None,
     start_block: spec.BlockSpec = None,
     end_block: spec.BlockSpec = None,
@@ -15,7 +15,7 @@ def construct_eth_new_filter(
         end_block = rpc_format.encode_block_number(end_block)
 
     parameters = {
-        'address': contract_address,
+        'address': address,
         'topics': topics,
         'fromBlock': start_block,
         'toBlock': end_block,

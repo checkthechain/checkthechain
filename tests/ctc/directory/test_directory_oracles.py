@@ -2,13 +2,13 @@ import pytest
 import toolconfig
 
 from ctc import spec
-import ctc.directory_new as directory
+from ctc import directory
 
 
 @pytest.mark.parametrize(
     'test',
     [
-        ['chainlink', 'ETH_USD', '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419'],
+        ['chainlink', 'ETH_USD', '0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419'],
     ],
 )
 def test_get_oracle_address(test):

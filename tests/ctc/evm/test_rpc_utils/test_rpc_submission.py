@@ -1,12 +1,16 @@
-from ctc.evm import rpc_utils
+import pytest
+
+from ctc import rpc
 
 
-def test_eth_gas_price():
-    result = rpc_utils.eth_gas_price()
+@pytest.mark.asyncio
+async def test_eth_gas_price():
+    result = await rpc.async_eth_gas_price()
     assert isinstance(result, int)
 
 
-def test_eth_accounts():
-    result = rpc_utils.eth_accounts()
+@pytest.mark.asyncio
+async def test_eth_accounts():
+    result = await rpc.async_eth_accounts()
     assert isinstance(result, list)
 

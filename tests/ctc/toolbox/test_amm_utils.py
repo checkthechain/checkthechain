@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 
-from fei.toolbox import uniswap_utils
-from fei.toolbox import validate_utils
+from ctc.toolbox.amm_utils import cpmm
+from ctc.toolbox import validate_utils
 
 
 x_reserves = 1e6
@@ -12,43 +12,55 @@ y_reserves = 1e3
 @pytest.mark.parametrize('x_sold', [1e1, 1e6, 1e10])
 def test_trade_x_sold(x_sold):
 
-    result = uniswap_utils.trade(
-        x_reserves=x_reserves, y_reserves=y_reserves, x_sold=x_sold,
+    result = cpmm.trade(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        x_sold=x_sold,
     )
 
     assert result['new_pool']['x_reserves'] == x_reserves + x_sold
     assert result['new_pool']['y_reserves'] == y_reserves - result['y_bought']
-    assert result['y_bought'] == uniswap_utils.compute_y_bought_when_x_sold(
-        x_sold=x_sold, x_reserves=x_reserves, y_reserves=y_reserves,
+    assert result['y_bought'] == cpmm.compute_y_bought_when_x_sold(
+        x_sold=x_sold,
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
     )
 
 
 @pytest.mark.parametrize('y_sold', [1e1, 1e6, 1e10])
 def test_trade_y_sold(y_sold):
 
-    result = uniswap_utils.trade(
-        x_reserves=x_reserves, y_reserves=y_reserves, y_sold=y_sold,
+    result = cpmm.trade(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        y_sold=y_sold,
     )
 
     assert result['new_pool']['x_reserves'] == x_reserves - result['x_bought']
     assert result['new_pool']['y_reserves'] == y_reserves + y_sold
-    assert result['x_bought'] == uniswap_utils.compute_y_bought_when_x_sold(
-        x_sold=y_sold, x_reserves=y_reserves, y_reserves=x_reserves,
+    assert result['x_bought'] == cpmm.compute_y_bought_when_x_sold(
+        x_sold=y_sold,
+        x_reserves=y_reserves,
+        y_reserves=x_reserves,
     )
 
 
 @pytest.mark.parametrize('x_bought', [1e1, 1e3, 1e5])
 def test_trade_x_bought(x_bought):
 
-    result = uniswap_utils.trade(
-        x_reserves=x_reserves, y_reserves=y_reserves, x_bought=x_bought,
+    result = cpmm.trade(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        x_bought=x_bought,
     )
     assert result['new_pool']['x_reserves'] == x_reserves - x_bought
     assert result['new_pool']['y_reserves'] == y_reserves + result['y_sold']
 
     # ensure that the reserve specification gives the same result
-    reverse_result = uniswap_utils.trade(
-        x_reserves=x_reserves, y_reserves=y_reserves, y_sold=result['y_sold'],
+    reverse_result = cpmm.trade(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        y_sold=result['y_sold'],
     )
     validate_utils._ensure_values_equal(result, reverse_result)
 
@@ -56,15 +68,19 @@ def test_trade_x_bought(x_bought):
 @pytest.mark.parametrize('y_bought', [1e0, 1e1, 1e2])
 def test_trade_y_bought(y_bought):
 
-    result = uniswap_utils.trade(
-        x_reserves=x_reserves, y_reserves=y_reserves, y_bought=y_bought,
+    result = cpmm.trade(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        y_bought=y_bought,
     )
     assert result['new_pool']['x_reserves'] == x_reserves - result['x_bought']
     assert result['new_pool']['y_reserves'] == y_reserves - y_bought
 
     # ensure that the reserve specification gives the same result
-    reverse_result = uniswap_utils.trade(
-        x_reserves=x_reserves, y_reserves=y_reserves, x_sold=result['x_sold'],
+    reverse_result = cpmm.trade(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        x_sold=result['x_sold'],
     )
     validate_utils._ensure_values_equal(result, reverse_result)
 
@@ -72,7 +88,7 @@ def test_trade_y_bought(y_bought):
 @pytest.mark.parametrize('new_x_reserves', [1e1, 1e6, 1e9])
 def test_trade_new_x_reserves(new_x_reserves):
 
-    result = uniswap_utils.trade_to_target_reserves(
+    result = cpmm.trade_to_target_reserves(
         x_reserves=x_reserves,
         y_reserves=y_reserves,
         new_x_reserves=new_x_reserves,
@@ -83,7 +99,7 @@ def test_trade_new_x_reserves(new_x_reserves):
     count = 0
     for name in ['x_sold', 'y_sold', 'y_bought', 'x_bought']:
         if result[name] >= 0:
-            reverse_result = uniswap_utils.trade(
+            reverse_result = cpmm.trade(
                 x_reserves=x_reserves,
                 y_reserves=y_reserves,
                 **{name: result[name]}
@@ -97,7 +113,7 @@ def test_trade_new_x_reserves(new_x_reserves):
 @pytest.mark.parametrize('new_y_reserves', [1e1, 1e3, 1e6])
 def test_trade_y_reserves_new(new_y_reserves):
 
-    result = uniswap_utils.trade_to_target_reserves(
+    result = cpmm.trade_to_target_reserves(
         x_reserves=x_reserves,
         y_reserves=y_reserves,
         new_y_reserves=new_y_reserves,
@@ -108,7 +124,7 @@ def test_trade_y_reserves_new(new_y_reserves):
     count = 0
     for name in ['x_sold', 'y_sold', 'y_bought', 'x_bought']:
         if result[name] >= 0:
-            reverse_result = uniswap_utils.trade(
+            reverse_result = cpmm.trade(
                 x_reserves=x_reserves,
                 y_reserves=y_reserves,
                 **{name: result[name]}
@@ -123,8 +139,10 @@ def test_trade_y_reserves_new(new_y_reserves):
 def test_trade_to_price(new_price):
 
     # modify x per y
-    result = uniswap_utils.trade_to_price(
-        x_reserves=x_reserves, y_reserves=y_reserves, new_x_per_y=new_price,
+    result = cpmm.trade_to_price(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        new_x_per_y=new_price,
     )
     result_price = (
         result['new_pool']['x_reserves'] / result['new_pool']['y_reserves']
@@ -132,8 +150,10 @@ def test_trade_to_price(new_price):
     assert np.isclose(new_price, result_price)
 
     # modify y per x
-    result = uniswap_utils.trade_to_price(
-        x_reserves=x_reserves, y_reserves=y_reserves, new_y_per_x=new_price,
+    result = cpmm.trade_to_price(
+        x_reserves=x_reserves,
+        y_reserves=y_reserves,
+        new_y_per_x=new_price,
     )
     result_price = (
         result['new_pool']['y_reserves'] / result['new_pool']['x_reserves']
@@ -149,7 +169,7 @@ def test_reject_negative_values():
         'y_bought',
     ]:
         with pytest.raises(Exception):
-            uniswap_utils.trade(
+            cpmm.trade(
                 x_reserves=x_reserves, y_reserves=y_reserves, **{arg: -1}
             )
 

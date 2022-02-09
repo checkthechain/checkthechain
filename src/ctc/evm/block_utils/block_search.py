@@ -32,7 +32,7 @@ async def async_get_contract_creation_block(
         if end_block == 'latest':
             end_block = latest_block
 
-    async def is_match(index):
+    async def async_is_match(index):
         if verbose:
             print('trying block:', index)
         return await address_utils.async_is_contract_address(
@@ -40,10 +40,10 @@ async def async_get_contract_creation_block(
         )
 
     if nary is None:
-        result = search_utils.binary_search(
+        result = await search_utils.async_binary_search(
             start_index=start_block,
             end_index=end_block,
-            is_match=is_match,
+            async_is_match=async_is_match,
         )
     else:
         result = search_utils.nary_search(

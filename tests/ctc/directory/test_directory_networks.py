@@ -4,7 +4,7 @@ import pytest
 import toolconfig
 
 from ctc import spec
-from ctc import directory_new as directory
+from ctc import directory
 
 
 @pytest.mark.parametrize(

@@ -66,8 +66,15 @@ async def async_eth_estimate_gas(
     function_parameters=None,
     provider=None,
     decode_response=True,
+    function_abi=None,
     **function_abi_query
 ):
+
+    if function_abi is None:
+        function_abi = await evm.async_get_function_abi(
+            contract_address=to_address, **function_abi_query
+        )
+
     request = rpc_constructors.construct_eth_estimate_gas(
         to_address=to_address,
         from_address=from_address,
@@ -76,7 +83,7 @@ async def async_eth_estimate_gas(
         value_sent=value_sent,
         call_data=call_data,
         function_parameters=function_parameters,
-        **function_abi_query
+        function_abi=function_abi,
     )
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_estimate_gas(
