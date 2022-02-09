@@ -3,4 +3,5 @@ TODO.md
 __pycache__/*
 *.egg-info
 dist/*
-
+*/.hypothesis
+.hypothesis/
