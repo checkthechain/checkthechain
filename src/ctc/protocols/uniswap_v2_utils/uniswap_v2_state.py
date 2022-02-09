@@ -52,6 +52,7 @@ async def async_get_pool_state(
         tokens=[token_x, token_y],
         block=block,
         provider=provider,
+        normalize=normalize,
     )
     reserves_task = asyncio.create_task(reserves_coroutine)
 
@@ -60,6 +61,7 @@ async def async_get_pool_state(
         token=pool,
         block=block,
         provider=provider,
+        normalize=normalize,
     )
     lp_total_supply_task = asyncio.create_task(lp_total_supply_coroutine)
 

@@ -1,4 +1,3 @@
-import toolplot  # type: ignore
 from ctc import directory
 from ctc import evm
 
@@ -113,5 +112,6 @@ async def plot_lbp_summary(
             },
         }
 
+        import toolplot  # type: ignore
         toolplot.plot_subplots(plot_data)
 
