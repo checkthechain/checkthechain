@@ -31,15 +31,18 @@ setuptools.setup(
         'tooltime',
         #
         # EVM dependencies
-        'pysha3',  # for keccak()
+        'pycryptodome',  # for keccak()
         'eth_abi',  # for encode_single()/decode_single()
         'eth_utils',  # for collapse_if_tuple()
         'rlp',  # for create2 address computation
     ],
     extras_require={
-        'dev': [
+        'test': [
             'pytest',
             'pytest-asyncio',
+        ],
+        'speed': [
+            'pysha3',  # for keccak()
         ],
     },
     scripts=[

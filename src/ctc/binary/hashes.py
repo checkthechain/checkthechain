@@ -1,8 +1,6 @@
 import typing
 from typing import Literal, Optional
 
-import sha3  # type: ignore
-
 from ctc import spec
 from . import formats
 
@@ -28,20 +26,54 @@ def keccak(
 def keccak(
     data: spec.BinaryInteger,
     output_format: Optional[spec.BinaryFormat] = 'prefix_hex',
+    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of hex or binary data"""
+
+    # determine library
+    if library is None:
+        try:
+            import sha3  # type: ignore
+
+            library = 'pysha3'
+
+        except ImportError:
+            library = 'pycryptodome'
+
+    # convert data to binary
     data = formats.convert(data, 'binary')
-    binary = sha3.keccak_256(data).digest()
+
+    if library == 'pysha3':
+        import sha3  # type: ignore
+
+        binary = sha3.keccak_256(data).digest()
+    elif library == 'pycryptodome':
+        from Crypto.Hash import keccak as f_keccak
+
+        binary = f_keccak.new(digest_bits=256, data=data).digest()
+    else:
+        raise Exception(
+            'must choose valid library, either \'pysha3\' or \'pycryptodome\''
+        )
+
     return formats.convert(binary, output_format)
 
 
 @typing.overload
-def keccak_text(text: str, output_format: Literal['integer']) -> int:
+def keccak_text(
+    text: str,
+    output_format: Literal['integer'],
+    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+) -> int:
     ...
 
 
 @typing.overload
-def keccak_text(text: str, output_format: Literal['binary']) -> bytes:
+def keccak_text(
+    text: str,
+    output_format: Literal['binary'],
+    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+) -> bytes:
     ...
 
 
@@ -49,13 +81,16 @@ def keccak_text(text: str, output_format: Literal['binary']) -> bytes:
 def keccak_text(
     text: str,
     output_format: Literal['prefix_hex', 'raw_hex'] = 'prefix_hex',
+    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
     ...
 
 
 def keccak_text(
-    text: str, output_format: Optional[spec.BinaryFormat] = 'prefix_hex'
+    text: str,
+    output_format: Optional[spec.BinaryFormat] = 'prefix_hex',
+    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of text"""
-    return keccak(text.encode(), output_format)
+    return keccak(text.encode(), output_format=output_format, library=library)
 
