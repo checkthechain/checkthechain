@@ -15,6 +15,9 @@ def get_command_spec():
 
 def cd_command(dirname, new_dir_tempfile):
 
+    if new_dir_tempfile is None:
+        raise Exception('must specify new_dir_tempfile')
+
     if dirname == 'code':
         path = ctc.__path__[0]
 
