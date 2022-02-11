@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import typing
 
 from ctc import spec
 from ctc import rpc
 
 from .. import evm_spec
-from . import erc20_metadata
 from . import erc20_normalize
 from . import erc20_generic
 

@@ -3,8 +3,8 @@ import typing
 from . import network_types
 
 
-RpcSingularRequest = dict[str, typing.Any]
-RpcPluralRequest = list[RpcSingularRequest]
+RpcSingularRequest = typing.Dict[str, typing.Any]
+RpcPluralRequest = typing.List[RpcSingularRequest]
 RpcRequest = typing.Union[RpcSingularRequest, RpcPluralRequest]
 
 
@@ -14,11 +14,11 @@ class RpcSingularResponseRaw(typing.TypedDict):
     result: typing.Any
 
 
-RpcPluralResponseRaw = list[RpcSingularResponseRaw]
+RpcPluralResponseRaw = typing.List[RpcSingularResponseRaw]
 RpcResponseRaw = typing.Union[RpcSingularResponseRaw, RpcPluralResponseRaw]
 
 RpcSingularResponse = typing.Any
-RpcPluralResponse = list[RpcSingularResponse]
+RpcPluralResponse = typing.List[RpcSingularResponse]
 RpcResponse = typing.Union[RpcPluralResponse, RpcSingularResponse]
 
 RpcConstructor = typing.Callable[..., RpcSingularRequest]
@@ -61,5 +61,7 @@ provider_keys = [
 
 ProviderShortcut = str
 ProviderSpec = typing.Union[ProviderShortcut, PartialProvider, Provider, None]
-ProviderKey = tuple[int, str, typing.Tuple[tuple[typing.Any, typing.Any], ...]]
+ProviderKey = typing.Tuple[
+    int, str, typing.Tuple[typing.Tuple[typing.Any, typing.Any], ...]
+]
 

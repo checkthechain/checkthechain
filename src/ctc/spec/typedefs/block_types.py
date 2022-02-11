@@ -77,9 +77,11 @@ class Block(typing.TypedDict):
     state_root: binary_types.PrefixHexData
     timestamp: int
     total_difficulty: int
-    transactions: typing.Union[list[TransactionHash], list[Transaction]]
+    transactions: typing.Union[
+        typing.List[TransactionHash], typing.List[Transaction]
+    ]
     transactions_root: binary_types.PrefixHexData
-    uncles: list[BlockHash]
+    uncles: typing.List[BlockHash]
 
 
 class RawLog(typing.TypedDict):
@@ -91,7 +93,7 @@ class RawLog(typing.TypedDict):
     blockNumber: int
     address: address_types.Address
     data: binary_types.PrefixHexData
-    topics: list[binary_types.PrefixHexData]
+    topics: typing.List[binary_types.PrefixHexData]
 
 
 class PendingRawLog(typing.TypedDict):
@@ -104,8 +106,8 @@ class PendingRawLog(typing.TypedDict):
     blockNumber: typing.Union[None, int]
     address: address_types.Address
     data: binary_types.PrefixHexData
-    topics: list[binary_types.PrefixHexData]
+    topics: typing.List[binary_types.PrefixHexData]
 
 
-NormalizedLog = dict[str, typing.Any]
+NormalizedLog = typing.Dict[str, typing.Any]
 

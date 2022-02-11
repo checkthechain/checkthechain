@@ -6,6 +6,8 @@ for overview of different chains see
 - https://chainlist.org/
 """
 
+from __future__ import annotations
+
 import os
 
 from ctc import config

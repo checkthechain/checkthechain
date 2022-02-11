@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ctc import binary
 from ctc import spec
 from . import function_parsing

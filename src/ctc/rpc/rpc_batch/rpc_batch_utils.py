@@ -2,6 +2,8 @@
 digestors are simpler than constructors and so they do not have batch versions
 """
 
+from __future__ import annotations
+
 import inspect
 import typing
 

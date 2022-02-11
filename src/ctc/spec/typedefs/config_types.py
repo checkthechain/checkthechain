@@ -21,21 +21,27 @@ import typing
 
 class ConfigNetworkDefaults(typing.TypedDict):
     default_network: network_types.NetworkName
-    default_providers: dict[network_types.NetworkName, rpc_types.ProviderName]
+    default_providers: typing.Dict[
+        network_types.NetworkName, rpc_types.ProviderName
+    ]
 
 
 class PartialConfigSpec(typing.TypedDict, total=False):
     version: str
     data_dir: str
-    providers: dict[rpc_types.ProviderName, rpc_types.Provider]
-    networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
+    providers: typing.Dict[rpc_types.ProviderName, rpc_types.Provider]
+    networks: typing.Dict[
+        network_types.NetworkName, network_types.NetworkMetadata
+    ]
     network_defaults: ConfigNetworkDefaults
 
 
 class ConfigSpec(typing.TypedDict):
     version: str
     data_dir: str
-    providers: dict[rpc_types.ProviderName, rpc_types.Provider]
-    networks: dict[network_types.NetworkName, network_types.NetworkMetadata]
+    providers: typing.Dict[rpc_types.ProviderName, rpc_types.Provider]
+    networks: typing.Dict[
+        network_types.NetworkName, network_types.NetworkMetadata
+    ]
     network_defaults: ConfigNetworkDefaults
 

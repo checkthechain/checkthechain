@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 from ctc import rpc
 from ctc import spec

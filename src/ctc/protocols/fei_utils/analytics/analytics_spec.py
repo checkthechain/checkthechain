@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 
 from ctc import spec
@@ -18,10 +20,10 @@ TimescaleSpec = typing.Union[Timescale, TimescaleShorthand]
 
 
 Timestamp = int
-Timestamps = list[int]
+Timestamps = typing.List[int]
 
 MetricName = str
-MetricSeries = list[float]
+MetricSeries = typing.List[float]
 
 
 class TimeData(typing.TypedDict):
@@ -66,18 +68,18 @@ class AnalyticsPayload(typing.TypedDict):
     data: dict[str, MetricGroup]
 
 
-MetricGroupCreator = typing.Callable[[list[int], bool], MetricGroup]
+MetricGroupCreator = typing.Callable[[typing.List[int], bool], MetricGroup]
 MetricGroupCreatorCoroutine = typing.Callable[
-    [list[int], bool],
+    [typing.List[int], bool],
     typing.Coroutine[typing.Any, typing.Any, MetricGroup],
 ]
 MultiMetricGroupCreator = typing.Callable[
-    [list[int], bool],
-    dict[str, MetricGroup],
+    [typing.List[int], bool],
+    typing.Dict[str, MetricGroup],
 ]
 MultiMetricGroupCreatorCoroutine = typing.Callable[
-    [list[int], bool],
-    typing.Coroutine[typing.Any, typing.Any, dict[str, MetricGroup]],
+    [typing.List[int], bool],
+    typing.Coroutine[typing.Any, typing.Any, typing.Dict[str, MetricGroup]],
 ]
 
 

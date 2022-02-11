@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sha3  # type: ignore
 import typing
 
@@ -14,7 +16,7 @@ def get_function_parameter_types(
 
         output = []
         for item in function_abi.get('inputs', []):
-            cast_item = typing.cast(dict[str, typing.Any], item)
+            cast_item = typing.cast(typing.Dict[str, typing.Any], item)
             collapsed = eth_utils.abi.collapse_if_tuple(cast_item)
             output.append(collapsed)
 
@@ -56,7 +58,7 @@ def get_function_parameter_names(
         if any(name is None for name in names):
             raise Exception('function abi does not specify names')
         else:
-            return typing.cast(list[str], names)
+            return typing.cast(typing.List[str], names)
     else:
         return names
 
@@ -135,7 +137,7 @@ def get_function_output_types(
 
     output_types = []
     for output in function_abi['outputs']:
-        cast_output = typing.cast(dict[str, typing.Any], output)
+        cast_output = typing.cast(typing.Dict[str, typing.Any], output)
         output_type = eth_utils.abi.collapse_if_tuple(cast_output)
         output_types.append(output_type)
     return output_types

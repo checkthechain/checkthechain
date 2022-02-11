@@ -1,4 +1,6 @@
-"""need to refactor with comon backend interface"""
+"""need to refactor with common backend interface"""
+
+from __future__ import annotations
 
 import ast
 import functools
@@ -104,7 +106,7 @@ def list_events_contracts(
     return contracts
 
 
-_PathEventsResult = dict[str, tuple[int, int]]
+_PathEventsResult = typing.Dict[str, typing.Tuple[int, int]]
 
 
 class _ListEventsResult(typing.TypedDict):
