@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 import toolcli
@@ -80,9 +82,8 @@ def setup_config_path(styles: dict[str, str]) -> tuple[str, bool]:
             print('Environmental variable', env_var, 'not set')
             print()
             answer = toolcli.input_yes_or_no(
-                prompt='Use default config location? ('
-                + default_config_path
-                + ')',
+                prompt='Use default config location? '
+                + default_config_path + ' ',
                 default='yes',
                 style=styles['question'],
             )

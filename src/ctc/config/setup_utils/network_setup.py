@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 import urllib.parse
 
@@ -184,7 +186,7 @@ def specify_providers(
         )
         print()
         if toolcli.input_yes_or_no(
-            prompt=prompt, default='no', style=styles['question']
+            prompt=prompt, default='yes', style=styles['question']
         ):
             provider_network = default_network
             provider_url = toolcli.input_prompt(
@@ -203,8 +205,12 @@ def specify_providers(
                 'name': provider_name,
                 'url': provider_url,
                 'network': provider_network,
+                'protocol': 'http',
+                'session_kwargs': None,
+                'chunk_size': None,
             }
-            providers[provider_name] = rpc.get_provider(provider_spec)
+            # should validate that this confirms to spec.ProviderSpec
+            providers[provider_name] = provider_spec
 
     # specify additional providers
     print()

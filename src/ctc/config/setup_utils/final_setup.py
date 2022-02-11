@@ -13,7 +13,6 @@ def finalize_setup(create_new_config, config, config_path, styles):
     toolcli.print('## Final Steps', style=styles['header'])
 
     if create_new_config:
-        print()
         config_write.write_config_file(
             config_data=config,
             path=config_path,
