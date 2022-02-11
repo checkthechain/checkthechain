@@ -14,6 +14,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         ('config', 'create'): 'ctc.cli.commands.config.create_command',
         ('config', 'edit'): 'ctc.cli.commands.config.edit_command',
         ('config',): 'ctc.cli.commands.config_command',
+        ('export',): 'ctc.cli.commands.export_command',
         ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
         ('fei',): 'ctc.protocols.fei_utils.cli.fei_command',
         ('gas',): 'ctc.cli.commands.gas_command',
