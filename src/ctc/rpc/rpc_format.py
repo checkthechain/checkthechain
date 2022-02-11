@@ -15,7 +15,11 @@ def encode_block_number(block: spec.BlockSpec) -> str:
     if isinstance(block, str) and block in ['latest', 'earliest', 'pending']:
         return block
     else:
-        if isinstance(block, typing.SupportsInt):
+        # python3.7 compatibliity
+        supports_int = hasattr(block, '__int__')
+        # supports_int = isinstance(block, typing.SupportsInt)
+
+        if supports_int:
             block = int(block)
         return binary.convert(block, 'prefix_hex')
 

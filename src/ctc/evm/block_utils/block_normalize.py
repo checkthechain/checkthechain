@@ -42,7 +42,12 @@ def standardize_block_number(
 
 def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
     """convert block number to int"""
-    if isinstance(block, typing.SupportsInt):
+
+    # python3.7 compatibility
+    # supports_int = isinstance(block, typing.SupportsInt)
+    supports_int = hasattr(block, '__int__')
+
+    if supports_int:
         if not isinstance(block, int):
             as_int = int(round(block))
             if abs(as_int - int(block)) > 0.0001:

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import typing
+from typing_extensions import TypedDict
 
 import toolconfig
 
@@ -6,7 +9,7 @@ from ctc import spec
 from . import config_spec
 
 
-class _ToolconfigKwargs(typing.TypedDict):
+class _ToolconfigKwargs(TypedDict):
     config_path_env_var: str
     default_config_path: str
 

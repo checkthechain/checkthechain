@@ -1,13 +1,14 @@
 import typing
+from typing_extensions import Literal
 
 
 BinaryData = typing.Union[bytes, str]
 BinaryInteger = typing.Union[int, BinaryData]
 BlockSpec = typing.Union[
-    int, BinaryData, typing.Literal['latest', 'earliest', 'pending']
+    int, BinaryData, Literal['latest', 'earliest', 'pending']
 ]
 
-BinaryFormat = typing.Literal['binary', 'prefix_hex', 'raw_hex', 'integer']
+BinaryFormat = Literal['binary', 'prefix_hex', 'raw_hex', 'integer']
 
 IntegerData = int
 

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import typing
-from typing import Literal, Optional
+from typing_extensions import Literal
 
 from ctc import spec
 from . import formats
@@ -25,8 +27,8 @@ def keccak(
 
 def keccak(
     data: spec.BinaryInteger,
-    output_format: Optional[spec.BinaryFormat] = 'prefix_hex',
-    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+    output_format: typing.Optional[spec.BinaryFormat] = 'prefix_hex',
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of hex or binary data"""
 
@@ -63,7 +65,7 @@ def keccak(
 def keccak_text(
     text: str,
     output_format: Literal['integer'],
-    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> int:
     ...
 
@@ -72,7 +74,7 @@ def keccak_text(
 def keccak_text(
     text: str,
     output_format: Literal['binary'],
-    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> bytes:
     ...
 
@@ -81,15 +83,15 @@ def keccak_text(
 def keccak_text(
     text: str,
     output_format: Literal['prefix_hex', 'raw_hex'] = 'prefix_hex',
-    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
     ...
 
 
 def keccak_text(
     text: str,
-    output_format: Optional[spec.BinaryFormat] = 'prefix_hex',
-    library: Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+    output_format: typing.Optional[spec.BinaryFormat] = 'prefix_hex',
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of text"""
     return keccak(text.encode(), output_format=output_format, library=library)

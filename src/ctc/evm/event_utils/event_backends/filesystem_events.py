@@ -6,6 +6,7 @@ import ast
 import functools
 import os
 import typing
+from typing_extensions import TypedDict
 
 import toolstr
 
@@ -109,7 +110,7 @@ def list_events_contracts(
 _PathEventsResult = typing.Dict[str, typing.Tuple[int, int]]
 
 
-class _ListEventsResult(typing.TypedDict):
+class _ListEventsResult(TypedDict):
     paths: _PathEventsResult
     block_range: spec.NumpyArray
     block_mask: spec.NumpyArray

@@ -1,4 +1,5 @@
 import typing
+from typing_extensions import TypedDict, Literal
 
 from . import network_types
 
@@ -8,7 +9,7 @@ RpcPluralRequest = typing.List[RpcSingularRequest]
 RpcRequest = typing.Union[RpcSingularRequest, RpcPluralRequest]
 
 
-class RpcSingularResponseRaw(typing.TypedDict):
+class RpcSingularResponseRaw(TypedDict):
     id: str
     jsonrpc: str
     result: typing.Any
@@ -32,20 +33,20 @@ RpcDigestor = typing.Callable[..., RpcResponse]
 ProviderName = str
 
 
-class PartialProvider(typing.TypedDict, total=False):
+class PartialProvider(TypedDict, total=False):
     url: str
     name: typing.Optional[ProviderName]
     network: typing.Optional[network_types.NetworkName]
-    protocol: typing.Literal['http', 'wss', 'ipc']
+    protocol: Literal['http', 'wss', 'ipc']
     session_kwargs: typing.Optional[dict]
     chunk_size: typing.Optional[int]
 
 
-class Provider(typing.TypedDict, total=True):
+class Provider(TypedDict, total=True):
     url: str
     name: typing.Optional[ProviderName]
     network: typing.Optional[network_types.NetworkName]
-    protocol: typing.Literal['http', 'wss', 'ipc']
+    protocol: Literal['http', 'wss', 'ipc']
     session_kwargs: typing.Optional[dict]
     chunk_size: typing.Optional[int]
 

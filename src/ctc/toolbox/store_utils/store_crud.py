@@ -1,11 +1,12 @@
 import os
 import typing
+from typing_extensions import Literal
 
 import toolcache
 
 
 formats = ['json', 'ast', 'csv', 'yaml', 'toml']
-DataFormat = typing.Literal['json', 'ast', 'csv', 'yaml', 'toml']
+DataFormat = Literal['json', 'ast', 'csv', 'yaml', 'toml']
 
 
 def get_path_data_format(path: str) -> DataFormat:
@@ -13,7 +14,11 @@ def get_path_data_format(path: str) -> DataFormat:
     extension = os.path.splitext(path)[-1]
     extension = extension[1:]
 
-    if extension in typing.get_args(DataFormat):
+    # python3.7 compatibility
+    # args = typing.get_args(DataFormat)
+    args = DataFormat.__args__
+
+    if extension in args:
         return typing.cast(DataFormat, extension)
     else:
         raise Exception('unknown file type: ' + str(extension))

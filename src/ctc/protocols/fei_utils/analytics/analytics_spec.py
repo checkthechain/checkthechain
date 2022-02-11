@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from typing_extensions import TypedDict
 
 from ctc import spec
 
@@ -10,7 +11,7 @@ from ctc import spec
 #
 
 
-class Timescale(typing.TypedDict):
+class Timescale(TypedDict):
     window_size: str
     interval_size: str
 
@@ -26,7 +27,7 @@ MetricName = str
 MetricSeries = typing.List[float]
 
 
-class TimeData(typing.TypedDict):
+class TimeData(TypedDict):
     timestamps: list[int]
     block_numbers: list[int]
     n_samples: int
@@ -35,14 +36,14 @@ class TimeData(typing.TypedDict):
     created_at_timestamp: int
 
 
-class MetricData(typing.TypedDict, total=False):
+class MetricData(TypedDict, total=False):
     values: typing.Union[list[float], list[int]]
     name: str
     link: str
     units: str
 
 
-class MetricGroupStrict(typing.TypedDict):
+class MetricGroupStrict(TypedDict):
     name: str
     metrics: dict[str, MetricData]
 
@@ -51,7 +52,7 @@ class MetricGroup(MetricGroupStrict, total=False):
     order: list[str]
 
 
-class AnalyticsPayload(typing.TypedDict):
+class AnalyticsPayload(TypedDict):
 
     # metadata
     version: str
@@ -96,7 +97,7 @@ payload_timescales = [
 ]
 
 
-class DexPoolMetadata(typing.TypedDict, total=False):
+class DexPoolMetadata(TypedDict, total=False):
     platform: str
     address: spec.ContractAddress
     other_assets: list[str]

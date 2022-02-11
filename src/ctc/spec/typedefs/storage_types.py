@@ -1,7 +1,7 @@
-import typing
+from typing_extensions import Literal
 
 
-StorageBackend = typing.Literal['Filesystem']
+StorageBackend = Literal['Filesystem']
 
-FilesystemRoot = typing.Literal['root', 'default']
+FilesystemRoot = Literal['root', 'default']
 

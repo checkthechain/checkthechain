@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import sha3  # type: ignore
 import typing
 
 from ctc import spec
+
+from .. import hashes
 
 
 def get_function_parameter_types(
@@ -125,8 +126,8 @@ def get_function_selector(
     if function_signature is None:
         function_signature = get_function_signature(function_abi)
 
-    full_hash = sha3.keccak_256(function_signature.encode())
-    return full_hash.hexdigest()[:8]
+    full_hash = hashes.keccak(function_signature.encode(), output_format='raw_hex')
+    return full_hash[:8]
 
 
 def get_function_output_types(

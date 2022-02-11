@@ -1,4 +1,5 @@
 import typing
+from typing_extensions import TypedDict, Literal
 
 
 Address = str
@@ -8,7 +9,7 @@ ERC20Symbol = str
 ERC20Reference = typing.Union[ERC20Address, ERC20Symbol]
 
 
-class AddressRequiredMetadata(typing.TypedDict):
+class AddressRequiredMetadata(TypedDict):
     name: str  # human readable name
     address: Address  # 20 byte address data
 
@@ -19,7 +20,7 @@ class AddressMetadata(AddressRequiredMetadata, total=False):
     label: str  # protocol name, project name, etc
 
 
-Oracletype = typing.Literal['feed', 'amm']
+Oracletype = Literal['feed', 'amm']
 
 
 class OracleFeedMetadata(AddressMetadata, total=True):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing
+from typing_extensions import TypedDict
 import urllib.parse
 
 import toolcli
@@ -12,7 +12,7 @@ from ctc.toolbox import nested_utils
 from .. import config_read
 
 
-class _NetworkData(typing.TypedDict):
+class _NetworkData(TypedDict):
     networks: dict[spec.NetworkName, spec.NetworkMetadata]
     providers: dict[spec.ProviderName, spec.Provider]
     network_defaults: spec.ConfigNetworkDefaults
@@ -59,7 +59,9 @@ def setup_networks(styles: dict[str, str]) -> tuple[_NetworkData, bool]:
         if go_back:
             break
 
-        network_id = toolcli.input_int('Network chain_id? ', style=styles['question'])
+        network_id = toolcli.input_int(
+            'Network chain_id? ', style=styles['question']
+        )
         block_explorer = toolcli.input_prompt(
             'Network block explorer? ', style=styles['question']
         )

@@ -3,13 +3,14 @@ ERC20 lists obtained from https://erc20lists.org/
 """
 
 import typing
+from typing_extensions import TypedDict
 
 from ctc import directory
 from ctc import spec
 from ctc.toolbox import store_utils
 
 
-class ERC20ListPayload(typing.TypedDict):
+class ERC20ListPayload(TypedDict):
     name: str
     timestamp: str
     version: 'ERC20ListVersion'
@@ -17,13 +18,13 @@ class ERC20ListPayload(typing.TypedDict):
     erc20s: list['ERC20ListToken']
 
 
-class ERC20ListVersion(typing.TypedDict):
+class ERC20ListVersion(TypedDict):
     major: int
     minor: int
     patch: int
 
 
-class ERC20ListToken(typing.TypedDict):
+class ERC20ListToken(TypedDict):
     address: spec.Address
     chainId: int
     name: str

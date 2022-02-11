@@ -1,4 +1,5 @@
 import typing
+from typing_extensions import TypedDict, Literal
 
 from . import address_types
 from . import binary_types
@@ -9,9 +10,9 @@ TransactionHash = binary_types.PrefixHexData
 
 block_number_names = ['latest', 'earliest', 'pending']
 BlockNumberName = typing.Union[
-    typing.Literal['latest'],
-    typing.Literal['earliest'],
-    typing.Literal['pending'],
+    Literal['latest'],
+    Literal['earliest'],
+    Literal['pending'],
 ]
 
 # anything that can be converted to an int without node querying
@@ -27,12 +28,12 @@ BlockNumberReference = typing.Union[RawBlockNumber, StandardBlockNumber]
 BlockReference = typing.Union[BlockNumberReference, BlockHash]
 
 
-class RawTransaction(typing.TypedDict):
+class RawTransaction(TypedDict):
     pass
 
 
 # use literal definition because 'from' is a python keyword
-Transaction = typing.TypedDict(
+Transaction = TypedDict(
     'Transaction',
     {
         'hash': TransactionHash,
@@ -55,11 +56,11 @@ Transaction = typing.TypedDict(
 )
 
 
-class RawBlock(typing.TypedDict):
+class RawBlock(TypedDict):
     pass
 
 
-class Block(typing.TypedDict):
+class Block(TypedDict):
     number: int
     difficulty: int
     extra_data: binary_types.PrefixHexData
@@ -84,7 +85,7 @@ class Block(typing.TypedDict):
     uncles: typing.List[BlockHash]
 
 
-class RawLog(typing.TypedDict):
+class RawLog(TypedDict):
     removed: bool
     logIndex: int
     transactionIndex: int
@@ -96,7 +97,7 @@ class RawLog(typing.TypedDict):
     topics: typing.List[binary_types.PrefixHexData]
 
 
-class PendingRawLog(typing.TypedDict):
+class PendingRawLog(TypedDict):
     # many log fields are nullable if a log is pending
     removed: bool
     logIndex: typing.Union[None, int]

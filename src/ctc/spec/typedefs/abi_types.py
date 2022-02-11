@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import typing
+from typing_extensions import TypedDict
 
 if typing.TYPE_CHECKING:
     from typing_extensions import NotRequired
 
 
-class FunctionABI(typing.TypedDict):
+class FunctionABI(TypedDict):
     type: typing.Literal['function', 'constructor', 'receive', 'fallback']
     name: NotRequired[str]
     inputs: NotRequired[list['ABIFunctionArg']]
@@ -16,19 +17,19 @@ class FunctionABI(typing.TypedDict):
     stateMutability: typing.Literal['pure', 'view', 'nonpayable', 'payable']
 
 
-class ABIFunctionArg(typing.TypedDict):
+class ABIFunctionArg(TypedDict):
     name: str
     type: 'ABIDatumType'
     components: 'ABITupleComponents'
 
 
-class EventABI(typing.TypedDict):
+class EventABI(TypedDict):
     type: typing.Literal['event']
     name: str
     inputs: list['ABIEventArg']
 
 
-class ABIEventArg(typing.TypedDict):
+class ABIEventArg(TypedDict):
     name: str
     type: 'ABIDatumType'
     components: 'ABITupleComponents'
@@ -36,7 +37,7 @@ class ABIEventArg(typing.TypedDict):
     anonymous: NotRequired[bool]
 
 
-class ErrorABI(typing.TypedDict):
+class ErrorABI(TypedDict):
     type: typing.Literal['error']
     name: str
     inputs: ABIFunctionArg
@@ -49,7 +50,7 @@ ABITupleComponents = typing.List['ABITupleComponent']
 
 ABITupleComponent = dict
 
-# # class ABITupleComponent(typing.TypedDict):
+# # class ABITupleComponent(TypedDict):
 # #     name: str
 # #     type: ABIDatumType
 # #     components: NotRequired['ABITupleComponents']
@@ -61,7 +62,7 @@ FunctionSelector = str
 FunctionSignature = str
 
 
-class DecodedCallData(typing.TypedDict):
+class DecodedCallData(TypedDict):
     function_abi: FunctionABI
     function_selector: str
     parameters: list[typing.Any]

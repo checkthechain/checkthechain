@@ -19,9 +19,12 @@ def is_block_number_name(
 def is_raw_block_number(
     block: typing.Any,
 ) -> TypeGuard[block_types.RawBlockNumber]:
-    return isinstance(
-        block, typing.SupportsInt
-    ) or binary_typeguards.is_hex_data(block)
+
+    # python3.7 compatibility
+    # supports_int = isinstance(block, typing.SupportsInt)
+    supports_int = hasattr(block, '__int__')
+
+    return supports_int or binary_typeguards.is_hex_data(block)
 
 
 def is_standard_block_number(

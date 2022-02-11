@@ -14,19 +14,21 @@
     - sql: configuration for sql database backend
 """
 
+import typing
+from typing_extensions import TypedDict
+
 from . import network_types
 from . import rpc_types
-import typing
 
 
-class ConfigNetworkDefaults(typing.TypedDict):
+class ConfigNetworkDefaults(TypedDict):
     default_network: network_types.NetworkName
     default_providers: typing.Dict[
         network_types.NetworkName, rpc_types.ProviderName
     ]
 
 
-class PartialConfigSpec(typing.TypedDict, total=False):
+class PartialConfigSpec(TypedDict, total=False):
     version: str
     data_dir: str
     providers: typing.Dict[rpc_types.ProviderName, rpc_types.Provider]
@@ -36,7 +38,7 @@ class PartialConfigSpec(typing.TypedDict, total=False):
     network_defaults: ConfigNetworkDefaults
 
 
-class ConfigSpec(typing.TypedDict):
+class ConfigSpec(TypedDict):
     version: str
     data_dir: str
     providers: typing.Dict[rpc_types.ProviderName, rpc_types.Provider]
