@@ -8,12 +8,20 @@ from . import formats
 
 
 @typing.overload
-def keccak(data: spec.BinaryInteger, output_format: Literal['integer']) -> int:
+def keccak(
+    data: spec.BinaryInteger,
+    output_format: Literal['integer'],
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+) -> int:
     ...
 
 
 @typing.overload
-def keccak(data: spec.BinaryInteger, output_format: Literal['binary']) -> bytes:
+def keccak(
+    data: spec.BinaryInteger,
+    output_format: Literal['binary'],
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
+) -> bytes:
     ...
 
 
@@ -21,6 +29,7 @@ def keccak(data: spec.BinaryInteger, output_format: Literal['binary']) -> bytes:
 def keccak(
     data: spec.BinaryInteger,
     output_format: Literal['prefix_hex', 'raw_hex', None],
+    library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
     ...
 
@@ -90,7 +99,7 @@ def keccak_text(
 
 def keccak_text(
     text: str,
-    output_format: typing.Optional[spec.BinaryFormat] = 'prefix_hex',
+    output_format: spec.BinaryFormat = 'prefix_hex',
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of text"""

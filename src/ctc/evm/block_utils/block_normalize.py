@@ -48,12 +48,14 @@ def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
     supports_int = hasattr(block, '__int__')
 
     if supports_int:
-        if not isinstance(block, int):
-            as_int = int(round(block))
-            if abs(as_int - int(block)) > 0.0001:
+        if isinstance(block, int):
+            return block
+        else:
+            block_supports_int = typing.cast(typing.SupportsInt, block)
+            as_int = int(round(block_supports_int))  # type: ignore
+            if abs(as_int - int(block_supports_int)) > 0.0001:
                 raise Exception('must specify integer blocks')
-            block = as_int
-        return block
+            return as_int
     elif isinstance(block, str):
         try:
             return int(block, 16)

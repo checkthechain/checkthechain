@@ -16,7 +16,7 @@ def get_path_data_format(path: str) -> DataFormat:
 
     # python3.7 compatibility
     # args = typing.get_args(DataFormat)
-    args = DataFormat.__args__
+    args = DataFormat.__args__  # type: ignore
 
     if extension in args:
         return typing.cast(DataFormat, extension)
