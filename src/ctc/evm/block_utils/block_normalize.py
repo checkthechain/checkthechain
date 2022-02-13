@@ -57,10 +57,20 @@ def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
                 raise Exception('must specify integer blocks')
             return as_int
     elif isinstance(block, str):
-        try:
-            return int(block, 16)
-        except ValueError:
-            pass
+        if block.startswith('0x'):
+            try:
+                return int(block, 16)
+            except ValueError:
+                pass
+        elif 'e' in block:
+            as_float = float(block)
+            as_int = int(as_float)
+            if abs(as_float - as_int) > 0.0001:
+                raise Exception('must specify integer blocks')
+            else:
+                return as_int
+        else:
+            return int(block)
 
     raise Exception('unknown block number specification: ' + str(block))
 
