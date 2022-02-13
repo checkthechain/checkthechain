@@ -32,9 +32,12 @@ async def async_get_contract_creation_block(
         if end_block == 'latest':
             end_block = latest_block
 
+    if verbose:
+        print('searching for creation block of ' + contract_address)
+
     async def async_is_match(index):
         if verbose:
-            print('trying block:', index)
+            print('- trying block:', index)
         return await address_utils.async_is_contract_address(
             address=contract_address, block=index, provider=provider
         )
