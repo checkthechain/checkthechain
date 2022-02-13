@@ -6,14 +6,17 @@
         - uncle inclusion rewards
         - uncle mining rewards
     - see https://github.com/ethereum/go-ethereum/issues/1644
-- amount of time passed in each block aggregation range
+- amount of time in each block aggregation range
 - historical blocks and block ranges
 - color
 """
 
+import time
+
 import numpy as np
 import pandas as pd
 import toolstr
+import tooltime
 
 from ctc import evm
 from ctc import rpc
@@ -53,28 +56,58 @@ async def async_gas_command(last, output, overwrite):
 
     # compute block gas stats
     blocks_gas_stats = [evm.get_block_gas_stats(block) for block in blocks]
-    df = pd.DataFrame(blocks_gas_stats, index=block_numbers)
-    df.index.name = 'block'
+    gas_stats_df = pd.DataFrame(blocks_gas_stats, index=block_numbers)
+    gas_stats_df.index.name = 'block'
+
+    now = time.time()
+    last_times = ['5 minutes', '10 minutes']
+    last_times_blocks = []
+    for last_time in last_times:
+        cutoff_timestamp = now - tooltime.timelength_to_seconds(last_time)
+        for i in range(n_blocks):
+            if blocks[-i - 1]['timestamp'] < cutoff_timestamp:
+                break
+        print(i)
+        last_times_blocks.append(i)
 
     toolstr.print_text_box('Gas Price Summary')
     print()
+    print('all prices reported in gwei')
+    print()
+    print()
     toolstr.print_header('Latest block = ' + str(latest))
     for key, value in blocks_gas_stats[-1].items():
-        print('-', key + ':', toolstr.format(value))
+        if key in ['gas_limit', 'gas_used']:
+            print(
+                '-', key + ':', toolstr.format(value, order_of_magnitude=True)
+            )
+        else:
+            print('-', key + ':', toolstr.format(value))
     print()
     print()
     toolstr.print_header('Previous Blocks')
     print('aggregated using median price of transactions in each block')
     print()
-    headers = ['blocks', 'min', 'median', 'mean', 'max']
+    headers = ['blocks', 'time', 'min', 'median', 'mean', 'max']
     rows = []
-    for last_n in last:
+    for l, last_n in enumerate(last + last_times_blocks):
 
         row = []
-        row.append('last ' + str(last_n) + ' blocks')
 
-        sub_df = df.iloc[-last_n:]
-        median_prices = sub_df['median_gas_price'].values
+        if l < len(last):
+            if last_n == 1:
+                row.append('latest block')
+            else:
+                row.append('last ' + str(last_n) + ' blocks')
+            timelength_seconds = round(now - blocks[-last_n]['timestamp'])
+            timelength_clock = tooltime.timelength_to_clock(timelength_seconds)
+            row.append(timelength_clock)
+        else:
+            row.append('last ' + last_times[l - len(last)])
+            row.append(tooltime.timelength_to_clock(last_times[l - len(last)]))
+
+        sub_gas_stats_df = gas_stats_df.iloc[-last_n:]
+        median_prices = sub_gas_stats_df['median_gas_price'].values
         median_prices = median_prices[~np.isnan(median_prices)]
 
         if len(median_prices) > 0:
@@ -89,6 +122,7 @@ async def async_gas_command(last, output, overwrite):
 
     final_df = pd.DataFrame(rows)
     final_df.columns = headers
+    final_df = final_df.sort_values(by='time')
     final_df = final_df.set_index('blocks')
 
     cli_utils.output_data(final_df, output, overwrite)
