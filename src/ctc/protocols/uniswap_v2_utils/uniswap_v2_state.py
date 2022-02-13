@@ -77,25 +77,12 @@ async def async_get_pool_state(
     token_x_reserves, token_y_reserves = await reserves_task
     lp_total_supply = await lp_total_supply_task
 
-    if normalize:
-
-        x_decimals, y_decimals = await decimals_task
-
-        normalized: uniswap_v2_spec.PoolState = {
-            'x_reserves': token_x_reserves / (10 ** x_decimals),
-            'y_reserves': token_y_reserves / (10 ** y_decimals),
-            'lp_total_supply': lp_total_supply / (10 ** 18),
-        }
-        return normalized
-
-    else:
-
-        output: uniswap_v2_spec.PoolState = {
-            'x_reserves': token_x_reserves,
-            'y_reserves': token_y_reserves,
-            'lp_total_supply': lp_total_supply,
-        }
-        return output
+    output: uniswap_v2_spec.PoolState = {
+        'x_reserves': token_x_reserves,
+        'y_reserves': token_y_reserves,
+        'lp_total_supply': lp_total_supply,
+    }
+    return output
 
 
 async def async_get_pool_state_by_block(

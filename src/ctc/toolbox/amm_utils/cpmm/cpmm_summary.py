@@ -23,23 +23,25 @@ def print_pool_summary(
 
     indent = toolstr.indent_to_str(indent)
 
-    print(indent + '- ' + x_name + ' reserves:', toolstr.format(x_reserves))
-    print(indent + '- ' + y_name + ' reserves:', toolstr.format(y_reserves))
+    print(indent + '- ' + x_name + ' reserves:', toolstr.format(x_reserves, order_of_magnitude=True))
+    print(indent + '- ' + y_name + ' reserves:', toolstr.format(y_reserves, order_of_magnitude=True))
     if lp_total_supply is not None:
-        print(indent + '- total lp tokens:', toolstr.format(lp_total_supply))
+        print(indent + '- total lp tokens:', toolstr.format(lp_total_supply, order_of_magnitude=True))
     print(
         indent + '-',
         x_name,
         '/',
         y_name + ' price:',
-        '%.6f' % (x_reserves / y_reserves),
+        # '%.6f' % (x_reserves / y_reserves),
+        toolstr.format(x_reserves / y_reserves),
     )
     print(
         indent + '-',
         y_name,
         '/',
         x_name + ' price:',
-        '%.6f' % (y_reserves / x_reserves),
+        # '%.6f' % (y_reserves / x_reserves),
+        toolstr.format(y_reserves / x_reserves),
     )
     print(indent + '-', x_name + ' / ' + y_name, 'liquidity depth:')
     print()
@@ -113,15 +115,15 @@ def print_liquidity_depth(
             new_x_per_y=new_x_per_y,
             fee_rate=fee_rate,
         )
-        if result['x_sold'] > 0:
-            trade.append('sell ' + format_str.format(result['x_sold']))
-            trade.append(' buy ' + format_str.format(result['y_bought']))
-        elif result['x_sold'] < 0:
-            trade.append(' buy ' + format_str.format(result['x_bought']))
-            trade.append('sell ' + format_str.format(result['y_sold']))
+        if depth != 0 and result['x_sold'] > 0:
+            trade.append('sell ' + toolstr.format(result['x_sold'], order_of_magnitude=True))
+            trade.append(' buy ' + toolstr.format(result['y_bought'], order_of_magnitude=True))
+        elif depth != 0 and result['x_sold'] < 0:
+            trade.append(' buy ' + toolstr.format(result['x_bought'], order_of_magnitude=True))
+            trade.append('sell ' + toolstr.format(result['y_sold'], order_of_magnitude=True))
         else:
-            trade.append('none 0.00')
-            trade.append('none 0.00')
+            trade.append('     0.00')
+            trade.append('     0.00')
         trades.append(trade)
 
     indent = ' ' * 4 + toolstr.indent_to_str(indent)

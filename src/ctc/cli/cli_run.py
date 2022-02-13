@@ -36,10 +36,10 @@ command_index = {
     ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
     ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
     ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
-    ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
-    ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
-    ('uniswap', 'swap'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
-    ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
+    ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
+    ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.burns_command',
+    ('uniswap', 'swaps'): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
+    ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.pool_command',
 }
 
 
