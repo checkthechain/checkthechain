@@ -75,12 +75,63 @@ async def async_resolve_blocks(
     return await evm.async_block_numbers_to_int(blocks=blocks)
 
 
+async def async_resolve_block_range(block_spec):
+    """
+    [123 456]
+    [123,456]
+    [123, 456]
+    [123 , 456]
+    [123 ,456]
+    [123  456]
+    [123,  456]
+    [123  ,  456]
+    [123  ,456]
+    [ 123 456]
+    [ 123,456]
+    [ 123, 456]
+    [ 123 , 456]
+    [ 123 ,456]
+    """
+
+    if isinstance(block_spec, str):
+        block_spec = [block_spec]
+
+    # parse tokens
+    tokens = [subtoken for token in block_spec for subtoken in token.split(',')]
+    tokens = [subtoken for token in tokens for subtoken in token.split(' ')]
+    tokens = [token.strip('()[]') for token in tokens]
+    tokens = [token for token in tokens if token != '']
+    if len(tokens) != 2:
+        raise Exception(
+            'invalid specification for block range: ' + str(block_spec)
+        )
+
+    # standardize
+    start_block, end_block = await evm.async_block_numbers_to_int(tokens)
+
+    # check for open bounds
+    open_start = tokens[0][0] == '('
+    open_end = tokens[-1][-1] == ')'
+    if open_start:
+        start_block += 1
+    if open_end:
+        end_block -= 1
+
+    if start_block > end_block:
+        raise Exception(
+            'invalid specification for block range: ' + str(block_spec)
+        )
+
+    return start_block, end_block
+
+
 def output_data(data, output, overwrite):
 
     if output == 'stdout':
         # print(data)
         import tooltable
         import toolstr
+
         rows = []
         for index, values in data.iterrows():
             row = []
