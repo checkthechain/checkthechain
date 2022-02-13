@@ -29,7 +29,7 @@ class ConfigNetworkDefaults(TypedDict):
 
 
 class PartialConfigSpec(TypedDict, total=False):
-    version: str
+    config_spec_version: str
     data_dir: str
     providers: typing.Dict[rpc_types.ProviderName, rpc_types.Provider]
     networks: typing.Dict[
@@ -39,7 +39,7 @@ class PartialConfigSpec(TypedDict, total=False):
 
 
 class ConfigSpec(TypedDict):
-    version: str
+    config_spec_version: str
     data_dir: str
     providers: typing.Dict[rpc_types.ProviderName, rpc_types.Provider]
     networks: typing.Dict[
