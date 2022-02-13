@@ -11,7 +11,7 @@ from ctc.protocols import fei_utils
 
 def get_command_spec():
     return {
-        'f': payload_command,
+        'f': async_payload_command,
         'args': [
             {'name': 'timescale', 'kwargs': {'nargs': '?', 'default': None}},
             {'name': '--path'},
@@ -20,7 +20,7 @@ def get_command_spec():
     }
 
 
-def payload_command(timescale, path, overwrite, **kwargs):
+async def async_payload_command(timescale, path, overwrite, **kwargs):
 
     # validate inputs
     if timescale is None:
@@ -43,7 +43,7 @@ def payload_command(timescale, path, overwrite, **kwargs):
     print()
     print('starting...')
     start_time = time.time()
-    payload = asyncio.run(run(timescale))
+    payload = await fei_utils.async_create_payload(timescale=timescale)
     end_time = time.time()
     print()
     print('...done (t=' + toolstr.format(end_time - start_time) + 's)')
@@ -52,11 +52,6 @@ def payload_command(timescale, path, overwrite, **kwargs):
     with open(path, 'w') as f:
         json.dump(payload, f)
 
-
-async def run(timescale, provider=None):
-    payload = await fei_utils.async_create_payload(timescale=timescale)
-    from ctc.rpc.rpc_backends import rpc_http_async
-    provider = rpc.get_provider(provider=provider)
-    await rpc_http_async.async_close_session(provider=provider)
-    return payload
+    provider = rpc.get_provider()
+    await rpc.async_close_http_session(provider=provider)
 
