@@ -146,6 +146,20 @@ def get_function_output_types(
 
 def get_function_output_names(
     function_abi: spec.FunctionABI,
+    human_readable: bool = False,
 ) -> list[typing.Optional[str]]:
-    return [output.get('name') for output in function_abi['outputs']]
+
+    output_names = [output.get('name') for output in function_abi['outputs']]
+
+    # human readable uses function name or output_# if no names provided
+    if human_readable:
+        if len(output_names) == 1:
+            if output_names[0] == '':
+                output_names[0] = function_abi.get('name')
+        else:
+            for on, output_name in list(enumerate(output_names)):
+                if output_name == '':
+                    output_names[on] == 'output_' + str(on)
+
+    return output_names
 
