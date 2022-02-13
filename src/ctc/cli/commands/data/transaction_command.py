@@ -25,8 +25,5 @@ async def run(transaction, sort):
         transaction_hash=transaction, sort_logs_by=sort
     )
 
-    from ctc.rpc.rpc_backends import rpc_http_async
-
-    provider = rpc.get_provider()
-    await rpc_http_async.async_close_session(provider=provider)
+    await rpc.async_close_http_session()
 

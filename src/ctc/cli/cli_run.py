@@ -1,38 +1,60 @@
 import toolcli
 
+command_index = {
+    #
+    # admin commands
+    (): 'ctc.cli.admin.root_command',
+    ('cd',): 'ctc.cli.commands.admin.cd_command',
+    ('config',): 'ctc.cli.commands.admin.config_command',
+    ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
+    ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
+    ('download-proxy-abi',): 'ctc.cli.commands.admin.download_proxy_abi_command',
+    ('setup',): 'ctc.cli.commands.admin.setup_command',
+    ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
+    #
+    # compute commands
+    ('keccak',): 'ctc.cli.commands.compute.keccak_command',
+    #
+    # data commands
+    ('address',): 'ctc.cli.commands.data.address_command',
+    ('block',): 'ctc.cli.commands.data.block_command',
+    ('blocks',): 'ctc.cli.commands.data.blocks_command',
+    ('call',): 'ctc.cli.commands.data.call_command',
+    ('calls',): 'ctc.cli.commands.data.calls_command',
+    ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
+    ('erc20',): 'ctc.cli.commands.data.erc20_command',
+    ('erc20', 'balance'): 'ctc.cli.commands.data.erc20_command',
+    ('erc20', 'balances'): 'ctc.cli.commands.data.erc20_command',
+    ('erc20', 'supply'): 'ctc.cli.commands.data.erc20_command',
+    ('erc20', 'transfers'): 'ctc.cli.commands.data.erc20_command',
+    ('events',): 'ctc.cli.commands.data.events_command',
+    ('gas',): 'ctc.cli.commands.data.gas_command',
+    ('transaction',): 'ctc.cli.commands.data.transaction_command',
+    # ('token',): 'ctc.cli.commands.data.token_command',
+    #
+    # protocol commands
+    ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
+    ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
+    ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
+    ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
+    ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
+    ('uniswap', 'swap'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
+    ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.uniswap_command',
+}
+
 
 def run_cli(raw_command=None, **toolcli_kwargs):
 
-    command_index = {
-        (): 'ctc.cli.root_command',
-        ('add_proxy_abi',): 'ctc.cli.commands.add_proxy_abi_command',
-        ('address',): 'ctc.cli.commands.address_command',
-        ('block',): 'ctc.cli.commands.block_command',
-        ('call',): 'ctc.cli.commands.call_command',
-        ('cd',): 'ctc.cli.commands.cd_command',
-        ('chainlink',): 'ctc.protocols.chainlink_utils.chainlink_command',
-        ('config', 'create'): 'ctc.cli.commands.config.create_command',
-        ('config', 'edit'): 'ctc.cli.commands.config.edit_command',
-        ('config',): 'ctc.cli.commands.config_command',
-        ('export',): 'ctc.cli.commands.export_command',
-        ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
-        ('fei',): 'ctc.protocols.fei_utils.cli.fei_command',
-        ('gas',): 'ctc.cli.commands.gas_command',
-        ('keccak',): 'ctc.cli.commands.keccak_command',
-        ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
-        ('rechunk_events',): 'ctc.cli.commands.rechunk_command',
-        ('setup',): 'ctc.cli.commands.setup_command',
-        ('token',): 'ctc.cli.commands.token_command',
-        ('transaction',): 'ctc.cli.commands.transaction_command',
+    config = {
+        'include_cd': True,
+        'include_debug': True,
     }
-
-    config = {'include_cd': True, 'include_debug': True}
-    toolcli_kwargs = {'config': config}
+    toolcli_kwargs = dict({'config': config}, **toolcli_kwargs)
 
     toolcli.run_cli(
         raw_command=raw_command,
         command_index=command_index,
-        **toolcli_kwargs
+        **toolcli_kwargs,
     )
 
 
