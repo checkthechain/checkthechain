@@ -2,6 +2,7 @@ import toolstr
 import tooltime
 
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 from .. import block_utils
@@ -18,7 +19,7 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
 
     from ctc.protocols import chainlink_utils
 
-    eth_usd = await chainlink_utils.async_fetch_eth_price(
+    eth_usd = await chainlink_utils.async_get_eth_price(
         block=transaction['block_number']
     )
 
@@ -72,7 +73,9 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
         print('[none]')
     else:
         try:
-            binary.get_contract_abi(contract_address=transaction['to'])
+            contract_abi = await evm.async_get_contract_abi(
+                contract_address=transaction['to']
+            )
         except spec.AbiNotFoundException:
             print()
             print()
@@ -80,14 +83,13 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             print('-------------------------')
             return
 
-        function_abi = binary.get_function_abi(
+        function_abi = await evm.async_get_function_abi(
             contract_address=transaction['to'],
             function_selector=transaction['input'][:10],
         )
         call_data = binary.decode_call_data(
             call_data=transaction['input'],
             function_abi=function_abi,
-            output_format='prefix_hex',
         )
         print()
         print()
@@ -98,7 +100,7 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             '-->',
             binary.get_function_signature(function_abi=function_abi),
         )
-        for p, (name, value) in enumerate(call_data['parameters'].items()):
+        for p, (name, value) in enumerate(call_data['named_parameters'].items()):
             if (
                 value
                 == 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -127,13 +129,14 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             if l != 0:
                 print()
 
+            event_abi = await evm.async_get_event_abi(
+                contract_address=log['address'],
+                event_hash=log['topics'][0],
+            )
             normalized_event = binary.normalize_event(
                 event=log,
                 arg_prefix=None,
-            )
-            event_abi = binary.async_get_event_abi(
-                contract_address=log['address'],
-                event_hash=log['topics'][0],
+                event_abi=event_abi,
             )
             event_signature = binary.get_event_signature(event_abi=event_abi)
             print(event_signature, '-->', log['address'])
