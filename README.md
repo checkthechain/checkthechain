@@ -18,6 +18,7 @@ It can be used as either 1) a python package or 2) a cli tool
 
 for details check out [the docs](/docs)
 
+
 ## Contents
 1. [**Example Usage**](#example-usage)
     1. [**ERC20**: get all token transfers and balances of an ERC20](#get-all-token-transfers-of-an-erc20)
@@ -48,59 +49,18 @@ transfers = await evm.async_get_erc20_transfers(
 )
 
 # get holdings of each address for a given block
-holdings = evm.get_erc20_holdings_from_transfers(transfers=transfers, block=12345789)
+holdings = evm.async_get_erc20_holdings_from_transfers(transfers=transfers, block=12345789)
 ```
 
 ```bash
 # bash
 
-ctc export erc20 transfers 0x956f47f50a910163d8bf957cf5846d573e7f87ca \
+ctc erc20 transfers 0x956f47f50a910163d8bf957cf5846d573e7f87ca \
     --output transfers.csv
 
-ctc export erc20 balances 0x956f47f50a910163d8bf957cf5846d573e7f87ca \
+ctc erc20 balances 0x956f47f50a910163d8bf957cf5846d573e7f87ca \
     --output balances.csv \
     --block 12345789
-```
-
-#### Get swaps, mints, and burns for a Uniswap pair
-
-```python
-# python
-
-from ctc.protocols import uniswap_v2_utils
-
-pool = '0x94b0a3d511b6ecdb17ebf877278ab030acb0a878'
-
-swaps = await uniswap_v2_utils.async_get_pool_swaps(pool)
-mints = await uniswap_v2_utils.async_get_pool_mints(pool)
-burns = await uniswap_v2_utils.async_get_pool_burns(pool)
-```
-
-```bash
-# bash
-
-POOL="0x94b0a3d511b6ecdb17ebf877278ab030acb0a878"
-
-ctc export uniswap swaps $POOL --output swaps.csv
-ctc export uniswap mints $POOL --output mints.csv
-ctc export uniswap burns $POOL --output burns.csv
-```
-
-#### Get historical data for a Chainlink feed
-```python
-# python
-
-from ctc.protocols import chainlink_utils
-
-feed = '0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'
-
-data = await chainlink_utils.async_get_feed_data(feed)
-```
-
-```bash
-# bash
-
-ctc export chainlink 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 --output data.csv
 ```
 
 #### Get DAO proposals and votes
@@ -128,8 +88,49 @@ votes = await evm.async_get_events(
 
 DAO="0x0bef27feb58e857046d630b2c03dfb7bae567494"
 
-ctc export events 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 ProposalCreated --output proposals.csv
-ctc export events 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 VoteCast --output votes.csv
+ctc events 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 ProposalCreated --output proposals.csv
+ctc events 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 VoteCast --output votes.csv
+```
+
+#### Get historical data for a Chainlink feed
+```python
+# python
+
+from ctc.protocols import chainlink_utils
+
+feed = '0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'
+
+data = await chainlink_utils.async_get_feed_data(feed)
+```
+
+```bash
+# bash
+
+ctc chainlink 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 --output data.csv
+```
+
+#### Get swaps, mints, and burns of a Uniswap pool
+
+```python
+# python
+
+from ctc.protocols import uniswap_v2_utils
+
+pool = '0x94b0a3d511b6ecdb17ebf877278ab030acb0a878'
+
+swaps = await uniswap_v2_utils.async_get_pool_swaps(pool)
+mints = await uniswap_v2_utils.async_get_pool_mints(pool)
+burns = await uniswap_v2_utils.async_get_pool_burns(pool)
+```
+
+```bash
+# bash
+
+POOL="0x94b0a3d511b6ecdb17ebf877278ab030acb0a878"
+
+ctc uniswap swaps $POOL --output swaps.csv
+ctc uniswap mints $POOL --output mints.csv
+ctc uniswap burns $POOL --output burns.csv
 ```
 
 
@@ -140,6 +141,7 @@ Two steps:
 2. run `ctc setup` in terminal to specify data provider and data storage path
 
 If your shell's `PATH` does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
+
 
 ## FAQ
 - What are the goals of `ctc`?
@@ -154,12 +156,7 @@ If your shell's `PATH` does not include python scripts you may need to do someth
 
 ## Related Projects
 - [`ethereum-etl`](https://github.com/blockchain-etl/ethereum-etl) ETL tools for bulk data gathering in python
-- [`seth`](https://github.com/dapphub/dapptools/tree/master/src/seth) swiss army knife cli tool for Ethereum
 - [`pycryptodome`](https://github.com/Legrandin/pycryptodome) self-contained cryptographic library for python
 - [`web3.py`](https://github.com/ethereum/web3.py/) official Ethereum python client
-- [`gnosis-py`](https://github.com/gnosis/gnosis-py) python tools for Ethereum and Gnosis projects
 - [`eth-abi`](https://github.com/sslivkoff/eth-abi-lite) python library for encoding/decoding EVM data
-- [`eth-utils`](https://github.com/ethereum/eth-utils) general python libraries for interacting with Ethereum
-- [`brownie`](https://github.com/eth-brownie/brownie) SDK for EVM smart contract development
-- [`vyper`](https://github.com/vyperlang/vyper) pythonic smart contract language
-- [`riemann-ether`](https://github.com/summa-tx/riemann-ether) ethereum rapid prototyping toolbox
+
