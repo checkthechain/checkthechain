@@ -103,6 +103,7 @@ async def async_get_erc20_balance_of(
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
+    **rpc_kwargs,
 ) -> typing.Union[int, float]:
 
     balance = await erc20_generic.async_erc20_eth_call(
@@ -111,6 +112,7 @@ async def async_get_erc20_balance_of(
         block=block,
         function_parameters=[address],
         provider=provider,
+        **rpc_kwargs,
     )
 
     if normalize:
@@ -127,6 +129,7 @@ async def async_get_erc20_balance_of_addresses(
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
+    **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
 
     balances = await rpc.async_batch_eth_call(
@@ -135,6 +138,7 @@ async def async_get_erc20_balance_of_addresses(
         function_abi=evm_spec.erc20_abis['balanceOf'],
         function_parameter_list=[[address] for address in addresses],
         provider=provider,
+        **rpc_kwargs,
     )
 
     if normalize:
@@ -151,6 +155,7 @@ async def async_get_erc20s_balance_of(
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
+    **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
     """"""
 
@@ -160,11 +165,12 @@ async def async_get_erc20s_balance_of(
         block=block,
         function_parameters=[address],
         provider=provider,
+        **rpc_kwargs,
     )
 
     if normalize:
         balances = await erc20_normalize.async_normalize_erc20s_quantities(
-            quantities=balances, tokens=tokens, provider=provider, block=block
+            quantities=balances, tokens=tokens, provider=provider, block=block,
         )
 
     return balances
@@ -176,6 +182,8 @@ async def async_get_erc20_balance_of_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize=True,
     provider: spec.ProviderSpec = None,
+    empty_token=0,
+    **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
     """"""
 
@@ -185,6 +193,8 @@ async def async_get_erc20_balance_of_by_block(
         blocks=blocks,
         function_parameters=[address],
         provider=provider,
+        empty_token=empty_token,
+        **rpc_kwargs,
     )
 
     if normalize:

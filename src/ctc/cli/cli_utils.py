@@ -48,7 +48,7 @@ async def async_resolve_blocks(
             start_block, end_block = await evm.async_block_numbers_to_int(
                 stripped[:2]
             )
-            if not open_start:
+            if open_start:
                 start_block += 1
 
             if len(tokens) == 2:
@@ -125,7 +125,9 @@ async def async_resolve_block_range(block_spec):
     return start_block, end_block
 
 
-def output_data(data, output, overwrite):
+def output_data(data, output, overwrite, top=None, indent=None):
+
+    import pandas as pd
 
     if output == 'stdout':
         # print(data)
@@ -133,16 +135,38 @@ def output_data(data, output, overwrite):
         import toolstr
 
         rows = []
-        for index, values in data.iterrows():
+        if isinstance(data, pd.DataFrame):
+            iterator = data.iterrows()
+        elif isinstance(data, pd.Series):
+            iterator = data.iteritems()
+        else:
+            raise Exception('unknown data format')
+
+        for index, values in iterator:
             row = []
             row.append(index)
-            for value in values.values:
-                if value and not isinstance(value, str):
-                    value = toolstr.format(value)
-                row.append(value)
+            if hasattr(values, 'values'):
+                # dataframe
+                for value in values.values:
+                    if value and not isinstance(value, str):
+                        value = toolstr.format(value)
+                    row.append(value)
+            else:
+                # series
+                row.append(toolstr.format(values, order_of_magnitude=True))
             rows.append(row)
-        columns = [data.index.name] + list(data.columns)
-        tooltable.print_table(rows=rows, headers=columns)
+
+        if top is not None:
+            if len(rows) > top:
+                rows = rows[:top]
+
+        if isinstance(data, pd.DataFrame):
+            columns = [data.index.name] + list(data.columns)
+        elif isinstance(data, pd.Series):
+            columns = [data.index.name, data.name]
+        else:
+            raise Exception('unknown data format')
+        tooltable.print_table(rows=rows, headers=columns, indent=indent)
 
     else:
 

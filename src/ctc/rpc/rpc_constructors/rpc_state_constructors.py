@@ -77,8 +77,11 @@ def construct_eth_estimate_gas(
 
 def construct_eth_get_balance(
     address,
-    block_number='latest',
+    block_number=None,
 ) -> spec.RpcResponse:
+
+    if block_number is None:
+        block_number = 'latest'
 
     block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create('eth_getBalance', [address, block_number])

@@ -52,18 +52,18 @@ async def async_get_erc20_transfers(
             token=token_address, block=block
         )
         dtype = float
-        transfers[column] = transfers[column] / dtype(
-            '1e' + str(decimals)
-        )
+        transfers[column] = transfers[column] / dtype('1e' + str(decimals))
 
     return transfers
 
 
-def get_erc20_holdings_from_transfers(
+async def async_get_erc20_holdings_from_transfers(
     transfers: spec.DataFrame,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    dtype: typing.Union[typing.Type[int], typing.Type[float]] = float,
-    # normalize: bool = True,
+    dtype: typing.Optional[
+        typing.Union[typing.Type[int], typing.Type[float]]
+    ] = None,
+    normalize: bool = False,
 ) -> spec.DataFrame:
 
     # filter block
@@ -75,17 +75,25 @@ def get_erc20_holdings_from_transfers(
     amount_key = get_token_amount_column(transfers)
 
     # convert to float
-    transfers[amount_key] = transfers[amount_key].map(dtype)
+    if dtype is not None:
+        transfers[amount_key] = transfers[amount_key].map(dtype)
 
     # subtract transfers out from transfers in
     from_transfers = transfers.groupby('arg__from')[amount_key].sum()
     to_transfers = transfers.groupby('arg__to')[amount_key].sum()
     balances = to_transfers.sub(from_transfers, fill_value=0)
 
+    if normalize:
+        decimals = await erc20_metadata.async_get_erc20_decimals(
+            transfers['contract_address'].values[0]
+        )
+        balances /= 10 ** decimals
+
     # sort
     balances = balances.sort_values(ascending=False)
 
-    balances.name = 'transfer_amount'
+    balances.name = 'balance'
+    balances.index.name = 'address'
 
     return balances
 
