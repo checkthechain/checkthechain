@@ -125,7 +125,7 @@ async def async_resolve_block_range(block_spec):
     return start_block, end_block
 
 
-def output_data(data, output, overwrite, top=None, indent=None):
+def output_data(data, output, overwrite, top=None, indent=None, raw=False):
 
     import pandas as pd
 
@@ -153,7 +153,10 @@ def output_data(data, output, overwrite, top=None, indent=None):
                     row.append(value)
             else:
                 # series
-                row.append(toolstr.format(values, order_of_magnitude=True))
+                if raw:
+                    row.append(values)
+                else:
+                    row.append(toolstr.format(values, order_of_magnitude=True))
             rows.append(row)
 
         if top is not None:

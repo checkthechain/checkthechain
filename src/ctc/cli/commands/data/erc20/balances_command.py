@@ -7,7 +7,6 @@ ctc erc20 balances <erc20> [--block <block>] [--wallets <wallets>]
 
 # balance of single wallet across multiple blocks
 ctc erc20 balances <erc20> <wallet> --blocks <blocks>
-
 """
 
 import pandas as pd
@@ -50,7 +49,9 @@ async def async_balances_command(
             )
         wallet = args[0]
 
-        block = await evm.async_get_latest_block_number()
+        if block is None:
+            block = 'latest'
+        block = await evm.async_block_number_to_int(block)
         symbols_coroutine = evm.async_get_erc20s_symbols(erc20s)
         balances = await evm.async_get_erc20s_balance_of(
             address=wallet,
@@ -79,7 +80,9 @@ async def async_balances_command(
             )
         erc20 = args[0]
 
-        block = await evm.async_get_latest_block_number()
+        if block is None:
+            block = 'latest'
+        block = await evm.async_block_number_to_int(block)
         symbol_coroutine = evm.async_get_erc20_symbol(erc20)
 
         if wallets is not None:
