@@ -5,6 +5,7 @@ from ctc import spec
 from .. import block_utils
 from .. import event_utils
 from . import erc20_metadata
+from . import erc20_abis
 
 
 def get_token_amount_column(df):
@@ -28,7 +29,7 @@ async def async_get_erc20_transfers(
 
     transfers = await event_utils.async_get_events(
         contract_address=token_address,
-        event_name='Transfer',
+        event_abi=erc20_abis.erc20_event_abis['Transfer'],
         start_block=start_block,
         end_block=end_block,
         **event_kwargs
