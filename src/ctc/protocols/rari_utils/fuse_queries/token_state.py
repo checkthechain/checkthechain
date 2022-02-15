@@ -68,6 +68,24 @@ async def async_get_ctoken_utilization(ctoken, block='latest'):
         return borrowed / total
 
 
+async def async_get_ctoken_exchange_rate(ctoken, block='latest'):
+    return await rpc.async_eth_call(
+        to_address=ctoken,
+        function_abi=rari_abis.ctoken_function_abis['exchangeRateCurrent'],
+        block_number=block,
+        empty_token=None,
+    )
+
+
+async def async_get_ctoken_exchange_rate_by_block(ctoken, blocks):
+    return await rpc.async_batch_eth_call(
+        to_address=ctoken,
+        function_abi=rari_abis.ctoken_function_abis['exchangeRateCurrent'],
+        block_numbers=blocks,
+        empty_token=None,
+    )
+
+
 async def async_get_supply_interest_per_block(
     ctoken, block='latest', normalize=True
 ):
