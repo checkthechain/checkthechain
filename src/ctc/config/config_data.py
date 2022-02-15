@@ -114,6 +114,30 @@ def initialize_data_root(
                     return False
 
     # create directory
-    shutil.copytree(default_data_dir, path, dirs_exist_ok=True)
+    try:
+        shutil.copytree(default_data_dir, path, dirs_exist_ok=True)
+    except TypeError:
+        # python3.7 compatibility
+        _py37_copytree(default_data_dir, path)
+
     return True
+
+
+def _py37_copytree(source, destination):
+    for root, dirs, files in os.walk(source):
+        relroot = os.path.relpath(root, source)
+        for dirname in dirs:
+            # source_dir = os.path.join(root, dirname)
+            if relroot == ".":
+                destination_dir = os.path.join(destination, dirname)
+            else:
+                destination_dir = os.path.join(destination, relroot, dirname)
+            os.makedirs(destination_dir, exist_ok=True)
+        for filename in files:
+            source_path = os.path.join(root, filename)
+            if relroot == ".":
+                destination_path = os.path.join(destination, filename)
+            else:
+                destination_path = os.path.join(destination, relroot, filename)
+            shutil.copy(source_path, destination_path)
 
