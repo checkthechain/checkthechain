@@ -99,7 +99,7 @@ async def async_download_events(
     verbose=True,
 ):
 
-    if event_hash is None and event_name is None:
+    if event_hash is None and event_name is None and event_abi is None:
         raise Exception('must specify either event_hash or event_name')
 
     contract_address = contract_address.lower()
@@ -160,6 +160,7 @@ async def async_download_events(
             from_backend='node',
             to_backend='filesystem',
             event_hash=event_hash,
+            event_abi=event_abi,
             contract_address=contract_address,
             provider=provider,
             **download
@@ -168,6 +169,7 @@ async def async_download_events(
     # load from filesystem
     return await filesystem_events.async_get_events_from_filesystem(
         event_hash=event_hash,
+        event_abi=event_abi,
         contract_address=contract_address,
         start_block=start_block,
         end_block=end_block,

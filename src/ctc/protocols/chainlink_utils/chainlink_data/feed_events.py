@@ -42,6 +42,7 @@ async def async_get_full_feed_event_data(
         event_name='AnswerUpdated',
         start_block=start_block,
         end_block=end_block,
+        verbose=False,
     )
 
     # rename columns

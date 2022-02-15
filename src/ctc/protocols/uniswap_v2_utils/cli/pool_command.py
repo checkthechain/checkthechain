@@ -26,7 +26,7 @@ async def async_pool_command(pool, block):
     x_symbol = tokens_metadata['x_symbol']
     y_symbol = tokens_metadata['y_symbol']
     title = 'Uniswap V2 Pool: ' + x_symbol + ' x ' + y_symbol
-    toolstr.print_header(title)
+    toolstr.print_text_box(title)
     print('-', x_symbol, 'address:', tokens_metadata['x_address'])
     print('-', y_symbol, 'address:', tokens_metadata['y_address'])
     print('-', x_symbol, 'decimals:', tokens_metadata['x_decimals'])
