@@ -39,18 +39,10 @@ async def async_get_erc20_transfers(
     column = get_token_amount_column(df=transfers)
     transfers[column] = transfers[column].map(int)
 
-    if normalize:
-
-        # get block
-        if start_block is not None:
-            block = block_utils.standardize_block_number(start_block)
-        elif end_block != 'latest' and end_block is not None:
-            block = block_utils.standardize_block_number(end_block)
-        else:
-            block = await block_utils.async_get_latest_block_number()
+    if normalize and len(transfers) > 0:
 
         decimals = await erc20_metadata.async_get_erc20_decimals(
-            token=token_address, block=block
+            token=token_address, block=transfers.index.values[0][0],
         )
         dtype = float
         transfers[column] = transfers[column] / dtype('1e' + str(decimals))
