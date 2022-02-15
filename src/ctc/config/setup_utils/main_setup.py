@@ -53,7 +53,7 @@ def setup_ctc() -> None:
     )
 
     config: spec.ConfigSpec = {
-        'version': '0.1.0',
+        'config_spec_version': '0.1.0',
         'data_dir': data_root,
         'networks': network_data['networks'],
         'providers': network_data['providers'],

@@ -8,8 +8,8 @@ from ctc.toolbox import search_utils
 from . import config_read
 
 
-def get_config_version() -> str:
-    return config_read.get_config()['version']
+def get_config_spec_version() -> str:
+    return config_read.get_config()['config_spec_version']
 
 
 def get_data_dir() -> str:

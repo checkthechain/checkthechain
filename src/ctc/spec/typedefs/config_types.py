@@ -1,7 +1,7 @@
 """
 
 ## Config Keys
-- version: version of config schema
+- config_spec_version: version of config schema
 - data_dir: root directory for storing ctc data
 - default_network: default network to use when none specified
 - providers: default provider for each network
