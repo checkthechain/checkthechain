@@ -28,6 +28,21 @@ BlockNumberReference = typing.Union[RawBlockNumber, StandardBlockNumber]
 BlockReference = typing.Union[BlockNumberReference, BlockHash]
 
 
+class BlockRange(TypedDict):
+    start_block: StandardBlockNumber
+    end_block: StandardBlockNumber
+    open_start: bool
+    open_end: bool
+
+
+class BlockSample(TypedDict):
+    start_block: StandardBlockNumber
+    end_block: StandardBlockNumber
+    block_interval: typing.Union[int, None]
+    open_start: bool
+    open_end: bool
+
+
 class RawTransaction(TypedDict):
     pass
 
