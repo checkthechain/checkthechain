@@ -3,7 +3,7 @@ import toolcli
 command_index = {
     #
     # admin commands
-    (): 'ctc.cli.admin.root_command',
+    (): 'ctc.cli.commands.root_command',
     ('cd',): 'ctc.cli.commands.admin.cd_command',
     ('config',): 'ctc.cli.commands.admin.config_command',
     ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',

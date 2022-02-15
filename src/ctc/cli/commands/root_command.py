@@ -1,18 +1,13 @@
-
-The `ctc` command line interface can perform many different tasks related to data collection, data analysis, and general block exploration.
-
-Calls to `ctc` follow the general format `ctc <subcommands> [options]`.
-
-When `pip` installs the `ctc` python package, it also installs the `ctc` cli program. If your environment does not include installed python scripts in your shell's `PATH`, then you may need to type `python3 -m ctc ...` in the terminal instead of just `ctc ...`.
+# from ctc.cli import cli_run
 
 
-## Subcommands
+def get_command_spec():
+    return {
+        'f': root_command,
+    }
 
-All subcommands can be printed typing `ctc` with no arguments.
 
-Each cli subcommand has a variety of options to customize its output. If you need more customization than these options provide, then you should use `ctc` from a python script instead.
-
-```
+available_subcommands = """
     cd                  change working directory to a ctc directory
     config              print current ctc config
     config edit         edit current ctc config
@@ -40,6 +35,20 @@ Each cli subcommand has a variety of options to customize its output. If you nee
     uniswap mints       export mints of a uniswap pool
     uniswap burns       export burns of a uniswap pool
     uniswap swaps       export swaps of a uniswap pool
-    uniswap pool        print summary of a uniswap pool
-```
+    uniswap pool        print summary of a uniswap pool"""
+
+
+def root_command():
+    print('check the chain')
+    print()
+    print('usage:')
+    print('    ctc <subcommands> [options]')
+    print()
+    print('available subcommands:')
+    # for command in cli_run.command_index.keys():
+    #     if command == ():
+    #         continue
+    #     print('   ', ' '.join(command))
+    print()
+    print(available_subcommands)
 
