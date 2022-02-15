@@ -1,4 +1,6 @@
 
+# Command Line Interface
+
 The `ctc` command line interface can perform many different tasks related to data collection, data analysis, and general block exploration.
 
 Calls to `ctc` follow the general format `ctc <subcommands> [options]`.
@@ -42,4 +44,6 @@ Each cli subcommand has a variety of options to customize its output. If you nee
     uniswap swaps       export swaps of a uniswap pool
     uniswap pool        print summary of a uniswap pool
 ```
+
+Better examples of each command coming soon
 
