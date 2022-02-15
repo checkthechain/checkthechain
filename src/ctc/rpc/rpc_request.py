@@ -94,6 +94,8 @@ async def async_send(
 
     if isinstance(request, dict):
         response = await async_send_raw(request=request, provider=full_provider)
+        if 'result' not in response and 'error' in response:
+            raise Exception('RPC ERROR: ' + response['error']['message'])
         return response['result']
 
     elif isinstance(request, list):
