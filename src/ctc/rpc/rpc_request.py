@@ -83,7 +83,9 @@ def send_raw(request: spec.RpcRequest, provider) -> spec.RpcResponseRaw:
         )
 
     else:
-        raise Exception('unknown provider protocol: ' + str(provider['protocol']))
+        raise Exception(
+            'unknown provider protocol: ' + str(provider['protocol'])
+        )
 
 
 async def async_send(
@@ -95,7 +97,9 @@ async def async_send(
     if isinstance(request, dict):
         response = await async_send_raw(request=request, provider=full_provider)
         if 'result' not in response and 'error' in response:
-            raise spec.RpcException('RPC ERROR: ' + response['error']['message'])
+            raise spec.RpcException(
+                'RPC ERROR: ' + response['error']['message']
+            )
         return response['result']
 
     elif isinstance(request, list):
@@ -170,7 +174,9 @@ async def async_send_raw(
         )
 
     else:
-        raise Exception('unknown provider protocol: ' + str(provider['protocol']))
+        raise Exception(
+            'unknown provider protocol: ' + str(provider['protocol'])
+        )
 
 
 def _log_request(request: spec.RpcRequest, provider: spec.Provider) -> None:
