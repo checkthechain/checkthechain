@@ -14,6 +14,7 @@ command_index = {
     #
     # compute commands
     ('keccak',): 'ctc.cli.commands.compute.keccak_command',
+    ('lower',): 'ctc.cli.commands.compute.lower_command',
     #
     # data commands
     ('address',): 'ctc.cli.commands.data.address_command',

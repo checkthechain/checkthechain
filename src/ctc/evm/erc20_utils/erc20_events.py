@@ -2,7 +2,6 @@ import typing
 
 from ctc import spec
 
-from .. import block_utils
 from .. import event_utils
 from . import erc20_metadata
 from . import erc20_abis
@@ -42,7 +41,8 @@ async def async_get_erc20_transfers(
     if normalize and len(transfers) > 0:
 
         decimals = await erc20_metadata.async_get_erc20_decimals(
-            token=token_address, block=transfers.index.values[0][0],
+            token=token_address,
+            block=transfers.index.values[0][0],
         )
         dtype = float
         transfers[column] = transfers[column] / dtype('1e' + str(decimals))
