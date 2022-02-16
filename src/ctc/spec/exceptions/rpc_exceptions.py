@@ -1,0 +1,4 @@
+
+class RpcException(Exception):
+    pass
+
