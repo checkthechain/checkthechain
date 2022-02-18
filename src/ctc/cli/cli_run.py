@@ -13,6 +13,7 @@ command_index = {
     ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
     #
     # compute commands
+    ('checksum',): 'ctc.cli.commands.compute.checksum_command',
     ('keccak',): 'ctc.cli.commands.compute.keccak_command',
     ('lower',): 'ctc.cli.commands.compute.lower_command',
     #
