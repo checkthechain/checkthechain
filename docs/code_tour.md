@@ -34,7 +34,6 @@ To use `async` functions they must be run from an event loop. These functions ca
 ```python
 import asyncio
 
-
 result = asyncio.run(some_async_function(input1, input2))
 ```
 

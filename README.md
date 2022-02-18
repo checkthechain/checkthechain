@@ -154,9 +154,8 @@ If your shell's `PATH` does not include python scripts you may need to do someth
     - If you want to query historical data, you will need an archive node. You can either [run one yourself](https://github.com/ledgerwatch/erigon) or use a third-party provider such as [Alchemy](https://www.alchemy.com/) or [Quicknode](https://www.quicknode.com/). You can also use `ctc` to query current (non-historical) data using a non-archive node.
 
 
-## Related Projects
+## Similar Projects
 - [`ethereum-etl`](https://github.com/blockchain-etl/ethereum-etl) ETL tools for bulk data gathering in python
-- [`pycryptodome`](https://github.com/Legrandin/pycryptodome) self-contained cryptographic library for python
 - [`web3.py`](https://github.com/ethereum/web3.py/) official Ethereum python client
-- [`eth-abi`](https://github.com/sslivkoff/eth-abi-lite) python library for encoding/decoding EVM data
+- [`seth`](https://github.com/dapphub/dapptools/tree/master/src/seth) cli EVM swiss army knife
 
