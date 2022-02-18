@@ -215,3 +215,20 @@ def match_format(
 
     return output
 
+
+def ascii_to_raw_hex(data):
+    return data.encode('ascii').hex()
+
+
+def ascii_to_prefix_hex(data):
+    return '0x' + ascii_to_raw_hex(data)
+
+
+def hex_to_ascii(data):
+    import codecs
+
+    if data.startswith('0x'):
+        data = data[2:]
+
+    return codecs.decode(data, 'hex').decode('ascii')
+

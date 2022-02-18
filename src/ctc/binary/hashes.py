@@ -103,5 +103,9 @@ def keccak_text(
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of text"""
-    return keccak(text.encode(), output_format=output_format, library=library)
+
+    if not isinstance(text, bytes):
+        text = text.encode()
+
+    return keccak(text, output_format=output_format, library=library)
 
