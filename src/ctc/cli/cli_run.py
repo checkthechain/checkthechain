@@ -36,11 +36,12 @@ command_index = {
     #
     # protocol commands
     ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
-    ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.exists_command',
-    ('ens', 'hash'): 'ctc.protocols.ens_utils.cli.hash_command',
-    ('ens', 'owner'): 'ctc.protocols.ens_utils.cli.owner_command',
-    ('ens', 'resolve'): 'ctc.protocols.ens_utils.cli.resolve_command',
-    ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.reverse_command',
+    ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
+    ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
+    ('ens', 'hash'): 'ctc.protocols.ens_utils.cli.ens.hash_command',
+    ('ens', 'owner'): 'ctc.protocols.ens_utils.cli.ens.owner_command',
+    ('ens', 'resolve'): 'ctc.protocols.ens_utils.cli.ens.resolve_command',
+    ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.ens.reverse_command',
     ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
     ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
     ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
