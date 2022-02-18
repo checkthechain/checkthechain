@@ -36,7 +36,7 @@ async def async_get_unclaimed_rewards_by_block(wallet, blocks, provider=None):
     return await asyncio.gather(*coroutines)
 
 
-async def async_compute_wallet_rewards(wallet, blocks, provider=None):
+async def async_compute_wallet_rewards(wallet, blocks, provider=None, replace_symbol=True):
 
     # add reward token
     reward_token = '0x4da27a545c0c5b758a6ba100e3a049001de870f5'
@@ -73,10 +73,18 @@ async def async_compute_wallet_rewards(wallet, blocks, provider=None):
     reward_balance = reward_unclaimed + reward_in_wallet
     reward_balance_usd = reward_balance * reward_price
 
-    return {
-        'reward_unclaimed': reward_unclaimed,
-        'reward_in_wallet': reward_in_wallet,
-        'reward_balance': reward_balance,
-        'reward_balance_usd': reward_balance_usd,
-    }
+    if replace_symbol:
+        return {
+            'stkAAVE_unclaimed': reward_unclaimed,
+            'stkAAVE_in_wallet': reward_in_wallet,
+            'stkAAVE_balance': reward_balance,
+            'stkAAVE_balance_usd': reward_balance_usd,
+        }
+    else:
+        return {
+            'reward_unclaimed': reward_unclaimed,
+            'reward_in_wallet': reward_in_wallet,
+            'reward_balance': reward_balance,
+            'reward_balance_usd': reward_balance_usd,
+        }
 
