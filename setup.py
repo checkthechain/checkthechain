@@ -33,6 +33,7 @@ setuptools.setup(
         # EVM dependencies
         'pycryptodome',  # for keccak()
         'eth_abi',  # for encode_single()/decode_single()
+        'idna',  # ENS resolution
         'eth_utils',  # for collapse_if_tuple()
         'rlp',  # for create2 address computation
     ],
