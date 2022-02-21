@@ -19,75 +19,6 @@ def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
     }
 
 
-def send(
-    request: spec.RpcRequest,
-    provider: typing.Optional[spec.ProviderSpec] = None,
-) -> spec.RpcResponse:
-    full_provider = rpc_provider.get_provider(provider)
-
-    if isinstance(request, dict):
-        response = send_raw(request=request, provider=full_provider)
-        return response['result']
-
-    elif isinstance(request, list):
-
-        # chunk request
-        request_chunks = chunk_request(request=request, provider=full_provider)
-
-        # send request chunks
-        response_chunks = [
-            send_raw(request=request_chunk, provider=full_provider)
-            for request_chunk in request_chunks
-        ]
-
-        # reorder chunks
-        plural_response = reorder_response_chunks(response_chunks, request)
-
-        return [subresponse['result'] for subresponse in plural_response]
-
-    else:
-
-        raise Exception('unknown request type: ' + str(type(request)))
-
-
-@typing.overload
-def send_raw(
-    request: spec.RpcSingularRequest, provider
-) -> spec.RpcSingularResponseRaw:
-    ...
-
-
-@typing.overload
-def send_raw(
-    request: spec.RpcPluralRequest, provider
-) -> spec.RpcPluralResponseRaw:
-    ...
-
-
-def send_raw(request: spec.RpcRequest, provider) -> spec.RpcResponseRaw:
-
-    if provider['protocol'] == 'http':
-        from .rpc_backends import rpc_http
-
-        return rpc_http.send_http(
-            request=request,
-            provider=provider,
-        )
-
-    elif provider['protocol'] == 'websocket':
-        from .rpc_backends import rpc_websocket
-
-        return rpc_websocket.send_websocket(
-            request=request,
-            provider=provider,
-        )
-
-    else:
-        raise Exception(
-            'unknown provider protocol: ' + str(provider['protocol'])
-        )
-
-
 async def async_send(
     request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderSpec] = None,
@@ -97,10 +28,13 @@ async def async_send(
     if isinstance(request, dict):
         response = await async_send_raw(request=request, provider=full_provider)
         if 'result' not in response and 'error' in response:
+            response = typing.cast(spec.RpcSingularResponseFailure, response)
             raise spec.RpcException(
                 'RPC ERROR: ' + response['error']['message']
             )
-        return response['result']
+        else:
+            response = typing.cast(spec.RpcSingularResponseSuccess, response)
+            return response['result']
 
     elif isinstance(request, list):
 

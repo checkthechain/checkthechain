@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 from typing_extensions import TypedDict, Literal
 
@@ -9,10 +11,22 @@ RpcPluralRequest = typing.List[RpcSingularRequest]
 RpcRequest = typing.Union[RpcSingularRequest, RpcPluralRequest]
 
 
-class RpcSingularResponseRaw(TypedDict):
+class RpcSingularResponseSuccess(TypedDict):
     id: str
     jsonrpc: str
     result: typing.Any
+
+
+class RpcSingularResponseFailure(TypedDict):
+    id: str
+    jsonrpc: str
+    error: typing.Any
+
+
+RpcSingularResponseRaw = typing.Union[
+    RpcSingularResponseSuccess,
+    RpcSingularResponseFailure,
+]
 
 
 RpcPluralResponseRaw = typing.List[RpcSingularResponseRaw]
