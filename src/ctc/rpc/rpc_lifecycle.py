@@ -46,16 +46,6 @@ def digest(
         raise Exception()
 
 
-def execute(
-    request: spec.RpcRequest,
-    provider: spec.ProviderSpec = None,
-    digest_kwargs: typing.Optional[dict] = None,
-) -> spec.RpcResponse:
-    """send an rpc request and digest the corresponding response"""
-    response = rpc_request.send(request=request, provider=provider)
-    return digest(response, request=request, digest_kwargs=digest_kwargs)
-
-
 async def async_execute(
     request: spec.RpcRequest,
     provider: spec.ProviderSpec = None,

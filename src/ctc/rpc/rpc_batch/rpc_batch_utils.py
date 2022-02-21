@@ -71,20 +71,6 @@ def _get_batch_constructor_inputs(method: str) -> dict[str, str]:
 #
 
 
-def batch_execute(
-    method: str, *, provider: spec.ProviderSpec = None, **kwargs
-) -> spec.RpcPluralResponse:
-    """execute batch rpc call synchronously"""
-
-    constructor_kwargs, digestor_kwargs = _separate_execution_kwargs(
-        method=method,
-        kwargs=kwargs,
-    )
-    request = batch_construct(method=method, **constructor_kwargs)
-    response = rpc_request.send(request=request, provider=provider)
-    return batch_digest(response=response, method=method, **digestor_kwargs)
-
-
 async def async_batch_execute(
     method: str, *, provider: spec.ProviderSpec = None, **kwargs
 ) -> spec.RpcPluralResponse:
