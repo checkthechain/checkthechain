@@ -72,7 +72,7 @@ def keccak(
 
 @typing.overload
 def keccak_text(
-    text: str,
+    text: typing.Union[str, bytes],
     output_format: Literal['integer'],
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> int:
@@ -81,7 +81,7 @@ def keccak_text(
 
 @typing.overload
 def keccak_text(
-    text: str,
+    text: typing.Union[str, bytes],
     output_format: Literal['binary'],
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> bytes:
@@ -90,7 +90,7 @@ def keccak_text(
 
 @typing.overload
 def keccak_text(
-    text: str,
+    text: typing.Union[str, bytes],
     output_format: Literal['prefix_hex', 'raw_hex'] = 'prefix_hex',
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
@@ -98,13 +98,13 @@ def keccak_text(
 
 
 def keccak_text(
-    text: str,
+    text: typing.Union[str, bytes],
     output_format: spec.BinaryFormat = 'prefix_hex',
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of text"""
 
-    if not isinstance(text, bytes):
+    if isinstance(text, str):
         text = text.encode()
 
     return keccak(text, output_format=output_format, library=library)

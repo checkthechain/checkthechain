@@ -44,7 +44,7 @@ async def async_normalize_erc20_quantities(
 ) -> list[float]:
 
     if all(quantity == 0 for quantity in quantities):
-        return quantities
+        return [float(0) for quantity in quantities]
 
     if decimals is None:
         if token is None:

@@ -6,7 +6,7 @@ from . import registrar
 
 
 def hash_name(name):
-    import idna
+    import idna  # type: ignore
 
     labels = name.split('.')
     output = '00' * 32

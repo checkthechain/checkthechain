@@ -9,7 +9,7 @@ def output_data(data, output, overwrite, top=None, indent=None, raw=False):
 
     if output == 'stdout':
         # print(data)
-        import tooltable
+        import tooltable  # type: ignore
         import toolstr
 
         rows = []

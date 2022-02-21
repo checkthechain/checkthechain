@@ -8,18 +8,22 @@ from ctc import spec
 
 async def async_resolve_block_range(
     block_range: typing.Union[str, typing.Sequence[str], spec.BlockRange],
+    provider: spec.ProviderSpec = None,
 ) -> tuple[int, int]:
 
     if not isinstance(block_range, dict):
-        block_range = parse_block_range(block_range)
+        parsed_range = parse_block_range(block_range)
+    else:
+        parsed_range = block_range
 
     start_block, end_block = await evm.async_block_numbers_to_int(
-        [block_range['start_block'], block_range['end_block']],
+        [parsed_range['start_block'], parsed_range['end_block']],
+        provider=provider,
     )
 
-    if block_range['open_start']:
+    if parsed_range['open_start']:
         start_block = start_block + 1
-    if block_range['open_end']:
+    if parsed_range['open_end']:
         end_block = end_block - 1
 
     if start_block > end_block:
@@ -30,6 +34,7 @@ async def async_resolve_block_range(
 
 async def async_resolve_block_sample(
     block_sample: typing.Union[str, typing.Sequence[str], spec.BlockSample],
+    provider: spec.ProviderSpec = None,
 ) -> list[int]:
 
     if not isinstance(block_sample, dict):
@@ -37,6 +42,7 @@ async def async_resolve_block_sample(
 
     start_block, end_block = await evm.async_block_numbers_to_int(
         [block_sample['start_block'], block_sample['end_block']],
+        provider=provider,
     )
 
     if block_sample['open_start']:
@@ -99,13 +105,19 @@ def parse_block_range(
         raise ValueError(
             'invalid block range specification: ' + str(block_spec)
         )
-    start_type, start_block, end_block, end_type = tokens
+    start_type, start_block_str, end_block_str, end_type = tokens
 
     # convert to int if applicable
-    if start_block not in spec.block_number_names:
-        start_block = evm.raw_block_number_to_int(start_block)
-    if end_block not in spec.block_number_names:
-        end_block = evm.raw_block_number_to_int(end_block)
+    if start_block_str in spec.block_number_names:
+        start_block_str = typing.cast(spec.BlockNumberName, start_block_str)
+        start_block: spec.StandardBlockNumber = start_block_str
+    else:
+        start_block = evm.raw_block_number_to_int(start_block_str)
+    if end_block_str in spec.block_number_names:
+        end_block_str = typing.cast(spec.BlockNumberName, end_block_str)
+        end_block: spec.StandardBlockNumber = end_block_str
+    else:
+        end_block = evm.raw_block_number_to_int(end_block_str)
 
     # detect interval types
     if start_type == '(':
@@ -133,28 +145,44 @@ def parse_block_range(
     }
 
 
-def parse_block_sample(block_spec):
+def parse_block_sample(
+    block_spec: typing.Union[str, typing.Sequence[str]]
+) -> spec.BlockSample:
 
     tokens = tokenize(block_spec)
 
     # parse out the four components
     if len(tokens) == 4:
-        start_type, start_block, end_block, end_type = tokens
-        block_interval = None
+        start_type, start_block_str, end_block_str, end_type = tokens
+        block_interval_str = None
     elif len(tokens) == 5:
-        start_type, start_block, end_block, block_interval, end_type = tokens
+        (
+            start_type,
+            start_block_str,
+            end_block_str,
+            block_interval_str,
+            end_type,
+        ) = tokens
     else:
         raise ValueError(
             'invalid block range specification: ' + str(block_spec)
         )
 
     # convert to int if applicable
-    if start_block not in spec.block_number_names:
-        start_block = evm.raw_block_number_to_int(start_block)
-    if end_block not in spec.block_number_names:
-        end_block = evm.raw_block_number_to_int(end_block)
-    if block_interval is not None:
-        block_interval = evm.raw_block_number_to_int(block_interval)
+    if start_block_str in spec.block_number_names:
+        start_block_str = typing.cast(spec.BlockNumberName, start_block_str)
+        start_block: spec.StandardBlockNumber = start_block_str
+    else:
+        start_block = evm.raw_block_number_to_int(start_block_str)
+    if end_block_str in spec.block_number_names:
+        end_block_str = typing.cast(spec.BlockNumberName, end_block_str)
+        end_block: spec.StandardBlockNumber = end_block_str
+    else:
+        end_block = evm.raw_block_number_to_int(end_block_str)
+    if block_interval_str is not None:
+        block_interval = evm.raw_block_number_to_int(block_interval_str)
+    else:
+        block_interval_str = None
 
     # detect interval types
     if start_type == '(':
