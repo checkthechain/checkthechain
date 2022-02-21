@@ -108,7 +108,7 @@ class ReturnPoolUsersWithData(TypedDict):
 
 
 class ReturnPoolsUsersWithData(TypedDict):
-    users: list[FusePoolUser]
+    users: list[list[FusePoolUser]]
     close_factors: list[int]
     liquidation_incentives: list[int]
     errored: list[bool]
@@ -134,50 +134,120 @@ class ReturnPoolsBySupplierWithData(TypedDict):
     errored: list[bool]
 
 
-def fuse_pool_to_dict(as_list: list[str]) -> FusePool:
+class UserSummary(TypedDict):
+    supply_balance: int
+    borrow_balance: int
+    error: bool
+
+
+class PoolUserSummary(TypedDict):
+    supply_balance: int
+    borrow_balance: int
+
+
+class ReturnWhitelistedPoolsByAccountWithData(TypedDict):
+    indices: list[int]
+    account_pools: list[FusePool]
+    data: list[FusePoolData]
+    errored: list[bool]
+
+
+def fuse_pool_to_dict(as_list: list[typing.Any]) -> FusePool:
+
     keys = list(FusePool.__annotations__.keys())
     if len(as_list) != len(keys):
         raise Exception('invalid number of items')
-    return dict(zip(keys, as_list))
+
+    return {
+        'name': as_list[0],
+        'creator': as_list[1],
+        'comptroller': as_list[2],
+        'block_posted': as_list[3],
+        'timestamp_posted': as_list[4],
+    }
 
 
-def fuse_pool_data_to_dict(as_list: list[str]) -> FusePool:
+def fuse_pool_data_to_dict(as_list: list[typing.Any]) -> FusePoolData:
+
     keys = list(FusePoolData.__annotations__.keys())
     if len(as_list) != len(keys):
         raise Exception('invalid number of items')
-    return dict(zip(keys, as_list))
+
+    return {
+        'total_supply': as_list[0],
+        'total_borrow': as_list[1],
+        'underlying_tokens': as_list[2],
+        'underlying_symbols': as_list[3],
+        'whitelisted_admin': as_list[4],
+    }
 
 
-def fuse_pool_asset_to_dict(as_list: list[str]) -> FusePoolAsset:
+def fuse_pool_asset_to_dict(as_list: list[typing.Any]) -> FusePoolAsset:
+
     keys = list(FusePoolAsset.__annotations__.keys())
     if len(as_list) != len(keys):
         raise Exception('invalid number of items')
-    return dict(zip(keys, as_list))
+
+    return {
+        'ftoken': as_list[0],
+        'underlying_token': as_list[1],
+        'underlying_name': as_list[2],
+        'underlying_symbol': as_list[3],
+        'underlying_decimals': as_list[4],
+        'underlying_balance': as_list[5],
+        'supply_rate_per_block': as_list[6],
+        'borrow_rate_per_block': as_list[7],
+        'total_supply': as_list[8],
+        'total_borrow': as_list[9],
+        'supply_balance': as_list[10],
+        'borrow_balance': as_list[11],
+        'liquidity': as_list[12],
+        'membership': as_list[13],
+        'exchange_rate': as_list[14],
+        'underlying_price': as_list[15],
+        'oracle': as_list[16],
+        'collateral_factor': as_list[17],
+        'reserve_factor': as_list[18],
+        'admin_fee': as_list[19],
+        'fuse_fee': as_list[20],
+        'borrow_guardian_paused': as_list[21],
+    }
 
 
-def fuse_pool_user_to_dict(as_list: list[str]) -> FusePoolUser:
+def fuse_pool_user_to_dict(as_list: list[typing.Any]) -> FusePoolUser:
+
     keys = list(FusePoolUser.__annotations__.keys())
     if len(as_list) != len(keys):
         raise Exception('invalid number of items')
-    result = dict(zip(keys, as_list))
+
+    result: FusePoolUser = {
+        'account': as_list[0],
+        'total_borrow': as_list[1],
+        'total_collateral': as_list[2],
+        'health': as_list[3],
+        'assets': as_list[4],
+    }
+
     result['assets'] = [
-        fuse_pool_asset_to_dict(asset) for asset in result['assets']
+        fuse_pool_asset_to_dict(asset)
+        for asset in typing.cast(typing.List[typing.Any], result['assets'])
     ]
     return result
 
 
-def c_token_ownership_to_dict(as_list: list[str]) -> CTokenOwnership:
-    keys = list(CTokenOwnership.__annotations__.keys())
-    if len(as_list) != len(keys):
-        raise Exception('invalid number of items')
-    return dict(zip(keys, as_list))
-
-
 def return_pool_summary_to_dict(as_list: list[typing.Any]) -> ReturnPoolSummary:
+
     keys = list(ReturnPoolSummary.__annotations__.keys())
     if len(as_list) != len(keys):
         raise Exception('invalid number of items')
-    return dict(zip(keys, as_list))
+
+    return {
+        'total_supply': as_list[0],
+        'total_borrow': as_list[1],
+        'underlying_tokens': as_list[2],
+        'underlying_symbols': as_list[3],
+        'whitelisted_admin': as_list[4],
+    }
 
 
 def return_pool_users_with_data_to_dict(
@@ -186,7 +256,17 @@ def return_pool_users_with_data_to_dict(
     keys = list(ReturnPoolUsersWithData.__annotations__.keys())
     if len(as_list) != len(keys):
         raise Exception('invalid number of items')
-    result = dict(zip(keys, as_list))
-    result['users'] = [fuse_pool_user_to_dict(user) for user in result['users']]
+
+    result: ReturnPoolUsersWithData = {
+        'users': as_list[0],
+        'close_factor': as_list[1],
+        'liquidation_incentive': as_list[2],
+    }
+
+    result['users'] = [
+        fuse_pool_user_to_dict(user)
+        for user in typing.cast(typing.List[typing.Any], result['users'])
+    ]
+
     return result
 

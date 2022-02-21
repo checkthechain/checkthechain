@@ -147,7 +147,7 @@ async def async_get_pool_assets_with_data(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> list[spec.FusePoolAsset]:
+) -> list[lens_spec.FusePoolAsset]:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
     function_abi = lens_abis.get_function_abi('getPoolAssetsWithData')
@@ -332,12 +332,7 @@ async def async_get_user_summary(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> TypedDict(
-    'UserSummary',
-    supply_balance=int,
-    borrow_balance=int,
-    error=bool,
-):
+) -> lens_spec.UserSummary:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
     function_abi = lens_abis.get_function_abi('getUserSummary')
@@ -352,7 +347,7 @@ async def async_get_user_summary(
     return {
         'supply_balance': result[0],
         'borrow_balance': result[1],
-        'errors': bool,
+        'error': result[2],
     }
 
 
@@ -362,7 +357,7 @@ async def async_get_pool_user_summary(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> TypedDict('ReturnUserSummary', supply_balance=int, borrow_balance=int):
+) -> lens_spec.PoolUserSummary:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
     function_abi = lens_abis.get_function_abi('getPoolUserSummary')
@@ -403,13 +398,7 @@ async def async_get_whitelisted_pools_by_account_with_data(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> TypedDict(
-    'ReturnWhitelistedPoolsByAccountWithData',
-    indices=list[int],
-    account_pools=list[lens_spec.FusePool],
-    data=list[lens_spec.FusePoolData],
-    errored=list[bool],
-):
+) -> lens_spec.ReturnWhitelistedPoolsByAccountWithData:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
     function_abi = lens_abis.get_function_abi(
@@ -422,10 +411,25 @@ async def async_get_whitelisted_pools_by_account_with_data(
         block_number=block,
         provider=provider,
     )
-    return {
+
+    output: lens_spec.ReturnWhitelistedPoolsByAccountWithData = {
         'indices': result[0],
         'account_pools': result[1],
         'data': result[2],
         'errored': result[3],
     }
+
+    output['account_pools'] = [
+        lens_spec.fuse_pool_to_dict(item)
+        for item in typing.cast(
+            typing.List[typing.Any], output['account_pools']
+        )
+    ]
+
+    output['data'] = [
+        lens_spec.fuse_pool_data_to_dict(item)
+        for item in typing.cast(typing.List[typing.Any], output['data'])
+    ]
+
+    return output
 
