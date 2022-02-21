@@ -2,6 +2,8 @@ import asyncio
 
 import pytest
 
+from ctc import rpc
+
 
 @pytest.fixture(scope="session")
 def event_loop(request):
@@ -12,4 +14,17 @@ def event_loop(request):
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
+
+
+@pytest.fixture(scope='session', autouse=True)
+async def setup_teardown():
+
+    # setup
+    pass
+
+    # transition to teardown
+    yield
+
+    # teardown
+    await rpc.async_close_http_session()
 
