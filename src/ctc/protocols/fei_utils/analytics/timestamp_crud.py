@@ -61,10 +61,10 @@ async def async_get_time_data(
 def resolve_timescale(
     timescale: analytics_spec.TimescaleSpec,
 ) -> analytics_spec.Timescale:
-    if (
-        isinstance(timescale, dict)
-        and set(timescale.keys()) == {'window_size', 'interval_size'}
-    ):
+    if isinstance(timescale, dict) and set(timescale.keys()) == {
+        'window_size',
+        'interval_size',
+    }:
         return timescale
 
     elif isinstance(timescale, str) and timescale.count(',') == 1:
@@ -95,7 +95,9 @@ def get_timestamps(
 async def async_get_timestamps_blocks(
     timestamps: typing.Sequence[analytics_spec.Timestamp],
     provider: spec.ProviderSpec,
-    **kwargs
+    block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
+    block_number_array: typing.Optional[spec.NumpyArray] = None,
+    block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
 ) -> list[int]:
 
     # use latest block if last timestamp is greater than latest block timestamp
@@ -113,7 +115,11 @@ async def async_get_timestamps_blocks(
 
     # get blocks of timestamps
     blocks = await evm.async_get_blocks_of_timestamps(
-        timestamps, provider=provider, **kwargs
+        timestamps,
+        provider=provider,
+        block_timestamps=block_timestamps,
+        block_number_array=block_number_array,
+        block_timestamp_array=block_timestamp_array,
     )
 
     # append latest block if swapped in for last timestamp

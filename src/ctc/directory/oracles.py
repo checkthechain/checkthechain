@@ -17,7 +17,7 @@ def get_oracle_address(
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
     block: spec.BlockNumberReference = 'latest',
-):
+) -> str:
 
     oracle = get_oracle_metadata(
         name=name,
@@ -35,7 +35,7 @@ def get_oracle_name(
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
     block: spec.BlockNumberReference = 'latest',
-):
+) -> str:
     oracle = get_oracle_metadata(
         address=address,
         network=network,

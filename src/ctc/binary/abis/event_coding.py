@@ -8,13 +8,49 @@ from . import abi_coding
 from . import event_parsing
 
 
+@typing.overload
+def decode_event_topics(
+    topics: typing.Sequence[spec.BinaryData],
+    *,
+    use_names: typing.Literal[False],
+    event_abi: typing.Optional[spec.EventABI] = None,
+    indexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    indexed_names: typing.Optional[list[str]] = None,
+) -> list[str]:
+    ...
+
+
+@typing.overload
+def decode_event_topics(
+    topics: typing.Sequence[spec.BinaryData],
+    *,
+    use_names: typing.Literal[True],
+    event_abi: typing.Optional[spec.EventABI] = None,
+    indexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    indexed_names: typing.Optional[list[str]] = None,
+) -> dict[str, str]:
+    ...
+
+
+@typing.overload
+def decode_event_topics(
+    topics: typing.Sequence[spec.BinaryData],
+    *,
+    event_abi: typing.Optional[spec.EventABI] = None,
+    indexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    indexed_names: typing.Optional[list[str]] = None,
+    use_names: bool = True,
+) -> typing.Union[list[str], dict[str, str]]:
+    ...
+
+
 def decode_event_topics(
     topics: typing.Sequence[spec.BinaryData],
     event_abi: typing.Optional[spec.EventABI] = None,
     indexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
     indexed_names: typing.Optional[list[str]] = None,
     use_names: bool = True,
-):
+) -> typing.Union[list[str], dict[str, str]]:
     """
     remaining edgecase:
     - variable data in indexed topic?
@@ -44,13 +80,50 @@ def decode_event_topics(
         return dict(zip(indexed_names, decoded_topics))
 
 
+@typing.overload
 def decode_event_unindexed_data(
     data: spec.BinaryData,
+    *,
+    use_names: typing.Literal[False],
+    event_abi: typing.Optional[spec.EventABI] = None,
+    unindexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    unindexed_names: typing.Optional[list[str]] = None,
+) -> list[str]:
+    ...
+
+
+@typing.overload
+def decode_event_unindexed_data(
+    data: spec.BinaryData,
+    *,
+    use_names: typing.Literal[True],
+    event_abi: typing.Optional[spec.EventABI] = None,
+    unindexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    unindexed_names: typing.Optional[list[str]] = None,
+) -> dict[str, str]:
+    ...
+
+
+@typing.overload
+def decode_event_unindexed_data(
+    data: spec.BinaryData,
+    *,
     event_abi: typing.Optional[spec.EventABI] = None,
     unindexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
     unindexed_names: typing.Optional[list[str]] = None,
     use_names: bool = True,
-):
+) -> typing.Union[list[str], dict[str, str]]:
+    ...
+
+
+def decode_event_unindexed_data(
+    data: spec.BinaryData,
+    *,
+    event_abi: typing.Optional[spec.EventABI] = None,
+    unindexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    unindexed_names: typing.Optional[list[str]] = None,
+    use_names: bool = True,
+) -> typing.Union[list[str], dict[str, str]]:
     """decode the unindexed data of event"""
 
     # gather metadata
@@ -82,10 +155,12 @@ def normalize_event(
 
     # decode event args
     decoded_topics = decode_event_topics(
-        topics=event['topics'], event_abi=event_abi
+        topics=event['topics'],
+        event_abi=event_abi,
+        use_names=True,
     )
     decoded_data = decode_event_unindexed_data(
-        data=event['data'], event_abi=event_abi
+        data=event['data'], event_abi=event_abi, use_names=True
     )
 
     # remove keys

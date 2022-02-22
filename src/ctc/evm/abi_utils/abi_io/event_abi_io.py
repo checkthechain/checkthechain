@@ -12,7 +12,7 @@ async def async_get_event_abi(
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     network: typing.Optional[spec.NetworkReference] = None,
-):
+) -> spec.EventABI:
 
     # get contract abi
     if contract_abi is None:

@@ -30,7 +30,7 @@ async def async_get_pool_symbols(
     x_address: spec.Address = None,
     y_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
-):
+) -> list[str]:
 
     if x_address is None or y_address is None:
         if pool is None:
@@ -51,7 +51,7 @@ async def async_get_pool_decimals(
     x_address: spec.Address = None,
     y_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
-):
+) -> list[int]:
 
     if x_address is None or y_address is None:
         if pool is None:

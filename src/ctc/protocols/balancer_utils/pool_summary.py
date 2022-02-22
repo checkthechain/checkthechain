@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import decimal
+import typing
 
 import numpy as np
 import pandas as pd
@@ -42,7 +45,10 @@ async def async_summarize_pool_state(balancer_pool, block='latest'):
 
 
 async def async_get_pool_swaps(
-    pool_address=None, start_block=None, end_block=None, vault=None
+    pool_address: typing.Optional[spec.Address] = None,
+    start_block: typing.Optional[spec.BlockNumberReference] = None,
+    end_block: typing.Optional[spec.BlockNumberReference] = None,
+    vault: typing.Optional[spec.Address] = None,
 ) -> spec.DataFrame:
 
     if vault is None:

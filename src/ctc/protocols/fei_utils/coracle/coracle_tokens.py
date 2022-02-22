@@ -28,7 +28,7 @@ async def async_get_pcv_tokens_symbols(
     tokens: list[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
-):
+) -> dict[spec.ERC20Reference, str]:
 
     non_usd_tokens = list(
         token for token in tokens if token != coracle_spec.usd_token

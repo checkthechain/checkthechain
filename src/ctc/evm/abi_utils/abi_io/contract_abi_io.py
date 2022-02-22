@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 
 from ctc import rpc
@@ -45,11 +47,11 @@ async def async_transfer_contract_abi(**kwargs):
 
 
 async def async_download_contract_abi(
-    contract_address,
-    name=None,
+    contract_address: spec.Address,
+    name: typing.Optional[str] = None,
     provider: spec.ProviderSpec = None,
     **kwargs
-):
+) -> spec.ContractABI:
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -72,11 +74,13 @@ async def async_download_contract_abi(
 
     try:
         await address_utils.async_save_eip897_abi(
-            contract_address=contract_address, provider=provider,
+            contract_address=contract_address,
+            provider=provider,
         )
         contract_abi = (
             await contract_abi_backends.async_get_contract_abi_from_filesystem(
-                contract_address=contract_address, network=network,
+                contract_address=contract_address,
+                network=network,
             )
         )
     except Exception:

@@ -16,19 +16,19 @@ async def async_get_public_pools_with_data(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-):
+) -> lens_spec.PublicPoolsWithData:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
 
     # on-chain implementation reverts, python implementation instead
-    kwargs = {
-        'block': block,
-        # 'provider': provider,
-    }
-    all_pools = await fuse_queries.async_get_all_pools(**kwargs)
+    all_pools = await fuse_queries.async_get_all_pools(
+        block=block, provider=provider
+    )
     comptrollers = [pool[2] for pool in all_pools]
     coroutines = [
-        _async_get_pool_summary_or_error(comptroller, **kwargs)
+        _async_get_pool_summary_or_error(
+            comptroller, block=block, provider=provider
+        )
         for comptroller in comptrollers
     ]
     results = await asyncio.gather(*coroutines)
@@ -36,7 +36,6 @@ async def async_get_public_pools_with_data(
     errors = [result['error'] is not None for result in results]
 
     return {
-        # 'indexes': result[0],
         'public_pools': [
             lens_spec.fuse_pool_to_dict(pool) for pool in all_pools
         ],
@@ -45,9 +44,24 @@ async def async_get_public_pools_with_data(
     }
 
 
-async def _async_get_pool_summary_or_error(comptroller, **kwargs):
+class _ReturnPoolSummaryOrError(TypedDict):
+    summary: typing.Optional[lens_spec.ReturnPoolSummary]
+    error: typing.Optional[str]
+
+
+async def _async_get_pool_summary_or_error(
+    comptroller: spec.Address,
+    lens_address: spec.Address = None,
+    provider: spec.ProviderSpec = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> _ReturnPoolSummaryOrError:
     try:
-        summary = await async_get_pool_summary(comptroller)
+        summary = await async_get_pool_summary(
+            comptroller=comptroller,
+            lens_address=lens_address,
+            provider=provider,
+            block=block,
+        )
         return {'summary': summary, 'error': None}
     except spec.RpcException as e:
         return {'summary': None, 'error': e.args[0]}
@@ -58,19 +72,19 @@ async def async_get_public_pools_by_verification_with_data(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-):
+) -> lens_spec.PublicPoolsWithData:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
 
     # on-chain implementation reverts, python implementation instead
-    kwargs = {
-        'block': block,
-        # 'provider': provider,
-    }
-    all_pools = await fuse_queries.async_get_all_pools(**kwargs)
+    all_pools = await fuse_queries.async_get_all_pools(
+        block=block, provider=provider
+    )
     comptrollers = [pool[2] for pool in all_pools]
     coroutines = [
-        _async_get_pool_summary_or_error(comptroller, **kwargs)
+        _async_get_pool_summary_or_error(
+            comptroller, block=block, provider=provider
+        )
         for comptroller in comptrollers
     ]
     results = await asyncio.gather(*coroutines)
@@ -102,7 +116,7 @@ async def async_get_pools_by_account_with_data(
     lens_address: spec.Address = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-):
+) -> lens_spec.ReturnPoolsBySupplierWithData:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
     function_abi = lens_abis.get_function_abi('getPoolsByAccountWithData')
@@ -114,7 +128,7 @@ async def async_get_pools_by_account_with_data(
         provider=provider,
     )
     return {
-        'indexes': result[0],
+        'indices': result[0],
         'account_pools': [
             lens_spec.fuse_pool_to_dict(pool) for pool in result[1]
         ],
@@ -173,14 +187,18 @@ async def async_get_public_pool_users_with_data(
 
     # on-chain implementation reverts, python implementation instead
     # kwargs = {'block': block, 'provider': provider}
-    kwargs = {'block': block}
     max_health = int(1e36)
 
-    all_pools = await fuse_queries.async_get_all_pools(**kwargs)
+    all_pools = await fuse_queries.async_get_all_pools(
+        block=block, provider=provider
+    )
     comptrollers = [pool[2] for pool in all_pools]
     coroutines = [
         _async_get_pool_users_with_data_or_error(
-            comptroller=comptroller, max_health=max_health, **kwargs
+            comptroller=comptroller,
+            max_health=max_health,
+            block=block,
+            provider=provider,
         )
         for comptroller in comptrollers
     ]

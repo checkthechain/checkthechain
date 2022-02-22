@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc import evm
 from ctc import spec
@@ -7,11 +10,11 @@ from . import uniswap_v2_metadata
 
 
 async def async_get_pool_swaps(
-    pool_address,
-    start_block=None,
-    end_block=None,
-    replace_symbols=False,
-    normalize=True,
+    pool_address: spec.Address,
+    start_block: typing.Optional[spec.BlockNumberReference] = None,
+    end_block: typing.Optional[spec.BlockNumberReference] = None,
+    replace_symbols: bool = False,
+    normalize: bool = True,
     provider: spec.ProviderSpec = None,
 ) -> spec.DataFrame:
 

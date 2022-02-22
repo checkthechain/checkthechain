@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing_extensions import TypedDict
 import urllib.parse
 
@@ -18,7 +19,7 @@ class _NetworkData(TypedDict):
     network_defaults: spec.ConfigNetworkDefaults
 
 
-def setup_networks(styles: dict[str, str]) -> tuple[_NetworkData, bool]:
+def setup_networks(styles: typing.Mapping[str, str]) -> tuple[_NetworkData, bool]:
     print()
     print()
     toolcli.print('## Network Setup', style=styles['header'])
@@ -134,10 +135,10 @@ def get_default_provider_name(provider_url: str, network: str) -> str:
 
 
 def specify_providers(
-    config_networks,
-    all_networks,
-    default_network,
-    styles,
+    config_networks: typing.Mapping[spec.NetworkName, spec.NetworkMetadata],
+    all_networks: typing.Mapping[spec.NetworkName, spec.NetworkMetadata],
+    default_network: str,
+    styles: typing.Mapping[str, str],
 ) -> dict[spec.ProviderName, spec.Provider]:
 
     # load old providers
@@ -288,13 +289,17 @@ def specify_providers(
 
 
 def specify_network_defaults(
-    default_network, providers, styles
+    default_network: str,
+    providers: typing.Mapping[str, spec.Provider],
+    styles: typing.Mapping[str, typing.Optional[str]],
 ) -> spec.ConfigNetworkDefaults:
 
     # compile providers for each network
     providers_per_network: dict[str, list[str]] = {}
     for provider_name, provider_metadata in providers.items():
         network = provider_metadata['network']
+        if network is None:
+            raise Exception('unknown network for provider: ' + str(provider_metadata))
         providers_per_network.setdefault(network, [])
         providers_per_network[network].append(provider_name)
 

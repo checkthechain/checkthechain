@@ -96,11 +96,19 @@ def get_erc20_address(
 def has_erc20_metadata(
     address: typing.Optional[spec.ERC20Address] = None,
     symbol: typing.Optional[spec.ERC20Symbol] = None,
-    **kwargs,
+    label: typing.Optional[_LabelGroup] = None,
+    network: spec.NetworkReference = None,
+    backend: spec.StorageBackend = 'Filesystem',
 ) -> bool:
 
     try:
-        get_erc20_metadata(address=address, symbol=symbol, **kwargs)
+        get_erc20_metadata(
+            address=address,
+            symbol=symbol,
+            label=label,
+            network=network,
+            backend=backend,
+        )
         return True
     except LookupError:
         return False

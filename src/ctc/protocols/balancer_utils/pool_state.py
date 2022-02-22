@@ -86,7 +86,7 @@ async def async_get_pool_fees(
     pool_address: spec.ContractAddress,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
-):
+) -> typing.Union[int, float]:
 
     fees = await rpc.async_eth_call(
         to_address=pool_address,

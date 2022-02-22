@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:
     from typing_extensions import TypeGuard
 
 
-def is_dataframe(candidate) -> TypeGuard['pandas.core.frame.DataFrame']:
+def is_dataframe(candidate: typing.Any) -> TypeGuard['pandas.core.frame.DataFrame']:
     import pandas as pd
     return isinstance(candidate, pd.DataFrame)
 

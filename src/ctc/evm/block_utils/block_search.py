@@ -1,19 +1,29 @@
+from __future__ import annotations
+
 import asyncio
 import functools
+import typing
+from typing_extensions import TypedDict
 
+from ctc import spec
 from ctc.toolbox import search_utils
 from .. import address_utils
 from . import block_crud
 
 
+class BlockTimestampSearchCache(TypedDict):
+    initializing: dict[int, bool]
+    timestamps: dict[int, int]
+
+
 async def async_get_contract_creation_block(
-    contract_address,
-    start_block=None,
-    end_block=None,
-    provider=None,
-    verbose=True,
-    nary=None,
-):
+    contract_address: spec.Address,
+    start_block: typing.Optional[spec.BlockNumberReference] = None,
+    end_block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderSpec = None,
+    verbose: bool = True,
+    nary: typing.Optional[int] = None,
+) -> int:
     """get the block where a contract was created
 
     algorithm: perform a binary search across blocks, check code bytes in each
@@ -26,7 +36,9 @@ async def async_get_contract_creation_block(
     if end_block is None:
         end_block = 'latest'
     if start_block == 'latest' or end_block == 'latest':
-        latest_block = await block_crud.async_get_latest_block_number()
+        latest_block = await block_crud.async_get_latest_block_number(
+            provider=provider
+        )
         if start_block == 'latest':
             start_block = latest_block
         if end_block == 'latest':
@@ -39,7 +51,9 @@ async def async_get_contract_creation_block(
         if verbose:
             print('- trying block:', index)
         return await address_utils.async_is_contract_address(
-            address=contract_address, block=index, provider=provider
+            address=contract_address,
+            block=index,
+            provider=provider,
         )
 
     if nary is None:
@@ -49,12 +63,7 @@ async def async_get_contract_creation_block(
             async_is_match=async_is_match,
         )
     else:
-        result = search_utils.nary_search(
-            start_index=start_block,
-            end_index=end_block,
-            is_match=is_match,
-            nary=nary,
-        )
+        raise NotImplementedError()
 
     if verbose:
         print('result:', result)
@@ -63,35 +72,37 @@ async def async_get_contract_creation_block(
 
 
 async def async_get_blocks_of_timestamps(
-    timestamps,
-    block_timestamps=None,
-    block_number_array=None,
-    block_timestamp_array=None,
-    nary=None,
-    cache=None,
-    provider=None,
-):
+    timestamps: typing.Sequence[int],
+    block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
+    block_number_array: typing.Optional[spec.NumpyArray] = None,
+    block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
+    nary: typing.Optional[int] = None,
+    cache: typing.Optional[BlockTimestampSearchCache] = None,
+    provider: spec.ProviderSpec = None,
+) -> list[int]:
     """once parallel node search created, use that"""
 
-    if (
-        block_timestamps is not None
-        and block_number_array is None
-        and block_timestamp_array is None
+    if block_timestamps is not None or (
+        block_number_array is not None and block_timestamp_array is not None
     ):
         import numpy as np
 
-        block_timestamp_array = np.array(list(block_timestamps.values()))
-        block_number_array = np.array(list(block_timestamps.keys()))
+        if block_timestamp_array is None:
+            if block_timestamps is None:
+                raise Exception('must specify more arguments')
+            block_timestamp_array = np.array(list(block_timestamps.values()))
+        if block_number_array is None:
+            if block_timestamps is None:
+                raise Exception('must specify more arguments')
+            block_number_array = np.array(list(block_timestamps.keys()))
 
         blocks = []
         for timestamp in timestamps:
             block = get_block_of_timestamp_from_arrays(
                 timestamp=timestamp,
-                nary=nary,
-                cache=cache,
-                block_timestamps=block_timestamps,
                 block_timestamp_array=block_timestamp_array,
                 block_number_array=block_number_array,
+                verbose=False,
             )
             blocks.append(block)
 
@@ -104,30 +115,39 @@ async def async_get_blocks_of_timestamps(
             coroutine = async_get_block_of_timestamp(
                 timestamp=timestamp,
                 verbose=False,
+                cache=cache,
+                nary=nary,
+                provider=provider,
             )
             coroutines.append(coroutine)
 
         return await asyncio.gather(*coroutines)
 
 
-# @toolparallel.parallelize_input(
-#     singular_arg='timestamp', plural_arg='timestamps'
-# )
 async def async_get_block_of_timestamp(
-    timestamp,
-    nary=None,
-    cache=None,
-    block_timestamps=None,
-    block_timestamp_array=None,
-    block_number_array=None,
+    timestamp: int,
+    nary: typing.Optional[int] = None,
+    cache: typing.Optional[BlockTimestampSearchCache] = None,
+    block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
+    block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
+    block_number_array: typing.Optional[spec.NumpyArray] = None,
     verbose: bool = True,
-    provider=None,
-):
-    if (
-        block_timestamps is not None
-        or block_timestamp_array is not None
-        and block_number_array is not None
+    provider: spec.ProviderSpec = None,
+) -> int:
+    import numpy as np
+
+    if block_timestamps is not None or (
+        block_timestamp_array is not None and block_number_array is not None
     ):
+        if block_timestamp_array is None:
+            if block_timestamps is None:
+                raise Exception('must specify more arguments')
+            block_timestamp_array = np.array(list(block_timestamps.values()))
+        if block_number_array is None:
+            if block_timestamps is None:
+                raise Exception('must specify more arguments')
+            block_number_array = np.array(list(block_timestamps.keys()))
+
         return get_block_of_timestamp_from_arrays(
             timestamp=timestamp,
             block_timestamp_array=block_timestamp_array,
@@ -140,12 +160,16 @@ async def async_get_block_of_timestamp(
             nary=nary,
             cache=cache,
             verbose=verbose,
+            provider=provider,
         )
 
 
 def get_block_of_timestamp_from_arrays(
-    timestamp, block_timestamp_array, block_number_array, verbose
-):
+    timestamp: int,
+    block_timestamp_array: spec.NumpyArray,
+    block_number_array: spec.NumpyArray,
+    verbose: bool,
+) -> int:
     import numpy as np
 
     index = np.searchsorted(block_timestamp_array, timestamp)
@@ -153,8 +177,12 @@ def get_block_of_timestamp_from_arrays(
 
 
 async def async_get_block_of_timestamp_from_node(
-    timestamp, nary=None, cache=None, provider=None, verbose: bool = True
-):
+    timestamp: int,
+    nary: typing.Optional[int] = None,
+    cache: typing.Optional[BlockTimestampSearchCache] = None,
+    provider: spec.ProviderSpec = None,
+    verbose: bool = True,
+) -> int:
     """
     - could make this efficiently parallelizable to multiple timestamps by sharing cache
         - would need to remove the initializing key from the shared cache
@@ -176,18 +204,25 @@ async def async_get_block_of_timestamp_from_node(
         debug=verbose,
     )
 
+    end_index = await block_crud.async_get_latest_block_number(
+        provider=provider
+    )
+
     return await search_utils.async_nary_search(
         nary=nary,
         start_index=1,
-        end_index=(await block_crud.async_get_latest_block_number()),
+        end_index=end_index,
         async_is_match=async_is_match,
         get_next_probes=get_next_probes,
     )
 
 
 async def _async_is_match_block_of_timestamp(
-    block_numbers, timestamp, cache, provider=None
-):
+    block_numbers: list[int],
+    timestamp: int,
+    cache: BlockTimestampSearchCache,
+    provider: spec.ProviderSpec = None,
+) -> list[bool]:
 
     # retrieve values not in cache
     not_in_cache = [
@@ -195,7 +230,7 @@ async def _async_is_match_block_of_timestamp(
         for block_number in block_numbers
         if block_number not in cache['timestamps']
     ]
-    gotten = await block_crud.async_get_blocks(not_in_cache)
+    gotten = await block_crud.async_get_blocks(not_in_cache, provider=provider)
     for block_number, block in zip(not_in_cache, gotten):
         cache['timestamps'][block_number] = block['timestamp']
 
@@ -207,8 +242,13 @@ async def _async_is_match_block_of_timestamp(
 
 
 def _get_next_probes_block_of_timestamp(
-    nary, probe_min, probe_max, timestamp, cache, debug=True
-):
+    nary: int,
+    probe_min: int,
+    probe_max: int,
+    timestamp: int,
+    cache: BlockTimestampSearchCache,
+    debug: bool = True,
+) -> list[int]:
     import numpy as np
 
     if cache['initializing'][timestamp]:
@@ -233,11 +273,13 @@ def _get_next_probes_block_of_timestamp(
         # if narrowing a range larger than N, probe a window of size X centered on target_index
         if probe_max - probe_min > 1000:
             size = probe_max - probe_min
-            probes = target_index + size * np.linspace(-0.01, 0.01, nary - 1)
-            probes = probes.astype(int)
+            probes_array = target_index + size * np.linspace(
+                -0.01, 0.01, nary - 1
+            )
+            probes_array = probes_array.astype(int)
             probes = [
                 probe
-                for probe in probes
+                for probe in probes_array
                 if probe <= probe_max and probe >= probe_min
             ]
             return probes

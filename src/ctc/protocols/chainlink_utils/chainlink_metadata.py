@@ -11,7 +11,7 @@ from . import chainlink_spec
 def get_feed_decimals(
     feed: chainlink_spec._FeedReference,
     provider: spec.ProviderSpec = None,
-):
+) -> int:
     provider = rpc.get_provider(provider)
     network = provider['network']
     if network is None:

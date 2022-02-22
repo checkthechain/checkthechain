@@ -93,6 +93,12 @@ class CTokenOwnership(TypedDict):
     fuse_admin_has_rights: bool
 
 
+class PublicPoolsWithData(TypedDict):
+    public_pools: list[FusePool]
+    data: list['ReturnPoolSummary']
+    errored: list[bool]
+
+
 class ReturnPoolSummary(TypedDict):
     total_supply: int
     total_borrow: int

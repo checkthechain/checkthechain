@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import rpc
 from ctc import spec
 from . import block_normalize
@@ -32,7 +34,7 @@ async def async_get_block(
 
 
 async def async_get_blocks(
-    blocks: list[spec.BlockReference],
+    blocks: typing.Sequence[spec.BlockReference],
     include_full_transactions: bool = False,
     chunk_size: int = 500,
     provider: spec.ProviderSpec = None,
@@ -73,10 +75,18 @@ async def async_get_latest_block_number(
 
 
 async def async_get_blocks_timestamps(
-    blocks: list[spec.BlockReference], **get_blocks_kwargs
+    blocks: list[spec.BlockReference],
+    include_full_transactions: bool = False,
+    chunk_size: int = 500,
+    provider: spec.ProviderSpec = None,
 ) -> list[int]:
     return [
         block['timestamp']
-        for block in await async_get_blocks(blocks=blocks, **get_blocks_kwargs)
+        for block in await async_get_blocks(
+            blocks=blocks,
+            include_full_transactions=include_full_transactions,
+            chunk_size=chunk_size,
+            provider=provider,
+        )
     ]
 

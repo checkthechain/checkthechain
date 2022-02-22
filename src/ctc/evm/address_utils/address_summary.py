@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import binary
 from ctc import rpc
 from ctc import spec
@@ -7,8 +11,11 @@ from . import address_data
 
 
 async def async_print_address_summary(
-    address, verbose=0, max_width=80, provider: spec.ProviderSpec = None
-):
+    address: spec.Address,
+    verbose: typing.Union[bool, int] = 0,
+    max_width: int = 80,
+    provider: spec.ProviderSpec = None,
+) -> None:
     """
 
     TODO (with more data)
@@ -45,7 +52,8 @@ async def async_print_address_summary(
         provider = rpc.get_provider(provider)
         network = provider['network']
         contract_abi = await abi_utils.async_get_contract_abi(
-            contract_address=address, network=network,
+            contract_address=address,
+            network=network,
         )
         df = abi_utils.contract_abi_to_dataframe(
             contract_abi=contract_abi, human_readable=False
