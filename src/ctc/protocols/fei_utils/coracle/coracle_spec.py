@@ -128,6 +128,22 @@ deposit_metadata = {
         'name': 'Uniswap FEI-agEUR',
         'platform': 'Uniswap V2',
     },
+    '0x2a188f9eb761f70ecea083ba6c2a40145078dfc2': {
+        'name': 'FEI-DAI PSM',
+        'platform': 'Fei',
+    },
+    '0x98e5f5706897074a4664dd3a32eb80242d6e694b': {
+        'name': 'FEI-ETH PSM',
+        'platform': 'Fei',
+    },
+    '0xb0e731f036adfdec12da77c15aab0f90e8e45a0e': {
+        'name': 'FEI-LUSD PSM',
+        'platform': 'Fei',
+    },
+    '0xc5bb8f0253776bec6ff450c2b40f092f7e7f5b57': {
+        'name': 'Balancer FEI-WETH',
+        'platform': 'Balancer',
+    },
 }
 
 
