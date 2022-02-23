@@ -51,10 +51,6 @@ def decode_event_topics(
     indexed_names: typing.Optional[list[str]] = None,
     use_names: bool = True,
 ) -> typing.Union[list[str], dict[str, str]]:
-    """
-    remaining edgecase:
-    - variable data in indexed topic?
-    """
 
     # get abi
     if indexed_types is None:
@@ -65,9 +61,17 @@ def decode_event_topics(
     # decode
     decoded_topics = []
     for topic, indexed_type in zip(topics[1:], indexed_types):
-        topic = formats.convert(topic, 'binary')
-        decoded_topic = abi_coding.abi_decode(topic, indexed_type)
-        decoded_topics.append(decoded_topic)
+        # only decode value types
+        if (
+            indexed_type in ['bytes', 'string']
+            or indexed_type.endswith(']')
+            or indexed_type.endswith(')')
+        ):
+            decoded_topics.append(topic)
+        else:
+            topic = formats.convert(topic, 'binary')
+            decoded_topic = abi_coding.abi_decode(topic, indexed_type)
+            decoded_topics.append(decoded_topic)
 
     # package output
     if not use_names:
