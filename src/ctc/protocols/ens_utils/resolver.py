@@ -1,4 +1,7 @@
+import asyncio
+
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 
 from . import ens_directory
@@ -70,4 +73,50 @@ async def async_reverse_lookup(address, provider=None, block=None):
 
 def name_history():
     pass
+
+
+async def async_get_text_record(key, name=None, node=None):
+
+    if node is None:
+        node = hash_name(name)
+
+    return await rpc.async_eth_call(
+        to_address=ens_directory.resolver,
+        function_name='text',
+        function_parameters=[node, key],
+    )
+
+
+async def async_get_text_records(name=None, node=None):
+    """
+    https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records
+    """
+
+    if node is None:
+        node = hash_name(name)
+
+    text_changes = await async_get_text_changes(name=name, node=node)
+    keys = list(text_changes['arg__key'].values)
+    coroutines = [
+        async_get_text_record(key=key, node=node)
+        for key in keys
+    ]
+    values = await asyncio.gather(*coroutines)
+    return dict(zip(keys, values))
+
+
+async def async_get_text_changes(name=None, node=None):
+
+    events = await evm.async_get_events(
+        contract_address=ens_directory.resolver,
+        event_name='TextChanged',
+        start_block=9000000,
+        verbose=False,
+    )
+
+    if node is None:
+        node = hash_name(name)
+
+    mask = events['arg__node'] == node
+    return events[mask]
 

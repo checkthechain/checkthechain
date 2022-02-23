@@ -40,6 +40,7 @@ command_index = {
     ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
     ('ens', 'hash'): 'ctc.protocols.ens_utils.cli.ens.hash_command',
     ('ens', 'owner'): 'ctc.protocols.ens_utils.cli.ens.owner_command',
+    ('ens', 'records'): 'ctc.protocols.ens_utils.cli.ens.records_command',
     ('ens', 'resolve'): 'ctc.protocols.ens_utils.cli.ens.resolve_command',
     ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.ens.reverse_command',
     ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
