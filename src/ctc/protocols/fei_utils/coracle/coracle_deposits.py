@@ -10,6 +10,21 @@ from . import coracle_spec
 from . import coracle_tokens
 
 
+function_abis = {
+    'getDepositsForToken': {
+        'inputs': [
+            {'internalType': 'address', 'name': '_token', 'type': 'address'}
+        ],
+        'name': 'getDepositsForToken',
+        'outputs': [
+            {'internalType': 'address[]', 'name': '', 'type': 'address[]'}
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+}
+
+
 async def async_get_tokens_deposits(
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
     block: spec.BlockReference = 'latest',
@@ -54,7 +69,7 @@ async def async_get_token_deposits(
     return await rpc.async_eth_call(
         to_address=coracle,
         block_number=block,
-        function_name='getDepositsForToken',
+        function_abi=function_abis['getDepositsForToken'],
         function_parameters={'_token': token},
         provider=provider,
     )

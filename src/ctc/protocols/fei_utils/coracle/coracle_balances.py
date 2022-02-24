@@ -15,6 +15,35 @@ from . import coracle_deposits
 from . import coracle_spec
 
 
+function_abis = {
+    'balance': {
+        'inputs': [],
+        'name': 'balance',
+        'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'resistantBalanceAndFei': {
+        'inputs': [],
+        'name': 'resistantBalanceAndFei',
+        'outputs': [
+            {
+                'internalType': 'uint256',
+                'name': '_resistantBalance',
+                'type': 'uint256',
+            },
+            {
+                'internalType': 'uint256',
+                'name': '_resistantFei',
+                'type': 'uint256',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+}
+
+
 #
 # # deposit balance getters
 #
@@ -28,7 +57,7 @@ async def async_get_deposit_balance(
     """get token balance of a particular deposit"""
     return await rpc.async_eth_call(
         to_address=deposit,
-        function_name='balance',
+        function_abi=function_abis['balance'],
         block_number=block,
         provider=provider,
     )
@@ -41,7 +70,7 @@ async def async_get_deposits_balances(
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_addresses=deposits,
-        function_name='balance',
+        function_abi=function_abis['balance'],
         block_number=block,
         provider=provider,
     )
@@ -54,7 +83,7 @@ async def async_get_deposit_balance_by_block(
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_address=deposit,
-        function_name='balance',
+        function_abi=function_abis['balance'],
         block_numbers=blocks,
         provider=provider,
     )
@@ -68,7 +97,7 @@ async def async_get_deposit_resistant_balance_and_fei(
     """get token balance of a particular deposit"""
     return await rpc.async_eth_call(
         to_address=deposit,
-        function_name='resistantBalanceAndFei',
+        function_abi=function_abis['resistantBalanceAndFei'],
         block_number=block,
         provider=provider,
     )
@@ -81,7 +110,7 @@ async def async_get_deposits_resistant_balances_and_fei(
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_addresses=deposits,
-        function_name='resistantBalanceAndFei',
+        function_abi=function_abis['resistantBalanceAndFei'],
         block_number=block,
         provider=provider,
     )
@@ -94,7 +123,7 @@ async def async_get_deposit_resistant_balance_and_fei_by_block(
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_address=deposit,
-        function_name='resistantBalanceAndFei',
+        function_abi=function_abis['resistantBalanceAndFei'],
         block_numbers=blocks,
         provider=provider,
     )
