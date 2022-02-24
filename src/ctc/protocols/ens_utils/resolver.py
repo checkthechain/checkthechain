@@ -87,7 +87,7 @@ async def async_get_text_record(key, name=None, node=None):
     )
 
 
-async def async_get_text_records(name=None, node=None):
+async def async_get_text_records(name=None, node=None, keys=None):
     """
     https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records
     """
@@ -95,12 +95,11 @@ async def async_get_text_records(name=None, node=None):
     if node is None:
         node = hash_name(name)
 
-    text_changes = await async_get_text_changes(name=name, node=node)
-    keys = list(text_changes['arg__key'].values)
-    coroutines = [
-        async_get_text_record(key=key, node=node)
-        for key in keys
-    ]
+    if keys is None:
+        text_changes = await async_get_text_changes(name=name, node=node)
+        keys = list(text_changes['arg__key'].values)
+
+    coroutines = [async_get_text_record(key=key, node=node) for key in keys]
     values = await asyncio.gather(*coroutines)
     return dict(zip(keys, values))
 
@@ -119,4 +118,31 @@ async def async_get_text_changes(name=None, node=None):
 
     mask = events['arg__node'] == node
     return events[mask]
+
+
+async def async_get_content_hash(name=None, node=None):
+
+    if node is None:
+        node = hash_name(name)
+
+    return rpc.async_eth_call(
+        to_address=ens_directory.resolver,
+        function_name='contentHash',
+        function_parameters=[node],
+    )
+
+
+async def async_get_expiration(name):
+
+    if not name.endswith('.eth'):
+        raise NotImplementedError('only implemented for .eth domains')
+
+    label = name.split('.')[-2]
+    label_id = binary.keccak_text(label, output_format='integer')
+
+    return await rpc.async_eth_call(
+        to_address=ens_directory.base_registrar,
+        function_name='nameExpires',
+        function_parameters=[label_id],
+    )
 

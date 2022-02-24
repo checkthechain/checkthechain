@@ -1,3 +1,6 @@
+import toolstr
+import tooltime
+
 from ctc import evm
 from ctc import rpc
 
@@ -22,12 +25,36 @@ async def ens_command(args, block):
             block = evm.standardize_block_number(block)
 
         if '.' in arg:
-            output = await ens_utils.async_resolve_name(arg, block=block)
+            name = arg
+            address = await ens_utils.async_resolve_name(name, block=block)
         elif evm.is_address_str(arg):
-            output = await ens_utils.async_reverse_lookup(arg, block=block)
+            address = arg
+            name = await ens_utils.async_reverse_lookup(address, block=block)
         else:
             raise Exception('could not parse inputs')
-        print(output)
+
+        owner = await ens_utils.async_get_owner(name=name)
+        expiration = await ens_utils.async_get_expiration(name=name)
+        resolver = await ens_utils.async_get_resolver(name=name)
+
+        toolstr.print_text_box(name)
+        print('- address:', address)
+        print('- owner:', owner)
+        print('- resolver:', resolver)
+        print('- namehash:', ens_utils.hash_name(name))
+        # print('- registered:', )
+        print('- expiration:', tooltime.timestamp_to_iso(expiration).replace('T', ' '))
+
+        text_records = await ens_utils.async_get_text_records(name=name)
+        if len(text_records) > 0:
+            print()
+            print()
+            toolstr.print_header('Text Records')
+            for key, value in sorted(text_records.items()):
+                print('-', key + ':', value)
+        else:
+            print('- no text records')
+
         await rpc.async_close_http_session()
 
     else:
