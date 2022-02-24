@@ -1,4 +1,3 @@
-
 usd_token = '0x1111111111111111111111111111111111111111'
 
 
@@ -144,6 +143,37 @@ deposit_metadata = {
         'name': 'Balancer FEI-WETH',
         'platform': 'Balancer',
     },
+}
+
+deposit_names = {
+    # BAL
+    '0xcd1ac0014e2ebd972f40f24df1694e6f528b2fd4': 'Balancer BAL-WETH',
+    # LUSD
+    '0xf846ee6e8ee9a6fbf51c7c65105cabc041c048ad': 'Fuse Pool 8 LUSD',
+    '0x374628ebe7ef6aca0574e750b618097531a26ff8': 'B Protocol LUSD',
+    '0x6026a1559cdd44a63c5ca9a078cc996a9eb68abb': 'Fuse Pool 7 LUSD',
+    '0x8c51e4532cc745cf3dfec5cebd835d07e7ba1002': 'Fuse Pool 91 LUSD',
+    # DPI
+    '0x9a774a1b1208c323eded05e6daf592e6e59caa55': 'Fuse Pool 19 DPI',
+    '0xb250926e75b1cc6c53e77bb9426baac14ab1e24c': 'DAO Timelock DPI',
+    # RAI
+    '0x7339ca4ac94020b83a34f5edfa6e0f26986c434b': 'DAO Timelock RAI',
+    '0x1267b39c93711dd374deab15e0127e4adb259be0': 'AAVE RAI',
+    '0xcce230c087f31032fc17621a2cf5e425a0b80c96': 'Fuse Pool 9 RAI',
+    # DAI
+    '0x9cc46ab5a714f7cd24c59f33c5769039b5872491': 'Fuse Pool 8 DAI',
+    '0xfde7077aaecdaf2c4b85261aa858c96a7e737a61': 'Compound DAI',
+    # WETH
+    '0x5e9fa7d783a7f7d4626ce450c8bd2ebbb26dfdb2': 'DAO Timelock ETH',
+    '0xc68412b72e68c30d4e6c0854b439cbbe957146e4': 'Fuse Pool 146 ETH',
+    '0x43ef03755991056681f01ee2182234ef6af1f658': 'AAVE ETH',
+    '0x0735e14d28ed395048d5fa4a8dbe6e6eb9fc0470': 'Compound ETH',
+    '0xa271ff86426c7fdaaae72603e6ce68c892d69ed7': 'Lido stETH',
+    '0x0961d2a545e0c1201b313d14c57023682a546b9d': 'Tokemak tWETH',
+    # agEUR
+    '0x485d23ce5725ecde46ca9033012984d90b514ffd': 'DAO Timelock agEUR',
+    # CREAM
+    '0x3a1838ac9eca864054bebb82c32455dd7d7fc89c': 'CREAM Hack Repayment',
 }
 
 
