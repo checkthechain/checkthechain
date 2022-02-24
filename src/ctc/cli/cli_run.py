@@ -31,6 +31,7 @@ command_index = {
     ('erc20', 'balances'): 'ctc.cli.commands.data.erc20.balances_command',
     ('erc20', 'transfers'): 'ctc.cli.commands.data.erc20.transfers_command',
     ('events',): 'ctc.cli.commands.data.events_command',
+    ('find',): 'ctc.cli.commands.data.find_command',
     ('gas',): 'ctc.cli.commands.data.gas_command',
     ('transaction',): 'ctc.cli.commands.data.transaction_command',
     #
