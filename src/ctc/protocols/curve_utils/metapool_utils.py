@@ -38,9 +38,12 @@ async def async_get_metapool_trade(
 
     if token_bought in parent_coins:
 
-        # ? convert these to get_token_index()
-        sold_index = metadata['token_symbols'].index(token_sold)
-        bought_index = metadata['token_addresses'].index(parent_lp)
+        sold_index = await pool_metadata.async_get_token_index(
+            pool=metapool, token=token_sold, metadata=metadata
+        )
+        bought_index = await pool_metadata.async_get_token_index(
+            pool=metapool, token=parent_lp, metadata=metadata
+        )
 
         if input_normalized:
             amount_sold *= 10 ** metadata['token_decimals'][sold_index]
@@ -70,8 +73,12 @@ async def async_get_metapool_trade(
 
     elif token_sold in parent_coins:
 
-        sold_index = metadata['token_addresses'].index(parent_lp)
-        bought_index = metadata['token_symbols'].index(token_bought)
+        sold_index = await pool_metadata.async_get_token_index(
+            pool=metapool, token=parent_lp, metadata=metadata
+        )
+        bought_index = await pool_metadata.async_get_token_index(
+            pool=metapool, token=token_bought, metadata=metadata
+        )
 
         raise NotImplementedError()
 

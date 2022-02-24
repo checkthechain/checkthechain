@@ -1,6 +1,8 @@
 from ctc import evm
 from ctc import rpc
 
+from . import pool_metadata
+
 
 async def async_get_virtual_price(pool, provider=None):
     return await rpc.async_eth_call(
@@ -15,7 +17,7 @@ async def async_get_lp_withdrawal(
     pool, amount_lp, token_withdrawn, provider=None
 ):
 
-    token_index = async_get_token_index(
+    token_index = await pool_metadata.async_get_token_index(
         pool=pool,
         token=token_withdrawn,
         provider=provider,
@@ -36,7 +38,7 @@ async def async_get_pool_state(pool, n_tokens=None, block=None, provider=None):
         block=block,
         provider=provider,
     )
-    token_addresses = await async_get_pool_addresses(
+    token_addresses = await pool_metadata.async_get_pool_addresses(
         pool,
         n_tokens=n_tokens,
         provider=provider,
