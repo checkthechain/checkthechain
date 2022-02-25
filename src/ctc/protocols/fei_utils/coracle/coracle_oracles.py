@@ -151,10 +151,13 @@ async def async_get_token_price_by_block(
 
 async def async_get_tokens_prices(
     tokens: typing.Sequence[spec.Address],
-    block: spec.BlockReference = 'latest',
+    block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
+
+    if block is None:
+        block = 'latest'
 
     block = await evm.async_block_number_to_int(block, provider=provider)
     oracles = await async_get_tokens_oracles(

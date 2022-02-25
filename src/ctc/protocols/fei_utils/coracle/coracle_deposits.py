@@ -27,11 +27,13 @@ function_abis = {
 
 async def async_get_tokens_deposits(
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
-    block: spec.BlockReference = 'latest',
+    block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> dict[spec.Address, typing.Tuple[spec.ContractAddress, ...]]:
     """get all deposits of all tokens in pcv"""
 
+    if block is None:
+        block = 'latest'
     block = await evm.async_block_number_to_int(block=block, provider=provider)
 
     # get tokens in pcv
@@ -58,13 +60,16 @@ async def async_get_tokens_deposits(
 
 async def async_get_token_deposits(
     token: spec.Address,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     wrapper: bool = False,
     provider: spec.ProviderSpec = None,
 ) -> typing.Tuple[spec.ContractAddress, ...]:
     """get list of a token's deposits"""
 
+    if block is None:
+        block = 'latest'
     block = await evm.async_block_number_to_int(block=block, provider=provider)
+
     coracle = coracle_spec.get_coracle_address(wrapper=wrapper, block=block)
     return await rpc.async_eth_call(
         to_address=coracle,
@@ -77,7 +82,7 @@ async def async_get_token_deposits(
 
 async def async_get_deposit_token(
     deposit: spec.ContractAddress,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> spec.Address:
     """get the token address of a deposit"""

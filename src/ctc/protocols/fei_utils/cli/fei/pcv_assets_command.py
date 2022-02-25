@@ -11,16 +11,23 @@ from ctc.protocols import fei_utils
 def get_command_spec():
     return {
         'f': async_pcv_assets_command,
+        'args': [
+            {'name': '--block'},
+        ],
     }
 
 
-async def async_pcv_assets_command():
-    await async_print_pcv_assets()
+async def async_pcv_assets_command(block):
+    await async_print_pcv_assets(block=block)
     await rpc.async_close_http_session()
 
 
-async def async_print_pcv_assets():
-    tokens_deposits = await fei_utils.async_get_tokens_deposits()
+async def async_print_pcv_assets(block):
+
+    if block is not None:
+        block = int(block)
+
+    tokens_deposits = await fei_utils.async_get_tokens_deposits(block=block)
 
     non_fei_deposits = {
         k: v
@@ -33,20 +40,23 @@ async def async_print_pcv_assets():
     }
     pcv_tokens = list(non_fei_deposits.keys())
     symbols_task = asyncio.create_task(
-        evm.async_get_erc20s_symbols(pcv_tokens)
+        evm.async_get_erc20s_symbols(pcv_tokens, block=block)
     )
 
     # get deposit balances
     deposit_tasks = []
     for token, deposits in non_fei_deposits.items():
         deposit_task = asyncio.create_task(
-            fei_utils.async_get_deposits_resistant_balances_and_fei(deposits)
+            fei_utils.async_get_deposits_resistant_balances_and_fei(
+                deposits, block=block
+            )
         )
         deposit_tasks.append(deposit_task)
 
     # token prices
     token_prices_list = await fei_utils.async_get_tokens_prices(
-        tokens=pcv_tokens
+        tokens=pcv_tokens,
+        block=block,
     )
     token_prices = dict(zip(pcv_tokens, token_prices_list))
 

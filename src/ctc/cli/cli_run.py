@@ -44,7 +44,7 @@ command_index = {
     ('ens', 'records'): 'ctc.protocols.ens_utils.cli.ens.records_command',
     ('ens', 'resolve'): 'ctc.protocols.ens_utils.cli.ens.resolve_command',
     ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.ens.reverse_command',
-    ('fei', 'payload'): 'ctc.protocols.fei_utils.cli.fei.payload_command',
+    ('fei', 'analytics'): 'ctc.protocols.fei_utils.cli.fei.analytics_command',
     ('fei', 'pcv'): 'ctc.protocols.fei_utils.cli.fei.pcv_command',
     ('fei', 'pcv', 'assets'): 'ctc.protocols.fei_utils.cli.fei.pcv_assets_command',
     ('fei', 'pcv', 'deposits'): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',

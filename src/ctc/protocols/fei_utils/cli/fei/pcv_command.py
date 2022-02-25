@@ -9,13 +9,20 @@ from ctc.protocols import fei_utils
 def get_command_spec():
     return {
         'f': async_pcv_command,
+        'args': [
+            {'name': '--block'},
+        ],
     }
 
 
-async def async_pcv_command():
-    pcv_stats = await fei_utils.async_get_pcv_stats()
+async def async_pcv_command(block):
+
+    if block is not None:
+        block = int(block)
+
+    pcv_stats = await fei_utils.async_get_pcv_stats(block=block)
     FEI = directory.get_erc20_address('FEI')
-    total_fei = await evm.async_get_erc20_total_supply(FEI)
+    total_fei = await evm.async_get_erc20_total_supply(FEI, block=block)
 
     total_pcv = pcv_stats['pcv'] / 1e18
     user_fei = pcv_stats['user_fei'] / 1e18
@@ -23,11 +30,11 @@ async def async_pcv_command():
     protocol_equity = total_pcv - user_fei
     cr = total_pcv / user_fei
 
-    output = 'list'
-    # output = 'table'
+    # output = 'list'
+    output = 'table'
 
+    format_kwargs = {'order_of_magnitude': True, 'prefix': '$'}
     if output == 'list':
-        format_kwargs = {'order_of_magnitude': True, 'prefix': '$'}
         toolstr.print_text_box('Fei PCV Summary')
         print('- total PCV:', toolstr.format(total_pcv, **format_kwargs))
         print('- total FEI:', toolstr.format(total_fei, **format_kwargs))
