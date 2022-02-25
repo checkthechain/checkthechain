@@ -32,8 +32,14 @@ async def async_print_pcv_deposits():
         ]
     }
     pcv_tokens = list(non_fei_deposits.keys())
-    symbols_task = asyncio.create_task(
-        evm.async_get_erc20s_symbols(pcv_tokens)
+    symbols_task = asyncio.create_task(evm.async_get_erc20s_symbols(pcv_tokens))
+
+    # fei balances
+    fei_deposits = await fei_utils.async_get_token_deposits(
+        '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
+    )
+    fei_balances_task = asyncio.create_task(
+        fei_utils.async_get_deposits_balances(fei_deposits)
     )
 
     # get deposit balances
@@ -95,9 +101,36 @@ async def async_print_pcv_deposits():
     headers = [
         'asset',
         'balance',
-        'address',
         'name',
+        'address',
     ]
     tooltable.print_table(rows, headers=headers)
     print()
+
+    toolstr.print_text_box('FEI Deployments')
+
+    fei_balances = await fei_balances_task
+
+    rows = []
+    for address, fei_balance in zip(fei_deposits, fei_balances):
+        name = ''
+        if address in fei_utils.deposit_metadata:
+            name = fei_utils.deposit_metadata[address]['name']
+        if address in fei_utils.deposit_names:
+            name = fei_utils.deposit_names[address]
+        row = [
+            'FEI',
+            toolstr.format(
+                fei_balance / 1e18,
+                order_of_magnitude=True,
+                trailing_zeros=True,
+                decimals=2,
+                prefix='$',
+            ),
+            name,
+            address,
+        ]
+        rows.append(row)
+    headers = ['asset', 'balance', 'name', 'address']
+    tooltable.print_table(rows, headers=headers)
 
