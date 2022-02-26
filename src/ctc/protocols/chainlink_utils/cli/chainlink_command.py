@@ -11,12 +11,12 @@ def get_command_spec():
     return {
         'f': async_chainlink_command,
         'args': [
-            {'name': 'feed', 'kwargs': {'nargs': '+'}},
-            {'name': '--blocks', 'kwargs': {'nargs': '+'}},
-            {'name': '--output', 'kwargs': {'default': 'stdout'}},
-            {'name': '--overwrite', 'kwargs': {}},
-            {'name': '--provider', 'kwargs': {}},
-            {'name': '--all-fields', 'kwargs': {'action': 'store_true'}},
+            {'name': 'feed', 'nargs': '+'},
+            {'name': '--blocks', 'nargs': '+'},
+            {'name': '--output', 'default': 'stdout'},
+            {'name': '--overwrite'},
+            {'name': '--provider'},
+            {'name': '--all-fields', 'action': 'store_true'},
             # {'name': '--no-interpolate', 'kwargs': {}},
         ],
     }

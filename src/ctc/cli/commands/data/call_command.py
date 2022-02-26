@@ -7,8 +7,8 @@ def get_command_spec():
         'args': [
             {'name': 'to_address'},
             {'name': 'function_name'},
-            {'name': 'args', 'kwargs': {'nargs': '*'}},
-            {'name': '--quiet', 'kwargs': {'action': 'store_true'}},
+            {'name': 'args', 'nargs': '*'},
+            {'name': '--quiet', 'action': 'store_true'},
         ],
     }
 

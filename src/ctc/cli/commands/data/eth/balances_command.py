@@ -17,13 +17,13 @@ def get_command_spec():
     return {
         'f': async_balances_command,
         'args': [
-            {'name': 'wallets', 'kwargs': {'nargs': '+'}},
+            {'name': 'wallets', 'nargs': '+'},
             {'name': '--block'},
-            {'name': '--blocks', 'kwargs': {'nargs': '+'}},
+            {'name': '--blocks', 'nargs': '+'},
             #
-            {'name': '--raw', 'kwargs': {'action': 'store_true'}},
-            {'name': '--output', 'kwargs': {'default': 'stdout'}},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
+            {'name': '--raw', 'action': 'store_true'},
+            {'name': '--output', 'default': 'stdout'},
+            {'name': '--overwrite', 'action': 'store_true'},
         ],
     }
 

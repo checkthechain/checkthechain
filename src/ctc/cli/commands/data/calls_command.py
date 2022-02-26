@@ -10,13 +10,13 @@ def get_command_spec():
     return {
         'f': async_calls_command,
         'args': [
-            {'name': 'args', 'kwargs': {'nargs': '*'}},
-            {'name': '--to-addresses', 'kwargs': {'nargs': '+'}},
-            {'name': '--blocks', 'kwargs': {'nargs': '+'}},
-            {'name': '--block', 'kwargs': {}},
-            {'name': '--quiet', 'kwargs': {'action': 'store_true'}},
-            {'name': '--output', 'kwargs': {'default': 'stdout'}},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
+            {'name': 'args', 'nargs': '*'},
+            {'name': '--to-addresses', 'nargs': '+'},
+            {'name': '--blocks', 'nargs': '+'},
+            {'name': '--block'},
+            {'name': '--quiet', 'action': 'store_true'},
+            {'name': '--output', 'default': 'stdout'},
+            {'name': '--overwrite', 'action': 'store_true'},
         ],
     }
 

@@ -8,8 +8,8 @@ def get_command_spec():
     return {
         'f': fuse_command,
         'args': [
-            {'name': 'pool', 'kwargs': {'nargs': '?'}},
-            {'name': '--block', 'kwargs': {'default': 'latest'}},
+            {'name': 'pool', 'nargs': '?'},
+            {'name': '--block', 'default': 'latest'},
         ],
     }
 

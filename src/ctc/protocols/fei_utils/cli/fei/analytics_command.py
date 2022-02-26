@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import time
@@ -13,9 +12,9 @@ def get_command_spec():
     return {
         'f': async_payload_command,
         'args': [
-            {'name': 'timescale', 'kwargs': {'nargs': '?', 'default': None}},
+            {'name': 'timescale', 'nargs': '?', 'default': None},
             {'name': '--path'},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
+            {'name': '--overwrite', 'action': 'store_true'},
         ],
     }
 

@@ -6,9 +6,9 @@ def get_command_spec():
     return {
         'f': async_block_command,
         'args': [
-            {'name': 'block', 'kwargs': {'nargs': '?'}},
-            {'name': '--timestamp', 'kwargs': {'type': int}},
-            {'name': '--verbose', 'kwargs': {'action': 'store_true'}},
+            {'name': 'block', 'nargs': '?'},
+            {'name': '--timestamp', 'type': int},
+            {'name': '--verbose', 'action': 'store_true'},
         ],
     }
 

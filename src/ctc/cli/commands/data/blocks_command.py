@@ -14,11 +14,11 @@ def get_command_spec():
     return {
         'f': async_block_command,
         'args': [
-            {'name': 'blocks', 'kwargs': {'nargs': '+'}},
-            {'name': '--attributes', 'kwargs': {'nargs': '+'}},
-            {'name': '--output', 'kwargs': {'default': 'stdout'}},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
-            {'name': '--provider', 'kwargs': {}},
+            {'name': 'blocks', 'nargs': '+'},
+            {'name': '--attributes', 'nargs': '+'},
+            {'name': '--output', 'default': 'stdout'},
+            {'name': '--overwrite', 'action': 'store_true'},
+            {'name': '--provider'},
         ],
     }
 

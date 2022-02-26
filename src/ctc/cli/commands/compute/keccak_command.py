@@ -6,9 +6,9 @@ def get_command_spec():
         'f': keccack_command,
         'args': [
             {'name': 'data'},
-            {'name': '--text', 'kwargs': {'action': 'store_true'}},
-            {'name': '--hex', 'kwargs': {'action': 'store_true'}},
-            {'name': '--raw', 'kwargs': {'action': 'store_true'}},
+            {'name': '--text', 'action': 'store_true'},
+            {'name': '--hex', 'action': 'store_true'},
+            {'name': '--raw', 'action': 'store_true'},
         ],
     }
 

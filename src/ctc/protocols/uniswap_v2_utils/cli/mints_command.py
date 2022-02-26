@@ -9,9 +9,9 @@ def get_command_spec():
         'f': async_burns_command,
         'args': [
             {'name': 'pool'},
-            {'name': '--blocks', 'kwargs': {'nargs': '+'}},
+            {'name': '--blocks', 'nargs': '+'},
             {'name': '--output'},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
+            {'name': '--overwrite', 'action': 'store_true'},
         ],
     }
 

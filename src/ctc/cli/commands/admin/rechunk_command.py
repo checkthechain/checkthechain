@@ -8,22 +8,24 @@ def get_command_spec():
     return {
         'f': rechunk_command,
         'args': [
-            {'name': 'contract_address', 'kwargs': {'nargs': '?'}},
-            {'name': 'event', 'kwargs': {'nargs': '?', 'default': None}},
+            {'name': 'contract_address', 'nargs': '?'},
+            {'name': 'event', 'nargs': '?', 'default': None},
             {'name': '--network'},
             {
                 'name': '--all',
-                'kwargs': {'action': 'store_true', 'dest': 'all_events'},
+                'action': 'store_true',
+                'dest': 'all_events',
             },
-            {'name': '--start_block', 'kwargs': {'type': int}},
-            {'name': '--end_block', 'kwargs': {'type': int}},
-            {'name': '--n_chunks', 'kwargs': {'type': int}},
+            {'name': '--start_block', 'type': int},
+            {'name': '--end_block', 'type': int},
+            {'name': '--n_chunks', 'type': int},
             {
                 'name': '--chunk_target_bytes',
-                'kwargs': {'type': float, 'required': True},
+                'type': float,
+                'required': True,
             },
-            {'name': '--dry', 'kwargs': {'action': 'store_true'}},
-            {'name': '--verbose', 'kwargs': {'action': 'store_true'}},
+            {'name': '--dry', 'action': 'store_true'},
+            {'name': '--verbose', 'action': 'store_true'},
         ],
     }
 

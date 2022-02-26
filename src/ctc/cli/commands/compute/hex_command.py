@@ -1,12 +1,14 @@
+import toolcli
+
 from ctc import binary
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': hex_command,
         'args': [
             {'name': 'data'},
-            {'name': '--raw', 'kwargs': {'action': 'store_true'}},
+            {'name': '--raw', 'action': 'store_true'},
         ],
     }
 

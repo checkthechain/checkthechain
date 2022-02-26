@@ -8,9 +8,9 @@ def get_command_spec():
         'f': async_transfers_command,
         'args': [
             {'name': 'erc20'},
-            {'name': '--blocks', 'kwargs': {'nargs': '+'}},
-            {'name': '--output', 'kwargs': {'default': 'stdout'}},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
+            {'name': '--blocks', 'nargs': '+'},
+            {'name': '--output', 'default': 'stdout'},
+            {'name': '--overwrite', 'action': 'store_true'},
         ],
     }
 

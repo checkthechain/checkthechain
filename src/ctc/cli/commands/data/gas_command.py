@@ -27,9 +27,9 @@ def get_command_spec():
     return {
         'f': async_gas_command,
         'args': [
-            {'name': '--last', 'kwargs': {'nargs': '+'}},
-            {'name': '--output', 'kwargs': {'default': 'stdout'}},
-            {'name': '--overwrite', 'kwargs': {'action': 'store_true'}},
+            {'name': '--last', 'nargs': '+'},
+            {'name': '--output', 'default': 'stdout'},
+            {'name': '--overwrite', 'action': 'store_true'},
         ],
     }
 

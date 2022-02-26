@@ -16,7 +16,7 @@ def get_command_spec():
         'f': async_pool_command,
         'args': [
             {'name': 'pool'},
-            {'name': '--block', 'kwargs': {'default': 'latest'}},
+            {'name': '--block', 'default': 'latest'},
         ],
     }
 

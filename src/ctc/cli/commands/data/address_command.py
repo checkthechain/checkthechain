@@ -9,7 +9,7 @@ def get_command_spec():
         'f': async_address_command,
         'args': [
             {'name': 'address'},
-            {'name': ['-v', '--verbose'], 'kwargs': {'action': 'store_true'}},
+            {'name': ['-v', '--verbose'], 'action': 'store_true'},
         ],
     }
 

@@ -11,7 +11,7 @@ def get_command_spec():
             {'name': 'erc20_address'},
             {'name': 'wallet_address'},
             {'name': '--block'},
-            {'name': '--raw', 'kwargs': {'action': 'store_true'}},
+            {'name': '--raw', 'action': 'store_true'},
         ],
     }
 
