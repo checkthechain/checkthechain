@@ -6,6 +6,7 @@ from ctc.protocols import ens_utils
 def get_command_spec():
     return {
         'f': async_owner_command,
+        'help': 'output owner of ENS name',
         'args': [
             {'name': 'name'},
             {'name': '--block'},

@@ -7,6 +7,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': add_proxy_abi_comamand,
+        'help': 'download proxy abi for contract',
         'args': [
             {'name': 'contract_address'},
             {'name': 'implementation_address'},

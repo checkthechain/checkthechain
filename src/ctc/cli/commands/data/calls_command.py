@@ -9,6 +9,7 @@ from ctc.cli import cli_utils
 def get_command_spec():
     return {
         'f': async_calls_command,
+        'help': 'output the result of multiple calls',
         'args': [
             {'name': 'args', 'nargs': '*'},
             {'name': '--to-addresses', 'nargs': '+'},

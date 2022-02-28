@@ -10,6 +10,7 @@ from ctc.protocols import ens_utils
 def get_command_spec():
     return {
         'f': ens_command,
+        'help': 'summarize ENS entry',
         'args': [
             {'name': 'args', 'kwargs': {'nargs': '+'}},
             {'name': '--block'},

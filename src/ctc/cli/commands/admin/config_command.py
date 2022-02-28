@@ -6,6 +6,7 @@ import ctc.config
 def get_command_spec():
     return {
         'f': config_command,
+        'help': 'print current config information',
     }
 
 

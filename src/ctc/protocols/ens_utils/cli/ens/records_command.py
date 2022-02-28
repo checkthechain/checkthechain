@@ -5,6 +5,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_records_command,
+        'help': 'output text records of ENS name',
         'args': [
             {'name': 'name'},
         ],

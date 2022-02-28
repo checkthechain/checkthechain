@@ -5,6 +5,7 @@ from ctc import directory
 def get_command_spec():
     return {
         'f': async_find_command,
+        'help': 'search for item in directory',
         'args': [
             {'name': 'query'},
         ]

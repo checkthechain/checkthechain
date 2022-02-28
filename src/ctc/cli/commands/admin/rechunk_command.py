@@ -7,6 +7,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': rechunk_command,
+        'help': 'rechunk events by specific chunk size',
         'args': [
             {'name': 'contract_address', 'nargs': '?'},
             {'name': 'event', 'nargs': '?', 'default': None},

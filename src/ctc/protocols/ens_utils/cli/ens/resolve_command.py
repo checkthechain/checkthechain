@@ -6,6 +6,7 @@ from ctc.protocols import ens_utils
 def get_command_spec():
     return {
         'f': async_resolve_command,
+        'help': 'resolve ENS name',
         'args': [
             {'name': 'name'},
             {'name': '--block'},

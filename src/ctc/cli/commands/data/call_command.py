@@ -4,6 +4,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_call_command,
+        'help': 'output result of a call',
         'args': [
             {'name': 'to_address'},
             {'name': 'function_name'},

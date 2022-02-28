@@ -11,6 +11,7 @@ from ctc.protocols import fei_utils
 def get_command_spec():
     return {
         'f': async_pcv_assets_command,
+        'help': 'output summary of Fei PCV assets',
         'args': [
             {'name': '--block'},
         ],

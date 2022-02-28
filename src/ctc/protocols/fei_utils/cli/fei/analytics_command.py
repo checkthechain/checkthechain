@@ -11,6 +11,7 @@ from ctc.protocols import fei_utils
 def get_command_spec():
     return {
         'f': async_payload_command,
+        'help': 'output data payload for app.fei.money/analytics',
         'args': [
             {'name': 'timescale', 'nargs': '?', 'default': None},
             {'name': '--path'},

@@ -7,6 +7,7 @@ from ctc.protocols import rari_utils
 def get_command_spec():
     return {
         'f': fuse_command,
+        'help': 'summarize fuse pool, token, or platform',
         'args': [
             {'name': 'pool', 'nargs': '?'},
             {'name': '--block', 'default': 'latest'},

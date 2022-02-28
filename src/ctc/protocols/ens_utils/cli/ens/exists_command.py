@@ -6,6 +6,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_exists_command,
+        'help': 'output whether ENS name exists',
         'args': [
             {'name': 'name'},
             {'name': '--block'},

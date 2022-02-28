@@ -7,6 +7,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': transaction_command,
+        'help': 'summarize transaction',
         'args': [
             {'name': 'transaction'},
             {'name': '--sort'},

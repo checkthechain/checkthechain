@@ -7,6 +7,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_burns_command,
+        'help': 'output information about pool burns',
         'args': [
             {'name': 'pool'},
             {'name': '--blocks', 'nargs': '+'},

@@ -7,6 +7,7 @@ import ctc.config
 def get_command_spec():
     return {
         'f': edit_config_command,
+        'help': 'edit config values',
     }
 
 

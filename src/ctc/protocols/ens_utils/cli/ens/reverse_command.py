@@ -6,6 +6,7 @@ from ctc.protocols import ens_utils
 def get_command_spec():
     return {
         'f': async_reverse_command,
+        'help': 'reverse ENS lookup address',
         'args': [
             {'name': 'name'},
             {'name': '--block'},

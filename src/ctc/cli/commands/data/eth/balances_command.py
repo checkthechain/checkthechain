@@ -16,6 +16,7 @@ from ctc.cli import cli_utils
 def get_command_spec():
     return {
         'f': async_balances_command,
+        'help': 'output ETH balance across blocks or addresses',
         'args': [
             {'name': 'wallets', 'nargs': '+'},
             {'name': '--block'},

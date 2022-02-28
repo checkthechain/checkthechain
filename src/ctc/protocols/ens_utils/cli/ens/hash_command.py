@@ -1,10 +1,10 @@
-from ctc import evm
 from ctc.protocols import ens_utils
 
 
 def get_command_spec():
     return {
         'f': hash_command,
+        'help': 'output hash of ENS name',
         'args': [
             {'name': 'name'},
         ]

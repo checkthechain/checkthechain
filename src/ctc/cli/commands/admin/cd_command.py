@@ -10,6 +10,7 @@ def get_command_spec():
             {'name': 'dirname'},
         ],
         'special': {'cd': True},
+        'help': 'change working directory to specified location',
     }
 
 

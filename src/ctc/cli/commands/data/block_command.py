@@ -5,6 +5,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_block_command,
+        'help': 'summarize block',
         'args': [
             {'name': 'block', 'nargs': '?'},
             {'name': '--timestamp', 'type': int},

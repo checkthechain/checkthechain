@@ -14,6 +14,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_pool_command,
+        'help': 'summarize pool',
         'args': [
             {'name': 'pool'},
             {'name': '--block', 'default': 'latest'},

@@ -10,6 +10,7 @@ from ctc.protocols import chainlink_utils
 def get_command_spec():
     return {
         'f': async_chainlink_command,
+        'help': 'output Chainlink feed data',
         'args': [
             {'name': 'feed', 'nargs': '+'},
             {'name': '--blocks', 'nargs': '+'},

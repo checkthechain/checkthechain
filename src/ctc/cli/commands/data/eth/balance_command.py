@@ -8,6 +8,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_balance_command,
+        'help': 'output ETH balance of address',
         'args': [
             {'name': 'address'},
             {'name': '--block'},

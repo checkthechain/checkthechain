@@ -11,6 +11,7 @@ from ctc.protocols import fei_utils
 def get_command_spec():
     return {
         'f': async_pcv_deposits_command,
+        'help': 'output summary of Fei PCV deposits',
         'args': [
             {'name': '--block'},
         ],

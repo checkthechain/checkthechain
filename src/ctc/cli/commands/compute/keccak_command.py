@@ -4,6 +4,7 @@ from ctc import binary
 def get_command_spec():
     return {
         'f': keccack_command,
+        'help': 'compute keccak hash of data',
         'args': [
             {'name': 'data'},
             {'name': '--text', 'action': 'store_true'},

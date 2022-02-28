@@ -7,6 +7,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_address_command,
+        'help': 'summarize address',
         'args': [
             {'name': 'address'},
             {'name': ['-v', '--verbose'], 'action': 'store_true'},

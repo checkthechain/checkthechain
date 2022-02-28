@@ -21,6 +21,7 @@ from ctc.cli import cli_utils
 def get_command_spec():
     return {
         'f': async_balances_command,
+        'help': 'output ERC20 balances across blocks, addresses or tokens',
         'args': [
             {'name': 'args', 'nargs': '+'},
             {'name': '--block'},

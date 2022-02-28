@@ -26,6 +26,7 @@ from ctc.cli import cli_utils
 def get_command_spec():
     return {
         'f': async_gas_command,
+        'help': 'output gas summary of block range',
         'args': [
             {'name': '--last', 'nargs': '+'},
             {'name': '--output', 'default': 'stdout'},

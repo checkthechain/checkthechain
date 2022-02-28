@@ -7,6 +7,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_balance_command,
+        'help': 'output an ERC20 balance',
         'args': [
             {'name': 'erc20_address'},
             {'name': 'wallet_address'},

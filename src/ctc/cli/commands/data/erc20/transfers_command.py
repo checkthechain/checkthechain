@@ -6,6 +6,7 @@ from ctc.cli import cli_utils
 def get_command_spec():
     return {
         'f': async_transfers_command,
+        'help': 'output information about ERC20 transfers',
         'args': [
             {'name': 'erc20'},
             {'name': '--blocks', 'nargs': '+'},
