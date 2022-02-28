@@ -1,5 +1,8 @@
 import toolcli
 
+import ctc
+
+
 command_index = {
     #
     # admin commands
@@ -56,11 +59,19 @@ command_index = {
 }
 
 
+description = 'if using ctc for the first time, run:\n    ctc setup'
+
+
 def run_cli(raw_command=None, **toolcli_kwargs):
 
     config = {
         'include_cd': True,
         'include_debug': True,
+        'include_version_subcommand': True,
+        'include_help_subcommand': True,
+        'version': ctc.__version__,
+        'description': description,
+        'base_command': 'ctc',
     }
     toolcli_kwargs = dict({'config': config}, **toolcli_kwargs)
 
