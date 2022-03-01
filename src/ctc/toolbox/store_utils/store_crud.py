@@ -70,6 +70,7 @@ def write_file_data(
     format: typing.Optional[DataFormat] = None,
     overwrite: bool = False,
     index_field: typing.Optional[str] = None,
+    create_directory: bool = True,
 ) -> None:
 
     if format is None:
@@ -77,6 +78,11 @@ def write_file_data(
 
     if os.path.isfile(path) and not overwrite:
         raise Exception('file already exists, use overwrite=True')
+
+    if create_directory:
+        dirpath = os.path.dirname(path)
+        if not os.path.isdir(dirpath):
+            os.makedirs(dirpath, exist_ok=True)
 
     with open(path, 'w') as f:
         write_buffer_data(
