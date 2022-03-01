@@ -3,16 +3,26 @@ from __future__ import annotations
 import os
 import shutil
 
-from . import fourbytes_spec
+from . import fourbyte_spec
 from . import io_utils
 from . import scrape_utils
 
 
+def local_function_signatures_exist() -> bool:
+    path = fourbyte_spec.get_default_path('function_signatures')
+    return os.path.isfile(path)
+
+
+def local_event_signatures_exist() -> bool:
+    path = fourbyte_spec.get_default_path('event_signatures')
+    return os.path.isfile(path)
+
+
 async def async_build_function_signatures_dataset() -> list[
-    fourbytes_spec.Entry
+    fourbyte_spec.Entry
 ]:
 
-    path = fourbytes_spec.get_default_path('function_signatures')
+    path = fourbyte_spec.get_default_path('function_signatures')
 
     # get current signatures and max_id
     if os.path.isfile(path):
@@ -47,9 +57,9 @@ async def async_build_function_signatures_dataset() -> list[
     return signatures
 
 
-async def async_build_event_signatures_dataset() -> list[fourbytes_spec.Entry]:
+async def async_build_event_signatures_dataset() -> list[fourbyte_spec.Entry]:
 
-    path = fourbytes_spec.get_default_path('event_signatures')
+    path = fourbyte_spec.get_default_path('event_signatures')
 
     # get current signatures and max_id
     if os.path.isfile(path):

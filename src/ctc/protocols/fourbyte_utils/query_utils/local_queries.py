@@ -4,7 +4,7 @@ import typing
 
 from ctc.toolbox import search_utils
 
-from .. import fourbytes_spec
+from .. import fourbyte_spec
 from .. import io_utils
 
 
@@ -14,7 +14,7 @@ def query_function_signature(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
     if hex_signature is None:
         signatures = io_utils.load_function_signatures()
         signatures_by_hex = None
@@ -37,7 +37,7 @@ def query_event_signature(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
     if hex_signature is None:
         signatures = io_utils.load_event_signatures()
         signatures_by_hex = None
@@ -55,15 +55,15 @@ def query_event_signature(
 
 
 def search_signatures(
-    signatures: typing.Optional[typing.Sequence[fourbytes_spec.Entry]] = None,
+    signatures: typing.Optional[typing.Sequence[fourbyte_spec.Entry]] = None,
     signatures_by_hex: typing.Optional[
-        typing.Mapping[str, typing.Sequence[fourbytes_spec.Entry]]
+        typing.Mapping[str, typing.Sequence[fourbyte_spec.Entry]]
     ] = None,
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     hex_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     inputs = {
         'id': id,

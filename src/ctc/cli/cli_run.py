@@ -11,7 +11,9 @@ command_index = {
     ('config',): 'ctc.cli.commands.admin.config_command',
     ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
     ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
-    ('download-proxy-abi',): 'ctc.cli.commands.admin.download_proxy_abi_command',
+    (
+        'download-proxy-abi',
+    ): 'ctc.cli.commands.admin.download_proxy_abi_command',
     ('setup',): 'ctc.cli.commands.admin.setup_command',
     ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
     #
@@ -49,13 +51,30 @@ command_index = {
     ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.ens.reverse_command',
     ('fei', 'analytics'): 'ctc.protocols.fei_utils.cli.fei.analytics_command',
     ('fei', 'pcv'): 'ctc.protocols.fei_utils.cli.fei.pcv_command',
-    ('fei', 'pcv', 'assets'): 'ctc.protocols.fei_utils.cli.fei.pcv_assets_command',
-    ('fei', 'pcv', 'deposits'): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
+    (
+        'fei',
+        'pcv',
+        'assets',
+    ): 'ctc.protocols.fei_utils.cli.fei.pcv_assets_command',
+    (
+        'fei',
+        'pcv',
+        'deposits',
+    ): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
     ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
     ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
     ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.burns_command',
     ('uniswap', 'swaps'): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
     ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.pool_command',
+    ('4byte',): 'ctc.protocols.fourbyte_utils.cli.fourbyte_command',
+    (
+        '4byte',
+        'build',
+    ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_build_command',
+    (
+        '4byte',
+        'path',
+    ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_path_command',
 }
 
 

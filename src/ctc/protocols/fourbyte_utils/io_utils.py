@@ -6,19 +6,19 @@ import toolcache
 
 from ctc.toolbox import store_utils
 
-from . import fourbytes_spec
+from . import fourbyte_spec
 
 
 def save_function_signatures(
-    signatures: typing.Sequence[fourbytes_spec.Entry],
+    signatures: typing.Sequence[fourbyte_spec.Entry],
     path: typing.Optional[str] = None,
     overwrite: bool = False,
     verbose: bool = True,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     # get default path
     if path is None:
-        path = fourbytes_spec.get_default_path('function_signatures')
+        path = fourbyte_spec.get_default_path('function_signatures')
 
     # save
     return save_signatures(
@@ -30,15 +30,15 @@ def save_function_signatures(
 
 
 def save_event_signatures(
-    signatures: typing.Sequence[fourbytes_spec.Entry],
+    signatures: typing.Sequence[fourbyte_spec.Entry],
     path: typing.Optional[str] = None,
     overwrite: bool = False,
     verbose: bool = True,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     # get default path
     if path is None:
-        path = fourbytes_spec.get_default_path('event_signatures')
+        path = fourbyte_spec.get_default_path('event_signatures')
 
     # save
     return save_signatures(
@@ -50,11 +50,11 @@ def save_event_signatures(
 
 
 def save_signatures(
-    signatures: typing.Sequence[fourbytes_spec.Entry],
+    signatures: typing.Sequence[fourbyte_spec.Entry],
     path: str,
     overwrite: bool = False,
     verbose: bool = True,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     # deduplicate and sort
     signatures_by_id = {}
@@ -79,28 +79,28 @@ def save_signatures(
 
 def load_function_signatures(
     path: typing.Optional[str] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     if path is None:
-        path = fourbytes_spec.get_default_path('function_signatures')
+        path = fourbyte_spec.get_default_path('function_signatures')
 
     return store_utils.load_file_data(path=path)
 
 
 def load_event_signatures(
     path: typing.Optional[str] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     if path is None:
-        path = fourbytes_spec.get_default_path('event_signatures')
+        path = fourbyte_spec.get_default_path('event_signatures')
 
     return store_utils.load_file_data(path=path)
 
 
 @toolcache.cache(cachetype='memory')
-def load_function_signatures_by_hex() -> dict[str, list[fourbytes_spec.Entry]]:
+def load_function_signatures_by_hex() -> dict[str, list[fourbyte_spec.Entry]]:
     signatures = load_function_signatures()
-    signatures_by_hex: dict[str, list[fourbytes_spec.Entry]] = {}
+    signatures_by_hex: dict[str, list[fourbyte_spec.Entry]] = {}
     for signature in signatures:
         signatures_by_hex.setdefault(signature['hex_signature'], [])
         signatures_by_hex[signature['hex_signature']].append(signature)
@@ -108,9 +108,9 @@ def load_function_signatures_by_hex() -> dict[str, list[fourbytes_spec.Entry]]:
 
 
 @toolcache.cache(cachetype='memory')
-def load_event_signatures_by_hex() -> dict[str, list[fourbytes_spec.Entry]]:
+def load_event_signatures_by_hex() -> dict[str, list[fourbyte_spec.Entry]]:
     signatures = load_event_signatures()
-    signatures_by_hex: dict[str, list[fourbytes_spec.Entry]] = {}
+    signatures_by_hex: dict[str, list[fourbyte_spec.Entry]] = {}
     for signature in signatures:
         signatures_by_hex.setdefault(signature['hex_signature'], [])
         signatures_by_hex[signature['hex_signature']].append(signature)

@@ -5,17 +5,17 @@ import typing
 
 import aiohttp
 
-from . import fourbytes_spec
+from . import fourbyte_spec
 
 
 async def async_scrape_function_signatures(
     wait_time: typing.Optional[int] = None,
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     return await async_scrape_set(
-        url=fourbytes_spec.endpoints['functions'],
+        url=fourbyte_spec.endpoints['functions'],
         wait_time=wait_time,
         print_every=print_every,
         min_id=min_id,
@@ -26,10 +26,10 @@ async def async_scrape_event_signatures(
     wait_time: typing.Optional[int] = None,
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     return await async_scrape_set(
-        url=fourbytes_spec.endpoints['events'],
+        url=fourbyte_spec.endpoints['events'],
         wait_time=wait_time,
         print_every=print_every,
         min_id=min_id,
@@ -41,7 +41,7 @@ async def async_scrape_set(
     wait_time: typing.Optional[int] = None,
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,
-) -> list[fourbytes_spec.Entry]:
+) -> list[fourbyte_spec.Entry]:
 
     results = []
 
