@@ -10,6 +10,9 @@ root_url = 'https://www.4byte.directory'
 endpoints = {
     'events': root_url + '/api/v1/event-signatures/',
     'functions': root_url + '/api/v1/signatures/',
+    'function_id': root_url + '/api/v1/signatures/{id}',
+    'function_hex': root_url + '/api/v1/signatures/?hex_signature={hex_signature}',
+    'function_text': root_url + '/api/v1/signatures/?text_signature={text_signature}',
 }
 
 

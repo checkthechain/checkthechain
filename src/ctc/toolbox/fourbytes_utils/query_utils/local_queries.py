@@ -3,8 +3,9 @@ from __future__ import annotations
 import typing
 
 from ctc.toolbox import search_utils
-from . import fourbytes_spec
-from . import io_utils
+
+from .. import fourbytes_spec
+from .. import io_utils
 
 
 def query_function_signature(
@@ -51,46 +52,6 @@ def query_event_signature(
         hex_signature=hex_signature,
         text_signature=text_signature,
     )
-
-
-async def async_query_function_signature(
-    id: typing.Optional[int] = None,
-    bytes_signature: typing.Optional[str] = None,
-    hex_signature: typing.Optional[str] = None,
-    text_signature: typing.Optional[str] = None,
-    source='local',
-) -> list[fourbytes_spec.Entry]:
-    if source == 'local':
-        return query_function_signature(
-            id=id,
-            bytes_signature=bytes_signature,
-            hex_signature=hex_signature,
-            text_signature=text_signature,
-        )
-    elif source == 'server':
-        raise NotImplementedError()
-    else:
-        raise Exception('unknown source: ' + str(source))
-
-
-async def async_query_event_signature(
-    id: typing.Optional[int] = None,
-    bytes_signature: typing.Optional[str] = None,
-    hex_signature: typing.Optional[str] = None,
-    text_signature: typing.Optional[str] = None,
-    source='local',
-) -> list[fourbytes_spec.Entry]:
-    if source == 'local':
-        return query_event_signature(
-            id=id,
-            bytes_signature=bytes_signature,
-            hex_signature=hex_signature,
-            text_signature=text_signature,
-        )
-    elif source == 'server':
-        raise NotImplementedError()
-    else:
-        raise Exception('unknown source: ' + str(source))
 
 
 def search_signatures(
