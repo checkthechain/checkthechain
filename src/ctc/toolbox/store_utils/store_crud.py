@@ -79,11 +79,17 @@ def write_file_data(
     if os.path.isfile(path) and not overwrite:
         raise Exception('file already exists, use overwrite=True')
 
+    # clear cache entries for file if they exist
+    load_file_data.cache.delete_entry(kwargs={'path': path})
+    load_file_data.cache.delete_entry(args=[path])
+
+    # create directory if need be
     if create_directory:
         dirpath = os.path.dirname(path)
         if not os.path.isdir(dirpath):
             os.makedirs(dirpath, exist_ok=True)
 
+    # write data
     with open(path, 'w') as f:
         write_buffer_data(
             buffer=f,
