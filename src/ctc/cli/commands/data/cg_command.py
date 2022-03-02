@@ -3,12 +3,11 @@ import sys
 import math
 
 import aiohttp
+import rich.console
+import rich.theme
 import toolcli
 import toolstr
 import tooltable
-
-from rich.console import Console
-from rich.theme import Theme
 
 
 url_template = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page={page}&sparkline=true&price_change_percentage=1h%2C24h%2C7d'
@@ -18,6 +17,7 @@ token_url_template = 'https://www.coingecko.com/en/coins/{name}'
 def get_command_spec():
     return {
         'f': async_cg_command,
+        'help': 'output coingecko market data',
         'args': [
             {'name': '-n'},
             {
@@ -62,22 +62,30 @@ async def async_cg_command(n, verbose, include_links):
     if verbose is None:
         verbose = toolcli.get_n_terminal_cols() >= 96
 
-    print_coingecko_data(data=data, verbose=verbose, include_links=include_links)
+    print_coingecko_data(
+        data=data, verbose=verbose, include_links=include_links
+    )
 
 
 def print_coingecko_data(data, verbose, include_links):
-    rows = []
-    rows_colors = []
 
+    # create headers
     headers = ['symbol', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
     if verbose:
         headers.append('7d chart')
 
+    # create rows
+    rows = []
+    rows_colors = []
     for item in data:
+
         row = []
         row_colors = []
+
+        # add symbol cell
         row.append(item['symbol'].upper())
 
+        # add price cell
         price = toolstr.format_number(
             item['current_price'],
             decimals=2,
@@ -86,6 +94,7 @@ def print_coingecko_data(data, verbose, include_links):
         )
         row.append(price)
 
+        # add price change cells
         for key in [
             'price_change_percentage_1h_in_currency',
             'price_change_percentage_24h_in_currency',
@@ -108,6 +117,7 @@ def print_coingecko_data(data, verbose, include_links):
             row.append(change)
         rows_colors.append(row_colors)
 
+        # add volume cell
         volume = toolstr.format(
             item['total_volume'],
             order_of_magnitude=True,
@@ -117,6 +127,7 @@ def print_coingecko_data(data, verbose, include_links):
         )
         row.append(volume)
 
+        # add market cap
         market_cap = toolstr.format(
             item['market_cap'],
             order_of_magnitude=True,
@@ -126,6 +137,7 @@ def print_coingecko_data(data, verbose, include_links):
         )
         row.append(market_cap)
 
+        # add sparkline
         if verbose:
             from toolstr.charts import braille
 
@@ -137,6 +149,7 @@ def print_coingecko_data(data, verbose, include_links):
 
         rows.append(row)
 
+    # render table without sending to stdout
     old_stdout = sys.stdout
     sys.stdout = None
     table = tooltable.print_table(
@@ -148,17 +161,23 @@ def print_coingecko_data(data, verbose, include_links):
     )
     sys.stdout = old_stdout
 
-    console = Console(theme=Theme(inherit=False))
+    # TODO: incorporate colors directly into table rendering function
+    # - the current solution is very hacky
+
+    # colorize table and print
     all_lines = table['as_str'].split('\n')
     cell_lines = all_lines[2:]
-
+    console = rich.console.Console(theme=rich.theme.Theme(inherit=False))
     print(all_lines[0])
     print(all_lines[1])
-    for l, (line, row_colors) in enumerate(zip(cell_lines, rows_colors)):
+    for rank, (line, row_colors) in enumerate(zip(cell_lines, rows_colors)):
+
+        # split row into cells
         cells = line.split('│')
 
+        # create link around token symbol
         if include_links:
-            name = data[l]['id']
+            name = data[rank]['id']
             url = token_url_template.format(name=name)
             left_whitespace = len(cells[1]) - len(cells[1].lstrip())
             right_whitespace = len(cells[1]) - len(cells[1].rstrip())
@@ -167,19 +186,24 @@ def print_coingecko_data(data, verbose, include_links):
             )
             cells[1] = ' ' * left_whitespace + cells[1] + ' ' * right_whitespace
 
+        # colorize price changes
         for rc, color in enumerate(row_colors):
-            cells[2 + rc] = (
-                '[' + color + ']' + cells[2 + rc] + '[/' + color + ']'
+            cells[3 + rc] = (
+                '[' + color + ']' + cells[3 + rc] + '[/' + color + ']'
             )
-        cells[-1] = (
-            '['
-            + row_colors[-1]
-            + ' bold]'
-            + cells[-1]
-            + '[/'
-            + row_colors[-1]
-            + ' bold]'
-        )
+
+        # colorize sparklink
+        if verbose:
+            cells[-1] = (
+                '['
+                + row_colors[-1]
+                + ' bold]'
+                + cells[-1]
+                + '[/'
+                + row_colors[-1]
+                + ' bold]'
+            )
+
         color_line = '│'.join(cells)
         console.print(color_line)
 
