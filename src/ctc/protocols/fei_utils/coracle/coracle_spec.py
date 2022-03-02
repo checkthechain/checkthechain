@@ -143,6 +143,32 @@ deposit_metadata = {
         'name': 'Balancer FEI-WETH',
         'platform': 'Balancer',
     },
+
+
+    '0x89dfbc12001b41985efabd7dfcae6a77b22e4ec3': {
+        'name': 'Balancer FEI-TRIBE',
+        'platform': 'Balancer',
+    },
+    '0xec54148cbc47bff8fcc5e04e5e8083adb8af9ad9': {
+        'name': 'Fuse Pool 90 FEI',
+        'platform': 'Rari Fuse',
+    },
+    '0xb3a026b830796e43bfc8b135553a7573538ab341': {
+        'name': 'Fuse Pool 79 FEI',
+        'platform': 'Rari Fuse',
+    },
+    '0xa62ddde8f799873e6fcdbb3acbba75da85d9dcde': {
+        'name': 'Fuse Pool 127 FEI',
+        'platform': 'Rari Fuse',
+    },
+    '0xa2bdbcb95d31c85bae6f0fa42d55f65d609d94ee': {
+        'name': 'Fuse Pool 22 FEI',
+        'platform': 'Rari Fuse',
+    },
+    '0x395b1bc1800fa0ad48ae3876e66d4c10d297650c': {
+        'name': 'Fuse Pool 72 FEI',
+        'platform': 'Rari Fuse',
+    },
 }
 
 deposit_names = {
@@ -174,13 +200,6 @@ deposit_names = {
     '0x485d23ce5725ecde46ca9033012984d90b514ffd': 'DAO Timelock agEUR',
     # CREAM
     '0x3a1838ac9eca864054bebb82c32455dd7d7fc89c': 'CREAM Hack Repayment',
-    # FEI
-    '0xec54148cbc47bff8fcc5e04e5e8083adb8af9ad9': 'Fuse Pool 90 FEI',
-    '0xb3a026b830796e43bfc8b135553a7573538ab341': 'Fuse Pool 79 FEI',
-    '0x89dfbc12001b41985efabd7dfcae6a77b22e4ec3': 'Balancer FEI-TRIBE',
-    '0xa62ddde8f799873e6fcdbb3acbba75da85d9dcde': 'Fuse Pool 127 FEI',
-    '0xa2bdbcb95d31c85bae6f0fa42d55f65d609d94ee': 'Fuse Pool 22 FEI',
-    '0x395b1bc1800fa0ad48ae3876e66d4c10d297650c': 'Fuse Pool 72 FEI',
 }
 
 
