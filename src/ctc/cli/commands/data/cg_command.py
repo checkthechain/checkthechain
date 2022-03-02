@@ -12,6 +12,7 @@ from rich.theme import Theme
 
 
 url_template = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page={page}&sparkline=true&price_change_percentage=1h%2C24h%2C7d'
+token_url_template = 'https://www.coingecko.com/en/coins/{name}'
 
 
 def get_command_spec():
@@ -25,6 +26,7 @@ def get_command_spec():
                 'const': True,
                 'default': None,
             },
+            {'name': '--include-links'},
         ],
     }
 
@@ -48,7 +50,7 @@ async def async_get_page(session, p):
         return await response.json()
 
 
-async def async_cg_command(n, verbose):
+async def async_cg_command(n, verbose, include_links):
 
     if n is None:
         n = toolcli.get_n_terminal_rows() - 3
@@ -60,14 +62,14 @@ async def async_cg_command(n, verbose):
     if verbose is None:
         verbose = toolcli.get_n_terminal_cols() >= 96
 
-    print_coingecko_data(data=data, verbose=verbose)
+    print_coingecko_data(data=data, verbose=verbose, include_links=include_links)
 
 
-def print_coingecko_data(data, verbose):
+def print_coingecko_data(data, verbose, include_links):
     rows = []
     rows_colors = []
 
-    headers = ['', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
+    headers = ['symbol', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
     if verbose:
         headers.append('7d chart')
 
@@ -152,8 +154,19 @@ def print_coingecko_data(data, verbose):
 
     print(all_lines[0])
     print(all_lines[1])
-    for line, row_colors in zip(cell_lines, rows_colors):
+    for l, (line, row_colors) in enumerate(zip(cell_lines, rows_colors)):
         cells = line.split('│')
+
+        if include_links:
+            name = data[l]['id']
+            url = token_url_template.format(name=name)
+            left_whitespace = len(cells[1]) - len(cells[1].lstrip())
+            right_whitespace = len(cells[1]) - len(cells[1].rstrip())
+            cells[1] = (
+                '[link ' + url + ']' + cells[1].strip() + '[/link ' + url + ']'
+            )
+            cells[1] = ' ' * left_whitespace + cells[1] + ' ' * right_whitespace
+
         for rc, color in enumerate(row_colors):
             cells[2 + rc] = (
                 '[' + color + ']' + cells[2 + rc] + '[/' + color + ']'
