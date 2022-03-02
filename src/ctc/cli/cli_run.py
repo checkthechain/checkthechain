@@ -41,6 +41,7 @@ command_index = {
     ('transaction',): 'ctc.cli.commands.data.transaction_command',
     #
     # protocol commands
+    ('cg',): 'ctc.cli.commands.data.cg_command',
     ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
     ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
     ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
