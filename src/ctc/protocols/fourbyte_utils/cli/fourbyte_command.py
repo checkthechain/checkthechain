@@ -6,6 +6,7 @@ from ctc.protocols import fourbyte_utils
 def get_command_spec():
     return {
         'f': async_fourbyte_command,
+        'help': 'lookup 4byte signature',
         'args': [
             {'name': 'signature'},
             {'name': '--local', 'action': 'store_true'},

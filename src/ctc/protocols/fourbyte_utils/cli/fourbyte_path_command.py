@@ -8,6 +8,7 @@ from ctc.protocols import fourbyte_utils
 def get_command_spec():
     return {
         'f': fourbyte_path_command,
+        'help': 'show paths of local 4byte database',
     }
 
 

@@ -4,6 +4,7 @@ from ctc.protocols import fourbyte_utils
 def get_command_spec():
     return {
         'f': async_fourbyte_build_command,
+        'help': 'build local copy of 4byte database',
         'args': [
             {
                 'name': 'datatype',
