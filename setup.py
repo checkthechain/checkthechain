@@ -26,7 +26,7 @@ setuptools.setup(
         'toolcli>=0.2.0',
         'toolconf',
         'toolplot',
-        'toolstr>=0.1.0',
+        'toolstr>=0.1.2',
         'tooltable',
         'tooltime',
         #
