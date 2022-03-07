@@ -1,3 +1,6 @@
+"""
+see https://github.com/curvefi/curve-pool-registry
+"""
 from __future__ import annotations
 
 import typing
