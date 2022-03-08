@@ -54,7 +54,8 @@ async def async_get_feed_aggregator(
     *,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
-) -> spec.Address:
+    fill_empty: bool = True,
+) -> typing.Optional[spec.Address]:
 
     feed = await async_resolve_feed_address(
         feed, block=block, provider=provider
@@ -64,6 +65,7 @@ async def async_get_feed_aggregator(
         to_address=feed,
         function_name='aggregator',
         block_number=block,
+        fill_empty=fill_empty,
     )
 
 
