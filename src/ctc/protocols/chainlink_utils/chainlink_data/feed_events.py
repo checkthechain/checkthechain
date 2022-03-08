@@ -64,8 +64,12 @@ async def async_get_full_feed_event_data(
     # interpolate
     if interpolate:
 
+        if keep_multiindex:
+            raise Exception('cannot use keep_multiindex and interpolate')
+        df.index = pd_utils.keep_level(df.index, level='block_number')
+
         # add initial data
-        if start_block < df.index.values[0][0]:
+        if start_block < df.index.values[0]:
             import pandas as pd
 
             initial_data = await feed_datum.async_get_feed_datum(
@@ -75,7 +79,6 @@ async def async_get_full_feed_event_data(
                 normalize=normalize,
                 fields='full',
             )
-            df.index = pd_utils.keep_level(df.index, level='block_number')
             initial_df = pd.DataFrame(initial_data, index=[start_block])
             df = pd.concat([initial_df, df])
 
