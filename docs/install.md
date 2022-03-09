@@ -1,3 +1,10 @@
+# `ctc` Installation
+
+- [Basic Installation](#basic-installation)
+- [Upgrading](#upgrading)
+- [Alternative Installations](#alternative-installations)
+- [Python-devtools](#additional-dependencies)
+
 
 ## Basic Installation
 
@@ -8,6 +15,13 @@ Two steps:
 If your shell's `PATH` does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
 
 Installation requires python3.7+
+
+
+## Upgrading
+
+Two steps:
+1. `pip install checkthechain -U`
+2. run `ctc setup` to add any new data to the data directory (can skip most steps by pressing enter)
 
 
 ## Alternative Installations
@@ -33,9 +47,9 @@ python -m pip install ./
 ```
 
 
-## Python Devtools
+## Additional Dependencies
 
-`python-dev` is a library required by many python packages including `ctc`. If you are an active python user, chances are you already have this installed, as this is a standard requirement for many packages. If you are a new python user, you may need to install it according to your operating system and python version.
+In Ubuntu and Debian `build-essential` and `python-dev` are libraries required by many python packages including `ctc`. If you are an active python user you likely already have these installed, as they are required for many standard packages. If you are setting up a new machine or environment, you may need to install them according to your operating system and python version.
 
 To install on Debian / Ubuntu can use the following:
 
@@ -43,5 +57,6 @@ To install on Debian / Ubuntu can use the following:
 PYTHON_VERSION=$(python3 -c "import sys; print('python' + str(sys.version_info.major) + '.' + str(sys.version_info.minor))")
 
 python3 -m pip install $PYTHON_VERSION-dev
+sudo apt-get install build-essential
 ```
 

@@ -142,6 +142,8 @@ Two steps:
 
 If your shell's `PATH` does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
 
+`ctc` requires Python >= 3.7. Detailed instructions and requirements can be found in the [installation docs](/docs/install.md).
+
 
 ## FAQ
 - What are the goals of `ctc`?
