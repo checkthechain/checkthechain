@@ -63,6 +63,7 @@ command_index = {
         'deposits',
     ): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
     ('rari', 'fuse'): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
+    ('uniswap', 'chart'): 'ctc.protocols.uniswap_v2_utils.cli.chart_command',
     ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
     ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.burns_command',
     ('uniswap', 'swaps'): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
@@ -85,13 +86,19 @@ description = 'if using ctc for the first time, run:\n    ctc setup'
 def run_cli(raw_command=None, **toolcli_kwargs):
 
     config = {
-        'include_cd': True,
-        'include_debug': True,
-        'include_version_subcommand': True,
-        'include_help_subcommand': True,
+        #
+        # metadata
+        'base_command': 'ctc',
         'version': ctc.__version__,
         'description': description,
-        'base_command': 'ctc',
+        #
+        # subcommands
+        'include_cd_subcommand': True,
+        'include_version_subcommand': True,
+        'include_help_subcommand': True,
+        #
+        # args
+        'include_debug_arg': True,
     }
     toolcli_kwargs = dict({'config': config}, **toolcli_kwargs)
 
