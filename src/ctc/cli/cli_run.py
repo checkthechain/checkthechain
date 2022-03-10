@@ -1,3 +1,5 @@
+import os
+
 import toolcli
 
 import ctc
@@ -7,7 +9,6 @@ command_index = {
     #
     # admin commands
     (): 'ctc.cli.commands.root_command',
-    ('cd',): 'ctc.cli.commands.admin.cd_command',
     ('config',): 'ctc.cli.commands.admin.config_command',
     ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
     ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
@@ -83,14 +84,48 @@ command_index = {
 description = 'if using ctc for the first time, run:\n    ctc setup'
 
 
+cd_dir_help = {
+    'code': 'directory where ctc code is stored',
+    'data': 'directory where ctc stores data',
+    'default_data': 'directory where ctc stores default data',
+    'config': 'directory where ctc stores config',
+    'notebooks': 'directory where ctc stores notebooks',
+}
+
+
+def cd_dir_getter(dirname: str) -> str:
+    import ctc
+    import ctc.config
+
+    if dirname == 'code':
+        return ctc.__path__[0]
+
+    elif dirname == 'data':
+        return ctc.config.get_data_dir()
+
+    elif dirname == 'default_data':
+        return ctc.config.get_default_data_dir()
+
+    elif dirname == 'config':
+        return os.path.dirname(ctc.config.get_config_path())
+
+    elif dirname == 'notebooks':
+        return ctc.config.get_reports_dir()
+
+    else:
+        raise Exception('unknown directory: ' + str(dirname))
+
+
 def run_cli(raw_command=None, **toolcli_kwargs):
 
     config = {
         #
         # metadata
         'base_command': 'ctc',
-        'version': ctc.__version__,
         'description': description,
+        'version': ctc.__version__,
+        'cd_dir_help': cd_dir_help,
+        'cd_dir_getter': cd_dir_getter,
         #
         # subcommands
         'include_cd_subcommand': True,
