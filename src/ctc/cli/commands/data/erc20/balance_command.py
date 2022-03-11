@@ -9,10 +9,14 @@ def get_command_spec():
         'f': async_balance_command,
         'help': 'output an ERC20 balance',
         'args': [
-            {'name': 'erc20_address'},
-            {'name': 'wallet_address'},
-            {'name': '--block'},
-            {'name': '--raw', 'action': 'store_true'},
+            {'name': 'erc20_address', 'help': 'address of ERC20 token'},
+            {'name': 'wallet_address', 'help': 'address of wallet'},
+            {'name': '--block', 'help': 'block number'},
+            {
+                'name': '--raw',
+                'action': 'store_true',
+                'help': 'whether to normalize balance by ERC20 decimals',
+            },
         ],
     }
 

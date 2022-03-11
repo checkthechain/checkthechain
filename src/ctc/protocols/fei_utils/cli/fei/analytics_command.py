@@ -13,9 +13,18 @@ def get_command_spec():
         'f': async_payload_command,
         'help': 'output data payload for app.fei.money/analytics',
         'args': [
-            {'name': 'timescale', 'nargs': '?', 'default': None},
-            {'name': '--path'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {
+                'name': 'timescale',
+                'nargs': '?',
+                'default': None,
+                'help': 'time window size and resolution',
+            },
+            {'name': '--path', 'help': 'path for data output (a .json file)'},
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'allow overwriting an already-existing file',
+            },
         ],
     }
 

@@ -11,7 +11,7 @@ def get_command_spec():
         'f': async_pcv_command,
         'help': 'output summary of Fei PCV',
         'args': [
-            {'name': '--block'},
+            {'name': '--block', 'block number'},
         ],
     }
 

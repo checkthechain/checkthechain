@@ -8,8 +8,8 @@ def get_command_spec():
         'f': async_owner_command,
         'help': 'output owner of ENS name',
         'args': [
-            {'name': 'name'},
-            {'name': '--block'},
+            {'name': 'name', 'help': 'ENS name'},
+            {'name': '--block', 'help': 'block number'},
         ],
     }
 

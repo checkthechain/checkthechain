@@ -19,14 +19,15 @@ def get_command_spec():
         'f': async_cg_command,
         'help': 'output coingecko market data',
         'args': [
-            {'name': '-n'},
+            {'name': '-n', 'help': 'number of entries to include in output'},
             {
                 'name': '--verbose',
                 'action': 'store_const',
                 'const': True,
                 'default': None,
+                'help': 'include extra data',
             },
-            {'name': '--include-links'},
+            {'name': '--include-links', 'help': 'include links in output'},
         ],
     }
 

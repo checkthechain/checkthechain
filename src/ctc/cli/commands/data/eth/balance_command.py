@@ -1,4 +1,3 @@
-
 import toolstr
 
 from ctc import evm
@@ -10,9 +9,13 @@ def get_command_spec():
         'f': async_balance_command,
         'help': 'output ETH balance of address',
         'args': [
-            {'name': 'address'},
-            {'name': '--block'},
-            {'name': '--raw', 'action': 'store_true'},
+            {'name': 'address', 'help': 'address of wallet'},
+            {'name': '--block', 'help': 'block number'},
+            {
+                'name': '--raw',
+                'action': 'store_true',
+                'help': 'skip normalizing balance by 1e18 decimals',
+            },
         ],
     }
 

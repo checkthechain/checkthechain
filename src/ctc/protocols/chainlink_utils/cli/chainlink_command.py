@@ -12,18 +12,36 @@ def get_command_spec():
         'f': async_chainlink_command,
         'help': 'output Chainlink feed data',
         'args': [
-            {'name': 'feed', 'nargs': '+'},
-            {'name': '--blocks', 'nargs': '+'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite'},
-            {'name': '--provider'},
-            {'name': '--all-fields', 'action': 'store_true'},
+            {'name': 'feed', 'nargs': '+', 'help': 'name or address of feed'},
+            {
+                'name': '--blocks',
+                'nargs': '+',
+                'help': 'block range of datapoints',
+            },
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
+            {'name': '--provider', 'help': 'rpc provider name or url'},
+            {
+                'name': '--all-fields',
+                'action': 'store_true',
+                'help': 'include all output fields',
+            },
             # {'name': '--no-interpolate', 'kwargs': {}},
         ],
     }
 
 
-async def async_chainlink_command(feed, blocks, output, overwrite, provider, all_fields):
+async def async_chainlink_command(
+    feed, blocks, output, overwrite, provider, all_fields
+):
 
     feed = '_'.join(feed)
 
@@ -43,7 +61,9 @@ async def async_chainlink_command(feed, blocks, output, overwrite, provider, all
             )
         else:
             raise Exception('unknown feed specification: ' + str(feed))
-        name = await rpc.async_eth_call(feed_address, function_name='description')
+        name = await rpc.async_eth_call(
+            feed_address, function_name='description'
+        )
         toolstr.print_text_box('Chainlink Feed: ' + name)
         print('- feed address')
         print('- feed:', feed)

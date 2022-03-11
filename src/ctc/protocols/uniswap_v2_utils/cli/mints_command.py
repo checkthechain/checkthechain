@@ -9,10 +9,18 @@ def get_command_spec():
         'f': async_burns_command,
         'help': 'output information about pool mints',
         'args': [
-            {'name': 'pool'},
-            {'name': '--blocks', 'nargs': '+'},
-            {'name': '--output'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {'name': 'pool', 'help': 'pool address'},
+            {'name': '--blocks', 'nargs': '+', 'help': 'block number range'},
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
         ],
     }
 
@@ -20,7 +28,9 @@ def get_command_spec():
 async def async_burns_command(pool, blocks, output, overwrite):
 
     if blocks is not None:
-        start_block, end_block = await cli_utils.async_resolve_block_range(blocks)
+        start_block, end_block = await cli_utils.async_resolve_block_range(
+            blocks
+        )
     else:
         start_block = None
         end_block = None

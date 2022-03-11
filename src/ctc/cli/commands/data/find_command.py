@@ -7,7 +7,7 @@ def get_command_spec():
         'f': async_find_command,
         'help': 'search for item in directory',
         'args': [
-            {'name': 'query'},
+            {'name': 'query', 'help': 'ERC20 symbol'},
         ]
     }
 

@@ -4,12 +4,24 @@ from ctc import binary
 def get_command_spec():
     return {
         'f': keccack_command,
-        'help': 'compute keccak hash of data',
+        'help': 'compute keccak hash of data\n\nby default, data treated as hex if it starts with "0x", or treated as text otherwise',
         'args': [
-            {'name': 'data'},
-            {'name': '--text', 'action': 'store_true'},
-            {'name': '--hex', 'action': 'store_true'},
-            {'name': '--raw', 'action': 'store_true'},
+            {'name': 'data', 'help': 'data to hash'},
+            {
+                'name': '--text',
+                'action': 'store_true',
+                'help': 'treat input data as text instead of hex',
+            },
+            {
+                'name': '--hex',
+                'action': 'store_true',
+                'help': 'treat data as hex',
+            },
+            {
+                'name': '--raw',
+                'action': 'store_true',
+                'help': 'omit "0x" prefix on output',
+            },
         ],
     }
 

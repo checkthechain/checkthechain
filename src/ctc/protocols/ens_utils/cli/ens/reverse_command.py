@@ -8,16 +8,16 @@ def get_command_spec():
         'f': async_reverse_command,
         'help': 'reverse ENS lookup address',
         'args': [
-            {'name': 'name'},
-            {'name': '--block'},
+            {'name': 'address', 'help': 'address of reverse lookup'},
+            {'name': '--block', 'help': 'block number'},
         ]
     }
 
 
-async def async_reverse_command(name, block):
+async def async_reverse_command(address, block):
     if block is not None:
         block = evm.standardize_block_number(block)
-    address = await ens_utils.async_reverse_lookup(name, block=block)
-    print(address)
+    name = await ens_utils.async_reverse_lookup(address, block=block)
+    print(name)
     await rpc.async_close_http_session()
 

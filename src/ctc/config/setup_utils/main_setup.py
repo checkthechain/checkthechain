@@ -26,6 +26,8 @@ def setup_ctc() -> None:
     print('- setup networks and providers')
     print()
     print('Each step can be skipped depending on what you need')
+    print('- this wizard can be rerun multiple times idempotently')
+    print('- by default, wizard will leave current settings unchanged')
 
     # ensure file is valid
     validation_setup.ensure_valid(styles=styles)

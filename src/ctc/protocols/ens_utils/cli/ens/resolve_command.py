@@ -8,8 +8,8 @@ def get_command_spec():
         'f': async_resolve_command,
         'help': 'resolve ENS name',
         'args': [
-            {'name': 'name'},
-            {'name': '--block'},
+            {'name': 'name', 'help': 'ENS name'},
+            {'name': '--block', 'help': 'block number'},
         ]
     }
 

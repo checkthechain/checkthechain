@@ -16,14 +16,20 @@ def get_command_spec():
         'f': async_pool_command,
         'help': 'summarize pool',
         'args': [
-            {'name': 'pool'},
-            {'name': '--block', 'default': 'latest'},
+            {'name': 'pool', 'help': 'pool address'},
+            {
+                'name': '--block',
+                'default': 'latest',
+                'help': 'block number range',
+            },
         ],
     }
 
 
 async def async_pool_command(pool, block):
-    tokens_metadata = await uniswap_v2_utils.async_get_pool_tokens_metadata(pool)
+    tokens_metadata = await uniswap_v2_utils.async_get_pool_tokens_metadata(
+        pool
+    )
     x_symbol = tokens_metadata['x_symbol']
     y_symbol = tokens_metadata['y_symbol']
     title = 'Uniswap V2 Pool: ' + x_symbol + ' x ' + y_symbol

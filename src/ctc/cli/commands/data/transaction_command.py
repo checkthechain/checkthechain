@@ -9,8 +9,8 @@ def get_command_spec():
         'f': transaction_command,
         'help': 'summarize transaction',
         'args': [
-            {'name': 'transaction'},
-            {'name': '--sort'},
+            {'name': 'transaction', 'help': 'hash of transaction'},
+            {'name': '--sort', 'help': 'attribute to sort logs by'},
         ],
     }
 

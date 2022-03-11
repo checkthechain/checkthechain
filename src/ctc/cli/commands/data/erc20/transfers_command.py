@@ -8,10 +8,22 @@ def get_command_spec():
         'f': async_transfers_command,
         'help': 'output information about ERC20 transfers',
         'args': [
-            {'name': 'erc20'},
-            {'name': '--blocks', 'nargs': '+'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {'name': 'erc20', 'help': 'ERC20 address'},
+            {
+                'name': '--blocks',
+                'nargs': '+',
+                'help': 'block range of transfers',
+            },
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
         ],
     }
 

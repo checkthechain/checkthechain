@@ -6,7 +6,7 @@ def get_command_spec():
         'f': checksum_command,
         'help': 'compute checksum of address',
         'args': [
-            {'name': 'address'},
+            {'name': 'address', 'help': 'address to get checksum of'},
         ],
     }
 

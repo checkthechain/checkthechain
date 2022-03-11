@@ -1,14 +1,3 @@
-"""
-# balance of single wallet across multiple tokens;
-ctc erc20 balances <wallet> --erc20s <erc20s> [--block <block>]
-
-# balances of wallets within single block (default = all wallets)
-ctc erc20 balances <erc20> [--block <block>] [--wallets <wallets>]
-
-# balance of single wallet across multiple blocks
-ctc erc20 balances <erc20> <wallet> --blocks <blocks>
-"""
-
 import pandas as pd
 
 import toolstr
@@ -18,21 +7,60 @@ from ctc import rpc
 from ctc.cli import cli_utils
 
 
+command_help = """output ERC20 balances of blocks/addresses/tokens
+
+# Example usage:
+
+## balance of single wallet across multiple tokens
+ctc erc20 balances <wallet> --erc20s <erc20s> [--block <block>]
+
+## balances of wallets within single block (default = all wallets)
+ctc erc20 balances <erc20> [--block <block>] [--wallets <wallets>]
+
+## balance of single wallet across multiple blocks
+ctc erc20 balances <erc20> <wallet> --blocks <blocks>
+"""
+
+
 def get_command_spec():
     return {
         'f': async_balances_command,
-        'help': 'output ERC20 balances of blocks/addresses/tokens',
+        'help': command_help,
         'args': [
-            {'name': 'args', 'nargs': '+'},
-            {'name': '--block'},
-            {'name': '--wallets', 'nargs': '+'},
-            {'name': '--blocks', 'nargs': '+'},
-            {'name': '--erc20s', 'nargs': '+'},
+            {'name': 'args', 'nargs': '+', 'help': '<see above>'},
+            {'name': '--block', 'help': 'block number'},
+            {
+                'name': '--wallets',
+                'nargs': '+',
+                'help': 'wallets to get balances of',
+            },
+            {
+                'name': '--blocks',
+                'nargs': '+',
+                'help': 'block numbers to get balances at',
+            },
+            {
+                'name': '--erc20s',
+                'nargs': '+',
+                'help': 'ERC20 addresses to get balances of',
+            },
             #
-            {'name': '--raw', 'action': 'store_true'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite', 'action': 'store_true'},
-            {'name': '--top'},
+            {
+                'name': '--raw',
+                'action': 'store_true',
+                'help': 'whether to skip normalizing by ERC20 decimals',
+            },
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
+            {'name': '--top', 'metavar': 'N', 'help': 'show top N addresses'},
         ],
     }
 

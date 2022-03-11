@@ -7,9 +7,17 @@ def get_command_spec():
         'f': async_block_command,
         'help': 'summarize block',
         'args': [
-            {'name': 'block', 'nargs': '?'},
-            {'name': '--timestamp', 'type': int},
-            {'name': '--verbose', 'action': 'store_true'},
+            {'name': 'block', 'nargs': '?', 'help': 'block number'},
+            {
+                'name': '--timestamp',
+                'type': int,
+                'help': 'specify block by timestamp',
+            },
+            {
+                'name': '--verbose',
+                'action': 'store_true',
+                'help': 'emit extra information',
+            },
         ],
     }
 

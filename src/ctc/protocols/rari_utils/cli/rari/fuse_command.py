@@ -9,23 +9,25 @@ def get_command_spec():
         'f': fuse_command,
         'help': 'summarize fuse pool, token, or platform',
         'args': [
-            {'name': 'pool', 'nargs': '?'},
-            {'name': '--block', 'default': 'latest'},
+            # TODO: allow arg to be pool comptroller
+            # - will need to check on chain to see if token or comptroller
+            {'name': 'arg', 'nargs': '?', 'help': 'pool index or token'},
+            {'name': '--block', 'default': 'latest', 'help': 'block number'},
         ],
     }
 
 
-def fuse_command(pool, block, **kwargs):
+def fuse_command(arg, block, **kwargs):
     if block != 'latest':
         block = int(block)
 
-    if pool is not None:
+    if arg is not None:
 
         try:
-            pool_index = int(pool)
+            pool_index = int(arg)
             arg_type = 'pool_index'
-        except Exception as e:
-            token = pool
+        except Exception:
+            token = arg
             arg_type = 'token'
 
         if arg_type == 'pool_index':

@@ -9,9 +9,17 @@ def get_command_spec():
         'f': async_address_command,
         'help': 'summarize address',
         'args': [
-            {'name': 'address'},
-            {'name': ['-v', '--verbose'], 'action': 'store_true'},
-            {'name': '--network'},
+            {'name': 'address', 'help': 'address to get summary of'},
+            {
+                'name': ['-v', '--verbose'],
+                'action': 'store_true',
+                'help': 'emit extra output',
+            },
+            {
+                'name': '--network',
+                'metavar': 'NAME_OR_ID',
+                'help': 'network name or id to scan address of',
+            },
         ],
     }
 

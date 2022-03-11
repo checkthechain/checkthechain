@@ -28,9 +28,17 @@ def get_command_spec():
         'f': async_gas_command,
         'help': 'output gas summary of block range',
         'args': [
-            {'name': '--last', 'nargs': '+'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {'name': '--last', 'metavar': 'N', 'nargs': '+', 'help': 'number of blocks to include'},
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
         ],
     }
 

@@ -8,9 +8,9 @@ def get_command_spec():
         'f': async_fourbyte_command,
         'help': 'lookup 4byte signature',
         'args': [
-            {'name': 'signature'},
-            {'name': '--local', 'action': 'store_true'},
-            {'name': '--remote', 'action': 'store_true'},
+            {'name': 'signature', 'help': 'signature to look up'},
+            {'name': '--local', 'action': 'store_true', 'help': 'use local database'},
+            {'name': '--remote', 'action': 'store_true', 'help': 'use remote database'},
         ],
     }
 

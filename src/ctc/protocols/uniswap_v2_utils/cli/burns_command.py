@@ -9,10 +9,18 @@ def get_command_spec():
         'f': async_burns_command,
         'help': 'output information about pool burns',
         'args': [
-            {'name': 'pool'},
-            {'name': '--blocks', 'nargs': '+'},
-            {'name': '--output'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {'name': 'pool', 'help': 'pool address'},
+            {'name': '--blocks', 'nargs': '+', 'help': 'block number range'},
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
         ],
     }
 

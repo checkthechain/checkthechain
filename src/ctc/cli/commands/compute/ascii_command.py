@@ -6,7 +6,7 @@ def get_command_spec():
         'f': ascii_command,
         'help': 'convert hex to ascii',
         'args': [
-            {'name': 'data'},
+            {'name': 'data', 'help': 'hex data to convert'},
         ],
     }
 

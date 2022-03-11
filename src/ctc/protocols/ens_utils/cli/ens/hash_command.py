@@ -6,7 +6,7 @@ def get_command_spec():
         'f': hash_command,
         'help': 'output hash of ENS name',
         'args': [
-            {'name': 'name'},
+            {'name': 'name', 'help': 'ENS name'},
         ]
     }
 

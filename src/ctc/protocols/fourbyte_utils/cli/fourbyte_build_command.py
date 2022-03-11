@@ -10,6 +10,7 @@ def get_command_spec():
                 'name': 'datatype',
                 'choices': ['functions', 'events'],
                 'nargs': '?',
+                'help': '"functions" or "events", omit to build database of both',
             },
         ],
     }

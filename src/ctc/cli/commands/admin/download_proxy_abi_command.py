@@ -9,8 +9,14 @@ def get_command_spec():
         'f': add_proxy_abi_comamand,
         'help': 'download proxy abi for contract',
         'args': [
-            {'name': 'contract_address'},
-            {'name': 'implementation_address'},
+            {
+                'name': 'contract_address',
+                'help': 'address that points toward implementation',
+            },
+            {
+                'name': 'implementation_address',
+                'help': 'address that implements functionality',
+            },
         ],
     }
 

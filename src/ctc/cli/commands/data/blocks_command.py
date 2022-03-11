@@ -15,11 +15,23 @@ def get_command_spec():
         'f': async_block_command,
         'help': 'output information about blocks',
         'args': [
-            {'name': 'blocks', 'nargs': '+'},
-            {'name': '--attributes', 'nargs': '+'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite', 'action': 'store_true'},
-            {'name': '--provider'},
+            {'name': 'blocks', 'nargs': '+', 'help': 'block range to fetch'},
+            {
+                'name': '--attributes',
+                'nargs': '+',
+                'help': 'attributes to fetch from each block',
+            },
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
+            {'name': '--provider', 'help': 'rpc provider to use'},
         ],
     }
 
@@ -81,8 +93,7 @@ async def async_block_command(
     # special attribute: gas stats
     if compute_gas:
         gas_stats = pd.DataFrame(
-            evm.get_block_gas_stats(block_data)
-            for block_data in blocks_data
+            evm.get_block_gas_stats(block_data) for block_data in blocks_data
         )
         for gas_attr in gas_attrs:
             if gas_attr in attributes:

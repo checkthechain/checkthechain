@@ -4,11 +4,11 @@ def get_command_spec():
         'f': lower_command,
         'help': 'convert to lower case',
         'args': [
-            {'name': 'arg'},
+            {'name': 'text', 'help': 'text to convert'},
         ],
     }
 
 
-def lower_command(arg):
-    print(arg.lower())
+def lower_command(text):
+    print(text.lower())
 

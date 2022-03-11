@@ -8,8 +8,8 @@ def get_command_spec():
         'f': async_exists_command,
         'help': 'output whether ENS name exists',
         'args': [
-            {'name': 'name'},
-            {'name': '--block'},
+            {'name': 'name', 'help': 'ENS name'},
+            {'name': '--block', 'help': 'block number'},
         ],
     }
 

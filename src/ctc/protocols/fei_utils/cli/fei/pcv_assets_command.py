@@ -13,7 +13,7 @@ def get_command_spec():
         'f': async_pcv_assets_command,
         'help': 'output summary of Fei PCV assets',
         'args': [
-            {'name': '--block'},
+            {'name': '--block', 'help': 'block number'},
         ],
     }
 

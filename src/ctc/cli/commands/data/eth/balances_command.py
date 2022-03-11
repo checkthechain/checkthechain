@@ -18,19 +18,44 @@ def get_command_spec():
         'f': async_balances_command,
         'help': 'output ETH balance across blocks or addresses',
         'args': [
-            {'name': 'wallets', 'nargs': '+'},
-            {'name': '--block'},
-            {'name': '--blocks', 'nargs': '+'},
+            {
+                'name': 'wallets',
+                'nargs': '+',
+                'help': 'wallet addresses to get balances of',
+            },
+            {'name': '--block', 'help': 'block number'},
+            {
+                'name': '--blocks',
+                'nargs': '+',
+                'help': 'block numbers to get balances in',
+            },
             #
-            {'name': '--raw', 'action': 'store_true'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {
+                'name': '--raw',
+                'action': 'store_true',
+                'help': 'skip normalizing by 1e18 decimals',
+            },
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
         ],
     }
 
 
 async def async_balances_command(
-    wallets, block, blocks, raw, output, overwrite,
+    wallets,
+    block,
+    blocks,
+    raw,
+    output,
+    overwrite,
 ):
     indent = None
     wallets = [wallet.lower() for wallet in wallets]
@@ -38,7 +63,9 @@ async def async_balances_command(
     if blocks is not None:
         # single wallet, multiple blocks
         if len(wallets) > 1:
-            raise Exception('cannot specify multiple wallets and multiple blocks')
+            raise Exception(
+                'cannot specify multiple wallets and multiple blocks'
+            )
 
         wallet = wallets[0]
         resolved_blocks = await cli_utils.async_resolve_blocks(blocks)
@@ -54,7 +81,9 @@ async def async_balances_command(
     else:
         # multiple wallets, single block
         if blocks is not None:
-            raise Exception('cannot specify multiple wallets and multiple blocks')
+            raise Exception(
+                'cannot specify multiple wallets and multiple blocks'
+            )
 
         if block is None:
             block = 'latest'

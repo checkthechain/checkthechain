@@ -5,19 +5,46 @@ from ctc import evm
 from ctc import rpc
 from ctc.cli import cli_utils
 
+command_help = """output the result of multiple calls
+
+# Example usage:
+
+## same call across multiple blocks
+ctc calls <address> <function_name> [<function_parameters>] --blocks <blocks>
+
+## same call across multiple addresses
+ctc calls <function_name> [<function_parameters>] --addresses <addresses> [--block block]
+"""
+
 
 def get_command_spec():
     return {
         'f': async_calls_command,
-        'help': 'output the result of multiple calls',
+        'help': command_help,
         'args': [
-            {'name': 'args', 'nargs': '*'},
-            {'name': '--to-addresses', 'nargs': '+'},
-            {'name': '--blocks', 'nargs': '+'},
-            {'name': '--block'},
-            {'name': '--quiet', 'action': 'store_true'},
-            {'name': '--output', 'default': 'stdout'},
-            {'name': '--overwrite', 'action': 'store_true'},
+            {'name': 'args', 'nargs': '*', 'help': '<see above>'},
+            {
+                'name': '--addresses',
+                'nargs': '+',
+                'help': 'addresses to point calls toward',
+            },
+            {'name': '--blocks', 'nargs': '+', 'help': 'block range for calls'},
+            {'name': '--block', 'help': 'block number for calls'},
+            {
+                'name': '--quiet',
+                'action': 'store_true',
+                'help': 'omit summary, only output function result',
+            },
+            {
+                'name': '--output',
+                'default': 'stdout',
+                'help': 'file path for output (.json or .csv)',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
+            },
         ],
     }
 

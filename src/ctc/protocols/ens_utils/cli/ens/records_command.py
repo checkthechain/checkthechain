@@ -7,7 +7,7 @@ def get_command_spec():
         'f': async_records_command,
         'help': 'output text records of ENS name',
         'args': [
-            {'name': 'name'},
+            {'name': 'name', 'help': 'ENS name'},
         ],
     }
 
