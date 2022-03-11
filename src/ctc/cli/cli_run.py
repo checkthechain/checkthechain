@@ -81,7 +81,10 @@ command_index = {
 }
 
 
-description = 'if using ctc for the first time, run:\n    ctc setup'
+description = """ctc is a tool for historical data analysis of Ethereum and other EVM chains
+
+if using ctc for the first time, run:
+    [option]ctc setup[/option]"""
 
 
 cd_dir_help = {
@@ -126,6 +129,17 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         'version': ctc.__version__,
         'cd_dir_help': cd_dir_help,
         'cd_dir_getter': cd_dir_getter,
+        #
+        'style_theme': {
+            'title': 'bold #ce93f9',
+            # 'description': '#f1fa8c',
+            # 'metavar': '#8be9fd',
+            'description': '#b9f29f',
+            'option': '#64aaaa',
+            # 'description': '#64aaaa',
+            'comment': '#6272a4',
+            # 'comment': '#8be9fd',
+        },
         #
         # subcommands
         'include_cd_subcommand': True,

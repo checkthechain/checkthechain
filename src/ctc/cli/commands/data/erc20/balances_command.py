@@ -7,19 +7,16 @@ from ctc import rpc
 from ctc.cli import cli_utils
 
 
-command_help = """output ERC20 balances of blocks/addresses/tokens
+command_help = """output ERC20 balances of blocks / addresses / tokens
 
-# Example usage:
+[comment]# example: balance of single wallet across multiple tokens[/comment]
+[option]ctc erc20 balances WALLET --erc20s ERC20S [--block BLOCK][/option]
 
-## balance of single wallet across multiple tokens
-ctc erc20 balances <wallet> --erc20s <erc20s> [--block <block>]
+[comment]# example: balances of wallets within single block (default = all wallets)[/comment]
+[option]ctc erc20 balances ERC20 [--block BLOCK] [--wallets WALLETS][/option]
 
-## balances of wallets within single block (default = all wallets)
-ctc erc20 balances <erc20> [--block <block>] [--wallets <wallets>]
-
-## balance of single wallet across multiple blocks
-ctc erc20 balances <erc20> <wallet> --blocks <blocks>
-"""
+[comment]# example: balance of single wallet across multiple blocks[/comment]
+[option]ctc erc20 balances ERC20 WALLET --blocks BLOCKS[/option]"""
 
 
 def get_command_spec():
