@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -23,7 +24,7 @@ async def async_print_address_summary(
     - transfers
     """
 
-    eth_balance = await rpc.async_eth_get_balance(address, provider=provider)
+    eth_balance = await evm.async_get_eth_balance(address, provider=provider)
     transaction_count = await rpc.async_eth_get_transaction_count(
         address, provider=provider
     )
@@ -43,7 +44,6 @@ async def async_print_address_summary(
     print('- address type:', address_type)
     print('- ETH balance:', eth_balance)
     print('- transaction count:', transaction_count)
-    print('- first transaction:')
 
     if is_contract:
         print()
