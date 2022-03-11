@@ -14,7 +14,8 @@ def get_command_spec():
 def edit_config_command():
     editor = os.environ.get('EDITOR')
     if editor is None or editor == '':
-        raise Exception('set $EDITOR env var')
+        editor = 'editor'
+        print('$EDITOR env var not set, attempting to use default editor')
 
     config_path = ctc.config.get_config_path()
 
