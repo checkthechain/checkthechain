@@ -1,7 +1,7 @@
 import asyncio
 
 import toolstr
-import tooltable
+import tooltable  # type: ignore
 
 from ctc import evm
 from ctc import rpc

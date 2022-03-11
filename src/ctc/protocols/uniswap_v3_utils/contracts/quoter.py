@@ -16,11 +16,11 @@ async def async_quote_exact_input_single(
     block: spec.BlockNumberReference = None,
 ) -> int:
     function_abi = uniswap_v3_spec.async_get_function_abi(
-        'quoteExactInputSingle'
+        'quoteExactInputSingle',
         'quoter',
     )
     return await rpc.async_eth_call(
-        to_contract=uniswap_v3_spec.quoter,
+        to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[
             token_in,
@@ -41,11 +41,11 @@ async def async_quote_exact_input(
     block: spec.BlockNumberReference = None,
 ) -> int:
     function_abi = uniswap_v3_spec.async_get_function_abi(
-        'quoteExactInput'
+        'quoteExactInput',
         'quoter',
     )
     return await rpc.async_eth_call(
-        to_contract=uniswap_v3_spec.quoter,
+        to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[path, amount_in],
         provider=provider,
@@ -63,11 +63,11 @@ async def async_quote_exact_output_single(
     block: spec.BlockNumberReference = None,
 ) -> int:
     function_abi = uniswap_v3_spec.async_get_function_abi(
-        'quoteExactOutputSingle'
+        'quoteExactOutputSingle',
         'quoter',
     )
     return await rpc.async_eth_call(
-        to_contract=uniswap_v3_spec.quoter,
+        to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[
             token_in,
@@ -88,11 +88,11 @@ async def async_quote_exact_output(
     block: spec.BlockNumberReference = None,
 ) -> int:
     function_abi = uniswap_v3_spec.async_get_function_abi(
-        'quoteExactOutput'
+        'quoteExactOutput',
         'quoter',
     )
     return await rpc.async_eth_call(
-        to_contract=uniswap_v3_spec.quoter,
+        to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[path, amount_in],
         provider=provider,

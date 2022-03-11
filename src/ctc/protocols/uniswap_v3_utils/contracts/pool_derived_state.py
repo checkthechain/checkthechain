@@ -12,7 +12,9 @@ async def async_pool_observe(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ):
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi('observe')
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'observe', 'pool'
+    )
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
@@ -33,8 +35,9 @@ async def async_pool_snapshot_cumulatives_inside(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ):
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi(
-        'snapshotCumulativesInside'
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'snapshotCumulativesInside',
+        'pool',
     )
     result = await rpc.async_eth_call(
         to_address=pool,

@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-import toolstr
+import toolstr  # type: ignore
 
 from ctc import rpc
 from ctc.protocols import fei_utils

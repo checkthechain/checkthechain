@@ -9,7 +9,9 @@ async def async_pool_factory(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ) -> spec.Address:
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi('factory')
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'factory', 'pool'
+    )
     return await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
@@ -23,7 +25,9 @@ async def async_pool_token0(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ) -> spec.Address:
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi('token0')
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'token0', 'pool'
+    )
     return await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
@@ -37,7 +41,9 @@ async def async_pool_token1(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ) -> spec.Address:
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi('token1')
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'token1', 'pool'
+    )
     return await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
@@ -51,7 +57,7 @@ async def async_pool_fee(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ) -> int:
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi('fee')
+    function_abi = await uniswap_v3_spec.async_get_function_abi('fee', 'pool')
     return await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
@@ -65,8 +71,8 @@ async def async_pool_tick_spacing(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ) -> int:
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi(
-        'tickSpacing'
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'tickSpacing', 'pool'
     )
     return await rpc.async_eth_call(
         to_address=pool,
@@ -81,8 +87,9 @@ async def async_pool_max_liquidity_per_tick(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
 ) -> int:
-    function_abi = await uniswap_v3_spec.async_get_pool_function_abi(
-        'maxLiquidityPerTick'
+    function_abi = await uniswap_v3_spec.async_get_function_abi(
+        'maxLiquidityPerTick',
+        'pool',
     )
     return await rpc.async_eth_call(
         to_address=pool,

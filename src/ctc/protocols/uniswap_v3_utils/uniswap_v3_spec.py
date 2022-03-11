@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from ctc import evm
 from ctc import spec
 
@@ -17,7 +18,18 @@ quoter = '0xb27308f9f90d607463bb33ea1bebb41c27ce5ab6'
 #
 
 
-_abi_cache = {
+_abi_cache: dict[
+    str,
+    typing.Optional[
+        dict[
+            str,
+            typing.Union[
+                spec.FunctionABI,
+                spec.EventABI,
+            ],
+        ]
+    ],
+] = {
     'pool': None,
     'quoter': None,
     'tick_lens': None,
@@ -54,12 +66,16 @@ async def async_get_function_abi(
     function_name: str, contract: str
 ) -> spec.FunctionABI:
     await _async_load_abi_cache(contract)
-    return _abi_cache[contract][function_name]
+    abi_entry = _abi_cache[contract]
+    if abi_entry is None:
+        raise Exception('must load abi into cache')
+    return typing.cast(spec.FunctionABI, abi_entry[function_name])
 
 
-async def async_get_event_abi(
-    event_name: str, contract: str
-) -> spec.EventABI:
+async def async_get_event_abi(event_name: str, contract: str) -> spec.EventABI:
     await _async_load_abi_cache(contract)
-    return _abi_cache[contract][event_name]
+    abi_entry = _abi_cache[contract]
+    if abi_entry is None:
+        raise Exception('must load abi into cache')
+    return typing.cast(spec.EventABI, abi_entry[event_name])
 

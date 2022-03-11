@@ -80,8 +80,8 @@ def write_file_data(
         raise Exception('file already exists, use overwrite=True')
 
     # clear cache entries for file if they exist
-    load_file_data.cache.delete_entry(kwargs={'path': path})
-    load_file_data.cache.delete_entry(args=[path])
+    load_file_data.cache.delete_entry(kwargs={'path': path})  # type: ignore
+    load_file_data.cache.delete_entry(args=[path])  # type: ignore
 
     # create directory if need be
     if create_directory:

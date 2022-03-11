@@ -1,4 +1,4 @@
-import tooltable
+import tooltable  # type: ignore
 from ctc import directory
 
 

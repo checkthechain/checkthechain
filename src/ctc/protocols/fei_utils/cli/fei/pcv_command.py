@@ -44,7 +44,7 @@ async def async_pcv_command(block):
         print('- PCV equity:', toolstr.format(protocol_equity, **format_kwargs))
         print('- CR:', toolstr.format(cr, percentage=True))
     elif output == 'table':
-        import tooltable
+        import tooltable  # type: ignore
 
         rows = [
             ['total PCV', toolstr.format(total_pcv, **format_kwargs)],

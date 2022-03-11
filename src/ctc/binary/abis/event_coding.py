@@ -59,7 +59,7 @@ def decode_event_topics(
         indexed_types = event_parsing.get_event_indexed_types(event_abi)
 
     # decode
-    decoded_topics = []
+    decoded_topics: list[str] = []
     for topic, indexed_type in zip(topics[1:], indexed_types):
         # only decode value types
         if (
@@ -67,7 +67,7 @@ def decode_event_topics(
             or indexed_type.endswith(']')
             or indexed_type.endswith(')')
         ):
-            decoded_topics.append(topic)
+            decoded_topics.append(topic)  # type: ignore
         else:
             topic = formats.convert(topic, 'binary')
             decoded_topic = abi_coding.abi_decode(topic, indexed_type)

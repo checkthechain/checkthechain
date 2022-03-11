@@ -1,4 +1,4 @@
-import tooltable
+import tooltable  # type: ignore
 
 from ctc.protocols import fourbyte_utils
 
