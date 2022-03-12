@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 import json
 import os
 import time
 
+import toolcli
 import toolstr  # type: ignore
 
 from ctc import rpc
 from ctc.protocols import fei_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_payload_command,
         'help': 'output data payload for app.fei.money/analytics',

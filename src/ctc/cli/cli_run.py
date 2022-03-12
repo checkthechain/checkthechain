@@ -145,6 +145,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         'include_cd_subcommand': True,
         'include_version_subcommand': True,
         'include_help_subcommand': True,
+        'include_cli_subcommand': True,
         #
         # args
         'include_debug_arg': True,

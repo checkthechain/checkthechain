@@ -23,7 +23,7 @@ setuptools.setup(
         #
         # tool suite
         'toolcache',
-        'toolcli>=0.3.0',
+        'toolcli>=0.3.3',
         'toolconf',
         'toolplot',
         'toolstr>=0.1.2',
