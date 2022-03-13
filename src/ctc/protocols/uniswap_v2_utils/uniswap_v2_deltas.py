@@ -105,6 +105,8 @@ async def async_get_pool_state_per_log(
     state_per_log = log_deltas[['delta_token0', 'delta_token1']].cumsum()
     state_per_log.columns = ['token0_reserves', 'token1_reserves']
 
+    _put_price_in_state(state_per_log)
+
     return state_per_log
 
 
@@ -128,6 +130,8 @@ async def async_get_pool_state_per_transaction(
     ].cumsum()
     state_per_transaction.columns = ['token0_reserves', 'token1_reserves']
 
+    _put_price_in_state(state_per_transaction)
+
     return state_per_transaction
 
 
@@ -150,10 +154,17 @@ async def async_get_pool_state_per_block(
     state_per_block = block_deltas[['delta_token0', 'delta_token1']].cumsum()
     state_per_block.columns = ['token0_reserves', 'token1_reserves']
 
+    _put_price_in_state(state_per_block)
+
     if interpolate:
         from ctc.toolbox import pd_utils
 
         state_per_block = pd_utils.interpolate_dataframe(state_per_block)
 
     return state_per_block
+
+
+def _put_price_in_state(state: spec.DataFrame) -> spec.DataFrame:
+    state['price_0_per_1'] = state['token0_reserves'] / state['token1_reserves']
+    state['price_1_per_0'] = state['token1_reserves'] / state['token0_reserves']
 
