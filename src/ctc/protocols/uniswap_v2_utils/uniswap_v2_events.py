@@ -49,19 +49,19 @@ async def async_get_pool_swaps(
     if normalize:
         x_decimals, y_decimals = await decimals_task
         swaps['arg__amount0In'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount0In'].astype(float),
+            quantities=swaps['arg__amount0In'].astype(float),  # type: ignore
             decimals=x_decimals,
         )
         swaps['arg__amount0Out'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount0Out'].astype(float),
+            quantities=swaps['arg__amount0Out'].astype(float),  # type: ignore
             decimals=x_decimals,
         )
         swaps['arg__amount1In'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount1In'].astype(float),
+            quantities=swaps['arg__amount1In'].astype(float),  # type: ignore
             decimals=y_decimals,
         )
         swaps['arg__amount1Out'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount1Out'].astype(float),
+            quantities=swaps['arg__amount1Out'].astype(float),  # type: ignore
             decimals=y_decimals,
         )
 
