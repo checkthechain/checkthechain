@@ -16,6 +16,7 @@ async def async_get_pool_swaps(
     replace_symbols: bool = False,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
+    verbose=False,
 ) -> spec.DataFrame:
 
     if replace_symbols:
@@ -37,6 +38,7 @@ async def async_get_pool_swaps(
         start_block=start_block,
         end_block=end_block,
         provider=provider,
+        verbose=verbose,
     )
     swaps['arg__amount0In'] = swaps['arg__amount0In'].map(int)
     swaps['arg__amount0Out'] = swaps['arg__amount0Out'].map(int)
@@ -87,6 +89,7 @@ async def async_get_pool_mints(
     replace_symbols=False,
     normalize=True,
     provider=None,
+    verbose=False,
 ):
     if normalize:
         decimals_task = asyncio.create_task(
@@ -107,6 +110,7 @@ async def async_get_pool_mints(
         start_block=start_block,
         end_block=end_block,
         provider=provider,
+        verbose=verbose,
     )
     mints['arg__amount0'] = mints['arg__amount0'].map(int)
     mints['arg__amount1'] = mints['arg__amount1'].map(int)
@@ -142,6 +146,7 @@ async def async_get_pool_burns(
     replace_symbols=False,
     normalize=True,
     provider=None,
+    verbose=False
 ):
 
     if normalize:
@@ -163,6 +168,7 @@ async def async_get_pool_burns(
         start_block=start_block,
         end_block=end_block,
         provider=provider,
+        verbose=verbose,
     )
     burns['arg__amount0'] = burns['arg__amount0'].map(int)
     burns['arg__amount1'] = burns['arg__amount1'].map(int)
