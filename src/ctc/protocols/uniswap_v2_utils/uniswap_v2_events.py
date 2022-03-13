@@ -82,7 +82,7 @@ async def async_get_pool_mints(
     # replace_symbols=False,
     # normalize=True,
 ):
-    return evm.get_events(
+    return await evm.async_get_events(
         event_name='Mint',
         contract_address=pool_address,
         start_block=start_block,
@@ -97,7 +97,7 @@ async def async_get_pool_burns(
     # replace_symbols=False,
     # normalize=True,
 ):
-    return evm.get_events(
+    return await evm.async_get_events(
         event_name='Burn',
         contract_address=pool_address,
         start_block=start_block,
