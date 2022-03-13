@@ -25,7 +25,11 @@ def get_command_spec():
 
 
 async def async_address_command(address, verbose, network, **kwargs):
-    max_width = os.get_terminal_size().columns
+    try:
+        max_width = os.get_terminal_size().columns
+    except OSError:
+        max_width = 80
+
     if verbose:
         verbose = 2
     await evm.async_print_address_summary(
