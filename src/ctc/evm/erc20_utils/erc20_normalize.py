@@ -9,7 +9,7 @@ from . import erc20_metadata
 
 async def async_normalize_erc20_quantity(
     quantity: typing.SupportsFloat,
-    token: typing.Optional[spec.ERC20Address],
+    token: typing.Optional[spec.ERC20Address] = None,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: spec.BlockNumberReference = 'latest',
@@ -37,7 +37,7 @@ async def async_normalize_erc20_quantity(
 
 async def async_normalize_erc20_quantities(
     quantities: typing.Sequence[typing.SupportsInt],
-    token: spec.ERC20Address,
+    token: spec.ERC20Address = None,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: spec.BlockNumberReference = 'latest',
