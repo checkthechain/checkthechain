@@ -298,3 +298,24 @@ def _get_next_probes_block_of_timestamp(
 
             return probes
 
+
+async def async_get_block_number_and_time(
+    block_number: typing.Optional[spec.BlockNumberReference] = None,
+    block_timestamp: typing.Optional[int] = None,
+) -> tuple[int, int]:
+
+    if block_timestamp is not None and block_number is not None:
+        raise Exception('must specify start_time or block_number')
+
+    if block_number is not None:
+        block = await block_crud.async_get_block(block_number)
+        return block['number'], block['timestamp']
+
+    elif block_timestamp is not None:
+        block_number = await async_get_block_of_timestamp(block_timestamp)
+        block = await block_crud.async_get_block(block_number)
+        return block['number'], block['timestamp']
+
+    else:
+        raise Exception('must specify start_time or block_number')
+
