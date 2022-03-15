@@ -84,7 +84,10 @@ command_index = {
 description = """ctc is a tool for historical data analysis of Ethereum and other EVM chains
 
 if using ctc for the first time, run:
-    [option]ctc setup[/option]"""
+    [option]ctc setup[/option]
+
+for quick lookups of an address, block, tx, or timestamp, run:
+    [option]ctc QUERY[/option]"""
 
 
 cd_dir_help = {
