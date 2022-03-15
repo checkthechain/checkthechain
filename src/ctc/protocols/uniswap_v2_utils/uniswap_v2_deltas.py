@@ -164,7 +164,7 @@ async def async_get_pool_state_per_block(
     return state_per_block
 
 
-def _put_price_in_state(state: spec.DataFrame) -> spec.DataFrame:
+def _put_price_in_state(state: spec.DataFrame) -> None:
     state['price_0_per_1'] = state['token0_reserves'] / state['token1_reserves']
     state['price_1_per_0'] = state['token1_reserves'] / state['token0_reserves']
 
