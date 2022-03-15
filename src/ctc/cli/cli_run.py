@@ -44,6 +44,7 @@ command_index = {
     # protocol commands
     ('cg',): 'ctc.cli.commands.data.cg_command',
     ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
+    ('chainlink', 'ls'): 'ctc.protocols.chainlink_utils.cli.chainlink_ls_command',
     ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
     ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
     ('ens', 'hash'): 'ctc.protocols.ens_utils.cli.ens.hash_command',
