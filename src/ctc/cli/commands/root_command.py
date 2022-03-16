@@ -54,13 +54,20 @@ def root_command(query, parse_spec):
         elif str.isalnum(item) and len(item) <= 20:
             from ctc import directory
 
-            metadata = directory.get_erc20_metadata(symbol=item)
-            address = metadata['address']
-            toolcli.execute_other_command_sequence(
-                command_sequence=('address',),
-                args={'parse_spec': parse_spec, 'address': address},
-                parse_spec=parse_spec,
-            )
+            try:
+                metadata = directory.get_erc20_metadata(symbol=item)
+                address = metadata['address']
+                toolcli.execute_other_command_sequence(
+                    command_sequence=('address',),
+                    args={'parse_spec': parse_spec, 'address': address},
+                    parse_spec=parse_spec,
+                )
+            except LookupError:
+                toolcli.execute_other_command_sequence(
+                    command_sequence=('help',),
+                    args={'parse_spec': parse_spec},
+                    parse_spec=parse_spec,
+                )
 
         else:
             raise Exception('unknown query: ' + str(query))
