@@ -169,6 +169,18 @@ deposit_metadata = {
         'name': 'Fuse Pool 72 FEI',
         'platform': 'Rari Fuse',
     },
+    '0xd2554839c2e8a87dd2cddd013ef828b6534abc26': {
+        'name': 'Uniswap FEI-agEUR',
+        'platform': 'Uniswap V2',
+    },
+    '0xb80b3dc4f8b30589477b2ba0e4ef2b8224bdf0a5': {
+        'name': 'Compound cFEI',
+        'platform': 'Compound',
+    },
+    '0x1370ca8655c255948d6c6110066d78680601b7c2': {
+        'name': 'Fuse Pool 156',
+        'platform': 'Rari Fuse',
+    },
 }
 
 deposit_names = {
