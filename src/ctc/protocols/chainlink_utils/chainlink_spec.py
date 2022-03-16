@@ -10,13 +10,7 @@ _FeedReference = typing.Union[spec.Address, str]
 
 
 class FeedRoundData(TypedDict):
-    answer: int
-    round_id: int
-    timestamp: int
-
-
-class FeedRoundDataNormalized(TypedDict):
-    answer: float
+    answer: typing.Union[int, float]
     round_id: int
     timestamp: int
 

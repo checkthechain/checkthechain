@@ -17,6 +17,7 @@ async def async_get_feed_answer_datum_by_block(
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     interpolate: bool = True,
+    invert: bool = False,
 ) -> spec.Series:
 
     int_blocks = await evm.async_block_numbers_to_int(blocks=blocks)
@@ -30,6 +31,7 @@ async def async_get_feed_answer_datum_by_block(
             normalize=normalize,
             block=block,
             provider=provider,
+            invert=invert,
         )
         coroutines.append(coroutine)
     result = await asyncio.gather(*coroutines)
@@ -50,6 +52,7 @@ async def async_get_feed_full_datum_by_block(
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     interpolate: bool = True,
+    invert: bool = False,
 ) -> spec.DataFrame:
 
     int_blocks = await evm.async_block_numbers_to_int(blocks=blocks)
@@ -63,6 +66,7 @@ async def async_get_feed_full_datum_by_block(
             provider=provider,
             normalize=normalize,
             fields='full',
+            invert=invert,
         )
         coroutines.append(coroutine)
     result = await asyncio.gather(*coroutines)

@@ -17,6 +17,7 @@ async def async_get_full_feed_event_data(
     interpolate: bool = False,
     provider: spec.ProviderSpec = None,
     keep_multiindex: bool = False,
+    invert: bool = False,
 ) -> spec.DataFrame:
     """
     TODO: be able to gather data across multiple aggregator changes
@@ -90,6 +91,9 @@ async def async_get_full_feed_event_data(
     elif not keep_multiindex:
         df.index = pd_utils.keep_level(df.index, level='block_number')
 
+    if invert:
+        df['answer'] = 1 / df['answer']
+
     return df
 
 
@@ -101,6 +105,7 @@ async def async_get_answer_feed_event_data(
     interpolate: bool = False,
     provider: spec.ProviderSpec = None,
     keep_multiindex: bool = False,
+    invert: bool = False,
 ) -> spec.Series:
 
     df = await async_get_full_feed_event_data(
@@ -111,6 +116,7 @@ async def async_get_answer_feed_event_data(
         interpolate=interpolate,
         provider=provider,
         keep_multiindex=keep_multiindex,
+        invert=invert,
     )
 
     return df['answer']

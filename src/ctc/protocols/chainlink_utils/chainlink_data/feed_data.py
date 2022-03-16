@@ -18,6 +18,7 @@ async def async_get_feed_data(
     blocks: typing.Sequence[spec.BlockNumberReference] = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
     provider: spec.ProviderSpec = None,
@@ -33,6 +34,7 @@ async def async_get_feed_data(
     blocks: typing.Sequence[spec.BlockNumberReference] = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
     provider: spec.ProviderSpec = None,
@@ -47,6 +49,7 @@ async def async_get_feed_data(
     blocks: typing.Sequence[spec.BlockNumberReference] = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
     provider: spec.ProviderSpec = None,
@@ -75,6 +78,7 @@ async def async_get_feed_data(
                     blocks=blocks,
                     normalize=normalize,
                     interpolate=interpolate,
+                    invert=invert,
                 )
             )
 
@@ -86,6 +90,7 @@ async def async_get_feed_data(
                 start_block=start_block,
                 end_block=end_block,
                 interpolate=interpolate,
+                invert=invert,
             )
 
     elif fields == 'full':
@@ -97,6 +102,7 @@ async def async_get_feed_data(
                 blocks=blocks,
                 normalize=normalize,
                 interpolate=interpolate,
+                invert=invert,
             )
 
         else:
@@ -107,6 +113,7 @@ async def async_get_feed_data(
                 start_block=start_block,
                 end_block=end_block,
                 interpolate=interpolate,
+                invert=invert,
             )
 
     else:
