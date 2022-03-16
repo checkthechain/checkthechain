@@ -39,9 +39,15 @@ async def async_get_pool_state(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
+    fill_empty: bool = True,
 ) -> uniswap_v2_spec.PoolState:
 
     block = await evm.async_block_number_to_int(block, provider=provider)
+
+    if fill_empty:
+        empty_token = 0
+    else:
+        empty_token = None
 
     # reserves
     token_x, token_y = await uniswap_v2_metadata.async_get_pool_tokens(
@@ -53,6 +59,8 @@ async def async_get_pool_state(
         block=block,
         provider=provider,
         normalize=normalize,
+        fill_empty=fill_empty,
+        empty_token=empty_token,
     )
     reserves_task = asyncio.create_task(reserves_coroutine)
 
@@ -62,16 +70,10 @@ async def async_get_pool_state(
         block=block,
         provider=provider,
         normalize=normalize,
+        fill_empty=fill_empty,
+        empty_token=empty_token,
     )
     lp_total_supply_task = asyncio.create_task(lp_total_supply_coroutine)
-
-    # metadata
-    if normalize:
-        decimals_coroutine = uniswap_v2_metadata.async_get_pool_decimals(
-            pool=pool,
-            provider=provider,
-        )
-        decimals_task = asyncio.create_task(decimals_coroutine)
 
     # await results
     token_x_reserves, token_y_reserves = await reserves_task
