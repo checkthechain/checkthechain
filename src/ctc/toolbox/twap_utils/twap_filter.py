@@ -18,22 +18,22 @@ def filter_twap(
     import pandas as pd
 
     # compute twap times
-    timestamps = np.array(timestamps)
+    timestamps_array = np.array(timestamps)
     filter_seconds = tooltime.timestamp_to_seconds(filter_duration)
     first_input_timestamp = timestamps[0]
-    output_mask = timestamps > first_input_timestamp + filter_seconds
-    twap_times = timestamps[output_mask]
+    output_mask = timestamps_array > first_input_timestamp + filter_seconds
+    twap_times = timestamps_array[output_mask]
 
     # compute twap values
     # cannot use efficient numpy operation because filter size is variable
     # (because block times are variable)
-    raw_values = np.array(raw_values)
+    raw_values_array = np.array(raw_values)
     twap_values = []
     for twap_time in twap_times:
-        lower_bound = twap_time - filter_seconds < timestamps
-        upper_bound = timestamps <= twap_time
+        lower_bound = twap_time - filter_seconds < timestamps_array
+        upper_bound = timestamps_array <= twap_time
         block_mask = lower_bound * upper_bound
-        twap_value = raw_values[block_mask].mean()
+        twap_value = raw_values_array[block_mask].mean()
         twap_values.append(twap_value)
 
     # format as Series
