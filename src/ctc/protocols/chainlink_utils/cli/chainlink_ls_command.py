@@ -1,5 +1,5 @@
 from ctc import directory
-import tooltable
+import tooltable  # type: ignore
 
 
 def get_command_spec():

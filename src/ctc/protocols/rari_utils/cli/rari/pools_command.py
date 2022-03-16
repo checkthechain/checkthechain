@@ -1,4 +1,4 @@
-import tooltable
+import tooltable  # type: ignore
 import tooltime
 
 from ctc import rpc
