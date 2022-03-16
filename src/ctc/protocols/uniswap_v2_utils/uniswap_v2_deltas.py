@@ -1,32 +1,62 @@
 from __future__ import annotations
 
+import asyncio
 import typing
 
 from ctc import evm
 from ctc import spec
 from . import uniswap_v2_events
+from . import uniswap_v2_state
 
 
 async def async_get_pool_log_deltas(
     pool: spec.Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
+    end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
+    include_initial_state: bool = True,
 ) -> spec.DataFrame:
     import pandas as pd
 
+    # get start_block and initial conditions
     if start_block is None:
         start_block = await evm.async_get_contract_creation_block(pool)
+        initial_point_task = None
+    else:
+        if include_initial_state:
+            coroutine = uniswap_v2_state.async_get_pool_state(
+                pool,
+                block=start_block,
+                normalize=normalize,
+            )
+            initial_point_task = asyncio.create_task(coroutine)
+        else:
+            initial_point_task = None
 
-    mints = await uniswap_v2_events.async_get_pool_mints(
-        pool, start_block=start_block, normalize=normalize
+    # get mints, burns, and swaps
+    mints_task = uniswap_v2_events.async_get_pool_mints(
+        pool,
+        start_block=start_block,
+        end_block=end_block,
+        normalize=normalize,
     )
-    burns = await uniswap_v2_events.async_get_pool_burns(
-        pool, start_block=start_block, normalize=normalize
+    burns_task = uniswap_v2_events.async_get_pool_burns(
+        pool,
+        start_block=start_block,
+        end_block=end_block,
+        normalize=normalize,
     )
-    swaps = await uniswap_v2_events.async_get_pool_swaps(
-        pool, start_block=start_block, normalize=normalize
+    swaps_task = uniswap_v2_events.async_get_pool_swaps(
+        pool,
+        start_block=start_block,
+        end_block=end_block,
+        normalize=normalize,
+    )
+    mints, burns, swaps = await asyncio.gather(
+        mints_task, burns_task, swaps_task
     )
 
+    # gather as DataFrames
     dfs = [
         pd.DataFrame(
             {
@@ -50,6 +80,18 @@ async def async_get_pool_log_deltas(
             },
         ),
     ]
+
+    # add initial point
+    if initial_point_task is not None:
+        initial_point = await initial_point_task
+        initial_point_df = pd.DataFrame(
+            {
+                'event': 'Initial',
+                'delta_token0': initial_point['x_reserves'],
+                'delta_token1': initial_point['y_reserves'],
+            }
+        )
+        dfs.append(initial_point_df)
 
     df = pd.concat(dfs)
     df = df.sort_index()
