@@ -75,7 +75,7 @@ async def async_get_latest_block_number(
 
 
 async def async_get_blocks_timestamps(
-    blocks: list[spec.BlockReference],
+    blocks: typing.Sequence[spec.BlockReference],
     include_full_transactions: bool = False,
     chunk_size: int = 500,
     provider: spec.ProviderSpec = None,
