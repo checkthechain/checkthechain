@@ -11,7 +11,11 @@ def get_command_spec():
         'args': [
             # TODO: allow arg to be pool comptroller
             # - will need to check on chain to see if token or comptroller
-            {'name': 'arg', 'nargs': '?', 'help': 'pool index or token'},
+            {
+                'name': 'arg',
+                'nargs': '?',
+                'help': 'pool index or token, omit to summarize platform',
+            },
             {'name': '--block', 'default': 'latest', 'help': 'block number'},
         ],
     }
