@@ -38,7 +38,7 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
     elif isinstance(provider, dict):
 
         # case: partial provider
-        if set(provider.keys()) == spec.provider_keys:
+        if set(provider.keys()) == set(spec.provider_keys):
             return typing.cast(spec.Provider, provider)
 
         else:
