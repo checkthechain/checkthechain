@@ -22,7 +22,11 @@ async def async_get_pool_addresses(
             try:
                 token_address = await rpc.async_eth_call(
                     to_address=pool,
-                    function_name='coins',
+                    function_abi={
+                        'name': 'coins',
+                        'inputs': [{'type': 'uint256'}],
+                        'outputs': [{'type': 'address'}],
+                    },
                     function_parameters=[t],
                     provider=provider,
                 )
@@ -34,7 +38,11 @@ async def async_get_pool_addresses(
         address_coroutines = [
             rpc.async_eth_call(
                 to_address=pool,
-                function_name='coins',
+                function_abi={
+                    'name': 'coins',
+                    'inputs': [{'type': 'uint256'}],
+                    'outputs': [{'type': 'address'}],
+                },
                 function_parameters=[i],
                 provider=provider,
             )

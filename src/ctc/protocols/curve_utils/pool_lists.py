@@ -4,15 +4,87 @@ import asyncio
 import typing
 
 from ctc import evm
+from ctc import rpc
 from ctc import spec
 
 old_pool_factory = '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae'
 pool_factory = '0xb9fc157394af804a3578134a6585c0dc9cc990d4'
+eth_address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 creation_blocks = {
     '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae': 11942404,
     '0xb9fc157394af804a3578134a6585c0dc9cc990d4': 12903979,
 }
+
+#
+# # call based
+#
+
+
+async def async_get_factory_pool_data(factory, include_balances=False):
+    n_pools = await rpc.async_eth_call(
+        to_address=factory,
+        function_name='pool_count',
+    )
+
+    coroutines = [
+        _async_get_pool_data(p, factory, include_balances=include_balances)
+        for p in range(n_pools)
+    ]
+
+    return await asyncio.gather(*coroutines)
+
+
+async def _async_get_pool_data(p, factory, include_balances=False):
+    pool = await rpc.async_eth_call(
+        to_address=factory,
+        function_name='pool_list',
+        function_parameters=[p],
+    )
+
+    coins = await rpc.async_eth_call(
+        to_address=factory,
+        function_name='get_coins',
+        function_parameters=[pool],
+    )
+    coins = [coin for coin in coins if coin not in [eth_address]]
+
+    valid_coins = [
+        coin
+        for coin in coins
+        if coin
+        not in ['0x0000000000000000000000000000000000000000', eth_address]
+    ]
+    symbols = await evm.async_get_erc20s_symbols(
+        valid_coins,
+    )
+
+    if eth_address in coins:
+        index = coins.index(eth_address)
+        symbols.insert(index, 'ETH')
+
+    if include_balances:
+        balances = await evm.async_get_erc20s_balance_of(
+            tokens=valid_coins,
+            address=pool,
+        )
+        if eth_address in coins:
+            eth_balance = await evm.async_get_eth_balance(pool)
+            balances.insert(index, eth_balance)
+    else:
+        balances = [None for coin in coins]
+
+    return {
+        'address': pool,
+        'tokens': coins,
+        'symbols': symbols,
+        'balances': balances,
+    }
+
+
+#
+# # event based
+#
 
 
 async def async_get_base_pools(
