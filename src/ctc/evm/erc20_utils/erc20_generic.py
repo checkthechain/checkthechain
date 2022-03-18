@@ -27,7 +27,7 @@ def get_erc20_address(token: spec.ERC20Reference) -> spec.ERC20Address:
 async def async_erc20_eth_call(
     function_name: str,
     token: spec.ERC20Reference,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ) -> typing.Any:
     """perform eth_call for an erc20"""
@@ -43,7 +43,7 @@ async def async_erc20_eth_call(
 async def async_erc20s_eth_calls(
     function_name: str,
     tokens: typing.Iterable[spec.ERC20Reference],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ) -> list[typing.Any]:
     """perform eth_call for multiple erc20s"""

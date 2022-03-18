@@ -21,7 +21,7 @@ def get_token_amount_column(df):
 async def async_get_erc20_transfers(
     token_address: spec.ERC20Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
-    end_block: spec.BlockNumberReference = 'latest',
+    end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     **event_kwargs
 ) -> spec.DataFrame:

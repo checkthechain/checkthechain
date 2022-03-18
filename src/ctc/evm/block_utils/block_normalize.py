@@ -13,13 +13,15 @@ from . import block_crud
 
 
 async def async_block_number_to_int(
-    block: spec.BlockNumberReference,
+    block: typing.Optional[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
 ) -> int:
     """resolve block number reference to int (e.g. converting 'latest' to int)
 
     Examples: 'latest', or 9999.0, or 9999
     """
+    if block is None:
+        block = 'latest'
     if block in spec.block_number_names:
         return await block_crud.async_get_latest_block_number(provider=provider)
     else:
@@ -27,12 +29,15 @@ async def async_block_number_to_int(
 
 
 def standardize_block_number(
-    block: spec.BlockNumberReference,
+    block: typing.Optional[spec.BlockNumberReference],
 ) -> spec.StandardBlockNumber:
     """turn block into standard block number reference
 
-    Examples: 'latest' or 123456
+    Examples of standard block numbers: 'latest' or 123456
     """
+
+    if block is None:
+        block = 'latest'
 
     if block in spec.block_number_names:
         return typing.cast(spec.BlockNumberName, block)

@@ -14,7 +14,7 @@ from . import erc20_generic
 
 async def async_get_erc20_decimals(
     token: spec.ERC20Reference,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ) -> int:
     """get decimals of an erc20"""
@@ -25,7 +25,7 @@ async def async_get_erc20_decimals(
 
 async def async_get_erc20s_decimals(
     tokens: typing.Iterable[spec.ERC20Reference],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ) -> list[int]:
     """get decimals of multiple erc20s"""
@@ -50,7 +50,7 @@ async def async_get_erc20_decimals_by_block(
 
 async def async_get_erc20_name(
     token: spec.ERC20Reference,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ) -> str:
     """get name of an erc20"""
@@ -61,7 +61,7 @@ async def async_get_erc20_name(
 
 async def async_get_erc20s_names(
     tokens: typing.Iterable[spec.ERC20Reference],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ) -> list[str]:
     """get name of multiple erc20s"""
@@ -97,7 +97,7 @@ def _decode_raw_symbol(data):
 
 async def async_get_erc20_symbol(
     token: spec.ERC20Reference,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ):
     """get symbol of an erc20"""
@@ -114,7 +114,7 @@ async def async_get_erc20_symbol(
 
 async def async_get_erc20s_symbols(
     tokens: typing.Iterable[spec.ERC20Reference],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs
 ):
     """get symbol of multiple erc20s"""

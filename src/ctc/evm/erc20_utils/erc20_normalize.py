@@ -12,7 +12,7 @@ async def async_normalize_erc20_quantity(
     token: typing.Optional[spec.ERC20Address] = None,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> float:
     """convert raw erc20 quantity by adjusting radix by (10 ** decimals)"""
 
@@ -40,7 +40,7 @@ async def async_normalize_erc20_quantities(
     token: spec.ERC20Address = None,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> list[float]:
 
     if all(quantity == 0 for quantity in quantities):
@@ -64,7 +64,7 @@ async def async_normalize_erc20s_quantities(
     quantities: typing.Sequence[typing.SupportsInt],
     tokens: typing.Optional[typing.Sequence[spec.ERC20Address]] = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> list[float]:
 

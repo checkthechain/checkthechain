@@ -17,12 +17,15 @@ from . import erc20_generic
 
 async def async_get_erc20_total_supply(
     token: spec.ERC20Reference,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
     **rpc_kwargs,
 ) -> typing.Union[int, float]:
     """"""
+
+    if block is None:
+        block = 'latest'
 
     total_supply = await erc20_generic.async_erc20_eth_call(
         token=token,
@@ -42,12 +45,15 @@ async def async_get_erc20_total_supply(
 
 async def async_get_erc20s_total_supplies(
     tokens: typing.Sequence[spec.ERC20Reference],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
     **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
     """"""
+
+    if block is None:
+        block = 'latest'
 
     total_supplies = await erc20_generic.async_erc20s_eth_calls(
         tokens=tokens, function_name='totalSupply', block=block, **rpc_kwargs
@@ -100,11 +106,14 @@ async def async_get_erc20_total_supply_by_block(
 async def async_get_erc20_balance_of(
     address: spec.Address,
     token: spec.ERC20Address,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
     **rpc_kwargs,
 ) -> typing.Union[int, float]:
+
+    if block is None:
+        block = 'latest'
 
     balance = await erc20_generic.async_erc20_eth_call(
         token=token,
@@ -126,11 +135,14 @@ async def async_get_erc20_balance_of(
 async def async_get_erc20_balance_of_addresses(
     addresses: typing.Sequence[spec.Address],
     token: spec.ERC20Address,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
     **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
+
+    if block is None:
+        block = 'latest'
 
     balances = await rpc.async_batch_eth_call(
         to_address=token,
@@ -152,12 +164,15 @@ async def async_get_erc20_balance_of_addresses(
 async def async_get_erc20s_balance_of(
     address: spec.Address,
     tokens: typing.Sequence[spec.ERC20Address],
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
     **rpc_kwargs,
 ) -> typing.Union[list[int], list[float]]:
     """"""
+
+    if block is None:
+        block = 'latest'
 
     balances = await erc20_generic.async_erc20s_eth_calls(
         tokens=tokens,
@@ -170,7 +185,10 @@ async def async_get_erc20s_balance_of(
 
     if normalize:
         balances = await erc20_normalize.async_normalize_erc20s_quantities(
-            quantities=balances, tokens=tokens, provider=provider, block=block,
+            quantities=balances,
+            tokens=tokens,
+            provider=provider,
+            block=block,
         )
 
     return balances
