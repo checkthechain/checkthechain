@@ -16,7 +16,7 @@ BlockNumberName = typing.Union[
 ]
 
 # anything that can be converted to an int without node querying
-RawBlockNumber = typing.Union[typing.SupportsRound, binary_types.HexData]
+RawBlockNumber = typing.Union[typing.SupportsRound, binary_types.HexData, str]
 
 # an int or block number name
 StandardBlockNumber = typing.Union[int, BlockNumberName]

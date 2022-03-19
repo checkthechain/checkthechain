@@ -32,20 +32,24 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_payload_command(timescale, path, overwrite, **kwargs):
+async def async_payload_command(
+    timescale: str,
+    path: str,
+    overwrite: bool,
+) -> None:
 
     # validate inputs
     if timescale is None:
         timescale = '30d, 1d'
-    timescale = fei_utils.resolve_timescale(timescale)
+    timescale_full = fei_utils.resolve_timescale(timescale)
     if path is None:
-        name = 'payload_{window_size}_{interval_size}'.format(**timescale)
+        name = 'payload_{window_size}_{interval_size}'.format(**timescale_full)
         path = './' + name + '.json'
 
     # print summary
     print('generating data payload')
-    print('- interval size:', timescale['interval_size'])
-    print('- window size:', timescale['window_size'])
+    print('- interval size:', timescale_full['interval_size'])
+    print('- window size:', timescale_full['window_size'])
     print('- output path:', path)
 
     if os.path.exists(path) and not overwrite:
@@ -55,7 +59,7 @@ async def async_payload_command(timescale, path, overwrite, **kwargs):
     print()
     print('starting...')
     start_time = time.time()
-    payload = await fei_utils.async_create_payload(timescale=timescale)
+    payload = await fei_utils.async_create_payload(timescale=timescale_full)
     end_time = time.time()
     print()
     print('...done (t=' + toolstr.format(end_time - start_time) + 's)')

@@ -1,14 +1,19 @@
-import asyncio
+from __future__ import annotations
 
+import asyncio
+import typing
+
+import toolcli
 import toolstr
 import tooltable  # type: ignore
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.protocols import fei_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_pcv_deposits_command,
         'help': 'output summary of Fei PCV deposits',
@@ -18,15 +23,19 @@ def get_command_spec():
     }
 
 
-async def async_pcv_deposits_command(block):
+async def async_pcv_deposits_command(
+    block: typing.Optional[spec.BlockNumberReference],
+) -> None:
     await async_print_pcv_deposits(block=block)
     await rpc.async_close_http_session()
 
 
-async def async_print_pcv_deposits(block):
+async def async_print_pcv_deposits(
+    block: typing.Optional[spec.BlockNumberReference],
+) -> None:
 
     if block is not None:
-        block = int(block)
+        block = await evm.async_block_number_to_int(block=block)
 
     tokens_deposits = await fei_utils.async_get_tokens_deposits(block=block)
 
@@ -64,7 +73,8 @@ async def async_print_pcv_deposits(block):
 
     # token prices
     token_prices_list = await fei_utils.async_get_tokens_prices(
-        tokens=pcv_tokens, block=block,
+        tokens=pcv_tokens,
+        block=block,
     )
     token_prices = dict(zip(pcv_tokens, token_prices_list))
 
@@ -97,7 +107,13 @@ async def async_print_pcv_deposits(block):
 
             name = ''
             if deposit in dex_pools:
-                name = fei_utils.dex_pools[deposit]['name']
+                deposit_metadata = fei_utils.dex_pools[deposit]
+                name = (
+                    deposit_metadata['platform']
+                    + ' '
+                    + 'FEI-'
+                    + '-'.join(deposit_metadata['other_assets'])
+                )
             if deposit in fei_utils.deposit_metadata:
                 name = fei_utils.deposit_metadata[deposit]['name']
             if deposit in fei_utils.deposit_names:

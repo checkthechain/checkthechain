@@ -66,6 +66,7 @@ async def async_get_eth_balance(
 @typing.overload
 async def async_get_eth_balance_by_block(
     address: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: typing.Literal[False],
     provider: typing.Optional[spec.ProviderSpec] = None,
@@ -76,6 +77,7 @@ async def async_get_eth_balance_by_block(
 @typing.overload
 async def async_get_eth_balance_by_block(
     address: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: typing.Literal[True] = True,
     provider: typing.Optional[spec.ProviderSpec] = None,
@@ -83,8 +85,20 @@ async def async_get_eth_balance_by_block(
     ...
 
 
+@typing.overload
 async def async_get_eth_balance_by_block(
     address: spec.Address,
+    *,
+    normalize: bool = True,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    provider: typing.Optional[spec.ProviderSpec] = None,
+) -> typing.Union[list[int], list[float]]:
+    ...
+
+
+async def async_get_eth_balance_by_block(
+    address: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: typing.Optional[spec.ProviderSpec] = None,
@@ -119,6 +133,17 @@ async def async_get_eth_balance_of_addresses(
     normalize: typing.Literal[True] = True,
     provider: typing.Optional[spec.ProviderSpec] = None,
 ) -> list[float]:
+    ...
+
+
+@typing.overload
+async def async_get_eth_balance_of_addresses(
+    addresses: typing.Sequence[spec.Address],
+    *,
+    normalize: bool = True,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: typing.Optional[spec.ProviderSpec] = None,
+) -> typing.Union[list[int], list[float]]:
     ...
 
 

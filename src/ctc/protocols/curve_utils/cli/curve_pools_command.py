@@ -1,5 +1,4 @@
 import asyncio
-import tooltable  # type: ignore
 
 from ctc import rpc
 from ctc.protocols import curve_utils

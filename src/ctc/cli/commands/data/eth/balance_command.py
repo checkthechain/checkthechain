@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
 import toolstr
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_balance_command,
         'help': 'output ETH balance of address',
@@ -20,7 +26,11 @@ def get_command_spec():
     }
 
 
-async def async_balance_command(address, block, raw):
+async def async_balance_command(
+    address: str,
+    block: typing.Optional[spec.BlockNumberReference],
+    raw: bool,
+) -> None:
 
     if block is not None:
         block = await evm.async_block_number_to_int(block)

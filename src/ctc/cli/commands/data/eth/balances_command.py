@@ -6,14 +6,20 @@ ctc eth balances <wallets> [--block <block>]
 ctc eth balances <wallet> [--blocks <block>]
 """
 
+from __future__ import annotations
+
+import typing
+
 import pandas as pd
+import toolcli
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.cli import cli_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_balances_command,
         'help': 'output ETH balance across blocks or addresses',
@@ -50,13 +56,13 @@ def get_command_spec():
 
 
 async def async_balances_command(
-    wallets,
-    block,
-    blocks,
-    raw,
-    output,
-    overwrite,
-):
+    wallets: list[str],
+    block: typing.Optional[spec.BlockNumberReference],
+    blocks: typing.Optional[typing.Sequence[str]],
+    raw: bool,
+    output: typing.Optional[str],
+    overwrite: bool,
+) -> None:
     indent = None
     wallets = [wallet.lower() for wallet in wallets]
 
@@ -68,7 +74,7 @@ async def async_balances_command(
             )
 
         wallet = wallets[0]
-        resolved_blocks = await cli_utils.async_resolve_blocks(blocks)
+        resolved_blocks = await cli_utils.async_resolve_block_range(blocks)
         balances = await evm.async_get_eth_balance_by_block(
             address=wallet,
             blocks=resolved_blocks,
@@ -77,6 +83,7 @@ async def async_balances_command(
         df = pd.DataFrame(balances, index=resolved_blocks)
         df.index.name = 'block'
         df.columns = ['balance']
+        output_data: typing.Union[spec.DataFrame, spec.Series] = df
 
     else:
         # multiple wallets, single block
@@ -96,11 +103,14 @@ async def async_balances_command(
                 normalize=(not raw),
             )
 
-            df = pd.Series(balances, index=wallets)
-            df.name = 'balance'
-            df.index.name = 'address'
+            series = pd.Series(balances, index=wallets)
+            series.name = 'balance'
+            series.index.name = 'address'
+            output_data = series
 
-    cli_utils.output_data(df, output, overwrite, indent=indent, raw=raw)
+    cli_utils.output_data(
+        output_data, output, overwrite, indent=indent, raw=raw
+    )
 
     await rpc.async_close_http_session()
 

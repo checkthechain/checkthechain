@@ -1,9 +1,14 @@
-import pandas as pd
+from __future__ import annotations
 
+import typing
+
+import pandas as pd
+import toolcli
 import toolstr
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.cli import cli_utils
 
 
@@ -19,7 +24,7 @@ command_help = """output ERC20 balances of blocks / addresses / tokens
 [option]ctc erc20 balances ERC20 WALLET --blocks BLOCKS[/option]"""
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_balances_command,
         'help': command_help,
@@ -63,8 +68,16 @@ def get_command_spec():
 
 
 async def async_balances_command(
-    args, block, wallets, blocks, erc20s, raw, output, overwrite, top
-):
+    args: list[str],
+    block: typing.Optional[spec.BlockNumberReference],
+    wallets: typing.Optional[list[str]],
+    blocks: typing.Optional[list[str]],
+    erc20s: typing.Optional[list[str]],
+    raw: bool,
+    output: typing.Optional[str],
+    overwrite: bool,
+    top: typing.Optional[str],
+) -> None:
     indent = None
 
     if len(args) == 1 and erc20s is not None:
@@ -89,6 +102,7 @@ async def async_balances_command(
         data = {'balance': balances, 'symbol': symbols, 'erc20_address': erc20s}
         df = pd.DataFrame(data)
         df = df.set_index('erc20_address')
+        output_data: typing.Union[spec.DataFrame, spec.Series] = df
 
         toolstr.print_text_box('ERC20 balances in wallet')
         print('- wallet:', wallet)
@@ -120,9 +134,10 @@ async def async_balances_command(
             )
             symbol = await symbol_coroutine
 
-            df = pd.Series(balances, index=wallets)
-            df.name = 'balance'
-            df.index.name = 'address'
+            series = pd.Series(balances, index=wallets)
+            series.name = 'balance'
+            series.index.name = 'address'
+            output_data = series
 
             print()
             toolstr.print_text_box(symbol + ' Balances')
@@ -142,10 +157,11 @@ async def async_balances_command(
             df = await evm.async_get_erc20_holdings_from_transfers(
                 transfers=transfers, dtype=None, normalize=(not raw)
             )
+            output_data = df
             symbol = await symbol_coroutine
 
             if top is None:
-                top = 20
+                top = '20'
 
             print()
             toolstr.print_text_box(symbol + ' Balances')
@@ -166,7 +182,7 @@ async def async_balances_command(
             )
         erc20, wallet = args
 
-        resolved_blocks = await cli_utils.async_resolve_blocks(blocks)
+        resolved_blocks = await cli_utils.async_resolve_block_range(blocks)
         balances = await evm.async_get_erc20_balance_of_by_block(
             address=wallet,
             token=erc20,
@@ -177,11 +193,14 @@ async def async_balances_command(
         df = pd.DataFrame(balances, index=resolved_blocks)
         df.index.name = 'block'
         df.columns = ['balance']
+        output_data = df
 
     else:
         raise Exception('invalid inputs')
 
-    cli_utils.output_data(df, output, overwrite, top=top, indent=indent)
+    cli_utils.output_data(
+        output_data, output, overwrite, top=top, indent=indent
+    )
 
     await rpc.async_close_http_session()
 

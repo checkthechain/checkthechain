@@ -51,7 +51,7 @@ function_abis = {
 
 async def async_get_deposit_balance(
     deposit: spec.ContractAddress,
-    block: spec.BlockReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> typing.Union[int, list[int]]:
     """get token balance of a particular deposit"""
@@ -65,7 +65,7 @@ async def async_get_deposit_balance(
 
 async def async_get_deposits_balances(
     deposits: typing.Sequence[spec.ContractAddress],
-    block: spec.BlockReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
@@ -91,7 +91,7 @@ async def async_get_deposit_balance_by_block(
 
 async def async_get_deposit_resistant_balance_and_fei(
     deposit: spec.ContractAddress,
-    block: spec.BlockReference = 'latest',
+    block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> typing.Union[int, list[int]]:
     """get token balance of a particular deposit"""
@@ -105,7 +105,7 @@ async def async_get_deposit_resistant_balance_and_fei(
 
 async def async_get_deposits_resistant_balances_and_fei(
     deposits: typing.Sequence[spec.ContractAddress],
-    block: spec.BlockReference = 'latest',
+    block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderSpec = None,
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
@@ -136,7 +136,7 @@ async def async_get_deposit_resistant_balance_and_fei_by_block(
 
 async def async_get_token_balance(
     token: spec.Address,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,
@@ -200,7 +200,7 @@ async def async_get_token_balance_by_block(
 
 async def async_get_tokens_balances(
     tokens: typing.Sequence[spec.Address] = None,
-    block: spec.BlockNumberReference = 'latest',
+    block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,

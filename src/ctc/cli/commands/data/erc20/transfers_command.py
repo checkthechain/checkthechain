@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
+
 from ctc import evm
 from ctc import rpc
 from ctc.cli import cli_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_transfers_command,
         'help': 'output information about ERC20 transfers',
@@ -28,7 +34,9 @@ def get_command_spec():
     }
 
 
-async def async_transfers_command(erc20, blocks, output, overwrite):
+async def async_transfers_command(
+    erc20: str, blocks: list[str], output: typing.Optional[str], overwrite: bool
+) -> None:
 
     if blocks is not None:
         start_block, end_block = await cli_utils.async_resolve_block_range(

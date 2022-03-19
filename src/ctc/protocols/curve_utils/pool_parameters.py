@@ -77,12 +77,17 @@ async def async_get_A_history(
 
     # get ramp events
     pool_start_block = await evm.async_get_contract_creation_block(
-        pool, verbose=False, provider=provider,
+        pool,
+        verbose=False,
+        provider=provider,
     )
     latest_block = await evm.async_get_latest_block_number(provider=provider)
-    blocks = np.arange(start_block, end_block)
+    blocks: spec.NumpyArray = np.arange(start_block, end_block, dtype=int)
     blocks_timestamps_task = asyncio.create_task(
-        evm.async_get_blocks_timestamps(blocks=blocks, provider=provider)
+        evm.async_get_blocks_timestamps(
+            blocks=typing.cast(typing.Sequence, blocks),
+            provider=provider,
+        )
     )
     events = await evm.async_get_events(
         contract_address=pool,
@@ -112,10 +117,13 @@ async def async_get_A_history(
 
     # need per-block timestamps over a long time range to continue :-\
     A = compute_A(
-        initial_A=events['arg__old_A'],
-        future_A=events['arg__new_A'],
-        initial_A_time=events['arg__initial_time'],
-        future_A_time=events['arg__future_time'],
+        initial_A=typing.cast(typing.Sequence, events['arg__old_A']),
+        future_A=typing.cast(typing.Sequence, events['arg__new_A']),
+        initial_A_time=typing.cast(
+            typing.Sequence,
+            events['arg__initial_time'],
+        ),
+        future_A_time=typing.cast(typing.Sequence, events['arg__future_time']),
         timestamps=blocks_timestamps,
     )
 
@@ -123,11 +131,11 @@ async def async_get_A_history(
 
 
 def compute_A(
-    initial_A: typing.Sequence[typing.SupportsInt, typing.SupportsFloat],
-    initial_A_time: typing.Sequence[typing.SupportsInt, typing.SupportsFloat],
-    future_A: typing.Sequence[typing.SupportsInt, typing.SupportsFloat],
-    future_A_time: typing.Sequence[typing.SupportsInt, typing.SupportsFloat],
-    timestamps: typing.Sequence[int],
+    initial_A: typing.Sequence,
+    initial_A_time: typing.Sequence,
+    future_A: typing.Sequence,
+    future_A_time: typing.Sequence,
+    timestamps: typing.Sequence,
 ) -> typing.Sequence[float]:
     """perform linear interpolation between initial and future A values
 
@@ -136,10 +144,22 @@ def compute_A(
 
     import numpy as np
 
-    initial_A = np.array(initial_A)
-    initial_A_time = np.array(initial_A_time)
-    future_A = np.array(future_A)
-    future_A_time = np.array(future_A_time)
+    return _compute_A(
+        initial_A=np.array(initial_A),
+        initial_A_time=np.array(initial_A_time),
+        future_A=np.array(future_A),
+        future_A_time=np.array(future_A_time),
+        timestamps=np.array(timestamps),
+    )
+
+
+def _compute_A(
+    initial_A: spec.NumpyArray,
+    initial_A_time: spec.NumpyArray,
+    future_A: spec.NumpyArray,
+    future_A_time: spec.NumpyArray,
+    timestamps: spec.NumpyArray,
+):
 
     intercept = initial_A
     slope = (future_A - initial_A) / (future_A_time - initial_A_time)

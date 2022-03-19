@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+import toolcli
 import toolstr
+import typing
 
 from ctc import evm
 from ctc import directory
 from ctc import rpc
+from ctc import spec
 from ctc.protocols import fei_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_pcv_command,
         'help': 'output summary of Fei PCV',
@@ -16,10 +21,10 @@ def get_command_spec():
     }
 
 
-async def async_pcv_command(block):
+async def async_pcv_command(block: typing.Optional[spec.BlockNumberReference]) -> None:
 
     if block is not None:
-        block = int(block)
+        block = await evm.async_block_number_to_int(block)
 
     pcv_stats = await fei_utils.async_get_pcv_stats(block=block)
     FEI = directory.get_erc20_address('FEI')

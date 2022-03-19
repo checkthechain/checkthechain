@@ -1,6 +1,10 @@
+from __future__ import annotations
+
+import typing
+
 import numpy as np
 import pandas as pd
-
+import toolcli
 import tooltime
 
 from ctc import evm
@@ -10,7 +14,7 @@ from ctc import spec
 from ctc.cli import cli_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_block_command,
         'help': 'output information about blocks',
@@ -37,12 +41,12 @@ def get_command_spec():
 
 
 async def async_block_command(
-    attributes,
-    blocks,
-    output,
-    provider,
-    overwrite,
-):
+    blocks: typing.Sequence[str],
+    attributes: typing.Optional[typing.Sequence[str]],
+    output: typing.Optional[typing.Sequence[str]],
+    overwrite: typing.Optional[bool],
+    provider: typing.Optional[typing.Sequence[str]],
+) -> None:
 
     if attributes is None:
         # gas stats as well
@@ -63,7 +67,7 @@ async def async_block_command(
         ]
 
     # determine blocks
-    export_blocks = await cli_utils.async_resolve_blocks(blocks)
+    export_blocks = await cli_utils.async_resolve_block_range(blocks)
 
     # print summary
     print('exporting from', len(export_blocks), 'blocks')
@@ -116,7 +120,7 @@ async def async_block_command(
     # output data
     if 'number' in df:
         df = df.set_index('number')
-    cli_utils.output_data(df=df, output=output, overwrite=overwrite)
+    cli_utils.output_data(df, output=output, overwrite=overwrite)
 
     # cleanup
     await rpc.async_close_http_session()
