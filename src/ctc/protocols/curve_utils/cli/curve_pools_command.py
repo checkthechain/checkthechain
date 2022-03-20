@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import asyncio
+
+import toolcli
 
 from ctc import rpc
 from ctc.protocols import curve_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_curve_pools_command,
         'help': 'list curve pools',
@@ -14,7 +18,7 @@ def get_command_spec():
     }
 
 
-async def async_curve_pools_command(verbose):
+async def async_curve_pools_command(verbose: bool) -> None:
     factories = [
         '0xB9fC157394Af804a3578134A6585C0dc9cc990d4',
         '0x90E00ACe148ca3b23Ac1bC8C240C2a7Dd9c2d7f5',

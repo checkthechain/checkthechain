@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
 import toolstr
 
 from ctc import directory
@@ -7,7 +12,7 @@ from ctc.cli import cli_utils
 from ctc.protocols import chainlink_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_chainlink_command,
         'help': 'output Chainlink feed data',
@@ -40,13 +45,18 @@ def get_command_spec():
 
 
 async def async_chainlink_command(
-    feed, blocks, output, overwrite, provider, all_fields
-):
+    feed: typing.Sequence[str],
+    blocks: typing.Optional[typing.Sequence[str]],
+    output: typing.Optional[str],
+    overwrite: typing.Optional[bool],
+    provider: typing.Optional[str],
+    all_fields: typing.Optional[bool],
+) -> None:
 
     feed = '_'.join(feed)
 
     if all_fields:
-        fields = 'full'
+        fields: typing.Literal['full', 'answer'] = 'full'
     else:
         fields = 'answer'
 
@@ -87,7 +97,7 @@ async def async_chainlink_command(
             feed,
             provider=provider,
             fields=fields,
-            **block_kwargs,
+            blocks=resolved_blocks,
         )
         df = feed_data
 

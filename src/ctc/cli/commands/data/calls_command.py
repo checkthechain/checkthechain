@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+import typing
+
 import pandas as pd
+import toolcli
 
 from ctc import binary
 from ctc import evm
@@ -17,7 +22,7 @@ ctc calls <function_name> [<function_parameters>] --addresses <addresses> [--blo
 """
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_calls_command,
         'help': command_help,
@@ -50,12 +55,18 @@ def get_command_spec():
 
 
 async def async_calls_command(
-    args, to_addresses, blocks, block, quiet, output, overwrite
-):
+    args: typing.Sequence[str],
+    addresses: typing.Optional[typing.Sequence[str]],
+    blocks: typing.Optional[typing.Sequence[str]],
+    block: typing.Optional[str],
+    quiet: typing.Optional[bool],
+    output: typing.Optional[str],
+    overwrite: typing.Optional[bool],
+) -> None:
 
-    if blocks is not None and to_addresses is not None:
+    if blocks is not None and addresses is not None:
         raise Exception('cannot specify both --blocks or --to-addresses')
-    if blocks is None and to_addresses is None:
+    if blocks is None and addresses is None:
         raise Exception('must specify either --blocks or --to-addresses')
 
     if blocks is not None:
@@ -64,7 +75,7 @@ async def async_calls_command(
 
         to_address, function_name, *function_parameters = args
 
-        block_numbers = await cli_utils.async_resolve_blocks(blocks)
+        block_numbers = await cli_utils.async_resolve_block_range(blocks)
 
         # fetch data
         results = await rpc.async_batch_eth_call(
@@ -88,7 +99,7 @@ async def async_calls_command(
         df.index.name = 'block'
         df.columns = output_names
 
-    elif to_addresses is not None:
+    elif addresses is not None:
         if block is None:
             block = 'latest'
 
@@ -96,11 +107,11 @@ async def async_calls_command(
 
         # assert that all address functions have the same number of outputs
         function_abi = await evm.async_get_function_abi(
-            contract_address=to_addresses[0],
+            contract_address=addresses[0],
             function_name=function_name,
         )
         n_outputs = len(function_abi['outputs'])
-        for to_address in to_addresses[1:]:
+        for to_address in addresses[1:]:
             other_function_abi = await evm.async_get_function_abi(
                 contract_address=to_address,
                 function_name=function_name,
@@ -110,7 +121,7 @@ async def async_calls_command(
 
         # fetch data
         results = await rpc.async_batch_eth_call(
-            to_addresses=to_addresses,
+            to_addresses=addresses,
             function_name=function_name,
             function_parameters=function_parameters,
             block_number=block,
@@ -121,7 +132,7 @@ async def async_calls_command(
             function_abi, human_readable=True
         )
 
-        df = pd.DataFrame(results, index=to_addresses)
+        df = pd.DataFrame(results, index=addresses)
         df.index.name = 'to_address'
         df.columns = output_names
 

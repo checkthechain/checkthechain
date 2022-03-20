@@ -43,9 +43,9 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_block_command(
     blocks: typing.Sequence[str],
     attributes: typing.Optional[typing.Sequence[str]],
-    output: typing.Optional[typing.Sequence[str]],
+    output: typing.Optional[str],
     overwrite: typing.Optional[bool],
-    provider: typing.Optional[typing.Sequence[str]],
+    provider: typing.Optional[str],
 ) -> None:
 
     if attributes is None:

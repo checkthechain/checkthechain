@@ -11,10 +11,14 @@
 - color
 """
 
+from __future__ import annotations
+
 import time
+import typing
 
 import numpy as np
 import pandas as pd
+import toolcli
 import toolstr
 import tooltime
 
@@ -23,12 +27,17 @@ from ctc import rpc
 from ctc.cli import cli_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_gas_command,
         'help': 'output gas summary of block range',
         'args': [
-            {'name': '--last', 'metavar': 'N', 'nargs': '+', 'help': 'number of blocks to include'},
+            {
+                'name': '--last',
+                'metavar': 'N',
+                'nargs': '+',
+                'help': 'number of blocks to include',
+            },
             {
                 'name': '--output',
                 'default': 'stdout',
@@ -43,17 +52,22 @@ def get_command_spec():
     }
 
 
-async def async_gas_command(last, output, overwrite):
+async def async_gas_command(
+    last: typing.Optional[typing.Sequence[str]],
+    output: typing.Optional[str],
+    overwrite: typing.Optional[bool],
+) -> None:
+
     if last is None:
-        last = [1, 10, 100]
+        last_as_int = [1, 10, 100]
     else:
-        last = [
+        last_as_int = [
             int(subtoken.strip(' '))
             for token in last
             for subtoken in token.strip(',').split(',')
         ]
 
-    n_blocks = max(last)
+    n_blocks = max(last_as_int)
     latest = await rpc.async_eth_block_number()
     block_numbers = list(range(latest - n_blocks + 1, latest + 1))
 
@@ -70,14 +84,16 @@ async def async_gas_command(last, output, overwrite):
 
     now = time.time()
     last_times = ['5 minutes', '10 minutes']
-    last_times_blocks = []
-    for last_time in last_times:
-        cutoff_timestamp = now - tooltime.timelength_to_seconds(last_time)
+    last_blocks = []
+    for last_as_int_time in last_times:
+        cutoff_timestamp = now - tooltime.timelength_to_seconds(
+            last_as_int_time
+        )
         for i in range(n_blocks):
             if blocks[-i - 1]['timestamp'] < cutoff_timestamp:
                 break
         print(i)
-        last_times_blocks.append(i)
+        last_blocks.append(i)
 
     toolstr.print_text_box('Gas Price Summary')
     print()
@@ -99,11 +115,11 @@ async def async_gas_command(last, output, overwrite):
     print()
     headers = ['blocks', 'time', 'min', 'median', 'mean', 'max']
     rows = []
-    for l, last_n in enumerate(last + last_times_blocks):
+    for l, last_n in enumerate(last_as_int + last_blocks):
 
-        row = []
+        row: list[typing.Union[str, None, int, float]] = []
 
-        if l < len(last):
+        if l < len(last_as_int):
             if last_n == 1:
                 row.append('latest block')
             else:
@@ -112,8 +128,10 @@ async def async_gas_command(last, output, overwrite):
             timelength_clock = tooltime.timelength_to_clock(timelength_seconds)
             row.append(timelength_clock)
         else:
-            row.append('last ' + last_times[l - len(last)])
-            row.append(tooltime.timelength_to_clock(last_times[l - len(last)]))
+            row.append('last ' + last_times[l - len(last_as_int)])
+            row.append(
+                tooltime.timelength_to_clock(last_times[l - len(last_as_int)])
+            )
 
         sub_gas_stats_df = gas_stats_df.iloc[-last_n:]
         median_prices = sub_gas_stats_df['median_gas_price'].values

@@ -104,7 +104,9 @@ async def async_compute_uniswap_v3_volume(
     }
 
 
-async def async_compute_sushiswap_volume(pool_address, blocks):
+async def async_compute_sushiswap_volume(
+    pool_address: spec.ContractAddress, blocks: list[int]
+) -> analytics_spec.MetricData:
     return await async_compute_uniswap_v2_volume(pool_address, blocks)
 
 
