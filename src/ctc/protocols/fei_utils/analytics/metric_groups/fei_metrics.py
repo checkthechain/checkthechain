@@ -17,7 +17,7 @@ async def async_compute_prices(
     feed_data = await chainlink_utils.async_get_feed_data(
         feed='FEI_USD', start_block=blocks[0] - 10000
     )
-    feed_data = feed_data / 1e8
+    feed_data = feed_data
     # feed_data = evm.interpolate_block_series(
     #     series=feed_data, end_block=blocks[-1]
     # )

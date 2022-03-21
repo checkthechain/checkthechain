@@ -313,11 +313,11 @@ async def async_get_tokens_balances_by_block(
     block_token_balances = await async_utils.gather_coroutines(*coroutines)
 
     if normalize:
-        int_type = list[dict[spec.Address, int]]
+        int_type = typing.List[typing.Dict[spec.Address, int]]
         int_result = typing.cast(int_type, block_token_balances)
         return nested_utils.list_of_dicts_to_dict_of_lists(int_result)
     else:
-        float_type = list[dict[spec.Address, float]]
+        float_type = typing.List[typing.Dict[spec.Address, float]]
         float_result = typing.cast(float_type, block_token_balances)
         return nested_utils.list_of_dicts_to_dict_of_lists(float_result)
 
