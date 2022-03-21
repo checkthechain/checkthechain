@@ -42,11 +42,6 @@ def get_command_spec():
                 'help': 'end of block range to rechunk',
             },
             {
-                'name': '--n-chunks',
-                'type': int,
-                'help': 'number of chunks to use',
-            },
-            {
                 'name': '--chunk-bytes',
                 'type': float,
                 'required': True,
@@ -67,24 +62,22 @@ def get_command_spec():
 
 
 def rechunk_command(
-    contract_address,
+    contract,
     event,
     all_events,
     start_block,
     end_block,
-    n_chunks,
     chunk_bytes,
     dry,
     verbose,
     network,
 ):
     coroutine = run(
-        contract_address=contract_address,
+        contract_address=contract,
         event=event,
         all_events=all_events,
         start_block=start_block,
         end_block=end_block,
-        n_chunks=n_chunks,
         chunk_bytes=chunk_bytes,
         dry=dry,
         verbose=verbose,
@@ -99,7 +92,6 @@ async def run(
     all_events,
     start_block,
     end_block,
-    n_chunks,
     chunk_bytes,
     dry,
     verbose,
@@ -112,7 +104,7 @@ async def run(
             network=network,
             start_block=start_block,
             end_block=end_block,
-            chunk_bytes=chunk_bytes,
+            chunk_target_bytes=chunk_bytes,
             dry=dry,
             verbose=verbose,
         )
@@ -133,8 +125,7 @@ async def run(
             event_hash=event_hash,
             start_block=start_block,
             end_block=end_block,
-            n_chunks=n_chunks,
-            chunk_bytes=chunk_bytes,
+            chunk_target_bytes=chunk_bytes,
             dry=dry,
             verbose=verbose,
         )

@@ -10,6 +10,14 @@ from .. import block_utils
 from .. import abi_utils
 
 
+def is_event_hash(data):
+    try:
+        binary.convert(data, 'binary')
+        return len(binary) == 32
+    except Exception:
+        return False
+
+
 def get_backend_functions():
     return {
         'get': {
