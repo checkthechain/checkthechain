@@ -56,7 +56,7 @@ def initialize_data_root(
         if not confirm:
             print()
             answer = toolcli.input_yes_or_no(
-                'Directory does not exist. Create it?', default='yes'
+                'Directory does not exist. Create it? ', default='yes'
             )
             if not answer:
                 if raise_if_unconfirmed:

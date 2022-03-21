@@ -54,11 +54,11 @@ async def async_decode_command(args: typing.Sequence[str]):
     input_names = binary.get_function_parameter_names(function_abi)
     for p, parameter in enumerate(decoded['parameters']):
         if isinstance(parameter, tuple):
-            print(str(p + 1) + '.', input_names[p] + ':')
+            print(str(p + 1) + '.', str(input_names[p]) + ':')
             for subparameter in parameter:
                 print('    ' + str(subparameter))
         else:
-            print(str(p + 1) + '.', input_names[p] + ':', parameter)
+            print(str(p + 1) + '.', str(input_names[p]) + ':', parameter)
 
     await rpc.async_close_http_session()
 
