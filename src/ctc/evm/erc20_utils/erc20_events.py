@@ -23,6 +23,7 @@ async def async_get_erc20_transfers(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
+    convert_from_str: bool = True,
     **event_kwargs
 ) -> spec.DataFrame:
 
@@ -36,7 +37,8 @@ async def async_get_erc20_transfers(
 
     # detect amount column
     column = get_token_amount_column(df=transfers)
-    transfers[column] = transfers[column].map(int)
+    if convert_from_str:
+        transfers[column] = transfers[column].map(int)
 
     if normalize and len(transfers) > 0:
 
