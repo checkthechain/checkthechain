@@ -37,15 +37,15 @@ def get_yields_sources() -> list[
 ]:
 
     from .yields_sources import aave_yields
+    from .yields_sources import compound_yields
     # from .yields_sources import rari_yields
     # from .yields_sources import curve_yields
-    # from .yields_sources import compound_yields
 
     yield_source_groups = [
         aave_yields.async_get_fei_yield_data,
+        compound_yields.async_get_fei_yield_data,
         # rari_fuse_yields.async_get_fei_yield_data,
         # curve_yields.async_get_fei_yield_data,
-        # compound_yields.async_get_fei_yield_data,
     ]
 
     return yield_source_groups

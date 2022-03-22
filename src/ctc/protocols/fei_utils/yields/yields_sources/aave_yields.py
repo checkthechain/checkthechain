@@ -36,9 +36,9 @@ async def async_get_fei_yield_data(
         'tvl_history': tvl_history,
         'tvl_history_units': 'FEI',
         'current_yield': current_yield,
-        'current_yield_units': {'Aave V2 FEI Lending': 'APY'},
+        'current_yield_units': {'Spot': 'APY', '7D': 'APY', '30D': 'APY'},
         'yield_history': yield_history,
-        'yield_history_units': {'Aave V2 FEI Lending': 'APY'},
+        'yield_history_units': {'Lending Interest': 'APY'},
     }
 
     return {aave_v2['name']: aave_v2}
@@ -53,9 +53,14 @@ async def async_get_aave_fei_tvl_history(block_numbers) -> list[float]:
 
 
 async def async_get_aave_fei_current_yield(block_numbers) -> list[float]:
-    return [0.01 for block in block_numbers]
+    return {
+        'Spot': 0.01,
+        '7D': 0.99,
+        '30D': 0.99,
+    }
 
 
 async def async_get_aave_fei_yield_history(block_numbers) -> list[float]:
-    return [0.01 for block in block_numbers]
+    return {'Lending Interest': [0.01 for block in block_numbers]}
+
 
