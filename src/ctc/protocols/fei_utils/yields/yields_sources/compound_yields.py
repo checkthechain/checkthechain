@@ -64,7 +64,7 @@ async def async_get_compound_fei_tvl_history(block_numbers) -> list[float]:
 
     tvl_history = cFEI_total_supply * cFEI_conversions / 1e10 / 1e18
 
-    return tvl_history
+    return list(tvl_history)
 
 
 async def async_get_compound_fei_current_yield(block_numbers) -> list[float]:
