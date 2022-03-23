@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
+from typing_extensions import Literal, TypedDict
 
 from ctc import spec
 
 
 FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
+TRIBE = '0xc7283b66eb1eb5fb86327f08e1b5816b0720212b'
 
 
 class FeiYieldPayload(TypedDict):
@@ -30,7 +31,7 @@ class YieldSourceData(TypedDict):
 
     # metadata
     name: str
-    category: typing.Literal['lending', 'dex']
+    category: Literal['Lending', 'DEX']
     platform: str
     staked_tokens: list[spec.Address]
     reward_tokens: list[spec.Address]
