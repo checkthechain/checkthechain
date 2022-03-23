@@ -24,23 +24,23 @@ class FeiYieldPayload(TypedDict):
     block_numbers: list[int]
 
     # farms
-    data: typing.Mapping[str, YieldSourceData]
+    data: typing.Mapping[str, YieldSourceData]  # map of farm_name -> farm_data
 
 
 class YieldSourceData(TypedDict):
 
     # metadata
-    name: str
-    category: Literal['Lending', 'DEX']
-    platform: str
-    staked_tokens: list[spec.Address]
-    reward_tokens: list[spec.Address]
+    name: str  # name of farm
+    category: Literal['Lending', 'DEX']  # category of farm
+    platform: str  # defi platform, e.g. 'Aave' or 'Rari'
+    staked_tokens: list[spec.Address]  # list of token addresses that are staked
+    reward_tokens: list[spec.Address]  # list of token addresses that are earned
 
     # metrics
-    tvl_history: list[float]
-    tvl_history_units: str
-    current_yield: dict[str, list[float]]
-    current_yield_units = dict[str, str]
-    yield_history: dict[str, list[float]]
-    yield_history_units: dict[str, str]
+    tvl_history: list[float]  # list of TVL values for farm
+    tvl_history_units: str  # units of TVL values, usually "USD"
+    current_yield: dict[str, float]  # map of "Spot", "7D", and "30D" to yield %
+    current_yield_units = dict[str, str]  # either "APY" or "APR" for each entry
+    yield_history: dict[str, list[float]]  # map of yield type name to % history
+    yield_history_units: dict[str, str]  # either "APY" or "APR" for each entry
 
