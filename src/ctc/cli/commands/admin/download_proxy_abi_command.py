@@ -42,5 +42,5 @@ async def run(contract_address, implementation_address):
     from ctc.rpc.rpc_backends import rpc_http_async
 
     provider = rpc.get_provider()
-    await rpc_http_async.async_close_session(provider=provider)
+    await rpc_http_async.async_http_close_session(provider=provider)
 
