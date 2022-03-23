@@ -168,35 +168,37 @@ async def async_get_ctoken_tvl_and_tvb(
 
         return {'tvb': borrowed, 'tvl': borrowed + liquidity}
 
-    if oracle is None:
-        oracle = await _async_get_ctoken_oracle(ctoken)
+    else:
 
-    if eth_price is None:
-        eth_price = await chainlink_utils.async_get_eth_price(block=block)
+        if oracle is None:
+            oracle = await _async_get_ctoken_oracle(ctoken)
 
-    # send queries
-    borrowed = asyncio.create_task(
-        async_get_total_borrowed(ctoken=ctoken, block=block)
-    )
-    liquidity = asyncio.create_task(
-        async_get_total_liquidity(ctoken=ctoken, block=block)
-    )
-    price = asyncio.create_task(
-        async_get_ctoken_price(ctoken=ctoken, oracle=oracle, block=block)
-    )
+        if eth_price is None:
+            eth_price = await chainlink_utils.async_get_eth_price(block=block)
 
-    # receive results
-    borrowed = await borrowed
-    borrowed /= 1e18
-    liquidity = await liquidity
-    liquidity /= 1e18
-    price = await price
+        # send queries
+        borrowed = asyncio.create_task(
+            async_get_total_borrowed(ctoken=ctoken, block=block)
+        )
+        liquidity = asyncio.create_task(
+            async_get_total_liquidity(ctoken=ctoken, block=block)
+        )
+        price = asyncio.create_task(
+            async_get_ctoken_price(ctoken=ctoken, oracle=oracle, block=block)
+        )
 
-    # compute output
-    return {
-        'tvb': borrowed * price * eth_price,
-        'tvl': (borrowed + liquidity) * price * eth_price,
-    }
+        # receive results
+        borrowed = await borrowed
+        borrowed /= 1e18
+        liquidity = await liquidity
+        liquidity /= 1e18
+        price = await price
+
+        # compute output
+        return {
+            'tvb': borrowed * price * eth_price,
+            'tvl': (borrowed + liquidity) * price * eth_price,
+        }
 
 
 async def _async_get_ctoken_oracle(ctoken):
