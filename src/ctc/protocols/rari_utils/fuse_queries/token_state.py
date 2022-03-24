@@ -24,6 +24,7 @@ async def async_get_ctoken_price(
     )
     if normalize:
         price /= 1e18
+
     return price
 
 
@@ -153,6 +154,7 @@ async def async_get_ctoken_tvl_and_tvb(
     block='latest',
     in_usd=True,
 ):
+    """combined into one function because tvl requires both to compute anyway"""
     if not in_usd:
         borrowed = asyncio.create_task(
             async_get_total_borrowed(ctoken=ctoken, block=block)
