@@ -53,21 +53,21 @@ async def async_get_compound_fei_tvl_history(block_numbers) -> list[float]:
         token=cFEI,
         blocks=block_numbers,
     )
-    cFEI_total_supply = np.array(cFEI_total_supply)
+    cFEI_total_supply_array = np.array(cFEI_total_supply)
 
     cFEI_conversions = await rpc.async_batch_eth_call(
         to_address=cFEI,
         block_numbers=block_numbers,
         function_name='exchangeRateStored',
     )
-    cFEI_conversions = np.array(cFEI_conversions)
+    cFEI_conversions_array = np.array(cFEI_conversions)
 
-    tvl_history = cFEI_total_supply * cFEI_conversions / 1e10 / 1e18
+    tvl_history = cFEI_total_supply_array * cFEI_conversions_array / 1e10 / 1e18
 
     return list(tvl_history)
 
 
-async def async_get_compound_fei_current_yield(block_numbers) -> list[float]:
+async def async_get_compound_fei_current_yield(block_numbers) -> dict[str, float]:
     return {
         'Spot': 0.01,
         '7D': 0.99,
@@ -75,6 +75,6 @@ async def async_get_compound_fei_current_yield(block_numbers) -> list[float]:
     }
 
 
-async def async_get_compound_fei_yield_history(block_numbers) -> list[float]:
+async def async_get_compound_fei_yield_history(block_numbers) -> dict[str, list[float]]:
     return {'Lending Interest': [0.01 for block in block_numbers]}
 

@@ -93,7 +93,7 @@ async def async_get_rari_farm_tvl_history(ctoken, block_numbers):
     return [item['tvl'] for item in tvl_history]
 
 
-async def async_get_fei_current_yield(ctoken) -> list[float]:
+async def async_get_fei_current_yield(ctoken) -> dict[str, float]:
     return {
         'Spot': 0.01,
         '7D': 0.99,
@@ -101,6 +101,8 @@ async def async_get_fei_current_yield(ctoken) -> list[float]:
     }
 
 
-async def async_get_fei_yield_history(block_numbers, ctoken) -> list[float]:
+async def async_get_fei_yield_history(
+    block_numbers, ctoken
+) -> dict[str, list[float]]:
     return {'Staking': [0.01 for block in block_numbers]}
 

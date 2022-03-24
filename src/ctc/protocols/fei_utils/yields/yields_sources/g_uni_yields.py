@@ -80,7 +80,9 @@ async def async_get_fei_tvl_history(block_numbers, g_uni_pool) -> list[float]:
     return tvl_history
 
 
-async def async_get_fei_current_yield(block_numbers, g_uni_pool) -> list[float]:
+async def async_get_fei_current_yield(
+    block_numbers, g_uni_pool
+) -> dict[str, float]:
     return {
         'Spot': 0.01,
         '7D': 0.99,
@@ -88,6 +90,8 @@ async def async_get_fei_current_yield(block_numbers, g_uni_pool) -> list[float]:
     }
 
 
-async def async_get_fei_yield_history(block_numbers, g_uni_pool) -> list[float]:
+async def async_get_fei_yield_history(
+    block_numbers, g_uni_pool
+) -> dict[str, list[float]]:
     return {'Staking': [0.01 for block in block_numbers]}
 

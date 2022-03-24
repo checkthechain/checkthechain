@@ -22,6 +22,7 @@ class FeiYieldPayload(TypedDict):
     window_size: str
     timestamps: list[int]
     block_numbers: list[int]
+    created_at_timestamp: int
 
     # farms
     data: typing.Mapping[str, YieldSourceData]  # map of farm_name -> farm_data
@@ -40,7 +41,7 @@ class YieldSourceData(TypedDict):
     tvl_history: list[float]  # list of TVL values for farm
     tvl_history_units: str  # units of TVL values, usually "USD"
     current_yield: dict[str, float]  # map of "Spot", "7D", and "30D" to yield %
-    current_yield_units = dict[str, str]  # either "APY" or "APR" for each entry
+    current_yield_units: dict[str, str]  # either "APY" or "APR" for each entry
     yield_history: dict[str, list[float]]  # map of yield type name to % history
     yield_history_units: dict[str, str]  # either "APY" or "APR" for each entry
 

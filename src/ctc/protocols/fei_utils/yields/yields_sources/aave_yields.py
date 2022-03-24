@@ -52,7 +52,7 @@ async def async_get_aave_fei_tvl_history(block_numbers) -> list[float]:
     return [float(tvl) for tvl in tvls]
 
 
-async def async_get_aave_fei_current_yield(block_numbers) -> list[float]:
+async def async_get_aave_fei_current_yield(block_numbers) -> dict[str, float]:
     return {
         'Spot': 0.01,
         '7D': 0.99,
@@ -60,7 +60,8 @@ async def async_get_aave_fei_current_yield(block_numbers) -> list[float]:
     }
 
 
-async def async_get_aave_fei_yield_history(block_numbers) -> list[float]:
+async def async_get_aave_fei_yield_history(
+    block_numbers,
+) -> dict[str, list[float]]:
     return {'Lending Interest': [0.01 for block in block_numbers]}
-
 
