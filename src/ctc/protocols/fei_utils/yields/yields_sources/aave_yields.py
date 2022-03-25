@@ -3,6 +3,7 @@ import typing
 
 from ctc import evm
 from ctc import spec
+from ctc.protocols import aave_v2_utils
 from .. import yields_spec
 
 
@@ -64,5 +65,9 @@ async def async_get_aave_fei_current_yield(block_numbers) -> dict[str, float]:
 async def async_get_aave_fei_yield_history(
     block_numbers,
 ) -> dict[str, list[float]]:
-    return {'Lending Interest': [0.01 for block in block_numbers]}
+    interest_rates = await aave_v2_utils.async_get_interest_rates_by_block(
+        token=yields_spec.FEI,
+        blocks=block_numbers,
+    )
+    return {'Lending Interest': list(interest_rates['supply_apy'])}
 
