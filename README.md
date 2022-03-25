@@ -158,8 +158,9 @@ If your shell's `PATH` does not include python scripts you may need to do someth
 
 ## Similar Projects
 - [`ethereum-etl`](https://github.com/blockchain-etl/ethereum-etl) ETL tools for bulk data gathering in python
-- [`seth`](https://github.com/dapphub/dapptools/tree/master/src/seth) cli EVM swiss army knife
-- [`ethereal`](https://github.com/wealdtech/ethereal) cli EVM swiss army knife
+- [`seth`](https://github.com/dapphub/dapptools/tree/master/src/seth) cli EVM swiss army knife (bash / js)
+- [`ethereal`](https://github.com/wealdtech/ethereal) cli EVM swiss army knife (go)
+- [`cast`](https://onbjerg.github.io/foundry-book/reference/cast.html) cli EVM swiss army knife (rust)
 - [`web3.py`](https://github.com/ethereum/web3.py/) official Ethereum python client
 - [`ApeWorX`](https://github.com/ApeWorX/ape) python development framework
 
