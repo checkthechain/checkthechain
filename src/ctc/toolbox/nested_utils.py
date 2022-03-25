@@ -20,7 +20,9 @@ def list_of_dicts_to_dict_of_lists(
 
     # gather all keys
     all_keys = {
-        each_key for each_dict in list_of_dicts for each_key in each_dict.keys()
+        each_key: None
+        for each_dict in list_of_dicts
+        for each_key in each_dict.keys()
     }
 
     # get dtype for fill value
@@ -35,12 +37,12 @@ def list_of_dicts_to_dict_of_lists(
 
     # initialize lists
     dict_of_lists: dict[K, list[V]] = {}
-    for key in all_keys:
+    for key in all_keys.keys():
         dict_of_lists[key] = []
 
     # build lists
     for each_dict in list_of_dicts:
-        for key in all_keys:
+        for key in all_keys.keys():
             dict_of_lists[key].append(each_dict.get(key, dtype()))
 
     return dict_of_lists
