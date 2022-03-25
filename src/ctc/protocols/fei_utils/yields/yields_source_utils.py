@@ -28,8 +28,7 @@ async def async_get_fei_yield_data(
         for name, yield_datum in yield_data.items()
     }
 
-
-def get_yields_sources() -> typing.Sequence[
+YieldGetter = typing.Sequence[
     typing.Callable[
         [typing.Sequence[spec.BlockNumberReference]],
         typing.Coroutine[
@@ -38,21 +37,23 @@ def get_yields_sources() -> typing.Sequence[
             typing.Mapping[str, yields_spec.YieldSourceData],
         ],
     ]
-]:
+]
+
+
+def get_yields_sources() -> YieldGetter:
 
     from .yields_sources import aave_yields
     from .yields_sources import compound_yields
     from .yields_sources import curve_yields
     from .yields_sources import g_uni_yields
-
-    # from .yields_sources import rari_yields
+    from .yields_sources import rari_yields
 
     yield_source_groups = [
         aave_yields.async_get_fei_yield_data,
         compound_yields.async_get_fei_yield_data,
         curve_yields.async_get_fei_yield_data,
         g_uni_yields.async_get_fei_yield_data,
-        # rari_fuse_yields.async_get_fei_yield_data,
+        rari_yields.async_get_fei_yield_data,
     ]
 
     return yield_source_groups
