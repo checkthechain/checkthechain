@@ -38,10 +38,10 @@ async def async_get_contract_abi_from_etherscan(contract_address, network=None):
     if not address_utils.is_address_str(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
     url_template = 'http://api.etherscan.io/api?module=contract&action=getabi&address={address}&format=raw'
-    session = aiohttp.ClientSession()
     abi_endpoint = url_template.format(address=contract_address)
-    async with session.get(abi_endpoint) as response:
-        content = await response.text()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(abi_endpoint) as response:
+            content = await response.text()
     if content == 'Contract source code not verified':
         raise spec.AbiNotFoundException()
     abi = json.loads(content)

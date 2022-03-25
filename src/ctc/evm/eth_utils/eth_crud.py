@@ -11,12 +11,12 @@ async def async_get_eth_total_supply():
     import aiohttp
 
     url = 'http://api.etherscan.io/api?module=stats&action=ethsupply'
-    session = aiohttp.ClientSession()
-    async with session.get(url) as response:
-        if response.status != 200:
-            raise Exception('could not get result')
-        result = await response.json()
-        return int(result['result'])
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise Exception('could not get result')
+            result = await response.json()
+            return int(result['result'])
 
 
 #
