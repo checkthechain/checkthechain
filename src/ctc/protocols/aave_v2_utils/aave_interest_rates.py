@@ -62,10 +62,10 @@ async def async_get_interest_rates(token, block=None):
     borrow_apy = (1 + borrow_apr / seconds_per_year) ** seconds_per_year - 1
 
     return {
-        'supply_apr': supply_apr,
-        'supply_apy': supply_apy,
-        'borrow_apr': borrow_apr,
-        'borrow_apy': borrow_apy,
+        'supply_apr': list(supply_apr),
+        'supply_apy': list(supply_apy),
+        'borrow_apr': list(borrow_apr),
+        'borrow_apy': list(borrow_apy),
     }
 
 
@@ -87,9 +87,9 @@ async def async_get_interest_rates_by_block(token, blocks=None):
     borrow_apy = (1 + borrow_apr / seconds_per_year) ** seconds_per_year - 1
 
     return {
-        'supply_apr': supply_apr,
-        'supply_apy': supply_apy,
-        'borrow_apr': borrow_apr,
-        'borrow_apy': borrow_apy,
+        'supply_apr': list(supply_apr),
+        'supply_apy': list(supply_apy),
+        'borrow_apr': list(borrow_apr),
+        'borrow_apy': list(borrow_apy),
     }
 
