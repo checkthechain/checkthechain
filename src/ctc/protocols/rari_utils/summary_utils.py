@@ -30,7 +30,6 @@ def print_fuse_pool_summary(block, *, tokens_data, pool_name):
 
     # get block data
     block_number = block['number']
-    time_iso = tooltime.timestamp_to_iso(block['timestamp']).replace('T', ' ')
 
     headers = {
         'name': 'token',

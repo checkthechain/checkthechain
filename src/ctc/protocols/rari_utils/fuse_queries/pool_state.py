@@ -42,7 +42,7 @@ async def async_get_pool_prices(
     return dict(zip(ctokens, prices))
 
 
-async def get_pool_tvl_and_tvb(
+async def async_get_pool_tvl_and_tvb(
     *, comptroller=None, ctokens=None, oracle=None, block='latest'
 ):
     if ctokens is None:
