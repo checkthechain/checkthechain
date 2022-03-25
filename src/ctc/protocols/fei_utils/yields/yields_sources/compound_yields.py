@@ -32,6 +32,7 @@ async def async_get_fei_yield_data(
         'name': 'Compound Lending',
         'category': 'Lending',
         'platform': 'Compound',
+        'url': 'https://app.compound.finance/',
         'staked_tokens': [yields_spec.FEI],
         'reward_tokens': [yields_spec.FEI],
         'tvl_history': tvl_history,

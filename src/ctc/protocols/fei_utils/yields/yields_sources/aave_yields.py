@@ -31,6 +31,7 @@ async def async_get_fei_yield_data(
         'name': 'Aave Lending',
         'category': 'Lending',
         'platform': 'Aave',
+        'url': 'https://app.aave.com/',
         'staked_tokens': [yields_spec.FEI],
         'reward_tokens': [yields_spec.FEI],
         'tvl_history': tvl_history,

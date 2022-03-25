@@ -32,6 +32,7 @@ class YieldSourceData(TypedDict):
 
     # metadata
     name: str  # name of farm
+    url: str  # link to farm
     category: Literal['Lending', 'DEX']  # category of farm
     platform: str  # defi platform, e.g. 'Aave' or 'Rari'
     staked_tokens: list[spec.Address]  # list of token addresses that are staked

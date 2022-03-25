@@ -68,6 +68,7 @@ async def async_get_curve_farm_yield_data(
         'name': 'Curve ' + name + ' Staking',
         'category': 'DEX',
         'platform': 'Curve',
+        'url': 'https://app.rari.capital/fuse/pool/8',
         'staked_tokens': (await pool_addresses_task),
         'reward_tokens': [yields_spec.TRIBE],
         #

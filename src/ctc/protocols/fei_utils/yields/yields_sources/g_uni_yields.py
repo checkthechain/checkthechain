@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import typing
 
@@ -55,8 +57,9 @@ async def compute_g_uni_yield_data(block_numbers, g_uni_pool):
 
     return {
         'name': name,
-        'category': 'DEX LP',
+        'category': 'DEX',
         'platform': 'Uniswap V3',
+        'url': 'https://app.rari.capital/fuse/pool/8',
         'staked_tokens': tokens,
         'reward_tokens': [yields_spec.TRIBE],
         'tvl_history': tvl_history,
