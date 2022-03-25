@@ -76,7 +76,7 @@ async def async_get_curve_farm_yield_data(
         'tvl_history': (await tvl_history_task),
         'tvl_history_units': 'USD',
         'current_yield': (await current_yield_task),
-        'current_yield_units': {'Spot': 'APR', '7D': 'APR', '30D': 'APR'},
+        'current_yield_units': {'Spot': 'APR'},
         'yield_history': (await yield_history_task),
         'yield_history_units': {'Staking': 'APR'},
     }
@@ -97,8 +97,6 @@ async def async_get_rari_farm_tvl_history(ctoken, block_numbers):
 async def async_get_fei_current_yield(ctoken) -> dict[str, float]:
     return {
         'Spot': 0.01,
-        '7D': 0.99,
-        '30D': 0.99,
     }
 
 

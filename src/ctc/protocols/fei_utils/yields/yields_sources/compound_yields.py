@@ -4,6 +4,7 @@ import typing
 from ctc import evm
 from ctc import rpc
 from ctc import spec
+from ctc.protocols import compound_utils
 from .. import yields_spec
 
 
@@ -17,28 +18,25 @@ async def async_get_fei_yield_data(
     tvl_history_task = asyncio.create_task(
         async_get_compound_fei_tvl_history(block_numbers)
     )
-    current_yield_task = asyncio.create_task(
-        async_get_compound_fei_current_yield(block_numbers)
-    )
     yield_history_task = asyncio.create_task(
         async_get_compound_fei_yield_history(block_numbers)
     )
 
     tvl_history = await tvl_history_task
-    current_yield = await current_yield_task
     yield_history = await yield_history_task
+    current_yield = {'Spot': yield_history['Lending Interest'][-1]}
 
     aave_v2: yields_spec.YieldSourceData = {
         'name': 'Compound Lending',
         'category': 'Lending',
         'platform': 'Compound',
-        'url': 'https://app.compound.finance/',
+        'url': 'https://app.compound.finance',
         'staked_tokens': [yields_spec.FEI],
         'reward_tokens': [yields_spec.FEI],
         'tvl_history': tvl_history,
         'tvl_history_units': 'FEI',
         'current_yield': current_yield,
-        'current_yield_units': {'Spot': 'APY', '7D': 'APY', '30D': 'APY'},
+        'current_yield_units': {'Spot': 'APY'},
         'yield_history': yield_history,
         'yield_history_units': {'Lending Interest': 'APY'},
     }
@@ -68,14 +66,12 @@ async def async_get_compound_fei_tvl_history(block_numbers) -> list[float]:
     return list(tvl_history)
 
 
-async def async_get_compound_fei_current_yield(block_numbers) -> dict[str, float]:
-    return {
-        'Spot': 0.01,
-        '7D': 0.99,
-        '30D': 0.99,
-    }
-
-
-async def async_get_compound_fei_yield_history(block_numbers) -> dict[str, list[float]]:
-    return {'Lending Interest': [0.01 for block in block_numbers]}
+async def async_get_compound_fei_yield_history(
+    block_numbers,
+) -> dict[str, list[float]]:
+    supply_apy = await compound_utils.async_get_supply_apy_by_block(
+        cFEI,
+        blocks=block_numbers,
+    )
+    return {'Lending Interest': supply_apy}
 

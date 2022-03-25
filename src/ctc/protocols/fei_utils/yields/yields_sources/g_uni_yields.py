@@ -65,7 +65,7 @@ async def compute_g_uni_yield_data(block_numbers, g_uni_pool):
         'tvl_history': tvl_history,
         'tvl_history_units': 'USD',
         'current_yield': current_yield,
-        'current_yield_units': {'Spot': 'APR', '7D': 'APR', '30D': 'APR'},
+        'current_yield_units': {'Spot': 'APR'},
         'yield_history': yield_history,
         'yield_history_units': {'Staking': 'APR'},
     }
@@ -88,8 +88,6 @@ async def async_get_fei_current_yield(
 ) -> dict[str, float]:
     return {
         'Spot': 0.01,
-        '7D': 0.99,
-        '30D': 0.99,
     }
 
 
