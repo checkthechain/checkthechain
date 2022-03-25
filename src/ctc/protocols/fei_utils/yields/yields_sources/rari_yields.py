@@ -8,12 +8,14 @@ from ctc.protocols import rari_utils
 from .. import yields_spec
 
 
+hard_min_tvl = 100000
+soft_min_tvl = 1000000
+hard_min_yield = 0.01
+soft_min_yield = 0.001
+
+
 async def async_get_fei_yield_data(
     block_numbers: typing.Sequence[spec.BlockNumberReference],
-    hard_min_tvl=100000,
-    soft_min_tvl=1000000,
-    hard_min_yield=0.01,
-    soft_min_yield=0.001,
 ) -> typing.Mapping[str, yields_spec.YieldSourceData]:
     """pools must pass both hard mins and at least one soft min"""
 
