@@ -27,6 +27,7 @@ command_index = {
     ('hex',): 'ctc.cli.commands.compute.hex_command',
     #
     # data commands
+    ('abi',): 'ctc.cli.commands.data.abi_command',
     ('address',): 'ctc.cli.commands.data.address_command',
     ('block',): 'ctc.cli.commands.data.block_command',
     ('blocks',): 'ctc.cli.commands.data.blocks_command',
