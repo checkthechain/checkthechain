@@ -63,7 +63,7 @@ async def async_get_feed_aggregator(
 
     return await rpc.async_eth_call(
         to_address=feed,
-        function_name='aggregator',
+        function_abi=chainlink_spec.feed_function_abis['aggregator'],
         block_number=block,
         fill_empty=fill_empty,
     )

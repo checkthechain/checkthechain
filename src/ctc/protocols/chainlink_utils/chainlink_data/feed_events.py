@@ -40,7 +40,7 @@ async def async_get_full_feed_event_data(
     # get events
     df = await evm.async_get_events(
         contract_address=aggregator_address,
-        event_name='AnswerUpdated',
+        event_abi=chainlink_spec.aggregator_event_abis['AnswerUpdated'],
         start_block=start_block,
         end_block=end_block,
         verbose=False,

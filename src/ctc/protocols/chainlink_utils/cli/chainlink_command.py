@@ -72,7 +72,8 @@ async def async_chainlink_command(
         else:
             raise Exception('unknown feed specification: ' + str(feed))
         name = await rpc.async_eth_call(
-            feed_address, function_name='description'
+            feed_address,
+            function_abi=chainlink_utils.feed_function_abis['description'],
         )
         toolstr.print_text_box('Chainlink Feed: ' + name)
         print('- feed address')

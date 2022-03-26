@@ -56,7 +56,7 @@ async def async_get_feed_datum(
 
         answer = await rpc.async_eth_call(
             to_address=feed,
-            function_name='latestAnswer',
+            function_abi=chainlink_spec.feed_function_abis['latestAnswer'],
             block_number=block,
             provider=provider,
             fill_empty=True,
@@ -77,7 +77,7 @@ async def async_get_feed_datum(
 
         data = await rpc.async_eth_call(
             to_address=feed,
-            function_name='latestRoundData',
+            function_abi=chainlink_spec.feed_function_abis['latestRoundData'],
             block_number=block,
             provider=provider,
             fill_empty=True,

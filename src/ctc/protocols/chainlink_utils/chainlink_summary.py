@@ -8,6 +8,7 @@ from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc.protocols import chainlink_utils
+from . import chainlink_spec
 
 
 async def async_summarize_feed(feed, n_recent=10):
@@ -22,10 +23,17 @@ async def async_summarize_feed(feed, n_recent=10):
         raise Exception('unknown feed specification: ' + str(feed))
 
     call_kwargs = {'to_address': feed_address}
-    name = await rpc.async_eth_call(function_name='description', **call_kwargs)
-    decimals = await rpc.async_eth_call(function_name='decimals', **call_kwargs)
+    name = await rpc.async_eth_call(
+        function_abi=chainlink_spec.feed_function_abis['description'],
+        **call_kwargs,
+    )
+    decimals = await rpc.async_eth_call(
+        function_abi=chainlink_spec.feed_function_abis['decimals'],
+        **call_kwargs,
+    )
     aggregator = await rpc.async_eth_call(
-        function_name='aggregator', **call_kwargs
+        function_abi=chainlink_spec.feed_function_abis['aggregator'],
+        **call_kwargs,
     )
 
     latest_block = await rpc.async_eth_block_number()

@@ -33,23 +33,39 @@ def get_command_spec():
                 'help': 'display event abi\'s only',
                 'action': 'store_true',
             },
-            {'name': '--name', 'help': 'name query of function or event abi'},
+            {'name': '--name', 'help': 'name of function or event abi'},
+            {
+                'name': '--search',
+                'help': 'query of name of function or event abi',
+            },
         ],
     }
 
 
 async def async_abi_command(
-    address, human_only, json_only, functions, events, name
+    address,
+    human_only,
+    json_only,
+    functions,
+    events,
+    name,
+    search,
 ):
     contract_abi = await evm.async_get_contract_abi(contract_address=address)
 
-    print(len(contract_abi))
-
     # filter by name
     if name is not None:
-        name = name.lower()
         contract_abi = [
-            item for item in contract_abi if name in item.get('name').lower()
+            item
+            for item in contract_abi
+            if item.get('name') is not None and name == item['name']
+        ]
+    if search is not None:
+        search = search.lower()
+        contract_abi = [
+            item
+            for item in contract_abi
+            if item.get('name') is not None and search in item['name'].lower()
         ]
 
     # filter by type
@@ -71,7 +87,8 @@ async def async_abi_command(
         print()
     if not json_only:
         evm.print_contract_abi_human_readable(
-            contract_abi, max_width=os.get_terminal_size().columns,
+            contract_abi,
+            max_width=os.get_terminal_size().columns,
         )
 
     await rpc.async_close_http_session()
