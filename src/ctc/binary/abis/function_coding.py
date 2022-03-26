@@ -194,9 +194,9 @@ def decode_function_named_parameters(
 def decode_function_output(
     encoded_output: spec.BinaryData,
     output_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    function_abi: spec.FunctionABI = None,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
-    function_abi: spec.FunctionABI = None,
 ) -> typing.Any:
     # need to test case when function has no output
 

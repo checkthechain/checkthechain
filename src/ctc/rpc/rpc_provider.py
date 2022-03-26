@@ -75,20 +75,15 @@ def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
     return (os.getpid(), provider['url'], tuple(session_kwargs.items()))
 
 
-def get_provider_network(provider):
-    if provider is None:
+def get_provider_network(provider: spec.ProviderSpec) -> spec.NetworkName:
+    if provider is None or isinstance(provider, str):
         provider = get_provider(provider)
 
-    if provider is not None and provider.get('network') is not None:
-        return provider['network']
-
+    network = provider.get('network')
+    if network is not None:
+        return network
     else:
-        provider = get_provider(provider)
-        network = provider['network']
-        if network is not None:
-            return network
-        else:
-            raise Exception('could not determine network')
+        raise Exception('could not determine network')
 
 
 def add_provider_parameters(
