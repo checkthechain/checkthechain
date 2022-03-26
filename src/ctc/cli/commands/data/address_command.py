@@ -16,6 +16,11 @@ def get_command_spec():
                 'help': 'emit extra output',
             },
             {
+                'name': '--raw',
+                'action': 'store_true',
+                'help': 'emit abi in raw json',
+            },
+            {
                 'name': '--network',
                 'metavar': 'NAME_OR_ID',
                 'help': 'network name or id to scan address of',
@@ -24,7 +29,7 @@ def get_command_spec():
     }
 
 
-async def async_address_command(address, verbose, network, **kwargs):
+async def async_address_command(address, verbose, network, raw):
     try:
         max_width = os.get_terminal_size().columns
     except OSError:
@@ -36,6 +41,7 @@ async def async_address_command(address, verbose, network, **kwargs):
         address=address,
         verbose=verbose,
         max_width=max_width,
+        raw=raw,
         provider={'network': network},
     )
     await rpc.async_close_http_session()
