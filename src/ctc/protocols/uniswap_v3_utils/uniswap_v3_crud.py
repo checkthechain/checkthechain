@@ -2,7 +2,8 @@ import asyncio
 
 from ctc import evm
 from ctc import rpc
-from ctc import spec
+
+from . import uniswap_v3_spec
 
 
 #
@@ -18,13 +19,6 @@ async def download_pool_abi(pool_address):
     )
 
 
-async def ensure_pool_abi(pool_address):
-    try:
-        await evm.async_get_contract_abi(contract_address=pool_address)
-    except spec.AbiNotFoundException:
-        await download_pool_abi(pool_address)
-
-
 async def async_get_pool_tokens(pool_address, **rpc_kwargs):
     kwargs = dict(rpc_kwargs, to_address=pool_address)
     return await asyncio.gather(
@@ -34,8 +28,6 @@ async def async_get_pool_tokens(pool_address, **rpc_kwargs):
 
 
 async def async_get_pool_metadata(pool_address, **rpc_kwargs):
-    await ensure_pool_abi(pool_address)
-
     x_address, y_address = await async_get_pool_tokens(
         pool_address=pool_address
     )
@@ -62,15 +54,16 @@ async def async_get_pool_swaps(
     replace_symbols=False,
     normalize=True,
 ):
-    await ensure_pool_abi(pool_address)
 
     if normalize or replace_symbols:
         metadata_task = asyncio.create_task(
             async_get_pool_metadata(pool_address)
         )
 
+    event_abi = await uniswap_v3_spec.async_get_event_abi('Swap', 'pool')
+
     swaps = await evm.async_get_events(
-        event_name='Swap',
+        event_abi=event_abi,
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
