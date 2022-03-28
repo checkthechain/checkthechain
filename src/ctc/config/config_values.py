@@ -27,6 +27,29 @@ def get_networks() -> dict[spec.NetworkName, spec.NetworkMetadata]:
     return config_read.get_config()['networks']
 
 
+def get_used_networks() -> dict[spec.NetworkName]:
+
+    ctc_config = config_read.get_config()
+
+    # collect all used networks
+    default_network = ctc_config['default_network']
+    providers = ctc_config['providers']
+    provider_networks = [
+        provider.get('network')
+        for provider in providers
+        if provider.get('network') is not None
+    ]
+    custom_networks = ctc_config['networks']
+
+    # get ordered unique networks
+    networks = [default_network]
+    for network in provider_networks + custom_networks:
+        if network not in networks:
+            networks.append(network)
+
+    return networks
+
+
 def get_providers() -> dict[spec.NetworkName, spec.Provider]:
     return config_read.get_config()['providers']
 
