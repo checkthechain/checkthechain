@@ -1,5 +1,5 @@
 import typing
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, NotRequired
 
 from . import address_types
 from . import binary_types
@@ -98,6 +98,7 @@ class Block(TypedDict):
     ]
     transactions_root: binary_types.PrefixHexData
     uncles: typing.List[BlockHash]
+    base_fee_per_gas: NotRequired[int]
 
 
 class RawLog(TypedDict):
