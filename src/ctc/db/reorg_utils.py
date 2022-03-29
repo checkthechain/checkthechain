@@ -21,7 +21,7 @@ def get_confirmation_block_age(datatype, network):
     return 128
 
 
-def async_revalidate_blocks(
+async def async_revalidate_blocks(
     conn: toolsql.SAConnection,
     start_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
@@ -118,11 +118,11 @@ async def async_get_premature_blocks(conn, provider=None):
 
 
 async def async_clean_invalid_blocks():
-    pass
+    raise NotImplementation()
 
 
-def async_does_block_hash_match(block_number, block_hash):
-    pass
+async def async_does_block_hash_match(block_number, block_hash):
+    raise NotImplementation()
 
 
 def detect_block_reorgs(conn, check_block_number='latest', provider=None):
