@@ -29,7 +29,7 @@ def get_prepared_schema(
 
     # add network to table name
     for table_name, table in list(schema['tables'].items()):
-        full_name = get_network_table_name(network=network, table_name=datatype)
+        full_name = get_table_name(network=network, table_name=datatype)
         if table.get('name') is not None:
             table['name'] = full_name
         schema['tables'][full_name] = schema['tables'].pop(table_name)  # type: ignore
@@ -42,11 +42,15 @@ def get_raw_schema(datatype: str) -> toolsql.DBSchema:
         from .datatypes import erc20_metadata
 
         return erc20_metadata.get_schema()
+    elif datatype == 'block_timestamps':
+        from .datatypes import block_timestamps
+
+        return block_timestamps.get_schema()
     else:
         raise Exception('unknown datatype: ' + str(datatype))
 
 
-def get_network_table_name(
+def get_table_name(
     table_name: str,
     network: spec.NetworkReference | None = None,
 ) -> str:

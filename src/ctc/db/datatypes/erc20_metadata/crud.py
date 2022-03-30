@@ -33,10 +33,7 @@ def insert_erc20_metadata(
         upsert_option = None
 
     # get table name
-    table = schema_utils.get_network_table_name(
-        table_name='erc20_metadata',
-        network=network,
-    )
+    table = schema_utils.get_table_name('erc20_metadata', network=network)
 
     # insert data
     toolsql.insert(
@@ -61,10 +58,7 @@ def select_erc20_metadata(
     address: spec.Address,
     network: spec.NetworkReference | None = None,
 ) -> db_spec.ERC20Metadata | None:
-    table = schema_utils.get_network_table_name(
-        table_name='erc20_metadata',
-        network=network,
-    )
+    table = schema_utils.get_table_name('erc20_metadata', network=network)
     return toolsql.select(
         conn=conn,
         table=table,
@@ -80,10 +74,7 @@ def select_erc20s_metadatas(
     addresses: typing.Sequence[spec.Address],
     network: spec.NetworkReference | None = None,
 ) -> typing.Sequence[db_spec.ERC20Metadata]:
-    table = schema_utils.get_network_table_name(
-        table_name='erc20_metadata',
-        network=network,
-    )
+    table = schema_utils.get_table_name('erc20_metadata', network=network)
     return toolsql.select(
         conn=conn,
         table=table,
@@ -96,10 +87,7 @@ def delete_erc20_metadata(
     address: spec.Address,
     network: spec.NetworkReference | None = None,
 ) -> None:
-    table = schema_utils.get_network_table_name(
-        network=network,
-        table_name='erc20_metadata',
-    )
+    table = schema_utils.get_table_name('erc20_metadata', network=network)
     toolsql.delete(table=table, conn=conn, row_id=address)
 
 
@@ -108,9 +96,6 @@ def delete_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
     network: spec.NetworkReference | None = None,
 ) -> None:
-    table = schema_utils.get_network_table_name(
-        network=network,
-        table_name='erc20_metadata',
-    )
+    table = schema_utils.get_table_name('erc20_metadata', network=network)
     toolsql.delete(table=table, conn=conn, row_ids=addresses)
 
