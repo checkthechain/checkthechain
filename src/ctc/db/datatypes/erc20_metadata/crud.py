@@ -73,13 +73,22 @@ def select_erc20s_metadatas(
     conn: toolsql.SAConnection,
     addresses: typing.Sequence[spec.Address],
     network: spec.NetworkReference | None = None,
-) -> typing.Sequence[db_spec.ERC20Metadata]:
+) -> typing.Sequence[db_spec.ERC20Metadata | None]:
+
     table = schema_utils.get_table_name('erc20_metadata', network=network)
-    return toolsql.select(
+    results = toolsql.select(
         conn=conn,
         table=table,
         row_ids=[address.lower() for address in addresses],
     )
+
+    # package into output
+    results_by_address = {result['address']: result for result in results}
+
+    return [
+        results_by_address.get(address)
+        for address in addresses
+    ]
 
 
 def delete_erc20_metadata(

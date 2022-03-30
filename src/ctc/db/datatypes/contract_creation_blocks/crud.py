@@ -31,7 +31,7 @@ def get_contract_creation_block(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
-) -> int:
+) -> int | None:
 
     table = schema_utils.get_table_name(
         'contract_creation_blocks',

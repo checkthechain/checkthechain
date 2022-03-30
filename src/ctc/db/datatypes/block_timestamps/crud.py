@@ -49,7 +49,7 @@ def get_timestamp_block(
     timestamp: int,
     network: spec.NetworkReference | None = None,
     mode: Literal['before', 'after', 'equal'] = 'after',
-) -> int:
+) -> int | None:
 
     table = schema_utils.get_table_name('block_timestamps', network=network)
 
@@ -76,7 +76,7 @@ def get_block_timestamp(
     conn: toolsql.SAConnection,
     block_number: int,
     network: spec.NetworkReference | None = None,
-) -> int:
+) -> int | None:
 
     table = schema_utils.get_table_name('block_timestamps', network=network)
 
@@ -92,12 +92,12 @@ def get_block_timestamp(
 
 def get_timestamps_blocks(
     conn: toolsql.SAConnection,
-    timestamps: int,
+    timestamps: typing.Sequence[int],
     network: spec.NetworkReference | None = None,
     mode: Literal['before', 'after', 'equal'] = 'after',
-) -> list[int]:
+) -> list[int | None]:
     return [
-        get_block_timestamp(
+        get_timestamp_block(
             conn=conn,
             timestamp=timestamp,
             network=network,

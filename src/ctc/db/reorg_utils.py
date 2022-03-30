@@ -57,7 +57,7 @@ async def async_revalidate_blocks(
 
     # get network
     network = rpc.get_provider_network(provider)
-    table_name = schema_utils.get_network_table_name(
+    table_name = schema_utils.get_table_name(
         table_name='blocks', network=network,
     )
 

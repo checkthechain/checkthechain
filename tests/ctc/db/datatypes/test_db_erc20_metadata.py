@@ -93,7 +93,7 @@ def test_create_schema():
                 conn=conn,
                 addresses=all_addresses,
             )
-            assert len(actual_metadatas) == 0
+            assert all(item is None for item in actual_metadatas)
 
         # insert data again
         with conn.begin():
@@ -113,5 +113,5 @@ def test_create_schema():
                 conn=conn,
                 addresses=all_addresses,
             )
-            assert len(actual_metadatas) == 0
+            assert all(item is None for item in actual_metadatas)
 

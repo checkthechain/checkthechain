@@ -15,7 +15,7 @@ def set_blocks(blocks: typing.Sequence[spec.Block]) -> None:
 
 def get_block(
     block_number: int | None = None, block_hash: str | None = None
-) -> spec.Block:
+) -> spec.Block | None:
     pass
 
 
@@ -26,7 +26,7 @@ def get_blocks(
     block_hashes: typing.Sequence[str] | None = None,
     start_block_hash: str | None = None,
     end_block_hash: str | None = None,
-) -> spec.Block:
+) -> typing.Sequence[spec.Block | None]:
     pass
 
 
