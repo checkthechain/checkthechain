@@ -88,7 +88,7 @@ def delete_erc20_metadata(
     network: spec.NetworkReference | None = None,
 ) -> None:
     table = schema_utils.get_table_name('erc20_metadata', network=network)
-    toolsql.delete(table=table, conn=conn, row_id=address)
+    toolsql.delete(table=table, conn=conn, row_id=address.lower())
 
 
 def delete_erc20s_metadata(
@@ -97,5 +97,9 @@ def delete_erc20s_metadata(
     network: spec.NetworkReference | None = None,
 ) -> None:
     table = schema_utils.get_table_name('erc20_metadata', network=network)
-    toolsql.delete(table=table, conn=conn, row_ids=addresses)
+    toolsql.delete(
+        table=table,
+        conn=conn,
+        row_ids=[address.lower() for address in addresses],
+    )
 
