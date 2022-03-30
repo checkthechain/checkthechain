@@ -41,7 +41,7 @@ def get_schema() -> toolsql.DBSchema:
                     },
                     {
                         'name': 'miner',
-                        'type': 'address',
+                        'type': 'Text',
                     },
                     {
                         'name': 'nonce',

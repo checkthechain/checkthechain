@@ -12,7 +12,7 @@ from . import schema_utils
 
 def create_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
-    datatypes: typing.Sequnce[str] | None = None,
+    datatypes: typing.Sequence[str] | None = None,
     verbose: bool = True,
     confirm: bool = True,
 ) -> None:

@@ -36,10 +36,11 @@ async def async_revalidate_blocks(
         if start_time is None:
             start_block = 0
         else:
-            start_block_data = await evm.async_get_block_of_timestamp(
+            start_block_number = await evm.async_get_block_of_timestamp(
                 timestamp=start_time,
                 provider=provider,
             )
+            start_block_data = await evm.async_get_block(start_block_number)
             start_block = start_block_data['number']
     if end_block is not None and end_time is not None:
         raise Exception('cannot specify both end_block and end_time')
@@ -47,20 +48,23 @@ async def async_revalidate_blocks(
         if end_time is None:
             end_block = 0
         else:
-            end_block_data = await evm.async_get_block_of_timestamp(
+            end_block_number = await evm.async_get_block_of_timestamp(
                 timestamp=end_time,
                 provider=provider,
             )
+            end_block_data = await evm.async_get_block(end_block_number)
             end_block = end_block_data['number']
 
     # get network
     network = rpc.get_provider_network(provider)
-    table_name = schema_utils.get_table_name(datatype='blocks', network=network)
+    table_name = schema_utils.get_network_table_name(
+        table_name='blocks', network=network,
+    )
 
     # build query
-    query_kwargs: toolsql.SelectKwargs = {
+    query_kwargs: toolsql.SelectQuery = {
         'table': table_name,
-        'columns': ['block_number', 'hash'],
+        'only_columns': ['block_number', 'hash'],
     }
     if start_block is not None:
         query_kwargs['where_gte'] = {'block_number': start_block}

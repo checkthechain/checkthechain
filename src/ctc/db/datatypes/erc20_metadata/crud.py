@@ -28,7 +28,7 @@ def insert_erc20_metadata(
 
     # get upsert option
     if upsert:
-        upsert_option = 'do_update'
+        upsert_option: toolsql.ConflictOption | None = 'do_update'
     else:
         upsert_option = None
 
@@ -77,7 +77,7 @@ def select_erc20_metadata(
 
 def select_erc20s_metadatas(
     conn: toolsql.SAConnection,
-    addresses: typing.Sequence[spec.Address] | None = None,
+    addresses: typing.Sequence[spec.Address],
     network: spec.NetworkReference | None = None,
 ) -> typing.Sequence[db_spec.ERC20Metadata]:
     table = schema_utils.get_network_table_name(

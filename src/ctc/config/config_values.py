@@ -27,7 +27,7 @@ def get_networks() -> dict[spec.NetworkName, spec.NetworkMetadata]:
     return config_read.get_config()['networks']
 
 
-def get_used_networks() -> dict[spec.NetworkName]:
+def get_used_networks() -> list[spec.NetworkName]:
 
     ctc_config = config_read.get_config()
 

@@ -32,7 +32,7 @@ def get_prepared_schema(
         full_name = get_network_table_name(network=network, table_name=datatype)
         if table.get('name') is not None:
             table['name'] = full_name
-        schema['tables'][full_name] = schema['tables'].pop(table_name)
+        schema['tables'][full_name] = schema['tables'].pop(table_name)  # type: ignore
 
     return schema
 
