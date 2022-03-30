@@ -46,6 +46,10 @@ def get_raw_schema(datatype: str) -> toolsql.DBSchema:
         from .datatypes import block_timestamps
 
         return block_timestamps.get_schema()
+    elif datatype == 'contract_creation_blocks':
+        from .datatypes import contract_creation_blocks
+
+        return contract_creation_blocks.get_schema()
     else:
         raise Exception('unknown datatype: ' + str(datatype))
 

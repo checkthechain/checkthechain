@@ -8,7 +8,7 @@ def get_schema() -> toolsql.DBSchema:
                 'columns': [
                     {
                         'name': 'address',
-                        'type': 'Binary',
+                        'type': 'Text',
                         'primary': True,
                     },
                     {
