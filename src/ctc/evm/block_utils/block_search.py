@@ -9,68 +9,12 @@ import tooltime
 
 from ctc import spec
 from ctc.toolbox import search_utils
-from .. import address_utils
 from . import block_crud
 
 
 class BlockTimestampSearchCache(TypedDict):
     initializing: dict[int, bool]
     timestamps: dict[int, int]
-
-
-async def async_get_contract_creation_block(
-    contract_address: spec.Address,
-    start_block: typing.Optional[spec.BlockNumberReference] = None,
-    end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
-    verbose: bool = True,
-    nary: typing.Optional[int] = None,
-) -> int:
-    """get the block where a contract was created
-
-    algorithm: perform a binary search across blocks, check code bytes in each
-    """
-
-    contract_address = address_utils.get_address_checksum(contract_address)
-
-    if start_block is None:
-        start_block = 0
-    if end_block is None:
-        end_block = 'latest'
-    if start_block == 'latest' or end_block == 'latest':
-        latest_block = await block_crud.async_get_latest_block_number(
-            provider=provider
-        )
-        if start_block == 'latest':
-            start_block = latest_block
-        if end_block == 'latest':
-            end_block = latest_block
-
-    if verbose:
-        print('searching for creation block of ' + contract_address)
-
-    async def async_is_match(index):
-        if verbose:
-            print('- trying block:', index)
-        return await address_utils.async_is_contract_address(
-            address=contract_address,
-            block=index,
-            provider=provider,
-        )
-
-    if nary is None:
-        result = await search_utils.async_binary_search(
-            start_index=start_block,
-            end_index=end_block,
-            async_is_match=async_is_match,
-        )
-    else:
-        raise NotImplementedError()
-
-    if verbose:
-        print('result:', result)
-
-    return result
 
 
 async def async_get_blocks_of_timestamps(

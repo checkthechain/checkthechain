@@ -50,7 +50,7 @@ class LeafDataSource(TypedDict, total=False):
     provider: spec.ProviderSpec
 
 
-def get_data_source(tags: dict[str, typing.Any]) -> DataSource:
+def get_data_source(**tags: typing.Any) -> DataSource:
     """get data source for a given type of data
 
     format is WIP and subject to change
@@ -60,11 +60,10 @@ def get_data_source(tags: dict[str, typing.Any]) -> DataSource:
         'block_timestamps',
         'contract_creation',
     ]:
-        datatype = tags['datatype']
         return {
             'backend': 'hybrid',
             'hybrid_order': [
-                {'backend': 'db', 'db_config': get_db_config(datatype)},
+                {'backend': 'db', 'db_config': get_db_config(tags['datatype'])},
                 {'backend': 'rpc'},
             ],
         }
@@ -95,6 +94,14 @@ def get_data_source(tags: dict[str, typing.Any]) -> DataSource:
                 },
             ],
             'hybrid_backfill': True,
+        }
+    elif tags.get('datatype') == 'contract_creation_blocks':
+        return {
+            'backend': 'hybrid',
+            'hybrid_order': [
+                {'backend': 'db', 'db_config': get_db_config(tags['datatype'])},
+                {'backend': 'rpc'},
+            ],
         }
     else:
         return {'backend': 'rpc'}
