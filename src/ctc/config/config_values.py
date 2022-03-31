@@ -32,17 +32,17 @@ def get_used_networks() -> list[spec.NetworkName]:
     ctc_config = config_read.get_config()
 
     # collect all used networks
-    default_network = ctc_config['default_network']
+    default_network = ctc_config['network_defaults']['default_network']
     providers = ctc_config['providers']
-    provider_networks = [
-        provider.get('network')
-        for provider in providers
-        if provider.get('network') is not None
-    ]
-    custom_networks = ctc_config['networks']
+    provider_networks: list[str] = []
+    for provider in providers.values():
+        network = provider.get('network')
+        if network is not None:
+            provider_networks.append(network)
+    custom_networks: list[str] = list(ctc_config['networks'].keys())
 
     # get ordered unique networks
-    networks = [default_network]
+    networks: list[str] = [default_network]
     for network in provider_networks + custom_networks:
         if network not in networks:
             networks.append(network)

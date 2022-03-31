@@ -50,5 +50,5 @@ class ConfigSpec(TypedDict):
     #
     # data sources
     # data_sources: None # not sure of format for this yet
-    db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
+    # db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
 

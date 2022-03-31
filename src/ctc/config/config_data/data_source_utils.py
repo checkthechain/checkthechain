@@ -24,8 +24,6 @@ class DataSource(TypedDict, total=False):
         - will insert result into earlier source if hybrid_backfill=True
     """
 
-    import toolsql
-
     # backend type
     backend: BackendType
 
@@ -36,8 +34,20 @@ class DataSource(TypedDict, total=False):
     provider: spec.ProviderSpec
 
     # hybrid parameters
-    hybrid_order: typing.Sequence[BackendType]
+    hybrid_order: typing.Sequence['LeafDataSource']
     hybrid_backfill: bool
+
+
+class LeafDataSource(TypedDict, total=False):
+
+    # backend type
+    backend: BackendType
+
+    # source parameters
+    db_config: toolsql.DBConfig
+    rest_endpoint: str
+    filesystem_root: str
+    provider: spec.ProviderSpec
 
 
 def get_data_source(tags: dict[str, typing.Any]) -> DataSource:
@@ -81,7 +91,7 @@ def get_data_source(tags: dict[str, typing.Any]) -> DataSource:
                 {'backend': 'filesystem'},
                 {
                     'backend': 'rest',
-                    'rest_endpoint': {'name': 'etherscan'},
+                    'rest_endpoint': 'etherscan',
                 },
             ],
             'hybrid_backfill': True,
@@ -102,6 +112,6 @@ def get_db_config(
     data_root = config_values.get_data_dir()
     return {
         'dbms': 'sqlite',
-        'path': os.path.join(data_root),
+        'path': os.path.join(data_root, 'ctc.db'),
     }
 
