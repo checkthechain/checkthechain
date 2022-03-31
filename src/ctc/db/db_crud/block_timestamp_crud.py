@@ -6,7 +6,7 @@ from typing_extensions import Literal
 import toolsql
 
 from ctc import spec
-from ... import schema_utils
+from .. import schema_utils
 
 
 def set_block_timestamp(
@@ -124,14 +124,12 @@ def get_blocks_timestamps(
     )
 
     blocks_timestamps = {
-        row['block_number']: row['timestamp']
-        for row in results
+        row['block_number']: row['timestamp'] for row in results
     }
 
-    for block_number in block_numbers_int:
-        blocks_timestamps.setdefault(block_number, None)
-
-    return blocks_timestamps
+    return [
+        blocks_timestamps.get(block_number) for block_number in block_numbers
+    ]
 
 
 def delete_block_timestamp(

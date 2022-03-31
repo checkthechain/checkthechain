@@ -5,8 +5,8 @@ import typing
 import toolsql
 
 from ctc import spec
-from ... import db_spec
-from ... import schema_utils
+from .. import db_spec
+from .. import schema_utils
 
 
 def insert_erc20_metadata(

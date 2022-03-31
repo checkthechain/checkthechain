@@ -14,7 +14,7 @@ def save_compressed_block_timestamps(
     dirname: str | None = None,
     path: str | None = None,
     clip_t0: bool | None = None,
-) -> None:
+) -> str:
     import numpy as np
 
     start_block = min(block_timestamps.keys())
@@ -39,7 +39,7 @@ def save_compressed_block_timestamps(
     timestamp_diffs = timestamps_array[1:] - timestamps_array[:-1]
 
     # convert to efficient dtype
-    dtype = np.int16
+    dtype: type = np.int16
     if (timestamp_diffs > np.iinfo(dtype).max).sum() > 0:
         dtype = np.int32
     timestamp_diffs = timestamp_diffs.astype(dtype)

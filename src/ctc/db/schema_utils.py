@@ -7,6 +7,7 @@ import toolsql
 from ctc import config
 from ctc import directory
 from ctc import spec
+from . import db_spec
 
 
 def get_all_datatypes() -> typing.Sequence[str]:
@@ -39,17 +40,11 @@ def get_prepared_schema(
 
 def get_raw_schema(datatype: str) -> toolsql.DBSchema:
     if datatype == 'erc20_metadata':
-        from .datatypes import erc20_metadata
-
-        return erc20_metadata.get_schema()
+        return db_spec.erc20_metadata_schema
     elif datatype == 'block_timestamps':
-        from .datatypes import block_timestamps
-
-        return block_timestamps.get_schema()
+        return db_spec.block_timestamps_schema
     elif datatype == 'contract_creation_blocks':
-        from .datatypes import contract_creation_blocks
-
-        return contract_creation_blocks.get_schema()
+        return db_spec.contract_creation_blocks_schema
     else:
         raise Exception('unknown datatype: ' + str(datatype))
 

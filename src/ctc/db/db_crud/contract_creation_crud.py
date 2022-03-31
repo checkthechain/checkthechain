@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 from ctc import spec
-from ... import schema_utils
+from .. import schema_utils
 
 
 def set_contract_creation_block(

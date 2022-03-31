@@ -7,7 +7,7 @@ import toolsql
 
 from ctc import config
 from ctc import spec
-from . import schema_utils
+from .. import schema_utils
 
 
 def create_tables(
