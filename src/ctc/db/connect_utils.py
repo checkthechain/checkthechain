@@ -6,8 +6,10 @@ from ctc import config
 def create_engine(datatype):
 
     # get db config
-    data_source = config.get_data_source(datatype)
-    if data_source.get('backend') != 'db' or 'db_config' in data_source:
+    data_source = config.get_data_source(datatype=datatype)
+    if data_source['backend'] == 'hybrid':
+        data_source = data_source['hybrid_order'][0]
+    if data_source.get('backend') != 'db' or 'db_config' not in data_source:
         raise Exception('not using database for this type of data')
     db_config = data_source['db_config']
 

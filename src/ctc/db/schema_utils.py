@@ -14,7 +14,19 @@ def get_all_datatypes() -> typing.Sequence[str]:
     return [
         'erc20_metadata',
         'block_timestamps',
+        'contract_creation_blocks',
     ]
+
+
+def get_raw_schema(datatype: str) -> toolsql.DBSchema:
+    if datatype == 'erc20_metadata':
+        return db_spec.erc20_metadata_schema
+    elif datatype == 'block_timestamps':
+        return db_spec.block_timestamps_schema
+    elif datatype == 'contract_creation_blocks':
+        return db_spec.contract_creation_blocks_schema
+    else:
+        raise Exception('unknown datatype: ' + str(datatype))
 
 
 def get_prepared_schema(
@@ -36,17 +48,6 @@ def get_prepared_schema(
         schema['tables'][full_name] = schema['tables'].pop(table_name)  # type: ignore
 
     return schema
-
-
-def get_raw_schema(datatype: str) -> toolsql.DBSchema:
-    if datatype == 'erc20_metadata':
-        return db_spec.erc20_metadata_schema
-    elif datatype == 'block_timestamps':
-        return db_spec.block_timestamps_schema
-    elif datatype == 'contract_creation_blocks':
-        return db_spec.contract_creation_blocks_schema
-    else:
-        raise Exception('unknown datatype: ' + str(datatype))
 
 
 def get_table_name(

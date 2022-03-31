@@ -29,6 +29,7 @@ command_index = {
     # data commands
     ('abi',): 'ctc.cli.commands.data.abi_command',
     ('address',): 'ctc.cli.commands.data.address_command',
+    ('db', 'create', 'tables'): 'ctc.cli.commands.data.db.create_tables_command',
     ('block',): 'ctc.cli.commands.data.block_command',
     ('blocks',): 'ctc.cli.commands.data.blocks_command',
     ('call',): 'ctc.cli.commands.data.call_command',
