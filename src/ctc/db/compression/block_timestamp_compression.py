@@ -86,11 +86,13 @@ def load_compressed_block_times(
     timestamp_diffs = np.load(path)['timestamp_diffs']
 
     if t_index == 't0':
-        timestamps = [t_start] + list(t_start + np.cumsum(timestamp_diffs))
+        head = [t_start]
     elif t_index == 't1':
-        timestamps = [0, t_start] + list(t_start + np.cumsum(timestamp_diffs))
+        head = [0, t_start]
     else:
         raise Exception()
+    tail = [int(item) for item in (t_start + np.cumsum(timestamp_diffs))]
+    timestamps = head + tail
 
     blocks = range(start_block, end_block + 1)
     return dict(zip(blocks, timestamps))

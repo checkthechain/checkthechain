@@ -27,13 +27,13 @@ def set_block_timestamp(
 
 def set_blocks_timestamps(
     conn: toolsql.SAConnection,
-    block_timestamps: typing.Mapping[int, int],
+    blocks_timestamps: typing.Mapping[int, int],
     network: spec.NetworkReference | None = None,
 ) -> None:
 
     rows = [
         {'block_number': block_number, 'timestamp': timestamp}
-        for block_number, timestamp in block_timestamps.items()
+        for block_number, timestamp in blocks_timestamps.items()
     ]
     table = schema_utils.get_table_name('block_timestamps', network=network)
     toolsql.insert(
@@ -109,19 +109,29 @@ def get_timestamps_blocks(
 
 def get_blocks_timestamps(
     conn: toolsql.SAConnection,
-    block_numbers: typing.Sequence[int],
+    block_numbers: typing.Sequence[typing.SupportsInt],
     network: spec.NetworkReference | None = None,
-) -> list[int]:
+) -> list[int | None]:
 
     table = schema_utils.get_table_name('block_timestamps', network=network)
 
-    return toolsql.select(
+    block_numbers_int = [int(item) for item in block_numbers]
+
+    results = toolsql.select(
         conn=conn,
         table=table,
-        where_in={'block_number': block_numbers},
-        only_columns=['timestamp'],
-        row_format='only_column',
+        where_in={'block_number': block_numbers_int},
     )
+
+    blocks_timestamps = {
+        row['block_number']: row['timestamp']
+        for row in results
+    }
+
+    for block_number in block_numbers_int:
+        blocks_timestamps.setdefault(block_number, None)
+
+    return blocks_timestamps
 
 
 def delete_block_timestamp(

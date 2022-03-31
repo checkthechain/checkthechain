@@ -75,10 +75,21 @@ def test_block_timestamps_db():
     # insert data
     with engine.connect() as conn:
 
-        # insert data
+        # insert data in bulk
         with conn.begin():
-            for datum in example_data:
-                block_timestamps.set_block_timestamp(conn=conn, **datum)
+            data = {
+                datum['block_number']: datum['timestamp']
+                for datum in example_data
+            }
+            block_timestamps.set_blocks_timestamps(
+                conn=conn,
+                blocks_timestamps=data,
+            )
+
+        # # insert data one-by-one
+        # with conn.begin():
+        #     for datum in example_data:
+        #         block_timestamps.set_block_timestamp(conn=conn, **datum)
 
         # get data individually
         with conn.begin():
@@ -89,7 +100,7 @@ def test_block_timestamps_db():
                 )
                 assert timestamp == datum['timestamp']
 
-#         # get data collectively
+        # get data collectively
         all_blocks = [datum['block_number'] for datum in example_data]
         all_timestamps = [datum['timestamp'] for datum in example_data]
         with conn.begin():
@@ -97,7 +108,7 @@ def test_block_timestamps_db():
                 conn=conn,
                 block_numbers=all_blocks,
             )
-            assert set(stored_timestamps) == set(all_timestamps)
+            assert set(stored_timestamps.values()) == set(all_timestamps)
 
         # delete entries one by one
         with conn.begin():
@@ -113,7 +124,7 @@ def test_block_timestamps_db():
                 conn=conn,
                 block_numbers=all_blocks,
             )
-            assert len(stored_timestamps) == 0
+            assert set(stored_timestamps.values()) == {None}
 
         # insert data again
         with conn.begin():
@@ -133,5 +144,5 @@ def test_block_timestamps_db():
                 conn=conn,
                 block_numbers=all_blocks,
             )
-            assert len(stored_timestamps) == 0
+            assert set(stored_timestamps.values()) == {None}
 
