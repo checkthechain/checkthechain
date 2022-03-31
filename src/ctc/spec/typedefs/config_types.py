@@ -13,6 +13,7 @@
     - rpc: set batching and other parameters for each rpc method
     - sql: configuration for sql database backend
 """
+from __future__ import annotations
 
 import typing
 from typing_extensions import TypedDict
@@ -46,4 +47,8 @@ class ConfigSpec(TypedDict):
         network_types.NetworkName, network_types.NetworkMetadata
     ]
     network_defaults: ConfigNetworkDefaults
+    #
+    # data sources
+    # data_sources: None # not sure of format for this yet
+    db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
 
