@@ -69,6 +69,7 @@ async def async_get_events_from_node(
         if event_abi is None:
             event_abi = await abi_utils.async_get_event_abi(
                 event_hash=event_hash,
+                event_name=event_name,
                 contract_abi=contract_abi,
                 contract_address=contract_address,
                 network=network,
