@@ -3,7 +3,7 @@ import tempfile
 import toolsql
 
 from ctc import db
-from ctc.db.datatypes import erc20_metadata
+
 
 example_data = [
     {
@@ -51,12 +51,12 @@ def test_create_schema():
         # insert data
         with conn.begin():
             for datum in example_data:
-                erc20_metadata.insert_erc20_metadata(conn=conn, **datum)
+                db.insert_erc20_metadata(conn=conn, **datum)
 
         # get data individually
         with conn.begin():
             for datum in example_data:
-                actual_metadata = erc20_metadata.select_erc20_metadata(
+                actual_metadata = db.select_erc20_metadata(
                     conn=conn,
                     address=datum['address'],
                 )
@@ -66,7 +66,7 @@ def test_create_schema():
         # get data collectively
         all_addresses = [datum['address'] for datum in example_data]
         with conn.begin():
-            actual_metadatas = erc20_metadata.select_erc20s_metadatas(
+            actual_metadatas = db.select_erc20s_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -82,14 +82,14 @@ def test_create_schema():
         # delete entries one by one
         with conn.begin():
             for datum in example_data:
-                erc20_metadata.delete_erc20_metadata(
+                db.delete_erc20_metadata(
                     conn=conn,
                     address=datum['address'],
                 )
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = erc20_metadata.select_erc20s_metadatas(
+            actual_metadatas = db.select_erc20s_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -98,18 +98,18 @@ def test_create_schema():
         # insert data again
         with conn.begin():
             for datum in example_data:
-                erc20_metadata.insert_erc20_metadata(conn=conn, **datum)
+                db.insert_erc20_metadata(conn=conn, **datum)
 
         # delete entries all at once
         with conn.begin():
-            erc20_metadata.delete_erc20s_metadata(
+            db.delete_erc20s_metadata(
                 conn=conn,
                 addresses=all_addresses,
             )
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = erc20_metadata.select_erc20s_metadatas(
+            actual_metadatas = db.select_erc20s_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )

@@ -4,7 +4,6 @@ import tempfile
 import toolsql
 
 from ctc import db
-from ctc.db.datatypes import block_timestamps
 
 
 example_data = [
@@ -81,7 +80,7 @@ def test_block_timestamps_db():
                 datum['block_number']: datum['timestamp']
                 for datum in example_data
             }
-            block_timestamps.set_blocks_timestamps(
+            db.set_blocks_timestamps(
                 conn=conn,
                 blocks_timestamps=data,
             )
@@ -94,7 +93,7 @@ def test_block_timestamps_db():
         # get data individually
         with conn.begin():
             for datum in example_data:
-                timestamp = block_timestamps.get_block_timestamp(
+                timestamp = db.get_block_timestamp(
                     conn=conn,
                     block_number=datum['block_number'],
                 )
@@ -104,45 +103,45 @@ def test_block_timestamps_db():
         all_blocks = [datum['block_number'] for datum in example_data]
         all_timestamps = [datum['timestamp'] for datum in example_data]
         with conn.begin():
-            stored_timestamps = block_timestamps.get_blocks_timestamps(
+            stored_timestamps = db.get_blocks_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
-            assert set(stored_timestamps.values()) == set(all_timestamps)
+            assert set(stored_timestamps) == set(all_timestamps)
 
         # delete entries one by one
         with conn.begin():
             for datum in example_data:
-                block_timestamps.delete_block_timestamp(
+                db.delete_block_timestamp(
                     conn=conn,
                     block_number=datum['block_number'],
                 )
 
         # ensure all entries deleted
         with conn.begin():
-            stored_timestamps = block_timestamps.get_blocks_timestamps(
+            stored_timestamps = db.get_blocks_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
-            assert set(stored_timestamps.values()) == {None}
+            assert set(stored_timestamps) == {None}
 
         # insert data again
         with conn.begin():
             for datum in example_data:
-                block_timestamps.set_block_timestamp(conn=conn, **datum)
+                db.set_block_timestamp(conn=conn, **datum)
 
         # delete entries all at once
         with conn.begin():
-            block_timestamps.delete_blocks_timestamps(
+            db.delete_blocks_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
 
         # ensure all entries deleted
         with conn.begin():
-            stored_timestamps = block_timestamps.get_blocks_timestamps(
+            stored_timestamps = db.get_blocks_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
-            assert set(stored_timestamps.values()) == {None}
+            assert set(stored_timestamps) == {None}
 

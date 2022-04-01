@@ -3,7 +3,6 @@ import tempfile
 import toolsql
 
 from ctc import db
-from ctc.db.datatypes import contract_creation_blocks
 
 
 example_data = [
@@ -49,7 +48,7 @@ def test_create_schema():
         # insert data
         with conn.begin():
             for datum in example_data:
-                contract_creation_blocks.set_contract_creation_block(
+                db.set_contract_creation_block(
                     conn=conn, **datum
                 )
 
@@ -57,7 +56,7 @@ def test_create_schema():
         with conn.begin():
             for datum in example_data:
                 stored_block = (
-                    contract_creation_blocks.get_contract_creation_block(
+                    db.get_contract_creation_block(
                         conn=conn,
                         address=datum['address'],
                     )
@@ -67,7 +66,7 @@ def test_create_schema():
         # delete entries one by one
         with conn.begin():
             for datum in example_data:
-                contract_creation_blocks.delete_contract_creation_block(
+                db.delete_contract_creation_block(
                     conn=conn,
                     address=datum['address'],
                 )
@@ -75,7 +74,7 @@ def test_create_schema():
         # ensure all entries deleted
         with conn.begin():
             for datum in example_data:
-                block = contract_creation_blocks.get_contract_creation_block(
+                block = db.get_contract_creation_block(
                     conn=conn,
                     address=datum['address'],
                 )
