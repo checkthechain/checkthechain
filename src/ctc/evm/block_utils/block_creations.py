@@ -41,12 +41,12 @@ async def async_get_contract_creation_block(
         # decide whether to store in db
         from ctc import db
 
-        confirmations = db.get_confirmation_block_age(
+        min_confirmations = db.get_min_confirmations(
             network=network,
             datatype='contract_creation_blocks',
         )
         latest_block = await latest_block_task
-        store_in_db = latest_block - block > confirmations
+        store_in_db = latest_block - block > min_confirmations
         if store_in_db:
             with db.create_engine(
                 datatype='contract_creation_blocks'

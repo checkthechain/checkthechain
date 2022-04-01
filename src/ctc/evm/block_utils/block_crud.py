@@ -15,11 +15,15 @@ async def async_get_block(
 
     if spec.is_block_number_reference(block):
 
-        return await rpc.async_eth_get_block_by_number(
+        block_data = await rpc.async_eth_get_block_by_number(
             block_number=block_normalize.standardize_block_number(block),
             provider=provider,
             include_full_transactions=include_full_transactions,
         )
+
+        await _async_handle_block_storage(block=block_data, provider=provider)
+
+        return block_data
 
     elif spec.is_block_hash(block):
 
@@ -31,6 +35,51 @@ async def async_get_block(
 
     else:
         raise Exception('unknown block specifier: ' + str(block))
+
+
+async def _async_handle_block_storage(block, provider=None):
+    from ctc import db
+
+    # determine whether to store block
+    network = rpc.get_provider_network(provider=provider)
+    min_confirmations = db.get_min_confirmations(
+        datatype='block_timestamps',
+        network=network,
+    )
+    engine = db.create_engine(
+        datatype='block_timestamps',
+        network=network,
+    )
+    check_if_exists = False
+    with engine.connect() as conn:
+        if (
+            check_if_exists
+            and db.get_block_timestamp(conn=conn, block_number=block['number'])
+            is not None
+        ):
+            store = False
+        else:
+            max_block = db.get_max_block_number(conn=conn, network=network)
+            if block['number'] <= max_block - min_confirmations:
+                store = True
+            else:
+                latest_block = await async_get_latest_block_number(
+                    provider=provider
+                )
+                store = block['number'] <= latest_block - min_confirmations
+
+    # store data in db
+    if store:
+        engine = db.create_engine(
+            datatype='block_timestamps',
+            network=network,
+        )
+        with engine.begin() as conn:
+            db.set_block_timestamp(
+                conn=conn,
+                block_number=block['number'],
+                timestamp=block['timestamp'],
+            )
 
 
 async def async_get_blocks(

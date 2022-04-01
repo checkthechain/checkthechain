@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import typing
 
 if typing.TYPE_CHECKING:
@@ -10,10 +9,10 @@ from typing_extensions import Literal
 from typing_extensions import TypedDict
 
 from ctc import spec
+from .. import config_values
 
 
 BackendType = Literal['filesystem', 'rpc', 'db', 'rest', 'hybrid']
-Datatype = str
 
 
 class DataSource(TypedDict, total=False):
@@ -63,7 +62,12 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         return {
             'backend': 'hybrid',
             'hybrid_order': [
-                {'backend': 'db', 'db_config': get_db_config(tags['datatype'])},
+                {
+                    'backend': 'db',
+                    'db_config': config_values.get_db_config(
+                        datatype=tags['datatype']
+                    ),
+                },
                 {'backend': 'rpc'},
             ],
         }
@@ -99,26 +103,15 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         return {
             'backend': 'hybrid',
             'hybrid_order': [
-                {'backend': 'db', 'db_config': get_db_config(tags['datatype'])},
+                {
+                    'backend': 'db',
+                    'db_config': config_values.get_db_config(
+                        datatype=tags['datatype']
+                    ),
+                },
                 {'backend': 'rpc'},
             ],
         }
     else:
         return {'backend': 'rpc'}
-
-
-def get_db_config(
-    datatype: Datatype = None,
-    network: spec.NetworkReference = None,
-) -> 'toolsql.DBConfig':
-
-    # for now, use same database for all datatypes and networks
-
-    from .. import config_values
-
-    data_root = config_values.get_data_dir()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(data_root, 'ctc.db'),
-    }
 

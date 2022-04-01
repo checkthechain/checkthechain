@@ -3,6 +3,9 @@ from __future__ import annotations
 import typing
 import os
 
+if typing.TYPE_CHECKING:
+    import toolsql
+
 from ctc import spec
 from ctc.toolbox import search_utils
 from . import config_read
@@ -108,4 +111,19 @@ def get_default_provider(
         raise Exception(
             'no default provider specified for network ' + str(network)
         )
+
+
+def get_db_config(
+    *,
+    datatype: str | None = None,
+    network: spec.NetworkReference | None = None,
+) -> 'toolsql.DBConfig':
+
+    # for now, use same database for all datatypes and networks
+
+    data_root = get_data_dir()
+    return {
+        'dbms': 'sqlite',
+        'path': os.path.join(data_root, 'ctc.db'),
+    }
 

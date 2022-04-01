@@ -50,19 +50,32 @@ def get_timestamp_block(
     network: spec.NetworkReference | None = None,
     mode: Literal['before', 'after', 'equal'] = 'after',
 ) -> int | None:
+    """
+
+    possible approaches to ensure db has enough data to give answer:
+    - possibilities
+        - run two queries, like (gte + lt) or (lte + gt)
+            - limit = 1 on both
+            - make sure that the results are only one apart
+        - run one query first, then...
+            - run second query to make sure result+1 or result-1 is in db
+        - assume db is complete, do not perform additional checks
+    - the relative speeds of these operations matter
+        - this all could be bikeshedding
+    """
 
     table = schema_utils.get_table_name('block_timestamps', network=network)
 
     if mode == 'before':
-        query = {'where_lte': timestamp}
+        query = {'where_lte': {'timestamp': timestamp}}
     elif mode == 'after':
-        query = {'where_gte': timestamp}
+        query = {'where_gte': {'timestamp': timestamp}}
     elif mode == 'equal':
-        query = {'where_gte': timestamp}
+        query = {'where_equals': {'timestamp': timestamp}}
     else:
         raise Exception('unknown mode: ' + str(mode))
 
-    return toolsql.select(
+    block_number = toolsql.select(
         conn=conn,
         table=table,
         return_count='one',
@@ -70,6 +83,26 @@ def get_timestamp_block(
         row_format='only_column',
         **query,
     )
+
+    if mode == 'before':
+        # assert block after is in db
+        next_timestamp = get_block_timestamp(
+            conn=conn,
+            block_number=block_number + 1,
+        )
+        if next_timestamp is None:
+            return None
+    elif mode == 'after':
+        # assert block before is in db
+        previous_timestamp = get_block_timestamp(
+            conn=conn,
+            block_number=block_number - 1,
+        )
+        # raise Exception()
+        if previous_timestamp is None:
+            return None
+
+    return block_number
 
 
 def get_block_timestamp(
@@ -88,6 +121,38 @@ def get_block_timestamp(
         only_columns=['timestamp'],
         return_count='one',
     )
+
+
+def get_max_block_number(
+    conn: toolsql.SAConnection,
+    network: spec.NetworkReference | None = None,
+):
+    table = schema_utils.get_table_name('block_timestamps', network=network)
+    result = toolsql.select(
+        conn=conn,
+        table=table,
+        sql_functions=[
+            ['max', 'block_number'],
+        ],
+        return_count='one',
+    )
+    return result['max__block_number']
+
+
+def get_max_block_timestamp(
+    conn: toolsql.SAConnection,
+    network: spec.NetworkReference | None = None,
+):
+    table = schema_utils.get_table_name('block_timestamps', network=network)
+    result = toolsql.select(
+        conn=conn,
+        table=table,
+        sql_functions=[
+            ['max', 'timestamp'],
+        ],
+        return_count='one',
+    )
+    return result['max__timestamp']
 
 
 def get_timestamps_blocks(

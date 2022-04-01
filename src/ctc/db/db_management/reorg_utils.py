@@ -16,7 +16,7 @@ from ctc import spec
 from . import schema_utils
 
 
-def get_confirmation_block_age(datatype, network):
+def get_min_confirmations(datatype, network):
     # for now use single confirmation age for all datatypes and networks
     return 128
 
@@ -103,8 +103,8 @@ async def async_get_premature_blocks(conn, provider=None):
     latest_block_number = await evm.async_get_latest_block_number(
         provider=provider
     )
-    confirmation_age = get_confirmation_block_age(network=network)
-    youngest_valid_block = latest_block_number - confirmation_age
+    min_confirmations = get_min_confirmations(network=network)
+    youngest_valid_block = latest_block_number - min_confirmations
 
     n_premature_blocks = toolsql.select(
         conn=conn,
@@ -115,7 +115,7 @@ async def async_get_premature_blocks(conn, provider=None):
 
     return {
         'latest_rpc_block': latest_block_number,
-        'confirmation_age': confirmation_age,
+        'min_confirmations': min_confirmations,
         'youngest_valid_block': youngest_valid_block,
         'n_premature_blocks': n_premature_blocks,
     }
