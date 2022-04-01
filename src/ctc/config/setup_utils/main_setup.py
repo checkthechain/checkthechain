@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import typing
+
 import ctc
 from ctc import spec
 
@@ -36,7 +40,7 @@ def setup_ctc() -> None:
     toolcli.print('Can skip options by simply pressing enter', style='bold')
 
     # load old config data for passing to each option
-    old_config = {}
+    old_config: typing.Mapping = {}
 
     # ensure file is valid
     validation_setup.ensure_valid(styles=styles)

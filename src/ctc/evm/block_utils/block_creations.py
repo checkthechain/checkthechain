@@ -64,7 +64,7 @@ async def async_get_contract_creation_block(
 async def async_get_contract_creation_block_from_db(
     contract_address,
     network,
-) -> int:
+) -> int | None:
     from ctc import db
 
     with db.create_engine(datatype='contract_creation_blocks').connect() as conn:

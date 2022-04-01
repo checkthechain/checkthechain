@@ -6,12 +6,14 @@ import typing
 
 import toolcli
 
+from ctc import spec
+
 
 def setup_dbs(
     styles: typing.Mapping[str, str],
     data_root: str,
     old_config,
-) -> tuple[None, bool]:
+) -> tuple[spec.PartialConfigSpec, bool]:
     print()
     print()
     toolcli.print('## Database Setup', style=styles['header'])
@@ -55,7 +57,7 @@ def setup_dbs(
                 if not answer:
                     raise Exception()
                 else:
-                    os.path.makedirs(path, exist_ok=True)
+                    os.makedirs(path, exist_ok=True)
                     filepath = os.path.join(path, 'ctc.db')
 
         if os.path.isfile(filepath):

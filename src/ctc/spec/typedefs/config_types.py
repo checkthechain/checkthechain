@@ -37,6 +37,7 @@ class PartialConfigSpec(TypedDict, total=False):
         network_types.NetworkName, network_types.NetworkMetadata
     ]
     network_defaults: ConfigNetworkDefaults
+    db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
 
 
 class ConfigSpec(TypedDict):
