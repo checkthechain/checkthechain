@@ -25,7 +25,7 @@ def setup_networks(styles: typing.Mapping[str, str]) -> tuple[_NetworkData, bool
     toolcli.print('## Network Setup', style=styles['header'])
 
     print()
-    print('The following networks are already installed:')
+    print('The following networks are already added:')
     default_networks = directory.load_networks_from_disk(use_default=True)
     for network_name, network_metadata in default_networks.items():
         print('-', network_name)

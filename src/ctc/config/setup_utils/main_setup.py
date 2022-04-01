@@ -1,7 +1,11 @@
+import ctc
 from ctc import spec
+
+import toolcli
 
 from . import config_path_setup
 from . import data_root_setup
+from . import db_setup
 from . import final_setup
 from . import network_setup
 from . import validation_setup
@@ -28,22 +32,31 @@ def setup_ctc() -> None:
     print('Each step can be skipped depending on what you need')
     print('- this wizard can be rerun multiple times idempotently')
     print('- by default, wizard will leave current settings unchanged')
+    print()
+    toolcli.print('Can skip options by simply pressing enter', style='bold')
+
+    # load old config data for passing to each option
+    old_config = {}
 
     # ensure file is valid
     validation_setup.ensure_valid(styles=styles)
 
     # collect new config file data
+    network_data, create_because_networks = network_setup.setup_networks(
+        styles=styles,
+    )
     (
         config_path,
         create_because_config_path,
     ) = config_path_setup.setup_config_path(styles=styles)
-    data_root, create_because_data_root = data_root_setup.setup_data_root(styles=styles)
-    network_data, create_because_networks = network_setup.setup_networks(
+    data_root, create_because_data_root = data_root_setup.setup_data_root(
         styles=styles
     )
-
-    # TODO: prompt whether to keep any other old config settings
-    pass
+    db_data, create_because_dbs = db_setup.setup_dbs(
+        styles=styles,
+        data_root=data_root,
+        old_config=old_config,
+    )
 
     # create new config file if need be
     create_new_config = any(
@@ -51,15 +64,17 @@ def setup_ctc() -> None:
             create_because_config_path,
             create_because_data_root,
             create_because_networks,
+            create_because_dbs,
         ]
     )
 
     config: spec.ConfigSpec = {
-        'config_spec_version': '0.1.0',
+        'config_spec_version': ctc.__version__,
         'data_dir': data_root,
         'networks': network_data['networks'],
         'providers': network_data['providers'],
         'network_defaults': network_data['network_defaults'],
+        'db_configs': db_data['db_configs'],
     }
 
     final_setup.finalize_setup(

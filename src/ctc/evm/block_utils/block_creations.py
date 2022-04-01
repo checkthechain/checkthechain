@@ -29,7 +29,6 @@ async def async_get_contract_creation_block(
 
     # if not in db, use rpc provider
     if block is None:
-        print("BLOCK NOT IN DB, SEARCHING PROVIDER")
         latest_block_task = asyncio.create_task(
             block_crud.async_get_latest_block_number(provider=provider)
         )
@@ -68,7 +67,7 @@ async def async_get_contract_creation_block_from_db(
 ) -> int:
     from ctc import db
 
-    with db.create_engine(datatype='contract_creation_blocks').begin() as conn:
+    with db.create_engine(datatype='contract_creation_blocks').connect() as conn:
         return db.get_contract_creation_block(
             conn=conn,
             address=contract_address,
