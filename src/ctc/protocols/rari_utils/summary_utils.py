@@ -152,7 +152,7 @@ async def _async_get_all_pools_stats(all_pools, block):
 
         chunk_pools_stats = [
             asyncio.create_task(
-                fuse_queries.get_pool_tvl_and_tvb(
+                fuse_queries.async_get_pool_tvl_and_tvb(
                     comptroller=pool[2], block=block
                 )
             )
