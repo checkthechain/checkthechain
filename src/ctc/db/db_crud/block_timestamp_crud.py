@@ -84,23 +84,24 @@ def get_timestamp_block(
         **query,
     )
 
-    if mode == 'before':
-        # assert block after is in db
-        next_timestamp = get_block_timestamp(
-            conn=conn,
-            block_number=block_number + 1,
-        )
-        if next_timestamp is None:
-            return None
-    elif mode == 'after':
-        # assert block before is in db
-        previous_timestamp = get_block_timestamp(
-            conn=conn,
-            block_number=block_number - 1,
-        )
-        # raise Exception()
-        if previous_timestamp is None:
-            return None
+    if block_number is not None:
+        if mode == 'before':
+            # assert block after is in db
+            next_timestamp = get_block_timestamp(
+                conn=conn,
+                block_number=block_number + 1,
+            )
+            if next_timestamp is None:
+                return None
+        elif mode == 'after':
+            # assert block before is in db
+            previous_timestamp = get_block_timestamp(
+                conn=conn,
+                block_number=block_number - 1,
+            )
+            # raise Exception()
+            if previous_timestamp is None:
+                return None
 
     return block_number
 
