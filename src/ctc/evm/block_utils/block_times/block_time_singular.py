@@ -19,8 +19,8 @@ async def async_get_block_of_timestamp(
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     verbose: bool = True,
     provider: spec.ProviderSpec = None,
+    use_db: bool = True,
 ) -> int:
-    import numpy as np
 
     if not isinstance(timestamp, int):
         timestamp = tooltime.timestamp_to_seconds(timestamp)
@@ -28,31 +28,30 @@ async def async_get_block_of_timestamp(
     if block_timestamps is not None or (
         block_timestamp_array is not None and block_number_array is not None
     ):
-        if block_timestamp_array is None:
-            if block_timestamps is None:
-                raise Exception('must specify more arguments')
-            block_timestamp_array = np.array(list(block_timestamps.values()))
-        if block_number_array is None:
-            if block_timestamps is None:
-                raise Exception('must specify more arguments')
-            block_number_array = np.array(list(block_timestamps.keys()))
-
         return get_block_of_timestamp_from_arrays(
             timestamp=timestamp,
             block_timestamp_array=block_timestamp_array,
             block_number_array=block_number_array,
+            block_timestamps=block_timestamps,
             verbose=verbose,
         )
     else:
-        from ctc import db
-        network = rpc.get_provider_network(provider=provider)
-        engine = db.create_engine(datatype='block_timestamps', network=network)
-        with engine.connect() as conn:
-            block = db.get_timestamp_block(
-                conn=conn,
-                network=network,
-                timestamp=timestamp,
-            )
+
+        # get from db
+        if use_db:
+            from ctc import db
+            network = rpc.get_provider_network(provider=provider)
+            engine = db.create_engine(datatype='block_timestamps', network=network)
+            with engine.connect() as conn:
+                block = db.get_timestamp_block(
+                    conn=conn,
+                    network=network,
+                    timestamp=timestamp,
+                )
+        else:
+            block = None
+
+        # get from node
         if block is not None:
             return block
         else:
@@ -69,9 +68,19 @@ def get_block_of_timestamp_from_arrays(
     timestamp: tooltime.Timestamp,
     block_timestamp_array: spec.NumpyArray,
     block_number_array: spec.NumpyArray,
+    block_timestamps: typing.Mapping[int, int] | None,
     verbose: bool,
 ) -> int:
     import numpy as np
+
+    if block_timestamp_array is None:
+        if block_timestamps is None:
+            raise Exception('must specify more arguments')
+        block_timestamp_array = np.array(list(block_timestamps.values()))
+    if block_number_array is None:
+        if block_timestamps is None:
+            raise Exception('must specify more arguments')
+        block_number_array = np.array(list(block_timestamps.keys()))
 
     if not isinstance(timestamp, int):
         timestamp = tooltime.timestamp_to_seconds(timestamp)

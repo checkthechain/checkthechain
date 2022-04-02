@@ -4,6 +4,7 @@ import asyncio
 import typing
 
 from ctc import spec
+from ctc import rpc
 
 from . import block_time_search
 from . import block_time_singular
@@ -17,6 +18,7 @@ async def async_get_blocks_of_timestamps(
     nary: typing.Optional[int] = None,
     cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
     provider: spec.ProviderSpec = None,
+    use_db: bool | None = None,
 ) -> list[int]:
     """once parallel node search created, use that"""
 
@@ -48,16 +50,50 @@ async def async_get_blocks_of_timestamps(
 
     else:
 
-        coroutines = []
-        for timestamp in timestamps:
-            coroutine = block_time_singular.async_get_block_of_timestamp(
-                timestamp=timestamp,
-                verbose=False,
-                cache=cache,
-                nary=nary,
-                provider=provider,
-            )
-            coroutines.append(coroutine)
+        # get timestamps form db
+        if use_db is None:
+            use_db = True
+        if use_db:
+            from ctc import db
 
-        return await asyncio.gather(*coroutines)
+            network = rpc.get_provider_network(provider)
+            engine = db.create_engine(
+                datatype='block_timestamps',
+                network=network,
+            )
+            with engine.connect() as conn:
+                db_blocks = db.get_timestamps_blocks(
+                    conn=conn,
+                    timestamps=timestamps,
+                )
+                results = {}
+                remaining_timestamps = []
+                for block, timestamp in zip(db_blocks, timestamps):
+                    if block is None:
+                        remaining_timestamps.append(timestamp)
+                    else:
+                        results[timestamp] = block
+        else:
+            remaining_timestamps = timestamps
+            results = {}
+
+        # get timestamps from rpc node
+        if len(remaining_timestamps) > 0:
+            coroutines = []
+            for timestamp in remaining_timestamps:
+                coroutine = block_time_singular.async_get_block_of_timestamp(
+                    timestamp=timestamp,
+                    verbose=False,
+                    cache=cache,
+                    nary=nary,
+                    provider=provider,
+                    use_db=False,
+                )
+                coroutines.append(coroutine)
+            node_blocks = await asyncio.gather(*coroutines)
+            node_results = dict(zip(remaining_timestamps, node_blocks))
+            results.update(node_results)
+
+        # combine
+        return [results[timestamp] for timestamp in timestamps]
 
