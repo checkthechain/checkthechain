@@ -7,10 +7,17 @@ def get_command_spec():
     return {
         'f': config_command,
         'help': 'print current config information',
+        'args': [
+            {
+                'name': '--reveal',
+                'action': 'store_true',
+                'help': 'show sensitive information in config',
+            },
+        ],
     }
 
 
-def config_command():
+def config_command(reveal):
 
     env_var = ctc.config.config_path_env_var
 
@@ -36,6 +43,12 @@ def config_command():
                 if isinstance(subvalue, dict) and len(subvalue) > 0:
                     print('    -', str(subkey) + ':')
                     for subsubkey, subsubvalue in subvalue.items():
+                        if (
+                            (not reveal)
+                            and key == 'providers'
+                            and subsubkey == 'url'
+                        ):
+                            subsubvalue = '********'
                         print('        -', str(subsubkey) + ':', subsubvalue)
                 else:
                     print('    -', str(subkey) + ':', subvalue)
