@@ -1,14 +1,23 @@
 from __future__ import annotations
 
+from . import block_crud
 from ctc import rpc
 
 
-async def async_get_block_gas_stats(block, normalize=True):
+async def async_get_block_gas_stats(block, normalize=True, provider=None):
     if not isinstance(block, dict):
-        if isinstance(block, str) and block.startswith('0x') and len(block) == 66:
-            block = await rpc.async_eth_get_block_by_hash(block)
+        if (
+            isinstance(block, str)
+            and block.startswith('0x')
+            and len(block) == 66
+        ):
+            block = await rpc.async_eth_get_block_by_hash(
+                block, provider=provider
+            )
         else:
-            block = await rpc.async_eth_get_block_by_number(block)
+            block = await block_crud.async_get_block(
+                block, include_full_transactions=True, provider=provider
+            )
     return get_block_gas_stats(block)
 
 
