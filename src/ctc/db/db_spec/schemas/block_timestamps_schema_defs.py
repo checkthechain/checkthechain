@@ -14,6 +14,7 @@ block_timestamps_schema: toolsql.DBSchema = {
                     'name': 'timestamp',
                     'type': 'Integer',
                     'index': True,
+                    'null': False,
                 },
             ],
         },

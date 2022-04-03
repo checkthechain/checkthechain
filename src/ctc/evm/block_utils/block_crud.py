@@ -22,6 +22,7 @@ async def async_get_block(
         )
 
         from ctc import db
+
         await db.async_intake_block(block=block_data, provider=provider)
 
         return block_data
@@ -60,6 +61,7 @@ async def async_get_blocks(
         )
 
         from ctc import db
+
         await db.async_intake_blocks(blocks=blocks_data, provider=provider)
 
         return blocks_data
@@ -95,6 +97,7 @@ async def async_get_blocks_timestamps(
     # get timestamps from db
     if use_db:
         from ctc import db
+
         network = rpc.get_provider_network(provider)
         engine = db.create_engine(datatype='block_timestamps', network=network)
         with engine.connect() as conn:
@@ -103,7 +106,11 @@ async def async_get_blocks_timestamps(
                 block_numbers=blocks,
             )
         results = dict(zip(blocks, db_timestamps))
-        remaining_blocks = [block for block in blocks if block is None]
+        remaining_blocks = [
+            block
+            for block, timestamp in zip(blocks, db_timestamps)
+            if timestamp is None
+        ]
     else:
         results = {}
         remaining_blocks = blocks
