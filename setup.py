@@ -10,7 +10,6 @@ setuptools.setup(
     install_requires=[
         #
         # data science
-        'matplotlib',
         'numpy',
         'pandas',
         'pandas-stubs',
@@ -25,7 +24,6 @@ setuptools.setup(
         'toolcache',
         'toolcli>=0.3.8',
         'toolconf',
-        'toolplot',
         'toolsql>=0.2.2',
         'toolstr>=0.1.2',
         'tooltable',
@@ -45,6 +43,10 @@ setuptools.setup(
         ],
         'speed': [
             'pysha3',  # for keccak()
+        ],
+        'plots': [
+            'matplotlib',
+            'toolplot',
         ],
     },
     scripts=[

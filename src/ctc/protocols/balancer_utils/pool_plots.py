@@ -1,4 +1,3 @@
-from ctc import directory
 from ctc import evm
 
 from . import pool_summary
