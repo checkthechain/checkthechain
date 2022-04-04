@@ -93,6 +93,7 @@ async def async_get_blocks_timestamps(
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
 ) -> list[int]:
+    blocks = [int(block) for block in blocks]
 
     # get timestamps from db
     if use_db:

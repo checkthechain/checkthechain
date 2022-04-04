@@ -71,7 +71,7 @@ command_index = {
     ): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
     ('rari',): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
     ('rari', 'pools'): 'ctc.protocols.rari_utils.cli.rari.pools_command',
-    # ('uniswap', 'chart'): 'ctc.protocols.uniswap_v2_utils.cli.chart_command',
+    ('uniswap', 'chart'): 'ctc.protocols.uniswap_v2_utils.cli.chart_command',
     ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
     ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.burns_command',
     ('uniswap', 'swaps'): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
