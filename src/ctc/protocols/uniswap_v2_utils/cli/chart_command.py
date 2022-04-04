@@ -172,6 +172,8 @@ async def async_chart_command(pool, invert, timescale, no_volume):
         print('- price units =', token1, 'per', token0)
     else:
         print('- price units =', token0, 'per', token1)
+    if not no_volume:
+        print('- volume units =', token0)
     print()
     console.print(graph)
 
