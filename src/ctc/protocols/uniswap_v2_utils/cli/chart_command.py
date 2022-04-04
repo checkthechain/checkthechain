@@ -21,16 +21,27 @@ def get_command_spec():
         'args': [
             {
                 'name': 'pool',
+                'help': 'Uniswap pool address',
             },
             {
-                'name': '--inverse',
+                'name': '--timescale',
+                'help': 'size of candlesticks, e.g. 1h, 1d, or 1w',
+            },
+            {
+                'name': '--invert',
                 'action': 'store_true',
-            }
+                'help': 'use inverse of price',
+            },
+            {
+                'name': '--no-volume',
+                'action': 'store_true',
+                'help': 'hide volume data',
+            },
         ],
     }
 
 
-async def async_chart_command(pool, inverse):
+async def async_chart_command(pool, invert, timescale, no_volume):
     import numpy as np
 
     metadata_task = asyncio.create_task(
@@ -38,7 +49,10 @@ async def async_chart_command(pool, inverse):
     )
 
     n_candles = math.floor((os.get_terminal_size().columns - 10) / 2)
-    candle_timescale = '1d'
+    if timescale is None:
+        candle_timescale = '1d'
+    else:
+        candle_timescale = timescale
     candle_seconds = tooltime.timelength_to_seconds(candle_timescale)
     window_seconds = candle_seconds * n_candles
 
@@ -61,7 +75,8 @@ async def async_chart_command(pool, inverse):
     prices = np.nan_to_num(swaps['x_sold'] / swaps['y_bought']) + np.nan_to_num(
         swaps['x_bought'] / swaps['y_sold']
     )
-    if inverse:
+    x_volumes = swaps['x_bought'].values + swaps['x_sold'].values
+    if invert:
         prices = 1 / prices
     block_timestamps = await evm.async_get_blocks_timestamps(
         swaps.index.get_level_values('block_number')
@@ -70,6 +85,7 @@ async def async_chart_command(pool, inverse):
         values=prices,
         indices=block_timestamps,
         bin_size=candle_seconds,
+        volumes=x_volumes,
     )
     ohlc = ohlc.iloc[-n_candles:]
 
@@ -115,13 +131,56 @@ async def async_chart_command(pool, inverse):
     )
     x_axis = toolstr.indent_block(x_axis, indent=y_axis_width)
 
+    # compute volume
+    if not no_volume:
+        ymax = ohlc['volume'].max() * 1.1
+        volume_render_grid = toolstr.create_grid(
+            n_rows=5,
+            n_columns=n_candles * 2,
+            xmin=render_grid['xmin'],
+            xmax=render_grid['xmax'],
+            ymin=0 - ymax / 9,
+            ymax=ymax,
+        )
+        volume_sample_grid = toolstr.create_grid(
+            sample_mode='quadrants',
+            **volume_render_grid,
+        )
+        volume_raster = toolstr.raster_bar_chart(
+            values=ohlc['volume'],
+            grid=volume_sample_grid,
+            bar_width=1,
+            bar_gap=3,
+            start_gap=1,
+        )
+        volume_y_axis = toolstr.render_y_axis(
+            grid=volume_render_grid,
+            n_ticks=1,
+        )
+
+    # wait for metadata
     metadata = await metadata_task
 
+    # print output
+    token0 = metadata['x_symbol']
+    token1 = metadata['y_symbol']
     toolstr.print_text_box(metadata['x_symbol'] + '-' + metadata['y_symbol'] + ' Uniswap V2 Pool')
-    print('each candle =', candle_timescale)
-    # print('- n_candlesticks:', n_candles)
+    print('- pool address =', pool)
+    print('- each candle =', candle_timescale)
+    print('- n_candles =', n_candles)
+    if invert:
+        print('- price units =', token1, 'per', token0)
+    else:
+        print('- price units =', token0, 'per', token1)
     print()
     console.print(graph)
+
+    if not no_volume:
+        volume_bars_str = toolstr.render_supergrid(volume_raster, sample_mode='quadrants')
+        volume_graph = toolstr.concatenate_blocks([volume_y_axis, volume_bars_str])
+        print(volume_graph)
+
+    # print x axis
     console.print(x_axis)
 
     await rpc.async_close_http_session()
