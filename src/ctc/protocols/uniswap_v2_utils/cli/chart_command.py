@@ -18,6 +18,7 @@ from ctc.protocols import uniswap_v2_utils
 def get_command_spec():
     return {
         'f': async_chart_command,
+        'help': 'chart price action of uniswap pools',
         'args': [
             {
                 'name': 'pool',
