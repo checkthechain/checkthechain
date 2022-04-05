@@ -110,6 +110,16 @@ async def async_print_pcv_assets(block: spec.BlockNumberReference) -> None:
             ),
         ]
         rows.append(row)
+
+    total_usd = toolstr.format(
+        sum(token_totals_usd.values()),
+        prefix='$',
+        decimals=2,
+        trailing_zeros=True,
+        order_of_magnitude=True,
+    )
+    print('total', total_usd)
     print()
     tooltable.print_table(rows, headers=headers)
+    print()
 
