@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from typing_extensions import Literal
 import os
 
 if typing.TYPE_CHECKING:
@@ -113,17 +114,43 @@ def get_default_provider(
         )
 
 
+@typing.overload
 def get_db_config(
     *,
     datatype: str | None = None,
     network: spec.NetworkReference | None = None,
+    require: Literal[True],
 ) -> 'toolsql.DBConfig':
+    ...
+
+
+@typing.overload
+def get_db_config(
+    *,
+    datatype: str | None = None,
+    network: spec.NetworkReference | None = None,
+    require: bool = False,
+) -> 'toolsql.DBConfig' | None:
+    ...
+
+
+def get_db_config(
+    *,
+    datatype: str | None = None,
+    network: spec.NetworkReference | None = None,
+    require: bool = False,
+) -> 'toolsql.DBConfig' | None:
 
     # for now, use same database for all datatypes and networks
+    config = config_read.get_config()
+    db_config = config.get('db_configs', {}).get('main')
+    if require and db_config is None:
+        raise Exception('db not configured')
+    return db_config
 
-    data_root = get_data_dir()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(data_root, 'ctc.db'),
-    }
+    # data_root = get_data_dir()
+    # return {
+    #     'dbms': 'sqlite',
+    #     'path': os.path.join(data_root, 'ctc.db'),
+    # }
 

@@ -56,6 +56,7 @@ def create_tables(
             db_config = config.get_db_config(
                 network=network,
                 datatype=datatype,
+                require=True,
             )
             db_schema = schema_utils.get_prepared_schema(
                 datatype=datatype,

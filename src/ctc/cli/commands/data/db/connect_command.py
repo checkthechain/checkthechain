@@ -12,6 +12,9 @@ def get_command_spec():
 
 def connect_command():
     db_config = config.get_db_config()
+    if db_config is None:
+        print('no database is configured, run `ctc setup`')
+        return
 
     if db_config['dbms'] == 'sqlite':
         print(

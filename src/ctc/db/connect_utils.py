@@ -14,6 +14,8 @@ def create_engine(datatype, network=None):
     if data_source.get('backend') != 'db' or 'db_config' not in data_source:
         raise Exception('not using database for this type of data')
     db_config = data_source['db_config']
+    if db_config is None:
+        raise Exception('invalid db_config')
 
     # create engine
     return toolsql.create_engine(db_config=db_config)
