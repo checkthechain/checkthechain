@@ -94,7 +94,22 @@ if using ctc for the first time, run:
     [option]ctc setup[/option]
 
 for quick lookups of an address, block, tx, or timestamp, run:
-    [option]ctc QUERY[/option]"""
+    [option]ctc QUERY[/option]
+
+    where [option]QUERY[/option] is an address, block number, tx hash, or timestamp"""
+
+# for example...
+#     [description]print block summary[/description]
+#     [option]ctc 14000000[/option]
+
+#     [description]print contract summary[/description]
+#     [option]ctc 0x956f47f50a910163d8bf957cf5846d573e7f87ca[/option]
+
+#     [description]print token summary[/description]
+#     [option]ctc FEI[/option]
+
+#     [description]print tx summary[/description]
+#     [option]ctc 0x285117fc6ecd443fc2a39f72dd3df79e65d25c5d3d680d41f229e793a495ef99[/option]"""
 
 
 cd_dir_help = {
