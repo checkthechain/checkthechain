@@ -58,6 +58,7 @@ async def summarize_fuse_pool(pool_index, block):
         block=block_data,
         tokens_data=tokens_data,
         pool_name=pool_name,
+        comptroller=comptroller,
     )
 
     from ctc.rpc.rpc_backends import rpc_http_async

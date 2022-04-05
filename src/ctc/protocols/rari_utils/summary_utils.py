@@ -23,7 +23,7 @@ def sort_nested_by(nested, key, reverse=False):
     return dict(sorted_pairs)
 
 
-def print_fuse_pool_summary(block, *, tokens_data, pool_name):
+def print_fuse_pool_summary(block, *, tokens_data, pool_name, comptroller):
 
     tvl = sum(token_data['supplied_tvl'] for token_data in tokens_data.values())
     tvb = sum(token_data['borrowed_tvl'] for token_data in tokens_data.values())
@@ -61,11 +61,11 @@ def print_fuse_pool_summary(block, *, tokens_data, pool_name):
 
     if pool_name in display_names:
         pool_name = display_names[pool_name]
-    toolstr.print_header(pool_name)
+    toolstr.print_text_box(pool_name)
+    print('- comptroller:', comptroller)
     print('- TVL:', toolstr.format(tvl, prefix='$', order_of_magnitude=True))
     print('- TVB:', toolstr.format(tvb, prefix='$', order_of_magnitude=True))
     print('- block:', block_number)
-    # print('- time:', time_iso)
     print()
     tooltable.print_table(rows, headers=headers.values())
 
