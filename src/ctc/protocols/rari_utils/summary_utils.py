@@ -25,8 +25,8 @@ def sort_nested_by(nested, key, reverse=False):
 
 def print_fuse_pool_summary(block, *, tokens_data, pool_name):
 
-    tvl = sum(token_data['supplied'] for token_data in tokens_data.values())
-    tvb = sum(token_data['borrowed'] for token_data in tokens_data.values())
+    tvl = sum(token_data['supplied_tvl'] for token_data in tokens_data.values())
+    tvb = sum(token_data['borrowed_tvl'] for token_data in tokens_data.values())
 
     # get block data
     block_number = block['number']
