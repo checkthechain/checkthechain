@@ -148,9 +148,3 @@ def get_db_config(
         raise Exception('db not configured')
     return db_config
 
-    # data_root = get_data_dir()
-    # return {
-    #     'dbms': 'sqlite',
-    #     'path': os.path.join(data_root, 'ctc.db'),
-    # }
-
