@@ -6,7 +6,13 @@ setuptools.setup(
     version='0.2.10',
     packages=setuptools.find_packages("./src"),
     package_dir={'': 'src'},
-    package_data={'ctc': ['default_data/*']},
+    package_data={
+        'ctc': [
+            'default_data/*',
+            'default_data/*/*',
+            'default_data/*/*/*',
+        ],
+    },
     install_requires=[
         #
         # data science
