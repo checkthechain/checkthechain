@@ -26,7 +26,6 @@ async def async_resolve_name(name, provider=None, block=None):
     result = await rpc.async_eth_call(
         to_address=ens_directory.resolver,
         block_number=block,
-        function_name='addr',
         function_abi={
             'name': 'addr',
             'inputs': [{'type': 'bytes32'}],
@@ -43,7 +42,6 @@ async def async_resolve_name(name, provider=None, block=None):
         result = await rpc.async_eth_call(
             to_address=resolver,
             block_number=block,
-            function_name='addr',
             function_abi={
                 'name': 'addr',
                 'inputs': [{'type': 'bytes32'}],
@@ -57,14 +55,15 @@ async def async_resolve_name(name, provider=None, block=None):
 
 
 async def async_reverse_lookup(address, provider=None, block=None):
+    function_abi = {
+        'name': 'getNames',
+        'inputs': [{'type': 'address[]'}],
+        'outputs': [{'type': 'string[]'}],
+    }
     names = await rpc.async_eth_call(
         to_address=ens_directory.reverse_records,
         block_number=block,
-        function_abi={
-            'name': 'getNames',
-            'inputs': [{'type': 'address[]'}],
-            'outputs': [{'type': 'string[]'}],
-        },
+        function_abi=function_abi,
         function_parameters=[[address]],
         provider=provider,
     )
@@ -80,9 +79,18 @@ async def async_get_text_record(key, name=None, node=None):
     if node is None:
         node = hash_name(name)
 
+    function_abi = {
+        'name': 'text',
+        'inputs': [
+            {'name': 'node', 'type': 'bytes32'},
+            {'name': 'key', 'type': 'string'},
+        ],
+        'outputs': [{'name': '', 'type': 'string'}],
+    }
+
     return await rpc.async_eth_call(
         to_address=ens_directory.resolver,
-        function_name='text',
+        function_abi=function_abi,
         function_parameters=[node, key],
     )
 
@@ -106,9 +114,34 @@ async def async_get_text_records(name=None, node=None, keys=None):
 
 async def async_get_text_changes(name=None, node=None):
 
+    event_abi = {
+        'name': 'TextChanged',
+        'type': 'event',
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'node',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': True,
+                'internalType': 'string',
+                'name': 'indexedKey',
+                'type': 'string',
+            },
+            {
+                'indexed': False,
+                'internalType': 'string',
+                'name': 'key',
+                'type': 'string',
+            },
+        ],
+    }
+
     events = await evm.async_get_events(
         contract_address=ens_directory.resolver,
-        event_name='TextChanged',
+        event_abi=event_abi,
         start_block=9000000,
         verbose=False,
     )
@@ -125,9 +158,17 @@ async def async_get_content_hash(name=None, node=None):
     if node is None:
         node = hash_name(name)
 
+    function_abi = {
+        'name': 'contenthash',
+        'inputs': [
+            {'name': 'node', 'type': 'bytes32'},
+        ],
+        'outputs': [{'name': '', 'type': 'bytes'}],
+    }
+
     return rpc.async_eth_call(
         to_address=ens_directory.resolver,
-        function_name='contentHash',
+        function_abi=function_abi,
         function_parameters=[node],
     )
 
@@ -140,9 +181,15 @@ async def async_get_expiration(name):
     label = name.split('.')[-2]
     label_id = binary.keccak_text(label, output_format='integer')
 
+    function_abi = {
+        'name': 'nameExpires',
+        'inputs': [{'name': 'id', 'type': 'uint256'}],
+        'outputs': [{'type': 'uint256'}],
+    }
+
     return await rpc.async_eth_call(
         to_address=ens_directory.base_registrar,
-        function_name='nameExpires',
+        function_abi=function_abi,
         function_parameters=[label_id],
     )
 

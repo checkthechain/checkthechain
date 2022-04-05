@@ -77,9 +77,30 @@ async def async_get_registration_block(name):
 
 
 async def async_get_registrations():
+    event_abi = {
+        'name': 'NewOwner',
+        'inputs': [
+            {
+                'indexed': True,
+                'name': 'node',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': True,
+                'name': 'label',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': False,
+                'name': 'owner',
+                'type': 'address',
+            },
+        ],
+    }
+
     new_owners = await evm.async_get_events(
         contract_address='0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e',
-        event_name='NewOwner',
+        event_abi=event_abi,
         start_block=9000000,
     )
     new_owners['arg__parent_node'] = new_owners.pop('arg__node')
