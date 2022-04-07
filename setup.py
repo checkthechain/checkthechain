@@ -47,8 +47,10 @@ setuptools.setup(
             'pytest',
             'pytest-asyncio',
         ],
-        'speed': [
+        'performance': [
             'pysha3',  # for keccak()
+            'scikit-image',  # for console unicode drawing with toolstr
+            'orjson',  # for json loading
         ],
         'plots': [
             'matplotlib',
