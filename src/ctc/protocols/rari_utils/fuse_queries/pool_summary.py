@@ -87,6 +87,8 @@ async def async_get_pool_summary(comptroller, block='latest'):
 
         tokens_data[token_name] = {
             'name': token_name,
+            'ctoken': ctoken,
+            'underlying': underlying,
             'borrowed': borrowed,
             'borrowed_tvl': borrowed * token_prices[ctoken],
             'supplied': supplied,
