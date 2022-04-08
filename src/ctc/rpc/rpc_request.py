@@ -22,7 +22,7 @@ def setup_rpc_logger():
     if not _rpc_logger_state['logger_setup']:
 
         # get logging path
-        rpc_log_path = config.get_rpc_log_path()
+        rpc_log_path = config.get_rpc_requests_log_path()
 
         # enqueue makes logging non-blocking for async compatibility
         loguru.logger.remove()
@@ -32,8 +32,6 @@ def setup_rpc_logger():
             rotation='10 MB',
             format='{time} {message}',
         )
-
-        print('loguru setup')
 
         _rpc_logger_state['logger_setup'] = True
 
