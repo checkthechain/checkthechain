@@ -39,6 +39,9 @@ class PartialConfigSpec(TypedDict, total=False):
     network_defaults: ConfigNetworkDefaults
     db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
 
+    log_rpc_calls: bool
+    log_sql_queries: bool
+
 
 class ConfigSpec(TypedDict):
     config_spec_version: str
@@ -52,4 +55,7 @@ class ConfigSpec(TypedDict):
     # data sources
     # data_sources: None # not sure of format for this yet
     db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
+
+    log_rpc_calls: bool
+    log_sql_queries: bool
 

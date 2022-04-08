@@ -3,11 +3,59 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
+import os
 import random
 import typing
 
+from ctc import config
 from ctc import spec
 from . import rpc_provider
+
+
+_rpc_logger_state = {
+    'logger_setup': False,
+}
+
+
+def setup_rpc_logger():
+    import loguru
+
+    if not _rpc_logger_state['logger_setup']:
+
+        # get logging path
+        log_dir = config.get_log_dir()
+        if not os.path.isdir(log_dir):
+            os.makedirs(log_dir)
+        rpc_log_path = os.path.join(log_dir, 'rpc_requests.log')
+
+        # enqueue makes logging non-blocking for async compatibility
+        loguru.logger.remove()
+        loguru.logger.add(
+            rpc_log_path,
+            enqueue=True,
+            rotation='10 MB',
+            format='{time} {message}',
+        )
+
+        print('loguru setup')
+
+        _rpc_logger_state['logger_setup'] = True
+
+
+def log_rpc_request(request, provider):
+    import loguru
+
+    setup_rpc_logger()
+
+    loguru.logger.info('request  ' + request['method'] + ' id=' + str(request['id']))
+
+
+def log_rpc_response(response, request, provider):
+    import loguru
+
+    setup_rpc_logger()
+
+    loguru.logger.info('response ' + request['method'] + ' id=' + str(request['id']))
 
 
 def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
@@ -25,6 +73,10 @@ async def async_send(
 ) -> spec.RpcResponse:
     full_provider = rpc_provider.get_provider(provider)
 
+    logging_rpc_calls = config.get_log_rpc_calls()
+    if logging_rpc_calls:
+        log_rpc_request(request=request, provider=full_provider)
+
     if isinstance(request, dict):
         response = await async_send_raw(request=request, provider=full_provider)
         if 'result' not in response and 'error' in response:
@@ -34,7 +86,7 @@ async def async_send(
             )
         else:
             response = typing.cast(spec.RpcSingularResponseSuccess, response)
-            return response['result']
+            output = response['result']
 
     elif isinstance(request, list):
 
@@ -63,11 +115,16 @@ async def async_send(
         # reorder chunks
         plural_response = reorder_response_chunks(response_chunks, request)
 
-        return [subresponse['result'] for subresponse in plural_response]
+        output = [subresponse['result'] for subresponse in plural_response]
 
     else:
 
         raise Exception('unknown request type: ' + str(type(request)))
+
+    if logging_rpc_calls:
+        log_rpc_response(response=response, request=request, provider=provider)
+
+    return output
 
 
 @typing.overload

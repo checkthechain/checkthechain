@@ -148,3 +148,17 @@ def get_db_config(
         raise Exception('db not configured')
     return db_config
 
+
+def get_log_rpc_calls() -> bool:
+    config = config_read.get_config()
+    return config.get('log_rpc_calls', False)
+
+
+def get_log_sql_queries() -> bool:
+    config = config_read.get_config()
+    return config.get('log_sql_queries', False)
+
+
+def get_log_dir() -> str:
+    return os.path.join(get_data_dir(), 'logs')
+
