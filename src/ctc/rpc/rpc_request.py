@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
-import os
 import random
 import typing
 
@@ -23,10 +22,7 @@ def setup_rpc_logger():
     if not _rpc_logger_state['logger_setup']:
 
         # get logging path
-        log_dir = config.get_log_dir()
-        if not os.path.isdir(log_dir):
-            os.makedirs(log_dir)
-        rpc_log_path = os.path.join(log_dir, 'rpc_requests.log')
+        rpc_log_path = config.get_rpc_log_path()
 
         # enqueue makes logging non-blocking for async compatibility
         loguru.logger.remove()

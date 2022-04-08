@@ -15,6 +15,7 @@ command_index = {
     (
         'download-proxy-abi',
     ): 'ctc.cli.commands.admin.download_proxy_abi_command',
+    ('log',): 'ctc.cli.commands.admin.log_command',
     ('setup',): 'ctc.cli.commands.admin.setup_command',
     ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
     #

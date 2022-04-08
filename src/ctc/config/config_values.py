@@ -162,3 +162,17 @@ def get_log_sql_queries() -> bool:
 def get_log_dir() -> str:
     return os.path.join(get_data_dir(), 'logs')
 
+
+def get_rpc_requests_log_path() -> str:
+    log_dir = get_log_dir()
+    if not os.path.isdir(log_dir):
+        os.makedirs(log_dir)
+    return os.path.join(log_dir, 'rpc_requests.log')
+
+
+def get_sql_queries_log_path() -> str:
+    log_dir = get_log_dir()
+    if not os.path.isdir(log_dir):
+        os.makedirs(log_dir)
+    return os.path.join(log_dir, 'sql_queries.log')
+
