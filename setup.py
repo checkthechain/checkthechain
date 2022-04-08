@@ -52,6 +52,9 @@ setuptools.setup(
             'scikit-image',  # for console unicode drawing with toolstr
             'orjson',  # for json loading
         ],
+        'full': [
+            'loguru',
+        ],
         'plots': [
             'matplotlib',
             'toolplot',

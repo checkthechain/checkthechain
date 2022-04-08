@@ -43,11 +43,21 @@ def setup_rpc_logger():
 
 
 def log_rpc_request(request, provider):
-    import loguru
+    try:
+        import loguru
+    except ImportError:
+        import warnings
+
+        warnings.warn(
+            'to use logging must install loguru, use `pip install loguru`'
+        )
+        return
 
     setup_rpc_logger()
 
-    loguru.logger.info('request  ' + request['method'] + ' id=' + str(request['id']))
+    loguru.logger.info(
+        'request  ' + request['method'] + ' id=' + str(request['id'])
+    )
 
 
 def log_rpc_response(response, request, provider):
@@ -55,7 +65,9 @@ def log_rpc_response(response, request, provider):
 
     setup_rpc_logger()
 
-    loguru.logger.info('response ' + request['method'] + ' id=' + str(request['id']))
+    loguru.logger.info(
+        'response ' + request['method'] + ' id=' + str(request['id'])
+    )
 
 
 def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
