@@ -101,17 +101,21 @@ async def async_get_blocks_timestamps(
 
         network = rpc.get_provider_network(provider)
         engine = db.create_engine(datatype='block_timestamps', network=network)
-        with engine.connect() as conn:
-            db_timestamps = db.get_blocks_timestamps(
-                conn=conn,
-                block_numbers=blocks,
-            )
-        results = dict(zip(blocks, db_timestamps))
-        remaining_blocks = [
-            block
-            for block, timestamp in zip(blocks, db_timestamps)
-            if timestamp is None
-        ]
+        if engine is not None:
+            with engine.connect() as conn:
+                db_timestamps = db.get_blocks_timestamps(
+                    conn=conn,
+                    block_numbers=blocks,
+                )
+            results = dict(zip(blocks, db_timestamps))
+            remaining_blocks = [
+                block
+                for block, timestamp in zip(blocks, db_timestamps)
+                if timestamp is None
+            ]
+        else:
+            results = {}
+            remaining_blocks = blocks
     else:
         results = {}
         remaining_blocks = blocks

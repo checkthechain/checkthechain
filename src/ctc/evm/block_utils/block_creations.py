@@ -48,15 +48,15 @@ async def async_get_contract_creation_block(
         latest_block = await latest_block_task
         store_in_db = latest_block - block > min_confirmations
         if store_in_db:
-            with db.create_engine(
-                datatype='contract_creation_blocks'
-            ).begin() as conn:
-                db.set_contract_creation_block(
-                    conn=conn,
-                    block_number=block,
-                    address=contract_address,
-                    network=network,
-                )
+            engine = db.create_engine(datatype='contract_creation_blocks')
+            if engine is not None:
+                with engine.begin() as conn:
+                    db.set_contract_creation_block(
+                        conn=conn,
+                        block_number=block,
+                        address=contract_address,
+                        network=network,
+                    )
 
     return block
 
@@ -66,13 +66,14 @@ async def async_get_contract_creation_block_from_db(
     network,
 ) -> int | None:
     from ctc import db
-
-    with db.create_engine(datatype='contract_creation_blocks').connect() as conn:
-        return db.get_contract_creation_block(
-            conn=conn,
-            address=contract_address,
-            network=network,
-        )
+    engine = db.create_engine(datatype='contract_creation_blocks')
+    if engine is not None:
+        with engine.connect() as conn:
+            return db.get_contract_creation_block(
+                conn=conn,
+                address=contract_address,
+                network=network,
+            )
 
 
 async def async_get_contract_creation_block_from_node(

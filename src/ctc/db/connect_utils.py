@@ -5,7 +5,7 @@ import toolsql
 from ctc import config
 
 
-def create_engine(datatype, network=None):
+def create_engine(datatype, network=None) -> toolsql.SAEngine | None:
 
     # get db config
     data_source = config.get_data_source(datatype=datatype, network=network)

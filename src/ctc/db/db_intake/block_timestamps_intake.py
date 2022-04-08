@@ -16,6 +16,9 @@ async def async_intake_block(block, provider=None):
         datatype='block_timestamps',
         network=network,
     )
+    if engine is None:
+        return
+
     check_if_exists = False
     with engine.connect() as conn:
         if (
@@ -64,6 +67,9 @@ async def async_intake_blocks(blocks, provider=None):
         datatype='block_timestamps',
         network=network,
     )
+    if engine is None:
+        return
+
     with engine.connect() as conn:
         max_intake_block = max(block['number'] for block in blocks)
         max_stored_block = db_crud.get_max_block_number(conn=conn, network=network)

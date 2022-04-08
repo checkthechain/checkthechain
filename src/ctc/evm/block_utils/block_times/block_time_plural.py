@@ -61,18 +61,22 @@ async def async_get_blocks_of_timestamps(
                 datatype='block_timestamps',
                 network=network,
             )
-            with engine.connect() as conn:
-                db_blocks = db.get_timestamps_blocks(
-                    conn=conn,
-                    timestamps=timestamps,
-                )
+            if engine is not None:
+                with engine.connect() as conn:
+                    db_blocks = db.get_timestamps_blocks(
+                        conn=conn,
+                        timestamps=timestamps,
+                    )
+                    results = {}
+                    remaining_timestamps = []
+                    for block, timestamp in zip(db_blocks, timestamps):
+                        if block is None:
+                            remaining_timestamps.append(timestamp)
+                        else:
+                            results[timestamp] = block
+            else:
+                remaining_timestamps = timestamps
                 results = {}
-                remaining_timestamps = []
-                for block, timestamp in zip(db_blocks, timestamps):
-                    if block is None:
-                        remaining_timestamps.append(timestamp)
-                    else:
-                        results[timestamp] = block
         else:
             remaining_timestamps = timestamps
             results = {}

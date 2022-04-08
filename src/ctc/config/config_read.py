@@ -50,8 +50,12 @@ def get_config(
     )
 
     validation = validate_config(config)
-    if not validation['valid']:
-        warning_text = '\n** ATTENTION **\nctc config is not formatted correctly'
+    # if not validation['valid']:
+    # disable validation until 0.3.0 and better upgrade utility in place
+    if False:
+        warning_text = (
+            '\n** ATTENTION **\nctc config is not formatted correctly'
+        )
         if len(validation['missing_keys']) > 0:
             warning_text += '\n    missing keys: ' + ', '.join(
                 str(key) for key in validation['missing_keys']
@@ -61,10 +65,13 @@ def get_config(
                 str(key) for key in validation['extra_keys']
             )
         warning_text += '\nview more config info by running `[#64aaaa]ctc config[/#64aaaa]` in terminal'
-        warning_text += '\nfix config by running `[#64aaaa]ctc setup[/#64aaaa]` in terminal'
+        warning_text += (
+            '\nfix config by running `[#64aaaa]ctc setup[/#64aaaa]` in terminal'
+        )
         warning_text += '\n'
 
         import rich.console
+
         warning_text = '[yellow]' + warning_text + '[/yellow]'
         console = rich.console.Console()
         console.print(warning_text)
