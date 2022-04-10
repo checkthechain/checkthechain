@@ -16,7 +16,7 @@ def construct_eth_call(
     call_data: spec.BinaryData = None,
     function_parameters: typing.Optional[typing.Union[list, dict]] = None,
     function_abi: typing.Optional[spec.FunctionABI] = None,
-) -> spec.RpcResponse:
+) -> spec.RpcRequest:
 
     if block_number is None:
         block_number = 'latest'
@@ -52,7 +52,7 @@ def construct_eth_estimate_gas(
     call_data: spec.BinaryData = None,
     function_parameters: typing.Optional[typing.Union[list, dict]] = None,
     function_abi: typing.Optional[spec.FunctionABI] = None,
-) -> spec.RpcResponse:
+) -> spec.RpcRequest:
 
     # encode call data
     if call_data is None:
@@ -78,7 +78,7 @@ def construct_eth_estimate_gas(
 def construct_eth_get_balance(
     address,
     block_number=None,
-) -> spec.RpcResponse:
+) -> spec.RpcRequest:
 
     if block_number is None:
         block_number = 'latest'
@@ -91,7 +91,7 @@ def construct_eth_get_storage_at(
     address: spec.BinaryData,
     position: spec.BinaryData,
     block_number='latest',
-) -> spec.RpcResponse:
+) -> spec.RpcRequest:
 
     position = binary.convert(position, 'prefix_hex')
     block_number = rpc_format.encode_block_number(block_number)
@@ -103,7 +103,7 @@ def construct_eth_get_storage_at(
 def construct_eth_get_code(
     address: spec.BinaryData,
     block_number: spec.BlockSpec = 'latest',
-) -> spec.RpcResponse:
+) -> spec.RpcRequest:
 
     block_number = rpc_format.encode_block_number(block_number)
     return rpc_request.create('eth_getCode', [address, block_number])
