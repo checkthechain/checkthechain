@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import os
+import typing
 
 import toolcli
 
@@ -30,7 +33,11 @@ command_index = {
     # data commands
     ('abi',): 'ctc.cli.commands.data.abi_command',
     ('address',): 'ctc.cli.commands.data.address_command',
-    ('db', 'create', 'tables'): 'ctc.cli.commands.data.db.create_tables_command',
+    (
+        'db',
+        'create',
+        'tables',
+    ): 'ctc.cli.commands.data.db.create_tables_command',
     ('db', 'connect'): 'ctc.cli.commands.data.db.connect_command',
     ('block',): 'ctc.cli.commands.data.block_command',
     ('blocks',): 'ctc.cli.commands.data.blocks_command',
@@ -50,7 +57,10 @@ command_index = {
     # protocol commands
     ('cg',): 'ctc.cli.commands.data.cg_command',
     ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
-    ('chainlink', 'ls'): 'ctc.protocols.chainlink_utils.cli.chainlink_ls_command',
+    (
+        'chainlink',
+        'ls',
+    ): 'ctc.protocols.chainlink_utils.cli.chainlink_ls_command',
     ('curve', 'pools'): 'ctc.protocols.curve_utils.cli.curve_pools_command',
     ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
     ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
@@ -146,6 +156,18 @@ def cd_dir_getter(dirname: str) -> str:
         raise Exception('unknown directory: ' + str(dirname))
 
 
+def help_url_getter(
+    *,
+    subcommand: typing.Tuple[str],
+    parse_spec: toolcli.ParseSpec,
+) -> str:
+    return (
+        'http://127.0.0.1:8000/cli/subcommands/'
+        + '_'.join(subcommand)
+        + '.html'
+    )
+
+
 def run_cli(raw_command=None, **toolcli_kwargs):
 
     config = {
@@ -156,6 +178,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         'version': ctc.__version__,
         'cd_dir_help': cd_dir_help,
         'cd_dir_getter': cd_dir_getter,
+        'help_url_getter': help_url_getter,
         #
         'style_theme': {
             'title': 'bold #ce93f9',
