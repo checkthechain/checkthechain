@@ -30,7 +30,7 @@ setuptools.setup(
         'toolcache',
         'toolcli>=0.3.8',
         'toolconf',
-        'toolsql>=0.2.2',
+        'toolsql>=0.2.3',
         'toolstr>=0.1.3',
         'tooltable',
         'tooltime',
