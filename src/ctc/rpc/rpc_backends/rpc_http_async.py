@@ -21,12 +21,21 @@ async def async_send_http(
     provider = rpc_provider.get_provider(provider)
     session = get_async_http_session(provider=provider)
 
+    headers = {'User-Agent': 'ctc'}
     for attempt in range(n_attempts):
 
-        async with session.post(provider['url'], json=request) as response:
+        async with session.post(
+            provider['url'], json=request, headers=headers
+        ) as response:
             if response.status != 200:
                 t_sleep = 2 ** attempt + random.random()
-                print('sleeping for ' + str(t_sleep))
+                print(
+                    'request failed with code '
+                    + str(response.status)
+                    + ' retrying in '
+                    + str(t_sleep)
+                    + 's'
+                )
                 await asyncio.sleep(t_sleep)
                 continue
             return await response.json()
