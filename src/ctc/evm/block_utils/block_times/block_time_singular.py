@@ -42,12 +42,15 @@ async def async_get_block_of_timestamp(
             from ctc import db
             network = rpc.get_provider_network(provider=provider)
             engine = db.create_engine(datatype='block_timestamps', network=network)
-            with engine.connect() as conn:
-                block = db.get_timestamp_block(
-                    conn=conn,
-                    network=network,
-                    timestamp=timestamp,
-                )
+            if engine is not None:
+                with engine.connect() as conn:
+                    block = db.get_timestamp_block(
+                        conn=conn,
+                        network=network,
+                        timestamp=timestamp,
+                    )
+            else:
+                block = None
         else:
             block = None
 
