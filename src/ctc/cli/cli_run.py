@@ -36,6 +36,7 @@ command_index = {
     ('blocks',): 'ctc.cli.commands.data.blocks_command',
     ('call',): 'ctc.cli.commands.data.call_command',
     ('calls',): 'ctc.cli.commands.data.calls_command',
+    ('decompile',): 'ctc.cli.commands.data.decompile_command',
     ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
     ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
     ('erc20', 'balance'): 'ctc.cli.commands.data.erc20.balance_command',
