@@ -1,3 +1,14 @@
+"""
+TODO:
+- add grouping for specific groups:
+        - erc20 functions and events
+        - proxy functions
+        - erc721 erc1155
+    - could group these either spatially or by color
+- add listing of unknown signatures
+- add event signatures
+"""
+
 from ctc import evm
 from ctc import rpc
 
@@ -5,6 +16,7 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_decompile_command,
+        'help': 'decompile contract abi',
         'args': [
             {
                 'name': 'address_or_bytecode',
