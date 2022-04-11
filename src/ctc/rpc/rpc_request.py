@@ -49,9 +49,18 @@ def log_rpc_request(request, provider):
 
     setup_rpc_logger()
 
-    loguru.logger.info(
-        'request  ' + request['method'] + ' id=' + str(request['id'])
-    )
+    if isinstance(request, dict):
+        loguru.logger.info(
+            'request  ' + request['method'] + ' id=' + str(request['id'])
+        )
+    elif isinstance(request, list):
+        entries = '\n'.join(
+            '    ' + subrequest['method'] + ' id=' + str(subrequest['id'])
+            for subrequest in request
+        )
+        loguru.logger.info('bulk request\n' + entries)
+    else:
+        raise Exception('cannot log request, unknown request type')
 
 
 def log_rpc_response(response, request, provider):
@@ -59,9 +68,16 @@ def log_rpc_response(response, request, provider):
 
     setup_rpc_logger()
 
-    loguru.logger.info(
-        'response ' + request['method'] + ' id=' + str(request['id'])
-    )
+    if isinstance(request, dict):
+        loguru.logger.info(
+            'response ' + request['method'] + ' id=' + str(request['id'])
+        )
+    elif isinstance(request, list):
+        entries = '\n'.join(
+            '    ' + subrequest['method'] + ' id=' + str(subrequest['id'])
+            for subrequest in request
+        )
+        loguru.logger.info('bulk response\n' + entries)
 
 
 def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
@@ -128,7 +144,14 @@ async def async_send(
         raise Exception('unknown request type: ' + str(type(request)))
 
     if logging_rpc_calls:
-        log_rpc_response(response=response, request=request, provider=provider)
+        if isinstance(request, dict):
+            log_rpc_response(
+                response=response, request=request, provider=provider,
+            )
+        elif isinstance(request, list):
+            log_rpc_response(
+                response=plural_response, request=request, provider=provider,
+            )
 
     return output
 
