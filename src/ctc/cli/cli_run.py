@@ -8,96 +8,118 @@ import toolcli
 import ctc
 
 
-command_index = {
-    #
-    # admin commands
-    (): 'ctc.cli.commands.root_command',
-    ('config',): 'ctc.cli.commands.admin.config_command',
-    ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
-    ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
-    (
-        'download-proxy-abi',
-    ): 'ctc.cli.commands.admin.download_proxy_abi_command',
-    ('log',): 'ctc.cli.commands.admin.log_command',
-    ('setup',): 'ctc.cli.commands.admin.setup_command',
-    ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
-    #
-    # compute commands
-    ('checksum',): 'ctc.cli.commands.compute.checksum_command',
-    ('decode',): 'ctc.cli.commands.compute.decode_command',
-    ('keccak',): 'ctc.cli.commands.compute.keccak_command',
-    ('lower',): 'ctc.cli.commands.compute.lower_command',
-    ('ascii',): 'ctc.cli.commands.compute.ascii_command',
-    ('hex',): 'ctc.cli.commands.compute.hex_command',
-    #
-    # data commands
-    ('abi',): 'ctc.cli.commands.data.abi_command',
-    ('address',): 'ctc.cli.commands.data.address_command',
-    (
-        'db',
-        'create',
-        'tables',
-    ): 'ctc.cli.commands.data.db.create_tables_command',
-    ('db', 'connect'): 'ctc.cli.commands.data.db.connect_command',
-    ('block',): 'ctc.cli.commands.data.block_command',
-    ('blocks',): 'ctc.cli.commands.data.blocks_command',
-    ('call',): 'ctc.cli.commands.data.call_command',
-    ('calls',): 'ctc.cli.commands.data.calls_command',
-    ('decompile',): 'ctc.cli.commands.data.decompile_command',
-    ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
-    ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
-    ('erc20', 'balance'): 'ctc.cli.commands.data.erc20.balance_command',
-    ('erc20', 'balances'): 'ctc.cli.commands.data.erc20.balances_command',
-    ('erc20', 'transfers'): 'ctc.cli.commands.data.erc20.transfers_command',
-    ('events',): 'ctc.cli.commands.data.events_command',
-    ('find',): 'ctc.cli.commands.data.find_command',
-    ('gas',): 'ctc.cli.commands.data.gas_command',
-    ('transaction',): 'ctc.cli.commands.data.transaction_command',
-    #
-    # protocol commands
-    ('cg',): 'ctc.cli.commands.data.cg_command',
-    ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
-    (
-        'chainlink',
-        'ls',
-    ): 'ctc.protocols.chainlink_utils.cli.chainlink_ls_command',
-    ('curve', 'pools'): 'ctc.protocols.curve_utils.cli.curve_pools_command',
-    ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
-    ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
-    ('ens', 'hash'): 'ctc.protocols.ens_utils.cli.ens.hash_command',
-    ('ens', 'owner'): 'ctc.protocols.ens_utils.cli.ens.owner_command',
-    ('ens', 'records'): 'ctc.protocols.ens_utils.cli.ens.records_command',
-    ('ens', 'resolve'): 'ctc.protocols.ens_utils.cli.ens.resolve_command',
-    ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.ens.reverse_command',
-    ('fei', 'analytics'): 'ctc.protocols.fei_utils.cli.fei.analytics_command',
-    ('fei', 'pcv'): 'ctc.protocols.fei_utils.cli.fei.pcv_command',
-    (
-        'fei',
-        'pcv',
-        'assets',
-    ): 'ctc.protocols.fei_utils.cli.fei.pcv_assets_command',
-    (
-        'fei',
-        'pcv',
-        'deposits',
-    ): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
-    ('rari',): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
-    ('rari', 'pools'): 'ctc.protocols.rari_utils.cli.rari.pools_command',
-    ('uniswap', 'chart'): 'ctc.protocols.uniswap_v2_utils.cli.chart_command',
-    ('uniswap', 'mints'): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
-    ('uniswap', 'burns'): 'ctc.protocols.uniswap_v2_utils.cli.burns_command',
-    ('uniswap', 'swaps'): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
-    ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.pool_command',
-    ('4byte',): 'ctc.protocols.fourbyte_utils.cli.fourbyte_command',
-    (
-        '4byte',
-        'build',
-    ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_build_command',
-    (
-        '4byte',
-        'path',
-    ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_path_command',
+command_index_by_category = {
+    'admin': {
+        (): 'ctc.cli.commands.root_command',
+        ('config',): 'ctc.cli.commands.admin.config_command',
+        ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
+        ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
+        (
+            'download-proxy-abi',
+        ): 'ctc.cli.commands.admin.download_proxy_abi_command',
+        ('log',): 'ctc.cli.commands.admin.log_command',
+        ('setup',): 'ctc.cli.commands.admin.setup_command',
+        ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
+    },
+    'compute': {
+        ('checksum',): 'ctc.cli.commands.compute.checksum_command',
+        ('decode',): 'ctc.cli.commands.compute.decode_command',
+        ('keccak',): 'ctc.cli.commands.compute.keccak_command',
+        ('lower',): 'ctc.cli.commands.compute.lower_command',
+        ('ascii',): 'ctc.cli.commands.compute.ascii_command',
+        ('hex',): 'ctc.cli.commands.compute.hex_command',
+    },
+    'data': {
+        ('abi',): 'ctc.cli.commands.data.abi_command',
+        ('address',): 'ctc.cli.commands.data.address_command',
+        (
+            'db',
+            'create',
+            'tables',
+        ): 'ctc.cli.commands.data.db.create_tables_command',
+        ('db', 'connect'): 'ctc.cli.commands.data.db.connect_command',
+        ('block',): 'ctc.cli.commands.data.block_command',
+        ('blocks',): 'ctc.cli.commands.data.blocks_command',
+        ('call',): 'ctc.cli.commands.data.call_command',
+        ('calls',): 'ctc.cli.commands.data.calls_command',
+        ('decompile',): 'ctc.cli.commands.data.decompile_command',
+        ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
+        ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
+        ('erc20', 'balance'): 'ctc.cli.commands.data.erc20.balance_command',
+        ('erc20', 'balances'): 'ctc.cli.commands.data.erc20.balances_command',
+        ('erc20', 'transfers'): 'ctc.cli.commands.data.erc20.transfers_command',
+        ('events',): 'ctc.cli.commands.data.events_command',
+        ('find',): 'ctc.cli.commands.data.find_command',
+        ('gas',): 'ctc.cli.commands.data.gas_command',
+        ('transaction',): 'ctc.cli.commands.data.transaction_command',
+    },
+    'protocol': {
+        ('cg',): 'ctc.cli.commands.data.cg_command',
+        ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
+        (
+            'chainlink',
+            'ls',
+        ): 'ctc.protocols.chainlink_utils.cli.chainlink_ls_command',
+        ('curve', 'pools'): 'ctc.protocols.curve_utils.cli.curve_pools_command',
+        ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
+        ('ens', 'exists'): 'ctc.protocols.ens_utils.cli.ens.exists_command',
+        ('ens', 'hash'): 'ctc.protocols.ens_utils.cli.ens.hash_command',
+        ('ens', 'owner'): 'ctc.protocols.ens_utils.cli.ens.owner_command',
+        ('ens', 'records'): 'ctc.protocols.ens_utils.cli.ens.records_command',
+        ('ens', 'resolve'): 'ctc.protocols.ens_utils.cli.ens.resolve_command',
+        ('ens', 'reverse'): 'ctc.protocols.ens_utils.cli.ens.reverse_command',
+        (
+            'fei',
+            'analytics',
+        ): 'ctc.protocols.fei_utils.cli.fei.analytics_command',
+        ('fei', 'pcv'): 'ctc.protocols.fei_utils.cli.fei.pcv_command',
+        (
+            'fei',
+            'pcv',
+            'assets',
+        ): 'ctc.protocols.fei_utils.cli.fei.pcv_assets_command',
+        (
+            'fei',
+            'pcv',
+            'deposits',
+        ): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
+        ('rari',): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
+        ('rari', 'pools'): 'ctc.protocols.rari_utils.cli.rari.pools_command',
+        (
+            'uniswap',
+            'chart',
+        ): 'ctc.protocols.uniswap_v2_utils.cli.chart_command',
+        (
+            'uniswap',
+            'mints',
+        ): 'ctc.protocols.uniswap_v2_utils.cli.mints_command',
+        (
+            'uniswap',
+            'burns',
+        ): 'ctc.protocols.uniswap_v2_utils.cli.burns_command',
+        (
+            'uniswap',
+            'swaps',
+        ): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
+        ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.pool_command',
+        ('4byte',): 'ctc.protocols.fourbyte_utils.cli.fourbyte_command',
+        (
+            '4byte',
+            'build',
+        ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_build_command',
+        (
+            '4byte',
+            'path',
+        ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_path_command',
+    },
 }
+
+command_index = {}
+help_subcommand_categories = {}
+for category, category_command_index in command_index_by_category.items():
+    command_index.update(category_command_index)
+    for subcommand in category_command_index.keys():
+        help_subcommand_categories[subcommand] = category
 
 
 description = """ctc is a tool for historical data analysis of Ethereum and other EVM chains
@@ -179,6 +201,7 @@ def run_cli(raw_command=None, **toolcli_kwargs):
         'cd_dir_help': cd_dir_help,
         'cd_dir_getter': cd_dir_getter,
         'help_url_getter': help_url_getter,
+        'help_subcommand_categories': help_subcommand_categories,
         #
         'style_theme': {
             'title': 'bold #ce93f9',
