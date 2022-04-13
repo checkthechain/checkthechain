@@ -5,6 +5,9 @@ rinkeby,4,rinkeby.etherscan.io
 goerli,5,goerli.etherscan.io
 kovan,42,kovan.etherscan.io
 polygon,137,polygonscan.com
+bsc,56,bscscan.com
+xdai,100,blockscout.com
+avax,43114,snowtrace.io
 fantom,250,ftmscan.com
 arbitrum,42161,arbiscan.io
 optimism,10,optimistic.etherscan.io
