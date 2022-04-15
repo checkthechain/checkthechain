@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from ctc import rpc
+from ctc import evm
 
 
 def get_command_spec():
@@ -14,15 +17,31 @@ def get_command_spec():
                 'action': 'store_true',
                 'help': 'hide summary and only output function result',
             },
+            {
+                'name': '--from',
+                'dest': 'from_address',
+                'help': 'address where call should come from',
+            },
+            {
+                'name': '--block',
+                'help': 'block number for call',
+            },
         ],
     }
 
 
-async def async_call_command(address, function_name, args, quiet):
+async def async_call_command(address, function_name, args, quiet, from_address, block):
+
+    if block is not None:
+        block = await evm.async_block_number_to_int(block)
 
     if not quiet:
         print('performing eth_call')
         print('- to address:', address)
+        if block is not None:
+            print('- block:', block)
+        if from_address is not None:
+            print('- from address:', from_address)
         print('- function:', function_name)
         print('- arguments:', args)
         print()
@@ -32,8 +51,11 @@ async def async_call_command(address, function_name, args, quiet):
         to_address=address,
         function_name=function_name,
         function_parameters=args,
+        from_address=from_address,
+        block_number=block,
     )
     print(result)
+    raise Exception()
 
     await rpc.async_close_http_session()
 

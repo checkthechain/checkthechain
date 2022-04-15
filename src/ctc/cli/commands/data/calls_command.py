@@ -8,6 +8,7 @@ import toolcli
 from ctc import binary
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.cli import cli_utils
 
 command_help = """output the result of multiple calls
@@ -50,6 +51,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
                 'help': 'specify that output path can be overwritten',
             },
+            {
+                'name': '--from',
+                'help': 'address that calls should come from',
+                'dest': 'from_address',
+            },
         ],
     }
 
@@ -62,6 +68,7 @@ async def async_calls_command(
     quiet: typing.Optional[bool],
     output: typing.Optional[str],
     overwrite: typing.Optional[bool],
+    from_address: typing.Optional[spec.Address],
 ) -> None:
 
     if blocks is not None and addresses is not None:
@@ -83,6 +90,7 @@ async def async_calls_command(
             function_name=function_name,
             function_parameters=function_parameters,
             block_numbers=block_numbers,
+            from_address=from_address,
         )
 
         # get output names
@@ -125,6 +133,7 @@ async def async_calls_command(
             function_name=function_name,
             function_parameters=function_parameters,
             block_number=block,
+            from_address=from_address,
         )
 
         # name based on first contract's abi
