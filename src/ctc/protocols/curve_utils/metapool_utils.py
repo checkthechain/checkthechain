@@ -68,8 +68,8 @@ async def async_get_metapool_trade(
                 metadata['token_addresses'][bought_index],
                 provider=provider,
             )
-            amount_bought *= 10 ** bought_decimals
-            amount_sold *= 10 ** metadata['token_decimals'][sold_index]
+            amount_bought /= 10 ** bought_decimals
+            amount_sold /= 10 ** metadata['token_decimals'][sold_index]
 
     elif token_sold in parent_coins:
 
