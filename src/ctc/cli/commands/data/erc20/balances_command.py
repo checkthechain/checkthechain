@@ -148,6 +148,18 @@ async def async_balances_command(
             print()
 
         else:
+
+            import eth_abi
+
+            try:
+                symbol = await symbol_coroutine
+            except eth_abi.exceptions.InsufficientDataBytes:
+                print(
+                    'this is an EOA, see `ctc erc20 balances -h` for proper syntax'
+                )
+                await rpc.async_close_http_session()
+                return
+
             transfers = await evm.async_get_erc20_transfers(
                 erc20,
                 start_block=None,
@@ -158,7 +170,6 @@ async def async_balances_command(
                 transfers=transfers, dtype=None, normalize=(not raw)
             )
             output_data = df
-            symbol = await symbol_coroutine
 
             if top is None:
                 top = '20'
