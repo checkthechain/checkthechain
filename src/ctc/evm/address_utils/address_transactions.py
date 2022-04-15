@@ -63,8 +63,6 @@ async def async_get_address_transaction_counts_by_block(address, nary=3):
         address=address,
         min_block=min_block,
         max_block=max_block,
-        min_count=min_count,
-        max_count=max_count,
         block_counts=block_counts,
         nary=nary,
     )

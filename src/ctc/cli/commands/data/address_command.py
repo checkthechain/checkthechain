@@ -7,7 +7,10 @@ from ctc import rpc
 def get_command_spec():
     return {
         'f': async_address_command,
-        'help': 'summarize address',
+        'help': """summarize address
+
+for contracts, will display ABI
+""",
         'args': [
             {'name': 'address', 'help': 'address to get summary of'},
             {

@@ -37,6 +37,10 @@ command_index_by_category = {
             'create',
             'tables',
         ): 'ctc.cli.commands.data.db.create_tables_command',
+        (
+            'address',
+            'transactions',
+        ): 'ctc.cli.commands.data.address_transactions_command',
         ('db', 'connect'): 'ctc.cli.commands.data.db.connect_command',
         ('block',): 'ctc.cli.commands.data.block_command',
         ('blocks',): 'ctc.cli.commands.data.blocks_command',
