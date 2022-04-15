@@ -158,7 +158,7 @@ deposit_metadata = {
         'platform': 'Rari Fuse',
     },
     '0xa62ddde8f799873e6fcdbb3acbba75da85d9dcde': {
-        'name': 'Fuse Pool 127 FEI',
+        'name': 'Fuse Pool 128 FEI',
         'platform': 'Rari Fuse',
     },
     '0xa2bdbcb95d31c85bae6f0fa42d55f65d609d94ee': {
