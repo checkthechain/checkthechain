@@ -17,3 +17,22 @@ else:
     DType = typing.Any
     NumpyArray = typing.Any
 
+
+Integer = typing.Union[
+    int,
+    'numpy.int8',
+    'numpy.int16',
+    'numpy.int32',
+    'numpy.int64',
+]
+
+Float = typing.Union[
+    float,
+    'numpy.float16',
+    'numpy.float32',
+    'numpy.float64',
+    'numpy.float128',
+]
+
+Number = typing.Union[Integer, Float]
+

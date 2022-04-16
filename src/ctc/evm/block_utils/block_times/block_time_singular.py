@@ -69,10 +69,10 @@ async def async_get_block_of_timestamp(
 
 def get_block_of_timestamp_from_arrays(
     timestamp: tooltime.Timestamp,
-    block_timestamp_array: spec.NumpyArray,
-    block_number_array: spec.NumpyArray,
-    block_timestamps: typing.Mapping[int, int] | None,
-    verbose: bool,
+    block_timestamp_array: spec.NumpyArray | None = None,
+    block_number_array: spec.NumpyArray | None = None,
+    block_timestamps: typing.Mapping[int, int] | None = None,
+    verbose: bool = False,
 ) -> int:
     import numpy as np
 

@@ -85,7 +85,7 @@ async def async_download_contract_abi(
         )
     except Exception:
         try:
-            await contract_abi_backends.async_save_eip1967_abi(
+            await address_utils.async_save_eip1967_abi(
                 contract_address=contract_address,
                 provider=provider,
             )

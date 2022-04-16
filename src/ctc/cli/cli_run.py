@@ -8,7 +8,7 @@ import toolcli
 import ctc
 
 
-command_index_by_category = {
+command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'admin': {
         (): 'ctc.cli.commands.root_command',
         ('config',): 'ctc.cli.commands.admin.config_command',

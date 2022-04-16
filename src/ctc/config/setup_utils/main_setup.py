@@ -79,6 +79,8 @@ def setup_ctc() -> None:
         'providers': network_data['providers'],
         'network_defaults': network_data['network_defaults'],
         'db_configs': db_data['db_configs'],
+        'log_rpc_calls': True,
+        'log_sql_queries': True,
     }
 
     final_setup.finalize_setup(

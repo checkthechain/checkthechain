@@ -93,7 +93,11 @@ async def async_get_blocks_timestamps(
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
 ) -> list[int]:
-    blocks = [int(block) for block in blocks]
+
+    blocks = await block_normalize.async_block_numbers_to_int(
+        blocks=blocks,
+        provider=provider,
+    )
 
     # get timestamps from db
     if use_db:
@@ -131,5 +135,11 @@ async def async_get_blocks_timestamps(
         for block_data in node_blocks:
             results[block_data['number']] = block_data['timestamp']
 
-    return [results[block] for block in blocks]
+    output: list[int] = []
+    for block in blocks:
+        result = results[block]
+        if result is None:
+            raise Exception('failed to get timestamp for block: ' + str(block))
+        output.append(result)
+    return output
 

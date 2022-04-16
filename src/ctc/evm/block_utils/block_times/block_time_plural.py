@@ -68,17 +68,17 @@ async def async_get_blocks_of_timestamps(
                         timestamps=timestamps,
                     )
                     results = {}
-                    remaining_timestamps = []
-                    for block, timestamp in zip(db_blocks, timestamps):
-                        if block is None:
+                    remaining_timestamps: list[int] = []
+                    for possible_block, timestamp in zip(db_blocks, timestamps):
+                        if possible_block is None:
                             remaining_timestamps.append(timestamp)
                         else:
-                            results[timestamp] = block
+                            results[timestamp] = possible_block
             else:
-                remaining_timestamps = timestamps
+                remaining_timestamps = list(timestamps)
                 results = {}
         else:
-            remaining_timestamps = timestamps
+            remaining_timestamps = list(timestamps)
             results = {}
 
         # get timestamps from rpc node

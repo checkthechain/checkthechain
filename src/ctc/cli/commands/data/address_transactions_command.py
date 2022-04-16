@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import tooltable
+import tooltable  # type: ignore
 
 from ctc import evm
 from ctc import rpc

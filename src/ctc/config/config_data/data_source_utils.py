@@ -59,15 +59,15 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         'block_timestamps',
         'contract_creation',
     ]:
+
+        db_config = config_values.get_db_config(datatype=tags['datatype'])
+        if db_config is None:
+            raise Exception('db_config not properly set')
+
         return {
             'backend': 'hybrid',
             'hybrid_order': [
-                {
-                    'backend': 'db',
-                    'db_config': config_values.get_db_config(
-                        datatype=tags['datatype']
-                    ),
-                },
+                {'backend': 'db', 'db_config': db_config},
                 {'backend': 'rpc'},
             ],
         }
@@ -100,15 +100,15 @@ def get_data_source(**tags: typing.Any) -> DataSource:
             'hybrid_backfill': True,
         }
     elif tags.get('datatype') == 'contract_creation_blocks':
+
+        db_config = config_values.get_db_config(datatype=tags['datatype'])
+        if db_config is None:
+            raise Exception('db_config not properly set')
+
         return {
             'backend': 'hybrid',
             'hybrid_order': [
-                {
-                    'backend': 'db',
-                    'db_config': config_values.get_db_config(
-                        datatype=tags['datatype']
-                    ),
-                },
+                {'backend': 'db', 'db_config': db_config},
                 {'backend': 'rpc'},
             ],
         }

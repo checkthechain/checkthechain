@@ -74,6 +74,8 @@ async def async_get_contract_creation_block_from_db(
                 address=contract_address,
                 network=network,
             )
+    else:
+        return None
 
 
 async def async_get_contract_creation_block_from_node(

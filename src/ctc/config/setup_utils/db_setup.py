@@ -8,6 +8,9 @@ import toolcli
 
 from ctc import spec
 
+if typing.TYPE_CHECKING:
+    import toolsql
+
 
 def setup_dbs(
     styles: typing.Mapping[str, str],
@@ -35,7 +38,7 @@ def setup_dbs(
         style=styles['question'],
     )
 
-    db_configs = {}
+    db_configs: typing.MutableMapping[str, 'toolsql.DBConfig'] = {}
     if db_mode == 0:
         db_configs['main'] = {
             'dbms': 'sqlite',
@@ -85,7 +88,7 @@ def setup_dbs(
         )
         db_configs['main'] = {
             'dbms': 'postgresql',
-            'url': url,
+            'hostname': url,
             'username': username,
             'password': password,
         }

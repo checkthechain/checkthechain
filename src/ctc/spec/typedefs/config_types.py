@@ -21,6 +21,9 @@ from typing_extensions import TypedDict
 from . import network_types
 from . import rpc_types
 
+if typing.TYPE_CHECKING:
+    import toolsql
+
 
 class ConfigNetworkDefaults(TypedDict):
     default_network: network_types.NetworkName
@@ -37,7 +40,7 @@ class PartialConfigSpec(TypedDict, total=False):
         network_types.NetworkName, network_types.NetworkMetadata
     ]
     network_defaults: ConfigNetworkDefaults
-    db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
+    db_configs: typing.Mapping[str, toolsql.DBConfig]
 
     log_rpc_calls: bool
     log_sql_queries: bool
@@ -54,7 +57,7 @@ class ConfigSpec(TypedDict):
     #
     # data sources
     # data_sources: None # not sure of format for this yet
-    db_configs: typing.Mapping[str, typing.Mapping[str, typing.Any]]
+    db_configs: typing.Mapping[str, toolsql.DBConfig]
 
     log_rpc_calls: bool
     log_sql_queries: bool
