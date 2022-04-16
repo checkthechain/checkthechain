@@ -1,5 +1,9 @@
+from __future__ import annotations
 
-def get_command_spec():
+import toolcli
+
+
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': lower_command,
         'help': 'convert to lower case',
@@ -9,6 +13,6 @@ def get_command_spec():
     }
 
 
-def lower_command(text):
+def lower_command(text: str) -> None:
     print(text.lower())
 

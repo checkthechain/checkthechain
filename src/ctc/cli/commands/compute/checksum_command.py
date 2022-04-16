@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+import toolcli
+
 from ctc import evm
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': checksum_command,
         'help': 'compute checksum of address',
@@ -11,6 +16,6 @@ def get_command_spec():
     }
 
 
-def checksum_command(address):
+def checksum_command(address: spec.Address) -> None:
     print(evm.get_address_checksum(address))
 

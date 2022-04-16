@@ -1,11 +1,13 @@
 import json
 import os
 
+import toolcli
+
 from ctc import evm
 from ctc import rpc
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_abi_command,
         'help': 'display abi of contract',

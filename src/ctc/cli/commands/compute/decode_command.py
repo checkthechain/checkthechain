@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import toolcli
 import toolstr
 
 from ctc import binary
@@ -9,7 +10,7 @@ from ctc import evm
 from ctc import rpc
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_decode_command,
         'help': """decode EVM call data
@@ -24,7 +25,12 @@ syntax is one of
     }
 
 
-async def async_decode_command(args: typing.Sequence[str], nested: bool, title=None, indent=None):
+async def async_decode_command(
+    args: typing.Sequence[str],
+    nested: bool,
+    title: str | None = None,
+    indent: str | None = None,
+) -> None:
     if len(args) == 1:
         from ctc.protocols import fourbyte_utils
 
@@ -61,10 +67,20 @@ async def async_decode_command(args: typing.Sequence[str], nested: bool, title=N
     print(indent + '- signature:', binary.get_function_signature(function_abi))
     print(indent + '- inputs:')
     for p, parameter in enumerate(function_abi['inputs']):
-        print(indent + '    ', str(p + 1) + '.', parameter['name'], parameter['type'])
+        print(
+            indent + '    ',
+            str(p + 1) + '.',
+            parameter['name'],
+            parameter['type'],
+        )
     print(indent + '- outputs:')
     for p, parameter in enumerate(function_abi['outputs']):
-        print(indent + '    ', str(p + 1) + '.', parameter['name'], parameter['type'])
+        print(
+            indent + '    ',
+            str(p + 1) + '.',
+            parameter['name'],
+            parameter['type'],
+        )
     print()
 
     # print function parameters
@@ -76,7 +92,12 @@ async def async_decode_command(args: typing.Sequence[str], nested: bool, title=N
         nested_calls = decoded['parameters'][0]
         for nc, nested_call in enumerate(nested_calls):
             nested_address, nested_call_data = nested_call
-            title = 'Nested Call Data ' + str(nc + 1) + ' / ' + str(len(nested_calls))
+            title = (
+                'Nested Call Data '
+                + str(nc + 1)
+                + ' / '
+                + str(len(nested_calls))
+            )
             print()
             await async_decode_command(
                 nested_call,
@@ -94,7 +115,11 @@ async def async_decode_command(args: typing.Sequence[str], nested: bool, title=N
                 for subparameter in parameter:
                     print(indent + '    ' + str(subparameter))
             else:
-                print(indent + str(p + 1) + '.', str(input_names[p]) + ':', parameter)
+                print(
+                    indent + str(p + 1) + '.',
+                    str(input_names[p]) + ':',
+                    parameter,
+                )
 
     await rpc.async_close_http_session()
 

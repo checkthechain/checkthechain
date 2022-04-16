@@ -18,7 +18,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def hex_command(data, raw):
+def hex_command(data: str, raw: bool) -> None:
     if raw:
         output = binary.ascii_to_raw_hex(data)
     else:

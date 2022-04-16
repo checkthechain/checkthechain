@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
+
+from ctc import spec
 from ctc import binary
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': keccack_command,
         'help': 'compute keccak hash of data\n\nby default, data treated as hex if it starts with "0x", or treated as text otherwise',
@@ -26,7 +33,7 @@ def get_command_spec():
     }
 
 
-def keccack_command(data, text, hex, raw):
+def keccack_command(data: str, text: bool, hex: bool, raw: bool) -> None:
     if text:
         hex = False
     elif hex:
@@ -35,7 +42,9 @@ def keccack_command(data, text, hex, raw):
         hex = data.startswith('0x')
 
     if hex:
-        keccak = binary.keccak(data)
+        keccak = binary.keccak(
+            typing.cast(spec.BinaryInteger, data), output_format='prefix_hex'
+        )
     else:
         keccak = binary.keccak_text(data)
 
