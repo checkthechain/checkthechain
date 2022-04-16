@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import os
+import typing
+
+import toolcli
 
 import ctc.config
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': config_command,
         'help': 'print current config information',
@@ -23,14 +28,14 @@ def get_command_spec():
     }
 
 
-def config_command(reveal, as_json):
+def config_command(reveal: bool, as_json: bool) -> None:
 
     env_var = ctc.config.config_path_env_var
 
     if as_json:
         import rich
 
-        config = ctc.config.get_config()
+        config: typing.Mapping = ctc.config.get_config()
         rich.print(config)
 
     else:
@@ -49,7 +54,7 @@ def config_command(reveal, as_json):
 
         print()
         print('## Config Values')
-        config = ctc.config.get_config()
+        config = typing.cast(typing.Mapping, ctc.config.get_config())
         for key in sorted(config.keys()):
             if isinstance(config[key], dict) and len(config[key]) > 0:
                 print('-', str(key) + ':')

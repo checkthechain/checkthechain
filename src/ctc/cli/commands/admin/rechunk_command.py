@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import asyncio
+
+import toolcli
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': rechunk_command,
         'help': 'rechunk events by specific chunk size',
@@ -43,7 +48,7 @@ def get_command_spec():
             },
             {
                 'name': '--chunk-bytes',
-                'type': float,
+                'type': int,
                 'required': True,
                 'help': 'target number of bytes per chunk',
             },
@@ -62,16 +67,16 @@ def get_command_spec():
 
 
 def rechunk_command(
-    contract,
-    event,
-    all_events,
-    start_block,
-    end_block,
-    chunk_bytes,
-    dry,
-    verbose,
-    network,
-):
+    contract: spec.Address,
+    event: str,
+    all_events: bool,
+    start_block: int,
+    end_block: int,
+    chunk_bytes: int,
+    dry: bool,
+    verbose: bool,
+    network: spec.NetworkReference,
+) -> None:
     coroutine = run(
         contract_address=contract,
         event=event,
@@ -87,16 +92,16 @@ def rechunk_command(
 
 
 async def run(
-    contract_address,
-    event,
-    all_events,
-    start_block,
-    end_block,
-    chunk_bytes,
-    dry,
-    verbose,
-    network,
-):
+    contract_address: spec.Address,
+    event: str,
+    all_events: bool,
+    start_block: int,
+    end_block: int,
+    chunk_bytes: int,
+    dry: bool,
+    verbose: bool,
+    network: spec.NetworkReference,
+) -> None:
 
     if all_events:
 

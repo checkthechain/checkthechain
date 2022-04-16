@@ -8,12 +8,15 @@ TODO:
 - add listing of unknown signatures
 - add event signatures
 """
+from __future__ import annotations
+
+import toolcli
 
 from ctc import evm
 from ctc import rpc
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_decompile_command,
         'help': 'decompile contract abi',
@@ -26,7 +29,7 @@ def get_command_spec():
     }
 
 
-async def async_decompile_command(address_or_bytecode):
+async def async_decompile_command(address_or_bytecode: str) -> None:
     if len(address_or_bytecode) == 42:
         bytecode = await rpc.async_eth_get_code(address_or_bytecode)
     else:

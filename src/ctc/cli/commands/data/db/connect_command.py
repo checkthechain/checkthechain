@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 import subprocess
+
+import toolcli
 
 from ctc import config
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': connect_command,
         'help': 'connect to database console (proceed with caution)',
     }
 
 
-def connect_command():
+def connect_command() -> None:
     db_config = config.get_db_config()
     if db_config is None:
         print('no database is configured, run `ctc setup`')

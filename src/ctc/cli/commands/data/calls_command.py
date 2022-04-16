@@ -65,9 +65,9 @@ async def async_calls_command(
     addresses: typing.Optional[typing.Sequence[str]],
     blocks: typing.Optional[typing.Sequence[str]],
     block: typing.Optional[str],
-    quiet: typing.Optional[bool],
-    output: typing.Optional[str],
-    overwrite: typing.Optional[bool],
+    quiet: bool,
+    output: str,
+    overwrite: bool,
     from_address: typing.Optional[spec.Address],
 ) -> None:
 

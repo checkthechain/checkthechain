@@ -1,22 +1,30 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
 import tooltable  # type: ignore
+
 from ctc import directory
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_find_command,
         'help': 'search for item in directory',
         'args': [
             {'name': 'query', 'help': 'ERC20 symbol'},
-        ]
+        ],
     }
 
 
-async def async_find_command(query):
+async def async_find_command(query: str) -> None:
     try:
         result = directory.get_erc20_metadata(symbol=query)
         row = []
-        headers = ['symbol', 'decimals', 'address']
+        headers: typing.Sequence[
+            typing.Literal['symbol', 'decimals', 'address']
+        ] = ['symbol', 'decimals', 'address']
         for key in headers:
             row.append(result[key])
         rows = [row]

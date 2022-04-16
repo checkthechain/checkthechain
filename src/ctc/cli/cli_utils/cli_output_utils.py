@@ -4,13 +4,21 @@ import os
 
 import toolcli
 
+from ctc import spec
 
-def output_data(data, output, overwrite, top=None, indent=None, raw=False):
+
+def output_data(
+    data: spec.DataFrame | spec.Series,
+    output: str,
+    overwrite: bool,
+    top: int | None = None,
+    indent: str | int | None = None,
+    raw: bool = False,
+) -> None:
 
     import pandas as pd
 
     if output == 'stdout':
-        # print(data)
         import tooltable  # type: ignore
         import toolstr
 

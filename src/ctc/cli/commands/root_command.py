@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import toolcli
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': root_command,
         'help': 'cli interface to ctc and its subcommands',
@@ -18,7 +20,7 @@ def get_command_spec():
     }
 
 
-def root_command(query, parse_spec):
+def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
     if len(query) == 0:
         toolcli.execute_other_command_sequence(
             command_sequence=('help',),

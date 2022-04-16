@@ -74,7 +74,7 @@ async def async_balances_command(
     blocks: typing.Optional[list[str]],
     erc20s: typing.Optional[list[str]],
     raw: bool,
-    output: typing.Optional[str],
+    output: str,
     overwrite: bool,
     top: typing.Optional[str],
 ) -> None:
@@ -209,8 +209,16 @@ async def async_balances_command(
     else:
         raise Exception('invalid inputs')
 
+    if top is not None:
+        output_top = int(top)
+    else:
+        output_top = None
     cli_utils.output_data(
-        output_data, output, overwrite, top=top, indent=indent
+        output_data,
+        output=output,
+        overwrite=overwrite,
+        top=output_top,
+        indent=indent,
     )
 
     await rpc.async_close_http_session()

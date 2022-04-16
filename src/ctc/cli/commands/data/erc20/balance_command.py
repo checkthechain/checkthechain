@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import toolcli
 import toolstr
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_balance_command,
         'help': 'output an ERC20 balance',
@@ -23,7 +25,12 @@ def get_command_spec():
     }
 
 
-async def async_balance_command(erc20_address, wallet_address, block, raw):
+async def async_balance_command(
+    erc20_address: spec.Address,
+    wallet_address: spec.Address,
+    block: str,
+    raw: bool,
+) -> None:
     balance = await evm.async_get_erc20_balance_of(
         address=wallet_address,
         token=erc20_address,

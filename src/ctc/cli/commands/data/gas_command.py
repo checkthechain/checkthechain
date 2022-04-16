@@ -54,8 +54,8 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_gas_command(
     last: typing.Optional[typing.Sequence[str]],
-    output: typing.Optional[str],
-    overwrite: typing.Optional[bool],
+    output: str,
+    overwrite: bool,
 ) -> None:
 
     if last is None:

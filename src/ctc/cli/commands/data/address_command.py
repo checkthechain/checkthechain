@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import os
+
+import toolcli
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_address_command,
         'help': """summarize address
@@ -32,7 +37,9 @@ for contracts, will display ABI
     }
 
 
-async def async_address_command(address, verbose, network, raw):
+async def async_address_command(
+    address: spec.Address, verbose: bool | int, network: str, raw: bool
+) -> None:
     try:
         max_width = os.get_terminal_size().columns
     except OSError:

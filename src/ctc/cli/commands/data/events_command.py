@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
+
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.cli import cli_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_events_command,
         'help': 'get contract events',
@@ -40,13 +47,13 @@ def get_command_spec():
 
 
 async def async_events_command(
-    contract,
-    event,
-    blocks,
-    output,
-    overwrite,
-    verbose,
-):
+    contract: str,
+    event: str,
+    blocks: typing.Sequence[str],
+    output: str,
+    overwrite: bool,
+    verbose: bool,
+) -> None:
 
     if event.startswith('0x'):
         kwargs = {'event_hash': event}
@@ -61,7 +68,7 @@ async def async_events_command(
         start_block = None
         end_block = None
 
-    events = await evm.async_get_events(
+    events: spec.DataFrame = await evm.async_get_events(
         contract_address=contract,
         start_block=start_block,
         end_block=end_block,
@@ -76,10 +83,13 @@ async def async_events_command(
 
         # output
         if not verbose:
-            events.index = [
-                str(value)
-                for value in events.index.get_level_values('block_number')
-            ]
+            events.index = typing.cast(
+                spec.PandasIndex,
+                [
+                    str(value)
+                    for value in events.index.get_level_values('block_number')
+                ]
+            )
             events.index.name = 'block'
             events = events[
                 [column for column in events.columns if column.startswith('arg__')]

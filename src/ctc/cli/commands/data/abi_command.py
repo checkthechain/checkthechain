@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 
@@ -5,6 +7,7 @@ import toolcli
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -45,14 +48,14 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_abi_command(
-    address,
-    human_only,
-    json_only,
-    functions,
-    events,
-    name,
-    search,
-):
+    address: spec.Address,
+    human_only: bool,
+    json_only: bool,
+    functions: bool,
+    events: bool,
+    name: str,
+    search: str,
+) -> None:
     contract_abi = await evm.async_get_contract_abi(contract_address=address)
 
     # filter by name

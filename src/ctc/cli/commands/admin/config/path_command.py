@@ -1,13 +1,17 @@
+from __future__ import annotations
+
+import toolcli
+
 from ctc import config
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': path_command,
         'help': 'print config path',
     }
 
 
-def path_command():
+def path_command() -> None:
     print(config.get_config_path())
 

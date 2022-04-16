@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import toolcli
 import tooltable  # type: ignore
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': address_transactions_command,
         'help': 'output all transactions from address',
@@ -16,7 +18,7 @@ def get_command_spec():
     }
 
 
-async def address_transactions_command(address):
+async def address_transactions_command(address: spec.Address) -> None:
 
     print('fetching transactions from address', address)
     print()

@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import asyncio
 import sys
 import math
+import typing
 
 import aiohttp
 import rich.console
@@ -14,7 +17,7 @@ url_template = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&o
 token_url_template = 'https://www.coingecko.com/en/coins/{name}'
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_cg_command,
         'help': 'output coingecko market data',
@@ -32,7 +35,7 @@ def get_command_spec():
     }
 
 
-async def async_get_coingecko_data(n):
+async def async_get_coingecko_data(n: int) -> typing.Sequence[typing.Mapping]:
     n_per_page = 100
     n_pages = math.ceil(n / n_per_page)
 
@@ -45,13 +48,15 @@ async def async_get_coingecko_data(n):
     return items[:n]
 
 
-async def async_get_page(session, p):
+async def async_get_page(
+    session: aiohttp.ClientSession, p: int
+) -> typing.Mapping:
     url = url_template.format(page=p + 1)
     async with session.get(url) as response:
         return await response.json()
 
 
-async def async_cg_command(n, verbose, include_links):
+async def async_cg_command(n: int, verbose: bool, include_links: bool) -> None:
 
     if n is None:
         n = toolcli.get_n_terminal_rows() - 3
@@ -68,7 +73,11 @@ async def async_cg_command(n, verbose, include_links):
     )
 
 
-def print_coingecko_data(data, verbose, include_links):
+def print_coingecko_data(
+    data: typing.Sequence,
+    verbose: bool,
+    include_links: bool,
+) -> None:
 
     # create headers
     headers = ['symbol', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
@@ -152,7 +161,7 @@ def print_coingecko_data(data, verbose, include_links):
 
     # render table without sending to stdout
     old_stdout = sys.stdout
-    sys.stdout = None
+    sys.stdout = None  # type: ignore
     table = tooltable.print_table(
         rows,
         headers=headers,

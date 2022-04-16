@@ -198,7 +198,10 @@ def help_url_getter(
     )
 
 
-def run_cli(raw_command=None, **toolcli_kwargs):
+def run_cli(
+    raw_command: str | None = None,
+    **toolcli_kwargs: typing.Any,
+) -> None:
 
     config = {
         #

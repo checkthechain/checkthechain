@@ -60,7 +60,7 @@ async def async_balances_command(
     block: typing.Optional[spec.BlockNumberReference],
     blocks: typing.Optional[typing.Sequence[str]],
     raw: bool,
-    output: typing.Optional[str],
+    output: str,
     overwrite: bool,
 ) -> None:
     indent = None

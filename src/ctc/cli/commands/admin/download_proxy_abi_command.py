@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import asyncio
+
+import toolcli
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': add_proxy_abi_comamand,
         'help': 'download proxy abi for contract',
@@ -21,7 +26,10 @@ def get_command_spec():
     }
 
 
-def add_proxy_abi_comamand(contract_address, implementation_address, **kwargs):
+def add_proxy_abi_comamand(
+    contract_address: spec.Address,
+    implementation_address: spec.Address,
+) -> None:
     print('saving proxy contract implementation...')
     print('     for contract:', contract_address)
     print('   implementation:', implementation_address)
@@ -33,7 +41,9 @@ def add_proxy_abi_comamand(contract_address, implementation_address, **kwargs):
         asyncio.run(run(contract_address, implementation_address))
 
 
-async def run(contract_address, implementation_address):
+async def run(
+    contract_address: spec.Address, implementation_address: spec.Address
+) -> None:
     await evm.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
         proxy_implementation=implementation_address,

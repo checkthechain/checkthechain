@@ -35,7 +35,10 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_transfers_command(
-    erc20: str, blocks: list[str], output: typing.Optional[str], overwrite: bool
+    erc20: str,
+    blocks: list[str],
+    output: str,
+    overwrite: bool,
 ) -> None:
 
     if blocks is not None:

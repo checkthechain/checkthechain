@@ -7,6 +7,7 @@ if typing.TYPE_CHECKING:
 
     DataFrame = pandas.core.frame.DataFrame
     Series = pandas.core.series.Series
+    PandasIndex = pandas.core.indexes.base.Index
     DType = numpy.typing.DTypeLike
     NumpyArray = numpy.typing.NDArray
 
@@ -14,6 +15,7 @@ else:
 
     DataFrame = typing.Any
     Series = typing.Any
+    PandasIndex = typing.Any
     DType = typing.Any
     NumpyArray = typing.Any
 
