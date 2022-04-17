@@ -13,7 +13,7 @@ async def async_query_function_signature(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-    source='local',
+    source: typing.Literal['local', 'remote'] = 'local',
 ) -> list[fourbyte_spec.Entry]:
     if source == 'local':
         return local_queries.query_function_signature(
@@ -39,7 +39,7 @@ async def async_query_event_signature(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-    source='local',
+    source: typing.Literal['local', 'remote'] = 'local',
 ) -> list[fourbyte_spec.Entry]:
     if source == 'local':
         return local_queries.query_event_signature(

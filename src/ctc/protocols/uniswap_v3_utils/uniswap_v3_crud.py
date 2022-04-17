@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 from . import uniswap_v3_spec
 
@@ -11,7 +15,7 @@ from . import uniswap_v3_spec
 #
 
 
-async def download_pool_abi(pool_address):
+async def download_pool_abi(pool_address: spec.Address) -> None:
     example_pool = '0x8f8ef111b67c04eb1641f5ff19ee54cda062f163'
     await evm.async_save_proxy_contract_abi_to_filesystem(
         contract_address=pool_address,
@@ -19,7 +23,10 @@ async def download_pool_abi(pool_address):
     )
 
 
-async def async_get_pool_tokens(pool_address, **rpc_kwargs):
+async def async_get_pool_tokens(
+    pool_address: spec.Address,
+    **rpc_kwargs: typing.Any,
+) -> tuple[spec.Address, spec.Address]:
     kwargs = dict(rpc_kwargs, to_address=pool_address)
     return await asyncio.gather(
         rpc.async_eth_call(function_name='token0', **kwargs),
@@ -27,7 +34,10 @@ async def async_get_pool_tokens(pool_address, **rpc_kwargs):
     )
 
 
-async def async_get_pool_metadata(pool_address, **rpc_kwargs):
+async def async_get_pool_metadata(
+    pool_address: spec.Address,
+    **rpc_kwargs: typing.Any,
+) -> dict[str, str]:
     x_address, y_address = await async_get_pool_tokens(
         pool_address=pool_address
     )
@@ -48,12 +58,12 @@ async def async_get_pool_metadata(pool_address, **rpc_kwargs):
 
 
 async def async_get_pool_swaps(
-    pool_address,
-    start_block=None,
-    end_block=None,
-    replace_symbols=False,
-    normalize=True,
-):
+    pool_address: spec.Address,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    replace_symbols: bool = False,
+    normalize: bool = True,
+) -> spec.DataFrame:
 
     if normalize or replace_symbols:
         metadata_task = asyncio.create_task(

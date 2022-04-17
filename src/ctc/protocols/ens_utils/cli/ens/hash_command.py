@@ -1,7 +1,11 @@
+from __future__ import annotations
+
+import toolcli
+
 from ctc.protocols import ens_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': hash_command,
         'help': 'output hash of ENS name',
@@ -11,6 +15,6 @@ def get_command_spec():
     }
 
 
-def hash_command(name):
+def hash_command(name: str) -> None:
     print(ens_utils.hash_name(name))
 

@@ -1,18 +1,22 @@
-import asyncio
+from __future__ import annotations
 
-from ctc import rpc
+import asyncio
+import typing
+
 from ctc.protocols import chainlink_utils
+from ctc import rpc
+from ctc import spec
 
 from . import aave_spec
 
 
 async def async_get_asset_price(
-    asset,
-    provider=None,
-    block='latest',
-    normalize=True,
-    units='usd',
-):
+    asset: spec.Address,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference = 'latest',
+    normalize: bool = True,
+    units: typing.Literal['usd', 'eth'] = 'usd',
+) -> typing.Sequence[int | float]:
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -50,8 +54,12 @@ async def async_get_asset_price(
 
 
 async def async_get_asset_price_by_block(
-    asset, blocks, provider=None, normalize=True, units='usd',
-):
+    asset: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    provider: spec.ProviderSpec = None,
+    normalize: bool = True,
+    units: typing.Literal['usd', 'eth'] = 'usd',
+) -> typing.Sequence[int | float]:
     coroutines = [
         async_get_asset_price(
             asset=asset,

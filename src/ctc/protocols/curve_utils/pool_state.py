@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 
 from ctc import evm
@@ -7,9 +9,12 @@ from ctc import spec
 from . import pool_metadata
 
 
-async def async_get_virtual_price(pool, provider=None):
+async def async_get_virtual_price(
+    pool: spec.Address,
+    provider: spec.ProviderSpec = None,
+) -> int:
     return await rpc.async_eth_call(
-        to_adress=pool,
+        to_address=pool,
         function_name='get_virtual_price',
         function_parameters=[],
         provider=provider,
@@ -17,8 +22,11 @@ async def async_get_virtual_price(pool, provider=None):
 
 
 async def async_get_lp_withdrawal(
-    pool, amount_lp, token_withdrawn, provider=None
-):
+    pool: spec.Address,
+    amount_lp: int,
+    token_withdrawn: spec.Address,
+    provider: spec.ProviderSpec = None,
+) -> int:
 
     token_index = await pool_metadata.async_get_token_index(
         pool=pool,
@@ -34,7 +42,12 @@ async def async_get_lp_withdrawal(
     )
 
 
-async def async_get_pool_state(pool, n_tokens=None, block=None, provider=None):
+async def async_get_pool_state(
+    pool: spec.Address,
+    n_tokens: int | None = None,
+    block: spec.BlockNumberReference = None,
+    provider: spec.ProviderSpec = None,
+) -> dict:
 
     total_supply = await evm.async_get_erc20_total_supply(
         token=pool,

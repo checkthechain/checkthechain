@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 import warnings
 
 from ctc import rpc
@@ -9,7 +10,10 @@ from .. import pool_metadata
 from .. import token_metadata
 
 
-async def async_get_ctoken_exchange_rate(ctoken, block='latest'):
+async def async_get_ctoken_exchange_rate(
+    ctoken: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> int:
     return await rpc.async_eth_call(
         to_address=ctoken,
         function_abi=rari_abis.ctoken_function_abis['exchangeRateCurrent'],
@@ -18,7 +22,10 @@ async def async_get_ctoken_exchange_rate(ctoken, block='latest'):
     )
 
 
-async def async_get_ctoken_exchange_rate_by_block(ctoken, blocks):
+async def async_get_ctoken_exchange_rate_by_block(
+    ctoken: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_address=ctoken,
         function_abi=rari_abis.ctoken_function_abis['exchangeRateCurrent'],
@@ -28,8 +35,12 @@ async def async_get_ctoken_exchange_rate_by_block(ctoken, blocks):
 
 
 async def async_get_ctoken_price(
-    ctoken, oracle=None, block='latest', normalize=True, raise_on_revert=False,
-):
+    ctoken: spec.Address,
+    oracle: spec.Address | None = None,
+    block: spec.BlockNumberReference = 'latest',
+    normalize: bool = True,
+    raise_on_revert: bool = False,
+) -> int | float:
 
     if oracle is None:
         oracle = await _async_get_ctoken_oracle(ctoken=ctoken)
@@ -52,7 +63,7 @@ async def async_get_ctoken_price(
     return price
 
 
-async def _async_get_ctoken_oracle(ctoken):
+async def _async_get_ctoken_oracle(ctoken: spec.Address) -> spec.Address:
     comptroller = await token_metadata.async_get_ctoken_comptroller(ctoken)
     oracle = await pool_metadata.async_get_pool_oracle(comptroller)
     return oracle

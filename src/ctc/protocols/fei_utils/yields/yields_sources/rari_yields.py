@@ -52,6 +52,18 @@ async def async_get_fei_yield_data(
             filtered[comptroller] = pool_data
     history = filtered
 
+    if pool_data['supply_apy'][0] is not None:
+        current_spot_yield = float(pool_data['supply_apy'][0])
+    else:
+        current_spot_yield = 0
+
+    lending_interest = []
+    for item in pool_data['supply_apy']:
+        if item is not None:
+            lending_interest.append(float(item))
+        else:
+            lending_interest.append(0)
+
     # format as output
     output: dict[str, yields_spec.YieldSourceData] = {}
     for comptroller, pool_data in history.items():
@@ -67,11 +79,11 @@ async def async_get_fei_yield_data(
             'reward_tokens': [yields_spec.FEI],
             #
             # metrics
-            'tvl_history': pool_data['tvl'],
+            'tvl_history': [float(item) for item in pool_data['tvl']],
             'tvl_history_units': 'USD',
-            'current_yield': {'Spot': pool_data['supply_apy'][0]},
+            'current_yield': {'Spot': current_spot_yield},
             'current_yield_units': {'Spot': 'APY'},
-            'yield_history': {'Lending Interest': pool_data['supply_apy']},
+            'yield_history': {'Lending Interest': lending_interest},
             'yield_history_units': {'Lending Interest': 'APY'},
         }
 

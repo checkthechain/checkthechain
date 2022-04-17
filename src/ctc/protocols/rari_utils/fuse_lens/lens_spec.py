@@ -7,7 +7,11 @@ from ctc import rpc
 from ctc import spec
 
 
-def get_lens_address(lens_name, network=None, provider=None):
+def get_lens_address(
+    lens_name: str,
+    network: spec.NetworkReference | None = None,
+    provider: spec.ProviderSpec = None,
+) -> spec.Address:
 
     if network is None:
         provider = rpc.get_provider(provider)

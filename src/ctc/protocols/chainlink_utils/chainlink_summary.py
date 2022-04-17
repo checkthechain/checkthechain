@@ -11,7 +11,7 @@ from ctc.protocols import chainlink_utils
 from . import chainlink_spec
 
 
-async def async_summarize_feed(feed, n_recent=10):
+async def async_summarize_feed(feed: str, n_recent: int = 10) -> None:
 
     if evm.is_address_str(feed):
         feed_address = feed

@@ -1,13 +1,17 @@
+from __future__ import annotations
+
+import toolcli
 import toolstr
 import tooltime
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 from ctc.protocols import ens_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': ens_command,
         'help': 'summarize ENS entry',
@@ -22,7 +26,7 @@ def get_command_spec():
     }
 
 
-async def ens_command(name_or_address, block):
+async def ens_command(name_or_address: str, block: spec.BlockNumberReference) -> None:
     arg = name_or_address[0]
 
     if block is not None:

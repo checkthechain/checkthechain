@@ -1,8 +1,12 @@
+from __future__ import annotations
+
+import toolcli
+
 from ctc import directory
 import tooltable  # type: ignore
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': chainlink_ls_command,
         'help': 'list all Chainlink feeds',
@@ -16,7 +20,7 @@ def get_command_spec():
     }
 
 
-def chainlink_ls_command(query):
+def chainlink_ls_command(query: str) -> None:
     oracle_feeds = directory.load_oracle_feeds(protocol='chainlink')
     rows = []
     for feed in oracle_feeds.values():

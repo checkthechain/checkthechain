@@ -1,10 +1,16 @@
-from ctc.protocols import uniswap_v2_utils
+from __future__ import annotations
 
+import typing
+
+import toolcli
+
+from ctc.protocols import uniswap_v2_utils
 from ctc.cli import cli_utils
 from ctc import rpc
+from ctc import spec
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_burns_command,
         'help': 'output information about pool mints',
@@ -25,7 +31,12 @@ def get_command_spec():
     }
 
 
-async def async_burns_command(pool, blocks, output, overwrite):
+async def async_burns_command(
+    pool: spec.Address,
+    blocks: typing.Sequence[str],
+    output: str,
+    overwrite: bool,
+) -> None:
 
     if blocks is not None:
         start_block, end_block = await cli_utils.async_resolve_block_range(

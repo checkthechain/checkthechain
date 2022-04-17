@@ -18,7 +18,11 @@ from . import call_utils
 from . import multicall_spec
 
 
-def get_multicall_address(*, network='mainnet', version='maker'):
+def get_multicall_address(
+    *,
+    network: str = 'mainnet',
+    version: str = 'maker',
+) -> spec.Address:
     if version.lower() == 'Maker'.lower():
         multicall = {
             'mainnet': '0xeefba1e63905ef1d7acba5a8513c70307c1ce441',
@@ -80,7 +84,7 @@ async def async_multicall(
 
 
 async def async_multicall_by_block(
-        calls: typing.Sequence[multicall_spec.Call],
+    calls: typing.Sequence[multicall_spec.Call],
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
 ) -> typing.Sequence[typing.Sequence[typing.Any]]:

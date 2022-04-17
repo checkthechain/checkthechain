@@ -1,21 +1,36 @@
+from __future__ import annotations
+
+import typing
+
+import toolcli
 import tooltable  # type: ignore
 
 from ctc.protocols import fourbyte_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_fourbyte_command,
         'help': 'lookup 4byte signature',
         'args': [
             {'name': 'signature', 'help': 'signature to look up'},
-            {'name': '--local', 'action': 'store_true', 'help': 'use local database'},
-            {'name': '--remote', 'action': 'store_true', 'help': 'use remote database'},
+            {
+                'name': '--local',
+                'action': 'store_true',
+                'help': 'use local database',
+            },
+            {
+                'name': '--remote',
+                'action': 'store_true',
+                'help': 'use remote database',
+            },
         ],
     }
 
 
-async def async_fourbyte_command(signature, local, remote):
+async def async_fourbyte_command(
+    signature: str, local: bool, remote: bool
+) -> None:
 
     try:
         int(signature, 16)
@@ -26,7 +41,7 @@ async def async_fourbyte_command(signature, local, remote):
     if local and remote:
         raise Exception('cannot specify both local and remote')
     if local:
-        source = 'local'
+        source: typing.Literal['local', 'remote'] = 'local'
     elif remote:
         source = 'remote'
     else:
@@ -110,4 +125,7 @@ async def async_fourbyte_command(signature, local, remote):
             print(result['text_signature'])
             print('- hash:', result['hex_signature'])
             print('- 4byte id:', result['id'])
+
+    else:
+        raise Exception('unknown signature_type: ' + str(signature_type))
 

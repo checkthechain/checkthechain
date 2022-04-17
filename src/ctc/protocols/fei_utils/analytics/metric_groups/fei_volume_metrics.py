@@ -97,7 +97,7 @@ async def async_compute_uniswap_v3_volume(
         start_block=blocks[0],
         replace_symbols=True,
     )
-    binned = evm.bin_by_blocks(np.abs(swaps['FEI_amount']), blocks)
+    binned: spec.Series = evm.bin_by_blocks(np.abs(swaps['FEI_amount']), blocks)  # type: ignore
     return {
         'values': list(binned.values),
         'units': 'FEI',

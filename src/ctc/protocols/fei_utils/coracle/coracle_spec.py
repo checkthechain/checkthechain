@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+import typing
+
+from ctc import spec
+
+
 usd_token = '0x1111111111111111111111111111111111111111'
 
 
@@ -143,8 +150,6 @@ deposit_metadata = {
         'name': 'Balancer FEI-WETH',
         'platform': 'Balancer',
     },
-
-
     '0x89dfbc12001b41985efabd7dfcae6a77b22e4ec3': {
         'name': 'Balancer FEI-TRIBE',
         'platform': 'Balancer',
@@ -215,13 +220,10 @@ deposit_names = {
 }
 
 
-def get_coracle_address(wrapper=False, block=None, blocks=None):
-
-    if blocks is not None:
-        return [
-            get_coracle_address(wrapper=wrapper, block=block)
-            for block in blocks
-        ]
+def get_coracle_address(
+    wrapper: bool = False,
+    block: spec.BlockNumberReference | None = None,
+) -> spec.Address:
 
     if wrapper:
         return coracle_addresses[
@@ -229,4 +231,14 @@ def get_coracle_address(wrapper=False, block=None, blocks=None):
         ]
     else:
         return coracle_addresses['CollateralizationOracle']
+
+
+def get_coracle_address_by_block(
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    wrapper: bool = False,
+) -> typing.Sequence[spec.Address]:
+    return [
+        get_coracle_address(wrapper=wrapper, block=block)
+        for block in blocks
+    ]
 

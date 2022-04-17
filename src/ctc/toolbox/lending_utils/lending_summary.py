@@ -1,30 +1,35 @@
+from __future__ import annotations
+
 import asyncio
+import typing
+import types
 
 import pandas as pd
 import tooltime
 
 from ctc import evm
+from ctc import spec
 
 
 async def async_get_lending_flows(
-    wallet,
-    pool_token,
-    protocol,
-    wallet_deposits=None,
-    deposits=None,
-    wallet_withdrawals=None,
-    withdrawals=None,
-    include_latest=True,
-    provider=None,
-    replace_symbols=True,
-    normalize=True,
-    include_rewards=True,
-):
+    wallet: spec.Address,
+    pool_token: spec.ERC20Reference,
+    protocol: typing.Literal['aave', 'compound', 'rari'],
+    wallet_deposits: spec.DataFrame | None = None,
+    deposits: spec.DataFrame | None = None,
+    wallet_withdrawals: spec.DataFrame | None = None,
+    withdrawals: spec.DataFrame | None = None,
+    include_latest: bool = True,
+    provider: spec.ProviderSpec = None,
+    replace_symbols: bool = True,
+    normalize: bool = True,
+    include_rewards: bool = True,
+) -> spec.DataFrame:
 
     if protocol == 'aave':
         from ctc.protocols import aave_v2_utils
 
-        protocol_module = aave_v2_utils
+        protocol_module: types.ModuleType = aave_v2_utils
     elif protocol == 'compound':
         from ctc.protocols import compound_utils
 
@@ -127,7 +132,7 @@ async def async_get_lending_flows(
 
     # compute time columns
     timestamps = await timestamps_task
-    df.insert(loc=0, column='timestamp', value=timestamps)
+    df.insert(loc=0, column='timestamp', value=timestamps)  # type: ignore
     df.insert(
         loc=1,
         column='time',
@@ -171,14 +176,15 @@ async def async_get_lending_flows(
 
 
 async def _async_create_raw_wallet_flows_df(
-    wallet,
-    wallet_deposits=None,
-    deposits=None,
-    wallet_withdrawals=None,
-    withdrawals=None,
-    include_latest=True,
-    provider=None,
-):
+    wallet: spec.Address,
+    wallet_deposits: spec.DataFrame | None = None,
+    deposits: spec.DataFrame | None = None,
+    wallet_withdrawals: spec.DataFrame | None = None,
+    withdrawals: spec.DataFrame | None = None,
+    include_latest: bool = True,
+    provider: spec.ProviderSpec = None,
+) -> spec.DataFrame:
+
     from ctc.protocols import aave_v2_utils
 
     no_deposits = wallet_deposits is None and deposits is None
@@ -195,23 +201,27 @@ async def _async_create_raw_wallet_flows_df(
 
     wallet = wallet.lower()
     if wallet_deposits is None:
+        if deposits is None:
+            raise Exception('could not determine deposits')
         wallet_deposits = deposits[deposits['arg__user'] == wallet]
     if isinstance(wallet_deposits.index, pd.MultiIndex):
         wallet_deposits = wallet_deposits.groupby(level='block_number').sum()
     if isinstance(wallet_deposits, pd.DataFrame):
-        wallet_deposits = wallet_deposits['arg__amount']
+        wallet_deposits_series = wallet_deposits['arg__amount']
     if wallet_withdrawals is None:
+        if withdrawals is None:
+            raise Exception('could not determine withdrawals')
         wallet_withdrawals = withdrawals[withdrawals['arg__user'] == wallet]
     if isinstance(wallet_withdrawals.index, pd.MultiIndex):
         wallet_withdrawals = wallet_withdrawals.groupby(
             level='block_number'
         ).sum()
     if isinstance(wallet_withdrawals, pd.DataFrame):
-        wallet_withdrawals = wallet_withdrawals['arg__amount']
+        wallet_withdrawals_series = wallet_withdrawals['arg__amount']
 
     raw_data = {
-        'asset_deposit': wallet_deposits,
-        'asset_withdrawal': wallet_withdrawals,
+        'asset_deposit': wallet_deposits_series,
+        'asset_withdrawal': wallet_withdrawals_series,
     }
     raw_df = pd.DataFrame(raw_data)
     raw_df = raw_df.fillna(0)

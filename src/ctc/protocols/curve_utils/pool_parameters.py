@@ -61,7 +61,8 @@ async def async_get_pool_future_A(
     )
 
 
-async def async_get_pool_ramps():
+async def async_get_pool_ramps() -> spec.DataFrame:
+    """get Ramp events"""
     raise NotImplementedError()
 
 
@@ -70,7 +71,7 @@ async def async_get_A_history(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
-):
+) -> typing.Sequence[float]:
     """get history of pool's A parameter"""
 
     import numpy as np
@@ -144,13 +145,15 @@ def compute_A(
 
     import numpy as np
 
-    return _compute_A(
+    result = _compute_A(
         initial_A=np.array(initial_A),
         initial_A_time=np.array(initial_A_time),
         future_A=np.array(future_A),
         future_A_time=np.array(future_A_time),
         timestamps=np.array(timestamps),
     )
+
+    return list(result)
 
 
 def _compute_A(
@@ -159,7 +162,7 @@ def _compute_A(
     future_A: spec.NumpyArray,
     future_A_time: spec.NumpyArray,
     timestamps: spec.NumpyArray,
-):
+) -> spec.NumpyArray:
 
     intercept = initial_A
     slope = (future_A - initial_A) / (future_A_time - initial_A_time)

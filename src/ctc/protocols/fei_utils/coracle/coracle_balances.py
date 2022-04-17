@@ -107,7 +107,7 @@ async def async_get_deposits_resistant_balances_and_fei(
     deposits: typing.Sequence[spec.ContractAddress],
     block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderSpec = None,
-) -> list[int]:
+) -> list[tuple[int, int]]:
     return await rpc.async_batch_eth_call(
         to_addresses=deposits,
         function_abi=function_abis['resistantBalanceAndFei'],

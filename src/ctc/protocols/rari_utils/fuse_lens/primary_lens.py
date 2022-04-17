@@ -231,7 +231,7 @@ async def async_get_public_pool_users_with_data(
     }
 
 
-async def _async_get_pool_users_with_data_or_error(**kwargs):
+async def _async_get_pool_users_with_data_or_error(**kwargs: typing.Any) -> dict:
     try:
         summary = await async_get_pool_users_with_data(**kwargs)
         return {'pool_users': summary, 'error': None}

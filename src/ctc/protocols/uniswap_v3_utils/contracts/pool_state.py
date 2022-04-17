@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing_extensions import TypedDict
+
 from ctc import rpc
 from ctc import spec
 
@@ -8,7 +12,7 @@ async def async_pool_slot0(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi('slot0', 'pool')
     result = await rpc.async_eth_call(
         to_address=pool,
@@ -31,7 +35,7 @@ async def async_pool_fee_growth_global_0_x128(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'feeGrowthGlobal0X128',
         'pool',
@@ -48,7 +52,7 @@ async def async_pool_fee_growth_global_1_x128(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'feeGrowthGlobal1X128',
         'pool',
@@ -65,7 +69,7 @@ async def async_pool_protocol_fees(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> tuple[int, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'protocolFees',
         'pool',
@@ -95,12 +99,23 @@ async def async_pool_liquidity(
     )
 
 
+class UniswapV3Ticks(TypedDict):
+    liquidity_gross: int
+    liquidity_net: int
+    fee_growth_outside_0_x128: int
+    fee_growth_outside_1_x128: int
+    tick_cummulative_outside: int
+    seconds_per_liquidity_outside_x128: int
+    seconds_outside: int
+    initialized: bool
+
+
 async def async_pool_ticks(
     tick: int,
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> UniswapV3Ticks:
     function_abi = await uniswap_v3_spec.async_get_function_abi('ticks', 'pool')
     result = await rpc.async_eth_call(
         to_address=pool,
@@ -145,7 +160,7 @@ async def async_pool_positions(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'positions',
         'pool',
@@ -166,12 +181,19 @@ async def async_pool_positions(
     }
 
 
+class UniswapV3Observations(TypedDict):
+    block_timestamp: int
+    tick_cummulative: int
+    seconds_per_liquidity_cummulative_x128: int
+    initialized: bool
+
+
 async def async_pool_observations(
     index: int,
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference = None,
-):
+) -> UniswapV3Observations:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'observations',
         'pool',

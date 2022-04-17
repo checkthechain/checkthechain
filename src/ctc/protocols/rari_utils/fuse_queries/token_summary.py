@@ -21,22 +21,25 @@ class CTokenMetricSpec(TypedDict, total=False):
 
 
 class CTokenMetrics(TypedDict, total=False):
-    tvl: float
-    tvb: float
-    supply_apy: float
-    borrow_apy: float
+    tvl: spec.Number
+    tvb: spec.Number
+    supply_apy: spec.Number | None
+    borrow_apy: spec.Number | None
 
 
 class CTokenMetricsByBlock(TypedDict, total=False):
-    tvl: typing.Sequence[float]
-    tvb: typing.Sequence[float]
-    supply_apy: typing.Sequence[float]
-    borrow_apy: typing.Sequence[float]
+    tvl: typing.Sequence[spec.Number]
+    tvb: typing.Sequence[spec.Number]
+    supply_apy: typing.Sequence[spec.Number | None]
+    borrow_apy: typing.Sequence[spec.Number | None]
 
 
 async def async_get_token_multipool_history(
-    token, blocks, metrics=None, comptrollers=None
-):
+    token: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    metrics: CTokenMetricSpec | None = None,
+    comptrollers: typing.Sequence[spec.Address] | None = None,
+) -> dict[spec.Address, CTokenMetricsByBlock]:
     """get token metrics across multiple pools and blocks"""
 
     if comptrollers is None:
@@ -59,8 +62,11 @@ async def async_get_token_multipool_history(
 
 
 async def async_get_pool_token_history(
-    comptroller, token, blocks, metrics=None
-):
+    comptroller: spec.Address,
+    token: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    metrics: CTokenMetricSpec | None = None,
+) -> CTokenMetricsByBlock | None:
     """get metrics of a token in a pool across blocks"""
     ctokens = await pool_metadata.async_get_pool_ctokens(comptroller)
     coroutines = []
@@ -82,8 +88,11 @@ async def async_get_pool_token_history(
 
 
 async def _async_get_token_history_if_match(
-    ctoken, token, blocks, metrics=None
-):
+    ctoken: spec.Address,
+    token: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    metrics: CTokenMetricSpec | None = None,
+) -> CTokenMetricsByBlock | None:
     underlying = await token_metadata.async_get_ctoken_underlying(ctoken)
     if underlying != token.lower():
         return None
@@ -97,12 +106,12 @@ async def _async_get_token_history_if_match(
 
 
 async def async_get_ctoken_state_by_block(
-    ctoken,
-    blocks,
-    metrics=None,
-    eth_price=None,
-    in_usd=True,
-):
+    ctoken: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    metrics: CTokenMetricSpec | None = None,
+    eth_price: spec.Number | None = None,
+    in_usd: bool = True,
+) -> CTokenMetricsByBlock:
     coroutines = []
     for block in blocks:
         coroutine = async_get_ctoken_state(
@@ -114,16 +123,19 @@ async def async_get_ctoken_state_by_block(
         )
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
-    return nested_utils.list_of_dicts_to_dict_of_lists(results)
+    return typing.cast(
+        CTokenMetricsByBlock,
+        nested_utils.list_of_dicts_to_dict_of_lists(results),
+    )
 
 
 async def async_get_ctoken_state(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
-    metrics: CTokenMetricSpec = None,
-    eth_price: typing.SupportsFloat | None = None,
+    metrics: CTokenMetricSpec | None = None,
+    eth_price: spec.Number | None = None,
     in_usd: bool = True,
-):
+) -> CTokenMetrics:
     if metrics is None:
         metrics = {
             'tvl': True,
@@ -134,13 +146,13 @@ async def async_get_ctoken_state(
 
     blocks_per_year = 2102400
     if metrics.get('tvl') or metrics.get('tvb'):
-        coroutine = token_state.async_get_ctoken_tvl_and_tvb(
+        tv_coroutine = token_state.async_get_ctoken_tvl_and_tvb(
             ctoken=ctoken,
             block=block,
             in_usd=in_usd,
             eth_price=eth_price,
         )
-        tv_task = asyncio.create_task(coroutine)
+        tv_task = asyncio.create_task(tv_coroutine)
     if metrics.get('supply_apy'):
         coroutine = token_state.async_get_supply_apy(
             ctoken=ctoken,

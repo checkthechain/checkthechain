@@ -47,8 +47,8 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_chainlink_command(
     feed: typing.Sequence[str],
     blocks: typing.Optional[typing.Sequence[str]],
-    output: typing.Optional[str],
-    overwrite: typing.Optional[bool],
+    output: str,
+    overwrite: bool,
     provider: typing.Optional[str],
     all_fields: typing.Optional[bool],
 ) -> None:

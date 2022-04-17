@@ -51,13 +51,16 @@ async def async_get_fei_deposit_balances(
     return dict(zip(fei_deposits, result))
 
 
-async def _async_get_non_fei_deposits_fei_balances(block, provider=None):
+async def _async_get_non_fei_deposits_fei_balances(
+    block: spec.BlockNumberReference,
+    provider: spec.ProviderSpec = None,
+) -> dict[str, int]:
 
     tokens_deposits = await coracle_deposits.async_get_tokens_deposits(
         block=block
     )
 
-    non_fei_deposits = []
+    non_fei_deposits: typing.MutableSequence[spec.Address] = []
     for token, deposits in tokens_deposits.items():
         non_fei_deposits.extend(deposits)
 

@@ -1,14 +1,22 @@
+from __future__ import annotations
+
 import asyncio
 import math
+import typing
 
 import toolstr
 import tooltime
 import tooltable  # type: ignore
 
+from ctc.protocols import chainlink_utils
 from ctc import directory
 from ctc import rpc
-from ctc.protocols import chainlink_utils
+from ctc import spec
 from . import fuse_queries
+
+
+K = typing.TypeVar('K')
+V = typing.TypeVar('V', bound=typing.Mapping)
 
 
 display_names = {
@@ -17,13 +25,21 @@ display_names = {
 }
 
 
-def sort_nested_by(nested, key, reverse=False):
+def sort_nested_by(
+    nested: typing.Mapping[K, V], key: str, reverse: bool = False
+) -> typing.Mapping[K, V]:
     pairs = list(nested.items())
     sorted_pairs = sorted(pairs, key=lambda pair: pair[1][key], reverse=reverse)
     return dict(sorted_pairs)
 
 
-def print_fuse_pool_summary(block, *, tokens_data, pool_name, comptroller):
+def print_fuse_pool_summary(
+    block: spec.Block,
+    *,
+    tokens_data: typing.Mapping[str, typing.Any],
+    pool_name: str,
+    comptroller: spec.Address,
+) -> None:
 
     tvl = sum(token_data['supplied_tvl'] for token_data in tokens_data.values())
     tvb = sum(token_data['borrowed_tvl'] for token_data in tokens_data.values())
@@ -70,7 +86,10 @@ def print_fuse_pool_summary(block, *, tokens_data, pool_name, comptroller):
     tooltable.print_table(rows, headers=headers.values())
 
 
-async def print_all_pool_summary(block='latest', n_display=15):
+async def print_all_pool_summary(
+    block: spec.BlockNumberReference = 'latest',
+    n_display: int = 15,
+) -> None:
 
     if block == 'latest':
         block = await rpc.async_eth_block_number()
@@ -89,15 +108,15 @@ async def print_all_pool_summary(block='latest', n_display=15):
         reverse=True,
     )
 
-    total_tvl = 0
-    total_tvb = 0
+    total_tvl: spec.Number = 0
+    total_tvb: spec.Number = 0
 
     rows = []
     for pool in sorted_pools[:n_display]:
 
         pool_stats = stats_by_comptroller[pool[2]]
 
-        row = []
+        row: typing.Any = []
 
         tvb = toolstr.format(
             pool_stats['tvb'], order_of_magnitude=True, prefix='$'
@@ -106,8 +125,8 @@ async def print_all_pool_summary(block='latest', n_display=15):
             pool_stats['tvl'], order_of_magnitude=True, prefix='$'
         )
 
-        total_tvl += pool_stats['tvl']
-        total_tvb += pool_stats['tvb']
+        total_tvl = total_tvl + pool_stats['tvl']  # type: ignore
+        total_tvb = total_tvb + pool_stats['tvb']  # type: ignore
 
         name = pool[0]
         name = display_names.get(pool[0], pool[0])
@@ -136,7 +155,10 @@ async def print_all_pool_summary(block='latest', n_display=15):
     tooltable.print_table(rows, headers=['#', 'pool', 'TVL', 'TVB'])
 
 
-async def _async_get_all_pools_stats(all_pools, block):
+async def _async_get_all_pools_stats(
+    all_pools: list[list[typing.Any]],
+    block: spec.BlockNumberReference,
+) -> list[dict[str, spec.Number]]:
 
     n_pools = len(all_pools)
     chunk_size = 300
@@ -150,7 +172,7 @@ async def _async_get_all_pools_stats(all_pools, block):
         chunk_pools = all_pools[slice(c * chunk_size, (c + 1) * chunk_size)]
         # print(slice(c * chunk_size, (c + 1) * chunk_size))
 
-        chunk_pools_stats = [
+        chunk_pools_stats_coroutine = [
             asyncio.create_task(
                 fuse_queries.async_get_pool_tvl_and_tvb(
                     comptroller=pool[2], block=block
@@ -159,18 +181,22 @@ async def _async_get_all_pools_stats(all_pools, block):
             for pool in chunk_pools
         ]
 
-        chunk_pools_stats = await asyncio.gather(*chunk_pools_stats)
+        chunk_pools_stats = await asyncio.gather(*chunk_pools_stats_coroutine)
 
         pools_stats += chunk_pools_stats
 
     return pools_stats
 
 
-async def async_get_token_multipool_stats(token, block='latest', in_usd=True):
+async def async_get_token_multipool_stats(
+    token: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+    in_usd: bool = True,
+) -> dict:
     pools = await fuse_queries.async_get_all_pools(block=block)
 
     eth_price = await chainlink_utils.async_get_eth_price(block=block)
-    pools_stats = [
+    pools_stats_task = [
         asyncio.create_task(
             async_get_token_pool_stats(
                 token=token,
@@ -182,20 +208,20 @@ async def async_get_token_multipool_stats(token, block='latest', in_usd=True):
         )
         for pool in pools
     ]
-    pools_stats = await asyncio.gather(*pools_stats)
+    pools_stats = await asyncio.gather(*pools_stats_task)
     tvl = 0
     tvb = 0
     for pool_stats in pools_stats:
-        tvl += pool_stats['tvl']
-        tvb += pool_stats['tvb']
+        tvl = tvl + pool_stats['tvl']  # type: ignore
+        tvb = tvb + pool_stats['tvb']  # type: ignore
 
     comptrollers = [pool[2] for pool in pools]
     per_pool = dict(zip(comptrollers, pools_stats))
 
-    per_pool = sorted(
+    per_pool_items = sorted(
         per_pool.items(), key=lambda item: item[1]['tvl'], reverse=True
     )
-    per_pool = dict(per_pool)
+    per_pool = dict(per_pool_items)
 
     pool_names = [
         asyncio.create_task(
@@ -248,8 +274,12 @@ async def async_get_token_multipool_stats(token, block='latest', in_usd=True):
 
 
 async def async_get_token_pool_stats(
-    token, comptroller, eth_price, block='latest', in_usd=True,
-):
+    token: spec.Address,
+    comptroller: spec.Address,
+    eth_price: spec.Number,
+    block: spec.BlockNumberReference = 'latest',
+    in_usd: bool = True,
+) -> dict:
 
     ctokens = await fuse_queries.async_get_pool_ctokens(
         comptroller=comptroller, block=block
@@ -261,8 +291,8 @@ async def async_get_token_pool_stats(
         comptroller=comptroller, block=block
     )
 
-    tvl = 0
-    tvb = 0
+    tvl: spec.Number = 0
+    tvb: spec.Number = 0
     matches = []
     for ctoken, underlying in underlyings.items():
         if underlying == token:
@@ -274,18 +304,22 @@ async def async_get_token_pool_stats(
                 block=block,
                 in_usd=in_usd,
             )
-            tvl += stats['tvl']
-            tvb += stats['tvb']
+            tvl = tvl + stats['tvl']  # type: ignore
+            tvb = tvb + stats['tvb']  # type: ignore
 
     if len(matches) > 0:
-        ctoken = matches[0]
+        ctoken_output: spec.Address | None = matches[0]
     else:
-        ctoken = None
+        ctoken_output = None
 
-    return {'tvl': tvl, 'tvb': tvb, 'ctoken': ctoken, 'matches': matches}
+    return {'tvl': tvl, 'tvb': tvb, 'ctoken': ctoken_output, 'matches': matches}
 
 
-async def async_print_fuse_token_summary(token, block='latest', in_usd=True):
+async def async_print_fuse_token_summary(
+    token: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+    in_usd: bool = True,
+) -> None:
 
     if directory.has_erc20_metadata(symbol=token):
         token = directory.get_erc20_address(symbol=token)
@@ -294,10 +328,10 @@ async def async_print_fuse_token_summary(token, block='latest', in_usd=True):
     else:
         symbol = directory.get_erc20_symbol(token)
 
-    block = await rpc.async_eth_get_block_by_number(block)
+    block_data = await rpc.async_eth_get_block_by_number(block)
     multipool_stats = await async_get_token_multipool_stats(
         token,
-        block=block['number'],
+        block=block_data['number'],
         in_usd=in_usd,
     )
 
@@ -345,12 +379,14 @@ async def async_print_fuse_token_summary(token, block='latest', in_usd=True):
     for pool_stats in multipool_stats['per_pool'].values():
         tvl += pool_stats['tvl']
         tvb += pool_stats['tvb']
-    timestamp = tooltime.timestamp_to_iso(block['timestamp']).replace('T', ' ')
+    timestamp = tooltime.timestamp_to_iso(block_data['timestamp']).replace(
+        'T', ' '
+    )
 
     toolstr.print_header(symbol + ' Token Fuse Usage')
     print('- TVL:', toolstr.format(tvl, order_of_magnitude=True, prefix=prefix))
     print('- TVB:', toolstr.format(tvb, order_of_magnitude=True, prefix=prefix))
-    print('- block:', block['number'])
+    print('- block:', block_data['number'])
     # print('- time:', timestamp)
     print()
     tooltable.print_table(rows, headers=headers)

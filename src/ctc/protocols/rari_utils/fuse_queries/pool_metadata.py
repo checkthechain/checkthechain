@@ -1,13 +1,21 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc import rpc
+from ctc import spec
 
 from .. import rari_abis
 from . import directory_metadata
 from . import token_metadata
 
 
-async def async_get_pool_ctoken(comptroller, underlying, block='latest'):
+async def async_get_pool_ctoken(
+    comptroller: spec.Address,
+    underlying: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> spec.Address:
     return await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
@@ -16,7 +24,10 @@ async def async_get_pool_ctoken(comptroller, underlying, block='latest'):
     )
 
 
-async def async_get_pool_ctokens(comptroller, block='latest'):
+async def async_get_pool_ctokens(
+    comptroller: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> tuple[spec.Address]:
     return await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
@@ -25,8 +36,11 @@ async def async_get_pool_ctokens(comptroller, block='latest'):
 
 
 async def async_get_pool_underlying_tokens(
-    *, ctokens=None, comptroller=None, block='latest'
-):
+    *,
+    ctokens: typing.Sequence[spec.Address] | None = None,
+    comptroller: spec.Address | None = None,
+    block: spec.BlockNumberReference = 'latest',
+) -> dict[spec.Address, spec.Address]:
     if ctokens is None:
         if comptroller is None:
             raise Exception('specify comptroller')
@@ -40,7 +54,10 @@ async def async_get_pool_underlying_tokens(
     return dict(zip(ctokens, underlyings))
 
 
-async def async_get_pool_oracle(comptroller, block='latest'):
+async def async_get_pool_oracle(
+    comptroller: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> spec.Address:
     return await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
@@ -48,7 +65,11 @@ async def async_get_pool_oracle(comptroller, block='latest'):
     )
 
 
-async def async_get_pool_name(comptroller, all_pools=None, block='latest'):
+async def async_get_pool_name(
+    comptroller: spec.Address,
+    all_pools: list[list[typing.Any]] | None = None,
+    block: spec.BlockNumberReference = 'latest',
+) -> str:
     comptroller = comptroller.lower()
     if all_pools is None:
         all_pools = await directory_metadata.async_get_all_pools(block=block)

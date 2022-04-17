@@ -82,7 +82,10 @@ async def async_get_curve_farm_yield_data(
     }
 
 
-async def async_get_rari_farm_tvl_history(ctoken, block_numbers):
+async def async_get_rari_farm_tvl_history(
+    ctoken: spec.Address,
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+) -> list[float]:
     coroutines = [
         rari_utils.async_get_ctoken_tvl_and_tvb(
             ctoken=ctoken,
@@ -94,14 +97,15 @@ async def async_get_rari_farm_tvl_history(ctoken, block_numbers):
     return [item['tvl'] for item in tvl_history]
 
 
-async def async_get_fei_current_yield(ctoken) -> dict[str, float]:
+async def async_get_fei_current_yield(ctoken: spec.Address) -> dict[str, float]:
     return {
         'Spot': 0.01,
     }
 
 
 async def async_get_fei_yield_history(
-    block_numbers, ctoken
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+    ctoken: spec.Address,
 ) -> dict[str, list[float]]:
     return {'Staking': [0.01 for block in block_numbers]}
 

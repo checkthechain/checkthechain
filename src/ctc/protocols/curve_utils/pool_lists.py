@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import typing
+from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
@@ -21,7 +22,10 @@ creation_blocks = {
 #
 
 
-async def async_get_factory_pool_data(factory, include_balances=False):
+async def async_get_factory_pool_data(
+    factory: spec.Address,
+    include_balances: bool = False,
+) -> list[CurvePoolData]:
     n_pools = await rpc.async_eth_call(
         to_address=factory,
         function_name='pool_count',
@@ -35,7 +39,18 @@ async def async_get_factory_pool_data(factory, include_balances=False):
     return await asyncio.gather(*coroutines)
 
 
-async def _async_get_pool_data(p, factory, include_balances=False):
+class CurvePoolData(TypedDict):
+    address: spec.Address
+    tokens: typing.Sequence[spec.Address]
+    symbols: typing.Sequence[str]
+    balances: typing.Sequence[int | float | None]
+
+
+async def _async_get_pool_data(
+    p: int,
+    factory: spec.Address,
+    include_balances: bool = False,
+) -> CurvePoolData:
     pool = await rpc.async_eth_call(
         to_address=factory,
         function_name='pool_list',
@@ -64,9 +79,11 @@ async def _async_get_pool_data(p, factory, include_balances=False):
         symbols.insert(index, 'ETH')
 
     if include_balances:
-        balances = await evm.async_get_erc20s_balance_of(
-            tokens=valid_coins,
-            address=pool,
+        balances: typing.MutableSequence[int | float | None] = (
+            await evm.async_get_erc20s_balance_of(  # type: ignore
+                tokens=valid_coins,
+                address=pool,
+            )
         )
         if eth_address in coins:
             eth_balance = await evm.async_get_eth_balance(pool)
@@ -92,7 +109,7 @@ async def async_get_base_pools(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
-):
+) -> spec.DataFrame:
     import pandas as pd
 
     if start_block is None:
@@ -135,7 +152,7 @@ async def async_get_plain_pools(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
-):
+) -> spec.DataFrame:
     if start_block is None:
         start_block = 12903979
 
@@ -174,7 +191,7 @@ async def async_get_meta_pools(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
-):
+) -> spec.DataFrame:
     import pandas as pd
 
     # gather data

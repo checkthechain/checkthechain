@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 from ctc import rpc
+from ctc import spec
 
 
-async def async_get_underlying_asset(pool_token, provider=None):
+async def async_get_underlying_asset(
+    pool_token: spec.Address,
+    provider: spec.ProviderSpec = None,
+) -> spec.Address:
     function_abi = {
         'name': 'UNDERLYING_ASSET_ADDRESS',
         'inputs': [],

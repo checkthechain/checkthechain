@@ -43,7 +43,9 @@ async def async_get_fei_yield_data(
     return {aave_v2['name']: aave_v2}
 
 
-async def async_get_aave_fei_tvl_history(block_numbers) -> list[float]:
+async def async_get_aave_fei_tvl_history(
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+) -> list[float]:
     tvls = await evm.async_get_erc20_total_supply_by_block(
         token=aFEI,
         blocks=block_numbers,
@@ -52,7 +54,7 @@ async def async_get_aave_fei_tvl_history(block_numbers) -> list[float]:
 
 
 async def async_get_aave_fei_yield_history(
-    block_numbers,
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
 ) -> dict[str, list[float]]:
     interest_rates = await aave_v2_utils.async_get_interest_rates_by_block(
         token=yields_spec.FEI,

@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 from . import aave_spec
 
 
 async def async_get_deposits(
-    start_block=None,
-    end_block=None,
-    provider=None,
-):
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+) -> spec.DataFrame:
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -39,10 +42,10 @@ async def async_get_deposits(
 
 
 async def async_get_withdrawals(
-    start_block=None,
-    end_block=None,
-    provider=None,
-):
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+) -> spec.DataFrame:
 
     provider = rpc.get_provider(provider)
     network = provider['network']

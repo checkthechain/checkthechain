@@ -1,7 +1,11 @@
+from __future__ import annotations
+
+import toolcli
+
 from ctc.protocols import fourbyte_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_fourbyte_build_command,
         'help': 'build local copy of 4byte database',
@@ -16,7 +20,7 @@ def get_command_spec():
     }
 
 
-async def async_fourbyte_build_command(datatype):
+async def async_fourbyte_build_command(datatype: str | None) -> None:
     if datatype is None:
         datatypes = ['functions', 'events']
     else:

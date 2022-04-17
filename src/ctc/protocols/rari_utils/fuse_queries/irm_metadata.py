@@ -1,9 +1,12 @@
-from ctc import rpc
+from __future__ import annotations
 
-from .. import rari_abis
+from ctc import spec
 
 
-async def async_get_irm_blocks_per_year(interest_rate_model, block='latest'):
+async def async_get_irm_blocks_per_year(
+    interest_rate_model: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> int:
 
     return 2102400
     # try:
@@ -18,5 +21,4 @@ async def async_get_irm_blocks_per_year(interest_rate_model, block='latest'):
     #         block_number=block,
     #         function_abi=rari_abis.interest_rate_model_abis['blocksPerYear'],
     #     )
-
 

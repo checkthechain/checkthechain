@@ -1,10 +1,18 @@
+# type: ignore
+"""this is very old code, needs to be refactored"""
+from __future__ import annotations
+
 import copy
 import json
 import os
+import typing
+from typing_extensions import TypedDict
 
 import numpy as np
 import pandas
 import tooltime
+
+from ctc import spec
 
 
 vote_data_file_template = '{name}__{datatype}__{timestamp}.json'
@@ -32,7 +40,12 @@ choice_names = {
 #
 
 
-def request_raw_vote_data(name, save=True, overwrite=False, verbose=True):
+def request_raw_vote_data(
+    name: str,
+    save: bool = True,
+    overwrite: bool = False,
+    verbose: bool = True,
+) -> dict:
 
     # create url
     url = url_templates['choices'].format(proposal_hash=proposal_hashes[name])
@@ -42,6 +55,7 @@ def request_raw_vote_data(name, save=True, overwrite=False, verbose=True):
 
     # request data
     import requests
+
     response = requests.get(url=url)
     data = response.json()
 
@@ -67,19 +81,23 @@ def request_raw_vote_data(name, save=True, overwrite=False, verbose=True):
 #
 
 
-# def get_vote_data_dir():
-#     data_dir = config_utils.get_config()['data_root']
-#     return os.path.join(data_dir, 'market/votes')
+def get_vote_data_dir() -> str:
+    raise NotImplementedError()
 
 
-def get_vote_data_path(name, datatype, timestamp):
+def get_vote_data_path(name: str, datatype: str, timestamp: str) -> str:
     filename = vote_data_file_template.format(
-        name=name, datatype=datatype, timestamp=timestamp,
+        name=name,
+        datatype=datatype,
+        timestamp=timestamp,
     )
     return os.path.join(get_vote_data_dir(), filename)
 
 
-def get_vote_data_files(name=None, datatype=None):
+def get_vote_data_files(
+    name: str | None = None,
+    datatype: str | None = None,
+) -> list[dict[str, str]]:
 
     vote_data_dir = get_vote_data_dir()
 
@@ -107,7 +125,7 @@ def get_vote_data_files(name=None, datatype=None):
     return files
 
 
-def parse_filename(filename):
+def parse_filename(filename: str) -> dict[str, str]:
     name, datatype, timestamp = os.path.splitext(filename)[0].split('__')
     return {
         'name': name,
@@ -122,8 +140,12 @@ def parse_filename(filename):
 
 
 def load_raw_vote_data(
-    name, datatype, request=None, timestamp=None, verbose=True
-):
+    name: str,
+    datatype: str,
+    request: bool | None = None,
+    timestamp: str | None = None,
+    verbose: bool = True,
+) -> dict:
     """load vote data from disk, requesting it online if necessary"""
 
     path = None
@@ -134,7 +156,9 @@ def load_raw_vote_data(
     elif timestamp is not None:
         # load specified file
         path = get_vote_data_path(
-            name=name, datatype=datatype, timestamp=timestamp,
+            name=name,
+            datatype=datatype,
+            timestamp=timestamp,
         )
 
     elif request is None and timestamp is None:
@@ -160,7 +184,18 @@ def load_raw_vote_data(
 #
 
 
-def get_vote_data(name, load_kwargs=None):
+class Vote(TypedDict):
+    address: spec.Address
+    timestamp: str
+    choice: str
+    scores: typing.Sequence[int]
+    scores_total: spec.Number
+
+
+def get_vote_data(
+    name: str,
+    load_kwargs: dict | None = None,
+) -> typing.Mapping[spec.Address, Vote]:
 
     # get raw data
     if load_kwargs is None:
@@ -197,8 +232,12 @@ def get_vote_data(name, load_kwargs=None):
 
 
 def create_vote_dataframe(
-    votes, tags_of_addresses=None, addresses_of_tags=None
-):
+    votes: typing.Mapping[spec.Address, Vote],
+    tags_of_addresses: typing.Mapping[str, typing.Mapping[str, str]]
+    | None = None,
+    addresses_of_tags: typing.Mapping[str, typing.Mapping[str, str]]
+    | None = None,
+) -> spec.DataFrame:
     """
 
     ## Inputs

@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc import binary
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 from . import ens_directory
 from . import registrar
 
 
-def hash_name(name):
+def hash_name(name: str) -> spec.PrefixHexData:
     import idna  # type: ignore
 
     labels = name.split('.')
@@ -20,7 +24,11 @@ def hash_name(name):
     return '0x' + output
 
 
-async def async_resolve_name(name, provider=None, block=None):
+async def async_resolve_name(
+    name: str,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> spec.Address:
     name_hash = hash_name(name)
 
     result = await rpc.async_eth_call(
@@ -54,7 +62,11 @@ async def async_resolve_name(name, provider=None, block=None):
     return result
 
 
-async def async_reverse_lookup(address, provider=None, block=None):
+async def async_reverse_lookup(
+    address: spec.Address,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> str:
     function_abi = {
         'name': 'getNames',
         'inputs': [{'type': 'address[]'}],
@@ -70,13 +82,19 @@ async def async_reverse_lookup(address, provider=None, block=None):
     return names[0]
 
 
-def name_history():
-    pass
+async def async_name_history() -> None:
+    raise NotImplementedError()
 
 
-async def async_get_text_record(key, name=None, node=None):
+async def async_get_text_record(
+    key: str,
+    name: str | None = None,
+    node: str | None = None,
+) -> str:
 
     if node is None:
+        if name is None:
+            raise Exception('must specify name or node')
         node = hash_name(name)
 
     function_abi = {
@@ -95,12 +113,18 @@ async def async_get_text_record(key, name=None, node=None):
     )
 
 
-async def async_get_text_records(name=None, node=None, keys=None):
+async def async_get_text_records(
+    name: str | None = None,
+    node: str | None = None,
+    keys: typing.Sequence[str] | None = None,
+) -> dict[str, str]:
     """
     https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records
     """
 
     if node is None:
+        if name is None:
+            raise Exception('must specify name or node')
         node = hash_name(name)
 
     if keys is None:
@@ -112,7 +136,10 @@ async def async_get_text_records(name=None, node=None, keys=None):
     return dict(zip(keys, values))
 
 
-async def async_get_text_changes(name=None, node=None):
+async def async_get_text_changes(
+    name: str | None = None,
+    node: str | None = None,
+) -> spec.DataFrame:
 
     event_abi = {
         'name': 'TextChanged',
@@ -147,15 +174,22 @@ async def async_get_text_changes(name=None, node=None):
     )
 
     if node is None:
+        if name is None:
+            raise Exception('must specify name or node')
         node = hash_name(name)
 
     mask = events['arg__node'] == node
     return events[mask]
 
 
-async def async_get_content_hash(name=None, node=None):
+async def async_get_content_hash(
+    name: str | None = None,
+    node: str | None = None,
+) -> str:
 
     if node is None:
+        if name is None:
+            raise Exception('must specify name or node')
         node = hash_name(name)
 
     function_abi = {
@@ -173,7 +207,7 @@ async def async_get_content_hash(name=None, node=None):
     )
 
 
-async def async_get_expiration(name):
+async def async_get_expiration(name: str) -> int:
 
     if not name.endswith('.eth'):
         raise NotImplementedError('only implemented for .eth domains')

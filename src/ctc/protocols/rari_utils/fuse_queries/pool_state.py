@@ -1,6 +1,10 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc.protocols import chainlink_utils
+from ctc import spec
 
 from . import pool_metadata
 from . import token_state
@@ -8,12 +12,12 @@ from . import token_state
 
 async def async_get_pool_prices(
     *,
-    oracle=None,
-    ctokens=None,
-    comptroller=None,
-    block='latest',
-    to_usd=True,
-):
+    oracle: spec.Address | None = None,
+    ctokens: typing.Sequence[spec.Address] | None = None,
+    comptroller: spec.Address | None = None,
+    block: spec.BlockNumberReference = 'latest',
+    to_usd: bool = True,
+) -> dict[spec.Address, spec.Number]:
     if oracle is None:
         if comptroller is None:
             raise Exception('specify comptroller')
@@ -43,8 +47,12 @@ async def async_get_pool_prices(
 
 
 async def async_get_pool_tvl_and_tvb(
-    *, comptroller=None, ctokens=None, oracle=None, block='latest'
-):
+    *,
+    comptroller: spec.Address | None = None,
+    ctokens: typing.Sequence[spec.Address] | None = None,
+    oracle: spec.Address | None = None,
+    block: spec.BlockNumberReference = 'latest',
+) -> dict[str, spec.Number]:
     if ctokens is None:
         if comptroller is None:
             raise Exception(
@@ -62,7 +70,7 @@ async def async_get_pool_tvl_and_tvb(
 
     eth_price = await chainlink_utils.async_get_eth_price(block=block)
 
-    ctokens_stats = [
+    ctokens_stats_coroutine = [
         asyncio.create_task(
             token_state.async_get_ctoken_tvl_and_tvb(
                 ctoken, oracle, eth_price, block=block
@@ -70,7 +78,7 @@ async def async_get_pool_tvl_and_tvb(
         )
         for ctoken in ctokens
     ]
-    ctokens_stats = await asyncio.gather(*ctokens_stats)
+    ctokens_stats = await asyncio.gather(*ctokens_stats_coroutine)
 
     tvl = 0
     tvb = 0

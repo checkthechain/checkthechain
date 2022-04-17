@@ -4,17 +4,21 @@ import functools
 
 import pandas as pd
 
+from ctc.rpc.rpc_executors_async import rpc_trace_executors_async
 from ctc import binary
 from ctc import evm
-from ctc.rpc.rpc_executors_async import rpc_trace_executors_async
+from ctc import spec
 
 
-async def get_transaction_traces_df(transaction_hash, provider=None):
+async def async_get_transaction_traces_df(
+    transaction_hash: spec.PrefixHexData,
+    provider: spec.ProviderSpec = None,
+) -> spec.DataFrame:
     traces = await rpc_trace_executors_async.async_trace_transaction(
         transaction_hash=transaction_hash,
     )
 
-    data = {}
+    data: dict = {}
 
     for trace in traces:
         for key, value in trace.items():
@@ -54,7 +58,7 @@ async def get_transaction_traces_df(transaction_hash, provider=None):
     return df
 
 
-async def _add_trace_call_data(df):
+async def _add_trace_call_data(df: spec.DataFrame) -> None:
 
     contract_abis = {}
     for contract_address in set(df['action__to']):
@@ -62,7 +66,7 @@ async def _add_trace_call_data(df):
             contract_address=contract_address,
         )
 
-    action_call_data = {
+    action_call_data: dict = {
         'action__name': [],
         'action__parameters': [],
         'result__outputs': [],

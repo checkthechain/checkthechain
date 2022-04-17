@@ -33,7 +33,10 @@ async def async_get_fei_yield_data(
     return {yield_data['name']: yield_data for yield_data in yield_datas}
 
 
-async def compute_g_uni_yield_data(block_numbers, g_uni_pool):
+async def compute_g_uni_yield_data(
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+    g_uni_pool: spec.Address,
+) -> yields_spec.YieldSourceData:
 
     # compute metadata
     tokens = await g_uni_utils.async_get_tokens(g_uni_pool)
@@ -45,8 +48,8 @@ async def compute_g_uni_yield_data(block_numbers, g_uni_pool):
     current_yield_task = asyncio.create_task(coroutine)
 
     # compute yield history
-    coroutine = async_get_fei_yield_history(block_numbers, g_uni_pool)
-    yield_history_task = asyncio.create_task(coroutine)
+    history_coroutine = async_get_fei_yield_history(block_numbers, g_uni_pool)
+    yield_history_task = asyncio.create_task(history_coroutine)
 
     # compute tvl
     tvl_history = await async_get_fei_tvl_history(block_numbers, g_uni_pool)
@@ -60,7 +63,7 @@ async def compute_g_uni_yield_data(block_numbers, g_uni_pool):
         'category': 'DEX',
         'platform': 'Uniswap V3',
         'url': 'https://app.rari.capital/fuse/pool/8',
-        'staked_tokens': tokens,
+        'staked_tokens': list(tokens),
         'reward_tokens': [yields_spec.TRIBE],
         'tvl_history': tvl_history,
         'tvl_history_units': 'USD',
@@ -71,7 +74,10 @@ async def compute_g_uni_yield_data(block_numbers, g_uni_pool):
     }
 
 
-async def async_get_fei_tvl_history(block_numbers, g_uni_pool) -> list[float]:
+async def async_get_fei_tvl_history(
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+    g_uni_pool: spec.Address,
+) -> list[float]:
     balances = await g_uni_utils.async_get_token_balances_by_block(
         g_uni_pool=g_uni_pool,
         blocks=block_numbers,
@@ -84,7 +90,8 @@ async def async_get_fei_tvl_history(block_numbers, g_uni_pool) -> list[float]:
 
 
 async def async_get_fei_current_yield(
-    block_numbers, g_uni_pool
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+    g_uni_pool: spec.Address,
 ) -> dict[str, float]:
     return {
         'Spot': 0.01,
@@ -92,7 +99,8 @@ async def async_get_fei_current_yield(
 
 
 async def async_get_fei_yield_history(
-    block_numbers, g_uni_pool
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+    g_uni_pool: spec.Address,
 ) -> dict[str, list[float]]:
     return {'Staking': [0.01 for block in block_numbers]}
 

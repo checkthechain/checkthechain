@@ -44,7 +44,9 @@ async def async_get_fei_yield_data(
     return {aave_v2['name']: aave_v2}
 
 
-async def async_get_compound_fei_tvl_history(block_numbers) -> list[float]:
+async def async_get_compound_fei_tvl_history(
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
+) -> list[float]:
 
     import numpy as np
 
@@ -67,7 +69,7 @@ async def async_get_compound_fei_tvl_history(block_numbers) -> list[float]:
 
 
 async def async_get_compound_fei_yield_history(
-    block_numbers,
+    block_numbers: typing.Sequence[spec.BlockNumberReference],
 ) -> dict[str, list[float]]:
     supply_apy = await compound_utils.async_get_supply_apy_by_block(
         cFEI,

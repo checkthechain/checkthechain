@@ -46,7 +46,7 @@ async def async_get_uniswap_v2_data(
     data_source: twap_spec.DataSource,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-):
+) -> spec.Series:
 
     from ctc.protocols import uniswap_v2_utils
 

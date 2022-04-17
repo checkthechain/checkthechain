@@ -1,17 +1,26 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc import rpc
 from ctc import evm
+from ctc import spec
 
 
-async def async_get_tokens(g_uni_pool):
+async def async_get_tokens(
+    g_uni_pool: spec.Address,
+) -> tuple[spec.Address, spec.Address]:
     return await asyncio.gather(
         rpc.async_eth_call(to_address=g_uni_pool, function_name='token0'),
         rpc.async_eth_call(to_address=g_uni_pool, function_name='token1'),
     )
 
 
-async def async_get_token_balances(g_uni_pool, normalize=True):
+async def async_get_token_balances(
+    g_uni_pool: spec.Address,
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     balances_coroutine = rpc.async_eth_call(
         to_address=g_uni_pool,
         function_name='getUnderlyingBalances',
@@ -32,7 +41,11 @@ async def async_get_token_balances(g_uni_pool, normalize=True):
         return await balances_task
 
 
-async def async_get_token_balances_by_block(g_uni_pool, blocks, normalize=True):
+async def async_get_token_balances_by_block(
+    g_uni_pool: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    normalize: bool = True,
+) -> typing.Sequence[typing.Sequence[int | float]]:
     balances_coroutine = rpc.async_batch_eth_call(
         to_address=g_uni_pool,
         function_name='getUnderlyingBalances',

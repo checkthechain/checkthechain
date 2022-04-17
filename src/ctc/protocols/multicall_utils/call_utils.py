@@ -20,10 +20,10 @@ def get_call_contract(call: multicall_spec.Call) -> spec.Address:
 async def async_encode_call(
     call: multicall_spec.Call,
     network: typing.Optional[spec.NetworkReference] = None,
-):
+) -> tuple[spec.Address, spec.BinaryData]:
     contract = get_call_contract(call)
     call_data = await async_encode_call_data(call=call, network=network)
-    return [contract, call_data]
+    return (contract, call_data)
 
 
 async def async_encode_call_data(
@@ -88,7 +88,7 @@ async def async_decode_call_output(
 async def async_get_call_function_abi(
     call: multicall_spec.Call,
     network: typing.Optional[spec.NetworkReference] = None,
-):
+) -> spec.FunctionABI:
 
     function: spec.FunctionABI | str | None = None
     call_data: spec.BinaryData | None = None
@@ -101,7 +101,7 @@ async def async_get_call_function_abi(
             raise Exception('unknown call format')
     elif isinstance(call, (list, tuple)):
         if isinstance(call[1], dict):
-            return call[1]
+            return typing.cast(spec.FunctionABI, call[1])
         elif isinstance(call[1], str) and not call[1].startswith('0x'):
             function = call[1]
         else:

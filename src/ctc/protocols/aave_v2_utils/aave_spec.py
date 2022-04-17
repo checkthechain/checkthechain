@@ -1,5 +1,12 @@
+from __future__ import annotations
 
-def get_aave_address(name, network=None):
+from ctc import spec
+
+
+def get_aave_address(
+    name: str,
+    network: spec.NetworkReference | None = None,
+) -> spec.Address:
     # TODO: move to directory
     if network == 'mainnet':
         if name == 'PriceOracle':

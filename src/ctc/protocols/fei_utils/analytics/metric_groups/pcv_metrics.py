@@ -14,7 +14,7 @@ async def async_compute_pcv_stats(
 ) -> dict[str, analytics_spec.MetricGroup]:
 
     pcv_stats_task = asyncio.create_task(
-        fei_utils.async_get_pcv_stats(blocks=blocks)
+        fei_utils.async_get_pcv_stats_by_block(blocks=blocks)
     )
     total_supply_task = asyncio.create_task(
         evm.async_get_erc20_total_supply_by_block(token='FEI', blocks=blocks)

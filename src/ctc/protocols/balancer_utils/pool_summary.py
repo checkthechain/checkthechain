@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import decimal
 import typing
+from typing_extensions import TypedDict
 
 import numpy as np
 import pandas as pd
@@ -14,7 +15,24 @@ from . import pool_metadata
 from . import pool_state
 
 
-async def async_summarize_pool_state(balancer_pool, block='latest'):
+class BalancerPoolState(TypedDict):
+    block: int
+    pool_tokens: typing.Sequence[spec.Address]
+    pool_fees: typing.Union[int, float]
+    pool_weights: typing.Union[
+        dict[spec.ContractAddress, int],
+        dict[spec.ContractAddress, float],
+    ]
+    pool_balances: typing.Union[
+        dict[spec.Address, int],
+        dict[spec.Address, float],
+    ]
+
+
+async def async_summarize_pool_state(
+    balancer_pool: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> BalancerPoolState:
 
     block = await evm.async_block_number_to_int(block)
 
@@ -72,7 +90,11 @@ async def async_get_pool_swaps(
     return swaps
 
 
-def summarize_pool_swaps(swaps, weights, as_dataframe=True):
+def summarize_pool_swaps(
+    swaps: spec.DataFrame,
+    weights: spec.DataFrame,
+    as_dataframe: bool = True,
+) -> typing.Mapping[tuple[str, str], spec.DataFrame]:
 
     trade_pairs = set()
     for i, row in swaps[['arg__tokenIn', 'arg__tokenOut']].iterrows():
@@ -118,9 +140,9 @@ def summarize_pool_swaps(swaps, weights, as_dataframe=True):
             data['weight_' + str(c)] = pair_weights[weight_column].values
 
         if as_dataframe:
-            data = pd.DataFrame(data)
+            df = pd.DataFrame(data)
 
-        pair_data[(token_in, token_out)] = data
+        pair_data[(token_in, token_out)] = df
 
     return pair_data
 

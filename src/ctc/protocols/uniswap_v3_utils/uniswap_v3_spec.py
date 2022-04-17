@@ -36,7 +36,7 @@ _abi_cache: dict[
 }
 
 
-async def _async_load_abi_cache(contract) -> None:
+async def _async_load_abi_cache(contract: str) -> None:
 
     # ensure cache in empty
     if _abi_cache[contract] is not None:
@@ -63,7 +63,8 @@ async def _async_load_abi_cache(contract) -> None:
 
 
 async def async_get_function_abi(
-    function_name: str, contract: str
+    function_name: str,
+    contract: str,
 ) -> spec.FunctionABI:
     await _async_load_abi_cache(contract)
     abi_entry = _abi_cache[contract]

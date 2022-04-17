@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import math
+import typing
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc import directory
 
 from . import irm_metadata
@@ -11,7 +15,10 @@ from . import token_metadata
 from . import token_state
 
 
-async def async_get_pool_summary(comptroller, block='latest'):
+async def async_get_pool_summary(
+    comptroller: spec.Address,
+    block: spec.BlockNumberReference = 'latest',
+) -> dict[str, typing.Any]:
 
     # get block number
     if block == 'latest':
@@ -47,11 +54,9 @@ async def async_get_pool_summary(comptroller, block='latest'):
 
         # get blocks per year
         if blocks_per_year is None:
-            interest_rate_model = (
-                await token_metadata.async_get_ctoken_irm(
-                    ctoken=ctoken,
-                    block=block,
-                )
+            interest_rate_model = await token_metadata.async_get_ctoken_irm(
+                ctoken=ctoken,
+                block=block,
             )
             blocks_per_year = await irm_metadata.async_get_irm_blocks_per_year(
                 interest_rate_model=interest_rate_model,
@@ -59,14 +64,14 @@ async def async_get_pool_summary(comptroller, block='latest'):
             )
 
         # get ctoken stats
-        borrowed = await token_state.async_get_total_borrowed(
+        borrowed_int = await token_state.async_get_total_borrowed(
             ctoken=ctoken, block=block
         )
-        borrowed /= 1e18
-        liquidity = await token_state.async_get_total_liquidity(
+        borrowed = borrowed_int / 1e18
+        liquidity_int = await token_state.async_get_total_liquidity(
             ctoken=ctoken, block=block
         )
-        liquidity /= 1e18
+        liquidity = liquidity_int / 1e18
         supply_apy = await token_state.async_get_supply_apy(
             ctoken=ctoken,
             block=block,
@@ -81,7 +86,7 @@ async def async_get_pool_summary(comptroller, block='latest'):
         # compute derived stats
         supplied = borrowed + liquidity
         if math.isclose(supplied, 0):
-            utilization = 0
+            utilization: int | float = 0
         else:
             utilization = borrowed / supplied
 

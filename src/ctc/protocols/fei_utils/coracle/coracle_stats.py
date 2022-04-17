@@ -1,16 +1,59 @@
+from __future__ import annotations
+
 import asyncio
+import typing
+from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from . import coracle_spec
 
 
-async def async_get_pcv_stats(
-    block=None, blocks=None, wrapper=False, provider=None
-):
+class FeiPcvStats(TypedDict):
+    pcv: int
+    user_fei: int
+    protocol_equity: int
+    valid: bool
 
+
+async def async_get_pcv_stats(
+    block: spec.BlockNumberReference | None = None,
+    wrapper: bool = False,
+    provider: spec.ProviderSpec = None,
+) -> FeiPcvStats:
+
+    if block is None:
+        block = 'latest'
     if block is not None:
         block = await evm.async_block_number_to_int(block=block)
+
+    to_address = coracle_spec.get_coracle_address(
+        wrapper,
+        block=block,
+    )
+    result = await rpc.async_eth_call(
+        function_name='pcvStats',
+        block_number=block,
+        provider=provider,
+        to_address=to_address,
+    )
+    return {
+        'pcv': result[0],
+        'user_fei': result[1],
+        'protocol_equity': result[2],
+        'valid': result[3],
+    }
+
+
+async def async_get_pcv_stats_by_block(
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    wrapper: bool = False,
+    provider: spec.ProviderSpec = None,
+) -> spec.DataFrame:
+
+    import numpy as np
+
     if blocks is not None:
         blocks = await evm.async_block_numbers_to_int(blocks=blocks)
 
@@ -19,53 +62,39 @@ async def async_get_pcv_stats(
     if provider['chunk_size'] is None:
         provider['chunk_size'] = 1
 
-    # fetch results
-    keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
-    if block is not None or (block is None and blocks is None):
+    coroutines = []
+    for block in blocks:
         to_address = coracle_spec.get_coracle_address(
-            wrapper, block=block,
+            wrapper,
+            block=block,
         )
-        result = await rpc.async_eth_call(
+        coroutine = rpc.async_eth_call(
             function_name='pcvStats',
             block_number=block,
             provider=provider,
             to_address=to_address,
         )
-        return dict(zip(keys, result))
+        coroutines.append(coroutine)
+    result = await asyncio.gather(*coroutines)
 
-    elif blocks is not None:
-        coroutines = []
-        for block in blocks:
-            to_address = coracle_spec.get_coracle_address(
-                wrapper, block=block,
-            )
-            coroutine = rpc.async_eth_call(
-                function_name='pcvStats',
-                block_number=block,
-                provider=provider,
-                to_address=to_address,
-            )
-            coroutines.append(coroutine)
-        result = await asyncio.gather(*coroutines)
+    # arrange results
+    transpose = list(zip(*result))
+    data = {}
+    keys = ['pcv', 'user_fei', 'protocol_equity', 'valid']
+    for k, key in enumerate(keys):
+        data[key] = transpose[k]
 
-        # arrange results
-        transpose = list(zip(*result))
-        data = {}
-        for k, key in enumerate(keys):
-            data[key] = transpose[k]
-            import numpy as np
+    as_array = {
+        'pcv': np.array(data['pcv']) / 1e18,
+        'user_fei': np.array(data['user_fei']) / 1e18,
+        'protocol_equity': np.array(data['protocol_equity']) / 1e18,
+        'valid': data['valid'],
+    }
 
-            data[key] = np.array(data[key])
-            if key in ['pcv', 'user_fei', 'protocol_equity']:
-                data[key] = data[key] / 1e18
+    # create dataframe
+    import pandas as pd
 
-        # create dataframe
-        import pandas as pd
+    df = pd.DataFrame(as_array, index=blocks)
 
-        df = pd.DataFrame(data, index=blocks)
-
-        return df
-
-    else:
-        raise Exception('must specify block or blocks')
+    return df
 

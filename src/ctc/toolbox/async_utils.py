@@ -4,10 +4,10 @@ import asyncio
 import concurrent.futures
 import functools
 import typing
-import types
 
-from typing_extensions import ParamSpec
 import pandas as pd
+
+from ctc import spec
 
 
 T = typing.TypeVar('T')
@@ -124,7 +124,11 @@ async def gather_dict(
 #    - if crossing process boundary, data transfers will become an issue
 
 
-async def async_read_csv(path, mode=None, **kwargs):
+async def async_read_csv(
+    path: str,
+    mode: str | None = None,
+    **kwargs: typing.Any,
+) -> spec.DataFrame:
 
     if mode is None:
         mode == 'processes'
@@ -143,7 +147,10 @@ async def async_read_csv(path, mode=None, **kwargs):
         raise Exception('unknown mode: ' + str(mode))
 
 
-async def async_read_csv_processes(path, pool=None):
+async def async_read_csv_processes(
+    path: str,
+    pool: concurrent.futures.ProcessPoolExecutor | None = None,
+) -> spec.DataFrame:
     loop = asyncio.get_running_loop()
 
     if pool is None:
@@ -159,7 +166,10 @@ async def async_read_csv_processes(path, pool=None):
         )
 
 
-async def async_read_csv_threads(path, pool=None):
+async def async_read_csv_threads(
+    path: str,
+    pool: concurrent.futures.ThreadPoolExecutor | None = None,
+) -> spec.DataFrame:
     loop = asyncio.get_running_loop()
 
     if pool is None:
@@ -175,7 +185,7 @@ async def async_read_csv_threads(path, pool=None):
         )
 
 
-async def async_read_csv_dask(path):
+async def async_read_csv_dask(path: str) -> spec.DataFrame:
     import dask.dataframe as dd  # type: ignore
     import dask.distributed  # type: ignore
 
@@ -184,7 +194,7 @@ async def async_read_csv_dask(path):
     return await client.compute(g)
 
 
-async def async_read_csv_aiofiles(path):
+async def async_read_csv_aiofiles(path: str) -> spec.DataFrame:
     import io
     import aiofiles
 
@@ -195,7 +205,7 @@ async def async_read_csv_aiofiles(path):
         return pd.read_csv(string_io)
 
 
-async def async_read_csv_anyio(path):
+async def async_read_csv_anyio(path: str) -> spec.DataFrame:
     import anyio.to_process
 
     return await anyio.to_process.run_sync(pd.read_csv, path)

@@ -1,22 +1,25 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import evm
+from ctc import spec
 
 from . import pool_summary
 
 
 async def plot_lbp_summary(
-    swaps,
-    weights,
-    pool_name,
-    pool_tokens,
-    pool_address,
-    price_range=None,
-    premium_range=None,
-    oracle_data=None,
-):
+    swaps: spec.DataFrame,
+    weights: spec.DataFrame,
+    pool_name: str,
+    pool_tokens: typing.Sequence[spec.Address],
+    pool_address: spec.Address,
+    price_range: typing.Sequence[int | float] | None = None,
+    premium_range: typing.Sequence[int | float] | None = None,
+    oracle_data: spec.DataFrame = None,
+) -> None:
 
-    summary = pool_summary.summarize_pool_swaps(
-        swaps=swaps, weights=weights
-    )
+    summary = pool_summary.summarize_pool_swaps(swaps=swaps, weights=weights)
 
     for pair in summary.keys():
 
@@ -44,6 +47,8 @@ async def plot_lbp_summary(
                 oracle_data.index <= max_block
             )
             oracle_data = oracle_data[oracle_mask]
+            if oracle_data is None:
+                raise Exception('invalid oracle_data')
             ys = [
                 {
                     'y': oracle_data.values,
@@ -52,9 +57,11 @@ async def plot_lbp_summary(
                 },
             ]
 
+            if oracle_data is None:
+                raise Exception('invalid oracle_data')
             premium = []
             for index, row in summary[pair].iterrows():
-                block_number = index[0]
+                block_number = index[0]  # type: ignore
                 oracle_price = oracle_data[block_number]
                 actual_price = row['price_out_per_in']
                 premium.append(float(actual_price) / oracle_price - 1)
@@ -112,5 +119,6 @@ async def plot_lbp_summary(
         }
 
         import toolplot  # type: ignore
+
         toolplot.plot_subplots(plot_data)
 

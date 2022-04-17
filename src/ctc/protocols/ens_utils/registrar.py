@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 from ctc import binary
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 from . import ens_directory
 from . import resolver
 
 
-async def async_get_owner(name, provider=None, block=None):
+async def async_get_owner(
+    name: str,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> str:
     node = resolver.hash_name(name)
     function_abi = {
         'name': 'owner',
@@ -22,7 +29,11 @@ async def async_get_owner(name, provider=None, block=None):
     )
 
 
-async def async_record_exists(name, provider=None, block=None):
+async def async_record_exists(
+    name: str,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> bool:
     node = resolver.hash_name(name)
     function_abi = {
         'name': 'recordExists',
@@ -38,7 +49,11 @@ async def async_record_exists(name, provider=None, block=None):
     )
 
 
-async def async_get_resolver(name, provider=None, block=None):
+async def async_get_resolver(
+    name: str,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> spec.Address:
     node = resolver.hash_name(name)
     function_abi = {
         'name': 'resolver',
@@ -54,7 +69,7 @@ async def async_get_resolver(name, provider=None, block=None):
     )
 
 
-async def async_get_registration_block(name):
+async def async_get_registration_block(name: str) -> int:
 
     if not name.endswith('.eth'):
         raise NotImplementedError()
@@ -76,7 +91,7 @@ async def async_get_registration_block(name):
     return block
 
 
-async def async_get_registrations():
+async def async_get_registrations() -> spec.DataFrame:
     event_abi = {
         'name': 'NewOwner',
         'inputs': [

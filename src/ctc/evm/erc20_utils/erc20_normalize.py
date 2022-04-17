@@ -36,7 +36,7 @@ async def async_normalize_erc20_quantity(
 
 
 async def async_normalize_erc20_quantities(
-    quantities: typing.Sequence[typing.SupportsInt],
+    quantities: typing.Sequence[typing.SupportsInt] | spec.Series,
     token: spec.ERC20Address = None,
     provider: spec.ProviderSpec = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
@@ -61,7 +61,7 @@ async def async_normalize_erc20_quantities(
 
 
 async def async_normalize_erc20s_quantities(
-    quantities: typing.Sequence[typing.SupportsInt],
+    quantities: typing.Sequence[typing.SupportsInt] | spec.Series,
     tokens: typing.Optional[typing.Sequence[spec.ERC20Address]] = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
@@ -116,7 +116,7 @@ async def async_normalize_erc20s_quantities(
 
 
 async def async_normalize_erc20_quantities_by_block(
-    quantities: typing.Sequence[typing.SupportsInt],
+    quantities: typing.Sequence[typing.SupportsInt] | spec.Series,
     blocks: typing.Iterable[spec.BlockNumberReference],
     token: typing.Optional[spec.ERC20Address] = None,
     decimals: typing.Optional[list[typing.SupportsInt]] = None,

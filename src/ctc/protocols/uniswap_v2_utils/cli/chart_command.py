@@ -6,16 +6,18 @@ import os
 import math
 
 import rich.console
+import toolcli
 import toolstr
 import tooltime
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.toolbox.defi_utils import ohlc_utils
 from ctc.protocols import uniswap_v2_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_chart_command,
         'help': 'chart price action of uniswap pools',
@@ -42,7 +44,12 @@ def get_command_spec():
     }
 
 
-async def async_chart_command(pool, invert, timescale, no_volume):
+async def async_chart_command(
+    pool: spec.Address,
+    invert: bool,
+    timescale: str,
+    no_volume: bool,
+) -> None:
     import numpy as np
 
     metadata_task = asyncio.create_task(
@@ -57,7 +64,7 @@ async def async_chart_command(pool, invert, timescale, no_volume):
     candle_seconds = tooltime.timelength_to_seconds(candle_timescale)
     window_seconds = candle_seconds * n_candles
 
-    window_end = tooltime.create_timestamp()
+    window_end = tooltime.create_timestamp_seconds()
     window_start = (
         math.floor((window_end - window_seconds) / candle_seconds)
         * candle_seconds
@@ -165,7 +172,9 @@ async def async_chart_command(pool, invert, timescale, no_volume):
     # print output
     token0 = metadata['x_symbol']
     token1 = metadata['y_symbol']
-    toolstr.print_text_box(metadata['x_symbol'] + '-' + metadata['y_symbol'] + ' Uniswap V2 Pool')
+    toolstr.print_text_box(
+        metadata['x_symbol'] + '-' + metadata['y_symbol'] + ' Uniswap V2 Pool'
+    )
     print('- pool address =', pool)
     print('- each candle =', candle_timescale)
     print('- n_candles =', n_candles)
@@ -179,8 +188,12 @@ async def async_chart_command(pool, invert, timescale, no_volume):
     console.print(graph)
 
     if not no_volume:
-        volume_bars_str = toolstr.render_supergrid(volume_raster, sample_mode='quadrants')
-        volume_graph = toolstr.concatenate_blocks([volume_y_axis, volume_bars_str])
+        volume_bars_str = toolstr.render_supergrid(
+            volume_raster, sample_mode='quadrants'
+        )
+        volume_graph = toolstr.concatenate_blocks(
+            [volume_y_axis, volume_bars_str]
+        )
         print(volume_graph)
 
     # print x axis

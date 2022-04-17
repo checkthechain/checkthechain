@@ -1,18 +1,21 @@
+from __future__ import annotations
+
 import os
 
+import toolcli
 import toolstr
 
 from ctc.protocols import fourbyte_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': fourbyte_path_command,
         'help': 'show paths of local 4byte database',
     }
 
 
-def fourbyte_path_command():
+def fourbyte_path_command() -> None:
     function_path = fourbyte_utils.get_default_path('function_signatures')
     event_path = fourbyte_utils.get_default_path('event_signatures')
 

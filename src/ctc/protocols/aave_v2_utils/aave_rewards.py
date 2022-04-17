@@ -1,15 +1,23 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 import numpy as np
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 from . import aave_oracle
 from . import aave_spec
 
 
-async def async_get_unclaimed_rewards(wallet, block=None, provider=None):
+async def async_get_unclaimed_rewards(
+    wallet: spec.Address,
+    block: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+) -> int:
     aave_incentives_controller = aave_spec.get_aave_address(
         'IncentivesController',
         network=rpc.get_provider_network(provider),
@@ -24,7 +32,11 @@ async def async_get_unclaimed_rewards(wallet, block=None, provider=None):
     )
 
 
-async def async_get_unclaimed_rewards_by_block(wallet, blocks, provider=None):
+async def async_get_unclaimed_rewards_by_block(
+    wallet: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    provider: spec.ProviderSpec = None,
+) -> typing.Sequence[int]:
     coroutines = [
         async_get_unclaimed_rewards(
             wallet=wallet,
@@ -36,7 +48,12 @@ async def async_get_unclaimed_rewards_by_block(wallet, blocks, provider=None):
     return await asyncio.gather(*coroutines)
 
 
-async def async_compute_wallet_rewards(wallet, blocks, provider=None, replace_symbol=True):
+async def async_compute_wallet_rewards(
+    wallet: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    provider: spec.ProviderSpec = None,
+    replace_symbol: bool = True,
+) -> typing.Mapping[str, spec.NumpyArray]:
 
     # add reward token
     reward_token = '0x4da27a545c0c5b758a6ba100e3a049001de870f5'
@@ -59,31 +76,28 @@ async def async_compute_wallet_rewards(wallet, blocks, provider=None, replace_sy
         provider=provider,
     )
 
-    (
-        reward_unclaimed,
-        reward_in_wallet,
-        reward_price,
-    ) = await asyncio.gather(
+    (reward_unclaimed, reward_in_wallet, reward_price,) = await asyncio.gather(
         reward_unclaimed_coroutine,
         reward_in_wallet_coroutine,
         reward_price_coroutine,
     )
 
-    reward_unclaimed = np.array(reward_unclaimed) / 1e18
-    reward_balance = reward_unclaimed + reward_in_wallet
+    reward_unclaimed_array = np.array(reward_unclaimed) / 1e18
+    reward_in_wallet_array = np.array(reward_in_wallet)
+    reward_balance = reward_unclaimed_array + reward_in_wallet_array
     reward_balance_usd = reward_balance * reward_price
 
     if replace_symbol:
         return {
-            'stkAAVE_unclaimed': reward_unclaimed,
-            'stkAAVE_in_wallet': reward_in_wallet,
+            'stkAAVE_unclaimed': reward_unclaimed_array,
+            'stkAAVE_in_wallet': reward_in_wallet_array,
             'stkAAVE_balance': reward_balance,
             'stkAAVE_balance_usd': reward_balance_usd,
         }
     else:
         return {
-            'reward_unclaimed': reward_unclaimed,
-            'reward_in_wallet': reward_in_wallet,
+            'reward_unclaimed': reward_unclaimed_array,
+            'reward_in_wallet': reward_in_wallet_array,
             'reward_balance': reward_balance,
             'reward_balance_usd': reward_balance_usd,
         }

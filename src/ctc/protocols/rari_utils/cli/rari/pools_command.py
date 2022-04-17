@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import toolcli
 import tooltable  # type: ignore
 import tooltime
 
@@ -5,7 +8,7 @@ from ctc import rpc
 from ctc.protocols import rari_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': pools_command,
         'help': 'list all Rari fuse pools',
@@ -19,7 +22,7 @@ def get_command_spec():
     }
 
 
-async def pools_command(verbose):
+async def pools_command(verbose: bool) -> None:
     all_pools = await rari_utils.async_get_all_pools()
     rows = []
     for p, pool in enumerate(all_pools):
