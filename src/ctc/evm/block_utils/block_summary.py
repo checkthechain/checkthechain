@@ -1,11 +1,20 @@
+from __future__ import annotations
+
+import typing
+
 import tooltime
 import toolstr
 
 from ctc import binary
+from ctc import spec
+
 from . import block_crud
 
 
-async def async_print_block_summary(block, provider=None):
+async def async_print_block_summary(
+    block: spec.Block | spec.BlockNumberReference,
+    provider: spec.ProviderSpec = None,
+) -> None:
 
     if not isinstance(block, dict):
         block = await block_crud.async_get_block(block=block, provider=provider)
@@ -23,7 +32,7 @@ async def async_print_block_summary(block, provider=None):
 
     if full_transactions:
         gas_prices = [
-            transaction['gas_price'] / 1e9
+            typing.cast(spec.Transaction, transaction)['gas_price'] / 1e9
             for transaction in block['transactions']
         ]
         import numpy as np
@@ -52,14 +61,14 @@ async def async_print_block_summary(block, provider=None):
             + ', '.join([str(percentile) + '%' for percentile in percentiles])
             + ')'
         )
-        gas_percentiles = (
+        gas_percentiles_str = (
             '('
             + ', '.join(
                 [toolstr.format(percentile) for percentile in gas_percentiles]
             )
             + ')'
         )
-        print('- gas prices:', percentile_label, '=', gas_percentiles)
+        print('- gas prices:', percentile_label, '=', gas_percentiles_str)
 
     message = block['extra_data']
     try:

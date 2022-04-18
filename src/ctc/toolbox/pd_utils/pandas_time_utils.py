@@ -30,7 +30,10 @@ def create_timestamp_column(
     return merged['timestamp']
 
 
-def create_datetime_column(df: spec.DataFrame, timestamps=None) -> spec.Series:
+def create_datetime_column(
+    df: spec.DataFrame,
+    timestamps: typing.Sequence[int] | None = None,
+) -> spec.Series:
     if 'timestamp' in df.columns:
         timestamp_column = df['timestamp']
     else:
@@ -40,7 +43,10 @@ def create_datetime_column(df: spec.DataFrame, timestamps=None) -> spec.Series:
     return pd.to_datetime(timestamp_column, unit='s')
 
 
-def create_date_column(df, timestamps=None):
+def create_date_column(
+    df: spec.DataFrame,
+    timestamps: typing.Sequence[int] | None = None,
+) -> spec.Series:
     if 'datetime' in df.columns:
         datetime = df['datetime']
     else:
@@ -50,7 +56,10 @@ def create_date_column(df, timestamps=None):
     return datetime.dt.date
 
 
-def create_week_column(df: spec.DataFrame, timestamps: typing.Sequence[int]):
+def create_week_column(
+    df: spec.DataFrame,
+    timestamps: typing.Sequence[int],
+) -> spec.Series:
     if 'datetime' in df.columns:
         datetime = df['datetime']
     else:
@@ -61,7 +70,7 @@ def create_week_column(df: spec.DataFrame, timestamps: typing.Sequence[int]):
 
 
 def add_missing_series_dates(
-        series: spec.Series, datetimes: spec.Series, fill_value: int = 0
+    series: spec.Series, datetimes: spec.Series, fill_value: int = 0
 ) -> spec.Series:
     series = series.copy()
     all_days = np.arange(

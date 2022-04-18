@@ -1,16 +1,23 @@
+from __future__ import annotations
+
 import math
+import typing
 
 
-def chunk_blocks_by_size(blocks, n_per_chunk):
+def chunk_blocks_by_size(
+    blocks: typing.Sequence[int], n_per_chunk: int
+) -> list[typing.Sequence[int]]:
     n_chunks = math.ceil(len(blocks) / n_per_chunk)
     return [
-        blocks[c * n_per_chunk: (c + 1) * n_per_chunk]
-        for c in range(n_chunks)
+        blocks[c * n_per_chunk : (c + 1) * n_per_chunk] for c in range(n_chunks)
     ]
 
 
-def chunk_blocks_into_ranges(blocks, chunk_size):
-    chunks_by_group = {}
+def chunk_blocks_into_ranges(
+    blocks: typing.Sequence[int],
+    chunk_size: int,
+) -> typing.MutableMapping[int, list[int]]:
+    chunks_by_group: typing.MutableMapping[int, list[int]] = {}
     for block in blocks:
         group = math.floor(block / chunk_size) * chunk_size
         chunks_by_group.setdefault(group, [])
@@ -18,7 +25,12 @@ def chunk_blocks_into_ranges(blocks, chunk_size):
     return chunks_by_group
 
 
-def get_chunks_in_range(start_block, end_block, chunk_size, trim_excess=False):
+def get_chunks_in_range(
+    start_block: int,
+    end_block: int,
+    chunk_size: int,
+    trim_excess: bool = False,
+) -> list[list[int]]:
     """break a range of blocks into chunks of a given chunk size"""
     chunk_start_block = (start_block // chunk_size) * chunk_size
     chunk_end_block = ((end_block // chunk_size) + 1) * chunk_size

@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import binary
+from ctc import spec
 
 
-def is_address_str(some_str):
+def is_address_str(some_str: str) -> bool:
     return (
         isinstance(some_str, str)
         and some_str.startswith('0x')
@@ -10,14 +15,17 @@ def is_address_str(some_str):
 
 
 def get_created_address(
-    sender, nonce=None, salt=None, init_code=None, output_format=None
-):
+    sender: spec.Address,
+    nonce: str | None = None,
+    salt: str | None = None,
+    init_code: spec.HexData | None = None,
+) -> spec.Address:
     # see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md
     # see https://ethereum.stackexchange.com/a/761
     if nonce is not None:
         # create
-        sender = binary.convert(sender, 'binary')
-        data = binary.rlp_encode([sender, nonce])
+        sender_binary = binary.convert(sender, 'binary')
+        data = binary.rlp_encode([sender_binary, nonce])
     elif salt is not None and init_code is not None:
         # create2
         data = (
@@ -31,21 +39,19 @@ def get_created_address(
 
     result = binary.keccak(data, output_format='prefix_hex')
     result = '0x' + result[26:]
-    if output_format is not None and output_format != 'prefix_hex':
-        result = binary.keccak(data=result, output_format=output_format)
 
     return result
 
 
 def create_hash_preview(
-    hash_data,
-    show_start=True,
-    show_end=True,
-    include_0x=True,
-    n_chars=6,
-    n_chars_start=None,
-    n_chars_end=None,
-):
+    hash_data: str,
+    show_start: bool = True,
+    show_end: bool = True,
+    include_0x: bool = True,
+    n_chars: int = 6,
+    n_chars_start: int | None = None,
+    n_chars_end: int | None = None,
+) -> str:
 
     if not include_0x and hash_data[:2] == '0x':
         hash_data = hash_data[2:]
@@ -66,7 +72,7 @@ def create_hash_preview(
     return preview
 
 
-def get_address_checksum(address):
+def get_address_checksum(address: spec.Address) -> spec.Address:
     """
 
     - adapted from eth_utils.to_checksum_address()
@@ -103,8 +109,10 @@ def get_address_checksum(address):
 
 
 def create_reverse_address_map(
-    address_map, include_lower=True, include_checksum=True
-):
+    address_map: typing.Mapping[str, spec.Address],
+    include_lower: bool = True,
+    include_checksum: bool = True,
+) -> dict[spec.Address, str]:
     if not include_lower and not include_checksum:
         raise Exception(
             'must include lower case addresses and/or checksum addresses'

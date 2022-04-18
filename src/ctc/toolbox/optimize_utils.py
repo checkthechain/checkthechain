@@ -1,17 +1,23 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 
 async def async_bisect(
-    async_f,
-    a,
-    b,
-    input_tol=None,
-    output_tol=None,
-    max_iterations=None,
-    f_args=None,
-    f_kwargs=None,
-    verbose=False,
-):
+    async_f: typing.Callable[
+        ...,
+        typing.Coroutine[typing.Any, typing.Any, float],
+    ],
+    a: int | float,
+    b: int | float,
+    input_tol: float | None = None,
+    output_tol: float | None = None,
+    max_iterations: int | None = None,
+    f_args: typing.Sequence | None = None,
+    f_kwargs: typing.Mapping | None = None,
+    verbose: bool = False,
+) -> float:
 
     # ensure that bounds are valid
     if a > b:

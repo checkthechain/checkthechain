@@ -1,18 +1,20 @@
-import decimal
+from __future__ import annotations
 
-import numpy as np
+import decimal
+import math
 
 from ctc.toolbox import validate_utils
+from . import cpmm_spec
 
 
 def mint_liquidity(
-    x_reserves,
-    y_reserves,
-    lp_total_supply,
-    x_deposited=None,
-    y_deposited=None,
-    lp_minted=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    lp_total_supply: int | float,
+    x_deposited: int | float | None = None,
+    y_deposited: int | float | None = None,
+    lp_minted: int | float | None = None,
+) -> cpmm_spec.Mint:
 
     # validate inputs
     validate_utils._ensure_exactly_one(x_deposited, y_deposited, lp_minted)
@@ -26,7 +28,7 @@ def mint_liquidity(
         alpha = lp_minted / lp_total_supply
     else:
         raise Exception('could not compute alpha')
-    if not isinstance(alpha, decimal.Decimal) and np.isinf(alpha):
+    if not isinstance(alpha, decimal.Decimal) and math.isinf(alpha):
         raise Exception('initialize pool first')
     elif alpha < 0:
         raise Exception('use burn_liquidity() for negative values')
@@ -49,13 +51,13 @@ def mint_liquidity(
 
 
 def burn_liquidity(
-    x_reserves,
-    y_reserves,
-    lp_total_supply,
-    x_withdrawn=None,
-    y_withdrawn=None,
-    lp_burned=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    lp_total_supply: int | float,
+    x_withdrawn: int | float | None = None,
+    y_withdrawn: int | float | None = None,
+    lp_burned: int | float | None = None,
+) -> cpmm_spec.Burn:
 
     # validate inputs
     validate_utils._ensure_exactly_one(x_withdrawn, y_withdrawn, lp_burned)

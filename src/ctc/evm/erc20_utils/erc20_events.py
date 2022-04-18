@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 
 from ctc import spec
@@ -7,7 +9,7 @@ from . import erc20_metadata
 from . import erc20_abis
 
 
-def get_token_amount_column(df):
+def get_token_amount_column(df: spec.DataFrame) -> str:
     if 'arg__value' in df:
         return 'arg__value'
     elif 'arg__amount' in df:
@@ -24,7 +26,7 @@ async def async_get_erc20_transfers(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     convert_from_str: bool = True,
-    **event_kwargs
+    **event_kwargs: typing.Any
 ) -> spec.DataFrame:
 
     transfers = await event_utils.async_get_events(

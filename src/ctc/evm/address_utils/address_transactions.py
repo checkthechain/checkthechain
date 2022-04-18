@@ -1,10 +1,50 @@
+from __future__ import annotations
+
 import asyncio
+import typing
+from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
-async def async_get_transactions_from_address(address, output_format='full'):
+@typing.overload
+async def async_get_transactions_from_address(
+    address: spec.Address,
+    output_format: typing.Literal['dataframe'],
+) -> spec.DataFrame:
+    ...
+
+
+@typing.overload
+async def async_get_transactions_from_address(
+    address: spec.Address,
+    output_format: typing.Literal['hashes'],
+) -> typing.Sequence[str]:
+    ...
+
+
+@typing.overload
+async def async_get_transactions_from_address(
+    address: spec.Address,
+    output_format: typing.Literal['full'] = 'full',
+) -> typing.Sequence[spec.Transaction]:
+    ...
+
+
+@typing.overload
+async def async_get_transactions_from_address(
+    address: spec.Address,
+    output_format: typing.Literal['full', 'dataframe', 'hashes'],
+) -> typing.Sequence[spec.Transaction] | spec.DataFrame | typing.Sequence[str]:
+    ...
+
+
+async def async_get_transactions_from_address(
+    address: spec.Address,
+    output_format: typing.Literal['full', 'dataframe', 'hashes'] = 'full',
+) -> typing.Sequence[spec.Transaction] | spec.DataFrame | typing.Sequence[str]:
     """get all transactions from an address"""
 
     address = address.lower()
@@ -19,7 +59,8 @@ async def async_get_transactions_from_address(address, output_format='full'):
     transactions = []
     for block, block_count in zip(blocks, count_data['diffs']):
         n_block_transactions = 0
-        for transaction in block['transactions']:
+        for transaction_data in block['transactions']:
+            transaction = typing.cast(spec.Transaction, transaction_data)
             if transaction['from'] == address:
                 transactions.append(transaction)
                 n_block_transactions += 1
@@ -37,7 +78,15 @@ async def async_get_transactions_from_address(address, output_format='full'):
         raise Exception('unknown output format: ' + str(output_format))
 
 
-async def async_get_address_transaction_counts_by_block(address, nary=3):
+class AddressTransactionCounts(TypedDict):
+    blocks: list[int]
+    diffs: list[int]
+    cummulative: list[int]
+
+
+async def async_get_address_transaction_counts_by_block(
+    address: spec.Address, nary: int = 3
+) -> AddressTransactionCounts:
     address = address.lower()
 
     # get initial data
@@ -86,12 +135,12 @@ async def async_get_address_transaction_counts_by_block(address, nary=3):
 
 
 async def _async_get_block_range_transaction_counts(
-    address,
-    min_block,
-    max_block,
-    block_counts,
-    nary,
-):
+    address: spec.Address,
+    min_block: int,
+    max_block: int,
+    block_counts: dict[int, int],
+    nary: int,
+) -> None:
     import numpy as np
 
     n_unknown_blocks = max_block - min_block - 1

@@ -1,19 +1,24 @@
+from __future__ import annotations
+
+import typing
+
 import toolstr
 import tooltable  # type: ignore
 
+from . import cpmm_spec
 from . import cpmm_trade
 
 
 def print_pool_summary(
-    x_reserves,
-    y_reserves,
-    lp_total_supply=None,
-    x_name=None,
-    y_name=None,
-    fee_rate=None,
-    indent=None,
-    depths=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    lp_total_supply: int | float | None = None,
+    x_name: str | None = None,
+    y_name: str | None = None,
+    fee_rate: float | None = None,
+    indent: int | str | None = None,
+    depths: typing.Sequence[float] | None = None,
+) -> None:
     # add in +/- 2% depth
 
     if x_name is None:
@@ -23,10 +28,19 @@ def print_pool_summary(
 
     indent = toolstr.indent_to_str(indent)
 
-    print(indent + '- ' + x_name + ' reserves:', toolstr.format(x_reserves, order_of_magnitude=True))
-    print(indent + '- ' + y_name + ' reserves:', toolstr.format(y_reserves, order_of_magnitude=True))
+    print(
+        indent + '- ' + x_name + ' reserves:',
+        toolstr.format(x_reserves, order_of_magnitude=True),
+    )
+    print(
+        indent + '- ' + y_name + ' reserves:',
+        toolstr.format(y_reserves, order_of_magnitude=True),
+    )
     if lp_total_supply is not None:
-        print(indent + '- total lp tokens:', toolstr.format(lp_total_supply, order_of_magnitude=True))
+        print(
+            indent + '- total lp tokens:',
+            toolstr.format(lp_total_supply, order_of_magnitude=True),
+        )
     print(
         indent + '-',
         x_name,
@@ -70,14 +84,14 @@ def print_pool_summary(
 
 
 def print_liquidity_depth(
-    x_reserves,
-    y_reserves,
-    depths=None,
-    x_name=None,
-    y_name=None,
-    fee_rate=None,
-    indent=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    depths: typing.Sequence[float] | None = None,
+    x_name: str | None = None,
+    y_name: str | None = None,
+    fee_rate: float | None = None,
+    indent: int | str | None = None,
+) -> None:
 
     if x_name is None:
         x_name = 'X'
@@ -116,11 +130,23 @@ def print_liquidity_depth(
             fee_rate=fee_rate,
         )
         if depth != 0 and result['x_sold'] > 0:
-            trade.append('sell ' + toolstr.format(result['x_sold'], order_of_magnitude=True))
-            trade.append(' buy ' + toolstr.format(result['y_bought'], order_of_magnitude=True))
+            trade.append(
+                'sell '
+                + toolstr.format(result['x_sold'], order_of_magnitude=True)
+            )
+            trade.append(
+                ' buy '
+                + toolstr.format(result['y_bought'], order_of_magnitude=True)
+            )
         elif depth != 0 and result['x_sold'] < 0:
-            trade.append(' buy ' + toolstr.format(result['x_bought'], order_of_magnitude=True))
-            trade.append('sell ' + toolstr.format(result['y_sold'], order_of_magnitude=True))
+            trade.append(
+                ' buy '
+                + toolstr.format(result['x_bought'], order_of_magnitude=True)
+            )
+            trade.append(
+                'sell '
+                + toolstr.format(result['y_sold'], order_of_magnitude=True)
+            )
         else:
             trade.append('     0.00')
             trade.append('     0.00')
@@ -131,13 +157,13 @@ def print_liquidity_depth(
 
 
 def print_trade_summary(
-    x_name=None,
-    y_name=None,
-    x_holdings_before=None,
-    y_holdings_before=None,
-    indent=None,
-    **trade_kwargs
-):
+    x_name: str | None = None,
+    y_name: str | None = None,
+    x_holdings_before: int | float | None = None,
+    y_holdings_before: int | float | None = None,
+    indent: int | str | None = None,
+    **trade_kwargs: typing.Any
+) -> None:
 
     if x_name is None:
         x_name = 'X'
@@ -227,7 +253,7 @@ def print_trade_summary(
     )
 
 
-def summarize_trade(**trade_kwargs):
+def summarize_trade(**trade_kwargs: typing.Any) -> cpmm_spec.TradeSummary:
     """compute y_bought and new pool values when trading x_sold"""
 
     # compute trade
@@ -251,7 +277,7 @@ def summarize_trade(**trade_kwargs):
 
     # compute fees
     if trade_kwargs.get('fee_rate') is None:
-        trade_kwargs['fee_rate'] = uniswap_spec.default_trade_fee
+        trade_kwargs['fee_rate'] = 0.003
     if results['x_sold'] > 0:
         x_fees = results['x_sold'] * trade_kwargs['fee_rate']
         y_fees = 0

@@ -12,7 +12,9 @@ from . import block_crud
 
 
 async def async_get_contract_creation_block(
-    contract_address, provider=None, **search_kwargs
+    contract_address: spec.Address,
+    provider: spec.ProviderSpec = None,
+    **search_kwargs: typing.Any,
 ) -> int:
 
     network = rpc.get_provider_network(provider)
@@ -35,7 +37,7 @@ async def async_get_contract_creation_block(
         block = await async_get_contract_creation_block_from_node(
             contract_address=contract_address,
             provider=provider,
-            **search_kwargs
+            **search_kwargs,
         )
 
         # decide whether to store in db
@@ -62,10 +64,11 @@ async def async_get_contract_creation_block(
 
 
 async def async_get_contract_creation_block_from_db(
-    contract_address,
-    network,
+    contract_address: spec.Address,
+    network: spec.NetworkReference,
 ) -> int | None:
     from ctc import db
+
     engine = db.create_engine(datatype='contract_creation_blocks')
     if engine is not None:
         with engine.connect() as conn:
@@ -109,7 +112,7 @@ async def async_get_contract_creation_block_from_node(
     if verbose:
         print('searching for creation block of ' + contract_address)
 
-    async def async_is_match(index):
+    async def async_is_match(index: int) -> bool:
         if verbose:
             print('- trying block:', index)
         return await address_utils.async_is_contract_address(

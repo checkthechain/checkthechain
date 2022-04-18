@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import toolstr
 import tooltime
 
@@ -8,7 +10,10 @@ from ctc import spec
 from .. import block_utils
 
 
-async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
+async def async_print_transaction_summary(
+    transaction_hash: str,
+    sort_logs_by: str | None = None,
+) -> None:
     transaction = await rpc.async_eth_get_transaction_by_hash(transaction_hash)
     transaction_receipt = await rpc.async_eth_get_transaction_receipt(
         transaction_hash=transaction_hash
@@ -100,13 +105,15 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             '-->',
             binary.get_function_signature(function_abi=function_abi),
         )
-        for p, (name, value) in enumerate(call_data['named_parameters'].items()):
-            if (
-                value
-                == 115792089237316195423570985008687907853269984665640564039457584007913129639935
-            ):
-                value = 'INT_MAX'
-            print('    ' + str(p + 1) + '.', name, '=', value)
+        named_parameters = call_data['named_parameters']
+        if named_parameters is not None:
+            for p, (name, value) in enumerate(named_parameters.items()):
+                if (
+                    value
+                    == 115792089237316195423570985008687907853269984665640564039457584007913129639935
+                ):
+                    value = 'INT_MAX'
+                print('    ' + str(p + 1) + '.', name, '=', value)
 
     print()
     print()
@@ -135,7 +142,7 @@ async def async_print_transaction_summary(transaction_hash, sort_logs_by=None):
             )
             normalized_event = binary.normalize_event(
                 event=log,
-                arg_prefix=None,
+                arg_prefix='',
                 event_abi=event_abi,
             )
             event_signature = binary.get_event_signature(event_abi=event_abi)

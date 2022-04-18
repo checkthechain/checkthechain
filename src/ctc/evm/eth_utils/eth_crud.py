@@ -7,7 +7,7 @@ from ctc import rpc
 from ctc import spec
 
 
-async def async_get_eth_total_supply():
+async def async_get_eth_total_supply() -> int | float:
     import aiohttp
 
     url = 'http://api.etherscan.io/api?module=stats&action=ethsupply'

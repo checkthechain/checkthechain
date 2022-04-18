@@ -1,7 +1,13 @@
+from __future__ import annotations
+
+import typing
+
 import numpy as np
 
+T = typing.TypeVar('T')
 
-def _ensure_exactly_one(*args):
+
+def _ensure_exactly_one(*args: T) -> T:
     non_none = list(arg for arg in args if arg is not None)
     if len(non_none) > 1:
         raise Exception('too many arguments specified')
@@ -10,7 +16,7 @@ def _ensure_exactly_one(*args):
     return non_none[0]
 
 
-def _ensure_positive(value, error=True):
+def _ensure_positive(value: typing.Any, error: bool = True) -> bool:
     if isinstance(value, (np.ndarray, tuple, list)):
         positive = all(subvalue > 0 for subvalue in value)
     else:
@@ -22,10 +28,11 @@ def _ensure_positive(value, error=True):
     return positive
 
 
-def _ensure_non_negative(value, error=True):
+def _ensure_non_negative(value: typing.Any, error: bool = True) -> bool:
     if isinstance(value, (np.ndarray, tuple, list)):
         non_negative = all(
-            subvalue >= 0 or np.isclose(subvalue, 0, atol=1e-7) for subvalue in value
+            subvalue >= 0 or np.isclose(subvalue, 0, atol=1e-7)
+            for subvalue in value
         )
     else:
         non_negative = value >= 0 or np.isclose(value, 0, atol=1e-7)
@@ -36,7 +43,7 @@ def _ensure_non_negative(value, error=True):
     return non_negative
 
 
-def _ensure_values_equal(lhs, rhs):
+def _ensure_values_equal(lhs: typing.Any, rhs: typing.Any) -> None:
     if isinstance(lhs, dict):
         assert set(lhs.keys()) == set(rhs.keys())
         for key in lhs.keys():

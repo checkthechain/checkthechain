@@ -1,25 +1,39 @@
+"""this code is fragile and hacky, it needs to get replaced in future"""
+from __future__ import annotations
+
+import typing
+
 from . import backend_exceptions
 
+T = typing.TypeVar('T')
 
-def get_backend_order(backend, backend_order):
+
+def get_backend_order(
+    backend: str | None = None,
+    backend_order: typing.Sequence[str] | None = None,
+) -> typing.Sequence[str]:
     if backend_order is None and backend is None:
-        backend_order = ['filesystem', 'node']
+        return ['filesystem', 'node']
     elif backend is not None:
-        backend_order = [backend]
+        return [backend]
     elif backend_order is not None:
-        pass
+        return backend_order
     else:
         raise Exception('specify backend or backend_order')
-    return backend_order
 
 
 def run_on_backend(
-    backend_functions, backend=None, backend_order=None, **function_kwargs
-):
+    backend_functions: typing.Mapping[str, typing.Callable[..., T]],
+    backend: str | None = None,
+    backend_order: typing.Sequence[str] | None = None,
+    **function_kwargs: typing.Any,
+) -> T:
     backend_order = get_backend_order(backend, backend_order)
     for backend in backend_order:
         try:
             function = backend_functions.get(backend)
+            if function is None:
+                raise Exception('unknown backend: ' + str(backend))
             return function(**function_kwargs)
         except backend_exceptions.DataNotFound:
             pass
@@ -28,12 +42,19 @@ def run_on_backend(
 
 
 async def async_run_on_backend(
-    backend_functions, backend=None, backend_order=None, **function_kwargs
-):
+    backend_functions: typing.Mapping[
+        str, typing.Callable[..., typing.Coroutine[typing.Any, typing.Any, T]]
+    ],
+    backend: str | None = None,
+    backend_order: typing.Sequence[str] | None = None,
+    **function_kwargs: typing.Any,
+) -> T:
     backend_order = get_backend_order(backend, backend_order)
     for backend in backend_order:
         try:
             function = backend_functions.get(backend)
+            if function is None:
+                raise Exception('unknown backend: ' + str(backend))
             return await function(**function_kwargs)
         except backend_exceptions.DataNotFound:
             pass
@@ -42,15 +63,15 @@ async def async_run_on_backend(
 
 
 def transfer_backends(
-    get,
-    save,
-    from_backend,
-    to_backend,
-    get_kwargs=None,
-    save_kwargs=None,
-    common_kwargs=None,
-    **more_common_kwargs
-):
+    get: typing.Callable,
+    save: typing.Callable,
+    from_backend: str,
+    to_backend: str,
+    get_kwargs: typing.Mapping | None = None,
+    save_kwargs: typing.Mapping | None = None,
+    common_kwargs: typing.Mapping | None = None,
+    **more_common_kwargs: typing.Any,
+) -> typing.Any:
     if common_kwargs is None:
         common_kwargs = {}
     common_kwargs = dict(common_kwargs, **more_common_kwargs)
@@ -68,15 +89,15 @@ def transfer_backends(
 
 
 async def async_transfer_backends(
-    get,
-    save,
-    from_backend,
-    to_backend,
-    get_kwargs=None,
-    save_kwargs=None,
-    common_kwargs=None,
-    **more_common_kwargs
-):
+    get: typing.Callable,
+    save: typing.Callable,
+    from_backend: str,
+    to_backend: str,
+    get_kwargs: typing.Mapping | None = None,
+    save_kwargs: typing.Mapping | None = None,
+    common_kwargs: typing.Mapping | None = None,
+    **more_common_kwargs: typing.Any,
+) -> typing.Any:
     if common_kwargs is None:
         common_kwargs = {}
     common_kwargs = dict(common_kwargs, **more_common_kwargs)

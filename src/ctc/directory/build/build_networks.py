@@ -3,6 +3,6 @@ def build_network_list() -> None:
     raise NotImplementedError()
 
 
-def add_network_to_disk():
+def add_network_to_disk() -> None:
     raise NotImplementedError()
 

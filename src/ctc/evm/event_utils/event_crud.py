@@ -1,6 +1,10 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import binary
-from ctc import spec
 from ctc import rpc
+from ctc import spec
 from ctc.toolbox import backend_utils
 from ctc.toolbox import pd_utils
 
@@ -10,7 +14,7 @@ from .. import block_utils
 from .. import abi_utils
 
 
-def is_event_hash(data):
+def is_event_hash(data: spec.BinaryData) -> bool:
     try:
         binary.convert(data, 'binary')
         return len(binary) == 32
@@ -18,7 +22,15 @@ def is_event_hash(data):
         return False
 
 
-def get_backend_functions():
+def get_backend_functions() -> dict[
+    str,
+    dict[
+        str,
+        typing.Callable[
+            ..., typing.Coroutine[typing.Any, typing.Any, spec.DataFrame]
+        ],
+    ],
+]:
     return {
         'get': {
             'filesystem': filesystem_events.async_get_events_from_filesystem,
@@ -33,12 +45,12 @@ def get_backend_functions():
 
 async def async_get_events(
     *,
-    contract_address,
-    start_block=None,
-    end_block=None,
-    backend_order=None,
-    keep_multiindex=True,
-    **query
+    contract_address: spec.Address,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    backend_order: typing.Sequence[str] | None = None,
+    keep_multiindex: bool = True,
+    **query: typing.Any
 ) -> spec.DataFrame:
 
     if start_block is None:
@@ -72,15 +84,21 @@ async def async_get_events(
     return events
 
 
-async def async_save_events(events, **query):
+async def async_save_events(
+    events: spec.DataFrame, **query: typing.Any
+) -> spec.DataFrame:
     return await backend_utils.async_run_on_backend(
         get_backend_functions()['save'], events=events, **query
     )
 
 
 async def async_transfer_events(
-    *, contract_address, start_block=None, end_block=None, **query
-):
+    *,
+    contract_address: spec.Address,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    **query: typing.Any
+) -> spec.DataFrame:
 
     start_block, end_block = await block_utils.async_block_numbers_to_int(
         blocks=[start_block, end_block],

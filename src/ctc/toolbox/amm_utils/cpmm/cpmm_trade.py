@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 import decimal
 
 from ctc.toolbox import validate_utils
+from . import cpmm_spec
 
 
 def trade(
-    x_reserves,
-    y_reserves,
-    x_sold=None,
-    x_bought=None,
-    y_sold=None,
-    y_bought=None,
-    new_x_reserves=None,
-    new_y_reserves=None,
-    fee_rate=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    x_sold: int | float | None = None,
+    x_bought: int | float | None = None,
+    y_sold: int | float | None = None,
+    y_bought: int | float | None = None,
+    new_x_reserves: int | float | None = None,
+    new_y_reserves: int | float | None = None,
+    fee_rate: int | float | None = None,
+) -> cpmm_spec.Trade:
     """perform trade with AMM
 
     ## Input Requirements
@@ -98,19 +101,13 @@ def trade(
 
 
 def trade_to_target_reserves(
-    x_reserves,
-    y_reserves,
-    new_x_reserves=None,
-    new_y_reserves=None,
-    fee_rate=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    new_x_reserves: int | float | None = None,
+    new_y_reserves: int | float | None = None,
+    fee_rate: float | None = None,
+) -> cpmm_spec.Trade:
     """compute trade required to reach specific target token reserve amounts"""
-
-    kwargs = {
-        'x_reserves': x_reserves,
-        'y_reserves': y_reserves,
-        'fee_rate': fee_rate,
-    }
 
     # convert reserve targets to bought or sold amounts
     if new_x_reserves is not None:
@@ -118,70 +115,97 @@ def trade_to_target_reserves(
             x_reserves - new_x_reserves, error=False
         ):
             x_bought = x_reserves - new_x_reserves
-            return trade(x_bought=x_bought, **kwargs)
+            return trade(
+                x_bought=x_bought,
+                x_reserves=x_reserves,
+                y_reserves=y_reserves,
+                fee_rate=fee_rate,
+            )
         else:
             x_sold = new_x_reserves - x_reserves
-            return trade(x_sold=x_sold, **kwargs)
+            return trade(
+                x_sold=x_sold,
+                x_reserves=x_reserves,
+                y_reserves=y_reserves,
+                fee_rate=fee_rate,
+            )
     elif new_y_reserves is not None:
         if validate_utils._ensure_positive(
             y_reserves - new_y_reserves, error=False
         ):
             y_bought = y_reserves - new_y_reserves
-            return trade(y_bought=y_bought, **kwargs)
+            return trade(
+                y_bought=y_bought,
+                x_reserves=x_reserves,
+                y_reserves=y_reserves,
+                fee_rate=fee_rate,
+            )
         else:
             y_sold = new_y_reserves - y_reserves
-            return trade(y_sold=y_sold, **kwargs)
+            return trade(
+                y_sold=y_sold,
+                x_reserves=x_reserves,
+                y_reserves=y_reserves,
+                fee_rate=fee_rate,
+            )
     else:
         raise Exception('specify either new_x_reserves or new_y_reserves')
 
 
 def trade_to_price(
-    x_reserves,
-    y_reserves,
-    new_x_per_y=None,
-    new_y_per_x=None,
-    fee_rate=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    new_x_per_y: int | float | None = None,
+    new_y_per_x: int | float | None = None,
+    fee_rate: float | None = None,
+) -> cpmm_spec.Trade:
     """compute trade required to reach specific price"""
-
-    kwargs = {
-        'x_reserves': x_reserves,
-        'y_reserves': y_reserves,
-        'fee_rate': fee_rate,
-    }
-    reverse_kwargs = {
-        'x_reserves': y_reserves,
-        'y_reserves': x_reserves,
-        'fee_rate': fee_rate,
-    }
 
     validate_utils._ensure_exactly_one(new_x_per_y, new_y_per_x)
 
     # convert prices to x per y
-    if new_y_per_x is not None:
+    if new_x_per_y is None:
+        if new_y_per_x is None:
+            raise Exception('must specify x_per_y or y_per_x')
         new_x_per_y = new_y_per_x ** -1
 
     # compute trades
     if new_x_per_y >= x_reserves / y_reserves:
         # case: sell x to increase x per y
         x_sold = compute_x_sold_to_reach_price(
-            new_x_per_y=new_x_per_y, **kwargs
+            new_x_per_y=new_x_per_y,
+            x_reserves=x_reserves,
+            y_reserves=y_reserves,
+            fee_rate=fee_rate,
         )
-        return trade(x_sold=x_sold, **kwargs)
+        return trade(
+            x_sold=x_sold,
+            x_reserves=x_reserves,
+            y_reserves=y_reserves,
+            fee_rate=fee_rate,
+        )
     else:
         # case: sell y to decrease x per y
         y_sold = compute_x_sold_to_reach_price(
-            new_x_per_y=(new_x_per_y ** -1), **reverse_kwargs
+            new_x_per_y=(new_x_per_y ** -1),
+            x_reserves=y_reserves,
+            y_reserves=x_reserves,
+            fee_rate=fee_rate,
         )
-        return trade(y_sold=y_sold, **kwargs)
+        return trade(
+            y_sold=y_sold,
+            x_reserves=x_reserves,
+            y_reserves=y_reserves,
+            fee_rate=fee_rate,
+        )
 
 
 def compute_x_sold_to_reach_price(
-    x_reserves,
-    y_reserves,
-    new_x_per_y,
-    fee_rate=None,
-):
+    x_reserves: int | float,
+    y_reserves: int | float,
+    new_x_per_y: int | float,
+    fee_rate: float | None = None,
+) -> float:
     """use quadratic formula to find trade size needed to reach new price
 
     - see wolframalpha.com/input/?i=g+x%5E2+%2B+%281+%2B+g%29+x+%2B+C+%3D+0
@@ -201,7 +225,12 @@ def compute_x_sold_to_reach_price(
     return x_sold
 
 
-def compute_y_bought_when_x_sold(x_sold, x_reserves, y_reserves, fee_rate=None):
+def compute_y_bought_when_x_sold(
+    x_sold: int | float,
+    x_reserves: int | float,
+    y_reserves: int | float,
+    fee_rate: float | None = None,
+) -> float:
     """compute amount of y bought when selling x_sold amount of x"""
     if fee_rate is None:
         fee_rate = 0.003
@@ -213,11 +242,11 @@ def compute_y_bought_when_x_sold(x_sold, x_reserves, y_reserves, fee_rate=None):
 
 
 def compute_x_sold_when_y_bought(
-    y_bought,
-    x_reserves,
-    y_reserves,
-    fee_rate=None,
-):
+    y_bought: int | float,
+    x_reserves: int | float,
+    y_reserves: int | float,
+    fee_rate: float | None = None,
+) -> float:
     """compute amount of x that must be sold to buy y_bought amount of y"""
     if fee_rate is None:
         fee_rate = 0.003

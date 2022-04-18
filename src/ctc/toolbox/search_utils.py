@@ -65,15 +65,19 @@ def get_matching_entry(
 
 def binary_search(
     *,
-    is_match,
-    start_index=None,
-    end_index=None,
-    index_range=None,
-    raise_if_not_found=True
-):
+    is_match: typing.Callable[[int], bool],
+    start_index: int | None = None,
+    end_index: int | None = None,
+    index_range: typing.Sequence[int] | None = None,
+    raise_if_not_found: bool = True,
+) -> int | None:
     """return the first index for which match returns True"""
 
-    if start_index is None and end_index is None:
+    if start_index is None or end_index is None:
+        if index_range is None:
+            raise Exception(
+                'must specify index_range or start_index and end_index'
+            )
         start_index, end_index = index_range
 
     start_index = int(start_index)
@@ -103,15 +107,21 @@ def binary_search(
 
 async def async_binary_search(
     *,
-    async_is_match,
-    start_index=None,
-    end_index=None,
-    index_range=None,
-    raise_if_not_found=True
-):
+    async_is_match: typing.Callable[
+        [int], typing.Coroutine[typing.Any, typing.Any, bool]
+    ],
+    start_index: int | None = None,
+    end_index: int | None = None,
+    index_range: typing.Sequence[int] | None = None,
+    raise_if_not_found: bool = True,
+) -> int | None:
     """return the first index for which match returns True"""
 
-    if start_index is None and end_index is None:
+    if start_index is None or end_index is None:
+        if index_range is None:
+            raise Exception(
+                'must specify index_range or start_index and end_index'
+            )
         start_index, end_index = index_range
 
     start_index = int(start_index)
@@ -140,14 +150,14 @@ async def async_binary_search(
 
 
 def nary_search(
-    nary,
-    start_index,
-    end_index,
-    is_match,
-    debug=False,
-    raise_if_not_found=True,
-    get_next_probes=None,
-):
+    nary: int,
+    start_index: int,
+    end_index: int,
+    is_match: typing.Callable[[typing.Sequence[int]], typing.Sequence[bool]],
+    debug: bool = False,
+    raise_if_not_found: bool = True,
+    get_next_probes: typing.Callable | None = None,
+) -> int | None:
 
     if get_next_probes is None:
         get_next_probes = get_next_probes_linear
@@ -219,14 +229,17 @@ def nary_search(
 
 
 async def async_nary_search(
-    nary,
-    start_index,
-    end_index,
-    async_is_match,
-    debug=False,
-    raise_if_not_found=True,
-    get_next_probes=None,
-):
+    nary: int,
+    start_index: int,
+    end_index: int,
+    async_is_match: typing.Callable[
+        [typing.Sequence[int]],
+        typing.Coroutine[typing.Any, typing.Any, typing.Sequence[bool]],
+    ],
+    debug: bool = False,
+    raise_if_not_found: bool = True,
+    get_next_probes: typing.Callable | None = None,
+) -> int | None:
 
     if get_next_probes is None:
         get_next_probes = get_next_probes_linear
@@ -297,10 +310,13 @@ async def async_nary_search(
             probe_max = probes[p]
 
 
-def get_next_probes_linear(probe_min, probe_max, nary):
+def get_next_probes_linear(
+    probe_min: int,
+    probe_max: int,
+    nary: int,
+) -> list[int]:
     n_probes = min(nary - 1, probe_max - probe_min - 1)
     d = (probe_max - probe_min) / (n_probes + 1)
     probes = [probe_min + (p + 1) * d for p in range(n_probes)]
-    probes = [round(probe) for probe in probes]
-    return probes
+    return [round(probe) for probe in probes]
 

@@ -117,7 +117,7 @@ async def async_normalize_erc20s_quantities(
 
 async def async_normalize_erc20_quantities_by_block(
     quantities: typing.Sequence[typing.SupportsInt] | spec.Series,
-    blocks: typing.Iterable[spec.BlockNumberReference],
+    blocks: typing.Sequence[spec.BlockNumberReference],
     token: typing.Optional[spec.ERC20Address] = None,
     decimals: typing.Optional[list[typing.SupportsInt]] = None,
     provider: spec.ProviderSpec = None,
