@@ -55,11 +55,6 @@ async def async_events_command(
     verbose: bool,
 ) -> None:
 
-    if event.startswith('0x'):
-        kwargs = {'event_hash': event}
-    else:
-        kwargs = {'event_name': event}
-
     if blocks is not None:
         all_blocks = await cli_utils.async_resolve_block_range(blocks)
         start_block = all_blocks[0]
@@ -68,13 +63,22 @@ async def async_events_command(
         start_block = None
         end_block = None
 
-    events: spec.DataFrame = await evm.async_get_events(
-        contract_address=contract,
-        start_block=start_block,
-        end_block=end_block,
-        verbose=False,
-        **kwargs
-    )
+    if event.startswith('0x'):
+        events: spec.DataFrame = await evm.async_get_events(
+            contract_address=contract,
+            start_block=start_block,
+            end_block=end_block,
+            verbose=False,
+            event_hash=event,
+        )
+    else:
+        events = await evm.async_get_events(
+            contract_address=contract,
+            start_block=start_block,
+            end_block=end_block,
+            verbose=False,
+            event_name=event,
+        )
 
     if len(events) == 0:
         print('[no events found]')

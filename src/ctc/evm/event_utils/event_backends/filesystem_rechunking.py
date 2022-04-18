@@ -23,7 +23,7 @@ async def async_rechunk_events(
     verbose: bool = True,
     dry: bool = False,
     network: spec.NetworkReference = 'mainnet',
-):
+) -> None:
     import numpy as np
 
     # get event hash
@@ -208,7 +208,7 @@ async def async_rechunk_events(
     # save chunks
     for event_chunk, chunk_range in zip(event_chunks, chunk_ranges):
         chunk_start_block, chunk_end_block = chunk_range
-        path = await filesystem_events.async_save_events_to_filesystem(
+        await filesystem_events.async_save_events_to_filesystem(
             events=event_chunk,
             contract_address=contract_address,
             event_hash=event_hash,
@@ -234,7 +234,7 @@ async def async_rechunk_all_events(
     chunk_size_tolerance: float = 0.1,
     verbose: bool = True,
     dry: bool = False,
-):
+) -> None:
     contracts_events = filesystem_events.list_contracts_events(network=network)
 
     for contract_address, events_data in contracts_events.items():

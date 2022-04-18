@@ -22,7 +22,7 @@ def is_event_hash(data: spec.BinaryData) -> bool:
         return False
 
 
-def get_backend_functions() -> dict[
+def get_event_backend_functions() -> dict[
     str,
     dict[
         str,
@@ -68,7 +68,7 @@ async def async_get_events(
         backend_order = ['filesystem', 'download']
 
     events = await backend_utils.async_run_on_backend(
-        get_backend_functions()['get'],
+        get_event_backend_functions()['get'],
         contract_address=contract_address,
         start_block=start_block,
         end_block=end_block,
@@ -88,7 +88,7 @@ async def async_save_events(
     events: spec.DataFrame, **query: typing.Any
 ) -> spec.DataFrame:
     return await backend_utils.async_run_on_backend(
-        get_backend_functions()['save'], events=events, **query
+        get_event_backend_functions()['save'], events=events, **query
     )
 
 

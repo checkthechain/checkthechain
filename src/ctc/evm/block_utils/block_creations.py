@@ -15,7 +15,7 @@ async def async_get_contract_creation_block(
     contract_address: spec.Address,
     provider: spec.ProviderSpec = None,
     **search_kwargs: typing.Any,
-) -> int:
+) -> int | None:
 
     network = rpc.get_provider_network(provider)
 
@@ -39,6 +39,8 @@ async def async_get_contract_creation_block(
             provider=provider,
             **search_kwargs,
         )
+        if block is None:
+            return None
 
         # decide whether to store in db
         from ctc import db
@@ -88,7 +90,7 @@ async def async_get_contract_creation_block_from_node(
     provider: spec.ProviderSpec = None,
     verbose: bool = True,
     nary: typing.Optional[int] = None,
-) -> int:
+) -> int | None:
     """get the block where a contract was created
 
     algorithm: perform a binary search across blocks, check code bytes in each
@@ -108,6 +110,11 @@ async def async_get_contract_creation_block_from_node(
             start_block = latest_block
         if end_block == 'latest':
             end_block = latest_block
+
+    if not isinstance(start_block, int):
+        raise Exception('unknown start_block representation')
+    if not isinstance(end_block, int):
+        raise Exception('unknown end_block representation')
 
     if verbose:
         print('searching for creation block of ' + contract_address)

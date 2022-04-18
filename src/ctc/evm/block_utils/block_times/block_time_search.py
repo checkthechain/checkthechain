@@ -47,13 +47,18 @@ async def async_get_block_of_timestamp_from_node(
         provider=provider
     )
 
-    return await search_utils.async_nary_search(
+    block = await search_utils.async_nary_search(
         nary=nary,
         start_index=1,
         end_index=end_index,
         async_is_match=async_is_match,
         get_next_probes=get_next_probes,
     )
+
+    if block is None:
+        raise Exception('could not find block for timestamp')
+
+    return block
 
 
 async def _async_is_match_block_of_timestamp(

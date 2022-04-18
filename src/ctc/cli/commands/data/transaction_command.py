@@ -19,12 +19,12 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def transaction_command(transaction: str, sort: bool) -> None:
+def transaction_command(transaction: str, sort: str) -> None:
 
     asyncio.run(run(transaction=transaction, sort=sort))
 
 
-async def run(transaction: str, sort: bool) -> None:
+async def run(transaction: str, sort: str) -> None:
 
     await evm.async_print_transaction_summary(
         transaction_hash=transaction, sort_logs_by=sort

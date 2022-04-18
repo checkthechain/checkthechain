@@ -10,7 +10,7 @@ from ... import address_utils
 from . import contract_abi_backends
 
 
-def get_backend_functions() -> dict[
+def get_abi_backend_functions() -> dict[
     str,
     dict[
         str,
@@ -37,7 +37,7 @@ async def async_get_contract_abi(**query: typing.Any) -> spec.ContractABI:
         backend_order = ['filesystem', 'download']
         query['backend_order'] = backend_order
     return await backend_utils.async_run_on_backend(
-        backend_functions=get_backend_functions()['get'], **query
+        backend_functions=get_abi_backend_functions()['get'], **query
     )
 
 
@@ -46,7 +46,7 @@ async def async_save_contract_abi(
 ) -> spec.ContractABI:
     query['contract_abi'] = contract_abi
     return await backend_utils.async_run_on_backend(
-        backend_functions=get_backend_functions()['save'], **query
+        backend_functions=get_abi_backend_functions()['save'], **query
     )
 
 

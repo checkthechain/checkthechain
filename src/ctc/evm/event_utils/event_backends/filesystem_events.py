@@ -276,7 +276,7 @@ async def async_save_events_to_filesystem(
     verbose: bool = True,
     provider: spec.ProviderSpec = None,
     network: typing.Optional[spec.NetworkReference] = None,
-) -> str:
+) -> spec.DataFrame:
 
     if network is None:
         provider = rpc.get_provider(provider)
@@ -315,7 +315,7 @@ async def async_save_events_to_filesystem(
     os.makedirs(os.path.dirname(path), exist_ok=True)
     events.to_csv(path)
 
-    return path
+    return events
 
 
 async def async_get_events_from_filesystem(

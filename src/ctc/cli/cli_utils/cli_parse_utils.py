@@ -182,7 +182,7 @@ def parse_block_sample(
     if block_interval_str is not None:
         block_interval = evm.raw_block_number_to_int(block_interval_str)
     else:
-        block_interval_str = None
+        block_interval = None
 
     # detect interval types
     if start_type == '(':
