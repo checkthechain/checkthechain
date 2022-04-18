@@ -39,7 +39,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
                 'help': 'include all output fields',
             },
-            # {'name': '--no-interpolate', 'kwargs': {}},
+            {
+                'name': '--interpolate',
+                'help': 'interpolate all blocks in range',
+                'action': 'store_true',
+            },
         ],
     }
 
@@ -51,6 +55,7 @@ async def async_chainlink_command(
     overwrite: bool,
     provider: typing.Optional[str],
     all_fields: typing.Optional[bool],
+    interpolate: bool,
 ) -> None:
 
     feed = '_'.join(feed)
@@ -86,11 +91,19 @@ async def async_chainlink_command(
         #     block_kwargs = {'start_block': start_block, 'end_block': end_block}
         #     print('- block_range: [' + str(start_block) + ', ' + str(end_block) + ']')
         # else:
-        resolved_blocks = await cli_utils.async_resolve_block_sample(blocks)
-        block_kwargs = {'blocks': resolved_blocks}
-        print('- n_blocks:', len(resolved_blocks))
-        print('- min_block:', min(resolved_blocks))
-        print('- max_block:', max(resolved_blocks))
+        if blocks is not None:
+            start_block, end_block = await cli_utils.async_resolve_block_range(
+                blocks
+            )
+        else:
+            start_block = None
+            end_block = None
+        # block_kwargs = {'blocks': resolved_blocks}
+        # print('- n_blocks:', len(resolved_blocks))
+        if start_block is not None:
+            print('- start_block:', start_block)
+        if end_block is not None:
+            print('- end_block:', end_block)
 
         print()
 
@@ -98,11 +111,13 @@ async def async_chainlink_command(
             feed,
             provider=provider,
             fields=fields,
-            blocks=resolved_blocks,
+            start_block=start_block,
+            end_block=end_block,
+            interpolate=interpolate,
         )
         df = feed_data
 
-        cli_utils.output_data(df, output=output, overwrite=overwrite)
+        cli_utils.output_data(df, output=output, overwrite=overwrite, raw=True)
 
     await rpc.async_close_http_session()
 

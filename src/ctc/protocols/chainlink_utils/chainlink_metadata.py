@@ -55,18 +55,23 @@ async def async_get_feed_aggregator(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderSpec = None,
     fill_empty: bool = True,
-) -> typing.Optional[spec.Address]:
+) -> spec.Address:
 
     feed = await async_resolve_feed_address(
         feed, block=block, provider=provider
     )
 
-    return await rpc.async_eth_call(
+    aggregator = await rpc.async_eth_call(
         to_address=feed,
         function_abi=chainlink_spec.feed_function_abis['aggregator'],
         block_number=block,
         fill_empty=fill_empty,
     )
+
+    if aggregator is None:
+        raise Exception('aggregator not specified')
+
+    return aggregator
 
 
 async def async_get_feed_first_block(
@@ -79,10 +84,15 @@ async def async_get_feed_first_block(
 
     feed = await async_resolve_feed_address(feed, provider=provider)
 
-    return await evm.async_get_contract_creation_block(
+    creation_block = await evm.async_get_contract_creation_block(
         contract_address=feed,
         start_block=start_search,
         end_block=end_search,
         verbose=verbose,
     )
+
+    if creation_block is None:
+        raise Exception('could not determine creation_block for feed')
+
+    return creation_block
 
