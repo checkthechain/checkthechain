@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import typing
 
 import toolstr
 
@@ -15,7 +14,7 @@ from . import address_data
 
 async def async_print_address_summary(
     address: spec.Address,
-    verbose: typing.Union[bool, int] = 0,
+    verbose: bool | int = False,
     max_width: int = 80,
     provider: spec.ProviderSpec = None,
     raw: bool = False,

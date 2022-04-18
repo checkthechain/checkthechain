@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import time
@@ -7,10 +9,12 @@ from ctc import spec
 from .... import address_utils
 
 
-_last_request = {'time': None}
+_last_request: dict[str, float | None] = {'time': None}
 
 
-async def async_get_contract_abi_from_etherscan(contract_address, network=None):
+async def async_get_contract_abi_from_etherscan(
+        contract_address: spec.Address, network: spec.NetworkReference | None=None,
+) -> spec.ContractABI:
     """fetch contract abi using etherscan"""
 
     if network is None:

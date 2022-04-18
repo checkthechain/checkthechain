@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 import copy
+import typing
 
 from ctc import binary
+from ctc import spec
+
 from . import abi_io
 from .. import event_utils
 
@@ -11,10 +16,11 @@ from .. import event_utils
 
 
 async def async_summarize_contract_abi(
-    contract_abi=None, contract_address=None
-):
+    contract_abi: spec.ContractABI | None = None,
+    contract_address: spec.Address | None = None,
+) -> None:
     if contract_abi is None:
-        contract_abi = abi_io.async_get_contract_abi(
+        contract_abi = await abi_io.async_get_contract_abi(
             contract_address=contract_address,
         )
     df = contract_abi_to_dataframe(contract_abi, human_readable=True)
@@ -23,10 +29,14 @@ async def async_summarize_contract_abi(
     IPython.display.display(df)
 
 
-def summarize_contract_events(*, contract_abi=None, events=None):
+async def async_summarize_contract_events(
+    *,
+    contract_abi: spec.ContractABI | None = None,
+    events: dict[str, spec.EventABI] | None = None,
+) -> None:
 
     if events is None:
-        events = get_contract_events(contract_abi=contract_abi)
+        events = await async_get_contract_events(contract_abi=contract_abi)
 
     print(len(events), 'events:')
     for event in events.values():
@@ -39,11 +49,14 @@ def summarize_contract_events(*, contract_abi=None, events=None):
             print('    - ' + var['name'] + ':', var['type'] + ',', index)
 
 
-def get_contract_events(contract_abi=None, **abi_query):
+async def async_get_contract_events(
+    contract_abi: spec.ContractABI | None = None,
+    **abi_query: typing.Any,
+) -> dict[str, spec.EventABI]:
     """get contract events by hash, as {event_hash: event_abi}"""
 
     if contract_abi is None:
-        contract_abi = abi_io.get_contract_abi(**abi_query)
+        contract_abi = await abi_io.async_get_contract_abi(**abi_query)
 
     return {
         binary.get_event_hash(event_abi=abi_item): abi_item
@@ -53,8 +66,10 @@ def get_contract_events(contract_abi=None, **abi_query):
 
 
 def print_contract_abi_human_readable(
-    contract_abi, max_width=80, verbose=False,
-):
+    contract_abi: spec.ContractABI,
+    max_width: int = 80,
+    verbose: bool | int = False,
+) -> None:
     df = contract_abi_to_dataframe(
         contract_abi=contract_abi, human_readable=False
     )
@@ -64,7 +79,9 @@ def print_contract_abi_human_readable(
 
     print('Contract ABI Functions')
     print('──────────────────────')
-    for i, (f, function) in enumerate(functions.iterrows()):
+    for i, (f, function_row) in enumerate(functions.iterrows()):
+
+        function = typing.cast(spec.FunctionABI, function_row)
 
         if len(function['outputs']) == 0:
             output_str = '[none]'
@@ -79,7 +96,7 @@ def print_contract_abi_human_readable(
 
         if not verbose:
             signature = binary.get_function_signature(
-                function_abi=function, include_names=True
+                function_abi=function, include_names=True,
             )
         else:
             signature = function['name'] + '()'
@@ -115,8 +132,9 @@ def print_contract_abi_human_readable(
     if len(events) == 0:
         print('[none]')
     for i, (e, event) in enumerate(events.iterrows()):
-        event_hash = binary.get_event_hash(event_abi=event)
-        signature = binary.get_event_signature(event_abi=event)
+        event_abi = typing.cast(spec.EventABI, event)
+        event_hash = binary.get_event_hash(event_abi=event_abi)
+        signature = binary.get_event_signature(event_abi=event_abi)
         line = str(i + 1) + '. ' + signature
         if len(line) > max_width:
             line = line[: max_width - 3] + '...'
@@ -132,9 +150,12 @@ def print_contract_abi_human_readable(
 #
 
 
-def contract_abi_to_dataframe(contract_abi, human_readable):
+def contract_abi_to_dataframe(
+    contract_abi: spec.ContractABI,
+    human_readable: bool,
+) -> spec.DataFrame:
     contract_abi = copy.deepcopy(contract_abi)
-    for entry in contract_abi:
+    for entry in typing.cast(typing.List[typing.Dict], contract_abi):
 
         if human_readable:
 
@@ -145,8 +166,8 @@ def contract_abi_to_dataframe(contract_abi, human_readable):
                 inputs = []
                 for input in entry['inputs']:
                     input_str = ''
-                    input_str += input.get('type')
-                    input_name = input.get('name')
+                    input_str += input.get('type', '')
+                    input_name = input.get('name', '')
                     if input_name is not None and input_name != '':
                         input_str += ' ' + input_name
                     inputs.append(input_str)
@@ -190,17 +211,19 @@ def contract_abi_to_dataframe(contract_abi, human_readable):
     return df
 
 
-def get_contract_events_dataframe(
-    contract_abi, contract_name=None, contract_address=None, protocol_name=None
-):
-    event_abis = event_utils.async_get_contract_events(
-        contract_abi=contract_abi
-    )
+async def async_get_contract_events_dataframe(
+    contract_abi: spec.ContractABI,
+    contract_name: str | None = None,
+    contract_address: spec.Address | None = None,
+    protocol_name: str | None = None,
+) -> spec.DataFrame:
+
+    event_abis = await async_get_contract_events(contract_abi=contract_abi)
     event_rows = []
     for event_hash, event_abi in event_abis.items():
 
-        data_types = binary.get_event_data_types(event_abi=event_abi)
-        data_names = binary.get_event_data_names(event_abi=event_abi)
+        data_types = binary.get_event_unindexed_types(event_abi=event_abi)
+        data_names = binary.get_event_unindexed_names(event_abi=event_abi)
         data_signature = [
             data_type + ' ' + data_name
             for data_type, data_name in zip(data_types, data_names)

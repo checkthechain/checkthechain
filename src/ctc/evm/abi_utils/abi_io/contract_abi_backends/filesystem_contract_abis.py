@@ -48,7 +48,9 @@ def get_contract_abi_filepath(
 #
 
 
-def list_contract_abi_contracts(network):
+def list_contract_abi_contracts(
+    network: spec.NetworkReference,
+) -> dict[spec.Address, str]:
     root = get_contract_abis_root(network=network)
     contracts = {}
     for filename in os.listdir(root):

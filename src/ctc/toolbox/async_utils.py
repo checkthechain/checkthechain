@@ -157,12 +157,12 @@ async def async_read_csv_processes(
         with concurrent.futures.ProcessPoolExecutor() as pool:
             return await loop.run_in_executor(
                 pool,
-                functools.partial(pd.read_csv, path),
+                functools.partial(pd.read_csv, path),  # type: ignore
             )
     else:
         return await loop.run_in_executor(
             pool,
-            functools.partial(pd.read_csv, path),
+            functools.partial(pd.read_csv, path),  # type: ignore
         )
 
 
@@ -176,12 +176,12 @@ async def async_read_csv_threads(
         with concurrent.futures.ThreadPoolExecutor() as pool:
             return await loop.run_in_executor(
                 pool,
-                functools.partial(pd.read_csv, path),
+                functools.partial(pd.read_csv, path),  # type: ignore
             )
     else:
         return await loop.run_in_executor(
             pool,
-            functools.partial(pd.read_csv, path),
+            functools.partial(pd.read_csv, path),  # type: ignore
         )
 
 

@@ -26,6 +26,7 @@ _abi_cache: dict[
             typing.Union[
                 spec.FunctionABI,
                 spec.EventABI,
+                spec.ErrorABI,
             ],
         ]
     ],

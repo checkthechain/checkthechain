@@ -10,7 +10,15 @@ from ... import address_utils
 from . import contract_abi_backends
 
 
-def get_backend_functions():
+def get_backend_functions() -> dict[
+    str,
+    dict[
+        str,
+        typing.Callable[
+            ..., typing.Coroutine[typing.Any, typing.Any, spec.ContractABI]
+        ],
+    ],
+]:
     return {
         'get': {
             'filesystem': contract_abi_backends.async_get_contract_abi_from_filesystem,
@@ -23,7 +31,7 @@ def get_backend_functions():
     }
 
 
-async def async_get_contract_abi(**query):
+async def async_get_contract_abi(**query: typing.Any) -> spec.ContractABI:
     backend_order = query.get('backend_order')
     if backend_order is None:
         backend_order = ['filesystem', 'download']
@@ -33,14 +41,16 @@ async def async_get_contract_abi(**query):
     )
 
 
-async def async_save_contract_abi(contract_abi, **query):
+async def async_save_contract_abi(
+    contract_abi: spec.ContractABI, **query: typing.Any
+) -> spec.ContractABI:
     query['contract_abi'] = contract_abi
     return await backend_utils.async_run_on_backend(
         backend_functions=get_backend_functions()['save'], **query
     )
 
 
-async def async_transfer_contract_abi(**kwargs):
+async def async_transfer_contract_abi(**kwargs: typing.Any) -> spec.ContractABI:
     return await backend_utils.async_transfer_backends(
         get=async_get_contract_abi, save=async_save_contract_abi, **kwargs
     )
@@ -50,7 +60,7 @@ async def async_download_contract_abi(
     contract_address: spec.Address,
     name: typing.Optional[str] = None,
     provider: spec.ProviderSpec = None,
-    **kwargs
+    **kwargs: typing.Any
 ) -> spec.ContractABI:
 
     provider = rpc.get_provider(provider)

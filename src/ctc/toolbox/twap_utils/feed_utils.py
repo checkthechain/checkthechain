@@ -9,7 +9,7 @@ from ctc import spec
 
 def get_contract_type_guards() -> dict[
     str,
-    typing.Callable[typing.Any, typing.Any, bool],
+    typing.Callable[..., typing.Coroutine[typing.Any, typing.Any, bool]],
 ]:
     return {
         'chainlink_feed': async_is_chainlink_feed,
