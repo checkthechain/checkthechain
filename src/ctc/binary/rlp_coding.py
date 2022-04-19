@@ -1,18 +1,22 @@
 """
 see https://eth.wiki/en/fundamentals/rlp
 """
+from __future__ import annotations
 
+import typing
+
+from ctc import spec
 from . import formats
 
 
-def rlp_encode(data, output_format='prefix_hex'):
+def rlp_encode(data: typing.Any) -> str:
     import rlp  # type: ignore
 
     rlp_data = rlp.encode(data)
-    return formats.convert(rlp_data, output_format)
+    return formats.convert(rlp_data, 'prefix_hex')
 
 
-def rlp_decode(data):
+def rlp_decode(data: spec.BinaryData) -> typing.Any:
     import rlp  # type: ignore
 
     binary_data = formats.convert(data, 'binary')

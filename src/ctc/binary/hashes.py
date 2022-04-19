@@ -28,7 +28,7 @@ def keccak(
 @typing.overload
 def keccak(
     data: spec.BinaryInteger,
-    output_format: Literal['prefix_hex', 'raw_hex', None],
+    output_format: Literal['prefix_hex', 'raw_hex', None] = 'prefix_hex',
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
     ...

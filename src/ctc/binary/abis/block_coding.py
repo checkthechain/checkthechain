@@ -1,0 +1,96 @@
+from __future__ import annotations
+
+import typing
+
+from ctc import spec
+from .. import formats
+
+
+def encode_block_number(block: spec.BlockSpec) -> str:
+
+    if isinstance(block, str) and block in ['latest', 'earliest', 'pending']:
+        return block
+    else:
+        # python3.7 compatibliity
+        supports_int = hasattr(block, '__int__')
+        # supports_int = isinstance(block, typing.SupportsInt)
+
+        if supports_int:
+            block = int(block)
+        return formats.convert(block, 'prefix_hex')
+
+
+#
+# # singular block standardization
+#
+
+
+def standardize_block_number(
+    block: typing.Optional[spec.BlockNumberReference],
+) -> spec.StandardBlockNumber:
+    """turn block into standard block number reference
+
+    Examples of standard block numbers: 'latest' or 123456
+    """
+
+    if block is None:
+        block = 'latest'
+
+    if block in spec.block_number_names:
+        return typing.cast(spec.BlockNumberName, block)
+    else:
+        return raw_block_number_to_int(block)
+
+
+def raw_block_number_to_int(block: spec.RawBlockNumber) -> int:
+    """convert block number to int"""
+
+    # python3.7 compatibility
+    # supports_int = isinstance(block, typing.SupportsInt)
+    supports_int = hasattr(block, '__int__')
+
+    if supports_int:
+        if isinstance(block, int):
+            return block
+        else:
+            block_supports_int = typing.cast(typing.SupportsInt, block)
+            as_int = int(round(block_supports_int))  # type: ignore
+            if abs(as_int - int(block_supports_int)) > 0.0001:
+                raise Exception('must specify integer blocks')
+            return as_int
+    elif isinstance(block, str):
+        if block.startswith('0x'):
+            try:
+                return int(block, 16)
+            except ValueError:
+                pass
+        elif 'e' in block:
+            as_float = float(block)
+            as_int = int(as_float)
+            if abs(as_float - as_int) > 0.0001:
+                raise Exception('must specify integer blocks')
+            else:
+                return as_int
+        else:
+            return int(block)
+
+    raise Exception('unknown block number specification: ' + str(block))
+
+
+#
+# # plural block standardization
+#
+
+
+def standardize_block_numbers(
+    blocks: typing.Iterable[spec.BlockNumberReference],
+) -> list[spec.StandardBlockNumber]:
+    """standardize an iterable of block number references"""
+    return [standardize_block_number(block) for block in blocks]
+
+
+def raw_block_number_to_ints(
+    blocks: typing.Iterable[spec.RawBlockNumber],
+) -> list[int]:
+    return [raw_block_number_to_int(block) for block in blocks]
+

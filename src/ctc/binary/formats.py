@@ -80,6 +80,9 @@ def convert(
     - 'prefix_hex': hex str with 0x prefix included
     - 'raw_hex': hex str without 0x prefix included
     - 'binary': bytes
+
+    :data: binary data
+    :output_format: str name of output format
     """
 
     if output_format is None:
@@ -216,19 +219,20 @@ def match_format(
     return output
 
 
-def ascii_to_raw_hex(data):
+def ascii_to_raw_hex(data: str) -> str:
     return data.encode('ascii').hex()
 
 
-def ascii_to_prefix_hex(data):
+def ascii_to_prefix_hex(data: str) -> str:
     return '0x' + ascii_to_raw_hex(data)
 
 
-def hex_to_ascii(data):
+def hex_to_ascii(data: str) -> str:
     import codecs
 
     if data.startswith('0x'):
         data = data[2:]
 
-    return codecs.decode(data, 'hex').decode('ascii')
+    cast_bytes = typing.cast(bytes, data)
+    return codecs.decode(cast_bytes, encoding='hex').decode('ascii')
 
