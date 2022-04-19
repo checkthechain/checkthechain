@@ -1,3 +1,10 @@
+"""
+## Next type system for RPC requests/responses
+- create RpcRequest[Method] and RpcResponse[Method]
+- implement using mypy plugin with get_type_analyze_hook()
+    - https://github.com/python/mypy/issues/6503
+    - https://github.com/python/mypy/issues/8848
+"""
 from __future__ import annotations
 
 import typing
