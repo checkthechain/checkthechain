@@ -34,7 +34,7 @@ def bin_by_blocks(
     # if new_data.index[0] < standard_blocks[0]:
     #     new_data = new_data.iloc[1:]
     new_data.index = pd.Index(standard_blocks)
-    new_data.index.name = 'gte_this_block'  # type: ignore
+    new_data.index.name = 'gte_this_block'
 
     return new_data
 

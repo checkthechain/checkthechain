@@ -195,7 +195,7 @@ async def async_send_raw(
             provider=provider,
         )
 
-    elif provider['protocol'] == 'websocket':
+    elif provider['protocol'] == 'wss':
         from .rpc_backends import rpc_websocket_async
 
         return await rpc_websocket_async.async_send_websocket(

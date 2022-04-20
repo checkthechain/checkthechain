@@ -39,7 +39,7 @@ def get_function_abi(
             continue
         if parameter_types is not None:
             types = function_parsing.get_function_parameter_types(function_abi)
-            if parameter_types != tuple(types):
+            if tuple(parameter_types) != tuple(types):
                 continue
         if function_selector is not None:
             item_selector = function_parsing.get_function_selector(function_abi)
