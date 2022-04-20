@@ -8,7 +8,7 @@ from .. import hashes
 
 
 def get_function_parameter_types(
-    function_abi: spec.FunctionABI = None,
+    function_abi: spec.FunctionABI | None = None,
     function_signature: typing.Optional[str] = None,
 ) -> list[spec.ABIDatumType]:
 
@@ -65,7 +65,7 @@ def get_function_parameter_names(
 
 
 def get_function_signature(
-    function_abi: spec.FunctionABI = None,
+    function_abi: spec.FunctionABI | None = None,
     parameter_types: typing.Optional[list[str]] = None,
     function_name: typing.Optional[str] = None,
     include_names: bool = False,
@@ -124,6 +124,8 @@ def get_function_selector(
 ) -> str:
 
     if function_signature is None:
+        if function_abi is not None:
+            raise Exception('must specify function_abi or function_signature')
         function_signature = get_function_signature(function_abi)
 
     full_hash = hashes.keccak(function_signature.encode(), output_format='raw_hex')

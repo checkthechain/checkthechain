@@ -19,7 +19,7 @@ async def async_get_pool_id(
 async def async_get_pool_address(
     pool_id: str,
     block: spec.BlockNumberReference | None = None,
-    vault: spec.Address = None,
+    vault: spec.Address | None = None,
 ) -> spec.Address:
     if vault is None:
         vault = directory.get_address(name='Vault', label='balancer')

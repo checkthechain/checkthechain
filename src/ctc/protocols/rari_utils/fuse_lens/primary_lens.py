@@ -13,7 +13,7 @@ from . import lens_spec
 
 
 async def async_get_public_pools_with_data(
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.PublicPoolsWithData:
@@ -51,7 +51,7 @@ class _ReturnPoolSummaryOrError(TypedDict):
 
 async def _async_get_pool_summary_or_error(
     comptroller: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> _ReturnPoolSummaryOrError:
@@ -69,7 +69,7 @@ async def _async_get_pool_summary_or_error(
 
 async def async_get_public_pools_by_verification_with_data(
     whitelisted_admin: bool,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.PublicPoolsWithData:
@@ -113,7 +113,7 @@ async def async_get_public_pools_by_verification_with_data(
 
 async def async_get_pools_by_account_with_data(
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplierWithData:
@@ -139,7 +139,7 @@ async def async_get_pools_by_account_with_data(
 
 async def async_get_pool_summary(
     comptroller: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolSummary:
@@ -158,7 +158,7 @@ async def async_get_pool_summary(
 
 async def async_get_pool_assets_with_data(
     comptroller: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> list[lens_spec.FusePoolAsset]:
@@ -177,7 +177,7 @@ async def async_get_pool_assets_with_data(
 
 async def async_get_public_pool_users_with_data(
     max_health: int = int(1e36),
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPublicPoolUsersWithData:
@@ -242,7 +242,7 @@ async def _async_get_pool_users_with_data_or_error(**kwargs: typing.Any) -> dict
 async def async_get_pool_users_with_data(
     comptroller: spec.Address,
     max_health: int = int(1e36),
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolUsersWithData:
@@ -266,7 +266,7 @@ async def async_get_pool_users_with_data(
 async def async_get_pools_users_with_data(
     comptrollers: spec.Address,
     max_health: int = int(1e36),
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsUsersWithData:
@@ -299,7 +299,7 @@ async def async_get_pools_users_with_data(
 
 async def async_get_pools_by_supplier(
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplier:
@@ -321,7 +321,7 @@ async def async_get_pools_by_supplier(
 
 async def async_get_pools_by_supplier_with_data(
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None= None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplierWithData:
@@ -347,7 +347,7 @@ async def async_get_pools_by_supplier_with_data(
 
 async def async_get_user_summary(
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.UserSummary:
@@ -372,7 +372,7 @@ async def async_get_user_summary(
 async def async_get_pool_user_summary(
     comptroller: spec.Address,
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.PoolUserSummary:
@@ -394,7 +394,7 @@ async def async_get_pool_user_summary(
 
 async def async_get_whitelisted_pools_by_account(
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> list[lens_spec.FusePool]:
@@ -413,7 +413,7 @@ async def async_get_whitelisted_pools_by_account(
 
 async def async_get_whitelisted_pools_by_account_with_data(
     account: spec.Address,
-    lens_address: spec.Address = None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnWhitelistedPoolsByAccountWithData:

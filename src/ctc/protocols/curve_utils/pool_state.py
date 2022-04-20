@@ -45,7 +45,7 @@ async def async_get_lp_withdrawal(
 async def async_get_pool_state(
     pool: spec.Address,
     n_tokens: int | None = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderSpec = None,
 ) -> dict:
 

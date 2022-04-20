@@ -13,7 +13,7 @@ async def async_quote_exact_input_single(
     amount_in: int,
     sqrt_price_limit_x96: int,
     provider: spec.ProviderSpec = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'quoteExactInputSingle',
@@ -38,7 +38,7 @@ async def async_quote_exact_input(
     path: str,
     amount_in: int,
     provider: spec.ProviderSpec = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'quoteExactInput',
@@ -60,7 +60,7 @@ async def async_quote_exact_output_single(
     amount_out: int,
     sqrt_price_limit_x96: int,
     provider: spec.ProviderSpec = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'quoteExactOutputSingle',
@@ -85,7 +85,7 @@ async def async_quote_exact_output(
     path: str,
     amount_in: int,
     provider: spec.ProviderSpec = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'quoteExactOutput',

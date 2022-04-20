@@ -9,10 +9,10 @@ from .. import rpc_request
 
 
 def construct_eth_new_filter(
-    address: spec.BinaryData = None,
-    topics: typing.Sequence[spec.BinaryData] = None,
-    start_block: spec.BlockNumberReference = None,
-    end_block: spec.BlockNumberReference = None,
+    address: spec.BinaryData | None = None,
+    topics: typing.Sequence[spec.BinaryData] | None = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
 ) -> spec.RpcRequest:
 
     if start_block is not None:
@@ -58,12 +58,13 @@ def construct_eth_get_filter_logs(
 
 
 def construct_eth_get_logs(
-    address: spec.BinaryData = None,
-    topics: typing.Sequence[spec.BinaryData] = None,
-    start_block: spec.BlockNumberReference = None,
-    end_block: spec.BlockNumberReference = None,
-    block_hash: spec.BinaryData = None,
+    address: spec.BinaryData | None = None,
+    topics: typing.Sequence[spec.BinaryData] | None = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    block_hash: spec.BinaryData | None = None,
 ) -> spec.RpcRequest:
+
     if start_block is not None:
         start_block = binary.encode_block_number(start_block)
     if end_block is not None:

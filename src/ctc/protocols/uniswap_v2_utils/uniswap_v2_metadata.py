@@ -25,10 +25,10 @@ async def async_get_pool_tokens(
 
 
 async def async_get_pool_symbols(
-    pool: spec.Address = None,
+    pool: spec.Address | None = None,
     *,
-    x_address: spec.Address = None,
-    y_address: spec.Address = None,
+    x_address: spec.Address | None = None,
+    y_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
 ) -> list[str]:
 
@@ -46,10 +46,10 @@ async def async_get_pool_symbols(
 
 
 async def async_get_pool_decimals(
-    pool: spec.Address = None,
+    pool: spec.Address | None = None,
     *,
-    x_address: spec.Address = None,
-    y_address: spec.Address = None,
+    x_address: spec.Address | None = None,
+    y_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
 ) -> list[int]:
 

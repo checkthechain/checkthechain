@@ -118,7 +118,7 @@ def get_address(
     address: typing.Optional[spec.Address] = None,
     name: typing.Optional[str] = None,
     contract_name: typing.Optional[str] = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
     network: typing.Optional[spec.NetworkReference] = None,
     backend: spec.StorageBackend = 'Filesystem',
 ) -> spec.Address:

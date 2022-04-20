@@ -9,14 +9,14 @@ from .. import rpc_request
 
 def construct_eth_call(
     to_address: spec.BinaryData,
-    from_address: spec.BinaryData = None,
-    gas: spec.BinaryData = None,
-    gas_price: spec.BinaryData = None,
-    value_sent: spec.BinaryData = None,
-    block_number: spec.BlockNumberReference = None,
-    call_data: spec.BinaryData = None,
+    from_address: spec.BinaryData | None = None,
+    gas: spec.BinaryData | None = None,
+    gas_price: spec.BinaryData | None = None,
+    value_sent: spec.BinaryData | None = None,
+    block_number: spec.BlockNumberReference | None = None,
+    call_data: spec.BinaryData | None = None,
     function_parameters: typing.Sequence | typing.Mapping | None = None,
-    function_abi: typing.Optional[spec.FunctionABI] = None,
+    function_abi: spec.FunctionABI | None = None,
 ) -> spec.RpcRequest:
 
     if block_number is None:
@@ -47,13 +47,13 @@ def construct_eth_call(
 
 def construct_eth_estimate_gas(
     to_address: spec.BinaryData,
-    from_address: spec.BinaryData = None,
-    gas: spec.BinaryData = None,
-    gas_price: spec.BinaryData = None,
-    value_sent: spec.BinaryData = None,
-    call_data: spec.BinaryData = None,
-    function_parameters: typing.Optional[typing.Union[list, dict]] = None,
-    function_abi: typing.Optional[spec.FunctionABI] = None,
+    from_address: spec.BinaryData | None = None,
+    gas: spec.BinaryData | None = None,
+    gas_price: spec.BinaryData | None = None,
+    value_sent: spec.BinaryData | None = None,
+    call_data: spec.BinaryData | None = None,
+    function_parameters: typing.Sequence | typing.Mapping | None = None,
+    function_abi: spec.FunctionABI | None = None,
 ) -> spec.RpcRequest:
 
     # encode call data

@@ -12,12 +12,12 @@ from . import analytics_spec
 
 
 async def async_get_time_data(
-    blocks: typing.Sequence[spec.BlockNumberReference] = None,
-    timestamps: typing.Sequence[int] = None,
-    timescale: typing.Optional[analytics_spec.TimescaleSpec] = None,
-    end_time: typing.Optional[analytics_spec.Timestamp] = None,
-    window_size: str = None,
-    interval_size: str = None,
+    blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
+    timestamps: typing.Sequence[int] | None = None,
+    timescale: analytics_spec.TimescaleSpec | None = None,
+    end_time: analytics_spec.Timestamp | None = None,
+    window_size: str | None = None,
+    interval_size: str | None = None,
     provider: spec.ProviderSpec = None,
 ) -> analytics_spec.TimeData:
 

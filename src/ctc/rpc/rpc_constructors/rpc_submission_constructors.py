@@ -43,11 +43,11 @@ def construct_eth_sign_transaction(
 def construct_eth_send_transaction(
     from_address: spec.BinaryData,
     data: spec.BinaryData,
-    to_address: spec.BinaryData = None,
+    to_address: spec.BinaryData | None = None,
     gas: int | None = None,
     gas_price: int | None = None,
     value: int | None = None,
-    nonce: spec.BinaryData = None,
+    nonce: spec.BinaryData | None = None,
 ) -> spec.RpcRequest:
     parameters = {
         'from': from_address,

@@ -144,7 +144,7 @@ def convert(
 def add_binary_pad(
     data: spec.BinaryInteger,
     pad_side: typing.Literal['left', 'right', None] = None,
-    padded_size: int = None,
+    padded_size: int | None = None,
 ) -> spec.BinaryInteger:
     """add pad of zeros to left or right side of binary data"""
 

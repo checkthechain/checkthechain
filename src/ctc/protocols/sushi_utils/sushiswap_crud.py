@@ -6,8 +6,8 @@ from ctc import spec
 
 async def async_get_pool_swaps(
     pool_address: spec.Address,
-    start_block: spec.BlockNumberReference = None,
-    end_block: spec.BlockNumberReference = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
     replace_symbols: bool = False,
     normalize: bool = True,
 ) -> spec.DataFrame:

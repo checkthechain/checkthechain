@@ -44,7 +44,7 @@ def get_multicall_address(
 
 async def async_multicall(
     calls: typing.Sequence[multicall_spec.Call],
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderSpec = None,
 ) -> typing.List[typing.Any]:
 

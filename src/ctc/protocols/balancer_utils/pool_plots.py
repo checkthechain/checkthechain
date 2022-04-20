@@ -16,7 +16,7 @@ async def plot_lbp_summary(
     pool_address: spec.Address,
     price_range: typing.Sequence[int | float] | None = None,
     premium_range: typing.Sequence[int | float] | None = None,
-    oracle_data: spec.DataFrame = None,
+    oracle_data: spec.DataFrame | None = None,
 ) -> None:
 
     summary = pool_summary.summarize_pool_swaps(swaps=swaps, weights=weights)

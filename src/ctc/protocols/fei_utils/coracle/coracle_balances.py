@@ -200,8 +200,8 @@ async def async_get_token_balance_by_block(
 
 
 async def async_get_tokens_balances(
-    tokens: typing.Sequence[spec.Address] = None,
-    block: typing.Optional[spec.BlockNumberReference] = None,
+    tokens: typing.Sequence[spec.Address] | None = None,
+    block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
     usd: bool = False,
