@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 contenttypes = {
     'Call': {
         'jsonrpc': 'Text',

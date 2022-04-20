@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 erc20_event_abis = {
     'Transfer': {
         'anonymous': False,

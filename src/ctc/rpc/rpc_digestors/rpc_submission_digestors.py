@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ctc import spec
 from ctc import binary
 from .. import rpc_format

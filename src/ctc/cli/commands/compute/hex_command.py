@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import toolcli
 
 from ctc import binary

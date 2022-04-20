@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 registry = '0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e'
 base_registrar = (
     '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85'  # the erc721 token

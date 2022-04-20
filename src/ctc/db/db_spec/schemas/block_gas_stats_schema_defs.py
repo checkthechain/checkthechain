@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import toolsql
 
 block_gas_stats_schema: toolsql.DBSchema = {

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import toolsql
 
 uniswap_v2_pools_schema: toolsql.DBSchema = {

@@ -1,4 +1,5 @@
 # replace eth_abi with eth_abi_lite
+from __future__ import annotations
 
 import typing
 

@@ -11,4 +11,5 @@ Desired Information
 - token CEX activity and inflow/outflow
 - how each of these values change over time
 """
+from __future__ import annotations
 

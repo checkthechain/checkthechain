@@ -1,6 +1,7 @@
 """
 ERC20 lists obtained from https://erc20lists.org/
 """
+from __future__ import annotations
 
 import typing
 from typing_extensions import TypedDict
