@@ -22,18 +22,17 @@ async def async_summarize_feed(feed: str, n_recent: int = 10) -> None:
     else:
         raise Exception('unknown feed specification: ' + str(feed))
 
-    call_kwargs = {'to_address': feed_address}
     name = await rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['description'],
-        **call_kwargs,
+        to_address=feed_address,
     )
     decimals = await rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['decimals'],
-        **call_kwargs,
+        to_address=feed_address,
     )
     aggregator = await rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['aggregator'],
-        **call_kwargs,
+        to_address=feed_address,
     )
 
     latest_block = await rpc.async_eth_block_number()

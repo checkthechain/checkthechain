@@ -57,6 +57,7 @@ async def async_get_events(
         start_block = await block_utils.async_get_contract_creation_block(
             contract_address
         )
+    start_block = await block_utils.async_block_number_to_int(start_block)
     if end_block is None:
         end_block = 'latest'
 
@@ -100,9 +101,14 @@ async def async_transfer_events(
     **query: typing.Any
 ) -> spec.DataFrame:
 
-    start_block, end_block = await block_utils.async_block_numbers_to_int(
-        blocks=[start_block, end_block],
-    )
+    if start_block is not None and end_block is not None:
+        start_block, end_block = await block_utils.async_block_numbers_to_int(
+            blocks=[start_block, end_block],
+        )
+    elif start_block is not None:
+        start_block = await block_utils.async_block_number_to_int(start_block)
+    elif end_block is not None:
+        end_block = await block_utils.async_block_number_to_int(end_block)
 
     return await backend_utils.async_transfer_backends(
         get=async_get_events,
@@ -115,25 +121,30 @@ async def async_transfer_events(
 
 
 async def async_download_events(
-    contract_address,
-    event_hash=None,
-    event_name=None,
-    event_abi=None,
-    start_block=None,
-    end_block=None,
-    provider=None,
-    verbose=True,
-):
+    contract_address: spec.Address,
+    event_hash: str | None = None,
+    event_name: str | None = None,
+    event_abi: spec.EventABI | None = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+    verbose: bool = True,
+) -> spec.DataFrame:
 
     if event_hash is None and event_name is None and event_abi is None:
         raise Exception('must specify either event_hash or event_name')
 
     contract_address = contract_address.lower()
 
-    start_block, end_block = await block_utils.async_block_numbers_to_int(
-        blocks=[start_block, end_block],
-        provider=provider,
-    )
+    if start_block is not None and end_block is not None:
+        start_block, end_block = await block_utils.async_block_numbers_to_int(
+            blocks=[start_block, end_block],
+        )
+    elif start_block is not None:
+        start_block = await block_utils.async_block_number_to_int(start_block)
+    elif end_block is not None:
+        end_block = await block_utils.async_block_number_to_int(end_block)
+
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -160,7 +171,7 @@ async def async_download_events(
     )
     downloads = []
     if listed_events is None:
-        download = {'start_block': start_block, 'end_block': end_block}
+        download: dict = {'start_block': start_block, 'end_block': end_block}
         downloads.append(download)
     else:
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import evm
+from ctc import binary
 from ctc import rpc
 from ctc import spec
 from ctc.protocols import ens_utils
@@ -23,7 +23,7 @@ async def async_owner_command(
     name: str, block: spec.BlockNumberReference
 ) -> None:
     if block is not None:
-        block = evm.standardize_block_number(block)
+        block = binary.standardize_block_number(block)
     owner = await ens_utils.async_get_owner(name, block=block)
     print(owner)
     await rpc.async_close_http_session()

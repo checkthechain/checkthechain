@@ -59,7 +59,9 @@ def get_providers() -> dict[spec.NetworkName, spec.Provider]:
 
 
 def has_provider(
-    *, name=typing.Optional[str], network=typing.Optional[str]
+    *,
+    name: typing.Optional[str] = None,
+    network: typing.Optional[str] = None,
 ) -> bool:
     try:
         get_provider(name=name, network=network)

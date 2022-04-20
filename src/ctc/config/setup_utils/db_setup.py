@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
 def setup_dbs(
     styles: typing.Mapping[str, str],
     data_root: str,
-    old_config,
+    old_config: typing.Mapping,
 ) -> tuple[spec.PartialConfigSpec, bool]:
     print()
     print()

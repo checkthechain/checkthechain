@@ -1,12 +1,11 @@
 import typing
 
-from ctc import directory
 from ctc import rpc
 from ctc import spec
 from . import abi_utils
 
 
-eip_897_abi = [
+eip_897_abi: typing.Sequence[spec.FunctionABI] = [
     {
         'name': 'proxyType',
         'type': 'function',

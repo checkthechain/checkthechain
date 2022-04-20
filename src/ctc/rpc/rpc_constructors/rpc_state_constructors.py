@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import typing
 
 from ctc import binary
 from ctc import spec
 from .. import rpc_request
-from .. import rpc_format
 
 
 def construct_eth_call(
@@ -12,15 +13,16 @@ def construct_eth_call(
     gas: spec.BinaryData = None,
     gas_price: spec.BinaryData = None,
     value_sent: spec.BinaryData = None,
-    block_number: spec.BlockSpec = None,
+    block_number: spec.BlockNumberReference = None,
     call_data: spec.BinaryData = None,
-    function_parameters: typing.Optional[typing.Union[list, dict]] = None,
+    function_parameters: typing.Sequence | typing.Mapping | None = None,
     function_abi: typing.Optional[spec.FunctionABI] = None,
 ) -> spec.RpcRequest:
 
     if block_number is None:
         block_number = 'latest'
-    block_number = rpc_format.encode_block_number(block_number)
+    else:
+        block_number = binary.encode_block_number(block_number)
 
     # encode call data
     if call_data is None:
@@ -76,35 +78,35 @@ def construct_eth_estimate_gas(
 
 
 def construct_eth_get_balance(
-    address,
-    block_number=None,
+    address: spec.Address,
+    block_number: spec.BlockNumberReference | None = None,
 ) -> spec.RpcRequest:
 
     if block_number is None:
         block_number = 'latest'
 
-    block_number = rpc_format.encode_block_number(block_number)
-    return rpc_request.create('eth_getBalance', [address, block_number])
+    encoded_block_number = binary.encode_block_number(block_number)
+    return rpc_request.create('eth_getBalance', [address, encoded_block_number])
 
 
 def construct_eth_get_storage_at(
     address: spec.BinaryData,
     position: spec.BinaryData,
-    block_number='latest',
+    block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
     position = binary.convert(position, 'prefix_hex')
-    block_number = rpc_format.encode_block_number(block_number)
+    encoded_block_number = binary.encode_block_number(block_number)
     return rpc_request.create(
-        'eth_getStorageAt', [address, position, block_number]
+        'eth_getStorageAt', [address, position, encoded_block_number]
     )
 
 
 def construct_eth_get_code(
     address: spec.BinaryData,
-    block_number: spec.BlockSpec = 'latest',
+    block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
-    block_number = rpc_format.encode_block_number(block_number)
+    block_number = binary.encode_block_number(block_number)
     return rpc_request.create('eth_getCode', [address, block_number])
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import spec
 from .. import rpc_request
 
@@ -45,7 +47,7 @@ def construct_shh_add_to_group(data: spec.BinaryData) -> spec.RpcRequest:
 
 
 def construct_shh_new_filter(
-    to_address: spec.BinaryData, topics: list[spec.BinaryData]
+    to_address: spec.BinaryData, topics: typing.Sequence[spec.BinaryData]
 ) -> spec.RpcRequest:
     payload = {
         'to': to_address,

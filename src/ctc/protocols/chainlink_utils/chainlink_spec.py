@@ -1,4 +1,5 @@
 # https://docs.chain.link/docs/faq/
+from __future__ import annotations
 
 import typing
 from typing_extensions import TypedDict
@@ -20,7 +21,7 @@ path_templates = {
 }
 
 
-feed_function_abis = {
+feed_function_abis: dict[str, spec.FunctionABI] = {
     'aggregator': {
         'inputs': [],
         'name': 'aggregator',
@@ -74,7 +75,7 @@ feed_function_abis = {
     },
 }
 
-aggregator_event_abis = {
+aggregator_event_abis: dict[str, spec.EventABI] = {
     'AnswerUpdated': {
         'anonymous': False,
         'inputs': [

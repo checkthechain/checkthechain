@@ -6,18 +6,17 @@ from ctc import spec
 from .. import formats
 
 
-def encode_block_number(block: spec.BlockSpec) -> str:
+def encode_block_number(block: spec.BlockNumberReference) -> str:
+    """encode block number as hex str"""
 
-    if isinstance(block, str) and block in ['latest', 'earliest', 'pending']:
-        return block
+    standard_block = standardize_block_number(block)
+
+    if isinstance(standard_block, str):
+        return standard_block
+    elif isinstance(standard_block, int):
+        return formats.convert(standard_block, 'prefix_hex')
     else:
-        # python3.7 compatibliity
-        supports_int = hasattr(block, '__int__')
-        # supports_int = isinstance(block, typing.SupportsInt)
-
-        if supports_int:
-            block = int(block)
-        return formats.convert(block, 'prefix_hex')
+        raise Exception('could not encode block number')
 
 
 #

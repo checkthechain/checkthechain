@@ -4,9 +4,13 @@ import typing
 import toolsql
 
 from ctc import config
+from ctc import spec
 
 
-def create_engine(datatype, network=None) -> toolsql.SAEngine | None:
+def create_engine(
+    datatype: str,
+    network: spec.NetworkReference | None = None,
+) -> toolsql.SAEngine | None:
 
     # get db config
     data_source: config.DataSource | config.LeafDataSource = (

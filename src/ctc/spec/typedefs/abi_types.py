@@ -9,29 +9,33 @@ if typing.TYPE_CHECKING:
     from typing_extensions import NotRequired
 
 
-class FunctionABI(TypedDict):
+class FunctionABI(TypedDict, total=False):
     type: typing.Literal['function', 'constructor', 'receive', 'fallback']
     name: NotRequired[str]
     inputs: NotRequired[list['ABIFunctionArg']]
     outputs: NotRequired[list['ABIFunctionArg']]
     stateMutability: typing.Literal['pure', 'view', 'nonpayable', 'payable']
+    anonymous: bool
 
 
-class ABIFunctionArg(TypedDict):
+class ABIFunctionArg(TypedDict, total=False):
     name: str
     type: 'ABIDatumType'
     components: 'ABITupleComponents'
+    internalType: 'ABIDatumType'
 
 
-class EventABI(TypedDict):
+class EventABI(TypedDict, total=False):
     type: typing.Literal['event']
     name: str
     inputs: list['ABIEventArg']
+    anonymous: bool
 
 
-class ABIEventArg(TypedDict):
+class ABIEventArg(TypedDict, total=False):
     name: str
     type: 'ABIDatumType'
+    internalType: 'ABIDatumType'
     components: 'ABITupleComponents'
     indexed: bool
     anonymous: NotRequired[bool]

@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolcli
 
 from ctc.protocols import ens_utils
-from ctc import evm
+from ctc import binary
 from ctc import rpc
 from ctc import spec
 
@@ -22,7 +22,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_exists_command(name: str, block: spec.BlockNumberReference) -> None:
 
     if block is not None:
-        block = evm.standardize_block_number(block)
+        block = binary.standardize_block_number(block)
     exists = await ens_utils.async_record_exists(name, block=block)
 
     print(exists)

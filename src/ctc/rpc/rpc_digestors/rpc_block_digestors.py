@@ -67,7 +67,7 @@ def digest_eth_get_block_by_number(
 
 def digest_eth_get_uncle_count_by_block_hash(
     response: spec.RpcSingularResponse, decode_response: bool = True
-):
+) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
     return response

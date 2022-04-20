@@ -1,4 +1,5 @@
 from .rpc_block_digestors import *
+from .rpc_dev_digestors import *
 from .rpc_log_digestors import *
 from .rpc_mining_digestors import *
 from .rpc_node_digestors import *

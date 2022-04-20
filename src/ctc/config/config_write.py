@@ -8,7 +8,7 @@ import toolconfig
 def write_config_file(
     config_data: spec.ConfigSpec,
     path: str,
-    overwrite: bool = False,
+    overwrite: toolconfig.OverwriteOption = False,
     style: typing.Optional[str] = None
 ) -> None:
 

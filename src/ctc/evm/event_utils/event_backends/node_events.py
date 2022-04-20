@@ -1,26 +1,28 @@
+from __future__ import annotations
+
 import asyncio
+import typing
 
 from ctc import binary
-from ctc import directory
 from ctc import rpc
 from ctc import spec
+
 from ... import abi_utils
 from ... import block_utils
 
 
 async def async_get_events_from_node(
-    start_block='latest',
-    end_block='latest',
-    event_name=None,
-    event_hash=None,
-    event_abi=None,
-    contract_address=None,
-    contract_abi=None,
-    blocks_per_chunk=2000,
-    package_as_dataframe=True,
-    verbose=True,
+    start_block: spec.BlockNumberReference = 'latest',
+    end_block: spec.BlockNumberReference = 'latest',
+    event_name: str | None = None,
+    event_hash: str | None = None,
+    event_abi: spec.EventABI | None = None,
+    contract_address: spec.Address | None = None,
+    contract_abi: spec.ContractABI | None = None,
+    blocks_per_chunk: int = 2000,
+    verbose: bool = True,
     provider: spec.ProviderSpec = None,
-):
+) -> spec.DataFrame:
     """see fetch_events() for complete kwarg list"""
 
     provider = rpc.get_provider(provider)
@@ -99,33 +101,32 @@ async def async_get_events_from_node(
     ]
 
     # package as dataframe
-    if package_as_dataframe:
-        entries = await _async_package_exported_events(
-            entries,
-            contract_address=contract_address,
-            contract_abi=contract_abi,
-            event_hash=event_hash,
-            event_name=event_name,
-            event_abi=event_abi,
-            provider=provider,
-        )
-
-    return entries
+    return await _async_package_exported_events(
+        entries,
+        contract_address=contract_address,
+        contract_abi=contract_abi,
+        event_hash=event_hash,
+        event_name=event_name,
+        event_abi=event_abi,
+        provider=provider,
+    )
 
 
 async def _async_get_chunk_of_events_from_node(
-    block_range,
-    event_hash,
-    contract_address,
-    verbose,
-    provider=None,
-):
+    block_range: typing.Sequence[spec.BlockNumberReference],
+    event_hash: str,
+    contract_address: spec.Address | None,
+    verbose: bool,
+    provider: spec.ProviderSpec = None,
+) -> typing.Sequence[spec.RawLog]:
 
     if verbose > 1:
         print('scraping block range: ' + str(block_range) + '\n', end='')
 
     # fetch entries
     start_block, end_block = block_range
+    start_block = binary.standardize_block_number(start_block)
+    end_block = binary.standardize_block_number(end_block)
     entries = await rpc.async_eth_get_logs(
         address=contract_address,
         topics=[event_hash],
@@ -138,21 +139,23 @@ async def _async_get_chunk_of_events_from_node(
 
 
 async def _async_package_exported_events(
-    entries,
-    contract_address,
-    contract_abi,
-    event_hash,
-    event_name,
-    event_abi,
-    provider,
-):
+    entries: typing.Sequence[spec.RawLog],
+    contract_address: spec.Address | None,
+    contract_abi: spec.ContractABI | None,
+    event_hash: str,
+    event_name: str,
+    event_abi: spec.EventABI | None,
+    provider: spec.ProviderSpec,
+) -> spec.DataFrame:
+
     if event_abi is None:
+        network = rpc.get_provider_network(provider)
         event_abi = await abi_utils.async_get_event_abi(
             contract_address=contract_address,
             contract_abi=contract_abi,
             event_hash=event_hash,
             event_name=event_name,
-            provider=provider,
+            network=network,
         )
 
     if len(entries) == 0:
@@ -175,8 +178,8 @@ async def _async_package_exported_events(
 
 
 def create_empty_event_dataframe(
-    event_abi=None,
-):
+    event_abi: spec.EventABI | None = None,
+) -> spec.DataFrame:
 
     # standard columns
     columns = [
@@ -190,8 +193,9 @@ def create_empty_event_dataframe(
     ]
 
     # event-specific columns
-    for item in event_abi['inputs']:
-        columns.append('arg__' + item['name'])
+    if event_abi is not None:
+        for item in event_abi['inputs']:
+            columns.append('arg__' + item['name'])
 
     import pandas as pd
 

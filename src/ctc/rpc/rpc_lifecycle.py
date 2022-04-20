@@ -12,7 +12,7 @@ def construct(
     *,
     batch_parameter: typing.Optional[str] = None,
     batch_values: typing.Optional[list[typing.Any]] = None,
-    **parameters
+    **parameters: typing.Any,
 ) -> spec.RpcRequest:
     """create an rpc request according to a specific method"""
     constructor = rpc_registry.get_constructors()[method]

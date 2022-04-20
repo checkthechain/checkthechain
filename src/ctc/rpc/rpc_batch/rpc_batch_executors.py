@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import evm
 from ctc import spec
 
@@ -5,24 +9,28 @@ from .. import rpc_provider
 from . import rpc_batch_utils
 
 
-async def async_batch_eth_accounts(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_accounts(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_accounts', **kwargs)
 
 
-async def async_batch_eth_block_number(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_block_number(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_block_number', **kwargs
     )
 
 
 async def async_batch_eth_call(
-    function_abi=None,
-    function_name=None,
-    function_selector=None,
-    provider=None,
-    to_address=None,
-    to_addresses=None,
-    **kwargs,
+    function_abi: spec.FunctionABI | None = None,
+    function_name: str | None = None,
+    function_selector: spec.FunctionSelector | None = None,
+    provider: spec.ProviderSpec = None,
+    to_address: spec.Address | None = None,
+    to_addresses: typing.Sequence[spec.Address] | None = None,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
 
     if function_abi is None:
@@ -58,52 +66,68 @@ async def async_batch_eth_call(
     )
 
 
-async def async_batch_eth_coinbase(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_coinbase(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_coinbase', **kwargs)
 
 
-async def async_batch_eth_compile_lll(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_compile_lll(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_compile_lll', **kwargs
     )
 
 
-async def async_batch_eth_compile_serpent(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_compile_serpent(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_compile_serpent', **kwargs
     )
 
 
-async def async_batch_eth_compile_solidity(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_compile_solidity(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_compile_solidity', **kwargs
     )
 
 
-async def async_batch_eth_estimate_gas(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_estimate_gas(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_estimate_gas', **kwargs
     )
 
 
-async def async_batch_eth_gas_price(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_gas_price(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_gas_price', **kwargs)
 
 
-async def async_batch_eth_get_balance(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_balance(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_balance', **kwargs
     )
 
 
-async def async_batch_eth_get_block_by_hash(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_block_by_hash(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_block_by_hash', **kwargs
     )
 
 
 async def async_batch_eth_get_block_by_number(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_block_by_number', **kwargs
@@ -111,7 +135,7 @@ async def async_batch_eth_get_block_by_number(
 
 
 async def async_batch_eth_get_block_transaction_count_by_hash(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_block_transaction_count_by_hash', **kwargs
@@ -119,49 +143,59 @@ async def async_batch_eth_get_block_transaction_count_by_hash(
 
 
 async def async_batch_eth_get_block_transaction_count_by_number(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_block_transaction_count_by_number', **kwargs
     )
 
 
-async def async_batch_eth_get_code(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_code(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_get_code', **kwargs)
 
 
-async def async_batch_eth_get_compilers(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_compilers(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_compilers', **kwargs
     )
 
 
 async def async_batch_eth_get_filter_changes(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_filter_changes', **kwargs
     )
 
 
-async def async_batch_eth_get_filter_logs(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_filter_logs(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_filter_logs', **kwargs
     )
 
 
-async def async_batch_eth_get_logs(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_logs(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_get_logs', **kwargs)
 
 
-async def async_batch_eth_get_storage_at(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_storage_at(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_storage_at', **kwargs
     )
 
 
 async def async_batch_eth_get_transaction_by_block_hash_and_index(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_transaction_by_block_hash_and_index', **kwargs
@@ -169,7 +203,7 @@ async def async_batch_eth_get_transaction_by_block_hash_and_index(
 
 
 async def async_batch_eth_get_transaction_by_block_number_and_index(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_transaction_by_block_number_and_index', **kwargs
@@ -177,7 +211,7 @@ async def async_batch_eth_get_transaction_by_block_number_and_index(
 
 
 async def async_batch_eth_get_transaction_by_hash(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_transaction_by_hash', **kwargs
@@ -185,7 +219,7 @@ async def async_batch_eth_get_transaction_by_hash(
 
 
 async def async_batch_eth_get_transaction_count(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_transaction_count', **kwargs
@@ -193,7 +227,7 @@ async def async_batch_eth_get_transaction_count(
 
 
 async def async_batch_eth_get_transaction_receipt(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_transaction_receipt', **kwargs
@@ -201,7 +235,7 @@ async def async_batch_eth_get_transaction_receipt(
 
 
 async def async_batch_eth_get_uncle_by_block_hash_and_index(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_uncle_by_block_hash_and_index', **kwargs
@@ -209,7 +243,7 @@ async def async_batch_eth_get_uncle_by_block_hash_and_index(
 
 
 async def async_batch_eth_get_uncle_by_block_number_and_index(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_uncle_by_block_number_and_index', **kwargs
@@ -217,7 +251,7 @@ async def async_batch_eth_get_uncle_by_block_number_and_index(
 
 
 async def async_batch_eth_get_uncle_count_by_block_hash(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_uncle_count_by_block_hash', **kwargs
@@ -225,167 +259,215 @@ async def async_batch_eth_get_uncle_count_by_block_hash(
 
 
 async def async_batch_eth_get_uncle_count_by_block_number(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_get_uncle_count_by_block_number', **kwargs
     )
 
 
-async def async_batch_eth_get_work(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_get_work(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_get_work', **kwargs)
 
 
-async def async_batch_eth_hashrate(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_hashrate(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_hashrate', **kwargs)
 
 
-async def async_batch_eth_mining(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_mining(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_mining', **kwargs)
 
 
-async def async_batch_eth_new_block_filter(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_new_block_filter(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_new_block_filter', **kwargs
     )
 
 
-async def async_batch_eth_new_filter(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_new_filter(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_new_filter', **kwargs)
 
 
 async def async_batch_eth_new_pending_transaction_filter(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_new_pending_transaction_filter', **kwargs
     )
 
 
-async def async_batch_eth_protocol_version(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_protocol_version(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_protocol_version', **kwargs
     )
 
 
 async def async_batch_eth_send_raw_transaction(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_send_raw_transaction', **kwargs
     )
 
 
-async def async_batch_eth_send_transaction(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_send_transaction(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_send_transaction', **kwargs
     )
 
 
-async def async_batch_eth_sign(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_sign(**kwargs: typing.Any) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_sign', **kwargs)
 
 
-async def async_batch_eth_sign_transaction(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_sign_transaction(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_sign_transaction', **kwargs
     )
 
 
-async def async_batch_eth_submit_hashrate(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_submit_hashrate(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_submit_hashrate', **kwargs
     )
 
 
-async def async_batch_eth_submit_work(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_submit_work(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_submit_work', **kwargs
     )
 
 
-async def async_batch_eth_syncing(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_syncing(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('eth_syncing', **kwargs)
 
 
-async def async_batch_eth_uninstall_filter(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_eth_uninstall_filter(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'eth_uninstall_filter', **kwargs
     )
 
 
-async def async_batch_net_listening(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_net_listening(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('net_listening', **kwargs)
 
 
-async def async_batch_net_peer_count(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_net_peer_count(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('net_peer_count', **kwargs)
 
 
-async def async_batch_net_version(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_net_version(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('net_version', **kwargs)
 
 
-async def async_batch_shh_add_to_group(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_add_to_group(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'shh_add_to_group', **kwargs
     )
 
 
 async def async_batch_shh_get_filter_changes(
-    **kwargs,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'shh_get_filter_changes', **kwargs
     )
 
 
-async def async_batch_shh_get_messages(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_get_messages(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'shh_get_messages', **kwargs
     )
 
 
-async def async_batch_shh_has_identity(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_has_identity(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'shh_has_identity', **kwargs
     )
 
 
-async def async_batch_shh_new_filter(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_new_filter(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('shh_new_filter', **kwargs)
 
 
-async def async_batch_shh_new_group(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_new_group(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('shh_new_group', **kwargs)
 
 
-async def async_batch_shh_new_identity(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_new_identity(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'shh_new_identity', **kwargs
     )
 
 
-async def async_batch_shh_post(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_post(**kwargs: typing.Any) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('shh_post', **kwargs)
 
 
-async def async_batch_shh_uninstall_filter(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_uninstall_filter(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'shh_uninstall_filter', **kwargs
     )
 
 
-async def async_batch_shh_version(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_shh_version(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('shh_version', **kwargs)
 
 
-async def async_batch_web3_client_version(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_web3_client_version(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute(
         'web3_client_version', **kwargs
     )
 
 
-async def async_batch_web3_sha3(**kwargs) -> spec.RpcPluralResponse:
+async def async_batch_web3_sha3(**kwargs: typing.Any) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('web3_sha3', **kwargs)
 

@@ -10,7 +10,7 @@ from . import coracle_spec
 from . import coracle_tokens
 
 
-function_abis = {
+coracle_function_abis: dict[str, spec.FunctionABI] = {
     'getDepositsForToken': {
         'inputs': [
             {'internalType': 'address', 'name': '_token', 'type': 'address'}
@@ -74,7 +74,7 @@ async def async_get_token_deposits(
     return await rpc.async_eth_call(
         to_address=coracle,
         block_number=block,
-        function_abi=function_abis['getDepositsForToken'],
+        function_abi=coracle_function_abis['getDepositsForToken'],
         function_parameters={'_token': token},
         provider=provider,
     )

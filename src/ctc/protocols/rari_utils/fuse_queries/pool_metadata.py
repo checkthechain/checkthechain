@@ -19,7 +19,7 @@ async def async_get_pool_ctoken(
     return await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
-        function_abi=rari_abis.comptroller_abis['cTokensByUnderlying'],
+        function_abi=rari_abis.comptroller_function_abis['cTokensByUnderlying'],
         function_parameters=[underlying],
     )
 
@@ -31,7 +31,7 @@ async def async_get_pool_ctokens(
     return await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
-        function_abi=rari_abis.comptroller_abis['getAllMarkets'],
+        function_abi=rari_abis.comptroller_function_abis['getAllMarkets'],
     )
 
 
@@ -61,7 +61,7 @@ async def async_get_pool_oracle(
     return await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
-        function_abi=rari_abis.comptroller_abis['oracle'],
+        function_abi=rari_abis.comptroller_function_abis['oracle'],
     )
 
 

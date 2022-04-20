@@ -8,7 +8,7 @@ async def async_get_underlying_asset(
     pool_token: spec.Address,
     provider: spec.ProviderSpec = None,
 ) -> spec.Address:
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'UNDERLYING_ASSET_ADDRESS',
         'inputs': [],
         'outputs': [{'type': 'address'}],

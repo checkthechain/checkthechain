@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+from ctc import spec
+
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
 
 
-async def async_eth_block_number(provider=None, decode_response=True):
+async def async_eth_block_number(
+    provider: spec.ProviderSpec = None, decode_response: bool = True
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_block_number()
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_block_number(
@@ -13,12 +19,12 @@ async def async_eth_block_number(provider=None, decode_response=True):
 
 
 async def async_eth_get_block_by_hash(
-    block_hash,
-    include_full_transactions=False,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    block_hash: str,
+    include_full_transactions: bool = False,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_block_by_hash(
         block_hash=block_hash,
         include_full_transactions=include_full_transactions,
@@ -32,12 +38,12 @@ async def async_eth_get_block_by_hash(
 
 
 async def async_eth_get_block_by_number(
-    block_number,
-    include_full_transactions=True,
-    decode_response=True,
-    provider=None,
-    snake_case_response=True,
-):
+    block_number: spec.StandardBlockNumber,
+    include_full_transactions: bool = True,
+    decode_response: bool = True,
+    provider: spec.ProviderSpec = None,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_block_by_number(
         block_number=block_number,
         include_full_transactions=include_full_transactions,
@@ -51,8 +57,10 @@ async def async_eth_get_block_by_number(
 
 
 async def async_eth_get_uncle_count_by_block_hash(
-    block_hash, provider=None, decode_response=True
-):
+    block_hash: str,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_uncle_count_by_block_hash(
         block_hash=block_hash,
     )
@@ -64,8 +72,10 @@ async def async_eth_get_uncle_count_by_block_hash(
 
 
 async def async_eth_get_uncle_count_by_block_number(
-    block_number, provider=None, decode_response=True
-):
+    block_number: spec.StandardBlockNumber,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_uncle_count_by_block_number(
         block_number=block_number,
     )
@@ -77,12 +87,12 @@ async def async_eth_get_uncle_count_by_block_number(
 
 
 async def async_eth_get_uncle_by_block_hash_and_index(
-    block_hash,
-    uncle_index,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    block_hash: str,
+    uncle_index: str,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_uncle_by_block_hash_and_index(
         block_hash=block_hash,
         uncle_index=uncle_index,
@@ -96,12 +106,12 @@ async def async_eth_get_uncle_by_block_hash_and_index(
 
 
 async def async_eth_get_uncle_by_block_number_and_index(
-    block_number,
-    uncle_index,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    block_number: spec.StandardBlockNumber,
+    uncle_index: str,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = (
         rpc_constructors.construct_eth_get_uncle_by_block_number_and_index(
             block_number=block_number,

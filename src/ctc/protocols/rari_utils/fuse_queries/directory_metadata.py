@@ -20,7 +20,7 @@ async def async_get_all_pools(
     return await rpc.async_eth_call(
         to_address=fuse_directory,
         block_number=block,
-        function_abi=rari_abis.pool_directory_abis['getAllPools'],
+        function_abi=rari_abis.pool_directory_function_abis['getAllPools'],
         provider=provider,
     )
 

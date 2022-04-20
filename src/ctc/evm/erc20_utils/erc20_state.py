@@ -147,7 +147,7 @@ async def async_get_erc20_balance_of_addresses(
     balances = await rpc.async_batch_eth_call(
         to_address=token,
         block_number=block,
-        function_abi=evm_spec.erc20_abis['balanceOf'],
+        function_abi=evm_spec.erc20_function_abis['balanceOf'],
         function_parameter_list=[[address] for address in addresses],
         provider=provider,
         **rpc_kwargs,
@@ -321,7 +321,7 @@ async def async_get_erc20s_allowances_by_address(
     allowances = await rpc.async_batch_eth_call(
         to_address=token,
         block_number=block,
-        function_abi=evm_spec.erc20_abis['allowance'],
+        function_abi=evm_spec.erc20_function_abis['allowance'],
         function_parameter_list=[[address] for address in addresses],
         provider=provider,
     )

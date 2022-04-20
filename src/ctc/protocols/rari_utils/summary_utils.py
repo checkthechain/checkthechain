@@ -9,6 +9,7 @@ import tooltime
 import tooltable  # type: ignore
 
 from ctc.protocols import chainlink_utils
+from ctc import binary
 from ctc import directory
 from ctc import rpc
 from ctc import spec
@@ -137,7 +138,8 @@ async def print_all_pool_summary(
         row.append(tvb)
         rows.append(row)
 
-    block_data = await rpc.async_eth_get_block_by_number(block)
+    standard_block = binary.standardize_block_number(block)
+    block_data = await rpc.async_eth_get_block_by_number(standard_block)
     timestamp = tooltime.timestamp_to_iso(block_data['timestamp']).replace(
         'T', ' '
     )
@@ -328,7 +330,8 @@ async def async_print_fuse_token_summary(
     else:
         symbol = directory.get_erc20_symbol(token)
 
-    block_data = await rpc.async_eth_get_block_by_number(block)
+    standard_block = binary.standardize_block_number(block)
+    block_data = await rpc.async_eth_get_block_by_number(standard_block)
     multipool_stats = await async_get_token_multipool_stats(
         token,
         block=block_data['number'],

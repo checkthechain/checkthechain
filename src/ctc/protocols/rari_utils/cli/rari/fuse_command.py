@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import asyncio
-
 import toolcli
 
+from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -54,7 +53,8 @@ async def summarize_fuse_pool(
     all_pools = await rari_utils.async_get_all_pools(block=block)
     pool = all_pools[pool_index]
     comptroller = pool[2]
-    block_data = await rpc.async_eth_get_block_by_number(block_number=block)
+    standard_block = binary.standardize_block_number(block)
+    block_data = await rpc.async_eth_get_block_by_number(block_number=standard_block)
 
     tokens_data = await rari_utils.async_get_pool_summary(
         comptroller=comptroller,

@@ -1,27 +1,33 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import evm
+from ctc import spec
+
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
 
 
 async def async_eth_call(
-    to_address,
-    from_address=None,
-    gas=None,
-    gas_price=None,
-    value_sent=None,
-    block_number=None,
-    call_data=None,
-    function_parameters=None,
-    provider=None,
-    decode_response=True,
-    delist_single_outputs=True,
-    package_named_outputs=False,
-    fill_empty=False,
-    empty_token=None,
-    function_abi=None,
-    **function_abi_query
-):
+    to_address: spec.Address,
+    from_address: spec.BinaryData = None,
+    gas: spec.BinaryData = None,
+    gas_price: spec.BinaryData = None,
+    value_sent: spec.BinaryData = None,
+    block_number: spec.BlockNumberReference = None,
+    call_data: spec.BinaryData = None,
+    function_parameters: typing.Sequence | typing.Mapping | None = None,
+    function_abi: typing.Optional[spec.FunctionABI] = None,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    delist_single_outputs: bool = True,
+    package_named_outputs: bool = False,
+    fill_empty: bool = False,
+    empty_token: typing.Any = None,
+    **function_abi_query: typing.Any
+) -> spec.RpcSingularResponse:
 
     if function_abi is None:
         function_abi = await evm.async_get_function_abi(
@@ -57,18 +63,18 @@ async def async_eth_call(
 
 
 async def async_eth_estimate_gas(
-    to_address,
-    from_address=None,
-    gas=None,
-    gas_price=None,
-    value_sent=None,
-    call_data=None,
-    function_parameters=None,
-    provider=None,
-    decode_response=True,
-    function_abi=None,
-    **function_abi_query
-):
+    to_address: spec.Address,
+    from_address: spec.BinaryData = None,
+    gas: spec.BinaryData = None,
+    gas_price: spec.BinaryData = None,
+    value_sent: spec.BinaryData = None,
+    call_data: spec.BinaryData = None,
+    function_parameters: typing.Optional[typing.Union[list, dict]] = None,
+    function_abi: typing.Optional[spec.FunctionABI] = None,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    **function_abi_query: typing.Any
+) -> spec.RpcSingularResponse:
 
     if function_abi is None:
         function_abi = await evm.async_get_function_abi(
@@ -93,11 +99,13 @@ async def async_eth_estimate_gas(
 
 
 async def async_eth_get_balance(
-    address,
-    block_number='latest',
-    provider=None,
-    decode_response=True,
-):
+    address: spec.Address,
+    block_number: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
+    if block_number is None:
+        block_number = 'latest'
     request = rpc_constructors.construct_eth_get_balance(
         address=address,
         block_number=block_number,
@@ -110,11 +118,13 @@ async def async_eth_get_balance(
 
 
 async def async_eth_get_storage_at(
-    address,
-    position,
-    block_number='latest',
-    provider=None,
-):
+    address: spec.Address,
+    position: spec.BinaryData,
+    block_number: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
+    if block_number is None:
+        block_number = 'latest'
     request = rpc_constructors.construct_eth_get_storage_at(
         address=address,
         position=position,
@@ -124,7 +134,13 @@ async def async_eth_get_storage_at(
     return rpc_digestors.digest_eth_get_storage_at(response)
 
 
-async def async_eth_get_code(address, block_number='latest', provider=None):
+async def async_eth_get_code(
+    address: spec.Address,
+    block_number: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
+    if block_number is None:
+        block_number = 'latest'
     request = rpc_constructors.construct_eth_get_code(
         address=address,
         block_number=block_number,

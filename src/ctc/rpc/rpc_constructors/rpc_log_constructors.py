@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import typing
+
+from ctc import binary
 from ctc import spec
 from .. import rpc_format
 from .. import rpc_request
@@ -7,14 +10,15 @@ from .. import rpc_request
 
 def construct_eth_new_filter(
     address: spec.BinaryData = None,
-    topics: list[spec.BinaryData] = None,
-    start_block: spec.BlockSpec = None,
-    end_block: spec.BlockSpec = None,
+    topics: typing.Sequence[spec.BinaryData] = None,
+    start_block: spec.BlockNumberReference = None,
+    end_block: spec.BlockNumberReference = None,
 ) -> spec.RpcRequest:
+
     if start_block is not None:
-        start_block = rpc_format.encode_block_number(start_block)
+        start_block = binary.encode_block_number(start_block)
     if end_block is not None:
-        end_block = rpc_format.encode_block_number(end_block)
+        end_block = binary.encode_block_number(end_block)
 
     parameters = {
         'address': address,
@@ -55,15 +59,15 @@ def construct_eth_get_filter_logs(
 
 def construct_eth_get_logs(
     address: spec.BinaryData = None,
-    topics: list[spec.BinaryData] = None,
-    start_block: spec.BlockSpec = None,
-    end_block: spec.BlockSpec = None,
+    topics: typing.Sequence[spec.BinaryData] = None,
+    start_block: spec.BlockNumberReference = None,
+    end_block: spec.BlockNumberReference = None,
     block_hash: spec.BinaryData = None,
 ) -> spec.RpcRequest:
     if start_block is not None:
-        start_block = rpc_format.encode_block_number(start_block)
+        start_block = binary.encode_block_number(start_block)
     if end_block is not None:
-        end_block = rpc_format.encode_block_number(end_block)
+        end_block = binary.encode_block_number(end_block)
 
     parameters = {
         'address': address,

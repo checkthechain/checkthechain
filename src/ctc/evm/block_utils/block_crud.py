@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
 from ctc import rpc
 from ctc import spec
 from . import block_normalize
@@ -16,7 +17,7 @@ async def async_get_block(
     if spec.is_block_number_reference(block):
 
         block_data = await rpc.async_eth_get_block_by_number(
-            block_number=block_normalize.standardize_block_number(block),
+            block_number=binary.standardize_block_number(block),
             provider=provider,
             include_full_transactions=include_full_transactions,
         )
@@ -51,7 +52,7 @@ async def async_get_blocks(
     if all(spec.is_block_number_reference(block) for block in blocks):
 
         standardized = [
-            block_normalize.standardize_block_number(block) for block in blocks
+            binary.standardize_block_number(block) for block in blocks
         ]
 
         blocks_data = await rpc.async_batch_eth_get_block_by_number(

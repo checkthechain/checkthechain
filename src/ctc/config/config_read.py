@@ -82,7 +82,13 @@ def get_config(
         return config
 
 
-def validate_config(config):
+class ConfigValidation(TypedDict):
+    valid: bool
+    missing_keys: typing.Iterable[str]
+    extra_keys: typing.Iterable[str]
+
+
+def validate_config(config: typing.Mapping) -> ConfigValidation:
     spec_keys = set(spec.ConfigSpec.__annotations__)
     actual_keys = set(config.keys())
     missing_keys = spec_keys - actual_keys

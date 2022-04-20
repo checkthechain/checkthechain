@@ -16,7 +16,7 @@ _rpc_logger_state = {
 }
 
 
-def setup_rpc_logger():
+def setup_rpc_logger() -> None:
     import loguru
 
     if not _rpc_logger_state['logger_setup']:
@@ -36,7 +36,9 @@ def setup_rpc_logger():
         _rpc_logger_state['logger_setup'] = True
 
 
-def log_rpc_request(request, provider):
+def log_rpc_request(
+    request: spec.RpcRequest, provider: spec.ProviderSpec
+) -> None:
     try:
         import loguru
     except ImportError:
@@ -63,7 +65,11 @@ def log_rpc_request(request, provider):
         raise Exception('cannot log request, unknown request type')
 
 
-def log_rpc_response(response, request, provider):
+def log_rpc_response(
+    response: spec.RpcResponse,
+    request: spec.RpcRequest,
+    provider: spec.ProviderSpec,
+) -> None:
     import loguru
 
     setup_rpc_logger()
@@ -146,11 +152,15 @@ async def async_send(
     if logging_rpc_calls:
         if isinstance(request, dict):
             log_rpc_response(
-                response=response, request=request, provider=provider,
+                response=response,
+                request=request,
+                provider=provider,
             )
         elif isinstance(request, list):
             log_rpc_response(
-                response=plural_response, request=request, provider=provider,
+                response=plural_response,
+                request=request,
+                provider=provider,
             )
 
     return output
@@ -158,14 +168,14 @@ async def async_send(
 
 @typing.overload
 async def async_send_raw(
-    request: spec.RpcSingularRequest, provider
+    request: spec.RpcSingularRequest, provider: spec.Provider
 ) -> spec.RpcSingularResponseRaw:
     ...
 
 
 @typing.overload
 async def async_send_raw(
-    request: spec.RpcPluralRequest, provider
+    request: spec.RpcPluralRequest, provider: spec.Provider
 ) -> spec.RpcPluralResponseRaw:
     ...
 
@@ -254,10 +264,10 @@ def chunk_request_by_size(
     ]
 
 
-def chunk_request_by_method(request):
+def chunk_request_by_method(request: spec.RpcRequest) -> None:
     raise NotImplementedError()
 
 
-def chunk_request_by_block_range(request):
+def chunk_request_by_block_range(request: spec.RpcRequest) -> None:
     raise NotImplementedError()
 

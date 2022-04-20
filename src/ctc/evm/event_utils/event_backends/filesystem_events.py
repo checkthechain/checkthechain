@@ -219,7 +219,8 @@ def list_events(
 
 
 def list_contracts_events(
-    network: typing.Optional[spec.NetworkReference] = None, **kwargs
+    network: typing.Optional[spec.NetworkReference] = None,
+    **kwargs: typing.Any,
 ) -> dict[str, dict[str, _ListEventsResult]]:
     contracts_events = {}
     for contract_address in list_events_contracts(network=network):
@@ -324,8 +325,8 @@ async def async_get_events_from_filesystem(
     event_name: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     verbose: bool = True,
-    start_block: typing.Optional[int] = None,
-    end_block: typing.Optional[int] = None,
+    start_block: typing.Optional[spec.BlockNumberReference] = None,
+    end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
     network: spec.NetworkReference = None,
 ) -> spec.DataFrame:

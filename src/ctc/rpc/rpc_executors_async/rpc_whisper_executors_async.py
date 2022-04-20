@@ -1,19 +1,36 @@
+from __future__ import annotations
+
+import typing
+
+from ctc import spec
+
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
 
 
-async def async_shh_version(provider=None):
+async def async_shh_version(
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_shh_version()
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_shh_version(
         response=response,
-        provider=provider,
     )
 
 
-async def async_shh_post(topics, payload, priority, ttl, provider=None):
-    request = rpc_constructors.construct_ssh_post(
+async def async_shh_post(
+    from_address: spec.BinaryData,
+    to_address: spec.BinaryData,
+    topics: list[spec.BinaryData],
+    payload: spec.BinaryData,
+    priority: spec.BinaryData,
+    ttl: spec.BinaryData,
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_post(
+        from_address=from_address,
+        to_address=to_address,
         topics=topics,
         payload=payload,
         priority=priority,
@@ -22,84 +39,84 @@ async def async_shh_post(topics, payload, priority, ttl, provider=None):
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_shh_post(
         response=response,
-        provider=provider,
     )
 
 
-async def async_shh_new_identity(provider=None):
-    request = rpc_constructors.construct_ssh_new_identity()
+async def async_shh_new_identity(
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_new_identity()
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_ssh_new_identity(
-        response=response,
-        provider=provider,
-    )
+    return rpc_digestors.digest_shh_new_identity(response=response)
 
 
-async def async_shh_has_identity(address, provider=None):
-    request = rpc_constructors.construct_shh_has_identity(address=address)
+async def async_shh_has_identity(
+    data: spec.BinaryData,
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_has_identity(data=data)
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_shh_has_identity(
-        response=response,
-        provider=provider,
-    )
+    return rpc_digestors.digest_shh_has_identity(response=response)
 
 
-async def async_shh_new_group(provider=None):
-    request = rpc_constructors.construct_ssh_new_group()
+async def async_shh_new_group(
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_new_group()
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_ssh_new_group(
-        response=response,
-        provider=provider,
-    )
+    return rpc_digestors.digest_shh_new_group(response=response)
 
 
-async def async_shh_add_to_group(address, provider=None):
-    request = rpc_constructors.construct_ssh_add_to_group(address=address)
+async def async_shh_add_to_group(
+    data: spec.BinaryData, provider: spec.ProviderSpec = None
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_add_to_group(data=data)
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_ssh_add_to_group(
-        response=response,
-        provider=provider,
-    )
+    return rpc_digestors.digest_shh_add_to_group(response=response)
 
 
-async def async_shh_new_filter(receiver, topics, provider=None):
+async def async_shh_new_filter(
+    to_address: spec.Address,
+    topics: typing.Sequence[spec.BinaryData],
+    provider: spec.ProviderSpec = None,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_shh_new_filter(
-        receiver=receiver, topics=topics
+        to_address=to_address, topics=topics
     )
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_shh_new_filter(
-        response=response,
-        provider=provider,
-    )
+    return rpc_digestors.digest_shh_new_filter(response=response)
 
 
-async def async_shh_uninstall_filter(filter_id, provider=None):
+async def async_shh_uninstall_filter(
+    filter_id: spec.BinaryData, provider: spec.ProviderSpec = None
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_shh_uninstall_filter(
         filter_id=filter_id
     )
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_shh_uninstall_filter(
         response=response,
-        provider=provider,
     )
 
 
-async def async_shh_get_filter_changes(filter_id, provider=None):
-    request = rpc_constructors.construct_ssh_get_filter_changes(
+async def async_shh_get_filter_changes(
+    filter_id: spec.BinaryData, provider: spec.ProviderSpec = None
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_get_filter_changes(
         filter_id=filter_id,
     )
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_ssh_get_filter_changes(
+    return rpc_digestors.digest_shh_get_filter_changes(
         response=response,
-        provider=provider,
     )
 
 
-async def async_shh_get_messages(filter_id, provider=None):
-    request = rpc_constructors.construct_ssh_get_messages(filter_id=filter_id)
+async def async_shh_get_messages(
+    filter_id: spec.BinaryData, provider: spec.ProviderSpec = None
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_shh_get_messages(filter_id=filter_id)
     response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_ssh_get_messages(
+    return rpc_digestors.digest_shh_get_messages(
         response=response,
-        provider=provider,
     )
 

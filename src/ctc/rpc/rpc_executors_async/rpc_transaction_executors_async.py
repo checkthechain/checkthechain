@@ -1,14 +1,20 @@
+from __future__ import annotations
+
+from ctc import spec
+
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
 
 
 async def async_eth_get_transaction_count(
-    from_address,
-    block_number='latest',
-    provider=None,
-    decode_response=True,
-):
+    from_address: spec.Address,
+    block_number: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
+    if block_number is None:
+        block_number = 'latest'
     request = rpc_constructors.construct_eth_get_transaction_count(
         from_address=from_address,
         block_number=block_number,
@@ -21,11 +27,11 @@ async def async_eth_get_transaction_count(
 
 
 async def async_eth_get_transaction_by_hash(
-    transaction_hash,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    transaction_hash: str,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_transaction_by_hash(
         transaction_hash=transaction_hash
     )
@@ -38,12 +44,12 @@ async def async_eth_get_transaction_by_hash(
 
 
 async def async_eth_get_transaction_by_block_hash_and_index(
-    block_hash,
-    transaction_index,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    block_hash: spec.BinaryData,
+    transaction_index: spec.BinaryData,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = (
         rpc_constructors.construct_eth_get_transaction_by_block_hash_and_index(
             block_hash=block_hash,
@@ -59,12 +65,12 @@ async def async_eth_get_transaction_by_block_hash_and_index(
 
 
 async def async_eth_get_transaction_by_block_number_and_index(
-    block_number,
-    transaction_index,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    block_number: spec.BlockNumberReference,
+    transaction_index: spec.BinaryData,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_transaction_by_block_number_and_index(
         block_number=block_number,
         transaction_index=transaction_index,
@@ -78,11 +84,11 @@ async def async_eth_get_transaction_by_block_number_and_index(
 
 
 async def async_eth_get_transaction_receipt(
-    transaction_hash,
-    provider=None,
-    decode_response=True,
-    snake_case_response=True,
-):
+    transaction_hash: str,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_transaction_receipt(
         transaction_hash=transaction_hash,
     )
@@ -95,12 +101,14 @@ async def async_eth_get_transaction_receipt(
 
 
 async def async_eth_get_block_transaction_count_by_hash(
-    block_hash,
-    provider=None,
-    decode_response=True,
-):
-    request = rpc_constructors.construct_eth_get_block_transaction_count_by_hash(
-        block_hash=block_hash,
+    block_hash: str,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
+    request = (
+        rpc_constructors.construct_eth_get_block_transaction_count_by_hash(
+            block_hash=block_hash,
+        )
     )
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_get_block_transaction_count_by_hash(
@@ -110,12 +118,14 @@ async def async_eth_get_block_transaction_count_by_hash(
 
 
 async def async_eth_get_block_transaction_count_by_number(
-    block_number,
-    provider=None,
-    decode_response=True,
-):
-    request = rpc_constructors.construct_eth_get_block_transaction_count_by_number(
-        block_number=block_number,
+    block_number: spec.BlockNumberReference,
+    provider: spec.ProviderSpec = None,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
+    request = (
+        rpc_constructors.construct_eth_get_block_transaction_count_by_number(
+            block_number=block_number,
+        )
     )
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_get_block_transaction_count_by_number(

@@ -18,15 +18,16 @@ async def async_get_pool_addresses(
     if n_tokens is None:
         token_addresses = []
         t = 0
+        function_abi: spec.FunctionABI = {
+            'name': 'coins',
+            'inputs': [{'type': 'uint256'}],
+            'outputs': [{'type': 'address'}],
+        }
         while True:
             try:
                 token_address = await rpc.async_eth_call(
                     to_address=pool,
-                    function_abi={
-                        'name': 'coins',
-                        'inputs': [{'type': 'uint256'}],
-                        'outputs': [{'type': 'address'}],
-                    },
+                    function_abi=function_abi,
                     function_parameters=[t],
                     provider=provider,
                 )
@@ -35,14 +36,15 @@ async def async_get_pool_addresses(
             except spec.RpcException:
                 break
     else:
+        function_abi = {
+            'name': 'coins',
+            'inputs': [{'type': 'uint256'}],
+            'outputs': [{'type': 'address'}],
+        }
         address_coroutines = [
             rpc.async_eth_call(
                 to_address=pool,
-                function_abi={
-                    'name': 'coins',
-                    'inputs': [{'type': 'uint256'}],
-                    'outputs': [{'type': 'address'}],
-                },
+                function_abi=function_abi,
                 function_parameters=[i],
                 provider=provider,
             )

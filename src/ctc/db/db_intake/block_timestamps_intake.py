@@ -1,10 +1,19 @@
+from __future__ import annotations
+
+import typing
+
 from ctc import rpc
+from ctc import spec
+
 from .. import db_crud
 from .. import db_management
 from .. import connect_utils
 
 
-async def async_intake_block(block, provider=None):
+async def async_intake_block(
+    block: spec.Block,
+    provider: spec.ProviderSpec = None,
+) -> None:
 
     # determine whether to store block
     network = rpc.get_provider_network(provider=provider)
@@ -49,7 +58,10 @@ async def async_intake_block(block, provider=None):
             )
 
 
-async def async_intake_blocks(blocks, provider=None):
+async def async_intake_blocks(
+    blocks: typing.Sequence[spec.Block],
+    provider: spec.ProviderSpec = None,
+) -> None:
     """
 
     TODO: database should store a max_complete_block number
@@ -72,7 +84,9 @@ async def async_intake_blocks(blocks, provider=None):
 
     with engine.connect() as conn:
         max_intake_block = max(block['number'] for block in blocks)
-        max_stored_block = db_crud.get_max_block_number(conn=conn, network=network)
+        max_stored_block = db_crud.get_max_block_number(
+            conn=conn, network=network
+        )
         if max_intake_block <= max_stored_block - min_confirmations:
             store_blocks = blocks
         else:
@@ -88,8 +102,7 @@ async def async_intake_blocks(blocks, provider=None):
     # store data in db
     if len(store_blocks) > 0:
         blocks_timestamps = {
-            block['number']: block['timestamp']
-            for block in store_blocks
+            block['number']: block['timestamp'] for block in store_blocks
         }
         with engine.begin() as conn:
             db_crud.set_blocks_timestamps(

@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import asyncio
+import typing
 
 import toolsql
 import tooltime
@@ -16,7 +17,7 @@ from ctc import spec
 from . import schema_utils
 
 
-def get_min_confirmations(datatype, network):
+def get_min_confirmations(datatype: str, network: spec.NetworkReference) -> int:
     # for now use single confirmation age for all datatypes and networks
     return 128
 
@@ -28,7 +29,7 @@ async def async_revalidate_blocks(
     end_block: spec.BlockNumberReference | None = None,
     end_time: tooltime.Timestamp | None = None,
     provider: spec.ProviderSpec | None = None,
-):
+) -> typing.Mapping:
 
     if start_block is not None and start_time is not None:
         raise Exception('cannot specify both start_block and start_time')
@@ -58,7 +59,8 @@ async def async_revalidate_blocks(
     # get network
     network = rpc.get_provider_network(provider)
     table_name = schema_utils.get_table_name(
-        table_name='blocks', network=network,
+        table_name='blocks',
+        network=network,
     )
 
     # build query
@@ -93,24 +95,31 @@ async def async_revalidate_blocks(
     }
 
 
-async def async_get_premature_blocks(conn, provider=None):
+async def async_get_premature_blocks(
+    conn: toolsql.SAConnection,
+    provider: spec.ProviderSpec = None,
+) -> typing.Mapping:
     # get network
     network = rpc.get_provider_network(provider)
-    table_name = schema_utils.get_table_name(datatype='blocks', network=network)
+    table_name = schema_utils.get_table_name(
+        table_name='blocks', network=network
+    )
     network = rpc.get_provider_network(provider)
 
     # blocks that are younger than confirmation age
     latest_block_number = await evm.async_get_latest_block_number(
         provider=provider
     )
-    min_confirmations = get_min_confirmations(network=network)
+    min_confirmations = get_min_confirmations(
+        network=network, datatype='blocks'
+    )
     youngest_valid_block = latest_block_number - min_confirmations
 
     n_premature_blocks = toolsql.select(
         conn=conn,
-        table_name=table_name,
+        table=table_name,
         where_gte={'block_number': youngest_valid_block},
-        count=True,
+        # count=True,
     )
 
     return {
@@ -121,25 +130,32 @@ async def async_get_premature_blocks(conn, provider=None):
     }
 
 
-async def async_clean_invalid_blocks():
-    raise NotImplementation()
+async def async_clean_invalid_blocks() -> None:
+    raise NotImplementedError()
 
 
-async def async_does_block_hash_match(block_number, block_hash):
-    raise NotImplementation()
+async def async_does_block_hash_match(
+    block_number: int,
+    block_hash: str,
+) -> None:
+    raise NotImplementedError()
 
 
-def detect_block_reorgs(conn, check_block_number='latest', provider=None):
+async def async_detect_block_reorgs(
+    conn: toolsql.SAConnection,
+    check_block_number: spec.BlockNumberReference = 'latest',
+    provider: spec.ProviderSpec = None,
+) -> None:
     # detect
-    check_block = evm.async_get_block(check_block_number, provider=provider)
+    check_block = await evm.async_get_block(check_block_number, provider=provider)
     block_number = check_block['number']
 
-    if block_db.has_block(block_number=block_number):
-        pass
+    # if block_db.has_block(block_number=block_number):
+    #     pass
 
 
-def detect_event_reorgs():
-    # assumes that
-    start_block = events.get_event_data(columns['block_number'])
-    block_hashes = events.get_event_data(columns=['block_hash'], unique=True)
+# def detect_event_reorgs() -> None:
+#     # assumes that
+#     start_block = events.get_event_data(columns['block_number'])
+#     block_hashes = events.get_event_data(columns=['block_hash'], unique=True)
 

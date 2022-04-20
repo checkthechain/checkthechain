@@ -15,7 +15,7 @@ async def async_get_owner(
     block: spec.BlockNumberReference | None = None,
 ) -> str:
     node = resolver.hash_name(name)
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'owner',
         'inputs': [{'type': 'bytes32'}],
         'outputs': [{'type': 'address'}],
@@ -35,7 +35,7 @@ async def async_record_exists(
     block: spec.BlockNumberReference | None = None,
 ) -> bool:
     node = resolver.hash_name(name)
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'recordExists',
         'inputs': [{'type': 'bytes32'}],
         'outputs': [{'type': 'bool'}],
@@ -55,7 +55,7 @@ async def async_get_resolver(
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     node = resolver.hash_name(name)
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'resolver',
         'inputs': [{'type': 'bytes32'}],
         'outputs': [{'type': 'address'}],
@@ -92,7 +92,7 @@ async def async_get_registration_block(name: str) -> int:
 
 
 async def async_get_registrations() -> spec.DataFrame:
-    event_abi = {
+    event_abi: spec.EventABI = {
         'name': 'NewOwner',
         'inputs': [
             {

@@ -12,7 +12,7 @@ contract_examples: dict[str, spec.Address] = {
 }
 
 
-pool_directory_abis = {
+pool_directory_event_abis: dict[str, spec.EventABI] = {
     'AdminChanged': {
         'anonymous': False,
         'inputs': [
@@ -44,56 +44,6 @@ pool_directory_abis = {
         ],
         'name': 'Upgraded',
         'type': 'event',
-    },
-    'admin': {
-        'inputs': [],
-        'name': 'admin',
-        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'stateMutability': 'nonpayable',
-        'type': 'function',
-    },
-    'changeAdmin': {
-        'inputs': [
-            {'internalType': 'address', 'name': 'newAdmin', 'type': 'address'}
-        ],
-        'name': 'changeAdmin',
-        'outputs': [],
-        'stateMutability': 'nonpayable',
-        'type': 'function',
-    },
-    'implementation': {
-        'inputs': [],
-        'name': 'implementation',
-        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'stateMutability': 'nonpayable',
-        'type': 'function',
-    },
-    'upgradeTo': {
-        'inputs': [
-            {
-                'internalType': 'address',
-                'name': 'newImplementation',
-                'type': 'address',
-            }
-        ],
-        'name': 'upgradeTo',
-        'outputs': [],
-        'stateMutability': 'nonpayable',
-        'type': 'function',
-    },
-    'upgradeToAndCall': {
-        'inputs': [
-            {
-                'internalType': 'address',
-                'name': 'newImplementation',
-                'type': 'address',
-            },
-            {'internalType': 'bytes', 'name': 'data', 'type': 'bytes'},
-        ],
-        'name': 'upgradeToAndCall',
-        'outputs': [],
-        'stateMutability': 'payable',
-        'type': 'function',
     },
     'AdminWhitelistUpdated': {
         'anonymous': False,
@@ -178,6 +128,59 @@ pool_directory_abis = {
         ],
         'name': 'PoolRegistered',
         'type': 'event',
+    },
+}
+
+pool_directory_function_abis: dict[str, spec.FunctionABI] = {
+    'admin': {
+        'inputs': [],
+        'name': 'admin',
+        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
+        'stateMutability': 'nonpayable',
+        'type': 'function',
+    },
+    'changeAdmin': {
+        'inputs': [
+            {'internalType': 'address', 'name': 'newAdmin', 'type': 'address'}
+        ],
+        'name': 'changeAdmin',
+        'outputs': [],
+        'stateMutability': 'nonpayable',
+        'type': 'function',
+    },
+    'implementation': {
+        'inputs': [],
+        'name': 'implementation',
+        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
+        'stateMutability': 'nonpayable',
+        'type': 'function',
+    },
+    'upgradeTo': {
+        'inputs': [
+            {
+                'internalType': 'address',
+                'name': 'newImplementation',
+                'type': 'address',
+            }
+        ],
+        'name': 'upgradeTo',
+        'outputs': [],
+        'stateMutability': 'nonpayable',
+        'type': 'function',
+    },
+    'upgradeToAndCall': {
+        'inputs': [
+            {
+                'internalType': 'address',
+                'name': 'newImplementation',
+                'type': 'address',
+            },
+            {'internalType': 'bytes', 'name': 'data', 'type': 'bytes'},
+        ],
+        'name': 'upgradeToAndCall',
+        'outputs': [],
+        'stateMutability': 'payable',
+        'type': 'function',
     },
     '_editAdminWhitelist': {
         'inputs': [
@@ -549,7 +552,7 @@ pool_directory_abis = {
 }
 
 
-comptroller_abis = {
+comptroller_event_abis: dict[str, spec.EventABI] = {
     'ActionPaused': {
         'anonymous': False,
         'inputs': [
@@ -861,8 +864,10 @@ comptroller_abis = {
         'name': 'WhitelistEnforcementChanged',
         'type': 'event',
     },
+}
+
+comptroller_function_abis: dict[str, spec.FunctionABI] = {
     '_addRewardsDistributor': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -872,21 +877,17 @@ comptroller_abis = {
         ],
         'name': '_addRewardsDistributor',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_afterNonReentrant': {
-        'constant': False,
         'inputs': [],
         'name': '_afterNonReentrant',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_become': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract Unitroller',
@@ -896,39 +897,31 @@ comptroller_abis = {
         ],
         'name': '_become',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_becomeImplementation': {
-        'constant': False,
         'inputs': [],
         'name': '_becomeImplementation',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_beforeNonReentrant': {
-        'constant': False,
         'inputs': [],
         'name': '_beforeNonReentrant',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_borrowGuardianPaused': {
-        'constant': True,
         'inputs': [],
         'name': '_borrowGuardianPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     '_deployMarket': {
-        'constant': False,
         'inputs': [
             {'internalType': 'bool', 'name': 'isCEther', 'type': 'bool'},
             {
@@ -944,21 +937,17 @@ comptroller_abis = {
         ],
         'name': '_deployMarket',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_mintGuardianPaused': {
-        'constant': True,
         'inputs': [],
         'name': '_mintGuardianPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     '_setBorrowCapGuardian': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -968,12 +957,10 @@ comptroller_abis = {
         ],
         'name': '_setBorrowCapGuardian',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setBorrowPaused': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract CToken',
@@ -984,12 +971,10 @@ comptroller_abis = {
         ],
         'name': '_setBorrowPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setCloseFactor': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -999,12 +984,10 @@ comptroller_abis = {
         ],
         'name': '_setCloseFactor',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setCollateralFactor': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract CToken',
@@ -1019,12 +1002,10 @@ comptroller_abis = {
         ],
         'name': '_setCollateralFactor',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setLiquidationIncentive': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -1034,12 +1015,10 @@ comptroller_abis = {
         ],
         'name': '_setLiquidationIncentive',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setMarketBorrowCaps': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract CToken[]',
@@ -1054,12 +1033,10 @@ comptroller_abis = {
         ],
         'name': '_setMarketBorrowCaps',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setMarketSupplyCaps': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract CToken[]',
@@ -1074,12 +1051,10 @@ comptroller_abis = {
         ],
         'name': '_setMarketSupplyCaps',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setMintPaused': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract CToken',
@@ -1090,12 +1065,10 @@ comptroller_abis = {
         ],
         'name': '_setMintPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setPauseGuardian': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1105,12 +1078,10 @@ comptroller_abis = {
         ],
         'name': '_setPauseGuardian',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setPriceOracle': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract PriceOracle',
@@ -1120,39 +1091,31 @@ comptroller_abis = {
         ],
         'name': '_setPriceOracle',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setSeizePaused': {
-        'constant': False,
         'inputs': [{'internalType': 'bool', 'name': 'state', 'type': 'bool'}],
         'name': '_setSeizePaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setTransferPaused': {
-        'constant': False,
         'inputs': [{'internalType': 'bool', 'name': 'state', 'type': 'bool'}],
         'name': '_setTransferPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setWhitelistEnforcement': {
-        'constant': False,
         'inputs': [{'internalType': 'bool', 'name': 'enforce', 'type': 'bool'}],
         'name': '_setWhitelistEnforcement',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setWhitelistStatuses': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address[]',
@@ -1163,21 +1126,17 @@ comptroller_abis = {
         ],
         'name': '_setWhitelistStatuses',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_toggleAutoImplementations': {
-        'constant': False,
         'inputs': [{'internalType': 'bool', 'name': 'enabled', 'type': 'bool'}],
         'name': '_toggleAutoImplementations',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_unsupportMarket': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract CToken',
@@ -1187,12 +1146,10 @@ comptroller_abis = {
         ],
         'name': '_unsupportMarket',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'accountAssets': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': '', 'type': 'address'},
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
@@ -1201,59 +1158,47 @@ comptroller_abis = {
         'outputs': [
             {'internalType': 'contract CToken', 'name': '', 'type': 'address'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'admin': {
-        'constant': True,
         'inputs': [],
         'name': 'admin',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'adminHasRights': {
-        'constant': True,
         'inputs': [],
         'name': 'adminHasRights',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'allBorrowers': {
-        'constant': True,
         'inputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
         'name': 'allBorrowers',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'allMarkets': {
-        'constant': True,
         'inputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
         'name': 'allMarkets',
         'outputs': [
             {'internalType': 'contract CToken', 'name': '', 'type': 'address'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'autoImplementation': {
-        'constant': True,
         'inputs': [],
         'name': 'autoImplementation',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'borrowAllowed': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'borrower', 'type': 'address'},
@@ -1265,39 +1210,31 @@ comptroller_abis = {
         ],
         'name': 'borrowAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'borrowCapGuardian': {
-        'constant': True,
         'inputs': [],
         'name': 'borrowCapGuardian',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'borrowCaps': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'borrowCaps',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'borrowGuardianPaused': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'borrowGuardianPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'borrowVerify': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'borrower', 'type': 'address'},
@@ -1309,12 +1246,10 @@ comptroller_abis = {
         ],
         'name': 'borrowVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'borrowWithinLimits': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {
@@ -1325,23 +1260,19 @@ comptroller_abis = {
         ],
         'name': 'borrowWithinLimits',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'cTokensByUnderlying': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'cTokensByUnderlying',
         'outputs': [
             {'internalType': 'contract CToken', 'name': '', 'type': 'address'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'checkMembership': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'},
             {
@@ -1352,39 +1283,31 @@ comptroller_abis = {
         ],
         'name': 'checkMembership',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'closeFactorMantissa': {
-        'constant': True,
         'inputs': [],
         'name': 'closeFactorMantissa',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'comptrollerImplementation': {
-        'constant': True,
         'inputs': [],
         'name': 'comptrollerImplementation',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'enforceWhitelist': {
-        'constant': True,
         'inputs': [],
         'name': 'enforceWhitelist',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'enterMarkets': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address[]',
@@ -1396,12 +1319,10 @@ comptroller_abis = {
         'outputs': [
             {'internalType': 'uint256[]', 'name': '', 'type': 'uint256[]'}
         ],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'exitMarket': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1411,21 +1332,17 @@ comptroller_abis = {
         ],
         'name': 'exitMarket',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'fuseAdminHasRights': {
-        'constant': True,
         'inputs': [],
         'name': 'fuseAdminHasRights',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getAccountLiquidity': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'}
         ],
@@ -1435,23 +1352,19 @@ comptroller_abis = {
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getAllBorrowers': {
-        'constant': True,
         'inputs': [],
         'name': 'getAllBorrowers',
         'outputs': [
             {'internalType': 'address[]', 'name': '', 'type': 'address[]'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getAllMarkets': {
-        'constant': True,
         'inputs': [],
         'name': 'getAllMarkets',
         'outputs': [
@@ -1461,12 +1374,10 @@ comptroller_abis = {
                 'type': 'address[]',
             }
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getAssetsIn': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'}
         ],
@@ -1478,12 +1389,10 @@ comptroller_abis = {
                 'type': 'address[]',
             }
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getHypotheticalAccountLiquidity': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'},
             {
@@ -1508,43 +1417,35 @@ comptroller_abis = {
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getRewardsDistributors': {
-        'constant': True,
         'inputs': [],
         'name': 'getRewardsDistributors',
         'outputs': [
             {'internalType': 'address[]', 'name': '', 'type': 'address[]'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getWhitelist': {
-        'constant': True,
         'inputs': [],
         'name': 'getWhitelist',
         'outputs': [
             {'internalType': 'address[]', 'name': '', 'type': 'address[]'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'isComptroller': {
-        'constant': True,
         'inputs': [],
         'name': 'isComptroller',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'isDeprecated': {
-        'constant': True,
         'inputs': [
             {
                 'internalType': 'contract CToken',
@@ -1554,12 +1455,10 @@ comptroller_abis = {
         ],
         'name': 'isDeprecated',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'liquidateBorrowAllowed': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1585,12 +1484,10 @@ comptroller_abis = {
         ],
         'name': 'liquidateBorrowAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'liquidateBorrowVerify': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1621,12 +1518,10 @@ comptroller_abis = {
         ],
         'name': 'liquidateBorrowVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'liquidateCalculateSeizeTokens': {
-        'constant': True,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1649,21 +1544,17 @@ comptroller_abis = {
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'liquidationIncentiveMantissa': {
-        'constant': True,
         'inputs': [],
         'name': 'liquidationIncentiveMantissa',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'markets': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'markets',
         'outputs': [
@@ -1674,12 +1565,10 @@ comptroller_abis = {
                 'type': 'uint256',
             },
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'mintAllowed': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'minter', 'type': 'address'},
@@ -1691,21 +1580,17 @@ comptroller_abis = {
         ],
         'name': 'mintAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'mintGuardianPaused': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'mintGuardianPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'mintVerify': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'minter', 'type': 'address'},
@@ -1722,12 +1607,10 @@ comptroller_abis = {
         ],
         'name': 'mintVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'mintWithinLimits': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {
@@ -1748,12 +1631,10 @@ comptroller_abis = {
         ],
         'name': 'mintWithinLimits',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'oracle': {
-        'constant': True,
         'inputs': [],
         'name': 'oracle',
         'outputs': [
@@ -1763,39 +1644,31 @@ comptroller_abis = {
                 'type': 'address',
             }
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'pauseGuardian': {
-        'constant': True,
         'inputs': [],
         'name': 'pauseGuardian',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'pendingAdmin': {
-        'constant': True,
         'inputs': [],
         'name': 'pendingAdmin',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'pendingComptrollerImplementation': {
-        'constant': True,
         'inputs': [],
         'name': 'pendingComptrollerImplementation',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'redeemAllowed': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'redeemer', 'type': 'address'},
@@ -1807,12 +1680,10 @@ comptroller_abis = {
         ],
         'name': 'redeemAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'redeemVerify': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'redeemer', 'type': 'address'},
@@ -1829,12 +1700,10 @@ comptroller_abis = {
         ],
         'name': 'redeemVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'repayBorrowAllowed': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'payer', 'type': 'address'},
@@ -1847,12 +1716,10 @@ comptroller_abis = {
         ],
         'name': 'repayBorrowAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'repayBorrowVerify': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'payer', 'type': 'address'},
@@ -1870,21 +1737,17 @@ comptroller_abis = {
         ],
         'name': 'repayBorrowVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'rewardsDistributors': {
-        'constant': True,
         'inputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
         'name': 'rewardsDistributors',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'seizeAllowed': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1910,21 +1773,17 @@ comptroller_abis = {
         ],
         'name': 'seizeAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'seizeGuardianPaused': {
-        'constant': True,
         'inputs': [],
         'name': 'seizeGuardianPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'seizeVerify': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -1950,30 +1809,24 @@ comptroller_abis = {
         ],
         'name': 'seizeVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'suppliers': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'suppliers',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'supplyCaps': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'supplyCaps',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'transferAllowed': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'src', 'type': 'address'},
@@ -1986,21 +1839,17 @@ comptroller_abis = {
         ],
         'name': 'transferAllowed',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'transferGuardianPaused': {
-        'constant': True,
         'inputs': [],
         'name': 'transferGuardianPaused',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'transferVerify': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'cToken', 'type': 'address'},
             {'internalType': 'address', 'name': 'src', 'type': 'address'},
@@ -2013,33 +1862,27 @@ comptroller_abis = {
         ],
         'name': 'transferVerify',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'whitelist': {
-        'constant': True,
         'inputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
         'name': 'whitelist',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'whitelistArray': {
-        'constant': True,
         'inputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
         'name': 'whitelistArray',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
 }
 
-ctoken_function_abis = {
+ctoken_function_abis: dict[str, spec.FunctionABI] = {
     '_setImplementation': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -2055,88 +1898,70 @@ ctoken_function_abis = {
         ],
         'name': '_setImplementation',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'admin': {
-        'constant': True,
         'inputs': [],
         'name': 'admin',
         'outputs': [
             {'internalType': 'address payable', 'name': '', 'type': 'address'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'adminHasRights': {
-        'constant': True,
         'inputs': [],
         'name': 'adminHasRights',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'delegateToImplementation': {
-        'constant': False,
         'inputs': [{'internalType': 'bytes', 'name': 'data', 'type': 'bytes'}],
         'name': 'delegateToImplementation',
         'outputs': [{'internalType': 'bytes', 'name': '', 'type': 'bytes'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'fuseAdminHasRights': {
-        'constant': True,
         'inputs': [],
         'name': 'fuseAdminHasRights',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'implementation': {
-        'constant': True,
         'inputs': [],
         'name': 'implementation',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     '_acceptAdmin': {
-        'constant': False,
         'inputs': [],
         'name': '_acceptAdmin',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_addReserves': {
-        'constant': False,
         'inputs': [
             {'internalType': 'uint256', 'name': 'addAmount', 'type': 'uint256'}
         ],
         'name': '_addReserves',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_becomeImplementation': {
-        'constant': False,
         'inputs': [{'internalType': 'bytes', 'name': 'data', 'type': 'bytes'}],
         'name': '_becomeImplementation',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_reduceReserves': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2146,39 +1971,31 @@ ctoken_function_abis = {
         ],
         'name': '_reduceReserves',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_renounceAdminRights': {
-        'constant': False,
         'inputs': [],
         'name': '_renounceAdminRights',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_renounceFuseAdminRights': {
-        'constant': False,
         'inputs': [],
         'name': '_renounceFuseAdminRights',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_resignImplementation': {
-        'constant': False,
         'inputs': [],
         'name': '_resignImplementation',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setAdminFee': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2188,12 +2005,10 @@ ctoken_function_abis = {
         ],
         'name': '_setAdminFee',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setComptroller': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract ComptrollerInterface',
@@ -2203,21 +2018,17 @@ ctoken_function_abis = {
         ],
         'name': '_setComptroller',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setFuseFee': {
-        'constant': False,
         'inputs': [],
         'name': '_setFuseFee',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setInterestRateModel': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'contract InterestRateModel',
@@ -2227,12 +2038,10 @@ ctoken_function_abis = {
         ],
         'name': '_setInterestRateModel',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setPendingAdmin': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address payable',
@@ -2242,12 +2051,10 @@ ctoken_function_abis = {
         ],
         'name': '_setPendingAdmin',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_setReserveFactor': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2257,12 +2064,10 @@ ctoken_function_abis = {
         ],
         'name': '_setReserveFactor',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_withdrawAdminFees': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2272,12 +2077,10 @@ ctoken_function_abis = {
         ],
         'name': '_withdrawAdminFees',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     '_withdrawFuseFees': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2287,85 +2090,69 @@ ctoken_function_abis = {
         ],
         'name': '_withdrawFuseFees',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'accrualBlockNumber': {
-        'constant': True,
         'inputs': [],
         'name': 'accrualBlockNumber',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'accrueInterest': {
-        'constant': False,
         'inputs': [],
         'name': 'accrueInterest',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'adminFeeMantissa': {
-        'constant': True,
         'inputs': [],
         'name': 'adminFeeMantissa',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'allowance': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'owner', 'type': 'address'},
             {'internalType': 'address', 'name': 'spender', 'type': 'address'},
         ],
         'name': 'allowance',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'approve': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'spender', 'type': 'address'},
             {'internalType': 'uint256', 'name': 'amount', 'type': 'uint256'},
         ],
         'name': 'approve',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'balanceOf': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'owner', 'type': 'address'}
         ],
         'name': 'balanceOf',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'balanceOfUnderlying': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'owner', 'type': 'address'}
         ],
         'name': 'balanceOfUnderlying',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'borrow': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2375,52 +2162,42 @@ ctoken_function_abis = {
         ],
         'name': 'borrow',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'borrowBalanceCurrent': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'}
         ],
         'name': 'borrowBalanceCurrent',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'borrowBalanceStored': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'}
         ],
         'name': 'borrowBalanceStored',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'borrowIndex': {
-        'constant': True,
         'inputs': [],
         'name': 'borrowIndex',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'borrowRatePerBlock': {
-        'constant': True,
         'inputs': [],
         'name': 'borrowRatePerBlock',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'comptroller': {
-        'constant': True,
         'inputs': [],
         'name': 'comptroller',
         'outputs': [
@@ -2430,48 +2207,38 @@ ctoken_function_abis = {
                 'type': 'address',
             }
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'decimals': {
-        'constant': True,
         'inputs': [],
         'name': 'decimals',
         'outputs': [{'internalType': 'uint8', 'name': '', 'type': 'uint8'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'exchangeRateCurrent': {
-        'constant': False,
         'inputs': [],
         'name': 'exchangeRateCurrent',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'exchangeRateStored': {
-        'constant': True,
         'inputs': [],
         'name': 'exchangeRateStored',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'fuseFeeMantissa': {
-        'constant': True,
         'inputs': [],
         'name': 'fuseFeeMantissa',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getAccountSnapshot': {
-        'constant': True,
         'inputs': [
             {'internalType': 'address', 'name': 'account', 'type': 'address'}
         ],
@@ -2482,21 +2249,17 @@ ctoken_function_abis = {
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': '', 'type': 'uint256'},
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getCash': {
-        'constant': True,
         'inputs': [],
         'name': 'getCash',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'initialize': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -2534,12 +2297,10 @@ ctoken_function_abis = {
         ],
         'name': 'initialize',
         'outputs': [],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'interestRateModel': {
-        'constant': True,
         'inputs': [],
         'name': 'interestRateModel',
         'outputs': [
@@ -2549,30 +2310,24 @@ ctoken_function_abis = {
                 'type': 'address',
             }
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'isCEther': {
-        'constant': True,
         'inputs': [],
         'name': 'isCEther',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'isCToken': {
-        'constant': True,
         'inputs': [],
         'name': 'isCToken',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'liquidateBorrow': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'borrower', 'type': 'address'},
             {
@@ -2588,43 +2343,35 @@ ctoken_function_abis = {
         ],
         'name': 'liquidateBorrow',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'mint': {
-        'constant': False,
         'inputs': [
             {'internalType': 'uint256', 'name': 'mintAmount', 'type': 'uint256'}
         ],
         'name': 'mint',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'name': {
-        'constant': True,
         'inputs': [],
         'name': 'name',
         'outputs': [{'internalType': 'string', 'name': '', 'type': 'string'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'pendingAdmin': {
-        'constant': True,
         'inputs': [],
         'name': 'pendingAdmin',
         'outputs': [
             {'internalType': 'address payable', 'name': '', 'type': 'address'}
         ],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'redeem': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2634,12 +2381,10 @@ ctoken_function_abis = {
         ],
         'name': 'redeem',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'redeemUnderlying': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2649,12 +2394,10 @@ ctoken_function_abis = {
         ],
         'name': 'redeemUnderlying',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'repayBorrow': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'uint256',
@@ -2664,12 +2407,10 @@ ctoken_function_abis = {
         ],
         'name': 'repayBorrow',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'repayBorrowBehalf': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'borrower', 'type': 'address'},
             {
@@ -2680,21 +2421,17 @@ ctoken_function_abis = {
         ],
         'name': 'repayBorrowBehalf',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'reserveFactorMantissa': {
-        'constant': True,
         'inputs': [],
         'name': 'reserveFactorMantissa',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'seize': {
-        'constant': False,
         'inputs': [
             {
                 'internalType': 'address',
@@ -2710,96 +2447,76 @@ ctoken_function_abis = {
         ],
         'name': 'seize',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'supplyRatePerBlock': {
-        'constant': True,
         'inputs': [],
         'name': 'supplyRatePerBlock',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'symbol': {
-        'constant': True,
         'inputs': [],
         'name': 'symbol',
         'outputs': [{'internalType': 'string', 'name': '', 'type': 'string'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'totalAdminFees': {
-        'constant': True,
         'inputs': [],
         'name': 'totalAdminFees',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'totalBorrows': {
-        'constant': True,
         'inputs': [],
         'name': 'totalBorrows',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'totalBorrowsCurrent': {
-        'constant': False,
         'inputs': [],
         'name': 'totalBorrowsCurrent',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'totalFuseFees': {
-        'constant': True,
         'inputs': [],
         'name': 'totalFuseFees',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'totalReserves': {
-        'constant': True,
         'inputs': [],
         'name': 'totalReserves',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'totalSupply': {
-        'constant': True,
         'inputs': [],
         'name': 'totalSupply',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'transfer': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'dst', 'type': 'address'},
             {'internalType': 'uint256', 'name': 'amount', 'type': 'uint256'},
         ],
         'name': 'transfer',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'transferFrom': {
-        'constant': False,
         'inputs': [
             {'internalType': 'address', 'name': 'src', 'type': 'address'},
             {'internalType': 'address', 'name': 'dst', 'type': 'address'},
@@ -2807,16 +2524,13 @@ ctoken_function_abis = {
         ],
         'name': 'transferFrom',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'nonpayable',
         'type': 'function',
     },
     'underlying': {
-        'constant': True,
         'inputs': [],
         'name': 'underlying',
         'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
@@ -2825,25 +2539,20 @@ ctoken_function_abis = {
 
 interest_rate_model_abis = {
     'baseRatePerBlock': {
-        'constant': True,
         'inputs': [],
         'name': 'baseRatePerBlock',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'blocksPerYear': {
-        'constant': True,
         'inputs': [],
         'name': 'blocksPerYear',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getBorrowRate': {
-        'constant': True,
         'inputs': [
             {'internalType': 'uint256', 'name': 'cash', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': 'borrows', 'type': 'uint256'},
@@ -2851,12 +2560,10 @@ interest_rate_model_abis = {
         ],
         'name': 'getBorrowRate',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'getSupplyRate': {
-        'constant': True,
         'inputs': [
             {'internalType': 'uint256', 'name': 'cash', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': 'borrows', 'type': 'uint256'},
@@ -2869,48 +2576,38 @@ interest_rate_model_abis = {
         ],
         'name': 'getSupplyRate',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'isInterestRateModel': {
-        'constant': True,
         'inputs': [],
         'name': 'isInterestRateModel',
         'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'jumpMultiplierPerBlock': {
-        'constant': True,
         'inputs': [],
         'name': 'jumpMultiplierPerBlock',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'kink': {
-        'constant': True,
         'inputs': [],
         'name': 'kink',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'multiplierPerBlock': {
-        'constant': True,
         'inputs': [],
         'name': 'multiplierPerBlock',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'view',
         'type': 'function',
     },
     'utilizationRate': {
-        'constant': True,
         'inputs': [
             {'internalType': 'uint256', 'name': 'cash', 'type': 'uint256'},
             {'internalType': 'uint256', 'name': 'borrows', 'type': 'uint256'},
@@ -2918,13 +2615,12 @@ interest_rate_model_abis = {
         ],
         'name': 'utilizationRate',
         'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'payable': False,
         'stateMutability': 'pure',
         'type': 'function',
     },
 }
 
-oracle_abis = {
+oracle_event_abis = {
     'NewAdmin': {
         'anonymous': False,
         'inputs': [
@@ -2988,6 +2684,9 @@ oracle_abis = {
         'name': 'NewOracle',
         'type': 'event',
     },
+}
+
+oracle_function_abis: dict[str, spec.FunctionABI] = {
     'add': {
         'inputs': [
             {

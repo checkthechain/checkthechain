@@ -49,7 +49,7 @@ async def async_get_ctoken_price(
         price = await rpc.async_eth_call(
             to_address=oracle,
             block_number=block,
-            function_abi=rari_abis.oracle_abis['getUnderlyingPrice'],
+            function_abi=rari_abis.oracle_function_abis['getUnderlyingPrice'],
             function_parameters=[ctoken],
         )
         if normalize:

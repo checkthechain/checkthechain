@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
 from ctc import evm
 from ctc import spec
 
@@ -112,12 +113,12 @@ def parse_block_range(
         start_block_str = typing.cast(spec.BlockNumberName, start_block_str)
         start_block: spec.StandardBlockNumber = start_block_str
     else:
-        start_block = evm.raw_block_number_to_int(start_block_str)
+        start_block = binary.raw_block_number_to_int(start_block_str)
     if end_block_str in spec.block_number_names:
         end_block_str = typing.cast(spec.BlockNumberName, end_block_str)
         end_block: spec.StandardBlockNumber = end_block_str
     else:
-        end_block = evm.raw_block_number_to_int(end_block_str)
+        end_block = binary.raw_block_number_to_int(end_block_str)
 
     # detect interval types
     if start_type == '(':
@@ -173,14 +174,14 @@ def parse_block_sample(
         start_block_str = typing.cast(spec.BlockNumberName, start_block_str)
         start_block: spec.StandardBlockNumber = start_block_str
     else:
-        start_block = evm.raw_block_number_to_int(start_block_str)
+        start_block = binary.raw_block_number_to_int(start_block_str)
     if end_block_str in spec.block_number_names:
         end_block_str = typing.cast(spec.BlockNumberName, end_block_str)
         end_block: spec.StandardBlockNumber = end_block_str
     else:
-        end_block = evm.raw_block_number_to_int(end_block_str)
+        end_block = binary.raw_block_number_to_int(end_block_str)
     if block_interval_str is not None:
-        block_interval = evm.raw_block_number_to_int(block_interval_str)
+        block_interval = binary.raw_block_number_to_int(block_interval_str)
     else:
         block_interval = None
 

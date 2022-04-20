@@ -127,7 +127,7 @@ def get_block_timestamp(
 def get_max_block_number(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
-):
+) -> int:
     table = schema_utils.get_table_name('block_timestamps', network=network)
     result = toolsql.select(
         conn=conn,
@@ -143,7 +143,7 @@ def get_max_block_number(
 def get_max_block_timestamp(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
-):
+) -> int:
     table = schema_utils.get_table_name('block_timestamps', network=network)
     result = toolsql.select(
         conn=conn,

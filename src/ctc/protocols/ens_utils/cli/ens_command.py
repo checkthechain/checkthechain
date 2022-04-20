@@ -4,6 +4,7 @@ import toolcli
 import toolstr
 import tooltime
 
+from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -30,7 +31,7 @@ async def ens_command(name_or_address: str, block: spec.BlockNumberReference) ->
     arg = name_or_address[0]
 
     if block is not None:
-        block = evm.standardize_block_number(block)
+        block = binary.standardize_block_number(block)
 
     if '.' in arg:
         name = arg

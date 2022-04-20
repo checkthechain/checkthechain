@@ -9,13 +9,14 @@ from ctc import rpc
 from ctc import spec
 from ctc.toolbox import async_utils
 from ctc.toolbox import nested_utils
+
 from . import coracle_tokens
 from . import coracle_oracles
 from . import coracle_deposits
 from . import coracle_spec
 
 
-function_abis = {
+function_abis: dict[str, spec.FunctionABI] = {
     'balance': {
         'inputs': [],
         'name': 'balance',

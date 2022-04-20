@@ -18,23 +18,28 @@ from .. import rpc_spec
 #
 
 
-def batch_construct(method: str, **constructor_kwargs) -> spec.RpcPluralRequest:
+def batch_construct(
+    method: str, **constructor_kwargs: typing.Any
+) -> spec.RpcPluralRequest:
     """construct a batch of rpc calls"""
     batch_inputs = _get_batch_constructor_inputs(method=method)
     if len(batch_inputs) == 0:
         raise Exception('no batch inputs available for method: ' + str(method))
     singular_constructor = rpc_registry.get_constructor(method=method)
-    parameter, values, constructor_kwargs = _get_batch_parameter(
+    parameter, values, other_constructor_kwargs = _get_batch_parameter(
         constructor_kwargs,
         batch_inputs,
     )
     return [
-        singular_constructor(**{parameter: value}, **constructor_kwargs)
+        singular_constructor(**{parameter: value}, **other_constructor_kwargs)
         for value in values
     ]
 
 
-def _get_batch_parameter(kwargs, batch_inputs):
+def _get_batch_parameter(
+    kwargs: typing.Mapping[str, typing.Any],
+    batch_inputs: typing.Mapping[str, str],
+) -> typing.Tuple[str, typing.Any, typing.Mapping[str, typing.Any]]:
     """identify the batch parameter given in kwargs
 
     return (singular_parameter, parameter_value, other_kwargs)
@@ -62,7 +67,7 @@ def _get_batch_parameter(kwargs, batch_inputs):
         )
 
 
-def _get_batch_constructor_inputs(method: str) -> dict[str, str]:
+def _get_batch_constructor_inputs(method: str) -> typing.Mapping[str, str]:
     return rpc_spec.rpc_constructor_batch_inputs.get(method, {})
 
 
@@ -72,7 +77,10 @@ def _get_batch_constructor_inputs(method: str) -> dict[str, str]:
 
 
 async def async_batch_execute(
-    method: str, *, provider: spec.ProviderSpec = None, **kwargs
+    method: str,
+    *,
+    provider: spec.ProviderSpec = None,
+    **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     """execute batch rpc call asynchronously"""
 
@@ -87,8 +95,8 @@ async def async_batch_execute(
 
 def _separate_execution_kwargs(
     method: str,
-    kwargs: dict[str, typing.Any],
-) -> tuple[dict[str, typing.Any], dict[str, typing.Any]]:
+    kwargs: typing.Mapping[str, typing.Any],
+) -> tuple[typing.Mapping[str, typing.Any], typing.Mapping[str, typing.Any]]:
     """separate constructor kwargs from digestor kwargs"""
 
     # compile digestor kwargs
@@ -119,7 +127,9 @@ def _separate_execution_kwargs(
 
 
 def batch_digest(
-    response: spec.RpcPluralResponse, method: str, **digestor_kwargs
+    response: spec.RpcPluralResponse,
+    method: str,
+    **digestor_kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
 
     digestor = rpc_registry.get_digestor(method)

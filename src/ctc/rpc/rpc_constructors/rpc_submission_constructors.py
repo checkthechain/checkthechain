@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ctc import spec
 from .. import rpc_request
 
@@ -10,18 +12,18 @@ def construct_eth_accounts() -> spec.RpcRequest:
     return rpc_request.create('eth_accounts', [])
 
 
-def construct_eth_sign(address, message) -> spec.RpcRequest:
+def construct_eth_sign(address: spec.Address, message: str) -> spec.RpcRequest:
     return rpc_request.create('eth_sign', [address, message])
 
 
 def construct_eth_sign_transaction(
-    from_address,
-    data,
-    to_address=None,
-    gas=None,
-    gas_price=None,
-    value=None,
-    nonce=None,
+    from_address: spec.Address,
+    data: str,
+    to_address: spec.Address | None = None,
+    gas: int | None = None,
+    gas_price: int | None = None,
+    value: int | None = None,
+    nonce: str | None = None,
 ) -> spec.RpcRequest:
 
     parameters = {
@@ -42,9 +44,9 @@ def construct_eth_send_transaction(
     from_address: spec.BinaryData,
     data: spec.BinaryData,
     to_address: spec.BinaryData = None,
-    gas: spec.BinaryData = None,
-    gas_price: spec.BinaryData = None,
-    value: spec.BinaryData = None,
+    gas: int | None = None,
+    gas_price: int | None = None,
+    value: int | None = None,
     nonce: spec.BinaryData = None,
 ) -> spec.RpcRequest:
     parameters = {

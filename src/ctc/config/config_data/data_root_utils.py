@@ -123,7 +123,7 @@ def initialize_data_root(
     return True
 
 
-def _py37_copytree(source, destination):
+def _py37_copytree(source: str, destination: str) -> None:
     for root, dirs, files in os.walk(source):
         relroot = os.path.relpath(root, source)
         for dirname in dirs:

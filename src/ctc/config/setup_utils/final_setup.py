@@ -1,12 +1,20 @@
+from __future__ import annotations
+
 import os
 
 import toolcli
 
+from ctc import spec
 from .. import config_write
 from .. import config_spec
 
 
-def finalize_setup(create_new_config, config, config_path, styles):
+def finalize_setup(
+    create_new_config: bool,
+    config: spec.ConfigSpec,
+    config_path: str,
+    styles: dict[str, str],
+) -> None:
 
     print()
     print()
@@ -52,7 +60,10 @@ def finalize_setup(create_new_config, config, config_path, styles):
 
     else:
         print()
-        toolcli.print('Using default config path ' + toolcli.add_style(config_path, styles['path']))
+        toolcli.print(
+            'Using default config path '
+            + toolcli.add_style(config_path, styles['path'])
+        )
 
     # print outro
     print()

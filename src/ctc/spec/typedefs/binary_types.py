@@ -4,9 +4,9 @@ from typing_extensions import Literal
 
 BinaryData = typing.Union[bytes, str]
 BinaryInteger = typing.Union[int, BinaryData]
-BlockSpec = typing.Union[
-    int, BinaryData, Literal['latest', 'earliest', 'pending']
-]
+# BlockSpec = typing.Union[
+#     int, BinaryData, Literal['latest', 'earliest', 'pending']
+# ]
 
 BinaryFormat = Literal['binary', 'prefix_hex', 'raw_hex', 'integer']
 

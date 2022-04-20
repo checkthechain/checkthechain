@@ -31,14 +31,16 @@ async def async_resolve_name(
 ) -> spec.Address:
     name_hash = hash_name(name)
 
+    function_abi: spec.FunctionABI = {
+        'name': 'addr',
+        'inputs': [{'type': 'bytes32'}],
+        'outputs': [{'type': 'address'}],
+    }
+
     result = await rpc.async_eth_call(
         to_address=ens_directory.resolver,
         block_number=block,
-        function_abi={
-            'name': 'addr',
-            'inputs': [{'type': 'bytes32'}],
-            'outputs': [{'type': 'address'}],
-        },
+        function_abi=function_abi,
         function_parameters=[name_hash],
         provider=provider,
     )
@@ -67,7 +69,7 @@ async def async_reverse_lookup(
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'getNames',
         'inputs': [{'type': 'address[]'}],
         'outputs': [{'type': 'string[]'}],
@@ -97,7 +99,7 @@ async def async_get_text_record(
             raise Exception('must specify name or node')
         node = hash_name(name)
 
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'text',
         'inputs': [
             {'name': 'node', 'type': 'bytes32'},
@@ -141,7 +143,7 @@ async def async_get_text_changes(
     node: str | None = None,
 ) -> spec.DataFrame:
 
-    event_abi = {
+    event_abi: spec.EventABI = {
         'name': 'TextChanged',
         'type': 'event',
         'inputs': [
@@ -192,7 +194,7 @@ async def async_get_content_hash(
             raise Exception('must specify name or node')
         node = hash_name(name)
 
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'contenthash',
         'inputs': [
             {'name': 'node', 'type': 'bytes32'},
@@ -200,7 +202,7 @@ async def async_get_content_hash(
         'outputs': [{'name': '', 'type': 'bytes'}],
     }
 
-    return rpc.async_eth_call(
+    return await rpc.async_eth_call(
         to_address=ens_directory.resolver,
         function_abi=function_abi,
         function_parameters=[node],
@@ -215,7 +217,7 @@ async def async_get_expiration(name: str) -> int:
     label = name.split('.')[-2]
     label_id = binary.keccak_text(label, output_format='integer')
 
-    function_abi = {
+    function_abi: spec.FunctionABI = {
         'name': 'nameExpires',
         'inputs': [{'name': 'id', 'type': 'uint256'}],
         'outputs': [{'type': 'uint256'}],
