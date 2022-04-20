@@ -124,7 +124,7 @@ def get_function_selector(
 ) -> str:
 
     if function_signature is None:
-        if function_abi is not None:
+        if function_abi is None:
             raise Exception('must specify function_abi or function_signature')
         function_signature = get_function_signature(function_abi)
 
