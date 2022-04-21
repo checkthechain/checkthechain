@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 import typing
 
+from . import optimize_exceptions
+
 
 async def async_bisect(
     async_f: typing.Callable[
@@ -21,7 +23,7 @@ async def async_bisect(
 
     # ensure that bounds are valid
     if a > b:
-        raise Exception(
+        raise optimize_exceptions.BadSearchDomain(
             'a must be less than b (' + str(a) + ' >= ' + str(b) + ')'
         )
 
@@ -49,7 +51,7 @@ async def async_bisect(
 
     # check that function has opposite signs at bounds
     if (f_a < 0 and f_b < 0) or (f_a > 0 and f_b > 0):
-        raise Exception(
+        raise optimize_exceptions.BadSearchDomain(
             'function must have opposite signs at bounds, have:\n    f(a) = '
             + str(f_a)
             + '\n    f(b) = '
@@ -64,7 +66,6 @@ async def async_bisect(
         f_c = await async_f(c, *f_args, **f_kwargs)
 
         if verbose:
-            # print('probing input=' + str(c) + ', f(input)=' + str(f_c))
             print('probing:   f(' + str(c) + ') = ' + str(f_c))
 
         # check if solution found

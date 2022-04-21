@@ -1,0 +1,4 @@
+
+class BadSearchDomain(Exception):
+    pass
+
