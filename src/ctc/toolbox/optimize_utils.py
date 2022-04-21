@@ -38,8 +38,8 @@ async def async_bisect(
     )
 
     if verbose:
-        print('probing min=' + str(a) + ', f(input)=' + str(f_a))
-        print('probing max=' + str(b) + ', f(input)=' + str(f_b))
+        print('probing min: f(' + str(a) + ') = ' + str(f_a))
+        print('probing max: f(' + str(b) + ') = ' + str(f_b))
 
     # check if solution on boundary
     if f_a == 0:
@@ -64,7 +64,8 @@ async def async_bisect(
         f_c = await async_f(c, *f_args, **f_kwargs)
 
         if verbose:
-            print('probing input=' + str(c) + ', f(input)=' + str(f_c))
+            # print('probing input=' + str(c) + ', f(input)=' + str(f_c))
+            print('probing:   f(' + str(c) + ') = ' + str(f_c))
 
         # check if solution found
         if f_c == 0:
@@ -96,7 +97,32 @@ async def async_bisect(
             raise Exception('solution could not be found')
 
     if verbose:
-        print('found solution ' + str(c))
+        summary = '\n'
+        summary += (
+            'found solution '
+            + str(c)
+        )
+        summary += (
+            '\n- iterations = '
+            + str(iteration + 1)
+        )
+        if input_tol is not None:
+            summary += (
+                '\n- input_precision = '
+                + str((b - a) / 2)
+                + ' < '
+                + str(input_tol)
+                + ' = input_tol'
+            )
+        if output_tol is not None:
+            summary += (
+                '\n- output_precision = '
+                + str(abs(f_c))
+                + ' < '
+                + str(input_tol)
+                + ' = output_tol'
+            )
+        print(summary)
 
     return c
 
