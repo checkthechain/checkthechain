@@ -45,16 +45,19 @@ async def async_get_liquidity_depth(
         'swap_kwargs': swap_kwargs,
     }
 
-    return await optimize_utils.async_bisect(
-        async_f=_async_new_price_distance,
-        a=int(min_search_depth),
-        b=int(max_search_depth),
-        max_iterations=max_iterations,
-        output_tol=output_tol,
-        input_tol=input_tol,
-        f_kwargs=f_kwargs,
-        verbose=verbose,
-    )
+    try:
+        return await optimize_utils.async_bisect(
+            async_f=_async_new_price_distance,
+            a=int(min_search_depth),
+            b=int(max_search_depth),
+            max_iterations=max_iterations,
+            output_tol=output_tol,
+            input_tol=input_tol,
+            f_kwargs=f_kwargs,
+            verbose=verbose,
+        )
+    except optimize_utils.BadSearchDomain:
+        return 0
 
 
 async def _async_new_price_distance(amount_sold, target_new_price, swap_kwargs):
