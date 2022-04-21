@@ -21,7 +21,9 @@ async def async_bisect(
 
     # ensure that bounds are valid
     if a > b:
-        raise Exception('a must be less than b')
+        raise Exception(
+            'a must be less than b (' + str(a) + ' >= ' + str(b) + ')'
+        )
 
     # set defaults
     if f_args is None:
@@ -35,6 +37,10 @@ async def async_bisect(
         async_f(b, *f_args, **f_kwargs),
     )
 
+    if verbose:
+        print('probing min=' + str(a) + ', f(input)=' + str(f_a))
+        print('probing max=' + str(b) + ', f(input)=' + str(f_b))
+
     # check if solution on boundary
     if f_a == 0:
         return a
@@ -43,7 +49,12 @@ async def async_bisect(
 
     # check that function has opposite signs at bounds
     if (f_a < 0 and f_b < 0) or (f_a > 0 and f_b > 0):
-        raise Exception('function must have opposite signs at bounds')
+        raise Exception(
+            'function must have opposite signs at bounds, have:\n    f(a) = '
+            + str(f_a)
+            + '\n    f(b) = '
+            + str(f_b)
+        )
 
     iteration = 0
     while True:
