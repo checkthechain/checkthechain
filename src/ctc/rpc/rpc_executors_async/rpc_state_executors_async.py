@@ -30,9 +30,10 @@ async def async_eth_call(
 ) -> spec.RpcSingularResponse:
 
     if function_abi is None:
-        function_abi = await evm.async_get_function_abi(
-            contract_address=to_address, **function_abi_query
-        )
+        if call_data is None or decode_response:
+            function_abi = await evm.async_get_function_abi(
+                contract_address=to_address, **function_abi_query
+            )
 
     # construct request
     request = rpc_constructors.construct_eth_call(
