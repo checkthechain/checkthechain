@@ -9,7 +9,7 @@ from ctc.protocols import fourbyte_utils
 
 async def async_decompile_function_abis(
     bytecode: str,
-    sort: str | None,
+    sort: str | None = None,
 ) -> typing.Sequence[typing.Mapping]:
     function_selectors = re.findall('8063([a-f0-9]{8})146', bytecode)
 
