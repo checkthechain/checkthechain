@@ -16,6 +16,11 @@ async def async_get_contract_creation_block(
     provider: spec.ProviderSpec = None,
     **search_kwargs: typing.Any,
 ) -> int | None:
+    """get block number of when contract was created
+
+    - caches result in local database
+    - behavior is undefined for functions that have undergone SELF-DESTRUCT(S)
+    """
 
     network = rpc.get_provider_network(provider)
 

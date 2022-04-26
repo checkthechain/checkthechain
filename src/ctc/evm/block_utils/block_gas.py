@@ -152,7 +152,7 @@ async def async_get_blocks_gas_stats(
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
 ) -> BlocksGasStats:
-    """get gas stats aggregated over multiple blocks"""
+    """get gas statistics aggregated over multiple blocks"""
 
     if blocks is None:
         if start_block is None or end_block is None:

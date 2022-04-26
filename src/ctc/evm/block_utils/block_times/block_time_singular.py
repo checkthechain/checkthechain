@@ -17,7 +17,7 @@ async def async_get_block_of_timestamp(
     block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
-    verbose: bool = True,
+    verbose: bool = False,
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
 ) -> int:
