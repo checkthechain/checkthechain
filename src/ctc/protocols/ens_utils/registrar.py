@@ -78,7 +78,7 @@ async def async_get_registration_block(name: str) -> int:
     parent_node = resolver.hash_name('.'.join(parent))
 
     registrations = await async_get_registrations()
-    mask = (registrations['arg__label'] == binary.keccak_text(label)) * (
+    mask = (registrations['arg__label'] == binary.keccak_text(label)) & (
         registrations['arg__parent_node'] == parent_node
     )
     result = registrations[mask]
@@ -117,6 +117,7 @@ async def async_get_registrations() -> spec.DataFrame:
         contract_address='0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e',
         event_abi=event_abi,
         start_block=9000000,
+        verbose=False,
     )
     new_owners['arg__parent_node'] = new_owners.pop('arg__node')
     return new_owners

@@ -54,8 +54,6 @@ async def async_build_function_signatures_dataset() -> list[
         os.remove(old_path)
     print('dataset built with', len(signatures), 'signatures')
 
-    return signatures
-
 
 async def async_build_event_signatures_dataset() -> list[fourbyte_spec.Entry]:
 
@@ -90,6 +88,4 @@ async def async_build_event_signatures_dataset() -> list[fourbyte_spec.Entry]:
     if os.path.isfile(old_path):
         os.remove(old_path)
     print('dataset built with', len(signatures), 'signatures')
-
-    return signatures
 
