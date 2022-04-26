@@ -17,15 +17,16 @@ alias keccak="ctc keccack"
 alias lower="ctc lower"
 
 # data commands
+alias abi="ctc abi"
 alias address="ctc address"
 alias block="ctc block"
 alias blocks="ctc blocks"
 alias call="ctc call"
 alias calls="ctc calls"
-alias eth="ctc eth"
 alias erc20="ctc erc20"
-alias transaction="ctc transaction"
+alias eth="ctc eth"
 alias gas="ctc gas"
+alias transaction="ctc transaction"
 
 # protocol commands
 alias 4byte="ctc 4byte"
