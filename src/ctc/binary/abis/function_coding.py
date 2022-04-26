@@ -141,7 +141,7 @@ def encode_function_parameters(
     parameters = new_parameters
 
     # encode
-    encoded_bytes = binary.abi_encode(
+    encoded_bytes = binary.encode_types(
         parameters, '(' + ','.join(parameter_types) + ')'
     )
 
@@ -156,7 +156,7 @@ def decode_function_parameters(
 
     parameter_types_str = '(' + ','.join(parameter_types) + ')'
     encoded_parameters = binary.convert(encoded_parameters, 'binary')
-    parameters = binary.abi_decode(encoded_parameters, parameter_types_str)
+    parameters = binary.decode_types(encoded_parameters, parameter_types_str)
 
     return parameters
 
@@ -209,7 +209,7 @@ def decode_function_output(
 
     # decode
     encoded_output = binary.convert(encoded_output, 'binary')
-    decoded_output = binary.abi_decode(encoded_output, output_types_str)
+    decoded_output = binary.decode_types(encoded_output, output_types_str)
 
     # decode strings
     new_decoded_output = []

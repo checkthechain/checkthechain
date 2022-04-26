@@ -97,7 +97,7 @@ def _decode_raw_symbol(data: str) -> str:
         return binary.hex_to_ascii(data).strip('\x00')
     else:
         as_binary = binary.convert(data, 'binary')
-        return binary.abi_decode(as_binary, '(string)')[0]
+        return binary.decode_types(as_binary, '(string)')[0]
 
 
 async def async_get_erc20_symbol(

@@ -70,7 +70,7 @@ def decode_event_topics(
             decoded_topics.append(topic)  # type: ignore
         else:
             topic = formats.convert(topic, 'binary')
-            decoded_topic = abi_coding.abi_decode(topic, indexed_type)
+            decoded_topic = abi_coding.decode_types(topic, indexed_type)
             decoded_topics.append(decoded_topic)
 
     # package output
@@ -138,7 +138,7 @@ def decode_event_unindexed_data(
 
     # decode data
     data = formats.convert(data, 'binary')
-    decoded = abi_coding.abi_decode(data, '(' + ','.join(unindexed_types) + ')')
+    decoded = abi_coding.decode_types(data, '(' + ','.join(unindexed_types) + ')')
 
     # package outputs
     if not use_names:

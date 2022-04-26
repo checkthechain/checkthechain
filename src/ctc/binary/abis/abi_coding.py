@@ -6,14 +6,14 @@ import typing
 from ctc import spec
 
 
-def abi_decode(data: bytes, types: spec.ABIDatatypeStr) -> typing.Any:
+def decode_types(data: bytes, types: spec.ABIDatatypeStr) -> typing.Any:
     # TODO: allow for any input format, allow specifying any output format
     import eth_abi
 
     return eth_abi.decode_single(types, data)
 
 
-def abi_encode(data: typing.Any, types: spec.ABIDatatypeStr) -> bytes:
+def encode_types(data: typing.Any, types: spec.ABIDatatypeStr) -> bytes:
     # TODO: allow for any input format, allow specifying any output format
     import eth_abi
 
