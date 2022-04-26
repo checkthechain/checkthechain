@@ -9,6 +9,19 @@ from ctc import spec
 from ctc.toolbox import pd_utils
 
 
+async def async_get_pool_A(
+    pool: spec.Address,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderSpec = None,
+) -> int:
+    return await rpc.async_eth_call(
+        to_address=pool,
+        function_name='A',
+        block_number=block,
+        provider=provider,
+    )
+
+
 async def async_get_pool_future_A_time(
     pool: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,

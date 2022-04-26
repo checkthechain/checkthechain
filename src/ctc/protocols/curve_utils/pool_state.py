@@ -7,17 +7,20 @@ from ctc import rpc
 from ctc import spec
 
 from . import pool_metadata
+from . import pool_parameters
 
 
 async def async_get_virtual_price(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
         function_name='get_virtual_price',
         function_parameters=[],
         provider=provider,
+        block_number=block,
     )
 
 
@@ -47,12 +50,14 @@ async def async_get_pool_state(
     n_tokens: int | None = None,
     block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderSpec = None,
+    normalize: bool = True,
 ) -> dict:
 
     total_supply = await evm.async_get_erc20_total_supply(
         token=pool,
         block=block,
         provider=provider,
+        normalize=normalize,
     )
     token_addresses = await pool_metadata.async_get_pool_addresses(
         pool,
@@ -64,11 +69,18 @@ async def async_get_pool_state(
         tokens=token_addresses,
         block=block,
         provider=provider,
+        normalize=normalize,
+    )
+    A = await pool_parameters.async_get_pool_A(
+        pool=pool,
+        block=block,
+        provider=provider,
     )
 
     return {
         'lp_total_supply': total_supply,
         'token_balances': token_balances,
+        'A': A,
     }
 
 
