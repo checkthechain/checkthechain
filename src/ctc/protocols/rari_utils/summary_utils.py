@@ -87,7 +87,7 @@ def print_fuse_pool_summary(
     tooltable.print_table(rows, headers=headers.values())
 
 
-async def print_all_pool_summary(
+async def async_print_all_pool_summary(
     block: spec.BlockNumberReference = 'latest',
     n_display: int = 15,
 ) -> None:

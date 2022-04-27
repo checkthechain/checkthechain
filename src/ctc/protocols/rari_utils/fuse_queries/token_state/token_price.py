@@ -57,7 +57,7 @@ async def async_get_ctoken_price(
     except spec.RpcException as e:
         if raise_on_revert:
             raise e
-        warnings.warn('price query failed for ctoken ' + str(ctoken))
+        # warnings.warn('price query failed for ctoken ' + str(ctoken))
         price = 0
 
     return price
