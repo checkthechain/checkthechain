@@ -30,26 +30,26 @@ class BalancerPoolState(TypedDict):
 
 
 async def async_summarize_pool_state(
-    balancer_pool: spec.Address,
+    pool_address: spec.Address,
     block: spec.BlockNumberReference = 'latest',
 ) -> BalancerPoolState:
 
     block = await evm.async_block_number_to_int(block)
 
     pool_tokens_coroutine = await pool_metadata.async_get_pool_tokens(
-        pool_address=balancer_pool,
+        pool_address=pool_address,
         block=block,
     )
     pool_fees_coroutine = await pool_state.async_get_pool_fees(
-        pool_address=balancer_pool,
+        pool_address=pool_address,
         block=block,
     )
     pool_weights_coroutine = await pool_state.async_get_pool_weights(
-        pool_address=balancer_pool,
+        pool_address=pool_address,
         block=block,
     )
     pool_balances_coroutine = await pool_state.async_get_pool_balances(
-        pool_address=balancer_pool,
+        pool_address=pool_address,
         block=block,
     )
 
@@ -82,6 +82,7 @@ async def async_get_pool_swaps(
         event_name='Swap',
         start_block=start_block,
         end_block=end_block,
+        verbose=False,
     )
 
     if pool_address is not None:
