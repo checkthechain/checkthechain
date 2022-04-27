@@ -11,7 +11,7 @@ async def async_quote_exact_input_single(
     token_out: spec.Address,
     fee: int,
     amount_in: int,
-    sqrt_price_limit_x96: int,
+    sqrt_price_limit_x96: int = 0,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -58,7 +58,7 @@ async def async_quote_exact_output_single(
     token_out: spec.Address,
     fee: int,
     amount_out: int,
-    sqrt_price_limit_x96: int,
+    sqrt_price_limit_x96: int = 0,
     provider: spec.ProviderSpec = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
