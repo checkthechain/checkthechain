@@ -32,9 +32,10 @@ async def async_get_deposits(
     )
     events = await evm.async_get_events(
         contract_address=aave_lending_pool,
-        event_name='Withdraw',
+        event_name='Deposit',
         start_block=start_block,
         end_block=end_block,
+        verbose=False,
     )
     events['arg__amount'] = events['arg__amount'].map(int)
 
@@ -66,9 +67,10 @@ async def async_get_withdrawals(
     )
     events = await evm.async_get_events(
         contract_address=aave_lending_pool,
-        event_name='Deposit',
+        event_name='Withdraw',
         start_block=start_block,
         end_block=end_block,
+        verbose=False,
     )
     events['arg__amount'] = events['arg__amount'].map(int)
 

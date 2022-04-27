@@ -17,7 +17,7 @@ async def async_get_supply_apy(
     supply_rate_per_block = await rpc.async_eth_call(
         to_address=ctoken,
         function_name='supplyRatePerBlock',
-        block=block,
+        block_number=block,
     )
     supply_apy = (1 + supply_rate_per_block / 1e18 * blocks_per_day) ** 365 - 1
     return supply_apy
@@ -30,7 +30,7 @@ async def async_get_borrow_apy(
     borrow_rate_per_block = await rpc.async_eth_call(
         to_address=ctoken,
         function_name='borrowRatePerBlock',
-        block=block,
+        block_number=block,
     )
     borrow_apy = (1 + borrow_rate_per_block / 1e18 * blocks_per_day) ** 365 - 1
     return borrow_apy
