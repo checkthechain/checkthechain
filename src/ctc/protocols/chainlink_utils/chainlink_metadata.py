@@ -10,11 +10,12 @@ from ctc import spec
 from . import chainlink_spec
 
 
-def get_feed_decimals(
+async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
     provider: spec.ProviderSpec = None,
 ) -> int:
     provider = rpc.get_provider(provider)
+    feed = await async_resolve_feed_address(feed, provider=provider)
     network = provider['network']
     if network is None:
         raise Exception('could not determine network')

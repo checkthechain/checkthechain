@@ -59,7 +59,7 @@ async def async_get_full_feed_event_data(
 
     # normalize
     if normalize:
-        decimals = chainlink_metadata.get_feed_decimals(
+        decimals = await chainlink_metadata.async_get_feed_decimals(
             feed=feed, provider=provider
         )
         df['answer'] /= 10 ** decimals
@@ -71,19 +71,25 @@ async def async_get_full_feed_event_data(
             raise Exception('cannot use keep_multiindex and interpolate')
         df.index = pd_utils.keep_level(df.index, level='block_number')
 
-        # add initial data
-        if start_block < df.index.values[0]:
-            import pandas as pd
+        # TODO: better detection of initial feed data point
+        first_feed_block = await chainlink_metadata.async_get_feed_first_block(feed)
+        if start_block == first_feed_block:
+            pass
+        else:
 
-            initial_data = await feed_datum.async_get_feed_datum(
-                feed=feed,
-                block=start_block,
-                provider=provider,
-                normalize=normalize,
-                fields='full',
-            )
-            initial_df = pd.DataFrame(initial_data, index=[start_block])
-            df = pd.concat([initial_df, df])
+            # add initial data
+            if start_block < df.index.values[0]:
+                import pandas as pd
+
+                initial_data = await feed_datum.async_get_feed_datum(
+                    feed=feed,
+                    block=start_block,
+                    provider=provider,
+                    normalize=normalize,
+                    fields='full',
+                )
+                initial_df = pd.DataFrame(initial_data, index=[start_block])
+                df = pd.concat([initial_df, df])
 
         end_block = await evm.async_block_number_to_int(
             end_block, provider=provider

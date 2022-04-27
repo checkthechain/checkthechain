@@ -40,10 +40,11 @@ async def async_get_composite_feed_data(
         product = product * data
 
     # normalize
-    feeds_decimals = [
-        chainlink_metadata.get_feed_decimals(feed=feed, provider=provider)
+    feeds_decimals_coroutines = [
+        chainlink_metadata.async_get_feed_decimals(feed=feed, provider=provider)
         for feed in composite_feed
     ]
+    feeds_decimals = await asyncio.gather(*feeds_decimals_coroutines)
     composite_decimals = sum(feeds_decimals)
     product = product / (10 ** composite_decimals)
 

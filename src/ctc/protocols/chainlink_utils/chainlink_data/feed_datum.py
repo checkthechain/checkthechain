@@ -65,7 +65,9 @@ async def async_get_feed_datum(
 
         if answer is not None:
             if normalize:
-                decimals = chainlink_metadata.get_feed_decimals(feed)
+                decimals = await chainlink_metadata.async_get_feed_decimals(
+                    feed
+                )
                 answer /= 10 ** decimals
 
             if invert:
@@ -94,7 +96,9 @@ async def async_get_feed_datum(
 
         if answer is not None:
             if normalize:
-                decimals = chainlink_metadata.get_feed_decimals(feed)
+                decimals = await chainlink_metadata.async_get_feed_decimals(
+                    feed
+                )
                 full['answer'] /= 10 ** decimals
 
             if invert:
