@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 import json
+import typing
+
+import toolcli
+import toolstr
+import tooltable # type: ignore
 
 from ctc import rpc
-
-import toolstr
-import tooltable
-
 from ctc.protocols import fei_utils
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_depth_command,
         'help': 'output FEI liquidity depth information',
@@ -29,17 +30,21 @@ def get_command_spec():
     }
 
 
-async def async_depth_command(prices, as_json):
+async def async_depth_command(
+    prices: typing.Sequence[str], as_json: bool
+) -> None:
 
     if prices is None:
-        prices = [
+        prices_float = [
             0.995,
             0.993,
             0.990,
         ]
+    else:
+        prices_float = [float(price) for price in prices]
 
     pool_price_depth = await fei_utils.async_get_fei_uniswap_pool_price_depth(
-        prices=prices
+        prices=prices_float
     )
 
     if as_json:
@@ -49,14 +54,14 @@ async def async_depth_command(prices, as_json):
         rows = []
         for pool in pool_price_depth.keys():
             row = [pool]
-            for price in prices:
+            for price in prices_float:
                 value = pool_price_depth[pool][price] / 1e18
                 row.append(
                     toolstr.format(value, order_of_magnitude=True, prefix='$')
                 )
             rows.append(row)
 
-        headers = ['pool'] + ['to $' + str(price) for price in prices]
+        headers = ['pool'] + ['to $' + str(price) for price in prices_float]
         toolstr.print_text_box('FEI Liquidity Depth')
         print()
         print(

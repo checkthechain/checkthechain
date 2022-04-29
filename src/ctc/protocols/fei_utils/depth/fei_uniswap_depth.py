@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import typing
 
 from ctc import directory
 from ctc.protocols import uniswap_v3_utils
 
 
-async def async_get_fei_uniswap_pools():
+async def async_get_fei_uniswap_pools() -> list[list[typing.Any]]:
     # TODO: automate
 
     FEI = directory.get_erc20_address('FEI')
@@ -24,8 +25,8 @@ async def async_get_fei_uniswap_pools():
 
 
 async def async_get_fei_uniswap_pool_price_depth(
-    pools=None, prices=None
-):
+    pools: list[list[typing.Any]] | None = None, prices: typing.Sequence[float] | None = None
+) -> dict[str, dict[float, float]]:
     if pools is None:
         pools = await async_get_fei_uniswap_pools()
 
@@ -63,7 +64,7 @@ async def async_get_fei_uniswap_pool_price_depth(
 
     depths = await asyncio.gather(*coroutines.values())
 
-    pool_price_depth = {}
+    pool_price_depth: dict[str, dict[float, float]] = {}
     for (p, price_level), depth in zip(coroutines.keys(), depths):
         token_in, token_out, fee, token_in_decimals, token_out_decimals = pools[
             p

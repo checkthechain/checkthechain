@@ -8,7 +8,7 @@ from ctc import binary
 
 def digest_eth_call(
     response: spec.RpcSingularResponse,
-    function_abi: spec.FunctionABI,
+    function_abi: spec.FunctionABI | None,
     decode_response: bool = True,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
@@ -22,6 +22,10 @@ def digest_eth_call(
             response = empty_token
 
         else:
+
+            if function_abi is None:
+                raise Exception('could not find function_abi for decoding')
+
             response = binary.decode_function_output(
                 encoded_output=response,
                 delist_single_outputs=delist_single_outputs,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import typing
+from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
@@ -9,6 +10,14 @@ from ctc import spec
 
 from . import contracts
 from . import uniswap_v3_spec
+
+
+class UniswapV3PoolMetadata(TypedDict):
+    x_symbol: str
+    y_symbol: str
+    x_address: str
+    y_address: str
+    fee: int
 
 
 #
@@ -40,7 +49,7 @@ async def async_get_pool_tokens(
 async def async_get_pool_metadata(
     pool_address: spec.Address,
     **rpc_kwargs: typing.Any,
-) -> dict[str, str]:
+) -> UniswapV3PoolMetadata:
     x_address, y_address = await async_get_pool_tokens(
         pool_address=pool_address
     )

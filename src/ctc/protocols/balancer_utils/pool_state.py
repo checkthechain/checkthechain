@@ -156,7 +156,7 @@ async def async_get_pool_balances_by_block(
     pool_id: typing.Optional[spec.HexData] = None,
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
-) -> typing.Union[dict[spec.Address, list[int, float]]]:
+) -> typing.Union[dict[spec.Address, list[int | float]]]:
 
     coroutines = [
         async_get_pool_balances(

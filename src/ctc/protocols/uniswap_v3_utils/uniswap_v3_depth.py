@@ -2,27 +2,30 @@
 the implementations here are stopgap solutions
 - in future will create a more complete internal Uniswap v3 representation
 """
+from __future__ import annotations
+
+import typing
 
 from ctc.toolbox import optimize_utils
 from ctc import evm
 
-from .contracts import quoter
+from . import contracts
 
 
 async def async_get_liquidity_depth(
-    new_price,
-    token_in,
-    token_out,
-    fee,
-    min_search_depth=1,
-    max_search_depth=int(10e6 * 1e18),
-    verbose=False,
-    output_tol=None,
-    input_tol=None,
-    max_iterations=50,
-    token_in_decimals=None,
-    token_out_decimals=None,
-):
+    new_price: int | float,
+    token_in: str,
+    token_out: str,
+    fee: int,
+    min_search_depth: int = 1,
+    max_search_depth: int = int(10e6 * 1e18),
+    verbose: bool = False,
+    output_tol: int | float | None = None,
+    input_tol: int | float | None = None,
+    max_iterations: int = 50,
+    token_in_decimals: int | None = None,
+    token_out_decimals: int | None = None,
+) -> float:
     """return amount of token sold needed to reach new price"""
 
     if token_in_decimals is None:
@@ -60,20 +63,22 @@ async def async_get_liquidity_depth(
         return 0
 
 
-async def _async_new_price_distance(amount_sold, target_new_price, swap_kwargs):
+async def _async_new_price_distance(
+    amount_sold: int | float, target_new_price: float, swap_kwargs: typing.Any
+) -> float:
     actual_new_price = await async_get_new_price(amount_sold, **swap_kwargs)
     return actual_new_price - target_new_price
 
 
 async def async_get_new_price(
-    amount_sold,
-    token_in,
-    token_out,
-    fee,
-    token_in_decimals,
-    token_out_decimals,
-    probe_amount_sold=None,
-):
+    amount_sold: int | float,
+    token_in: str,
+    token_out: str,
+    fee: int,
+    token_in_decimals: int,
+    token_out_decimals: int,
+    probe_amount_sold: int | None = None,
+) -> float:
     """return new price in pool after a given amount of a token is sold
 
     - does this by computing a trade and an additional probe trade
@@ -86,14 +91,14 @@ async def async_get_new_price(
     amount_sold = int(amount_sold)
     total_input_probe = int(amount_sold + probe_amount_sold)
 
-    bought_amount = await quoter.async_quote_exact_input_single(
+    bought_amount = await contracts.async_quote_exact_input_single(
         token_in=token_in,
         token_out=token_out,
         fee=fee,
         amount_in=amount_sold,
         sqrt_price_limit_x96=0,
     )
-    probe_amount_bought = await quoter.async_quote_exact_input_single(
+    probe_amount_bought = await contracts.async_quote_exact_input_single(
         token_in=token_in,
         token_out=token_out,
         fee=fee,

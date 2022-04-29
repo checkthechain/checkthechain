@@ -3,10 +3,11 @@ from __future__ import annotations
 import re
 import typing
 
-from . import typedefs
 
-
-def typehints_formatter(annotation, sphinx_config):
+def typehints_formatter(
+    annotation: typing.Any,
+    sphinx_config: typing.Mapping,
+) -> str:
     """used for documentation of types by sphinx_autodoc_typehints"""
     output = str(annotation)
     matches = re.findall('[a-zA-Z_\.]+', output)

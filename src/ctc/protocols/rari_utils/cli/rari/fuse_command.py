@@ -76,7 +76,7 @@ async def summarize_fuse_pool(
 
 async def summarize_all_fuse_pools(block: spec.BlockNumberReference) -> None:
 
-    await rari_utils.print_all_pool_summary(block=block)
+    await rari_utils.async_print_all_pool_summary(block=block)
 
     from ctc.rpc.rpc_backends import rpc_http_async
 

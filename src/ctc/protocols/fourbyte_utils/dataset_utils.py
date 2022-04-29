@@ -18,9 +18,7 @@ def local_event_signatures_exist() -> bool:
     return os.path.isfile(path)
 
 
-async def async_build_function_signatures_dataset() -> list[
-    fourbyte_spec.Entry
-]:
+async def async_build_function_signatures_dataset() -> None:
 
     path = fourbyte_spec.get_default_path('function_signatures')
 
@@ -55,7 +53,7 @@ async def async_build_function_signatures_dataset() -> list[
     print('dataset built with', len(signatures), 'signatures')
 
 
-async def async_build_event_signatures_dataset() -> list[fourbyte_spec.Entry]:
+async def async_build_event_signatures_dataset() -> None:
 
     path = fourbyte_spec.get_default_path('event_signatures')
 

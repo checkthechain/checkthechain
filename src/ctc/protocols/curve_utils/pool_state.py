@@ -13,7 +13,7 @@ from . import pool_parameters
 async def async_get_virtual_price(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
-    block: spec.BlockNumberReference = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
