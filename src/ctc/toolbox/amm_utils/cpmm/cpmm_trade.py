@@ -30,9 +30,6 @@ def trade(
         - new_x_reserves
         - new_y_reserves
     - values in this list can be scalars or numpy arrays
-
-    ## Inputs
-    - [see uniswap_spec.py]
     """
 
     # validate inputs

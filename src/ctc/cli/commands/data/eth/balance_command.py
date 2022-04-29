@@ -23,6 +23,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'skip normalizing balance by 1e18 decimals',
             },
         ],
+        'examples': [
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 --raw',
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 --block 14000000',
+        ],
     }
 
 

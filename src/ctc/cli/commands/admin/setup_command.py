@@ -9,6 +9,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': setup_command,
         'help': 'run ctc setup wizard',
+        'examples': [''],
     }
 
 

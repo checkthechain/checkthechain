@@ -12,16 +12,7 @@ from ctc import spec
 from ctc.cli import cli_utils
 
 
-command_help = """output ERC20 balances of blocks / addresses / tokens
-
-[comment]# example: balance of single wallet across multiple tokens[/comment]
-[option]ctc erc20 balances WALLET --erc20s ERC20S [--block BLOCK][/option]
-
-[comment]# example: balances of wallets within single block (default = all wallets)[/comment]
-[option]ctc erc20 balances ERC20 [--block BLOCK] [--wallets WALLETS][/option]
-
-[comment]# example: balance of single wallet across multiple blocks[/comment]
-[option]ctc erc20 balances ERC20 WALLET --blocks BLOCKS[/option]"""
+command_help = """output ERC20 balances of blocks / addresses / tokens"""
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -64,6 +55,20 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--top', 'metavar': 'N', 'help': 'show top N addresses'},
         ],
+        'examples': {
+            'WALLET --erc20s ERC20S [--block BLOCK]': {
+                'description': 'version 1: balance of single wallet across multiple tokens',
+                'runnable': False,
+            },
+            'ERC20 [--block BLOCK] [--wallets WALLETS]': {
+                'description': 'version 2: balances of multiple wallets in single block (default = all wallets)',
+                'runnable': False,
+            },
+            'ERC20 WALLET --blocks BLOCKS': {
+                'description': 'version 3: balance of single wallet across multiple blocks',
+                'runnable': False,
+            },
+        },
     }
 
 

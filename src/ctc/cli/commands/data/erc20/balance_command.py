@@ -22,6 +22,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'whether to normalize balance by ERC20 decimals',
             },
         ],
+        'examples': [
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca 0x9928e4046d7c6513326ccea028cd3e7a91c7590a',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca 0x9928e4046d7c6513326ccea028cd3e7a91c7590a --raw',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca 0x9928e4046d7c6513326ccea028cd3e7a91c7590a --block 14000000',
+        ],
     }
 
 

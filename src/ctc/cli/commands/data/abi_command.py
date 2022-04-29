@@ -44,6 +44,13 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'query of name of function or event abi',
             },
         ],
+        'examples': [
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --json',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --functions',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --functions --json',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --name Transfer',
+        ],
     }
 
 

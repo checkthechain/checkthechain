@@ -22,6 +22,9 @@ syntax is one of
             {'name': 'args', 'nargs': '+'},
             {'name': '--nested', 'action': 'store_true'},
         ],
+        'examples': {
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
+        },
     }
 
 

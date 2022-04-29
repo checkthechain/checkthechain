@@ -23,6 +23,9 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'address that implements functionality',
             },
         ],
+        'examples': [
+            '0xd8553552f8868c1ef160eedf031cf0bcf9686945 0x67db14e73c2dce786b5bbbfa4d010deab4bbfcf9',
+        ],
     }
 
 

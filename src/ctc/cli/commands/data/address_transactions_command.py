@@ -15,6 +15,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'address', 'help': 'get transactions from this address'},
         ],
+        'examples': ['0xd8da6bf26964af9d7eed9e03e53415d37aa96045'],
     }
 
 

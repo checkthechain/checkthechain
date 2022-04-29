@@ -31,12 +31,16 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify that output path can be overwritten',
             },
         ],
+        'examples': [
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --blocks [14000000, 14000100]',
+        ],
     }
 
 
 async def async_transfers_command(
     erc20: str,
-    blocks: list[str],
+    blocks: typing.Sequence[str],
     output: str,
     overwrite: bool,
 ) -> None:

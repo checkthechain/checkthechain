@@ -12,6 +12,10 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'data', 'help': 'hex data to convert'},
         ],
+        'examples': [
+            '0x766974616c696b',
+            '0x7475726475636b656e',
+        ],
     }
 
 

@@ -17,6 +17,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'omit the "0x" prefix',
             },
         ],
+        'examples': [
+            'vitalik',
+            'turducken',
+        ],
     }
 
 

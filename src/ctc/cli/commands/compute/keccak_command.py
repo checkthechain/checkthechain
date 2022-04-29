@@ -30,6 +30,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'omit "0x" prefix on output',
             },
         ],
+        'examples': {
+            '0x678acb67e': 'take hash of hex data',
+            'vitalik': 'take hash of text',
+        },
     }
 
 

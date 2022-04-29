@@ -11,6 +11,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': connect_command,
         'help': 'connect to database console (proceed with caution)',
+        'examples': [''],
     }
 
 

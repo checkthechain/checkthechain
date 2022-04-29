@@ -43,6 +43,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
+        'examples': [
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks [14000000, 14100000]',
+        ],
     }
 
 

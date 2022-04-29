@@ -32,6 +32,10 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--include-links', 'help': 'include links in output'},
         ],
+        'examples': [
+            '',
+            '-n 100',
+        ],
     }
 
 

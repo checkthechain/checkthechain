@@ -37,6 +37,10 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--provider', 'help': 'rpc provider to use'},
         ],
+        'examples': {
+            '[14000000, 14000100]': 'get blocks 14000000 through 14000100',
+            '[14000000, 14000100] --attributes timestamp,number': 'get blocks 14000000 through 14000100',
+        },
     }
 
 
@@ -87,7 +91,6 @@ async def async_block_command(
     blocks_data = await rpc.async_batch_eth_get_block_by_number(
         block_numbers=export_blocks,
         include_full_transactions=compute_gas,
-        overwrite=overwrite,
         provider=provider,
     )
 

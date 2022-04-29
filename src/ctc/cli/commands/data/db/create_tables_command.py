@@ -23,6 +23,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'networks to create tables for',
             },
         ],
+        'examples': [''],
     }
 
 

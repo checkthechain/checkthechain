@@ -10,6 +10,9 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'text', 'help': 'text to convert'},
         ],
+        'examples': [
+            '0x956F47F50A910163D8BF957Cf5846D573E7f87CA',
+        ],
     }
 
 

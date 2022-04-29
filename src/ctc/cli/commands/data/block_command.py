@@ -29,6 +29,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
+        'examples': [
+            '14000000',
+            '14000000 --json',
+            '--timestamp 1600000000',
+        ],
     }
 
 

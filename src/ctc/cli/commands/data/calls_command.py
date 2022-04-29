@@ -11,16 +11,7 @@ from ctc import rpc
 from ctc import spec
 from ctc.cli import cli_utils
 
-command_help = """output the result of multiple calls
-
-# Example usage:
-
-## same call across multiple blocks
-ctc calls <address> <function_name> [<function_parameters>] --blocks <blocks>
-
-## same call across multiple addresses
-ctc calls <function_name> [<function_parameters>] --addresses <addresses> [--block block]
-"""
+command_help = """output the result of multiple calls"""
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -57,6 +48,16 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'dest': 'from_address',
             },
         ],
+        'examples': {
+            '<address> <function_name> [<function_parameters>] --blocks <blocks>': {
+                'description': 'version 1: same call across multiple blocks',
+                'runnable': False,
+            },
+            '<function_name> [<function_parameters>] --addresses <addresses> [--block block]': {
+                'description': 'version 2: same call across multiple addresses',
+                'runnable': False,
+            },
+        },
     }
 
 

@@ -49,6 +49,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify that output path can be overwritten',
             },
         ],
+        'examples': [
+            '',
+            '--last 1000',
+        ],
     }
 
 
@@ -92,7 +96,6 @@ async def async_gas_command(
         for i in range(n_blocks):
             if blocks[-i - 1]['timestamp'] < cutoff_timestamp:
                 break
-        print(i)
         last_blocks.append(i)
 
     toolstr.print_text_box('Gas Price Summary')

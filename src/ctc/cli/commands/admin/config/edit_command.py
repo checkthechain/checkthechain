@@ -15,6 +15,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'special': {
             'hidden': True,
         },
+        'examples': [''],
     }
 
 

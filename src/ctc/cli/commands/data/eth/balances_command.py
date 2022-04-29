@@ -52,6 +52,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify that output path can be overwritten',
             },
         ],
+        'examples': {
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 0xea674fdde714fd979de3edf0f56aa9716b898ec8 0xbe0eb53f46cd790cd13851d5eff43d12404d33e8': 'multiple wallets',
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 --blocks [14000000, 14000100]': 'multiple blocks',
+        },
     }
 
 

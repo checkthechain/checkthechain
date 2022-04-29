@@ -14,8 +14,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'f': async_address_command,
         'help': """summarize address
 
-for contracts, will display ABI
-""",
+for contracts, will display ABI""",
         'args': [
             {'name': 'address', 'help': 'address to get summary of'},
             {
@@ -33,6 +32,9 @@ for contracts, will display ABI
                 'metavar': 'NAME_OR_ID',
                 'help': 'network name or id to scan address of',
             },
+        ],
+        'examples': [
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
         ],
     }
 
