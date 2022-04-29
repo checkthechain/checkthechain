@@ -7,6 +7,7 @@ from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc import spec
+from ctc.toolbox import nested_utils
 
 from . import pool_metadata
 
@@ -146,4 +147,29 @@ async def async_get_pool_balances(
             pool_balances[token] /= 10 ** decimal
 
     return pool_balances
+
+
+async def async_get_pool_balances_by_block(
+    *,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    pool_address: typing.Optional[spec.ContractAddress] = None,
+    pool_id: typing.Optional[spec.HexData] = None,
+    vault: typing.Optional[spec.ContractAddress] = None,
+    normalize: bool = True,
+) -> typing.Union[dict[spec.Address, list[int, float]]]:
+
+    coroutines = [
+        async_get_pool_balances(
+            pool_address=pool_address,
+            pool_id=pool_id,
+            block=block,
+            vault=vault,
+            normalize=normalize,
+        )
+        for block in blocks
+    ]
+
+    balances_by_block = await asyncio.gather(*coroutines)
+
+    return nested_utils.list_of_dicts_to_dict_of_lists(balances_by_block)
 
