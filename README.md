@@ -16,7 +16,7 @@ It can be used as either 1) a python package or 2) a cli tool
 - **protocol specificity**: includes functionality for protocols like Chainlink, Uniswap, ERC20, and more
 - **command line interface**: performs many block explorer tasks in the terminal
 
-for details check out [the docs](/docs)
+for details check out [the docs](https://ctc.readthedocs.io/)
 
 
 ## Contents
@@ -30,9 +30,10 @@ for details check out [the docs](/docs)
 4. [**Similar Projects**](#similar-projects)
 
 
+
 ## Example Usage
 
-for more examples see [the examples](/docs/examples) in the docs
+for more examples see examples in (the docs)[https://ctc.readthedocs.io/en/latest/index.html#datatypes]
 
 
 #### Get all token transfers of an ERC20
@@ -142,7 +143,7 @@ Two steps:
 
 If your shell's `PATH` does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
 
-`ctc` requires python >= 3.7. Detailed instructions and requirements can be found in the [installation docs](/docs/install.md).
+`ctc` requires python >= 3.7. Detailed instructions and requirements can be found in the [installation docs](https://ctc.readthedocs.io/en/latest/overview/installation.html).
 
 
 ## FAQ
@@ -151,16 +152,19 @@ If your shell's `PATH` does not include python scripts you may need to do someth
     - **Clean API emphasizing UX**: With `ctc` most data queries can be obtained with a single function call. No need to instantiate objects. RPC inputs/outputs are automatically encoded/decoded by default.
     - **Maximize data accessibility**: Blockchains contain vast amounts of data, but accessing this data can require large amounts of time, effort, and expertise. `ctc` aims to lower the barrier to entry on all fronts.
 - Why use `async`?
-    - `async` is a natural fit for efficiently querying large amounts of data from an archive node. All `ctc` functions that fetch external data use `async`. For tips on using `async` see [this section](/docs/code_tour.md#async) in the docs. Future versions of `ctc` will include some wrappers for synchronous code.
+    - `async` is a natural fit for efficiently querying large amounts of data from an archive node. All `ctc` functions that fetch external data use `async`. For tips on using `async` see [this section](https://ctc.readthedocs.io/en/latest/python/async_code.html) in the docs. Future versions of `ctc` will include some wrappers for synchronous code.
 - Do I need an archive node?
     - If you want to query historical data, you will need an archive node. You can either [run one yourself](https://github.com/ledgerwatch/erigon) or use a third-party provider such as [Alchemy](https://www.alchemy.com/), [Quicknode](https://www.quicknode.com/), or [Moralis](https://moralis.io/speedy-nodes/). You can also use `ctc` to query current (non-historical) data using a non-archive node.
+- Is `ctc` useful for recent, non-historical data?
+    Yes, `ctc` has lots of functionality for querying the current state of the chain.
 
 
 ## Similar Projects
 - [`ethereum-etl`](https://github.com/blockchain-etl/ethereum-etl) ETL tools for bulk data gathering in python
+- [`Trueblocks`](https://github.com/TrueBlocks/trueblocks-core) optimized EVM local indexing engine
+- [`cast`](https://onbjerg.github.io/foundry-book/reference/cast.html) cli EVM swiss army knife (rust)
 - [`seth`](https://github.com/dapphub/dapptools/tree/master/src/seth) cli EVM swiss army knife (bash / js)
 - [`ethereal`](https://github.com/wealdtech/ethereal) cli EVM swiss army knife (go)
-- [`cast`](https://onbjerg.github.io/foundry-book/reference/cast.html) cli EVM swiss army knife (rust)
 - [`web3.py`](https://github.com/ethereum/web3.py/) official Ethereum python client
-- [`ApeWorX`](https://github.com/ApeWorX/ape) python development framework
+- [`ethtx.info`](https://ethtx.info/) EVM transaction trace visualizer
 
