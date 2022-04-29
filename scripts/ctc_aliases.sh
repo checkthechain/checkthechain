@@ -30,7 +30,7 @@ alias transaction="ctc transaction"
 
 # protocol commands
 alias 4byte="ctc 4byte"
-alias cg="ctc coingecko"
+alias cg="ctc cg"
 alias chainlink="ctc chainlink"
 alias curve="ctc curve"
 alias ens="ctc ens"
