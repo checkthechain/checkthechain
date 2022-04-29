@@ -191,7 +191,7 @@ def help_url_getter(
     categories = parse_spec['config']['help_subcommand_categories']
     category = categories.get(subcommand, 'other')
     return (
-        'http://127.0.0.1:8000/cli/subcommands/'
+        'https://ctc.readthedocs.io/en/latest/cli/subcommands/'
         + category
         + '/'
         + '_'.join(subcommand)
