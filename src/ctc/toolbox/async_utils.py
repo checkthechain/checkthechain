@@ -1,3 +1,8 @@
+"""
+Ideas:
+- create version of gather that prints progress bar
+"""
+
 from __future__ import annotations
 
 import asyncio
