@@ -26,6 +26,7 @@ async def async_get_erc20_transfers(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     convert_from_str: bool = True,
+    verbose=False,
     **event_kwargs: typing.Any
 ) -> spec.DataFrame:
 
@@ -34,6 +35,7 @@ async def async_get_erc20_transfers(
         event_abi=erc20_abis.erc20_event_abis['Transfer'],
         start_block=start_block,
         end_block=end_block,
+        verbose=verbose,
         **event_kwargs
     )
 
