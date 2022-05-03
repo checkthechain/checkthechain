@@ -48,19 +48,22 @@ def interpolate_series(
     )
 
     # insert pre fill value
-    if start_index < series.index.values[0]:
-        if pre_fill_value is None:
-            raise Exception('for early start must specify pre_fill_value')
-        new_series.iloc[0] = pre_fill_value
-    elif start_index > series.index.values[-1]:
-        # case: indicies start after the series ends
-        new_series.iloc[0] = series.values[-1]
-    elif start_index > series.index.values[0]:
-        # fill in any initial values that were cut off
-        fill_index = np.nonzero(series.index > start_index)[0][0] - 1  # type: ignore
-        new_series.iloc[0] = series.iloc[fill_index]
+    if len(series) > 0:
+        if start_index < series.index.values[0]:
+            if pre_fill_value is None:
+                raise Exception('for early start must specify pre_fill_value')
+            new_series.iloc[0] = pre_fill_value
+        elif start_index > series.index.values[-1]:
+            # case: indicies start after the series ends
+            new_series.iloc[0] = series.values[-1]
+        elif start_index > series.index.values[0]:
+            # fill in any initial values that were cut off
+            fill_index = np.nonzero(series.index > start_index)[0][0] - 1  # type: ignore
+            new_series.iloc[0] = series.iloc[fill_index]
 
     # interpolate values
+    if len(series) == 0 and len(new_series) > 0 and pre_fill_value is not None:
+        new_series.iloc[0] = pre_fill_value
     new_series = new_series.fillna(method='ffill')
 
     return new_series
