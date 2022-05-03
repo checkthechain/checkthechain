@@ -17,11 +17,11 @@ raw_secondary_abi = """[{"inputs":[],"name":"directory","outputs":[{"internalTyp
 
 
 def get_primary_lens_abi() -> dict[str, spec.FunctionABI | spec.EventABI]:
-    return json.loads(raw_primary_abi)
+    return {item['name']: item for item in json.loads(raw_primary_abi)}
 
 
 def get_secondary_lens_abi() -> dict[str, spec.FunctionABI | spec.EventABI]:
-    return json.loads(raw_secondary_abi)
+    return {item['name']: item for item in json.loads(raw_secondary_abi)}
 
 
 @toolcache.cache('memory')
