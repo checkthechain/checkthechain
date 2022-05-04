@@ -16,6 +16,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'display abi of contract',
         'args': [
             {'name': 'address', 'help': 'address of contract'},
+            {'name': 'name', 'help': 'name of function or event', 'nargs': '?'},
             {
                 'name': '--human',
                 'dest': 'human_only',
@@ -56,11 +57,11 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_abi_command(
     address: spec.Address,
+    name: str | None,
     human_only: bool,
     json_only: bool,
     functions: bool,
     events: bool,
-    name: str,
     search: str,
 ) -> None:
     contract_abi = await evm.async_get_contract_abi(contract_address=address)
