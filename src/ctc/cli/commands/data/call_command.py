@@ -18,9 +18,9 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': 'function-name', 'help': 'name of function to call'},
             {'name': 'args', 'nargs': '*', 'help': 'function arguments'},
             {
-                'name': '--quiet',
+                'name': '--verbose',
                 'action': 'store_true',
-                'help': 'hide summary and only output function result',
+                'help': 'show summary',
             },
             {
                 'name': '--from',
@@ -42,7 +42,7 @@ async def async_call_command(
     address: spec.Address,
     function_name: str,
     args: typing.Sequence[str],
-    quiet: bool,
+    verbose: bool,
     from_address: spec.Address,
     block: str,
 ) -> None:
@@ -52,7 +52,7 @@ async def async_call_command(
     else:
         block_number = 'latest'
 
-    if not quiet:
+    if verbose:
         print('performing eth_call')
         print('- to address:', address)
         if block is not None:
@@ -64,10 +64,26 @@ async def async_call_command(
         print()
         print('result:')
 
+    function_abi = await evm.async_get_function_abi(
+        contract_address=address,
+        function_name=function_name,
+    )
+
+    if len(args) != len(function_abi['inputs']):
+        print('could not find appropriate function abi')
+
+    # convert args as needed
+    typed_args: list[typing.Any] = []
+    for arg, arg_abi in zip(args, function_abi['inputs']):
+        if arg.isnumeric() and 'int' in arg_abi['type']:
+            typed_args.append(int(arg))
+        else:
+            typed_args.append(arg)
+
     result = await rpc.async_eth_call(
         to_address=address,
-        function_name=function_name,
-        function_parameters=args,
+        function_abi=function_abi,
+        function_parameters=typed_args,
         from_address=from_address,
         block_number=block_number,
     )
