@@ -26,7 +26,7 @@ async def async_get_erc20_transfers(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     convert_from_str: bool = True,
-    verbose=False,
+    verbose: bool=False,
     **event_kwargs: typing.Any
 ) -> spec.DataFrame:
 
