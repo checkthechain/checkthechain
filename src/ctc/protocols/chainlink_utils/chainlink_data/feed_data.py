@@ -4,7 +4,7 @@ import typing
 
 from ctc import spec
 
-from .. import chainlink_metadata
+from .. import chainlink_feed_metadata
 from .. import chainlink_spec
 from . import feed_datum_by_block
 from . import feed_events
@@ -60,9 +60,11 @@ async def async_get_feed_data(
         raise Exception('should only provide one block specification')
     if blocks is None:
         if start_block is None:
-            start_block = await chainlink_metadata.async_get_feed_first_block(
-                feed=feed,
-                provider=provider,
+            start_block = (
+                await chainlink_feed_metadata.async_get_feed_first_block(
+                    feed=feed,
+                    provider=provider,
+                )
             )
         if end_block is None:
             end_block = 'latest'

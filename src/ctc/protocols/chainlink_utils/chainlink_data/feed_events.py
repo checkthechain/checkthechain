@@ -6,7 +6,7 @@ from ctc import evm
 from ctc import spec
 from ctc.toolbox import pd_utils
 
-from .. import chainlink_metadata
+from .. import chainlink_feed_metadata
 from .. import chainlink_spec
 from . import feed_datum
 
@@ -26,17 +26,19 @@ async def async_get_full_feed_event_data(
     """
 
     # get feed address
-    feed = await chainlink_metadata.async_resolve_feed_address(
+    feed = await chainlink_feed_metadata.async_resolve_feed_address(
         feed, provider=provider
     )
 
     # get aggregator
     if end_block is None:
         end_block = await evm.async_get_latest_block_number()
-    aggregator_address = await chainlink_metadata.async_get_feed_aggregator(
-        feed=feed,
-        block=end_block,
-        provider=provider,
+    aggregator_address = (
+        await chainlink_feed_metadata.async_get_feed_aggregator(
+            feed=feed,
+            block=end_block,
+            provider=provider,
+        )
     )
 
     # get events
@@ -59,7 +61,7 @@ async def async_get_full_feed_event_data(
 
     # normalize
     if normalize:
-        decimals = await chainlink_metadata.async_get_feed_decimals(
+        decimals = await chainlink_feed_metadata.async_get_feed_decimals(
             feed=feed, provider=provider
         )
         df['answer'] /= 10 ** decimals
@@ -72,7 +74,9 @@ async def async_get_full_feed_event_data(
         df.index = pd_utils.keep_level(df.index, level='block_number')
 
         # TODO: better detection of initial feed data point
-        first_feed_block = await chainlink_metadata.async_get_feed_first_block(feed)
+        first_feed_block = (
+            await chainlink_feed_metadata.async_get_feed_first_block(feed)
+        )
         if start_block == first_feed_block:
             pass
         else:

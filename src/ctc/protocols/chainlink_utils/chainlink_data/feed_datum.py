@@ -5,7 +5,7 @@ import typing
 from ctc import rpc
 from ctc import spec
 
-from .. import chainlink_metadata
+from .. import chainlink_feed_metadata
 from .. import chainlink_spec
 
 
@@ -50,7 +50,7 @@ async def async_get_feed_datum(
     if block is None:
         block = 'latest'
 
-    feed = await chainlink_metadata.async_resolve_feed_address(feed)
+    feed = await chainlink_feed_metadata.async_resolve_feed_address(feed)
 
     if fields == 'answer':
 
@@ -65,8 +65,8 @@ async def async_get_feed_datum(
 
         if answer is not None:
             if normalize:
-                decimals = await chainlink_metadata.async_get_feed_decimals(
-                    feed
+                decimals = (
+                    await chainlink_feed_metadata.async_get_feed_decimals(feed)
                 )
                 answer /= 10 ** decimals
 
@@ -96,8 +96,8 @@ async def async_get_feed_datum(
 
         if answer is not None:
             if normalize:
-                decimals = await chainlink_metadata.async_get_feed_decimals(
-                    feed
+                decimals = (
+                    await chainlink_feed_metadata.async_get_feed_decimals(feed)
                 )
                 full['answer'] /= 10 ** decimals
 

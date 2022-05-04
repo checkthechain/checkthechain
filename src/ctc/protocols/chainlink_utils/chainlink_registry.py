@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import rpc
 from ctc import spec
 
@@ -21,7 +23,7 @@ feed_registry_address_assets = {
     v: k for k, v in feed_registry_asset_addresses.items()
 }
 
-feed_registry_abis = {
+registry_function_abis: typing.Mapping[str, spec.FunctionABI] = {
     'getFeed': {
         'inputs': [
             {'internalType': 'address', 'name': 'base', 'type': 'address'},
@@ -60,6 +62,52 @@ feed_registry_abis = {
         'stateMutability': 'view',
         'type': 'function',
     },
+    'getPhase': {
+        'inputs': [
+            {
+                'internalType': 'address',
+                'name': 'base',
+                'type': 'address'
+            },
+            {
+                'internalType': 'address',
+                'name': 'quote',
+                'type': 'address'
+            },
+            {
+                'internalType': 'uint16',
+                'name': 'phaseId',
+                'type': 'uint16'
+            }
+        ],
+        'name': 'getPhase',
+        'outputs': [
+            {
+                'components': [
+                    {
+                        'internalType': 'uint16',
+                        'name': 'phaseId',
+                        'type': 'uint16'
+                    },
+                    {
+                        'internalType': 'uint80',
+                        'name': 'startingAggregatorRoundId',
+                        'type': 'uint80'
+                    },
+                    {
+                        'internalType': 'uint80',
+                        'name': 'endingAggregatorRoundId',
+                        'type': 'uint80'
+                    }
+                ],
+                'internalType': 'struct FeedRegistryInterface.Phase',
+                'name': 'phase',
+                'type': 'tuple'
+            }
+        ],
+        'stateMutability': 'view',
+        'type': 'function'
+    },
 }
 
 
@@ -67,13 +115,13 @@ async def async_get_registry_feed(
     base: str,
     quote: str,
     provider: spec.ProviderSpec = None,
-):
+) -> spec.Address:
     network = rpc.get_provider_network(provider)
     registry_address = feed_registry[network]
 
     return await rpc.async_eth_call(
         to_address=registry_address,
-        function_abi=feed_registry_abis['getFeed'],
+        function_abi=registry_function_abis['getFeed'],
         function_parameters=[base, quote],
         provider=provider,
     )
@@ -84,13 +132,14 @@ async def async_get_phase_range(
     quote: str,
     phase: int,
     provider: spec.ProviderSpec = None,
-) -> None:
+) -> typing.Tuple[int, ...]:
     network = rpc.get_provider_network(provider)
     registry_address = feed_registry[network]
 
     result = await rpc.async_eth_call(
         to_address=registry_address,
-        function_abi=feed_registry_abis['getPhaseRange'],
+        # function_abi=registry_function_abis['getPhaseRange'],
+        function_abi=registry_function_abis['getPhase'],
         function_parameters=[base, quote, phase],
         provider=provider,
     )

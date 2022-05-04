@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import toolcli
+import tooltable  # type: ignore
 
 from ctc import directory
-import tooltable  # type: ignore
 
 
 def get_command_spec() -> toolcli.CommandSpec:

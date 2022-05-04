@@ -5,7 +5,7 @@ import typing
 
 from ctc import spec
 from .. import chainlink_spec
-from .. import chainlink_metadata
+from .. import chainlink_feed_metadata
 from . import feed_data
 
 
@@ -41,7 +41,10 @@ async def async_get_composite_feed_data(
 
     # normalize
     feeds_decimals_coroutines = [
-        chainlink_metadata.async_get_feed_decimals(feed=feed, provider=provider)
+        chainlink_feed_metadata.async_get_feed_decimals(
+            feed=feed,
+            provider=provider,
+        )
         for feed in composite_feed
     ]
     feeds_decimals = await asyncio.gather(*feeds_decimals_coroutines)
