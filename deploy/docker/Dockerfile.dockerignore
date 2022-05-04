@@ -1,0 +1,5 @@
+**/fei.egg-info
+**/__pycache__
+**/.mypy_cache
+**/.git
+**/.pytest_cache
