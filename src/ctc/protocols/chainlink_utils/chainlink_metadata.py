@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import typing
 
 from ctc import directory
@@ -25,6 +26,44 @@ async def async_get_feed_decimals(
         protocol='chainlink',
     )
     return metadata['decimals']
+
+
+async def async_get_aggregator_description(
+    aggregator: spec.Address,
+    provider: spec.ProviderSpec = None,
+) -> str:
+
+    function_abi = {
+        'inputs': [],
+        'name': 'description',
+        'outputs': [{'internalType': 'string', 'name': '', 'type': 'string'}],
+        'stateMutability': 'view',
+        'type': 'function',
+    }
+
+    provider = rpc.get_provider(provider)
+    return rpc.async_eth_call(
+        to_address=aggregator,
+        provider=provider,
+        function_abi=function_abi,
+    )
+
+
+async def async_get_aggregator_base_quote(
+    aggregator: spec.Address, provider: spec.ProviderSpec = None,
+) -> dict[str, str]:
+    description = await async_get_aggregator_description(
+        aggregator=aggregator,
+        provider=provider,
+    )
+    try:
+        base, quote = description.split(' / ')
+        return {'base': base, 'quote': quote}
+    except Exception:
+        raise Exception(
+            'could not determine base or quote from description: '
+            + str(description)
+        )
 
 
 async def async_resolve_feed_address(
@@ -75,6 +114,39 @@ async def async_get_feed_aggregator(
         raise Exception('aggregator not specified')
 
     return aggregator
+
+
+async def async_get_feed_aggregator_history(
+    feed: str, provider: spec.ProviderSpec
+) -> list[spec.Address]:
+
+    previous_aggregators = await async_get_feed_previous_aggregators(
+        feed=feed, provider=provider
+    )
+
+
+async def async_get_feed_previous_aggregators(
+    feed: str, provider: spec.ProviderSpec
+) -> list[spec.Address]:
+
+    feed = await async_resolve_feed_address(feed, provider=provider)
+
+    current_phase = await rpc.async_eth_call(
+        to_address=feed,
+        function_name='phaseId',
+    )
+
+    coroutines = [
+        rpc.async_eth_call(
+            to_address=feed,
+            function_name='phaseAggregators',
+            function_parameters=[i],
+        )
+        for i in range(1, current_phase + 1)
+    ]
+    aggregators = await asyncio.gather(*coroutines)
+
+    return aggregators
 
 
 async def async_get_feed_first_block(
