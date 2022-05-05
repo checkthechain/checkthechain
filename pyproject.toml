@@ -1,0 +1,88 @@
+
+# https://github.com/flying-sheep/awesome-python-packaging
+# https://flit.pypa.io/en/latest/pyproject_toml.html
+
+#
+# # build
+#
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "checkthechain"
+readme = "README.md"
+requires-python = ">=3.7"
+dynamic = ["version", "description"]
+license = {file = "LICENSE"}
+dependencies = [
+]
+
+[project.optional-dependencies]
+
+
+[project.urls]
+Documentation = "https://ctc.readthedocs.io/en/latest/"
+Source = "https://github.com/fei-protocol/checkthechain"
+
+[project.scripts]
+ctc = "ctc:main"
+
+[tool.flit.module]
+name = "ctc"
+
+
+#
+# # black
+#
+
+# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
+
+[tool.black]
+line-length = 80
+skip-string-normalization = true
+target-version = ['py37']
+
+
+#
+# # mypy
+#
+
+# https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml
+
+[tool.mypy]
+python_version = "3.9"
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+
+
+#
+# # pytest
+#
+
+# https://docs.pytest.org/en/latest/reference/customize.html#pyproject-toml
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+
+#
+# # tox
+#
+
+# https://tox.wiki/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py37,py38,py39,py310
+
+[testenv]
+deps = pytest >= 3.0.0, <4
+commands = pytest
+"""
+
