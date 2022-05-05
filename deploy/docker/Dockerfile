@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+# force non-interactive installations
+ENV DEBIAN_FRONTEND noninteractive
+
 # install system packages
 RUN apt-get update -y
 RUN apt install -y \
@@ -14,10 +17,7 @@ RUN apt-get install -y \
     ${PYTHON_VERSION} \
     ${PYTHON_VERSION}-dev \
     ${PYTHON_VERSION}-distutils
-
 RUN curl https://bootstrap.pypa.io/get-pip.py | ${PYTHON_VERSION}
-
-# RUN ${PYTHON_VERSION} -m pip install pip
 
 # create default user
 RUN useradd -ms /bin/bash user
@@ -53,4 +53,5 @@ RUN chown -R user /home/user/repos/ctc
 USER user
 WORKDIR /home/user/repos/ctc
 RUN ${PYTHON_VERSION} -m pip install ./ --user
+RUN echo 'PATH="~/.local/bin":$PATH' >.bashrc
 
