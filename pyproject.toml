@@ -105,6 +105,8 @@ name = "ctc"
 
 # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 
+# run using `black` in repo root directory
+
 [tool.black]
 line-length = 80
 skip-string-normalization = true
@@ -116,6 +118,9 @@ target-version = ['py37']
 #
 
 # https://coverage.readthedocs.io/en/latest/config.html
+
+# run using `coverage run` in repo root directory
+
 [tool.coverage.run]
 command_line = "-m pytest"
 # branch = true
@@ -133,6 +138,8 @@ directory = ".coverage_html"
 
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml
 
+# run using `mypy` in repo root directory
+
 [tool.mypy]
 python_version = "3.9"
 warn_unused_configs = true
@@ -147,6 +154,8 @@ files = ["src/ctc"]
 
 # https://docs.pytest.org/en/latest/reference/customize.html#pyproject-toml
 
+# run using `pytest` in repo root directory
+
 [tool.pytest.ini_options]
 testpaths = [
     "tests",
@@ -159,6 +168,8 @@ asyncio_mode = 'auto'
 #
 
 # https://tox.wiki/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
+
+# run using `tox` in repo root directory
 
 [tool.tox]
 legacy_tox_ini = """
