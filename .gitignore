@@ -6,3 +6,4 @@ dist/*
 */.hypothesis
 .hypothesis/
 build/*
+.tox/*
