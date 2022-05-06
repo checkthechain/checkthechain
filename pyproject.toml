@@ -132,6 +132,7 @@ files = ["src/ctc"]
 testpaths = [
     "tests",
 ]
+asyncio_mode = 'auto'
 
 
 #
