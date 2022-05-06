@@ -7,3 +7,5 @@ dist/*
 .hypothesis/
 build/*
 .tox/*
+.coverage
+.coverage_html/*

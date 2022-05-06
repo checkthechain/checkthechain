@@ -112,6 +112,22 @@ target-version = ['py37']
 
 
 #
+# # coverage
+#
+
+# https://coverage.readthedocs.io/en/latest/config.html
+[tool.coverage.run]
+command_line = "-m pytest"
+# branch = true
+include = [
+    "src/*",
+]
+
+[tool.coverage.html]
+directory = ".coverage_html"
+
+
+#
 # # mypy
 #
 
