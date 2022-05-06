@@ -103,9 +103,12 @@ async def async_print_all_pool_summary(
         pool[2]: pool_stats for pool, pool_stats in zip(all_pools, pools_stats)
     }
 
+    def _get_tvl(pool: list[typing.Any]) -> spec.Number:
+        return stats_by_comptroller[pool[2]]['tvl']
+
     sorted_pools = sorted(
         all_pools[: len(stats_by_comptroller)],
-        key=lambda pool: stats_by_comptroller[pool[2]]['tvl'],
+        key=_get_tvl,  # type: ignore
         reverse=True,
     )
 

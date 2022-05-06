@@ -96,7 +96,7 @@ async def async_save_eip897_abi(
     if network is None:
         raise Exception('could not determine network')
 
-    abi_utils.async_save_proxy_contract_abi_to_filesystem(
+    await abi_utils.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
         proxy_implementation=eip897_address,
         network=network,
@@ -117,7 +117,7 @@ async def async_save_eip1967_abi(
     if network is None:
         raise Exception('could not determine network')
 
-    abi_utils.async_save_proxy_contract_abi_to_filesystem(
+    await abi_utils.async_save_proxy_contract_abi_to_filesystem(
         contract_address=contract_address,
         proxy_implementation=eip1967_address,
         network=network,

@@ -1,4 +1,9 @@
 
+#
+# # resources
+#
+
+# https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
 # https://github.com/flying-sheep/awesome-python-packaging
 # https://flit.pypa.io/en/latest/pyproject_toml.html
 
@@ -57,6 +62,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
+    'mypy==0.950',
     'pytest',
     'pytest-asyncio',
 ]
@@ -102,10 +108,11 @@ target-version = ['py37']
 
 [tool.mypy]
 python_version = "3.9"
+warn_unused_configs = true
 disallow_untyped_defs = true
 no_implicit_optional = true
 strict_equality = true
-
+files = ["src/ctc"]
 
 #
 # # pytest

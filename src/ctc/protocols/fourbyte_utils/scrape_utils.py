@@ -79,7 +79,7 @@ async def async_scrape_set(
 
             # wait between responses
             if wait_time is not None:
-                asyncio.sleep(wait_time)
+                await asyncio.sleep(wait_time)
 
     return results
 

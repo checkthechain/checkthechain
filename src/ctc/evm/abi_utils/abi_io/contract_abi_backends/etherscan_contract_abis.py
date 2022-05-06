@@ -36,7 +36,7 @@ async def async_get_contract_abi_from_etherscan(
         sleep_time = _last_request['time'] + cadence - current_time
         sleep_time = max(0, sleep_time)
         print('sleeping', sleep_time, 'seconds for etherscan ratelimit')
-        asyncio.sleep(sleep_time)
+        await asyncio.sleep(sleep_time)
     _last_request['time'] = time.time()
 
     if not address_utils.is_address_str(contract_address):
