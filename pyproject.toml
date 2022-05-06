@@ -70,9 +70,12 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
+    'tox',
+    'tox-asdf',
     'mypy==0.950',
     'pytest',
     'pytest-asyncio',
+    'virtualenv>=20.6.0',
 ]
 performance = [
     'pysha3',  # for keccak()
@@ -145,9 +148,12 @@ asyncio_mode = 'auto'
 legacy_tox_ini = """
 [tox]
 envlist = py37,py38,py39,py310
+isolated_build = True
 
 [testenv]
-deps = pytest >= 3.0.0, <4
+deps =
+    pytest >= 6
+    pytest-asyncio
 commands = pytest
 """
 
