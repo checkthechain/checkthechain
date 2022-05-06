@@ -13,7 +13,11 @@ def get_command_spec() -> toolcli.CommandSpec:
         'f': async_curve_pools_command,
         'help': 'list curve pools',
         'args': [
-            {'name': '--verbose', 'action': 'store_true'},
+            {
+                'name': '--verbose',
+                'help': 'include extra data',
+                'action': 'store_true',
+            },
         ],
     }
 
@@ -56,4 +60,3 @@ async def async_curve_pools_command(verbose: bool) -> None:
         print(item['address'] + '    ' + ', '.join(item['symbols']))
 
     await rpc.async_close_http_session()
-

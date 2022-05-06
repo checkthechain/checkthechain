@@ -19,12 +19,18 @@ syntax is one of
     [option]ctc CALL_DATA[/option]
     [option]ctc CONTRACT_ADDRESS CALL_DATA[/option]""",
         'args': [
-            {'name': 'args', 'nargs': '+'},
-            {'name': '--nested', 'action': 'store_true'},
+            {
+                'name': 'args',
+                'help': 'either `CALL_DATA` or `CONTRACT_ADDRESS CALL_DATA`',
+                'nargs': '+',
+            },
+            {
+                'name': '--nested',
+                'help': 'whether to decode nested calls',
+                'action': 'store_true',
+            },
         ],
-        'examples': [
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
-        ],
+        'examples': ['0x956f47f50a910163d8bf957cf5846d573e7f87ca'],
     }
 
 
@@ -125,4 +131,3 @@ async def async_decode_command(
                 )
 
     await rpc.async_close_http_session()
-

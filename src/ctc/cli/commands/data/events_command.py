@@ -25,6 +25,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': '--blocks',
+                'help': 'block range',
                 'nargs': '+',
             },
             {
