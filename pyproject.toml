@@ -70,11 +70,11 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    'tox',
-    'tox-asdf',
+    'tox==3.8.0',
+    'tox-asdf==0.1.0',
     'mypy==0.950',
-    'pytest',
-    'pytest-asyncio',
+    'pytest>=6',
+    'pytest-asyncio==0.18.0',
     'virtualenv>=20.6.0',
 ]
 performance = [
