@@ -55,7 +55,7 @@ dependencies = [
     'toolcache',
     'toolcli>=0.3.8',
     'toolconf',
-    'toolsql>=0.2.3',
+    'toolsql>=0.2.4',
     'toolstr>=0.1.3',
     'tooltable',
     'tooltime',
