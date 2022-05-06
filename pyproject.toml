@@ -53,7 +53,7 @@ dependencies = [
     #
     # tool suite
     'toolcache',
-    'toolcli>=0.3.8',
+    'toolcli>=0.3.10',
     'toolconf',
     'toolsql>=0.2.4',
     'toolstr>=0.1.3',
