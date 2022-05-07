@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import asyncio
+import time
 import typing
+from typing_extensions import TypedDict
 
 from ctc import binary
 from ctc import rpc
@@ -24,7 +27,10 @@ async def async_get_block(
 
         from ctc import db
 
-        await db.async_intake_block(block=block_data, provider=provider)
+        await db.async_intake_block(
+            block=block_data,
+            network=rpc.get_provider_network(provider),
+        )
 
         return block_data
 
@@ -63,7 +69,10 @@ async def async_get_blocks(
 
         from ctc import db
 
-        await db.async_intake_blocks(blocks=blocks_data, provider=provider)
+        await db.async_intake_blocks(
+            blocks=blocks_data,
+            network=rpc.get_provider_network(provider),
+        )
 
         return blocks_data
 
@@ -81,10 +90,48 @@ async def async_get_blocks(
         )
 
 
+class LatestBlockCacheEntry(TypedDict, total=False):
+    request_time: float
+    response_time: float
+    block_number: int
+
+
+_latest_block_cache: typing.MutableMapping[str, LatestBlockCacheEntry] = {}
+_latest_block_lock = asyncio.Lock()
+
+
 async def async_get_latest_block_number(
     provider: spec.ProviderSpec = None,
+    use_cache=True,
+    cache_time=1,
 ) -> int:
-    return await rpc.async_eth_block_number(provider=provider)
+
+    if not use_cache:
+        return await rpc.async_eth_block_number(provider=provider)
+
+    else:
+
+        async with _latest_block_lock:
+
+            network = rpc.get_provider_network(provider)
+            request_time = time.time()
+            network_cache = _latest_block_cache.get(network)
+            if (
+                network_cache is not None
+                and request_time - network_cache['request_time'] < cache_time
+            ):
+                return network_cache['block_number']
+
+            result = await rpc.async_eth_block_number(provider=provider)
+
+            response_time = time.time()
+            _latest_block_cache[network] = {
+                'request_time': request_time,
+                'response_time': response_time,
+                'block_number': result,
+            }
+
+            return result
 
 
 async def async_get_blocks_timestamps(
@@ -108,7 +155,7 @@ async def async_get_blocks_timestamps(
         engine = db.create_engine(datatype='block_timestamps', network=network)
         if engine is not None:
             with engine.connect() as conn:
-                db_timestamps = db.get_blocks_timestamps(
+                db_timestamps = await db.async_query_blocks_timestamps(
                     conn=conn,
                     block_numbers=blocks,
                 )
@@ -143,4 +190,3 @@ async def async_get_blocks_timestamps(
             raise Exception('failed to get timestamp for block: ' + str(block))
         output.append(result)
     return output
-
