@@ -1,6 +1,16 @@
 """ctc is a tool for collecting and processing historical EVM data"""
-# TODO: set __version__ in setup.cfg for single source of truth
-# - https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
-# - using importlib.metadata adds too much to startup time, not good for cli's
+
 __version__ = '0.3.0b1'
 
+
+def get_version_tuple() -> tuple[int, int, int]:
+
+    # remove alpha, beta, and release candidate tokens
+    version_str = __version__
+    for token in ['a', 'b', 'rc']:
+        if token in version_str:
+            version_str = version_str[version_str.index(token)]
+            break
+
+    tokens = version_str.split('.')
+    return (int(tokens[0]), int(tokens[1]), int(tokens[2]))
