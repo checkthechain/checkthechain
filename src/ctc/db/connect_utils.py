@@ -11,6 +11,7 @@ def create_engine(
     datatype: str,
     network: spec.NetworkReference | None = None,
 ) -> toolsql.SAEngine | None:
+    """create sqlalchemy engine object"""
 
     # get db config
     data_source: config.DataSource | config.LeafDataSource = (

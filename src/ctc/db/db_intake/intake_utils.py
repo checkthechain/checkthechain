@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import directory
 from ctc import rpc
 from ctc import spec
 
@@ -13,7 +14,10 @@ from .. import db_management
 T = typing.TypeVar('T', int, spec.Block)
 
 
-async def async_is_block_fully_confirmed(block: int | spec.Block, network) -> bool:
+async def async_is_block_fully_confirmed(
+    block: int | spec.Block,
+    network: spec.NetworkReference,
+) -> bool:
 
     if isinstance(block, int):
         block_number = block
@@ -21,12 +25,13 @@ async def async_is_block_fully_confirmed(block: int | spec.Block, network) -> bo
         block_number = block['number']
 
     # check whether block is older than newest block in db
-    max_db_block = _get_max_block_number(network=network)
-    if block_number < max_db_block:
+    max_db_block = await _async_get_max_block_number(network=network)
+    if max_db_block is not None and block_number < max_db_block:
         return True
 
     # check whether block has enough confirmations
-    provider: spec.ProviderSpec = {'network': network}
+    network_name = directory.get_network_name(network)
+    provider: spec.ProviderSpec = {'network': network_name}
     rpc_latest_block = await rpc.async_eth_block_number(provider=provider)
     required_confirmations = db_management.get_required_confirmations(
         network=network,
@@ -35,7 +40,8 @@ async def async_is_block_fully_confirmed(block: int | spec.Block, network) -> bo
 
 
 async def async_filter_fully_confirmed_blocks(
-    blocks: typing.Sequence[T], network
+    blocks: typing.Sequence[T],
+    network: spec.NetworkReference,
 ) -> typing.Sequence[T]:
 
     block_numbers = []
@@ -49,12 +55,13 @@ async def async_filter_fully_confirmed_blocks(
 
     # check whether all blocks older than newest block in db
     max_block_number = max(block_numbers)
-    max_db_block = _get_max_block_number(network=network)
-    if max_db_block > max_block_number:
+    max_db_block = await _async_get_max_block_number(network=network)
+    if max_db_block is not None and max_db_block > max_block_number:
         return blocks
 
     # check whether blocks have enough confirmations
-    provider: spec.ProviderSpec = {'network': network}
+    network_name = directory.get_network_name(network)
+    provider: spec.ProviderSpec = {'network': network_name}
     rpc_latest_block = await rpc.async_eth_block_number(provider=provider)
     required_confirmations = db_management.get_required_confirmations(
         network=network,
@@ -67,7 +74,9 @@ async def async_filter_fully_confirmed_blocks(
     ]
 
 
-def _get_max_block_number(network):
+async def _async_get_max_block_number(
+    network: spec.NetworkReference,
+) -> int | None:
     engine = connect_utils.create_engine(
         datatype='block_timestamps',
         network=network,
@@ -75,4 +84,6 @@ def _get_max_block_number(network):
     if engine is None:
         raise Exception('could not connect to database')
     with engine.begin() as conn:
-        return db_crud.get_max_block_number(network=network, conn=conn)
+        return await db_crud.async_query_max_block_number(
+            network=network, conn=conn
+        )

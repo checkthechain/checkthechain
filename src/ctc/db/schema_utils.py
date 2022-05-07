@@ -54,8 +54,8 @@ def get_table_name(
     table_name: str,
     network: spec.NetworkReference | None = None,
 ) -> str:
+    """get full table name, incorporating chain information"""
     if network is None:
         network = config.get_default_network()
     chain_id = directory.get_network_chain_id(network)
     return table_name + '__network_' + str(chain_id)
-

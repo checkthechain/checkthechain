@@ -67,9 +67,7 @@ async def async_intake_block_timestamp(
 
     if block_number is None or timestamp is None:
         if block is None:
-            raise Exception(
-                'must specify block or block_number and timestamp'
-            )
+            raise Exception('must specify block or block_number and timestamp')
         block_number = block['number']
         timestamp = block['timestamp']
 
@@ -102,13 +100,16 @@ async def async_intake_blocks(
 ) -> None:
 
     blocks_coroutine = async_intake_raw_blocks(blocks=blocks, network=network)
-    timestamps_coroutine = await async_intake_block_timestamps(
+    timestamps_coroutine = async_intake_block_timestamps(
         blocks=blocks, network=network
     )
     await asyncio.gather(blocks_coroutine, timestamps_coroutine)
 
 
-async def async_intake_raw_blocks(blocks, network) -> None:
+async def async_intake_raw_blocks(
+    blocks: typing.Sequence[spec.Block],
+    network: spec.NetworkReference,
+) -> None:
 
     if 'blocks' not in db_management.get_active_schemas():
         return
@@ -129,7 +130,7 @@ async def async_intake_block_timestamps(
     *,
     block_timestamps: typing.Mapping[int, int] | None = None,
     network: spec.NetworkReference,
-):
+) -> None:
 
     if blocks is not None and block_timestamps is not None:
         raise Exception('cannot specify both blocks and block_timestamps')

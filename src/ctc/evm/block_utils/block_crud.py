@@ -102,8 +102,8 @@ _latest_block_lock = asyncio.Lock()
 
 async def async_get_latest_block_number(
     provider: spec.ProviderSpec = None,
-    use_cache=True,
-    cache_time=1,
+    use_cache: bool = True,
+    cache_time: int | float = 1,
 ) -> int:
 
     if not use_cache:
