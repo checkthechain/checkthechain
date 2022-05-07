@@ -63,7 +63,7 @@ async def async_get_blocks_of_timestamps(
             )
             if engine is not None:
                 with engine.connect() as conn:
-                    db_blocks = db.get_timestamps_blocks(
+                    db_blocks = await db.async_query_timestamps_blocks(
                         conn=conn,
                         timestamps=timestamps,
                     )

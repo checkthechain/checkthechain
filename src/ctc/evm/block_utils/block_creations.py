@@ -36,9 +36,6 @@ async def async_get_contract_creation_block(
 
     # if not in db, use rpc provider
     if block is None:
-        latest_block_task = asyncio.create_task(
-            block_crud.async_get_latest_block_number(provider=provider)
-        )
         block = await async_get_contract_creation_block_from_node(
             contract_address=contract_address,
             provider=provider,
@@ -47,25 +44,13 @@ async def async_get_contract_creation_block(
         if block is None:
             return None
 
-        # decide whether to store in db
         from ctc import db
 
-        min_confirmations = db.get_min_confirmations(
+        await db.async_intake_contract_creation_block(
+            contract_address=contract_address,
+            block=block,
             network=network,
-            datatype='contract_creation_blocks',
         )
-        latest_block = await latest_block_task
-        store_in_db = latest_block - block > min_confirmations
-        if store_in_db:
-            engine = db.create_engine(datatype='contract_creation_blocks')
-            if engine is not None:
-                with engine.begin() as conn:
-                    db.set_contract_creation_block(
-                        conn=conn,
-                        block_number=block,
-                        address=contract_address,
-                        network=network,
-                    )
 
     return block
 
@@ -79,7 +64,7 @@ async def async_get_contract_creation_block_from_db(
     engine = db.create_engine(datatype='contract_creation_blocks')
     if engine is not None:
         with engine.connect() as conn:
-            return db.get_contract_creation_block(
+            return await db.async_query_contract_creation_block(
                 conn=conn,
                 address=contract_address,
                 network=network,

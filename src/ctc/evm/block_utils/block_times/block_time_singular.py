@@ -44,7 +44,7 @@ async def async_get_block_of_timestamp(
             engine = db.create_engine(datatype='block_timestamps', network=network)
             if engine is not None:
                 with engine.connect() as conn:
-                    block = db.get_timestamp_block(
+                    block = await db.async_query_timestamp_block(
                         conn=conn,
                         network=network,
                         timestamp=timestamp,
