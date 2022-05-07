@@ -61,7 +61,7 @@ async def async_get_lending_flows(
     blocks_before = blocks - 1
 
     # queue tasks
-    timestamps_coroutine = evm.async_get_blocks_timestamps(
+    timestamps_coroutine = evm.async_get_block_timestamps(
         blocks=blocks,
         provider=provider,
     )

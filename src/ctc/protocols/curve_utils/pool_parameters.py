@@ -97,8 +97,8 @@ async def async_get_A_history(
     )
     latest_block = await evm.async_get_latest_block_number(provider=provider)
     blocks: spec.NumpyArray = np.arange(start_block, end_block, dtype=int)
-    blocks_timestamps_task = asyncio.create_task(
-        evm.async_get_blocks_timestamps(
+    block_timestamps_task = asyncio.create_task(
+        evm.async_get_block_timestamps(
             blocks=typing.cast(typing.Sequence, blocks),
             provider=provider,
         )
@@ -127,7 +127,7 @@ async def async_get_A_history(
     )
 
     # get blocks timestamps
-    blocks_timestamps = await blocks_timestamps_task
+    block_timestamps = await block_timestamps_task
 
     # need per-block timestamps over a long time range to continue :-\
     A = compute_A(
@@ -138,7 +138,7 @@ async def async_get_A_history(
             events['arg__initial_time'],
         ),
         future_A_time=typing.cast(typing.Sequence, events['arg__future_time']),
-        timestamps=blocks_timestamps,
+        timestamps=block_timestamps,
     )
 
     return A

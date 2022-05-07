@@ -102,7 +102,7 @@ async def async_intake_blocks(
 ) -> None:
 
     blocks_coroutine = async_intake_raw_blocks(blocks=blocks, network=network)
-    timestamps_coroutine = await async_intake_blocks_timestamps(
+    timestamps_coroutine = await async_intake_block_timestamps(
         blocks=blocks, network=network
     )
     await asyncio.gather(blocks_coroutine, timestamps_coroutine)
@@ -124,14 +124,14 @@ async def async_intake_raw_blocks(blocks, network) -> None:
             await db_crud.async_store_blocks(conn=conn, blocks=confirmed)
 
 
-async def async_intake_blocks_timestamps(
+async def async_intake_block_timestamps(
     blocks: typing.Sequence[spec.Block] | None = None,
     *,
-    blocks_timestamps: typing.Mapping[int, int] | None = None,
+    block_timestamps: typing.Mapping[int, int] | None = None,
     network: spec.NetworkReference,
 ):
 
-    if blocks is not None and blocks_timestamps is not None:
+    if blocks is not None and block_timestamps is not None:
         raise Exception('cannot specify both blocks and block_timestamps')
 
     if 'blocks' not in db_management.get_active_schemas():
@@ -147,18 +147,18 @@ async def async_intake_blocks_timestamps(
         )
         if len(confirmed_blocks) == 0:
             return
-        confirmed_blocks_timestamps = None
-    elif blocks_timestamps is not None:
+        confirmed_block_timestamps = None
+    elif block_timestamps is not None:
         confirmed_numbers = (
             await intake_utils.async_filter_fully_confirmed_blocks(
-                blocks=list(blocks_timestamps.keys()),
+                blocks=list(block_timestamps.keys()),
                 network=network,
             )
         )
         if len(confirmed_numbers) == 0:
             return
-        confirmed_blocks_timestamps = {
-            number: blocks_timestamps[number] for number in confirmed_numbers
+        confirmed_block_timestamps = {
+            number: block_timestamps[number] for number in confirmed_numbers
         }
         confirmed_blocks = None
     else:
@@ -172,10 +172,10 @@ async def async_intake_blocks_timestamps(
     if engine is None:
         return
     with engine.begin() as conn:
-        await db_crud.async_store_blocks_timestamps(
+        await db_crud.async_store_block_timestamps(
             conn=conn,
             blocks=confirmed_blocks,
-            blocks_timestamps=confirmed_blocks_timestamps,
+            block_timestamps=confirmed_block_timestamps,
         )
 
 
@@ -210,7 +210,7 @@ async def async_intake_blocks_timestamps(
 #                 elif schema == 'block_timestamps':
 #                     coroutine = db_crud.async_store_blocks_timestamp(
 #                         conn=conn,
-#                         blocks=should_store_blocks_timestamps,
+#                         blocks=should_store_block_timestamps,
 #                     )
 #                     coroutines.append(coroutine)
 #                 elif schema == 'block_gas_stats':
@@ -345,11 +345,11 @@ async def async_intake_blocks_timestamps(
 
 #    # store data in db
 #    if len(store_blocks) > 0:
-#        blocks_timestamps = {
+#        block_timestamps = {
 #            block['number']: block['timestamp'] for block in store_blocks
 #        }
 #        with engine.begin() as conn:
-#            db_crud.set_blocks_timestamps(
+#            db_crud.set_block_timestamps(
 #                conn=conn,
-#                blocks_timestamps=blocks_timestamps,
+#                block_timestamps=block_timestamps,
 #            )

@@ -134,7 +134,7 @@ async def async_get_latest_block_number(
             return result
 
 
-async def async_get_blocks_timestamps(
+async def async_get_block_timestamps(
     blocks: typing.Sequence[spec.BlockReference],
     include_full_transactions: bool = False,
     chunk_size: int = 500,
@@ -155,7 +155,7 @@ async def async_get_blocks_timestamps(
         engine = db.create_engine(datatype='block_timestamps', network=network)
         if engine is not None:
             with engine.connect() as conn:
-                db_timestamps = await db.async_query_blocks_timestamps(
+                db_timestamps = await db.async_query_block_timestamps(
                     conn=conn,
                     block_numbers=blocks,
                 )

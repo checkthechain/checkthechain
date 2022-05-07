@@ -47,7 +47,7 @@ async def async_get_twap(
     # start block timestamp acquisition task
     blocks = list(range(start_block, end_block + 1))
     block_timestamps_task = asyncio.create_task(
-        evm.async_get_blocks_timestamps(blocks=blocks, provider=provider)
+        evm.async_get_block_timestamps(blocks=blocks, provider=provider)
     )
 
     # get data

@@ -86,7 +86,7 @@ async def async_chart_command(
     x_volumes = swaps['x_bought'].values + swaps['x_sold'].values
     if invert:
         prices = 1 / prices
-    block_timestamps = await evm.async_get_blocks_timestamps(
+    block_timestamps = await evm.async_get_block_timestamps(
         swaps.index.get_level_values('block_number')
     )
     ohlc = ohlc_utils.compute_ohlc(

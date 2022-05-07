@@ -184,7 +184,7 @@ async def async_query_timestamps_blocks(
         return [None] * len(timestamps)
 
 
-async def async_query_blocks_timestamps(
+async def async_query_block_timestamps(
     conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[typing.SupportsInt],
     network: spec.NetworkReference | None = None,
@@ -203,12 +203,12 @@ async def async_query_blocks_timestamps(
             where_in={'block_number': block_numbers_int},
         )
 
-        blocks_timestamps = {
+        block_timestamps = {
             row['block_number']: row['timestamp'] for row in results
         }
 
         return [
-            blocks_timestamps.get(block_number)
+            block_timestamps.get(block_number)
             for block_number in block_numbers
         ]
 

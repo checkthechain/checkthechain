@@ -24,23 +24,23 @@ async def async_store_block_timestamp(
     )
 
 
-async def async_store_blocks_timestamps(
+async def async_store_block_timestamps(
     conn: toolsql.SAConnection,
-    blocks_timestamps: typing.Mapping[int, int] | None = None,
+    block_timestamps: typing.Mapping[int, int] | None = None,
     blocks: typing.Sequence[spec.Block] | None = None,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    if blocks_timestamps is None:
+    if block_timestamps is None:
         if blocks is None:
-            raise Exception('must specify blocks_timestamps or blocks')
-        blocks_timestamps = {
+            raise Exception('must specify block_timestamps or blocks')
+        block_timestamps = {
             block['number']: block['timestamp'] for block in blocks
         }
 
     rows = [
         {'block_number': block_number, 'timestamp': timestamp}
-        for block_number, timestamp in blocks_timestamps.items()
+        for block_number, timestamp in block_timestamps.items()
     ]
     table = schema_utils.get_table_name('block_timestamps', network=network)
     toolsql.insert(
@@ -66,7 +66,7 @@ async def async_delete_block_timestamp(
     )
 
 
-async def async_delete_blocks_timestamps(
+async def async_delete_block_timestamps(
     conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[int],
     network: spec.NetworkReference | None = None,
