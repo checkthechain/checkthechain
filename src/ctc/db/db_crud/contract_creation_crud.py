@@ -6,7 +6,7 @@ from ctc import spec
 from .. import schema_utils
 
 
-def set_contract_creation_block(
+async def async_store_contract_creation_block(
     conn: toolsql.SAConnection,
     address: spec.Address,
     block_number: int,
@@ -27,7 +27,7 @@ def set_contract_creation_block(
     )
 
 
-def get_contract_creation_block(
+async def async_query_contract_creation_block(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
@@ -47,7 +47,7 @@ def get_contract_creation_block(
     )
 
 
-def delete_contract_creation_block(
+async def async_delete_contract_creation_block(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
@@ -61,4 +61,3 @@ def delete_contract_creation_block(
         table=table,
         row_id=address.lower(),
     )
-

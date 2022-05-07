@@ -2,47 +2,54 @@ from __future__ import annotations
 
 import typing
 
+import toolsql
+
 from ctc import spec
 
 
-def set_block(block: spec.Block) -> None:
-    pass
+async def async_store_block(
+    block: spec.Block,
+    conn: toolsql.SAConnection,
+) -> None:
+    raise NotImplementedError()
 
 
-def set_blocks(blocks: typing.Sequence[spec.Block]) -> None:
-    pass
+async def async_store_blocks(
+    blocks: typing.Sequence[spec.Block],
+    conn: toolsql.SAConnection,
+) -> None:
+    raise NotImplementedError()
 
 
-def get_block(
-    block_number: int | None = None, block_hash: str | None = None
+async def async_query_block(
+    block: int | str,
+    conn: toolsql.SAConnection,
 ) -> spec.Block | None:
-    pass
+    raise NotImplementedError()
 
 
-def get_blocks(
-    block_numbers: typing.Sequence[int] | None = None,
-    start_block_number: int | None = None,
-    end_block_number: int | None = None,
-    block_hashes: typing.Sequence[str] | None = None,
-    start_block_hash: str | None = None,
-    end_block_hash: str | None = None,
+async def async_query_blocks(
+    blocks: typing.Sequence[int | str] | None = None,
+    *,
+    start_block: int | None = None,
+    end_block: int | None = None,
+    conn: toolsql.SAConnection,
 ) -> typing.Sequence[spec.Block | None]:
-    pass
+    raise NotImplementedError()
 
 
-def delete_block(
-    block_number: int | None = None, block_hash: str | None = None
+async def async_delete_block(
+    block: int | str,
+    conn: toolsql.SAConnection,
 ) -> None:
-    pass
+    raise NotImplementedError()
 
 
-def delete_blocks(
-    block_numbers: typing.Sequence[int] | None = None,
-    start_block_number: int | None = None,
-    end_block_number: int | None = None,
-    block_hashes: typing.Sequence[str] | None = None,
-    start_block_hash: str | None = None,
-    end_block_hash: str | None = None,
+async def async_delete_blocks(
+    blocks: typing.Sequence[int | str] | None = None,
+    *,
+    start_block: int | None = None,
+    end_block: int | None = None,
+    conn: toolsql.SAConnection,
 ) -> None:
-    pass
-
+    raise NotImplementedError()
