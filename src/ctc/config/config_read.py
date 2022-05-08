@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import typing
-import warnings
 from typing_extensions import TypedDict
 
 import toolconfig
+import toolcache
 
 from ctc import spec
 from . import config_spec
+
+
+_config_cache: typing.MutableMapping[str, spec.PartialConfigSpec] = {
+    'overrides': {},
+}
 
 
 class _ToolconfigKwargs(TypedDict):
@@ -43,14 +48,69 @@ def get_config(
     ...
 
 
+@toolcache.cache('memory')
 def get_config(
     validate: toolconfig.ValidationOption = False,
 ) -> typing.Union[spec.ConfigSpec, typing.MutableMapping]:
 
-    config = toolconfig.get_config(
+    # load from file
+    config_from_file = toolconfig.get_config(
         config_spec=spec.ConfigSpec, validate=validate, **_kwargs
     )
 
+    # load overrides
+    config_overrides = _config_cache['overrides']
+
+    # combine config data
+    config = dict(config_from_file, **config_overrides)
+
+    # validate
+    validate_config(config)
+
+    if validate == 'raise':
+        return typing.cast(spec.ConfigSpec, config)
+    else:
+        return config
+
+
+#
+# # config overrides
+#
+
+
+def get_config_overrides() -> spec.PartialConfigSpec:
+    return _config_cache['overrides']
+
+
+def set_config_override(key: str, value: typing.Any) -> None:
+    _config_cache['overrides'][key] = value  # type: ignore
+
+
+def clear_config_override(key: str) -> None:
+    if key in _config_cache['overrides']:
+        del _config_cache['overrides'][key]  # type: ignore
+
+    # clear get_config cache
+
+
+def clear_config_overrides() -> None:
+    _config_cache['overrides'] = {}
+
+    # clear get_config cache
+
+
+#
+# # validation
+#
+
+class ConfigValidation(TypedDict):
+    valid: bool
+    missing_keys: typing.Iterable[str]
+    extra_keys: typing.Iterable[str]
+
+
+def validate_config(config: typing.Mapping) -> ConfigValidation:
+    # process config version
     version = get_config_version_tuple(config)
     if version < config_spec.min_allowed_config_version:
         raise Exception(
@@ -64,7 +124,19 @@ def get_config(
         console = rich.console.Console()
         console.print(warning_text)
 
-    validation = validate_config(config)
+    # process keys
+    spec_keys = set(spec.ConfigSpec.__annotations__)
+    actual_keys = set(config.keys())
+    missing_keys = spec_keys - actual_keys
+    extra_keys = actual_keys - spec_keys
+    valid = spec_keys == actual_keys
+
+    validation: ConfigValidation = {
+        'valid': valid,
+        'missing_keys': missing_keys,
+        'extra_keys': extra_keys,
+    }
+
     # if not validation['valid']:
     # disable validation until 0.3.0 and better upgrade utility in place
     if False:
@@ -91,10 +163,17 @@ def get_config(
         console = rich.console.Console()
         console.print(warning_text)
 
-    if validate == 'raise':
-        return typing.cast(spec.ConfigSpec, config)
-    else:
-        return config
+    # process datatypes
+    # toolconfig.config_is_valid(config_spec=spec.ConfigSpec, **_kwargs)
+
+    return validation
+
+
+def config_is_valid(config: typing.Mapping | None = None) -> bool:
+    if config is None:
+        config = get_config()
+    validation = validate_config(config)
+    return validation['valid']
 
 
 def get_config_version_tuple(
@@ -122,26 +201,3 @@ def get_config_version_tuple(
             return (config_version[0], config_version[1], config_version[2])
 
     raise Exception('could not detect config version')
-
-
-class ConfigValidation(TypedDict):
-    valid: bool
-    missing_keys: typing.Iterable[str]
-    extra_keys: typing.Iterable[str]
-
-
-def validate_config(config: typing.Mapping) -> ConfigValidation:
-    spec_keys = set(spec.ConfigSpec.__annotations__)
-    actual_keys = set(config.keys())
-    missing_keys = spec_keys - actual_keys
-    extra_keys = actual_keys - spec_keys
-    valid = spec_keys == actual_keys
-    return {
-        'valid': valid,
-        'missing_keys': missing_keys,
-        'extra_keys': extra_keys,
-    }
-
-
-def config_is_valid() -> bool:
-    return toolconfig.config_is_valid(config_spec=spec.ConfigSpec, **_kwargs)
