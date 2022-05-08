@@ -58,7 +58,7 @@ def get_test_db_config():
     }
 
 
-def test_block_timestamps_db():
+async def test_block_timestamps_db():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         datatype='block_timestamps',
@@ -88,12 +88,12 @@ def test_block_timestamps_db():
         # insert data one-by-one
         with conn.begin():
             for datum in example_data:
-                db.set_block_timestamp(conn=conn, **datum)
+                await db.async_store_block_timestamp(conn=conn, **datum)
 
         # get data individually
         with conn.begin():
             for datum in example_data:
-                timestamp = db.get_block_timestamp(
+                timestamp = await db.async_query_block_timestamp(
                     conn=conn,
                     block_number=datum['block_number'],
                 )
@@ -103,7 +103,7 @@ def test_block_timestamps_db():
         all_blocks = [datum['block_number'] for datum in example_data]
         all_timestamps = [datum['timestamp'] for datum in example_data]
         with conn.begin():
-            stored_timestamps = db.get_blocks_timestamps(
+            stored_timestamps = await db.async_query_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
@@ -112,14 +112,14 @@ def test_block_timestamps_db():
         # delete entries one by one
         with conn.begin():
             for datum in example_data:
-                db.delete_block_timestamp(
+                await db.async_delete_block_timestamp(
                     conn=conn,
                     block_number=datum['block_number'],
                 )
 
         # ensure all entries deleted
         with conn.begin():
-            stored_timestamps = db.get_blocks_timestamps(
+            stored_timestamps = await db.async_query_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
@@ -128,18 +128,18 @@ def test_block_timestamps_db():
         # insert data again
         with conn.begin():
             for datum in example_data:
-                db.set_block_timestamp(conn=conn, **datum)
+                await db.async_store_block_timestamp(conn=conn, **datum)
 
         # delete entries all at once
         with conn.begin():
-            db.delete_blocks_timestamps(
+            await db.async_delete_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
 
         # ensure all entries deleted
         with conn.begin():
-            stored_timestamps = db.get_blocks_timestamps(
+            stored_timestamps = await db.async_query_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )

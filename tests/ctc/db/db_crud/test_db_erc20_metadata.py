@@ -32,7 +32,7 @@ def get_test_db_config():
     }
 
 
-def test_create_schema():
+async def test_create_schema():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         datatype='erc20_metadata',
@@ -50,13 +50,15 @@ def test_create_schema():
 
         # insert data
         with conn.begin():
-            for datum in example_data:
-                db.insert_erc20_metadata(conn=conn, **datum)
+            await db.async_store_erc20s_metadatas(
+                conn=conn,
+                metadatas=example_data,
+            )
 
         # get data individually
         with conn.begin():
             for datum in example_data:
-                actual_metadata = db.select_erc20_metadata(
+                actual_metadata = await db.async_query_erc20_metadata(
                     conn=conn,
                     address=datum['address'],
                 )
@@ -66,7 +68,7 @@ def test_create_schema():
         # get data collectively
         all_addresses = [datum['address'] for datum in example_data]
         with conn.begin():
-            actual_metadatas = db.select_erc20s_metadatas(
+            actual_metadatas = await db.async_query_erc20s_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -82,14 +84,14 @@ def test_create_schema():
         # delete entries one by one
         with conn.begin():
             for datum in example_data:
-                db.delete_erc20_metadata(
+                await db.async_delete_erc20_metadata(
                     conn=conn,
                     address=datum['address'],
                 )
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = db.select_erc20s_metadatas(
+            actual_metadatas = await db.async_query_erc20s_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -98,20 +100,19 @@ def test_create_schema():
         # insert data again
         with conn.begin():
             for datum in example_data:
-                db.insert_erc20_metadata(conn=conn, **datum)
+                await db.async_store_erc20_metadata(conn=conn, **datum)
 
         # delete entries all at once
         with conn.begin():
-            db.delete_erc20s_metadata(
+            await db.async_delete_erc20s_metadata(
                 conn=conn,
                 addresses=all_addresses,
             )
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = db.select_erc20s_metadatas(
+            actual_metadatas = await db.async_query_erc20s_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
             assert all(item is None for item in actual_metadatas)
-

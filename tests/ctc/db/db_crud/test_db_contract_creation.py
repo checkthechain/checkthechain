@@ -29,7 +29,7 @@ def get_test_db_config():
     }
 
 
-def test_create_schema():
+async def test_create_schema():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         datatype='contract_creation_blocks',
@@ -48,7 +48,7 @@ def test_create_schema():
         # insert data
         with conn.begin():
             for datum in example_data:
-                db.set_contract_creation_block(
+                await db.async_store_contract_creation_block(
                     conn=conn, **datum
                 )
 
@@ -56,7 +56,7 @@ def test_create_schema():
         with conn.begin():
             for datum in example_data:
                 stored_block = (
-                    db.get_contract_creation_block(
+                    await db.async_query_contract_creation_block(
                         conn=conn,
                         address=datum['address'],
                     )
@@ -66,7 +66,7 @@ def test_create_schema():
         # delete entries one by one
         with conn.begin():
             for datum in example_data:
-                db.delete_contract_creation_block(
+                await db.async_delete_contract_creation_block(
                     conn=conn,
                     address=datum['address'],
                 )
@@ -74,7 +74,7 @@ def test_create_schema():
         # ensure all entries deleted
         with conn.begin():
             for datum in example_data:
-                block = db.get_contract_creation_block(
+                block = await db.async_query_contract_creation_block(
                     conn=conn,
                     address=datum['address'],
                 )
