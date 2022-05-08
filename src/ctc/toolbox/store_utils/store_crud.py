@@ -7,8 +7,8 @@ from typing_extensions import Literal
 import toolcache
 
 
-formats = ['json', 'ast', 'csv', 'yaml', 'toml']
-DataFormat = Literal['json', 'ast', 'csv', 'yaml', 'toml']
+formats = ['json', 'ast', 'csv', 'toml']
+DataFormat = Literal['json', 'ast', 'csv', 'toml']
 
 
 def get_path_data_format(path: str) -> DataFormat:
@@ -51,10 +51,6 @@ def load_buffer_data(buffer: typing.TextIO, format: DataFormat) -> typing.Any:
 
         df = pd.read_csv(buffer)
         return df.to_dict(orient='records')
-    elif format == 'yaml':
-        import yaml
-
-        return yaml.safe_load(buffer)
     elif format == 'toml':
         import toml
 
@@ -131,10 +127,6 @@ def write_buffer_data(
             raise Exception('can only write mappings to toml, not sequences')
 
         toml.dump(data, buffer)
-    elif format == 'yaml':
-        import yaml
-
-        yaml.dump(data, buffer)
     elif format == 'csv':
         import csv
 

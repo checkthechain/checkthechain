@@ -47,7 +47,6 @@ dependencies = [
     'aiohttp',
     'aiofiles',
     'loguru',
-    'pyyaml',
     'toml',
     #
     # tool suite
