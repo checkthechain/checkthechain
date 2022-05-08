@@ -40,9 +40,8 @@ classifiers = [
 dependencies = [
     #
     # data science
-    'numpy',
-    'pandas',
-    'pandas-stubs',
+    'numpy>=1.19.0',
+    'pandas>=1.2.0',
     #
     # data dependencies
     'aiohttp',
@@ -52,20 +51,20 @@ dependencies = [
     'toml',
     #
     # tool suite
-    'toolcache',
+    'toolcache>=0.4.0',
     'toolcli>=0.3.10',
-    'toolconf',
+    'toolconf>=0.0.4',
     'toolsql>=0.2.4',
     'toolstr>=0.1.3',
-    'tooltable',
-    'tooltime',
+    'tooltable>=0.1.0',
+    'tooltime>=0.1.4',
     #
     # EVM dependencies
-    'pycryptodome',  # for keccak()
-    'eth_abi',  # for encode_single()/decode_single()
-    'idna',  # ENS resolution
-    'eth_utils',  # for collapse_if_tuple()
-    'rlp',  # for create2 address computation
+    'pycryptodome>=3.9.1',  # for keccak()
+    'eth_abi>=3.0.0',  # for encode_single()/decode_single()
+    'idna>=3.3',  # ENS resolution
+    'eth_utils>=2.0',  # for collapse_if_tuple()
+    'rlp>0.3.0',  # for create2 address computation
 ]
 
 [project.optional-dependencies]
@@ -76,15 +75,16 @@ test = [
     'pytest>=6',
     'pytest-asyncio==0.18.0',
     'virtualenv>=20.6.0',
+    'pandas-stubs>=1.2.0.1',
 ]
 performance = [
-    'pysha3',  # for keccak()
-    'scikit-image',  # for console unicode drawing with toolstr
-    'orjson',  # for json loading
+    'pysha3==1.0.2',  # for keccak()
+    'scikit-image>=0.19.2',  # for console unicode drawing with toolstr
+    'orjson>=3.6.8',  # for json loading
 ]
 plots = [
-    'matplotlib',
-    'toolplot',
+    'matplotlib>=3.1.3',
+    'toolplot>=0.1.0',
 ]
 
 
