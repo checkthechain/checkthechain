@@ -60,7 +60,7 @@ dependencies = [
     #
     # EVM dependencies
     'pycryptodome>=3.9.1',  # for keccak()
-    'eth_abi_lite>=3.0.1',  # for abi encoding
+    'eth_abi_lite>=3.0.2',  # for abi encoding
     'idna>=3.3',  # ENS resolution
 ]
 
