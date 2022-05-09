@@ -154,11 +154,11 @@ async def async_balances_command(
 
         else:
 
-            import eth_abi
+            import eth_abi_lite
 
             try:
                 symbol = await symbol_coroutine
-            except eth_abi.exceptions.InsufficientDataBytes:
+            except eth_abi_lite.exceptions.InsufficientDataBytes:
                 print(
                     'this is an EOA, see `ctc erc20 balances -h` for proper syntax'
                 )

@@ -13,12 +13,12 @@ def get_function_parameter_types(
 ) -> list[spec.ABIDatumType]:
 
     if function_abi is not None:
-        import eth_utils
+        import eth_utils_lite
 
         output = []
         for item in function_abi.get('inputs', []):
             cast_item = typing.cast(typing.Dict[str, typing.Any], item)
-            collapsed = eth_utils.abi.collapse_if_tuple(cast_item)
+            collapsed = eth_utils_lite.abi.collapse_if_tuple(cast_item)
             output.append(collapsed)
 
         return output
@@ -136,12 +136,12 @@ def get_function_output_types(
     function_abi: spec.FunctionABI,
 ) -> list[spec.ABIDatumType]:
 
-    import eth_utils
+    import eth_utils_lite
 
     output_types = []
     for output in function_abi['outputs']:
         cast_output = typing.cast(typing.Dict[str, typing.Any], output)
-        output_type = eth_utils.abi.collapse_if_tuple(cast_output)
+        output_type = eth_utils_lite.abi.collapse_if_tuple(cast_output)
         output_types.append(output_type)
     return output_types
 
