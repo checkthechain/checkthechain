@@ -182,6 +182,7 @@ isolated_build = True
 deps =
     pytest >= 6
     pytest-asyncio
+    rlp
 commands = pytest
 
 ; the legacy environment uses the oldest allowed dependencies
