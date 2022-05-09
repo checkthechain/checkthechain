@@ -12,7 +12,7 @@ async def async_intake_contract_creation_block(
     block: int,
     network: spec.NetworkReference,
 ) -> None:
-    if 'contract_creation_blocks' not in db_management.get_active_schemas():
+    if not db_management.get_active_schemas().get('contract_creation_blocks'):
         return
     confirmed = await intake_utils.async_is_block_fully_confirmed(
         block=block, network=network
