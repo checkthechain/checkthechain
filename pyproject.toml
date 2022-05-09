@@ -67,13 +67,14 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    'tox==3.8.0',
-    'tox-asdf==0.1.0',
     'mypy==0.950',
-    'pytest>=6',
-    'pytest-asyncio==0.18.0',
-    'virtualenv>=20.6.0',
     'pandas-stubs>=1.2.0.1',
+    'pytest-asyncio==0.18.0',
+    'pytest>=6',
+    'tox-asdf==0.1.0',
+    'tox==3.8.0',
+    'typing-extensions>4.0.0',
+    'virtualenv>=20.6.0',
 ]
 performance = [
     'pysha3==1.0.2',  # for keccak()
