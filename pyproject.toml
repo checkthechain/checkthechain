@@ -175,7 +175,7 @@ asyncio_mode = 'auto'
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py37,py37-legacy
+envlist = py37,py38,py39,py310,py37-legacy
 isolated_build = True
 
 [testenv]
@@ -190,6 +190,7 @@ commands = pytest
 deps =
     pytest >= 6
     pytest-asyncio
+    rlp
     ;
     ; data science
     numpy==1.19.0
@@ -218,11 +219,3 @@ deps =
 
 commands = pytest --disable-warnings
 """
-
-    # numpy == 1.19.0
-    # pandas == 1.2.4
-
-# envlist = py37,py38,py39,py310,py37-legacy
-
-    # legacy: numpy==1.19.0
-    # legacy: pandas==1.2.0
