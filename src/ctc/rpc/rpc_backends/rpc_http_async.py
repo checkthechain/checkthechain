@@ -3,8 +3,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
+import typing
 
-import aiohttp
+if typing.TYPE_CHECKING:
+    import aiohttp
 
 from ctc import spec
 from .. import rpc_provider
@@ -55,6 +57,8 @@ async def async_send_http(
 def get_async_http_session(
     provider: spec.Provider, create: bool = True
 ) -> aiohttp.ClientSession:
+    import aiohttp
+
     key = rpc_provider.get_provider_key(provider)
     if key not in _http_sessions:
         if create:

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import aiohttp
 
 from .. import fourbyte_spec
 
@@ -14,6 +13,8 @@ async def async_query_function_signature_remote(
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
 ) -> list[fourbyte_spec.Entry]:
+
+    import aiohttp
 
     # get url template
     if id is not None:
@@ -51,6 +52,8 @@ async def async_query_event_signature_remote(
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
 ) -> list[fourbyte_spec.Entry]:
+
+    import aiohttp
 
     # get url template
     if id is not None:

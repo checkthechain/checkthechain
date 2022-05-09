@@ -6,7 +6,6 @@ from ctc import binary
 from ctc import rpc
 from ctc import spec
 from ctc.toolbox import backend_utils
-from ctc.toolbox import pd_utils
 
 from .event_backends import filesystem_events
 from .event_backends import node_events
@@ -78,6 +77,8 @@ async def async_get_events(
     )
 
     if not keep_multiindex:
+        from ctc.toolbox import pd_utils
+
         events.index = pd_utils.keep_level(
             index=events.index, level='block_number'
         )

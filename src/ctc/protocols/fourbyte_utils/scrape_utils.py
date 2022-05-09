@@ -3,8 +3,6 @@ from __future__ import annotations
 import asyncio
 import typing
 
-import aiohttp
-
 from . import fourbyte_spec
 
 
@@ -42,6 +40,8 @@ async def async_scrape_set(
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,
 ) -> list[fourbyte_spec.Entry]:
+
+    import aiohttp
 
     results = []
 
@@ -82,4 +82,3 @@ async def async_scrape_set(
                 await asyncio.sleep(wait_time)
 
     return results
-
