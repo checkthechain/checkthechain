@@ -54,7 +54,7 @@ dependencies = [
     'toolcli>=0.3.10',
     'toolconf>=0.0.4',
     'toolsql>=0.2.4',
-    'toolstr>=0.1.3',
+    'toolstr>=0.2.1',
     'tooltable>=0.1.0',
     'tooltime>=0.1.4',
     #
@@ -73,7 +73,7 @@ test = [
     'pytest>=6',
     'tox-asdf==0.1.0',
     'tox==3.8.0',
-    'typing-extensions>4.0.0',
+    'typing-extensions>=4.0.0',
     'virtualenv>=20.6.0',
 ]
 performance = [
