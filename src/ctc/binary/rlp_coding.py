@@ -10,14 +10,24 @@ from . import formats
 
 
 def rlp_encode(data: typing.Any) -> str:
-    import rlp  # type: ignore
+    try:
+        import rlp  # type: ignore
+    except ImportError:
+        raise Exception(
+            'the rlp package is required for this feature, try `pip install rlp`'
+        )
 
     rlp_data = rlp.encode(data)
     return formats.convert(rlp_data, 'prefix_hex')
 
 
 def rlp_decode(data: spec.BinaryData) -> typing.Any:
-    import rlp  # type: ignore
+    try:
+        import rlp  # type: ignore
+    except ImportError:
+        raise Exception(
+            'the rlp package is required for this feature, try `pip install rlp`'
+        )
 
     binary_data = formats.convert(data, 'binary')
 
@@ -118,4 +128,3 @@ def rlp_decode(data: spec.BinaryData) -> typing.Any:
 #        return s[beginning:]
 #    else:
 #        return s[beginning: length + 1]
-
