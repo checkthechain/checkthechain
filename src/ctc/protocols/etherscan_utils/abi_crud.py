@@ -38,13 +38,11 @@ async def async_get_contract_abi(
     # process inputs
     if network is None:
         network = config.get_default_network()
-    if network != 'mainnet':
-        raise Exception('etherscan is only for mainnnet')
     if not evm.is_address_str(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
 
     if verbose:
-        print('fetching abi from etherscan:', contract_address)
+        print('fetching ' + str(network) + ' abi from etherscan:', contract_address)
 
     # create lock
     lock = _etherscan_ratelimit['lock']
@@ -70,14 +68,14 @@ async def async_get_contract_abi(
             await asyncio.sleep(time_to_sleep)
 
         # create url
-        url_template = etherscan_spec.abi_url_templates['mainnet']
+        url_template = etherscan_spec.get_abi_url_template(network)
         abi_endpoint = url_template.format(address=contract_address)
 
         # make request
-        _etherscan_ratelimit['last_request_time'] = time.time()
         async with aiohttp.ClientSession() as session:
             async with session.get(abi_endpoint) as response:
                 content = await response.text()
+        _etherscan_ratelimit['last_request_time'] = time.time()
 
         # process request
         if content == 'Contract source code not verified':
