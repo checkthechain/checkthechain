@@ -26,8 +26,8 @@ async def async_get_erc20_transfers(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     convert_from_str: bool = True,
-    verbose: bool=False,
-    **event_kwargs: typing.Any
+    verbose: bool = False,
+    **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     transfers = await event_utils.async_get_events(
@@ -36,7 +36,7 @@ async def async_get_erc20_transfers(
         start_block=start_block,
         end_block=end_block,
         verbose=verbose,
-        **event_kwargs
+        **event_kwargs,
     )
 
     # detect amount column
@@ -95,4 +95,3 @@ async def async_get_erc20_holdings_from_transfers(
     balances.index.name = 'address'
 
     return balances
-
