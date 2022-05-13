@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import time
 
 import tooltable  # type: ignore
@@ -13,7 +14,7 @@ from ctc.protocols import chainlink_utils
 from . import chainlink_spec
 
 
-async def async_summarize_feed(feed: str, n_recent: int = 10) -> None:
+async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
 
     if evm.is_address_str(feed):
         feed_address = feed
@@ -24,18 +25,21 @@ async def async_summarize_feed(feed: str, n_recent: int = 10) -> None:
     else:
         raise Exception('unknown feed specification: ' + str(feed))
 
-    name = await rpc.async_eth_call(
+    name_coroutine = rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['description'],
         to_address=feed_address,
     )
-    decimals = await rpc.async_eth_call(
+    decimals_coroutine = rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['decimals'],
         to_address=feed_address,
     )
-    aggregator = await rpc.async_eth_call(
+    aggregator_coroutine = rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['aggregator'],
         to_address=feed_address,
     )
+    name_task = asyncio.create_task(name_coroutine)
+    decimals_task = asyncio.create_task(decimals_coroutine)
+    aggregator_task = asyncio.create_task(aggregator_coroutine)
 
     latest_block = await rpc.async_eth_block_number()
     data = await chainlink_utils.async_get_feed_data(
@@ -60,6 +64,10 @@ async def async_summarize_feed(feed: str, n_recent: int = 10) -> None:
         ]
         updates.append(update)
 
+    name = await name_task
+    decimals = await decimals_task
+    aggregator = await aggregator_task
+
     title = 'Chainlink Feed Summary: ' + name
     toolstr.print_text_box(title, double=False)
     print('- name:', name)
@@ -76,4 +84,3 @@ async def async_summarize_feed(feed: str, n_recent: int = 10) -> None:
     tooltable.print_table(
         updates[-n_recent:][::-1], headers=headers, indent='    '
     )
-
