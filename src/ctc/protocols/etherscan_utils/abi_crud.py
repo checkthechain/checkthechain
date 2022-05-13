@@ -70,7 +70,7 @@ async def async_get_contract_abi(
             await asyncio.sleep(time_to_sleep)
 
         # create url
-        url_template = etherscan_spec.abi_url_templates['mainnet_abi']
+        url_template = etherscan_spec.abi_url_templates['mainnet']
         abi_endpoint = url_template.format(address=contract_address)
 
         # make request

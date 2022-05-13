@@ -7,23 +7,6 @@ from ctc import rpc
 from ctc import spec
 
 
-async def async_get_eth_total_supply() -> int | float:
-    import aiohttp
-
-    url = 'http://api.etherscan.io/api?module=stats&action=ethsupply'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status != 200:
-                raise Exception('could not get result')
-            result = await response.json()
-            return int(result['result'])
-
-
-#
-# # balances
-#
-
-
 @typing.overload
 async def async_get_eth_balance(
     address: spec.Address,
@@ -165,4 +148,3 @@ async def async_get_eth_balance_of_addresses(
         balances = [balance / 1e18 for balance in balances]
 
     return balances
-
