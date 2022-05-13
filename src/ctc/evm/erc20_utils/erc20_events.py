@@ -10,10 +10,10 @@ from . import erc20_abis
 
 
 def get_token_amount_column(df: spec.DataFrame) -> str:
-    if 'arg__value' in df:
-        return 'arg__value'
-    elif 'arg__amount' in df:
+    if 'arg__amount' in df:
         return 'arg__amount'
+    elif 'arg__value' in df:
+        return 'arg__value'
     elif 'arg__wad' in df:
         return 'arg__wad'
     else:
