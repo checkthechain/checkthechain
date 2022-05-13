@@ -96,7 +96,7 @@ class LatestBlockCacheEntry(TypedDict, total=False):
 
 
 _latest_block_cache: typing.MutableMapping[str, LatestBlockCacheEntry] = {}
-_latest_block_lock = asyncio.Lock()
+_latest_block_lock = {'lock': None}
 
 
 async def async_get_latest_block_number(
@@ -110,7 +110,13 @@ async def async_get_latest_block_number(
 
     else:
 
-        async with _latest_block_lock:
+        # must initialize asyncio.Lock within a running event loop
+        # see https://stackoverflow.com/a/55918049
+        if _latest_block_lock.get('lock') is None:
+            _latest_block_lock['lock'] = asyncio.Lock()
+        lock = _latest_block_lock['lock']
+
+        async with lock:
 
             network = rpc.get_provider_network(provider)
             request_time = time.time()
