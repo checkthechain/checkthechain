@@ -41,7 +41,6 @@ async def async_get_fei_psm_mints(
     psms=None,
     timestamp=True,
     normalize=True,
-    cummulative=True,
 ):
     if psms is None:
         psms = get_psms()
