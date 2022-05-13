@@ -77,6 +77,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'analytics',
         ): 'ctc.protocols.fei_utils.cli.fei.analytics_command',
         ('fei', 'depth'): 'ctc.protocols.fei_utils.cli.fei.depth_command',
+        ('fei', 'dex'): 'ctc.protocols.fei_utils.cli.fei.dex_command',
         ('fei', 'pcv'): 'ctc.protocols.fei_utils.cli.fei.pcv_command',
         (
             'fei',
