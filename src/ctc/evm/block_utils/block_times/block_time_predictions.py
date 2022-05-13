@@ -12,7 +12,7 @@ from ctc import spec
 async def async_predict_block_timestamp(
     block: typing.SupportsInt,
     provider: spec.ProviderSpec = None,
-    window_size=88295,
+    window_size: int = 88295,
 ) -> int:
     """TODO: mode that uses database only, no rpc calls"""
 
@@ -40,9 +40,11 @@ async def async_predict_block_timestamp(
 async def async_predict_block_timestamps(
     blocks: typing.Sequence[typing.SupportsInt],
     provider: spec.ProviderSpec = None,
-    window_size=100000,
-):
-    blocks = [int(block) for block in blocks]
+    window_size: int = 100000,
+) -> typing.Sequence[int]:
+
+    int_blocks = [int(block) for block in blocks]
+
     predictions = {}
     old_block_tasks = {}
     window_task = None
@@ -51,7 +53,7 @@ async def async_predict_block_timestamps(
     latest_block = await evm.async_get_block('latest', provider=provider)
     latest_number = latest_block['number']
 
-    for block in blocks:
+    for block in int_blocks:
         if block == latest_number:
             predictions[block] = latest_block['timestamp']
         elif block < latest_number:
@@ -85,14 +87,15 @@ async def async_predict_block_timestamps(
         ):
             predictions[block] = timestamp
 
-    return [predictions[block] for block in blocks]
+    return [predictions[block] for block in int_blocks]
 
 
 async def async_predict_timestamp_block(
-    timestamp: typing.SupportsRound,
+    timestamp: tooltime.Timestamp,
     provider: spec.ProviderSpec = None,
-    window_size=86400 * 16,
+    window_size: int = 86400 * 16,
 ) -> int:
+
     timestamp = tooltime.timestamp_to_seconds(timestamp)
 
     latest_block = await evm.async_get_block('latest', provider=provider)
@@ -101,7 +104,7 @@ async def async_predict_timestamp_block(
     if timestamp == latest_timestamp:
         return latest_block['number']
     elif timestamp < latest_timestamp:
-        return evm.async_get_block_of_timestamp(timestamp, provider=provider)
+        return await evm.async_get_block_of_timestamp(timestamp, provider=provider)
     else:
         old_timestamp = latest_timestamp - window_size
         old_block = await evm.async_get_block_of_timestamp(
@@ -117,12 +120,12 @@ async def async_predict_timestamp_block(
 
 
 async def async_predict_timestamp_blocks(
-    timestamps: typing.Sequence[typing.SupportsRound],
+    timestamps: typing.Sequence[tooltime.Timestamp],
     provider: spec.ProviderSpec = None,
-    window_size=86400 * 16,
-):
+    window_size: int = 86400 * 16,
+) -> typing.Sequence[int]:
 
-    timestamps = [
+    int_timestamps = [
         tooltime.timestamp_to_seconds(timestamp) for timestamp in timestamps
     ]
 
@@ -132,10 +135,10 @@ async def async_predict_timestamp_blocks(
     new_timestamps = []
     window_task = None
 
-    predictions = {}
-    for timestamp in timestamps:
+    predictions: dict[int, int | float] = {}
+    for timestamp in int_timestamps:
         if timestamp == latest_timestamp:
-            predictions[timestamp] = latest_block
+            predictions[timestamp] = latest_block['number']
         elif timestamp < latest_timestamp:
             coroutine = evm.async_get_block_of_timestamp(
                 timestamp, provider=provider
@@ -165,4 +168,4 @@ async def async_predict_timestamp_blocks(
         for timestamp, result in zip(old_timestamp_tasks.keys(), results):
             predictions[timestamp] = result
 
-    return [round(predictions[timestamp]) for timestamp in timestamps]
+    return [round(predictions[timestamp]) for timestamp in int_timestamps]

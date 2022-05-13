@@ -18,8 +18,8 @@ def hash_name(name: str) -> spec.PrefixHexData:
     labels = name.split('.')
     output = '00' * 32
     for label in labels[::-1]:
-        label = idna.encode(label, uts46=True)
-        label_hash = binary.keccak_text(label, output_format='raw_hex')
+        label_bytes = idna.encode(label, uts46=True)
+        label_hash = binary.keccak_text(label_bytes, output_format='raw_hex')
         output = binary.keccak(output + label_hash, output_format='raw_hex')
     return '0x' + output
 

@@ -5,7 +5,7 @@ import typing
 if typing.TYPE_CHECKING:
     import tooltime
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore
 import toolstr
 
 from ctc import evm
@@ -14,8 +14,8 @@ from ctc import spec
 
 async def async_block_timestamp_xticks(
     provider: spec.ProviderSpec = None,
-    representation: tooltime.TimestampRepresentation | None = None,
-):
+    representation: tooltime.TimestampExtendedRepresentation | None = None,
+) -> None:
     """
     matplotlib.FuncFormatter not used, because it cannot use async
     """

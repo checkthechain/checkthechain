@@ -29,8 +29,8 @@ async def async_get_block_timestamp(
                 if timestamp is not None:
                     return timestamp
 
-    block = await block_crud.async_get_block(block, provider=provider)
-    return block['timestamp']
+    block_data = await block_crud.async_get_block(block, provider=provider)
+    return block_data['timestamp']
 
 
 async def async_get_block_timestamps(
