@@ -4,6 +4,7 @@ import asyncio
 import logging
 import random
 import typing
+import warnings
 
 if typing.TYPE_CHECKING:
     import aiohttp
@@ -31,7 +32,7 @@ async def async_send_http(
         ) as response:
             if response.status != 200:
                 t_sleep = 2 ** attempt + random.random()
-                print(
+                warnings.warn(
                     'request failed with code '
                     + str(response.status)
                     + ' retrying in '
@@ -49,8 +50,8 @@ async def async_send_http(
             + ' retries, status_code = '
             + str(response.status)
         )
-        logger = logging.getLogger()
-        logger.info(message)
+        # logger = logging.getLogger()
+        # logger.info(message)
         raise Exception(message)
 
 
