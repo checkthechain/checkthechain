@@ -1,3 +1,5 @@
+"""OLD, deprecate in favor of etherscan_utils"""
+
 from __future__ import annotations
 
 import asyncio
