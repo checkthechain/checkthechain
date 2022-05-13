@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import os
 import typing
 
+from ctc import directory
 from ctc import spec
 
 
@@ -19,8 +21,28 @@ abi_url_templates: typing.Mapping[str, str] = {
 }
 
 
-def get_abi_url_template(network: spec.NetworkName) -> str:
+def get_abi_url_template(network: spec.NetworkReference) -> str:
+
+    network = directory.get_network_name(network)
+
     if network not in abi_url_templates:
         raise Exception('block explorer unknown for network=' + str(network))
+
+    template = abi_url_templates[network]
+
+    key = get_etherscan_key(network=network)
+    if key is not None:
+        template = template + '&apikey=' + str(key)
+
+    return template
+
+
+def get_etherscan_key(network: spec.NetworkName) -> str | None:
+    if network == 'mainnet':
+        key = os.environ.get('ETHERSCAN_API_KEY')
+        if key == '':
+            return None
+        else:
+            return key
     else:
-        return abi_url_templates[network]
+        return None
