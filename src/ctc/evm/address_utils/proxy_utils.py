@@ -4,35 +4,69 @@ import typing
 
 from ctc import rpc
 from ctc import spec
-from . import abi_utils
 
 
-eip_897_abi: typing.Sequence[spec.FunctionABI] = [
-    {
+async def async_get_proxy_address(
+    contract_address: spec.Address,
+    provider: spec.ProviderSpec = None,
+) -> spec.Address | None:
+
+    # try eip897
+    eip897_address = await _async_get_eip897_implementation(
+        contract_address=contract_address,
+        provider=provider,
+    )
+    if eip897_address is not None:
+        return eip897_address
+
+    # try eip1967
+    eip1967_address = await _async_get_eip1967_proxy_logic_address(
+        contract_address=contract_address,
+        provider=provider,
+    )
+    if eip1967_address is not None:
+        return eip1967_address
+
+    return None
+
+
+#
+# # eip897
+#
+
+
+async def _async_get_eip897_proxy_type(
+    contract_address: spec.Address, provider: spec.ProviderSpec = None
+) -> int | None:
+
+    function_abi: spec.FunctionABI = {
         'name': 'proxyType',
         'type': 'function',
         'inputs': [],
         'outputs': [
             {'name': 'proxyTypeId', 'type': 'uint256'},
         ],
-    },
-    {
+    }
+
+    return await rpc.async_eth_call(
+        to_address=contract_address,
+        function_abi=function_abi,
+        provider=provider,
+    )
+
+
+async def _async_get_eip897_implementation(
+    contract_address: spec.Address, provider: spec.ProviderSpec = None
+) -> spec.Address:
+
+    function_abi: spec.FunctionABI = {
         'name': 'implementation',
         'type': 'function',
         'inputs': [],
         'outputs': [
             {'name': 'codeAddr', 'type': 'address'},
         ],
-    },
-]
-
-
-async def async_get_eip897_proxy_type(
-    contract_address: spec.Address, provider: spec.ProviderSpec = None
-) -> int:
-
-    function_abi = eip_897_abi[0]
-    assert function_abi['name'] == 'proxyType'
+    }
 
     return await rpc.async_eth_call(
         to_address=contract_address,
@@ -41,21 +75,12 @@ async def async_get_eip897_proxy_type(
     )
 
 
-async def async_get_eip897_implementation(
-    contract_address: spec.Address, provider: spec.ProviderSpec = None
-) -> spec.Address:
-
-    function_abi = eip_897_abi[1]
-    assert function_abi['name'] == 'implementation'
-
-    return await rpc.async_eth_call(
-        to_address=contract_address,
-        function_abi=function_abi,
-        provider=provider,
-    )
+#
+# # eip1967
+#
 
 
-async def async_get_eip1967_proxy_logic_address(
+async def _async_get_eip1967_proxy_logic_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
@@ -82,49 +107,7 @@ async def async_get_eip1967_proxy_logic_address(
     return '0x' + result[-40:]
 
 
-async def async_save_eip897_abi(
-    contract_address: spec.Address, provider: spec.ProviderSpec = None
-) -> None:
-
-    provider = rpc.get_provider(provider)
-    eip897_address = await async_get_eip897_implementation(
-        contract_address,
-        provider=provider,
-    )
-
-    network = provider['network']
-    if network is None:
-        raise Exception('could not determine network')
-
-    await abi_utils.async_save_proxy_contract_abi_to_filesystem(
-        contract_address=contract_address,
-        proxy_implementation=eip897_address,
-        network=network,
-    )
-
-
-async def async_save_eip1967_abi(
-    contract_address: spec.Address, provider: spec.ProviderSpec = None
-) -> None:
-
-    provider = rpc.get_provider(provider)
-    eip1967_address = await async_get_eip1967_proxy_logic_address(
-        contract_address,
-        provider=provider,
-    )
-
-    network = provider['network']
-    if network is None:
-        raise Exception('could not determine network')
-
-    await abi_utils.async_save_proxy_contract_abi_to_filesystem(
-        contract_address=contract_address,
-        proxy_implementation=eip1967_address,
-        network=network,
-    )
-
-
-async def async_get_eip1967_proxy_beacon_address(
+async def _async_get_eip1967_proxy_beacon_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> spec.Address:
@@ -149,7 +132,7 @@ async def async_get_eip1967_proxy_beacon_address(
     return '0x' + result[-40:]
 
 
-async def async_get_eip1967_proxy_admin_address(
+async def _async_get_eip1967_proxy_admin_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> spec.Address:
@@ -172,4 +155,3 @@ async def async_get_eip1967_proxy_admin_address(
     )
 
     return '0x' + result[-40:]
-
