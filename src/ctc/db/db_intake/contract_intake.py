@@ -20,7 +20,10 @@ async def async_intake_contract_creation_block(
     if not confirmed:
         return
 
-    engine = connect_utils.create_engine(datatype='contract_creation_blocks')
+    engine = connect_utils.create_engine(
+        datatype='contract_creation_blocks',
+        network=network,
+    )
     if engine is not None:
         with engine.begin() as conn:
             await db_crud.async_store_contract_creation_block(

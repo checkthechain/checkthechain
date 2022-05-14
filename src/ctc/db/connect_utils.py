@@ -9,7 +9,7 @@ from ctc import spec
 
 def create_engine(
     datatype: str,
-    network: spec.NetworkReference | None = None,
+    network: spec.NetworkReference,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""
 
@@ -29,4 +29,3 @@ def create_engine(
 
     # create engine
     return toolsql.create_engine(db_config=db_config)
-

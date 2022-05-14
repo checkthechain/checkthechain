@@ -61,7 +61,9 @@ async def async_get_contract_creation_block_from_db(
 ) -> int | None:
     from ctc import db
 
-    engine = db.create_engine(datatype='contract_creation_blocks')
+    engine = db.create_engine(
+        datatype='contract_creation_blocks', network=network,
+    )
     if engine is not None:
         with engine.connect() as conn:
             return await db.async_query_contract_creation_block(
@@ -131,4 +133,3 @@ async def async_get_contract_creation_block_from_node(
         print('result:', result)
 
     return result
-
