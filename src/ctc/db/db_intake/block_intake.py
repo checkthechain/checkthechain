@@ -7,7 +7,7 @@ from ctc import spec
 
 from .. import db_crud
 from .. import db_management
-from .. import connect_utils
+from .. import db_connect
 from . import intake_utils
 
 
@@ -47,14 +47,18 @@ async def async_intake_raw_block(
         return
 
     # store in db
-    engine = connect_utils.create_engine(
+    engine = db_connect.create_engine(
         datatype='block_timestamps',
         network=network,
     )
     if engine is None:
         return
     with engine.begin() as conn:
-        await db_crud.async_store_block(conn=conn, block=block)
+        await db_crud.async_store_block(
+            conn=conn,
+            block=block,
+            network=network,
+        )
 
 
 async def async_intake_block_timestamp(
@@ -80,7 +84,7 @@ async def async_intake_block_timestamp(
         return
 
     # store in db
-    engine = connect_utils.create_engine(
+    engine = db_connect.create_engine(
         datatype='block_timestamps',
         network=network,
     )
@@ -118,11 +122,15 @@ async def async_intake_raw_blocks(
         network=network,
     )
     if len(confirmed) > 0:
-        engine = connect_utils.create_engine(datatype='blocks', network=network)
+        engine = db_connect.create_engine(datatype='blocks', network=network)
         if engine is None:
             return
         with engine.begin() as conn:
-            await db_crud.async_store_blocks(conn=conn, blocks=confirmed)
+            await db_crud.async_store_blocks(
+                conn=conn,
+                blocks=confirmed,
+                network=network,
+            )
 
 
 async def async_intake_block_timestamps(
@@ -166,7 +174,7 @@ async def async_intake_block_timestamps(
         raise Exception('specify either blocks or block_timestamps')
 
     # store in database
-    engine = connect_utils.create_engine(
+    engine = db_connect.create_engine(
         datatype='block_timestamps',
         network=network,
     )
@@ -266,7 +274,7 @@ async def async_intake_block_timestamps(
 #        datatype='block_timestamps',
 #        network=network,
 #    )
-#    engine = connect_utils.create_engine(
+#    engine = db_connect.create_engine(
 #        datatype='block_timestamps',
 #        network=network,
 #    )
@@ -320,7 +328,7 @@ async def async_intake_block_timestamps(
 #        datatype='block_timestamps',
 #        network=network,
 #    )
-#    engine = connect_utils.create_engine(
+#    engine = db_connect.create_engine(
 #        datatype='block_timestamps',
 #        network=network,
 #    )

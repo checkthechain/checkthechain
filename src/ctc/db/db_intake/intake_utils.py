@@ -6,7 +6,7 @@ from ctc import directory
 from ctc import rpc
 from ctc import spec
 
-from .. import connect_utils
+from .. import db_connect
 from .. import db_crud
 from .. import db_management
 
@@ -77,13 +77,13 @@ async def async_filter_fully_confirmed_blocks(
 async def _async_get_max_block_number(
     network: spec.NetworkReference,
 ) -> int | None:
-    engine = connect_utils.create_engine(
+    engine = db_connect.create_engine(
         datatype='block_timestamps',
         network=network,
     )
     if engine is None:
         raise Exception('could not connect to database')
     with engine.begin() as conn:
-        return await db_crud.async_query_max_block_number(
+        return await db_crud.async_select_max_block_number(
             network=network, conn=conn
         )

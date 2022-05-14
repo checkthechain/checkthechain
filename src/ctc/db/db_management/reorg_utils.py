@@ -14,7 +14,7 @@ import tooltime
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from . import schema_utils
+from .. import db_schemas
 
 
 def get_required_confirmations(network: spec.NetworkReference) -> int:
@@ -58,7 +58,7 @@ async def async_revalidate_blocks(
 
     # get network
     network = rpc.get_provider_network(provider)
-    table_name = schema_utils.get_table_name(
+    table_name = db_schemas.get_table_name(
         table_name='blocks',
         network=network,
     )
@@ -101,7 +101,7 @@ async def async_get_premature_blocks(
 ) -> typing.Mapping:
     # get network
     network = rpc.get_provider_network(provider)
-    table_name = schema_utils.get_table_name(
+    table_name = db_schemas.get_table_name(
         table_name='blocks', network=network
     )
     network = rpc.get_provider_network(provider)

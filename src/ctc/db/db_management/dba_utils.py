@@ -7,12 +7,13 @@ import toolsql
 
 from ctc import config
 from ctc import spec
-from .. import schema_utils
+from .. import db_schemas
+from .. import db_spec
 
 
 def create_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
-    datatypes: typing.Sequence[str] | None = None,
+    datatypes: typing.Sequence[db_spec.DBDatatype] | None = None,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
@@ -21,7 +22,7 @@ def create_tables(
     if networks is None:
         networks = config.get_used_networks()
     if datatypes is None:
-        datatypes = schema_utils.get_all_datatypes()
+        datatypes = db_spec.get_all_datatypes()
 
     # get preamble
     if verbose or not confirm:
@@ -58,12 +59,12 @@ def create_tables(
                 datatype=datatype,
                 require=True,
             )
-            db_schema = schema_utils.get_prepared_schema(
+            schema = db_schemas.get_prepared_schema(
                 datatype=datatype,
                 network=network,
             )
             toolsql.create_tables(
-                db_schema=db_schema,
+                db_schema=schema,
                 db_config=db_config,
             )
 
