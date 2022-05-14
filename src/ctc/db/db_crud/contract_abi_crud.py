@@ -1,59 +1,67 @@
 from __future__ import annotations
 
+import json
+
 import toolsql
 
 from ctc import spec
-from .. import schema_utils
+from .. import db_schemas
 
 
-async def async_store_contract_creation_block(
-    conn: toolsql.SAConnection,
+async def async_store_contract_abi(
     address: spec.Address,
-    block_number: int,
+    abi: spec.ContractABI,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = schema_utils.get_table_name(
-        'contract_creation_blocks', network=network
+    abi_text = json.dumps(abi)
+
+    table = db_schemas.get_table_name(
+        'contract_abis', network=network
     )
     toolsql.insert(
         conn=conn,
         table=table,
         row={
             'address': address.lower(),
-            'block_number': block_number,
+            'abi_text': abi_text,
         },
         upsert='do_update',
     )
 
 
-async def async_query_contract_creation_block(
+async def async_select_contract_abi(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
-) -> int | None:
+) -> spec.ContractABI | None:
 
-    table = schema_utils.get_table_name(
-        'contract_creation_blocks',
+    table = db_schemas.get_table_name(
+        'contract_abis',
         network=network,
     )
-    return toolsql.select(
+    abi_text = toolsql.select(
         conn=conn,
         table=table,
         row_id=address.lower(),
         return_count='one',
-        only_columns=['block_number'],
+        only_columns=['abi_text'],
         row_format='only_column',
     )
+    if abi_text is not None:
+        return json.loads(abi_text)
+    else:
+        return None
 
 
-async def async_delete_contract_creation_block(
+async def async_delete_contract_abi(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
 ) -> None:
-    table = schema_utils.get_table_name(
-        'contract_creation_blocks',
+    table = db_schemas.get_table_name(
+        'contract_abis',
         network=network,
     )
     toolsql.delete(

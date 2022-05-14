@@ -8,10 +8,10 @@ import toolsql
 
 from ctc import spec
 from .. import db_management
-from .. import schema_utils
+from .. import db_schemas
 
 
-async def async_query_timestamp_block(
+async def async_select_timestamp_block(
     conn: toolsql.SAConnection,
     timestamp: int,
     network: spec.NetworkReference | None = None,
@@ -43,7 +43,7 @@ async def async_query_timestamp_block(
     timestamp_schema = db_management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', network=network)
+        table = db_schemas.get_table_name('block_timestamps', network=network)
         block_number = toolsql.select(
             conn=conn,
             table=table,
@@ -60,7 +60,7 @@ async def async_query_timestamp_block(
     if block_number is not None:
         if mode == 'before':
             # assert block after is in db
-            next_timestamp = await async_query_block_timestamp(
+            next_timestamp = await async_select_block_timestamp(
                 conn=conn,
                 block_number=block_number + 1,
             )
@@ -68,7 +68,7 @@ async def async_query_timestamp_block(
                 return None
         elif mode == 'after':
             # assert block before is in db
-            previous_timestamp = await async_query_block_timestamp(
+            previous_timestamp = await async_select_block_timestamp(
                 conn=conn,
                 block_number=block_number - 1,
             )
@@ -78,7 +78,7 @@ async def async_query_timestamp_block(
     return block_number
 
 
-async def async_query_block_timestamp(
+async def async_select_block_timestamp(
     conn: toolsql.SAConnection,
     block_number: int,
     network: spec.NetworkReference | None = None,
@@ -87,7 +87,7 @@ async def async_query_block_timestamp(
     timestamp_schema = db_management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', network=network)
+        table = db_schemas.get_table_name('block_timestamps', network=network)
 
         return toolsql.select(
             conn=conn,
@@ -105,7 +105,7 @@ async def async_query_block_timestamp(
         return None
 
 
-async def async_query_max_block_number(
+async def async_select_max_block_number(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
@@ -113,7 +113,7 @@ async def async_query_max_block_number(
     timestamp_schema = db_management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', network=network)
+        table = db_schemas.get_table_name('block_timestamps', network=network)
         result = toolsql.select(
             conn=conn,
             table=table,
@@ -131,14 +131,14 @@ async def async_query_max_block_number(
         return None
 
 
-async def async_query_max_block_timestamp(
+async def async_select_max_block_timestamp(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
     timestamp_schema = db_management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', network=network)
+        table = db_schemas.get_table_name('block_timestamps', network=network)
         result = toolsql.select(
             conn=conn,
             table=table,
@@ -156,7 +156,7 @@ async def async_query_max_block_timestamp(
         return None
 
 
-async def async_query_timestamps_blocks(
+async def async_select_timestamps_blocks(
     conn: toolsql.SAConnection,
     timestamps: typing.Sequence[int],
     network: spec.NetworkReference | None = None,
@@ -167,7 +167,7 @@ async def async_query_timestamps_blocks(
 
     if timestamp_schema == 'block_timestamps':
         coroutines = [
-            async_query_timestamp_block(
+            async_select_timestamp_block(
                 conn=conn,
                 timestamp=timestamp,
                 network=network,
@@ -184,7 +184,7 @@ async def async_query_timestamps_blocks(
         return [None] * len(timestamps)
 
 
-async def async_query_block_timestamps(
+async def async_select_block_timestamps(
     conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[typing.SupportsInt],
     network: spec.NetworkReference | None = None,
@@ -193,7 +193,7 @@ async def async_query_block_timestamps(
     timestamp_schema = db_management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', network=network)
+        table = db_schemas.get_table_name('block_timestamps', network=network)
 
         block_numbers_int = [int(item) for item in block_numbers]
 

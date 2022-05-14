@@ -10,6 +10,7 @@ from ctc import spec
 async def async_store_block(
     block: spec.Block,
     conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
 ) -> None:
     raise NotImplementedError()
 
@@ -17,39 +18,44 @@ async def async_store_block(
 async def async_store_blocks(
     blocks: typing.Sequence[spec.Block],
     conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
 ) -> None:
     raise NotImplementedError()
 
 
-async def async_query_block(
-    block: int | str,
+async def async_select_block(
+    block_number: int | str,
     conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
 ) -> spec.Block | None:
     raise NotImplementedError()
 
 
-async def async_query_blocks(
-    blocks: typing.Sequence[int | str] | None = None,
+async def async_select_blocks(
+    block_numbers: typing.Sequence[int | str] | None = None,
     *,
     start_block: int | None = None,
     end_block: int | None = None,
     conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
 ) -> typing.Sequence[spec.Block | None]:
     raise NotImplementedError()
 
 
 async def async_delete_block(
-    block: int | str,
+    block_number: int | str,
     conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
 ) -> None:
     raise NotImplementedError()
 
 
 async def async_delete_blocks(
-    blocks: typing.Sequence[int | str] | None = None,
+    block_nubmers: typing.Sequence[int | str] | None = None,
     *,
     start_block: int | None = None,
     end_block: int | None = None,
     conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
 ) -> None:
     raise NotImplementedError()
