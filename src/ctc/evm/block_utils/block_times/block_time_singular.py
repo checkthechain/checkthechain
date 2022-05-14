@@ -37,34 +37,25 @@ async def async_get_block_of_timestamp(
         )
     else:
 
-        # get from db
+        # db
         if use_db:
             from ctc import db
             network = rpc.get_provider_network(provider=provider)
-            engine = db.create_engine(datatype='block_timestamps', network=network)
-            if engine is not None:
-                with engine.connect() as conn:
-                    block = await db.async_query_timestamp_block(
-                        conn=conn,
-                        network=network,
-                        timestamp=timestamp,
-                    )
-            else:
-                block = None
-        else:
-            block = None
-
-        # get from node
-        if block is not None:
-            return block
-        else:
-            return await block_time_search.async_get_block_of_timestamp_from_node(
+            block = await db.async_query_timestamp_block(
+                network=network,
                 timestamp=timestamp,
-                nary=nary,
-                cache=cache,
-                verbose=verbose,
-                provider=provider,
             )
+            if block is not None:
+                return block
+
+        # rpc node
+        return await block_time_search.async_get_block_of_timestamp_from_node(
+            timestamp=timestamp,
+            nary=nary,
+            cache=cache,
+            verbose=verbose,
+            provider=provider,
+        )
 
 
 def get_block_of_timestamp_from_arrays(

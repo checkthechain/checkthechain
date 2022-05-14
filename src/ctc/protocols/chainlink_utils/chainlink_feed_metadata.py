@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import directory
@@ -26,7 +25,6 @@ async def async_get_feed_decimals(
         protocol='chainlink',
     )
     return metadata['decimals']
-
 
 
 async def async_resolve_feed_address(
@@ -100,4 +98,3 @@ async def async_get_feed_first_block(
         raise Exception('could not determine creation_block for feed')
 
     return creation_block
-

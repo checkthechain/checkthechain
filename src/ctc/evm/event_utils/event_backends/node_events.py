@@ -52,10 +52,11 @@ async def async_get_events_from_node(
 
     # gather metadata
     if contract_abi is None and event_abi is None:
-        contract_abi = await abi_utils.async_get_contract_abi(
-            contract_address=contract_address,
-            network=network,
-        )
+        if contract_address is not None:
+            contract_abi = await abi_utils.async_get_contract_abi(
+                contract_address=contract_address,
+                network=network,
+            )
     if event_name is None and event_hash is None and event_abi is None:
         raise Exception('must specify event_name or event_hash or event_abi')
     if event_name is None:

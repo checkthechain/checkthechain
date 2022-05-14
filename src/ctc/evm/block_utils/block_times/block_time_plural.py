@@ -18,7 +18,7 @@ async def async_get_blocks_of_timestamps(
     nary: typing.Optional[int] = None,
     cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
     provider: spec.ProviderSpec = None,
-    use_db: bool | None = None,
+    use_db: bool = True,
 ) -> list[int]:
     """once parallel node search created, use that"""
 
@@ -51,32 +51,23 @@ async def async_get_blocks_of_timestamps(
     else:
 
         # get timestamps form db
-        if use_db is None:
-            use_db = True
         if use_db:
             from ctc import db
 
             network = rpc.get_provider_network(provider)
-            engine = db.create_engine(
-                datatype='block_timestamps',
+            db_blocks = await db.async_query_timestamps_blocks(
                 network=network,
+                timestamps=timestamps,
             )
-            if engine is not None:
-                with engine.connect() as conn:
-                    db_blocks = await db.async_query_timestamps_blocks(
-                        conn=conn,
-                        timestamps=timestamps,
-                    )
-                    results = {}
-                    remaining_timestamps: list[int] = []
-                    for possible_block, timestamp in zip(db_blocks, timestamps):
-                        if possible_block is None:
-                            remaining_timestamps.append(timestamp)
-                        else:
-                            results[timestamp] = possible_block
-            else:
-                remaining_timestamps = list(timestamps)
-                results = {}
+
+            # package non-null results
+            results = {}
+            remaining_timestamps: list[int] = []
+            for possible_block, timestamp in zip(db_blocks, timestamps):
+                if possible_block is None:
+                    remaining_timestamps.append(timestamp)
+                else:
+                    results[timestamp] = possible_block
         else:
             remaining_timestamps = list(timestamps)
             results = {}
@@ -100,4 +91,3 @@ async def async_get_blocks_of_timestamps(
 
         # combine
         return [results[timestamp] for timestamp in timestamps]
-

@@ -28,4 +28,3 @@ erc20_event_abis = {
         'type': 'event',
     },
 }
-

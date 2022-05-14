@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc.toolbox import search_utils
@@ -14,6 +13,7 @@ from . import block_crud
 async def async_get_contract_creation_block(
     contract_address: spec.Address,
     provider: spec.ProviderSpec = None,
+    use_db: bool = True,
     **search_kwargs: typing.Any,
 ) -> int | None:
     """get block number of when contract was created
@@ -24,28 +24,23 @@ async def async_get_contract_creation_block(
 
     network = rpc.get_provider_network(provider)
 
-    # first check db
-    use_db = True
     if use_db:
-        block = await async_get_contract_creation_block_from_db(
-            contract_address=contract_address,
-            network=network,
-        )
-    else:
-        block = None
-
-    # if not in db, use rpc provider
-    if block is None:
-        block = await async_get_contract_creation_block_from_node(
-            contract_address=contract_address,
-            provider=provider,
-            **search_kwargs,
-        )
-        if block is None:
-            return None
-
         from ctc import db
 
+        block = await db.async_query_contract_creation_block(
+            address=contract_address,
+            network=network,
+        )
+        if block is not None:
+            return block
+
+    block = await async_get_contract_creation_block_from_node(
+        contract_address=contract_address,
+        provider=provider,
+        **search_kwargs,
+    )
+
+    if use_db and block is not None:
         await db.async_intake_contract_creation_block(
             contract_address=contract_address,
             block=block,
@@ -53,26 +48,6 @@ async def async_get_contract_creation_block(
         )
 
     return block
-
-
-async def async_get_contract_creation_block_from_db(
-    contract_address: spec.Address,
-    network: spec.NetworkReference,
-) -> int | None:
-    from ctc import db
-
-    engine = db.create_engine(
-        datatype='contract_creation_blocks', network=network,
-    )
-    if engine is not None:
-        with engine.connect() as conn:
-            return await db.async_query_contract_creation_block(
-                conn=conn,
-                address=contract_address,
-                network=network,
-            )
-    else:
-        return None
 
 
 async def async_get_contract_creation_block_from_node(
