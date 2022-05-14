@@ -31,8 +31,10 @@ async def async_create_tables_command(
     datatypes: typing.Sequence[str],
     networks: typing.Sequence[str],
 ) -> None:
+    for datatype in datatypes:
+        if datatype not in db.DBDatatype.__args__:  # type: ignore
+            raise Exception('unknown datatype: ' + str(datatype))
     db.create_tables(
-        datatypes=datatypes,
+        datatypes=typing.cast(typing.Sequence[db.DBDatatype], datatypes),
         networks=networks,
     )
-
