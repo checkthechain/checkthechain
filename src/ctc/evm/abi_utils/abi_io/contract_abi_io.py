@@ -43,12 +43,14 @@ async def async_get_contract_abi(
         contract_address=contract_address,
         provider=provider,
     )
+    includes_proxy = False
     if proxy_address is not None:
         proxy_abi = await etherscan_utils.async_get_contract_abi(
             contract_address,
             network=network,
         )
         abi = abi_modify.combine_contract_abis([abi, proxy_abi])
+        includes_proxy = True
 
     # save to db
     if use_db:
@@ -56,6 +58,7 @@ async def async_get_contract_abi(
             contract_address=contract_address,
             network=network,
             abi=abi,
+            includes_proxy=includes_proxy,
         )
 
     return abi

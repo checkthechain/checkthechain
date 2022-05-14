@@ -39,6 +39,7 @@ async def async_intake_contract_abi(
     contract_address: spec.Address,
     network: spec.NetworkReference,
     abi: spec.ContractABI,
+    includes_proxy: bool,
 ) -> None:
 
     if not db_management.get_active_schemas().get('contract_abis'):
@@ -52,6 +53,7 @@ async def async_intake_contract_abi(
             await db_crud.async_store_contract_abi(
                 address=contract_address,
                 abi=abi,
+                includes_proxy=includes_proxy,
                 conn=conn,
                 network=network,
             )
