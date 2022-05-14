@@ -5,7 +5,7 @@ import typing
 import toolsql
 
 from ctc import spec
-from .. import schema_utils
+from .. import db_schemas
 
 
 async def async_store_block_timestamp(
@@ -15,7 +15,7 @@ async def async_store_block_timestamp(
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = db_schemas.get_table_name('block_timestamps', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -42,7 +42,7 @@ async def async_store_block_timestamps(
         {'block_number': block_number, 'timestamp': timestamp}
         for block_number, timestamp in block_timestamps.items()
     ]
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = db_schemas.get_table_name('block_timestamps', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -57,7 +57,7 @@ async def async_delete_block_timestamp(
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = db_schemas.get_table_name('block_timestamps', network=network)
 
     toolsql.delete(
         conn=conn,
@@ -72,7 +72,7 @@ async def async_delete_block_timestamps(
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = db_schemas.get_table_name('block_timestamps', network=network)
 
     toolsql.delete(
         conn=conn,
