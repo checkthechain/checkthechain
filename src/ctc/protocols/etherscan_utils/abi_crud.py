@@ -27,6 +27,10 @@ _etherscan_ratelimit: EtherscanRatelimit = {
 }
 
 
+def set_etherscan_ratelimit(requests_per_second: int | float) -> None:
+    _etherscan_ratelimit['requests_per_second'] = requests_per_second
+
+
 async def async_get_contract_abi(
     contract_address: spec.Address,
     network: spec.NetworkReference | None = None,
