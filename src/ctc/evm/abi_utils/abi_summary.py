@@ -20,6 +20,8 @@ async def async_summarize_contract_abi(
     contract_address: spec.Address | None = None,
 ) -> None:
     if contract_abi is None:
+        if contract_address is None:
+            raise Exception('must specify contract_abi or contract_address')
         contract_abi = await abi_io.async_get_contract_abi(
             contract_address=contract_address,
         )

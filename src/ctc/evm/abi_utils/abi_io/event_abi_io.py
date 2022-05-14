@@ -18,6 +18,8 @@ async def async_get_event_abi(
 
     # get contract abi
     if contract_abi is None:
+        if contract_address is None:
+            raise Exception('must specify contract_abi or contract_address')
         contract_abi = await contract_abi_io.async_get_contract_abi(
             contract_address=contract_address,
             network=network,
