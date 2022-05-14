@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+from typing_extensions import TypedDict
+
 import asyncio
+import typing
 
 from ctc import directory
 from ctc import evm
+from ctc import spec
 
 
 address_pools = {
@@ -53,7 +57,7 @@ pool_colors = {
 }
 
 
-def get_token_map():
+def get_token_map() -> dict[str, spec.Address]:
     return {
         'FEI': directory.get_erc20_address('FEI'),
         'LUSD': directory.get_erc20_address('LUSD'),
@@ -65,7 +69,9 @@ def get_token_map():
     }
 
 
-async def async_get_stable_dex_balances_by_block(blocks):
+async def async_get_stable_dex_balances_by_block(
+    blocks: typing.Sequence[spec.BlockNumberReference],
+) -> typing.Mapping[str, spec.NumpyArray]:
     import numpy as np
 
     token_map = get_token_map()
@@ -89,9 +95,19 @@ async def async_get_stable_dex_balances_by_block(blocks):
     return pool_balances
 
 
+class FEIDEXMetrics(TypedDict):
+    pool_balances: typing.Mapping[str, spec.NumpyArray]
+    total_FEI: spec.NumpyArray
+    pool_tvls: typing.Mapping[str, spec.NumpyArray]
+    total_tvl: spec.NumpyArray
+    pool_imbalances: typing.Mapping[str, spec.NumpyArray]
+    total_imbalance: spec.NumpyArray
+
+
 async def async_get_fei_stable_dex_metrics_by_block(
-    blocks=None, pool_balances=None,
-):
+    blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
+    pool_balances: typing.Mapping[str, spec.NumpyArray] | None = None,
+) -> FEIDEXMetrics:
 
     if pool_balances is None:
         if blocks is None:
@@ -100,10 +116,10 @@ async def async_get_fei_stable_dex_metrics_by_block(
             blocks=blocks
         )
 
-    pool_tvls = {}
+    pool_tvls: typing.MutableMapping[str, spec.NumpyArray] = {}
     pool_targets = {}
     pool_fei_tvls = {}
-    pool_fei_imbalances = {}
+    pool_fei_imbalances: typing.MutableMapping[str, spec.NumpyArray] = {}
     for pool_name in pool_tokens.keys():
 
         # pool tvls
@@ -111,7 +127,9 @@ async def async_get_fei_stable_dex_metrics_by_block(
             pool_balances[pool_name + '__' + token]
             for token in pool_tokens[pool_name]
         ]
-        pool_tvls[pool_name] = sum(pool_token_balances)
+        pool_tvls[pool_name] = typing.cast(
+            spec.NumpyArray, sum(pool_token_balances)
+        )
 
         # pool targets
         n_tokens = len(pool_tokens[pool_name])
@@ -123,9 +141,13 @@ async def async_get_fei_stable_dex_metrics_by_block(
             pool_fei_tvls[pool_name] - pool_targets[pool_name]
         )
 
-    total_pool_tvls = sum(pool_tvls.values())
-    total_pool_fei_tvl = sum(pool_fei_tvls.values())
-    total_pool_fei_imbalance = sum(pool_fei_imbalances.values())
+    total_pool_tvls = typing.cast(spec.NumpyArray, sum(pool_tvls.values()))
+    total_pool_fei_tvl = typing.cast(
+        spec.NumpyArray, sum(pool_fei_tvls.values())
+    )
+    total_pool_fei_imbalance = typing.cast(
+        spec.NumpyArray, sum(pool_fei_imbalances.values())
+    )
 
     return {
         'pool_balances': pool_balances,

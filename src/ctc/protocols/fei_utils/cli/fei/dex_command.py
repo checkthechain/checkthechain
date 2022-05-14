@@ -42,7 +42,10 @@ async def async_dexes_command(block: spec.BlockNumberReference | None) -> None:
     await rpc.async_close_http_session()
 
 
-def print_dex_table(metrics, block):
+def print_dex_table(
+    metrics: fei_dexes.FEIDEXMetrics,
+    block: spec.BlockNumberReference,
+) -> None:
 
     headers = [
         'Pool',
@@ -71,7 +74,9 @@ def print_dex_table(metrics, block):
 
     row = [
         'TOTAL',
-        toolstr.format(metrics['total_tvl'][-1], order_of_magnitude=True, prefix='$'),
+        toolstr.format(
+            metrics['total_tvl'][-1], order_of_magnitude=True, prefix='$'
+        ),
         toolstr.format(metrics['total_FEI'][-1], order_of_magnitude=True),
         toolstr.format(metrics['total_imbalance'][-1], order_of_magnitude=True),
     ]

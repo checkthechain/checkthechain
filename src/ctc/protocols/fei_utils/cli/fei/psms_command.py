@@ -5,7 +5,7 @@ import asyncio
 import toolcli
 import tooltime
 import toolstr
-import tooltable
+import tooltable  # type: ignore
 
 from ctc.protocols.fei_utils import fei_psms
 from ctc import rpc
@@ -70,7 +70,7 @@ async def psms_command(
     await rpc.async_close_http_session()
 
 
-async def async_print_psm_state(block):
+async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
     psms = fei_psms.get_psms()
 
     mint_paused_coroutines = [
