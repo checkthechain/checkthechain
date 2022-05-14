@@ -57,7 +57,7 @@ ProviderName = str
 class PartialProvider(TypedDict, total=False):
     url: str
     name: typing.Optional[ProviderName]
-    network: typing.Optional[network_types.NetworkName]
+    network: typing.Optional[network_types.NetworkReference]
     protocol: Literal['http', 'wss', 'ipc']
     session_kwargs: typing.Optional[dict]
     chunk_size: typing.Optional[int]
@@ -66,7 +66,7 @@ class PartialProvider(TypedDict, total=False):
 class Provider(TypedDict, total=True):
     url: str
     name: typing.Optional[ProviderName]
-    network: typing.Optional[network_types.NetworkName]
+    network: typing.Optional[network_types.NetworkReference]
     protocol: Literal['http', 'wss', 'ipc']
     session_kwargs: typing.Optional[dict]
     chunk_size: typing.Optional[int]

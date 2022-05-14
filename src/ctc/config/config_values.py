@@ -42,7 +42,10 @@ def get_used_networks() -> list[spec.NetworkName]:
     for provider in providers.values():
         network = provider.get('network')
         if network is not None:
-            provider_networks.append(network)
+            from ctc import directory
+
+            network_name = directory.get_network_name(network)
+            provider_networks.append(network_name)
     custom_networks: list[str] = list(ctc_config['networks'].keys())
 
     # get ordered unique networks
@@ -73,14 +76,14 @@ def has_provider(
 def get_provider(
     *,
     name: typing.Optional[str] = None,
-    network: typing.Optional[str] = None,
+    network: str | int | None = None,
     protocol: typing.Optional[str] = None,
 ) -> spec.Provider:
 
     providers = list(get_providers().values())
 
     # build query
-    query = {}
+    query: typing.MutableMapping[str, str | int] = {}
     if name is None and network is None:
         raise Exception('specify network name or network')
     if name is not None:
@@ -177,4 +180,3 @@ def get_sql_queries_log_path() -> str:
     if not os.path.isdir(log_dir):
         os.makedirs(log_dir)
     return os.path.join(log_dir, 'sql_queries.log')
-

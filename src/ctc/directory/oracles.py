@@ -9,11 +9,12 @@ import ctc.config
 from ctc.toolbox import search_utils
 from ctc.toolbox import store_utils
 from ctc import spec
+from . import networks
 
 
 def get_oracle_address(
     name: str,
-    network: spec.NetworkName = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
     block: spec.BlockNumberReference = 'latest',
@@ -31,7 +32,7 @@ def get_oracle_address(
 
 def get_oracle_name(
     address: spec.Address,
-    network: spec.NetworkName = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
     block: spec.BlockNumberReference = 'latest',
@@ -50,7 +51,7 @@ def has_oracle_metadata(
     name: typing.Optional[str] = None,
     *,
     address: typing.Optional[spec.Address] = None,
-    network: spec.NetworkName = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     protocol: str = 'chainlink',
 ) -> bool:
     try:
@@ -66,7 +67,7 @@ def get_oracle_metadata(
     name: typing.Optional[str] = None,
     *,
     address: typing.Optional[spec.Address] = None,
-    network: spec.NetworkName = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     protocol: str = 'chainlink',
     oracle_type: spec.Oracletype = 'feed',
     block: spec.BlockNumberReference = 'latest',
@@ -87,7 +88,7 @@ def get_oracle_feed_metadata(
     name: typing.Optional[str] = None,
     *,
     address: typing.Optional[spec.Address] = None,
-    network: spec.NetworkName = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     protocol: str = 'chainlink',
     block: spec.BlockNumberReference = 'latest',
 ) -> spec.OracleFeedMetadata:
@@ -116,7 +117,7 @@ def get_oracle_feed_metadata(
 
 @toolcache.cache(cachetype='memory')
 def load_oracle_feeds(
-    network: spec.NetworkName = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     protocol: str = 'chainlink',
 ) -> dict[str, spec.OracleFeedMetadata]:
     path = get_oracle_feed_path(network=network, protocol=protocol)
@@ -125,8 +126,8 @@ def load_oracle_feeds(
 
 
 def get_oracle_feed_path(
-    network: spec.NetworkName = 'mainnet', protocol: str = 'chainlink'
+    network: spec.NetworkReference = 'mainnet', protocol: str = 'chainlink'
 ) -> str:
+    network_name = networks.get_network_name(network)
     data_dir = ctc.config.get_data_dir()
-    return os.path.join(data_dir, network, 'oracle_feeds', protocol + '.csv')
-
+    return os.path.join(data_dir, network_name, 'oracle_feeds', protocol + '.csv')

@@ -119,10 +119,10 @@ def validate_config(config: typing.Mapping) -> ConfigValidation:
     if version < config_spec.min_recommended_config_version:
         import rich.console
 
-        warning_text = '[ctc] old config format, upgrade by running `ctc setup` in a terminal'
-        warning_text = '[yellow]' + warning_text + '[/yellow]'
-        console = rich.console.Console()
-        console.print(warning_text)
+        # warning_text = '[ctc] old config format, upgrade by running `ctc setup` in a terminal'
+        # warning_text = '[yellow]' + warning_text + '[/yellow]'
+        # console = rich.console.Console()
+        # console.print(warning_text)
 
     # process keys
     spec_keys = set(spec.ConfigSpec.__annotations__)

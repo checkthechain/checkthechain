@@ -5,6 +5,7 @@ import os
 import typing
 
 import ctc.config
+from ctc import directory
 from ctc import spec
 
 
@@ -81,7 +82,7 @@ def get_provider_network(provider: spec.ProviderSpec) -> spec.NetworkName:
 
     network = provider.get('network')
     if network is not None:
-        return network
+        return directory.get_network_name(network)
     else:
         raise Exception('could not determine network')
 

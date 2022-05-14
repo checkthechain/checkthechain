@@ -300,8 +300,9 @@ def specify_network_defaults(
         network = provider_metadata['network']
         if network is None:
             raise Exception('unknown network for provider: ' + str(provider_metadata))
-        providers_per_network.setdefault(network, [])
-        providers_per_network[network].append(provider_name)
+        network_name = directory.get_network_name(network)
+        providers_per_network.setdefault(network_name, [])
+        providers_per_network[network_name].append(provider_name)
 
     # get default provider for each network
     default_providers = {}
