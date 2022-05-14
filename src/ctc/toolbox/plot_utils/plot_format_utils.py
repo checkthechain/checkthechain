@@ -13,6 +13,9 @@ from ctc import evm
 from ctc import spec
 
 
+T = typing.TypeVar('T')
+
+
 async def async_xtick_block_dates(
     provider: spec.ProviderSpec = None,
 ) -> None:
@@ -43,7 +46,9 @@ async def async_xtick_block_dates(
     plt.xticks(locations, labels, ha='left', rotation=-25)
 
 
-def _select_interleaved(items, number):
+def _select_interleaved(
+    items: typing.Sequence[T], number: int
+) -> typing.Sequence[T]:
     import numpy as np
 
     if len(items) == 0:
@@ -58,7 +63,7 @@ def _select_interleaved(items, number):
 async def async_block_timestamp_xticks(
     provider: spec.ProviderSpec = None,
     representation: tooltime.TimestampExtendedRepresentation | None = None,
-    omit='year',
+    omit: str | None = 'year',
 ) -> None:
     """
     matplotlib.FuncFormatter not used, because it cannot use async
