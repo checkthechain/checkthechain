@@ -25,14 +25,6 @@ class UniswapV3PoolMetadata(TypedDict):
 #
 
 
-async def download_pool_abi(pool_address: spec.Address) -> None:
-    example_pool = '0x8f8ef111b67c04eb1641f5ff19ee54cda062f163'
-    await evm.async_save_proxy_contract_abi_to_filesystem(
-        contract_address=pool_address,
-        proxy_implementation=example_pool,
-    )
-
-
 async def async_get_pool_tokens(
     pool_address: spec.Address,
     **rpc_kwargs: typing.Any,
