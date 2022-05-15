@@ -11,6 +11,7 @@ from .. import db_schemas
 async def async_store_contract_abi(
     address: spec.Address,
     abi: spec.ContractABI,
+    includes_proxy: bool,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> None:
@@ -26,6 +27,7 @@ async def async_store_contract_abi(
         row={
             'address': address.lower(),
             'abi_text': abi_text,
+            'includes_proxy': includes_proxy,
         },
         upsert='do_update',
     )
