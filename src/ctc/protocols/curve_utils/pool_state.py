@@ -51,7 +51,7 @@ async def async_get_pool_state(
     block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
-) -> dict:
+) -> dict[str, typing.Any]:
 
     total_supply = await evm.async_get_erc20_total_supply(
         token=pool,

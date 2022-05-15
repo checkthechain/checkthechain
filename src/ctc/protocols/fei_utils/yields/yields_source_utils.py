@@ -17,8 +17,7 @@ async def async_get_fei_yield_data(
     # get data
     coroutines = []
     for yield_source in yields_sources:
-        coroutine = typing.cast(typing.Awaitable, yield_source(block_numbers))
-        coroutines.append(coroutine)
+        coroutines.append(yield_source(block_numbers))
     yield_datas = await asyncio.gather(*coroutines)
 
     # package data
@@ -28,19 +27,18 @@ async def async_get_fei_yield_data(
         for name, yield_datum in yield_data.items()
     }
 
-YieldGetter = typing.Sequence[
-    typing.Callable[
-        [typing.Sequence[spec.BlockNumberReference]],
-        typing.Coroutine[
-            typing.Any,
-            typing.Any,
-            typing.Mapping[str, yields_spec.YieldSourceData],
-        ],
-    ]
+
+YieldGetter = typing.Callable[
+    [typing.Sequence[spec.BlockNumberReference]],
+    typing.Coroutine[
+        typing.Any,
+        typing.Any,
+        typing.Mapping[str, yields_spec.YieldSourceData],
+    ],
 ]
 
 
-def get_yields_sources() -> YieldGetter:
+def get_yields_sources() -> typing.Sequence[YieldGetter]:
 
     from .yields_sources import aave_yields
     from .yields_sources import compound_yields
@@ -57,4 +55,3 @@ def get_yields_sources() -> YieldGetter:
     ]
 
     return yield_source_groups
-

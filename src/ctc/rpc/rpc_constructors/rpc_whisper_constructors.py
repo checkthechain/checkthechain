@@ -18,7 +18,7 @@ def construct_shh_post(
     priority: spec.BinaryData,
     ttl: spec.BinaryData,
 ) -> spec.RpcRequest:
-    data: dict = {
+    data: dict[str, typing.Any] = {
         'from': from_address,
         'to': to_address,
         'topics': topics,

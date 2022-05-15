@@ -40,7 +40,7 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
 
         # case: partial provider
         if set(provider.keys()) == set(spec.provider_keys):
-            return typing.cast(spec.Provider, provider)
+            return provider  # type: ignore
 
         else:
             selection_keys = ['name', 'network', 'protocol']

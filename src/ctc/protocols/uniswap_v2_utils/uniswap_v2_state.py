@@ -12,12 +12,12 @@ from . import uniswap_v2_spec
 
 
 async def replace_pool_state_symbols(
-    pool_state: typing.Mapping,
+    pool_state: typing.Mapping[str, typing.Any],
     *,
     pool: spec.Address | None = None,
     symbols: typing.Optional[typing.Sequence[str]] = None,
     provider: spec.ProviderSpec = None,
-) -> typing.Mapping:
+) -> typing.Mapping[str, typing.Any]:
 
     if symbols is None:
         if pool is None:

@@ -59,7 +59,7 @@ class PartialProvider(TypedDict, total=False):
     name: typing.Optional[ProviderName]
     network: typing.Optional[network_types.NetworkReference]
     protocol: Literal['http', 'wss', 'ipc']
-    session_kwargs: typing.Optional[dict]
+    session_kwargs: typing.Optional[dict[str, typing.Any]]
     chunk_size: typing.Optional[int]
 
 
@@ -68,7 +68,7 @@ class Provider(TypedDict, total=True):
     name: typing.Optional[ProviderName]
     network: typing.Optional[network_types.NetworkReference]
     protocol: Literal['http', 'wss', 'ipc']
-    session_kwargs: typing.Optional[dict]
+    session_kwargs: typing.Optional[dict[str, typing.Any]]
     chunk_size: typing.Optional[int]
 
 
@@ -86,4 +86,3 @@ ProviderSpec = typing.Union[ProviderShortcut, PartialProvider, Provider, None]
 ProviderKey = typing.Tuple[
     int, str, typing.Tuple[typing.Tuple[typing.Any, typing.Any], ...]
 ]
-

@@ -11,7 +11,7 @@ class MultipleMatchesFound(LookupError):
     pass
 
 
-M = typing.TypeVar('M', bound=typing.Mapping)
+M = typing.TypeVar('M', bound=typing.Mapping[typing.Any, typing.Any])
 
 
 def get_matching_entries(
@@ -156,7 +156,7 @@ def nary_search(
     is_match: typing.Callable[[typing.Sequence[int]], typing.Sequence[bool]],
     debug: bool = False,
     raise_if_not_found: bool = True,
-    get_next_probes: typing.Callable | None = None,
+    get_next_probes: typing.Callable[..., typing.Sequence[int]] | None = None,
 ) -> int | None:
 
     if get_next_probes is None:
@@ -238,7 +238,7 @@ async def async_nary_search(
     ],
     debug: bool = False,
     raise_if_not_found: bool = True,
-    get_next_probes: typing.Callable | None = None,
+    get_next_probes: typing.Callable[..., typing.Sequence[int]] | None = None,
 ) -> int | None:
 
     if get_next_probes is None:
@@ -319,4 +319,3 @@ def get_next_probes_linear(
     d = (probe_max - probe_min) / (n_probes + 1)
     probes = [probe_min + (p + 1) * d for p in range(n_probes)]
     return [round(probe) for probe in probes]
-

@@ -8,8 +8,8 @@ from ctc import spec
 
 
 def filter_twap(
-    raw_values: typing.Sequence,
-    timestamps: typing.Sequence,
+    raw_values: typing.Sequence[typing.Any],
+    timestamps: typing.Sequence[typing.Any],
     filter_duration: tooltime.Timestamp,
 ) -> spec.Series:
     """convert raw value of a TWAP"""

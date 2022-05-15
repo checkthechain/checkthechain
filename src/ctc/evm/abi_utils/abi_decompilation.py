@@ -10,7 +10,7 @@ from ctc.protocols import fourbyte_utils
 async def async_decompile_function_abis(
     bytecode: str,
     sort: str | None = None,
-) -> typing.Sequence[typing.Mapping]:
+) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
     function_selectors = re.findall('8063([a-f0-9]{8})146', bytecode)
 
     coroutines = [
@@ -24,4 +24,3 @@ async def async_decompile_function_abis(
         abis = sorted(abis, key=lambda item: item[sort])
 
     return abis
-

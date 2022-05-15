@@ -75,8 +75,6 @@ async def async_rechunk_events(
         end_block = max(
             path_end for path_start, path_end in event_list['paths'].values()
         )
-    start_block = typing.cast(int, start_block)
-    end_block = typing.cast(int, end_block)
 
     # get original files of block range
     original_paths = []

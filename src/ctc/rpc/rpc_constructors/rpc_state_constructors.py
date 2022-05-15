@@ -15,7 +15,9 @@ def construct_eth_call(
     value_sent: spec.BinaryData | None = None,
     block_number: spec.BlockNumberReference | None = None,
     call_data: spec.BinaryData | None = None,
-    function_parameters: typing.Sequence | typing.Mapping | None = None,
+    function_parameters: typing.Sequence[typing.Any]
+    | typing.Mapping[str, typing.Any]
+    | None = None,
     function_abi: spec.FunctionABI | None = None,
 ) -> spec.RpcRequest:
 
@@ -52,7 +54,9 @@ def construct_eth_estimate_gas(
     gas_price: spec.BinaryData | None = None,
     value_sent: spec.BinaryData | None = None,
     call_data: spec.BinaryData | None = None,
-    function_parameters: typing.Sequence | typing.Mapping | None = None,
+    function_parameters: typing.Sequence[typing.Any]
+    | typing.Mapping[str, typing.Any]
+    | None = None,
     function_abi: spec.FunctionABI | None = None,
 ) -> spec.RpcRequest:
 
@@ -109,4 +113,3 @@ def construct_eth_get_code(
 
     block_number = binary.encode_block_number(block_number)
     return rpc_request.create('eth_getCode', [address, block_number])
-

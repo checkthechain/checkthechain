@@ -12,7 +12,7 @@ T = typing.TypeVar('T')
 def decode_response(
     response: dict[str, typing.Union[int, str]],
     quantities: typing.Optional[list[str]] = None,
-) -> dict:
+) -> dict[str, typing.Any]:
     if quantities is None:
         quantities = []
     decoded = {}
@@ -41,4 +41,3 @@ def camel_case_to_snake_case(text: str) -> str:
     adapted from https://stackoverflow.com/a/1176023
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', text).lower()
-

@@ -52,7 +52,7 @@ ContractABI = typing.List[typing.Union[FunctionABI, EventABI, ErrorABI]]
 
 ABITupleComponents = typing.List['ABITupleComponent']
 
-ABITupleComponent = dict
+ABITupleComponent = typing.Mapping[typing.Any, typing.Any]
 
 # # class ABITupleComponent(TypedDict):
 # #     name: str

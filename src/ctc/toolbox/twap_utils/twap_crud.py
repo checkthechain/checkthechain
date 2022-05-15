@@ -63,7 +63,7 @@ async def async_get_twap(
         twap = data
     elif mode == 'raw':
         twap = twap_filter.filter_twap(
-            raw_values=typing.cast(typing.Sequence, data.values),
+            raw_values=typing.cast(typing.Sequence[typing.Any], data.values),
             timestamps=(await block_timestamps_task),
             filter_duration=filter_duration,
         )

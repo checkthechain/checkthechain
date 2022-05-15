@@ -99,7 +99,7 @@ async def async_get_A_history(
     blocks: spec.NumpyArray = np.arange(start_block, end_block, dtype=int)
     block_timestamps_task = asyncio.create_task(
         evm.async_get_block_timestamps(
-            blocks=typing.cast(typing.Sequence, blocks),
+            blocks=typing.cast(typing.Sequence[int], blocks),
             provider=provider,
         )
     )
@@ -131,13 +131,20 @@ async def async_get_A_history(
 
     # need per-block timestamps over a long time range to continue :-\
     A = compute_A(
-        initial_A=typing.cast(typing.Sequence, events['arg__old_A']),
-        future_A=typing.cast(typing.Sequence, events['arg__new_A']),
+        initial_A=typing.cast(
+            typing.Sequence[typing.Union[int, float]], events['arg__old_A']
+        ),
+        future_A=typing.cast(
+            typing.Sequence[typing.Union[int, float]], events['arg__new_A']
+        ),
         initial_A_time=typing.cast(
-            typing.Sequence,
+            typing.Sequence[typing.Union[int, float]],
             events['arg__initial_time'],
         ),
-        future_A_time=typing.cast(typing.Sequence, events['arg__future_time']),
+        future_A_time=typing.cast(
+            typing.Sequence[typing.Union[int, float]],
+            events['arg__future_time'],
+        ),
         timestamps=block_timestamps,
     )
 
@@ -145,11 +152,11 @@ async def async_get_A_history(
 
 
 def compute_A(
-    initial_A: typing.Sequence,
-    initial_A_time: typing.Sequence,
-    future_A: typing.Sequence,
-    future_A_time: typing.Sequence,
-    timestamps: typing.Sequence,
+    initial_A: typing.Sequence[int | float],
+    initial_A_time: typing.Sequence[int | float],
+    future_A: typing.Sequence[int | float],
+    future_A_time: typing.Sequence[int | float],
+    timestamps: typing.Sequence[int | float],
 ) -> typing.Sequence[float]:
     """perform linear interpolation between initial and future A values
 
@@ -185,4 +192,3 @@ def _compute_A(
     result[mask] = future_A
 
     return result
-

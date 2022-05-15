@@ -29,7 +29,7 @@ async def async_revalidate_blocks(
     end_block: spec.BlockNumberReference | None = None,
     end_time: tooltime.Timestamp | None = None,
     provider: spec.ProviderSpec | None = None,
-) -> typing.Mapping:
+) -> typing.Mapping[typing.Any, typing.Any]:
 
     if start_block is not None and start_time is not None:
         raise Exception('cannot specify both start_block and start_time')
@@ -98,7 +98,7 @@ async def async_revalidate_blocks(
 async def async_get_premature_blocks(
     conn: toolsql.SAConnection,
     provider: spec.ProviderSpec = None,
-) -> typing.Mapping:
+) -> typing.Mapping[typing.Any, typing.Any]:
     # get network
     network = rpc.get_provider_network(provider)
     table_name = db_schemas.get_table_name(

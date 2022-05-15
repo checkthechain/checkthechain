@@ -39,7 +39,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_get_coingecko_data(n: int) -> typing.Sequence[typing.Mapping]:
+async def async_get_coingecko_data(
+    n: int,
+) -> typing.Sequence[typing.Mapping[typing.Any, typing.Any]]:
     n_per_page = 100
     n_pages = math.ceil(n / n_per_page)
 
@@ -54,7 +56,7 @@ async def async_get_coingecko_data(n: int) -> typing.Sequence[typing.Mapping]:
 
 async def async_get_page(
     session: aiohttp.ClientSession, p: int
-) -> typing.Mapping:
+) -> typing.Mapping[typing.Any, typing.Any]:
     url = url_template.format(page=p + 1)
     async with session.get(url) as response:
         return await response.json()
@@ -78,7 +80,7 @@ async def async_cg_command(n: int, verbose: bool, include_links: bool) -> None:
 
 
 def print_coingecko_data(
-    data: typing.Sequence,
+    data: typing.Sequence[typing.Any],
     verbose: bool,
     include_links: bool,
 ) -> None:
@@ -220,4 +222,3 @@ def print_coingecko_data(
 
         color_line = '│'.join(cells)
         console.print(color_line)
-

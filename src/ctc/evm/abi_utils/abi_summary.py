@@ -98,7 +98,8 @@ def print_contract_abi_human_readable(
 
         if not verbose:
             signature = binary.get_function_signature(
-                function_abi=function, include_names=True,
+                function_abi=function,
+                include_names=True,
             )
         else:
             signature = function['name'] + '()'
@@ -157,7 +158,9 @@ def contract_abi_to_dataframe(
     human_readable: bool,
 ) -> spec.DataFrame:
     contract_abi = copy.deepcopy(contract_abi)
-    for entry in typing.cast(typing.List[typing.Dict], contract_abi):
+    for entry in typing.cast(
+        typing.List[typing.Dict[str, typing.Any]], contract_abi
+    ):
 
         if human_readable:
 
@@ -258,4 +261,3 @@ async def async_get_contract_events_dataframe(
     import pandas as pd
 
     return pd.DataFrame(event_rows)
-

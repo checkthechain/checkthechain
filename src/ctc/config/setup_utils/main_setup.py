@@ -40,7 +40,7 @@ def setup_ctc() -> None:
     toolcli.print('Can skip options by simply pressing enter', style='bold')
 
     # load old config data for passing to each option
-    old_config: typing.Mapping = {}
+    old_config: typing.Mapping[typing.Any, typing.Any] = {}
 
     # ensure file is valid
     validation_setup.ensure_valid(styles=styles)

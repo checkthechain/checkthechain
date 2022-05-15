@@ -44,14 +44,14 @@ def get_config(validate: typing.Literal['raise'] = 'raise') -> spec.ConfigSpec:
 @typing.overload
 def get_config(
     validate: typing.Literal['warn', False]
-) -> typing.MutableMapping:
+) -> typing.MutableMapping[str, typing.Any]:
     ...
 
 
 @toolcache.cache('memory')
 def get_config(
     validate: toolconfig.ValidationOption = False,
-) -> typing.Union[spec.ConfigSpec, typing.MutableMapping]:
+) -> typing.Union[spec.ConfigSpec, typing.MutableMapping[str, typing.Any]]:
 
     # load from file
     config_from_file = toolconfig.get_config(
@@ -103,13 +103,14 @@ def clear_config_overrides() -> None:
 # # validation
 #
 
+
 class ConfigValidation(TypedDict):
     valid: bool
     missing_keys: typing.Iterable[str]
     extra_keys: typing.Iterable[str]
 
 
-def validate_config(config: typing.Mapping) -> ConfigValidation:
+def validate_config(config: typing.Any) -> ConfigValidation:
     # process config version
     version = get_config_version_tuple(config)
     if version < config_spec.min_allowed_config_version:
@@ -169,7 +170,7 @@ def validate_config(config: typing.Mapping) -> ConfigValidation:
     return validation
 
 
-def config_is_valid(config: typing.Mapping | None = None) -> bool:
+def config_is_valid(config: typing.Any | None = None) -> bool:
     if config is None:
         config = get_config()
     validation = validate_config(config)
@@ -177,7 +178,7 @@ def config_is_valid(config: typing.Mapping | None = None) -> bool:
 
 
 def get_config_version_tuple(
-    config: typing.Mapping,
+    config: typing.Mapping[str, typing.Any],
 ) -> typing.Tuple[int, int, int]:
 
     if 'config_spec_version' in config:

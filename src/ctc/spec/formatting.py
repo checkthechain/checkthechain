@@ -6,7 +6,7 @@ import typing
 
 def typehints_formatter(
     annotation: typing.Any,
-    sphinx_config: typing.Mapping,
+    sphinx_config: typing.Mapping[str, typing.Any],
 ) -> str:
     """used for documentation of types by sphinx_autodoc_typehints"""
     output = str(annotation)

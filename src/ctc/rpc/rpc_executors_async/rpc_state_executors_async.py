@@ -18,7 +18,9 @@ async def async_eth_call(
     value_sent: spec.BinaryData | None = None,
     block_number: spec.BlockNumberReference | None = None,
     call_data: spec.BinaryData | None = None,
-    function_parameters: typing.Sequence | typing.Mapping | None = None,
+    function_parameters: typing.Sequence[typing.Any]
+    | typing.Mapping[str, typing.Any]
+    | None = None,
     function_abi: spec.FunctionABI | None = None,
     provider: spec.ProviderSpec = None,
     decode_response: bool = True,
@@ -26,7 +28,7 @@ async def async_eth_call(
     package_named_outputs: bool = False,
     fill_empty: bool = False,
     empty_token: typing.Any = None,
-    **function_abi_query: typing.Any
+    **function_abi_query: typing.Any,
 ) -> spec.RpcSingularResponse:
 
     if function_abi is None:
@@ -70,11 +72,13 @@ async def async_eth_estimate_gas(
     gas_price: spec.BinaryData | None = None,
     value_sent: spec.BinaryData | None = None,
     call_data: spec.BinaryData | None = None,
-    function_parameters: typing.Sequence | typing.Mapping | None = None,
+    function_parameters: typing.Sequence[typing.Any]
+    | typing.Mapping[str, typing.Any]
+    | None = None,
     function_abi: spec.FunctionABI | None = None,
     provider: spec.ProviderSpec = None,
     decode_response: bool = True,
-    **function_abi_query: typing.Any
+    **function_abi_query: typing.Any,
 ) -> spec.RpcSingularResponse:
 
     if function_abi is None:
@@ -148,4 +152,3 @@ async def async_eth_get_code(
     )
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_get_code(response)
-

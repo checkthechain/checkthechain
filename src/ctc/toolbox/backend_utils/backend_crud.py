@@ -63,13 +63,13 @@ async def async_run_on_backend(
 
 
 def transfer_backends(
-    get: typing.Callable,
-    save: typing.Callable,
+    get: typing.Callable[..., typing.Any],
+    save: typing.Callable[..., typing.Any],
     from_backend: str,
     to_backend: str,
-    get_kwargs: typing.Mapping | None = None,
-    save_kwargs: typing.Mapping | None = None,
-    common_kwargs: typing.Mapping | None = None,
+    get_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    save_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    common_kwargs: typing.Mapping[str, typing.Any] | None = None,
     **more_common_kwargs: typing.Any,
 ) -> typing.Any:
     if common_kwargs is None:
@@ -89,13 +89,13 @@ def transfer_backends(
 
 
 async def async_transfer_backends(
-    get: typing.Callable,
-    save: typing.Callable,
+    get: typing.Callable[..., typing.Any],
+    save: typing.Callable[..., typing.Any],
     from_backend: str,
     to_backend: str,
-    get_kwargs: typing.Mapping | None = None,
-    save_kwargs: typing.Mapping | None = None,
-    common_kwargs: typing.Mapping | None = None,
+    get_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    save_kwargs: typing.Mapping[str, typing.Any] | None = None,
+    common_kwargs: typing.Mapping[str, typing.Any] | None = None,
     **more_common_kwargs: typing.Any,
 ) -> typing.Any:
     if common_kwargs is None:

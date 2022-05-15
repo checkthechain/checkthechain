@@ -231,7 +231,9 @@ async def async_get_public_pool_users_with_data(
     }
 
 
-async def _async_get_pool_users_with_data_or_error(**kwargs: typing.Any) -> dict:
+async def _async_get_pool_users_with_data_or_error(
+    **kwargs: typing.Any,
+) -> dict[str, typing.Any]:
     try:
         summary = await async_get_pool_users_with_data(**kwargs)
         return {'pool_users': summary, 'error': None}
@@ -321,7 +323,7 @@ async def async_get_pools_by_supplier(
 
 async def async_get_pools_by_supplier_with_data(
     account: spec.Address,
-    lens_address: spec.Address | None= None,
+    lens_address: spec.Address | None = None,
     provider: spec.ProviderSpec = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplierWithData:
@@ -450,4 +452,3 @@ async def async_get_whitelisted_pools_by_account_with_data(
     ]
 
     return output
-

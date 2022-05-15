@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
     Series = pandas.core.series.Series
     PandasIndex = pandas.core.indexes.base.Index
     DType = numpy.typing.DTypeLike
-    NumpyArray = numpy.typing.NDArray
+    NumpyArray = numpy.typing.NDArray  # type: ignore
 
 else:
 

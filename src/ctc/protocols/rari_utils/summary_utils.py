@@ -17,7 +17,7 @@ from . import fuse_queries
 
 
 K = typing.TypeVar('K')
-V = typing.TypeVar('V', bound=typing.Mapping)
+V = typing.TypeVar('V', bound=typing.Mapping[str, typing.Any])
 
 
 display_names = {
@@ -197,7 +197,7 @@ async def async_get_token_multipool_stats(
     token: spec.Address,
     block: spec.BlockNumberReference = 'latest',
     in_usd: bool = True,
-) -> dict:
+) -> dict[str, typing.Any]:
     pools = await fuse_queries.async_get_all_pools(block=block)
 
     eth_price = await chainlink_utils.async_get_eth_price(block=block)
@@ -284,7 +284,7 @@ async def async_get_token_pool_stats(
     eth_price: spec.Number,
     block: spec.BlockNumberReference = 'latest',
     in_usd: bool = True,
-) -> dict:
+) -> dict[str, typing.Any]:
 
     ctokens = await fuse_queries.async_get_pool_ctokens(
         comptroller=comptroller, block=block

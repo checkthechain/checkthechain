@@ -62,8 +62,8 @@ def load_buffer_data(buffer: typing.TextIO, format: DataFormat) -> typing.Any:
 def write_file_data(
     path: str,
     data: typing.Union[
-        typing.Sequence[typing.Mapping],
-        typing.Mapping[typing.Any, typing.Mapping],
+        typing.Sequence[typing.Mapping[str, typing.Any]],
+        typing.Mapping[typing.Any, typing.Mapping[str, typing.Any]],
     ],
     format: typing.Optional[DataFormat] = None,
     overwrite: bool = False,
@@ -100,8 +100,8 @@ def write_file_data(
 def write_buffer_data(
     buffer: typing.TextIO,
     data: typing.Union[
-        typing.Sequence[typing.Mapping],
-        typing.Mapping[typing.Any, typing.Mapping],
+        typing.Sequence[typing.Mapping[str, typing.Any]],
+        typing.Mapping[typing.Any, typing.Mapping[str, typing.Any]],
     ],
     format: DataFormat,
     index_field: typing.Optional[str] = None,
@@ -133,7 +133,7 @@ def write_buffer_data(
         # gather fields
         field_set: set[str] = set()
         if isinstance(data, list):
-            dataiter: typing.Iterable[dict] = data
+            dataiter: typing.Iterable[dict[typing.Any, typing.Any]] = data
         elif isinstance(data, dict):
             dataiter = data.values()
         else:

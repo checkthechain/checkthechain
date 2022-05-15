@@ -16,8 +16,8 @@ async def async_bisect(
     input_tol: float | None = None,
     output_tol: float | None = None,
     max_iterations: int | None = None,
-    f_args: typing.Sequence | None = None,
-    f_kwargs: typing.Mapping | None = None,
+    f_args: typing.Sequence[typing.Any] | None = None,
+    f_kwargs: typing.Mapping[str, typing.Any] | None = None,
     verbose: bool = False,
 ) -> float:
 

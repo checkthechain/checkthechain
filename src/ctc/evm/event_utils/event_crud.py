@@ -49,7 +49,7 @@ async def async_get_events(
     end_block: spec.BlockNumberReference | None = None,
     backend_order: typing.Sequence[str] | None = None,
     keep_multiindex: bool = True,
-    **query: typing.Any
+    **query: typing.Any,
 ) -> spec.DataFrame:
 
     if start_block is None:
@@ -73,7 +73,7 @@ async def async_get_events(
         start_block=start_block,
         end_block=end_block,
         backend_order=backend_order,
-        **query
+        **query,
     )
 
     if not keep_multiindex:
@@ -99,7 +99,7 @@ async def async_transfer_events(
     contract_address: spec.Address,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    **query: typing.Any
+    **query: typing.Any,
 ) -> spec.DataFrame:
 
     if start_block is not None and end_block is not None:
@@ -117,7 +117,7 @@ async def async_transfer_events(
         contract_address=contract_address,
         start_block=start_block,
         end_block=end_block,
-        **query
+        **query,
     )
 
 
@@ -146,7 +146,6 @@ async def async_download_events(
     elif end_block is not None:
         end_block = await block_utils.async_block_number_to_int(end_block)
 
-
     provider = rpc.get_provider(provider)
     network = provider['network']
     if network is None:
@@ -170,9 +169,12 @@ async def async_download_events(
         contract_address=contract_address,
         event_hash=event_hash,
     )
-    downloads = []
+    downloads: list[typing.Mapping[str, typing.Any]] = []
     if listed_events is None:
-        download: dict = {'start_block': start_block, 'end_block': end_block}
+        download: typing.Mapping[str, typing.Any] = {
+            'start_block': start_block,
+            'end_block': end_block,
+        }
         downloads.append(download)
     else:
 
@@ -201,7 +203,7 @@ async def async_download_events(
             event_abi=event_abi,
             contract_address=contract_address,
             provider=provider,
-            **download
+            **download,
         )
 
     # load from filesystem
@@ -214,4 +216,3 @@ async def async_download_events(
         verbose=verbose,
         provider=provider,
     )
-

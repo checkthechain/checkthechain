@@ -1,6 +1,7 @@
 """WIP"""
 from __future__ import annotations
 
+import typing
 import functools
 
 import pandas as pd
@@ -19,7 +20,7 @@ async def async_get_transaction_traces_df(
         transaction_hash=transaction_hash,
     )
 
-    data: dict = {}
+    data: dict[str, list[typing.Any]] = {}
 
     for trace in traces:
         for key, value in trace.items():
@@ -67,7 +68,7 @@ async def _add_trace_call_data(df: spec.DataFrame) -> None:
             contract_address=contract_address,
         )
 
-    action_call_data: dict = {
+    action_call_data: dict[str, list[typing.Any]] = {
         'action__name': [],
         'action__parameters': [],
         'result__outputs': [],

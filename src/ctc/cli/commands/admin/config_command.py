@@ -40,7 +40,7 @@ def config_command(reveal: bool, as_json: bool) -> None:
     if as_json:
         import rich
 
-        config: typing.Mapping = ctc.config.get_config()
+        config: typing.Mapping[str, typing.Any] = ctc.config.get_config()
         rich.print(config)
 
     else:
@@ -59,7 +59,9 @@ def config_command(reveal: bool, as_json: bool) -> None:
 
         print()
         print('## Config Values')
-        config = typing.cast(typing.Mapping, ctc.config.get_config())
+        config = typing.cast(
+            typing.Mapping[str, typing.Any], ctc.config.get_config()
+        )
         for key in sorted(config.keys()):
             if isinstance(config[key], dict) and len(config[key]) > 0:
                 print('-', str(key) + ':')
@@ -80,4 +82,3 @@ def config_command(reveal: bool, as_json: bool) -> None:
                         print('    -', str(subkey) + ':', subvalue)
             else:
                 print('-', str(key) + ':', config[key])
-
