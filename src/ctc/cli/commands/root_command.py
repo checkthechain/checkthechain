@@ -14,9 +14,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'address, block number, tx hash, or ERC20 symbol',
             }
         ],
-        'special': {
-            'include_parse_spec': True,
-        },
+        'extra_data': ['parse_spec'],
     }
 
 

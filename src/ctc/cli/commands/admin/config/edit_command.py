@@ -12,9 +12,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': edit_config_command,
         'help': 'edit config values',
-        'special': {
-            'hidden': True,
-        },
+        'hidden': True,
         'examples': [''],
     }
 
