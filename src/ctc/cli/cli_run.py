@@ -6,6 +6,8 @@ import typing
 import toolcli
 
 import ctc
+import ctc.config
+from .plugins import toolsql_plugin
 
 
 command_index_by_category: dict[str, toolcli.CommandIndex] = {
@@ -14,9 +16,9 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('config',): 'ctc.cli.commands.admin.config_command',
         ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
         ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
-        (
-            'download-proxy-abi',
-        ): 'ctc.cli.commands.admin.download_proxy_abi_command',
+        # (
+        #     'download-proxy-abi',
+        # ): 'ctc.cli.commands.admin.download_proxy_abi_command',
         ('log',): 'ctc.cli.commands.admin.log_command',
         ('setup',): 'ctc.cli.commands.admin.setup_command',
         ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
@@ -33,15 +35,16 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('abi',): 'ctc.cli.commands.data.abi_command',
         ('address',): 'ctc.cli.commands.data.address_command',
         (
+            'address',
+            'transactions',
+        ): 'ctc.cli.commands.data.address_transactions_command',
+        (
             'db',
             'create',
             'tables',
         ): 'ctc.cli.commands.data.db.create_tables_command',
-        (
-            'address',
-            'transactions',
-        ): 'ctc.cli.commands.data.address_transactions_command',
         ('db', 'connect'): 'ctc.cli.commands.data.db.connect_command',
+        ('db', 'status'): 'ctc.cli.commands.data.db.status_command',
         ('block',): 'ctc.cli.commands.data.block_command',
         ('blocks',): 'ctc.cli.commands.data.blocks_command',
         ('call',): 'ctc.cli.commands.data.call_command',
@@ -229,15 +232,20 @@ def run_cli(
         },
         #
         # subcommands
+        'include_standard_subcommands': True,
         'include_cd_subcommand': True,
-        'include_version_subcommand': True,
-        'include_help_subcommand': True,
-        'include_record_help_subcommand': True,
-        'include_cli_subcommand': True,
         #
         # args
         'include_debug_arg': True,
+        #
+        # plugins
+        'plugins': [toolsql_plugin.plugin],
+        'extra_data_getters': {
+            'db_config': ctc.config.get_db_config,
+            'db_schema': ('ctc.db', 'get_complete_prepared_schema'),
+        },
     }
+
     toolcli_kwargs = dict({'config': config}, **toolcli_kwargs)
 
     toolcli.run_cli(
@@ -245,4 +253,3 @@ def run_cli(
         command_index=command_index,
         **toolcli_kwargs,
     )
-
