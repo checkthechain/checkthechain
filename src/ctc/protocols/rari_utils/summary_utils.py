@@ -11,6 +11,7 @@ import tooltable  # type: ignore
 from ctc.protocols import chainlink_utils
 from ctc import binary
 from ctc import directory
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 from . import fuse_queries
@@ -331,7 +332,7 @@ async def async_print_fuse_token_summary(
     if token == '0x0000000000000000000000000000000000000000':
         symbol = 'ETH'
     else:
-        symbol = directory.get_erc20_symbol(token)
+        symbol = await evm.async_get_erc20_symbol(token)
 
     standard_block = binary.standardize_block_number(block)
     block_data = await rpc.async_eth_get_block_by_number(standard_block)
