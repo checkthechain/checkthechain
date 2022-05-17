@@ -24,6 +24,7 @@ _etherscan_ratelimit: EtherscanRatelimit = {
     'requests_per_second': 0.2,
     'last_request_time': 0,
     'lock': None,
+    'recent_results': {},
 }
 
 
@@ -62,6 +63,9 @@ async def async_get_contract_abi(
     # acquire lock
     async with lock:
 
+        if contract_address in _etherscan_ratelimit['recent_results']:
+            return _etherscan_ratelimit['recent_results'][contract_address]
+
         # ratelimit
         now = time.time()
         time_since_last = now - _etherscan_ratelimit['last_request_time']
@@ -95,5 +99,7 @@ async def async_get_contract_abi(
                 'could not obtain contract abi from etherscan for '
                 + str(contract_address)
             )
+
+        _etherscan_ratelimit['recent_results'][contract_address] = abi
 
     return abi
