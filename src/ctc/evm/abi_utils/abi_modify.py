@@ -11,8 +11,16 @@ def combine_contract_abis(
 
     # insert using name to avoid name collisions
     combined = {}
+    unnamed = None
     for contract_abi in contract_abis:
         for item in contract_abi:
-            combined[item['name']] = item
+            if item.get('name') is None:
+                unnamed = item
+            else:
+                combined[item['name']] = item
 
-    return list(combined.values())
+    new_abi = list(combined.values())
+    if unnamed is not None:
+        new_abi.append(unnamed)
+
+    return new_abi

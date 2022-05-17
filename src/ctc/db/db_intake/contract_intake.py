@@ -36,11 +36,17 @@ async def async_intake_contract_creation_block(
 
 
 async def async_intake_contract_abi(
+    abi: spec.ContractABI,
     contract_address: spec.Address,
     network: spec.NetworkReference,
-    abi: spec.ContractABI,
     includes_proxy: bool,
 ) -> None:
+
+    # validate input format
+    if not isinstance(abi, list):
+        raise Exception('bad format for contract abi')
+    if any(not isinstance(item, dict) for item in abi):
+        raise Exception('bad format for contract abi')
 
     if not db_management.get_active_schemas().get('contract_abis'):
         return

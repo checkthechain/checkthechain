@@ -24,6 +24,7 @@ def get_active_schemas() -> typing.Mapping[db_spec.DBDatatype, bool]:
         'block_timestamps': True,
         'block_gas_stats': False,
         'contract_creation_blocks': True,
+        'contract_abis': True,
         'erc20_metadata': True,
         'erc20_state': False,
         'events': False,
