@@ -26,6 +26,10 @@ skip_tokens = [
 ]
 
 deposit_metadata = {
+    '0x2c47fef515d2c70f2427706999e158533f7cf090': {
+        'name': 'Tribe Turbo',
+        'platform': 'Rari Fuse',
+    },
     '0xb4ffd10c4c290dc13e8e30bf186f1509001515fd': {
         'name': 'Fuse Pool 25',
         'platform': 'Rari Fuse',
@@ -130,6 +134,14 @@ deposit_metadata = {
         'name': 'Balancer FEI-USD',
         'platform': 'Balancer',
     },
+    '0x673f7dfa863b611de657759aede629b260f4e682': {
+        'name': 'Balancer Pool2',
+        'platform': 'Balancer',
+    },
+    '0xd8eb546726d449fc1ded06dfeca800a2fa8bb930': {
+        'name': 'Balancer Pool2',
+        'platform': 'Balancer',
+    },
     '0x7ac2ab8143634419c5bc230a9f9955c3e29f64ef': {
         'name': 'Uniswap FEI-agEUR',
         'platform': 'Uniswap V2',
@@ -186,6 +198,18 @@ deposit_metadata = {
         'name': 'Fuse Pool 156',
         'platform': 'Rari Fuse',
     },
+    '0x564efce5c6873219a7fbe450187c23254e3d62a4': {
+        'name': 'Tribe VOLT Reserves',
+        'platform': 'Tribe',
+    },
+    '0x8cba3149b95084a61bbab9e01110b0fb92c9a289': {
+        'name': 'Balancer veBAL',
+        'platform': 'Balancer',
+    },
+    '0xe8633c49ace655eb4a8b720e6b12f09bd3a97812': {
+        'name': 'FEI-agEUR LP',
+        'platform': 'Angle',
+    },
 }
 
 deposit_names = {
@@ -203,6 +227,7 @@ deposit_names = {
     '0x7339ca4ac94020b83a34f5edfa6e0f26986c434b': 'DAO Timelock RAI',
     '0x1267b39c93711dd374deab15e0127e4adb259be0': 'AAVE RAI',
     '0xcce230c087f31032fc17621a2cf5e425a0b80c96': 'Fuse Pool 9 RAI',
+    '0x5dde9b4b14edf59cb23c1d4579b279846998205e': 'RAI PSM',
     # DAI
     '0x9cc46ab5a714f7cd24c59f33c5769039b5872491': 'Fuse Pool 8 DAI',
     '0xfde7077aaecdaf2c4b85261aa858c96a7e737a61': 'Compound DAI',

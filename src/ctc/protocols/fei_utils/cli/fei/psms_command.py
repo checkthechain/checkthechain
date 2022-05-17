@@ -114,8 +114,8 @@ async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
     for p, (psm_name, psm_address) in enumerate(psms.items()):
         row = [
             ' '.join(psm_name.split(' ')[:-1]),
-            str(bool(mint_paused[p])),
-            str(bool(redeem_paused[p])),
+            str(not bool(mint_paused[p])),
+            str(not bool(redeem_paused[p])),
             psm_address,
         ]
         rows.append(row)

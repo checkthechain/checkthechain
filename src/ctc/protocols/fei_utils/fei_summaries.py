@@ -111,7 +111,6 @@ async def async_print_pcv_assets(
     print('total', total_usd)
     print()
     tooltable.print_table(rows, headers=headers)
-    print()
 
 
 async def async_print_pcv_deposits(
