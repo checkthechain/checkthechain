@@ -13,6 +13,7 @@ DBDatatype = Literal[
     'contract_creation_blocks',
     'erc20_metadata',
     'erc20_state',
+    # 'events',
 ]
 
 

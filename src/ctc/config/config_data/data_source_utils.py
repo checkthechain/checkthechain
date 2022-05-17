@@ -57,7 +57,8 @@ def get_data_source(**tags: typing.Any) -> DataSource:
     if tags.get('datatype') in [
         'erc20_metadata',
         'block_timestamps',
-        'contract_creation',
+        'contract_abis',
+        'contract_creation_blocks',
     ]:
 
         db_config = config_values.get_db_config(datatype=tags['datatype'])
@@ -87,7 +88,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
                 {'backend': 'rest', 'rest_endpoint': '4byte.directory'},
             ],
         }
-    elif tags.get('datatype') == 'contract_abi':
+    elif tags.get('datatype') == 'contract_abis':
         return {
             'backend': 'hybrid',
             'hybrid_order': [
@@ -98,19 +99,6 @@ def get_data_source(**tags: typing.Any) -> DataSource:
                 },
             ],
             'hybrid_backfill': True,
-        }
-    elif tags.get('datatype') == 'contract_creation_blocks':
-
-        db_config = config_values.get_db_config(datatype=tags['datatype'])
-        if db_config is None:
-            raise Exception('db_config not properly set')
-
-        return {
-            'backend': 'hybrid',
-            'hybrid_order': [
-                {'backend': 'db', 'db_config': db_config},
-                {'backend': 'rpc'},
-            ],
         }
     else:
         return {'backend': 'rpc'}

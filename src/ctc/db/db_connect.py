@@ -6,9 +6,11 @@ import toolsql
 from ctc import config
 from ctc import spec
 
+from . import db_spec
+
 
 def create_engine(
-    datatype: str,
+    datatype: db_spec.DBDatatype,
     network: spec.NetworkReference,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""
