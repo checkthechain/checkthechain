@@ -50,7 +50,7 @@ async def test_create_schema():
 
         # insert data
         with conn.begin():
-            await db.async_store_erc20s_metadatas(
+            await db.async_upsert_erc20_metadatas(
                 conn=conn,
                 metadatas=example_data,
             )
@@ -58,7 +58,7 @@ async def test_create_schema():
         # get data individually
         with conn.begin():
             for datum in example_data:
-                actual_metadata = await db.async_query_erc20_metadata(
+                actual_metadata = await db.async_select_erc20_metadata(
                     conn=conn,
                     address=datum['address'],
                 )
@@ -68,7 +68,7 @@ async def test_create_schema():
         # get data collectively
         all_addresses = [datum['address'] for datum in example_data]
         with conn.begin():
-            actual_metadatas = await db.async_query_erc20s_metadatas(
+            actual_metadatas = await db.async_select_erc20_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -91,7 +91,7 @@ async def test_create_schema():
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = await db.async_query_erc20s_metadatas(
+            actual_metadatas = await db.async_select_erc20_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -100,7 +100,7 @@ async def test_create_schema():
         # insert data again
         with conn.begin():
             for datum in example_data:
-                await db.async_store_erc20_metadata(conn=conn, **datum)
+                await db.async_upsert_erc20_metadata(conn=conn, **datum)
 
         # delete entries all at once
         with conn.begin():
@@ -111,7 +111,7 @@ async def test_create_schema():
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = await db.async_query_erc20s_metadatas(
+            actual_metadatas = await db.async_select_erc20_metadatas(
                 conn=conn,
                 addresses=all_addresses,
             )

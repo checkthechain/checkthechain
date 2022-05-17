@@ -88,12 +88,12 @@ async def test_block_timestamps_db():
         # insert data one-by-one
         with conn.begin():
             for datum in example_data:
-                await db.async_store_block_timestamp(conn=conn, **datum)
+                await db.async_upsert_block_timestamp(conn=conn, **datum)
 
         # get data individually
         with conn.begin():
             for datum in example_data:
-                timestamp = await db.async_query_block_timestamp(
+                timestamp = await db.async_select_block_timestamp(
                     conn=conn,
                     block_number=datum['block_number'],
                 )
@@ -103,7 +103,7 @@ async def test_block_timestamps_db():
         all_blocks = [datum['block_number'] for datum in example_data]
         all_timestamps = [datum['timestamp'] for datum in example_data]
         with conn.begin():
-            stored_timestamps = await db.async_query_block_timestamps(
+            stored_timestamps = await db.async_select_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
@@ -119,7 +119,7 @@ async def test_block_timestamps_db():
 
         # ensure all entries deleted
         with conn.begin():
-            stored_timestamps = await db.async_query_block_timestamps(
+            stored_timestamps = await db.async_select_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
@@ -128,7 +128,7 @@ async def test_block_timestamps_db():
         # insert data again
         with conn.begin():
             for datum in example_data:
-                await db.async_store_block_timestamp(conn=conn, **datum)
+                await db.async_upsert_block_timestamp(conn=conn, **datum)
 
         # delete entries all at once
         with conn.begin():
@@ -139,9 +139,8 @@ async def test_block_timestamps_db():
 
         # ensure all entries deleted
         with conn.begin():
-            stored_timestamps = await db.async_query_block_timestamps(
+            stored_timestamps = await db.async_select_block_timestamps(
                 conn=conn,
                 block_numbers=all_blocks,
             )
             assert set(stored_timestamps) == {None}
-

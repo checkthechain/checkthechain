@@ -48,7 +48,7 @@ async def test_create_schema():
         # insert data
         with conn.begin():
             for datum in example_data:
-                await db.async_store_contract_creation_block(
+                await db.async_upsert_contract_creation_block(
                     conn=conn, **datum
                 )
 
@@ -56,7 +56,7 @@ async def test_create_schema():
         with conn.begin():
             for datum in example_data:
                 stored_block = (
-                    await db.async_query_contract_creation_block(
+                    await db.async_select_contract_creation_block(
                         conn=conn,
                         address=datum['address'],
                     )
@@ -74,9 +74,8 @@ async def test_create_schema():
         # ensure all entries deleted
         with conn.begin():
             for datum in example_data:
-                block = await db.async_query_contract_creation_block(
+                block = await db.async_select_contract_creation_block(
                     conn=conn,
                     address=datum['address'],
                 )
                 assert block is None
-
