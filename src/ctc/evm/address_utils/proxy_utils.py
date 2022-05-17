@@ -12,19 +12,22 @@ async def async_get_proxy_address(
 ) -> spec.Address | None:
 
     # try eip897
-    eip897_address = await _async_get_eip897_implementation(
-        contract_address=contract_address,
-        provider=provider,
-    )
-    if eip897_address is not None:
-        return eip897_address
+    try:
+        eip897_address = await _async_get_eip897_implementation(
+            contract_address=contract_address,
+            provider=provider,
+        )
+        if eip897_address is not None:
+            return eip897_address
+    except spec.exceptions.rpc_exceptions.RpcException:
+        pass
 
     # try eip1967
     eip1967_address = await _async_get_eip1967_proxy_logic_address(
         contract_address=contract_address,
         provider=provider,
     )
-    if eip1967_address is not None:
+    if eip1967_address != '0x0000000000000000000000000000000000000000':
         return eip1967_address
 
     return None
