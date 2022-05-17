@@ -7,7 +7,7 @@ import toolsql
 from ctc import spec
 
 
-async def async_store_block(
+async def async_upsert_block(
     block: spec.Block,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
@@ -15,7 +15,7 @@ async def async_store_block(
     raise NotImplementedError()
 
 
-async def async_store_blocks(
+async def async_upsert_blocks(
     blocks: typing.Sequence[spec.Block],
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,

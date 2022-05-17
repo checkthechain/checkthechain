@@ -5,7 +5,7 @@ import typing
 from ctc import spec
 
 from .. import db_connect
-from .. import db_crud
+from .. import db_statements
 from .. import db_spec
 
 
@@ -20,7 +20,7 @@ async def async_query_erc20_metadata(
     if engine is None:
         return None
     with engine.connect() as conn:
-        return await db_crud.async_select_erc20_metadata(
+        return await db_statements.async_select_erc20_metadata(
             conn=conn,
             address=address,
             network=network,
@@ -38,7 +38,7 @@ async def async_query_erc20s_metadata(
     if engine is None:
         return [None] * len(addresses)
     with engine.connect() as conn:
-        return await db_crud.async_select_erc20_metadatas(
+        return await db_statements.async_select_erc20_metadatas(
             conn=conn,
             addresses=addresses,
             network=network,

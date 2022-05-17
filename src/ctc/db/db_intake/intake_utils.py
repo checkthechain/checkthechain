@@ -7,7 +7,7 @@ from ctc import rpc
 from ctc import spec
 
 from .. import db_connect
-from .. import db_crud
+from .. import db_statements
 from .. import db_management
 
 
@@ -84,6 +84,6 @@ async def _async_get_max_block_number(
     if engine is None:
         raise Exception('could not connect to database')
     with engine.begin() as conn:
-        return await db_crud.async_select_max_block_number(
+        return await db_statements.async_select_max_block_number(
             network=network, conn=conn
         )

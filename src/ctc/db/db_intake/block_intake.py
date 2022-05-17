@@ -5,7 +5,7 @@ import typing
 
 from ctc import spec
 
-from .. import db_crud
+from .. import db_statements
 from .. import db_management
 from .. import db_connect
 from . import intake_utils
@@ -54,7 +54,7 @@ async def async_intake_raw_block(
     if engine is None:
         return
     with engine.begin() as conn:
-        await db_crud.async_store_block(
+        await db_statements.async_upsert_block(
             conn=conn,
             block=block,
             network=network,
@@ -91,7 +91,7 @@ async def async_intake_block_timestamp(
     if engine is None:
         return
     with engine.begin() as conn:
-        await db_crud.async_store_block_timestamp(
+        await db_statements.async_upsert_block_timestamp(
             conn=conn,
             block_number=block_number,
             timestamp=timestamp,
@@ -126,7 +126,7 @@ async def async_intake_raw_blocks(
         if engine is None:
             return
         with engine.begin() as conn:
-            await db_crud.async_store_blocks(
+            await db_statements.async_upsert_blocks(
                 conn=conn,
                 blocks=confirmed,
                 network=network,
@@ -181,7 +181,7 @@ async def async_intake_block_timestamps(
     if engine is None:
         return
     with engine.begin() as conn:
-        await db_crud.async_store_block_timestamps(
+        await db_statements.async_upsert_block_timestamps(
             conn=conn,
             blocks=confirmed_blocks,
             block_timestamps=confirmed_block_timestamps,
@@ -211,21 +211,21 @@ async def async_intake_block_timestamps(
 #             coroutines = []
 #             for schema in active_block_schemas:
 #                 if schema == 'blocks':
-#                     coroutine = db_crud.async_store_blocks(
+#                     coroutine = db_statements.async_upsert_blocks(
 #                         conn=conn,
 #                         blocks=intake_blocks,
 #                     )
 #                     coroutines.append(coroutine)
 #                 elif schema == 'block_timestamps':
-#                     coroutine = db_crud.async_store_blocks_timestamp(
+#                     coroutine = db_statements.async_upsert_blocks_timestamp(
 #                         conn=conn,
-#                         blocks=should_store_block_timestamps,
+#                         blocks=should_upsert_block_timestamps,
 #                     )
 #                     coroutines.append(coroutine)
 #                 elif schema == 'block_gas_stats':
-#                     coroutine = db_crud.async_store_blocks_gas_stats(
+#                     coroutine = db_statements.async_upsert_blocks_gas_stats(
 #                         conn=conn,
-#                         blocks=should_store_blocks_gas_stats,
+#                         blocks=should_upsert_blocks_gas_stats,
 #                     )
 #                     coroutines.append(coroutine)
 #                 else:
@@ -236,7 +236,7 @@ async def async_intake_block_timestamps(
 # async def async_should_intake_raw_block(block, network):
 
 #     # check whether already stored
-#     db_crud.does_block_exist()
+#     db_statements.does_block_exist()
 
 
 # async def async_should_intake_blocks(blocks, provider):
@@ -285,14 +285,14 @@ async def async_intake_block_timestamps(
 #    with engine.connect() as conn:
 #        if (
 #            check_if_exists
-#            and db_crud.get_block_timestamp(
+#            and db_statements.get_block_timestamp(
 #                conn=conn, block_number=block['number']
 #            )
 #            is not None
 #        ):
 #            store = False
 #        else:
-#            max_block = db_crud.get_max_block_number(conn=conn, network=network)
+#            max_block = db_statements.get_max_block_number(conn=conn, network=network)
 #            if block['number'] <= max_block - min_confirmations:
 #                store = True
 #            else:
@@ -304,7 +304,7 @@ async def async_intake_block_timestamps(
 #    # store data in db
 #    if store:
 #        with engine.begin() as conn:
-#            db_crud.set_block_timestamp(
+#            db_statements.set_block_timestamp(
 #                conn=conn,
 #                block_number=block['number'],
 #                timestamp=block['timestamp'],
@@ -337,7 +337,7 @@ async def async_intake_block_timestamps(
 
 #    with engine.connect() as conn:
 #        max_intake_block = max(block['number'] for block in blocks)
-#        max_stored_block = db_crud.get_max_block_number(
+#        max_stored_block = db_statements.get_max_block_number(
 #            conn=conn, network=network
 #        )
 #        if max_intake_block <= max_stored_block - min_confirmations:
@@ -358,7 +358,7 @@ async def async_intake_block_timestamps(
 #            block['number']: block['timestamp'] for block in store_blocks
 #        }
 #        with engine.begin() as conn:
-#            db_crud.set_block_timestamps(
+#            db_statements.set_block_timestamps(
 #                conn=conn,
 #                block_timestamps=block_timestamps,
 #            )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from ctc import spec
 from .. import db_connect
-from .. import db_crud
+from .. import db_statements
 from .. import db_management
 from . import intake_utils
 
@@ -27,7 +27,7 @@ async def async_intake_contract_creation_block(
     )
     if engine is not None:
         with engine.begin() as conn:
-            await db_crud.async_store_contract_creation_block(
+            await db_statements.async_upsert_contract_creation_block(
                 conn=conn,
                 block_number=block,
                 address=contract_address,
@@ -50,7 +50,7 @@ async def async_intake_contract_abi(
     )
     if engine is not None:
         with engine.begin() as conn:
-            await db_crud.async_store_contract_abi(
+            await db_statements.async_upsert_contract_abi(
                 address=contract_address,
                 abi=abi,
                 includes_proxy=includes_proxy,

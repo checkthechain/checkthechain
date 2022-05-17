@@ -1,69 +1,59 @@
 from __future__ import annotations
 
-import json
-
 import toolsql
 
 from ctc import spec
 from .. import db_schemas
 
 
-async def async_store_contract_abi(
-    address: spec.Address,
-    abi: spec.ContractABI,
-    includes_proxy: bool,
+async def async_upsert_contract_creation_block(
     conn: toolsql.SAConnection,
+    address: spec.Address,
+    block_number: int,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    abi_text = json.dumps(abi)
-
     table = db_schemas.get_table_name(
-        'contract_abis', network=network
+        'contract_creation_blocks', network=network
     )
     toolsql.insert(
         conn=conn,
         table=table,
         row={
             'address': address.lower(),
-            'abi_text': abi_text,
-            'includes_proxy': includes_proxy,
+            'block_number': block_number,
         },
         upsert='do_update',
     )
 
 
-async def async_select_contract_abi(
+async def async_select_contract_creation_block(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
-) -> spec.ContractABI | None:
+) -> int | None:
 
     table = db_schemas.get_table_name(
-        'contract_abis',
+        'contract_creation_blocks',
         network=network,
     )
-    abi_text = toolsql.select(
+    return toolsql.select(
         conn=conn,
         table=table,
         row_id=address.lower(),
         return_count='one',
-        only_columns=['abi_text'],
+        only_columns=['block_number'],
         row_format='only_column',
     )
-    if abi_text is not None:
-        return json.loads(abi_text)
-    else:
-        return None
 
 
-async def async_delete_contract_abi(
+async def async_delete_contract_creation_block(
     conn: toolsql.SAConnection,
     address: spec.Address,
     network: spec.NetworkReference | None = None,
 ) -> None:
     table = db_schemas.get_table_name(
-        'contract_abis',
+        'contract_creation_blocks',
         network=network,
     )
     toolsql.delete(

@@ -8,7 +8,7 @@ from ctc import spec
 from .. import db_schemas
 
 
-async def async_store_block_timestamp(
+async def async_upsert_block_timestamp(
     conn: toolsql.SAConnection,
     block_number: int,
     timestamp: int,
@@ -24,7 +24,7 @@ async def async_store_block_timestamp(
     )
 
 
-async def async_store_block_timestamps(
+async def async_upsert_block_timestamps(
     conn: toolsql.SAConnection,
     block_timestamps: typing.Mapping[int, int] | None = None,
     blocks: typing.Sequence[spec.Block] | None = None,

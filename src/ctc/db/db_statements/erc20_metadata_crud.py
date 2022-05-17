@@ -10,7 +10,7 @@ from .. import db_spec
 from .. import db_schemas
 
 
-async def async_store_erc20_metadata(
+async def async_upsert_erc20_metadata(
     conn: toolsql.SAConnection,
     address: spec.Address,
     symbol: str | None = None,
@@ -45,13 +45,13 @@ async def async_store_erc20_metadata(
     )
 
 
-async def async_store_erc20_metadatas(
+async def async_upsert_erc20_metadatas(
     conn: toolsql.SAConnection,
     metadatas: typing.Sequence[db_spec.ERC20Metadata],
     network: spec.NetworkReference | None = None,
 ) -> None:
     coroutines = [
-        async_store_erc20_metadata(conn=conn, network=network, **metadata)
+        async_upsert_erc20_metadata(conn=conn, network=network, **metadata)
         for metadata in metadatas
     ]
     await asyncio.gather(*coroutines)
