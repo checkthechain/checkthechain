@@ -26,5 +26,6 @@ def calc_out_given_in(
     foo = pow(y, weight_ratio)
     bar = 1 - foo
     token_amount_out = token_balance_out * bar
+    if not spec.is_number(token_amount_out):
+        raise Exception('cannot compute result')
     return token_amount_out
-

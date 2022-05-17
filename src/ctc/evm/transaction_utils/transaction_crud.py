@@ -23,4 +23,3 @@ async def async_get_transactions(
         for transaction_hash in transaction_hashes
     ]
     return await asyncio.gather(*coroutines)
-

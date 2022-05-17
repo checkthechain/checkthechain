@@ -18,9 +18,9 @@ async def async_decompile_function_abis(
         for selector in function_selectors
     ]
     abi_lists = await asyncio.gather(*coroutines)
-    abis = [abi for abi_list in abi_lists for abi in abi_list]
+    abis: list[fourbyte_utils.Entry] = [abi for abi_list in abi_lists for abi in abi_list]
 
     if sort is not None:
-        abis = sorted(abis, key=lambda item: item[sort])
+        abis = sorted(abis, key=lambda item: item[sort])  # type: ignore
 
     return abis

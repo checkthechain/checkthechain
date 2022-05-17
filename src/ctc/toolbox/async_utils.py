@@ -27,7 +27,8 @@ async def gather_coroutines(
     *coroutines: typing.Coroutine[typing.Any, typing.Any, R]
 ) -> list[R]:
     """gather without erasing type information"""
-    return await asyncio.gather(*coroutines)
+    results = await asyncio.gather(*coroutines)
+    return typing.cast(list[R], results)
 
 
 async def gather_dict(
@@ -196,7 +197,8 @@ async def async_read_csv_dask(path: str) -> spec.DataFrame:
 
     client = await dask.distributed.Client(asynchronous=True)
     g = dd.read_csv(path, dtype='object')
-    return await client.compute(g)
+    result = await client.compute(g)
+    return typing.cast(spec.DataFrame, result)
 
 
 async def async_read_csv_aiofiles(path: str) -> spec.DataFrame:

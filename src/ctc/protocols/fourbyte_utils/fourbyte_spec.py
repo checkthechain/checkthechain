@@ -39,4 +39,3 @@ def get_default_path(datatype: str) -> str:
         '4byte',
         datatype + '.json',
     )
-

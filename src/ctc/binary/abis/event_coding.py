@@ -142,7 +142,7 @@ def decode_event_unindexed_data(
 
     # package outputs
     if not use_names:
-        return decoded
+        return list(decoded)
     else:
         if unindexed_names is None:
             if event_abi is None:

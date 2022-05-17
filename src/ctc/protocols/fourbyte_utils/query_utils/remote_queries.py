@@ -42,7 +42,7 @@ async def async_query_function_signature_remote(
             if id is not None:
                 return [result]
             else:
-                return result['results']
+                return result['results']  # type: ignore
 
 
 async def async_query_event_signature_remote(
@@ -81,5 +81,4 @@ async def async_query_event_signature_remote(
             if id is not None:
                 return [result]
             else:
-                return result['results']
-
+                return result['results']  # type: ignore

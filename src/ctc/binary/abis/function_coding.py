@@ -158,7 +158,7 @@ def decode_function_parameters(
     encoded_parameters = binary.convert(encoded_parameters, 'binary')
     parameters = binary.decode_types(encoded_parameters, parameter_types_str)
 
-    return parameters
+    return list(parameters)
 
 
 def decode_function_named_parameters(
@@ -235,4 +235,3 @@ def decode_function_output(
             decoded_output = dict(zip(names, decoded_output))
 
     return decoded_output
-

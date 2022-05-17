@@ -79,22 +79,46 @@ def save_signatures(
 
 def load_function_signatures(
     path: typing.Optional[str] = None,
+    validate: bool = False,
 ) -> list[fourbyte_spec.Entry]:
 
     if path is None:
         path = fourbyte_spec.get_default_path('function_signatures')
 
-    return store_utils.load_file_data(path=path)
+    result = store_utils.load_file_data(path=path)
+
+    if validate:
+        if not isinstance(result, list):
+            raise Exception('badly formed file')
+        for item in result:
+            if not isinstance(item, dict) or set(item.keys()) != set(
+                fourbyte_spec.Entry.__annotations__.keys()
+            ):
+                raise Exception('badly formed file')
+
+    return result  # type: ignore
 
 
 def load_event_signatures(
     path: typing.Optional[str] = None,
+    validate: bool = False,
 ) -> list[fourbyte_spec.Entry]:
 
     if path is None:
         path = fourbyte_spec.get_default_path('event_signatures')
 
-    return store_utils.load_file_data(path=path)
+    result = store_utils.load_file_data(path=path)
+
+    if validate:
+        if not isinstance(result, list):
+            raise Exception('badly formed file')
+        for item in result:
+            if not isinstance(item, dict) or set(item.keys()) != set(
+                fourbyte_spec.Entry.__annotations__.keys()
+            ):
+                raise Exception('badly formed file')
+
+    return result  # type: ignore
 
 
 @toolcache.cache(cachetype='memory')
@@ -115,4 +139,3 @@ def load_event_signatures_by_hex() -> dict[str, list[fourbyte_spec.Entry]]:
         signatures_by_hex.setdefault(signature['hex_signature'], [])
         signatures_by_hex[signature['hex_signature']].append(signature)
     return signatures_by_hex
-

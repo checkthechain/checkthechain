@@ -42,7 +42,11 @@ def create_datetime_column(
         if timestamps is None:
             raise Exception('must specify timestamps')
         timestamp_column = create_timestamp_column(df, timestamps)
-    return pd.to_datetime(timestamp_column, unit='s')
+
+    result = pd.to_datetime(timestamp_column, unit='s')
+    if not isinstance(result, pd.Series):
+        raise Exception('bad inputs given')
+    return result
 
 
 def create_date_column(
@@ -55,7 +59,11 @@ def create_date_column(
         if timestamps is None:
             raise Exception('must specify timestamps')
         datetime = create_timestamp_column(df, timestamps)
-    return datetime.dt.date
+
+    result = datetime.dt.date
+    if not isinstance(result, pd.Series):
+        raise Exception('bad inputs given')
+    return result
 
 
 def create_week_column(
@@ -68,7 +76,11 @@ def create_week_column(
         datetime = create_timestamp_column(df, timestamps)
     year = datetime.dt.isocalendar().year.astype(str)
     week = datetime.dt.isocalendar().week.astype(str)
-    return year + '-' + week
+
+    result = year + '-' + week
+    if not isinstance(result, pd.Series):
+        raise Exception('bad inputs given')
+    return result
 
 
 def add_missing_series_dates(
