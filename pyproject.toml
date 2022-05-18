@@ -56,7 +56,7 @@ dependencies = [
     'toolconf>=0.1.0',
     'toolsql>=0.3.0',
     'toolstr>=0.2.2',
-    'tooltable>=0.1.0',
+    'tooltable>=0.1.1',
     'tooltime>=0.1.4',
     #
     # EVM dependencies
