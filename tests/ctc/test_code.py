@@ -27,7 +27,7 @@ def test_code_imports_future_annotations():
         print()
         print(len(missing), 'paths with missing future annotation import:')
         print()
-        print(' '.join(relpaths))
+        print('- ' + '\n- '.join(relpaths))
     assert len(missing) == 0
 
 
