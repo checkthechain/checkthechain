@@ -43,7 +43,7 @@ dependencies = [
     'numpy>=1.19.0',
     'pandas>=1.2.0',
     #
-    # data dependencies
+    # io dependencies
     'aiohttp>=3.7.4',
     'aiofiles>=0.8.0',
     'loguru>=0.5.3',
@@ -52,8 +52,8 @@ dependencies = [
     # tool suite
     'toolcache>=0.4.0',
     'toolcli>=0.5.0',
-    'toolconf>=0.0.4',
-    'toolsql>=0.2.4',
+    'toolconf>=0.1.0',
+    'toolsql>=0.3.0',
     'toolstr>=0.2.2',
     'tooltable>=0.1.0',
     'tooltime>=0.1.4',
@@ -72,7 +72,7 @@ test = [
     'pytest>=6',
     'tox-asdf==0.1.0',
     'tox==3.8.0',
-    'typing-extensions>=4.0.0',
+    'typing-extensions>=4.2.0',
     'virtualenv>=20.6.0',
 ]
 performance = [
