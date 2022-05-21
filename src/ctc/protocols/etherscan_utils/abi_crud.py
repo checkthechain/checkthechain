@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing_extensions import TypedDict
 
 import asyncio
@@ -18,6 +19,7 @@ class EtherscanRatelimit(TypedDict):
     requests_per_second: int | float
     last_request_time: int | float
     lock: asyncio.Lock | None
+    recent_results: typing.MutableMapping[spec.Address, typing.Any]
 
 
 _etherscan_ratelimit: EtherscanRatelimit = {

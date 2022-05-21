@@ -4,6 +4,14 @@ import toolcli
 import toolstr
 import typing
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class NumberFormat(TypedDict):
+        order_of_magnitude: bool
+        prefix: str
+
+
 from ctc import evm
 from ctc import directory
 from ctc import rpc
@@ -39,7 +47,7 @@ async def async_pcv_command(block: typing.Optional[spec.BlockNumberReference]) -
     # output = 'list'
     output = 'table'
 
-    format_kwargs = {'order_of_magnitude': True, 'prefix': '$'}
+    format_kwargs: NumberFormat = {'order_of_magnitude': True, 'prefix': '$'}
     if output == 'list':
         toolstr.print_text_box('Fei PCV Summary')
         print('- total PCV:', toolstr.format(total_pcv, **format_kwargs))

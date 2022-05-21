@@ -155,7 +155,7 @@ async def async_chart_command(
             **volume_render_grid,
         )
         volume_raster = toolstr.raster_bar_chart(
-            values=ohlc['volume'],
+            values=ohlc['volume'],  # type: ignore
             grid=volume_sample_grid,
             bar_width=1,
             bar_gap=3,

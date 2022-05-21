@@ -7,27 +7,27 @@ from .. import db_spec
 
 
 class ActiveSchemas(TypedDict, total=False):
-    blocks: bool
-    block_timestamps: bool
     block_gas_stats: bool
+    block_timestamps: bool
+    blocks: bool
+    contract_abis: bool
     contract_creation_blocks: bool
     erc20_metadata: bool
-    erc20_balances: bool
-    erc20_total_supplies: bool
-    events: bool
+    erc20_state: bool
+    # events: bool
 
 
 def get_active_schemas() -> typing.Mapping[db_spec.DBDatatype, bool]:
     """return specification of which subset of incoming data to store in db"""
     return {
-        'blocks': False,
-        'block_timestamps': True,
         'block_gas_stats': False,
-        'contract_creation_blocks': True,
+        'block_timestamps': True,
+        'blocks': False,
         'contract_abis': True,
+        'contract_creation_blocks': True,
         'erc20_metadata': True,
         'erc20_state': False,
-        'events': False,
+        # 'events': False,
     }
 
 
