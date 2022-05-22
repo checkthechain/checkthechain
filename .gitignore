@@ -1,4 +1,5 @@
 TODO.md
+CHANGELOG.md
 *.pyc
 __pycache__/*
 *.egg-info
