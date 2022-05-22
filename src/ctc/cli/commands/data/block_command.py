@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -66,6 +65,3 @@ async def async_block_command(
         rich.print_json(json.dumps(block_data))
     else:
         await evm.async_print_block_summary(block=block_number)
-
-    await rpc.async_close_http_session()
-

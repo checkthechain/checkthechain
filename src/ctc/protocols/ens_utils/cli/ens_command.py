@@ -6,7 +6,6 @@ import tooltime
 
 from ctc import binary
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 from ctc.protocols import ens_utils
@@ -65,6 +64,3 @@ async def ens_command(name_or_address: str, block: spec.BlockNumberReference) ->
             print('-', key + ':', value)
     else:
         print('- no text records')
-
-    await rpc.async_close_http_session()
-

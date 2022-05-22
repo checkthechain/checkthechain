@@ -14,7 +14,6 @@ if typing.TYPE_CHECKING:
 
 from ctc import evm
 from ctc import directory
-from ctc import rpc
 from ctc import spec
 from ctc.protocols import fei_utils
 
@@ -79,5 +78,3 @@ async def async_pcv_command(
             format=format_kwargs,
             column_format={'CR': {'percentage': True}},
         )
-
-    await rpc.async_close_http_session()

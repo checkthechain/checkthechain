@@ -7,7 +7,6 @@ import toolcli
 import toolstr
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 from ctc.cli import cli_utils
 
@@ -162,7 +161,6 @@ async def async_balances_command(
                 print(
                     'this is an EOA, see `ctc erc20 balances -h` for proper syntax'
                 )
-                await rpc.async_close_http_session()
                 return
 
             transfers = await evm.async_get_erc20_transfers(
@@ -225,6 +223,3 @@ async def async_balances_command(
         top=output_top,
         indent=indent,
     )
-
-    await rpc.async_close_http_session()
-

@@ -124,7 +124,3 @@ async def async_block_command(
     if 'number' in df:
         df = df.set_index('number')
     cli_utils.output_data(df, output=output, overwrite=overwrite)
-
-    # cleanup
-    await rpc.async_close_http_session()
-

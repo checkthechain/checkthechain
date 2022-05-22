@@ -5,7 +5,6 @@ import typing
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 from ctc.cli import cli_utils
 
@@ -109,6 +108,3 @@ async def async_events_command(
             }
             events = events.rename(columns=new_column_names)
         cli_utils.output_data(events, output=output, overwrite=overwrite)
-
-    await rpc.async_close_http_session()
-

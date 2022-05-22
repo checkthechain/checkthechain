@@ -5,7 +5,6 @@ import os
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 
@@ -56,5 +55,3 @@ async def async_address_command(
         raw=raw,
         provider={'network': network},
     )
-    await rpc.async_close_http_session()
-

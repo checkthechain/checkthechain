@@ -4,7 +4,6 @@ import toolcli
 import toolstr
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 
@@ -43,5 +42,3 @@ async def address_transactions_command(address: spec.Address) -> None:
         headers=headers,
         compact=True,
     )
-
-    await rpc.async_close_http_session()

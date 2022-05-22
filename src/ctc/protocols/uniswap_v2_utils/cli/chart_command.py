@@ -11,7 +11,6 @@ import toolstr
 import tooltime
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 from ctc.toolbox.defi_utils import ohlc_utils
 from ctc.protocols import uniswap_v2_utils
@@ -198,6 +197,3 @@ async def async_chart_command(
 
     # print x axis
     console.print(x_axis)
-
-    await rpc.async_close_http_session()
-

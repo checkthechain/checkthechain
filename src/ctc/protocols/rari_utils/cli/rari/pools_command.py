@@ -4,7 +4,6 @@ import toolcli
 import toolstr
 import tooltime
 
-from ctc import rpc
 from ctc.protocols import rari_utils
 
 
@@ -54,5 +53,3 @@ async def pools_command(verbose: bool) -> None:
         rows.append(row)
     print(len(rows))
     toolstr.print_table(rows, headers=headers)
-
-    await rpc.async_close_http_session()

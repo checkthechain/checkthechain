@@ -45,6 +45,3 @@ async def async_decompile_command(address_or_bytecode: str) -> None:
 
     for entry in decompiled_function_abis:
         print(entry['hex_signature'], entry['text_signature'])
-
-    await rpc.async_close_http_session()
-

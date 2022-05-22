@@ -14,7 +14,6 @@ import pandas as pd
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 from ctc.cli import cli_utils
 
@@ -115,6 +114,3 @@ async def async_balances_command(
     cli_utils.output_data(
         output_data, output, overwrite, indent=indent, raw=raw
     )
-
-    await rpc.async_close_http_session()
-

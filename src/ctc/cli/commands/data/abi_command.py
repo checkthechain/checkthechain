@@ -6,7 +6,6 @@ import os
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 
@@ -103,6 +102,3 @@ async def async_abi_command(
             contract_abi,
             max_width=os.get_terminal_size().columns,
         )
-
-    await rpc.async_close_http_session()
-

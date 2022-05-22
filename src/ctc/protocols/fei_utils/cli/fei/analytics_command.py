@@ -7,7 +7,6 @@ import time
 import toolcli
 import toolstr  # type: ignore
 
-from ctc import rpc
 from ctc.protocols import fei_utils
 
 
@@ -67,7 +66,3 @@ async def async_payload_command(
     # save payload
     with open(path, 'w') as f:
         json.dump(payload, f)
-
-    provider = rpc.get_provider()
-    await rpc.async_close_http_session(provider=provider)
-

@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 
 from ctc import binary
-from ctc import rpc
 from ctc import spec
 from ctc.protocols import ens_utils
 
@@ -24,5 +23,3 @@ async def async_resolve_command(name: str, block: spec.BlockNumberReference) -> 
         block = binary.standardize_block_number(block)
     address = await ens_utils.async_resolve_name(name, block=block)
     print(address)
-    await rpc.async_close_http_session()
-

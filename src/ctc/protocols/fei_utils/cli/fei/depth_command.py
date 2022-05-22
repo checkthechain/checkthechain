@@ -6,7 +6,6 @@ import typing
 import toolcli
 import toolstr
 
-from ctc import rpc
 from ctc.protocols import fei_utils
 
 
@@ -76,5 +75,3 @@ async def async_depth_command(
                 'trailing_zeros': True,
             },
         )
-
-    await rpc.async_close_http_session()

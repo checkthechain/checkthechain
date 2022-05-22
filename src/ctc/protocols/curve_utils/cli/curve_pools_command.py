@@ -4,7 +4,6 @@ import asyncio
 
 import toolcli
 
-from ctc import rpc
 from ctc.protocols import curve_utils
 
 
@@ -58,5 +57,3 @@ async def async_curve_pools_command(verbose: bool) -> None:
                 continue
 
         print(item['address'] + '    ' + ', '.join(item['symbols']))
-
-    await rpc.async_close_http_session()

@@ -4,7 +4,6 @@ import toolcli
 
 from ctc.protocols import ens_utils
 from ctc import binary
-from ctc import rpc
 from ctc import spec
 
 
@@ -26,5 +25,3 @@ async def async_exists_command(name: str, block: spec.BlockNumberReference) -> N
     exists = await ens_utils.async_record_exists(name, block=block)
 
     print(exists)
-    await rpc.async_close_http_session()
-

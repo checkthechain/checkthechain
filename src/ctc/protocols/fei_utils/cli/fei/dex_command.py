@@ -7,7 +7,6 @@ import toolstr
 
 from ctc import evm
 from ctc import spec
-from ctc import rpc
 from ctc.protocols.fei_utils import fei_dexes
 
 
@@ -38,7 +37,6 @@ async def async_dexes_command(block: spec.BlockNumberReference | None) -> None:
         block = await block_task
 
     print_dex_table(metrics, block=block)
-    await rpc.async_close_http_session()
 
 
 def print_dex_table(

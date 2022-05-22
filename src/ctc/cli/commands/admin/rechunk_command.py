@@ -5,7 +5,6 @@ import asyncio
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 
@@ -143,6 +142,3 @@ async def run(
         raise Exception(
             'usage either `ctc rechunk --all` or `ctc rechunk contract_address event_hash`'
         )
-
-    await rpc.async_close_http_session()
-

@@ -6,7 +6,6 @@ import toolcli
 
 from ctc.protocols import uniswap_v2_utils
 from ctc.cli import cli_utils
-from ctc import rpc
 from ctc import spec
 
 
@@ -52,6 +51,3 @@ async def async_burns_command(
         end_block=end_block,
     )
     cli_utils.output_data(burns, output, overwrite)
-
-    await rpc.async_close_http_session()
-

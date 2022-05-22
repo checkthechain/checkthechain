@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import typing
-
 import toolcli
 
-from ctc import rpc
 from ctc import spec
 from ctc.protocols import fei_utils
 
@@ -20,8 +17,6 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_pcv_deposits_command(
-    block: typing.Optional[spec.BlockNumberReference],
+    block: spec.BlockNumberReference | None,
 ) -> None:
     await fei_utils.async_print_pcv_deposits(block=block)
-    await rpc.async_close_http_session()
-

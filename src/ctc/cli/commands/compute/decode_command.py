@@ -7,7 +7,6 @@ import toolstr
 
 from ctc import binary
 from ctc import evm
-from ctc import rpc
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -129,5 +128,3 @@ async def async_decode_command(
                     str(input_names[p]) + ':',
                     parameter,
                 )
-
-    await rpc.async_close_http_session()

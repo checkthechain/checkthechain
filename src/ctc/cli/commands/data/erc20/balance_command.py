@@ -4,7 +4,6 @@ import toolcli
 import toolstr
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 
@@ -46,5 +45,3 @@ async def async_balance_command(
         print(balance)
     else:
         print(toolstr.format(balance))
-    await rpc.async_close_http_session()
-

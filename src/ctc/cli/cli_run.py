@@ -8,6 +8,7 @@ import toolcli
 import ctc
 import ctc.config
 from .plugins import toolsql_plugin
+from . import cli_utils
 
 
 command_index_by_category: dict[str, toolcli.CommandIndex] = {
@@ -16,9 +17,6 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('config',): 'ctc.cli.commands.admin.config_command',
         ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
         ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
-        # (
-        #     'download-proxy-abi',
-        # ): 'ctc.cli.commands.admin.download_proxy_abi_command',
         ('log',): 'ctc.cli.commands.admin.log_command',
         ('setup',): 'ctc.cli.commands.admin.setup_command',
         ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
@@ -219,6 +217,7 @@ def run_cli(
         'cd_dir_getter': cd_dir_getter,
         'help_url_getter': help_url_getter,
         'help_subcommand_categories': help_subcommand_categories,
+        'async_context_manager': cli_utils.AsyncContextManager,
         #
         'style_theme': {
             'title': 'bold #ce93f9',

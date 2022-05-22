@@ -55,5 +55,4 @@
 #     from ctc.rpc.rpc_backends import rpc_http_async
 
 #     provider = rpc.get_provider()
-#     await rpc_http_async.async_close_http_session(provider=provider)
 

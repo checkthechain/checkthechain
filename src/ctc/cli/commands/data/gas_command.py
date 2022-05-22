@@ -156,6 +156,3 @@ async def async_gas_command(
     final_df = final_df.set_index('blocks')
 
     cli_utils.output_data(final_df, output, overwrite)
-
-    await rpc.async_close_http_session()
-

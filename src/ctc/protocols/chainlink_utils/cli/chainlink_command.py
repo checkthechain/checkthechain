@@ -137,6 +137,3 @@ async def async_chainlink_command(
 
         print()
         cli_utils.output_data(df, output=output, overwrite=overwrite, raw=True)
-
-    await rpc.async_close_http_session()
-

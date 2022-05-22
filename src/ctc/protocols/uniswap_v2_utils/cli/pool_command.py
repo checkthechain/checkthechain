@@ -1,9 +1,3 @@
-"""
-
-information:
-- pool metadata
-- pool state
-"""
 from __future__ import annotations
 
 import typing
@@ -13,7 +7,6 @@ import toolstr
 
 from ctc.protocols import uniswap_v2_utils
 from ctc.toolbox.amm_utils import cpmm
-from ctc import rpc
 from ctc import spec
 
 
@@ -65,6 +58,3 @@ async def async_pool_command(
         depths=depths_float,
         **pool_state,
     )
-
-    await rpc.async_close_http_session()
-

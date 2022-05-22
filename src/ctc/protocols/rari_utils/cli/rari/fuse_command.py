@@ -68,20 +68,10 @@ async def summarize_fuse_pool(
         comptroller=comptroller,
     )
 
-    from ctc.rpc.rpc_backends import rpc_http_async
-
-    provider = rpc.get_provider()
-    await rpc_http_async.async_close_http_session(provider=provider)
-
 
 async def summarize_all_fuse_pools(block: spec.BlockNumberReference) -> None:
 
     await rari_utils.async_print_all_pool_summary(block=block)
-
-    from ctc.rpc.rpc_backends import rpc_http_async
-
-    provider = rpc.get_provider()
-    await rpc_http_async.async_close_http_session(provider=provider)
 
 
 async def summarize_fuse_token(
@@ -91,9 +81,3 @@ async def summarize_fuse_token(
     if token == 'ETH':
         token = '0x0000000000000000000000000000000000000000'
     await rari_utils.async_print_fuse_token_summary(token=token, block=block)
-
-    from ctc.rpc.rpc_backends import rpc_http_async
-
-    provider = rpc.get_provider()
-    await rpc_http_async.async_close_http_session(provider=provider)
-

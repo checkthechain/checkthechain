@@ -5,7 +5,6 @@ import typing
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 from ctc.cli import cli_utils
 
 
@@ -59,5 +58,3 @@ async def async_transfers_command(
         end_block=end_block,
     )
     cli_utils.output_data(transfers, output=output, overwrite=overwrite)
-    await rpc.async_close_http_session()
-

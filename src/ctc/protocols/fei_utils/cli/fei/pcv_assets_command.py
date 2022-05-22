@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import rpc
 from ctc.protocols import fei_utils
 
 
@@ -18,5 +17,3 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_pcv_assets_command(block: str) -> None:
     await fei_utils.async_print_pcv_assets(block=block)
-    await rpc.async_close_http_session()
-

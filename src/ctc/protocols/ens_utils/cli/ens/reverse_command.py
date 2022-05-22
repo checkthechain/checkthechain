@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 
 from ctc import binary
-from ctc import rpc
 from ctc import spec
 from ctc.protocols import ens_utils
 
@@ -27,5 +26,3 @@ async def async_reverse_command(
         block = binary.standardize_block_number(block)
     name = await ens_utils.async_reverse_lookup(address, block=block)
     print(name)
-    await rpc.async_close_http_session()
-

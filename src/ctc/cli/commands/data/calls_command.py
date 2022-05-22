@@ -150,6 +150,3 @@ async def async_calls_command(
         raise Exception('must specify either --blocks or --to-addresses')
 
     cli_utils.output_data(data=df, output=output, overwrite=overwrite)
-
-    await rpc.async_close_http_session()
-

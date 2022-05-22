@@ -66,8 +66,6 @@ async def psms_command(
     redemptions = await redeems_task
     fei_psms.print_fei_psm_redemptions(redemptions, limit=limit)
 
-    await rpc.async_close_http_session()
-
 
 async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
     psms = fei_psms.get_psms()

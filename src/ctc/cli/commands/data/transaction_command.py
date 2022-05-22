@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 
 from ctc import evm
-from ctc import rpc
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -28,6 +27,3 @@ async def async_transaction_command(transaction: str, sort: str) -> None:
         )
     except Exception:
         pass
-
-    await rpc.async_close_http_session()
-

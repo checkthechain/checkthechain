@@ -88,6 +88,3 @@ async def async_call_command(
         block_number=block_number,
     )
     print(result)
-
-    await rpc.async_close_http_session()
-
