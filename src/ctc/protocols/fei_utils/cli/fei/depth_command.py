@@ -5,7 +5,6 @@ import typing
 
 import toolcli
 import toolstr
-import tooltable # type: ignore
 
 from ctc import rpc
 from ctc.protocols import fei_utils
@@ -56,9 +55,7 @@ async def async_depth_command(
             row = [pool]
             for price in prices_float:
                 value = pool_price_depth[pool][price] / 1e18
-                row.append(
-                    toolstr.format(value, order_of_magnitude=True, prefix='$')
-                )
+                row.append(value)
             rows.append(row)
 
         headers = ['pool'] + ['to $' + str(price) for price in prices_float]
@@ -69,7 +66,15 @@ async def async_depth_command(
         )
         print('(this is different from the realized price for these trades)')
         print()
-        tooltable.print_table(rows, headers=headers)
+        toolstr.print_table(
+            rows,
+            headers=headers,
+            format={
+                'order_of_magnitude': True,
+                'prefix': '$',
+                'decimals': 2,
+                'trailing_zeros': True,
+            },
+        )
 
     await rpc.async_close_http_session()
-

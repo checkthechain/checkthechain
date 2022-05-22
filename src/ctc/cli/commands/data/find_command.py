@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 import toolcli
-import tooltable  # type: ignore
+import toolstr
 
 from ctc import directory
 
@@ -31,7 +31,6 @@ async def async_find_command(query: str) -> None:
         for key in headers:
             row.append(result[key])
         rows = [row]
-        tooltable.print_table(rows=rows, headers=headers)
+        toolstr.print_table(rows=rows, headers=headers)
     except LookupError:
         print('could not find anything')
-

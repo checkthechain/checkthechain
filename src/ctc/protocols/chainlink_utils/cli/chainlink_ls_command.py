@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import toolcli
-import tooltable  # type: ignore
+import toolstr
 
 from ctc import directory
 
@@ -33,7 +33,6 @@ def chainlink_ls_command(query: str) -> None:
             feed['address'][:42],
         ]
         rows.append(row)
-    headers = ['name', 'deviation', 'heartbeat', 'address']
+    headers = ['name', 'delta', 'rate', 'address']
     print(len(rows))
-    tooltable.print_table(rows, headers=headers)
-
+    toolstr.print_table(rows, headers=headers)

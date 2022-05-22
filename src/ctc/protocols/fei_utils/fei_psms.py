@@ -6,7 +6,6 @@ import typing
 
 import pandas as pd
 import tooltime
-import tooltable  # type: ignore
 import toolstr
 
 from ctc import evm
@@ -153,14 +152,19 @@ def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
             str(block),
             age_str,
             mint['token'],
-            toolstr.format(mint['arg__amountFeiOut'], order_of_magnitude=True),
-            toolstr.format(mint['cummulative'], order_of_magnitude=True),
+            mint['arg__amountFeiOut'],
+            mint['cummulative'],
         ]
         rows.append(row)
 
     toolstr.print_text_box('Recent Mints')
     print()
-    tooltable.print_table(rows, headers=headers)
+    format = {
+        'order_of_magnitude': True,
+        'trailing_zeros': True,
+        'oom_blank': ' ',
+    }
+    toolstr.print_table(rows, headers=headers, format=format)
 
 
 def print_fei_psm_redemptions(
@@ -191,11 +195,16 @@ def print_fei_psm_redemptions(
             str(block),
             age_str,
             redeem['token'],
-            toolstr.format(redeem['arg__amountFeiIn'], order_of_magnitude=True),
-            toolstr.format(redeem['cummulative'], order_of_magnitude=True),
+            redeem['arg__amountFeiIn'],
+            redeem['cummulative'],
         ]
         rows.append(row)
 
     toolstr.print_text_box('Recent Redeems')
     print()
-    tooltable.print_table(rows, headers=headers)
+    format = {
+        'order_of_magnitude': True,
+        'trailing_zeros': True,
+        'oom_blank': ' ',
+    }
+    toolstr.print_table(rows, headers=headers, format=format)

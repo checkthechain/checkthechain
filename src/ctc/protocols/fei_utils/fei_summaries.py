@@ -4,7 +4,6 @@ import asyncio
 import typing
 
 import toolstr
-import tooltable  # type: ignore
 
 from ctc import evm
 from ctc import spec
@@ -110,7 +109,7 @@ async def async_print_pcv_assets(
     )
     print('total', total_usd)
     print()
-    tooltable.print_table(rows, headers=headers)
+    toolstr.print_table(rows, headers=headers)
 
 
 async def async_print_pcv_deposits(
@@ -215,7 +214,7 @@ async def async_print_pcv_deposits(
         'name',
         'address',
     ]
-    tooltable.print_table(rows, headers=headers)
+    toolstr.print_table(rows, headers=headers)
     print()
 
     toolstr.print_text_box('FEI Deployments')
@@ -243,5 +242,4 @@ async def async_print_pcv_deposits(
         ]
         rows.append(row)
     headers = ['asset', 'balance', 'name', 'address']
-    tooltable.print_table(rows, headers=headers)
-
+    toolstr.print_table(rows, headers=headers)

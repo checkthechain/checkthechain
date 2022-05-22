@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import time
 
-import tooltable  # type: ignore
 import tooltime
 import toolstr
 
@@ -52,7 +51,7 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
 
     updates = []
     for i, row in data.iterrows():
-        timestamp = row['timestamp']
+        timestamp = int(row['timestamp'])
         age = tooltime.timelength_to_phrase(time.time() - timestamp)
         age = ' '.join(age.split(' ')[:2]).strip(',')
         update = [
@@ -81,6 +80,10 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
     toolstr.print_header('Recent Updates')
     print()
     headers = ['value', 'age', 'block', 'timestamp', 'time']
-    tooltable.print_table(
-        updates[-n_recent:][::-1], headers=headers, indent='    '
+
+    toolstr.print_table(
+        updates[-n_recent:][::-1],
+        headers=headers,
+        indent='    ',
+        column_format={'value': {'decimals': 5}},
     )

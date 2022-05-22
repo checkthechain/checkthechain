@@ -6,7 +6,6 @@ import typing
 
 import toolstr
 import tooltime
-import tooltable  # type: ignore
 
 from ctc.protocols import chainlink_utils
 from ctc import binary
@@ -85,7 +84,7 @@ def print_fuse_pool_summary(
     print('- TVB:', toolstr.format(tvb, prefix='$', order_of_magnitude=True))
     print('- block:', block_number)
     print()
-    tooltable.print_table(rows, headers=headers.values())
+    toolstr.print_table(rows, headers=headers.values())
 
 
 async def async_print_all_pool_summary(
@@ -158,7 +157,7 @@ async def async_print_all_pool_summary(
     print('- block:', block)
     # print('- time:', timestamp)
     print()
-    tooltable.print_table(rows, headers=['#', 'pool', 'TVL', 'TVB'])
+    toolstr.print_table(rows, headers=['#', 'pool', 'TVL', 'TVB'])
 
 
 async def _async_get_all_pools_stats(
@@ -396,5 +395,4 @@ async def async_print_fuse_token_summary(
     print('- block:', block_data['number'])
     # print('- time:', timestamp)
     print()
-    tooltable.print_table(rows, headers=headers)
-
+    toolstr.print_table(rows, headers=headers)

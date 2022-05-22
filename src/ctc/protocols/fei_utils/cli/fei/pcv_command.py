@@ -29,7 +29,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_pcv_command(block: typing.Optional[spec.BlockNumberReference]) -> None:
+async def async_pcv_command(
+    block: typing.Optional[spec.BlockNumberReference],
+) -> None:
 
     if block is not None:
         block = await evm.async_block_number_to_int(block)
@@ -47,7 +49,12 @@ async def async_pcv_command(block: typing.Optional[spec.BlockNumberReference]) -
     # output = 'list'
     output = 'table'
 
-    format_kwargs: NumberFormat = {'order_of_magnitude': True, 'prefix': '$'}
+    format_kwargs: NumberFormat = {
+        'order_of_magnitude': True,
+        'prefix': '$',
+        'oom_blank': ' ',
+        'trailing_zeros': True,
+    }
     if output == 'list':
         toolstr.print_text_box('Fei PCV Summary')
         print('- total PCV:', toolstr.format(total_pcv, **format_kwargs))
@@ -57,18 +64,20 @@ async def async_pcv_command(block: typing.Optional[spec.BlockNumberReference]) -
         print('- PCV equity:', toolstr.format(protocol_equity, **format_kwargs))
         print('- CR:', toolstr.format(cr, percentage=True))
     elif output == 'table':
-        import tooltable  # type: ignore
-
         rows = [
-            ['total PCV', toolstr.format(total_pcv, **format_kwargs)],
-            ['total FEI', toolstr.format(total_fei, **format_kwargs)],
-            ['user FEI', toolstr.format(user_fei, **format_kwargs)],
-            ['protocol FEI', toolstr.format(protocol_fei, **format_kwargs)],
-            ['PCV equity', toolstr.format(protocol_equity, **format_kwargs)],
-            ['CR', toolstr.format(cr, percentage=True)],
+            ['total PCV', total_pcv],
+            ['total FEI', total_fei],
+            ['user FEI', user_fei],
+            ['protocol FEI', protocol_fei],
+            ['PCV equity', protocol_equity],
+            ['CR', cr],
         ]
         toolstr.print_text_box('Fei PCV Summary')
-        tooltable.print_table(rows, headers=['', 'amount'])
+        toolstr.print_table(
+            rows,
+            headers=['', 'amount'],
+            format=format_kwargs,
+            column_format={'CR': {'percentage': True}},
+        )
 
     await rpc.async_close_http_session()
-

@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 
 import toolcli
-import tooltable  # type: ignore
 import toolstr
 
 from ctc import evm
@@ -62,9 +61,9 @@ def print_dex_table(
 
         row = [
             pool_name,
-            toolstr.format(tvl, order_of_magnitude=True, prefix='$'),
-            toolstr.format(fei_balance, order_of_magnitude=True),
-            toolstr.format(imbalance, order_of_magnitude=True),
+            tvl,
+            fei_balance,
+            imbalance,
         ]
 
         rows.append(row)
@@ -74,15 +73,19 @@ def print_dex_table(
 
     row = [
         'TOTAL',
-        toolstr.format(
-            metrics['total_tvl'][-1], order_of_magnitude=True, prefix='$'
-        ),
-        toolstr.format(metrics['total_FEI'][-1], order_of_magnitude=True),
-        toolstr.format(metrics['total_imbalance'][-1], order_of_magnitude=True),
+        metrics['total_tvl'][-1],
+        metrics['total_FEI'][-1],
+        metrics['total_imbalance'][-1],
     ]
     rows.append(row)
 
     toolstr.print_text_box('Fei Stable DEX State')
     print('(block = ' + str(block) + ')')
     print()
-    tooltable.print_table(rows, headers=headers)
+    format = {'trailing_zeros': 2, 'decimals': 2, 'order_of_magnitude': True}
+    toolstr.print_table(
+        rows,
+        headers=headers,
+        format=format,
+        column_format={'Total TVL': dict(format, prefix='$')},
+    )

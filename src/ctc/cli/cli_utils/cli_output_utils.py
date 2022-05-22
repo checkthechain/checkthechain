@@ -19,7 +19,6 @@ def output_data(
     import pandas as pd
 
     if output == 'stdout':
-        import tooltable  # type: ignore
         import toolstr
 
         rows = []
@@ -57,7 +56,7 @@ def output_data(
             columns = [data.index.name, data.name]
         else:
             raise Exception('unknown data format')
-        tooltable.print_table(rows=rows, headers=columns, indent=indent)
+        toolstr.print_table(rows=rows, headers=columns, indent=indent)
 
     else:
 
@@ -78,4 +77,3 @@ def output_data(
 
         else:
             raise Exception('unknown output format: ' + str(output))
-

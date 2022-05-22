@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import toolcli
-import tooltable  # type: ignore
+import toolstr
 
 from ctc import evm
 from ctc import rpc
@@ -38,11 +38,10 @@ async def address_transactions_command(address: spec.Address) -> None:
         rows.append(row)
 
     headers = ['#', 'block', 'transaction hash']
-    tooltable.print_table(
+    toolstr.print_table(
         rows,
         headers=headers,
-        compact=2,
+        compact=True,
     )
 
     await rpc.async_close_http_session()
-

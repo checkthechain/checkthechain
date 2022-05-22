@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-import sys
 import math
+import os
+import sys
 import typing
 
 import aiohttp
 import rich.console
 import rich.theme
 import toolstr
-import tooltable  # type: ignore
 
 
 url_template = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page={page}&sparkline=true&price_change_percentage=1h%2C24h%2C7d'
@@ -51,7 +51,7 @@ def print_market_data(
     # create headers
     headers = ['symbol', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
     if verbose:
-        headers.append('7d chart')
+        headers.append('7D chart')
 
     # create rows
     rows = []
@@ -86,6 +86,7 @@ def print_market_data(
                 postfix='%',
                 trailing_zeros=True,
             )
+            change = item[key]
             if item[key] < 0:
                 color = '#e15241'
             elif item[key] > 0:
@@ -94,6 +95,7 @@ def print_market_data(
                 color = 'black'
             row_colors.append(color)
             row.append(change)
+            # row.append('[' + color + ']' + change + '[/' + color + ']')
         rows_colors.append(row_colors)
 
         # add volume cell
@@ -128,60 +130,80 @@ def print_market_data(
 
         rows.append(row)
 
+    def positive_negative_color(value):
+        if value > 0:
+            return '#4eaf0a'
+        elif value < 0:
+            return '#e15241'
+        else:
+            return 'grey'
+
     # render table without sending to stdout
-    old_stdout = sys.stdout
-    sys.stdout = None  # type: ignore
-    table = tooltable.print_table(
+    # old_stdout = sys.stdout
+    # sys.stdout = None  # type: ignore
+    toolstr.print_table(
         rows,
         headers=headers,
-        justify='right',
-        row_index=True,
-        trim_to_terminal=True,
+        add_row_index=True,
+        # max_table_width=os.get_terminal_size().columns,
+        column_style={
+            'Δ 1H': lambda context: 'bold ' + positive_negative_color(context['cell']),
+            'Δ 24H': lambda context: 'bold ' + positive_negative_color(context['cell']),
+            'Δ 7D': lambda context: 'bold ' + positive_negative_color(context['cell']),
+            '7D chart': lambda context: 'bold ' + positive_negative_color(
+                context['row'][context['labels'].index('Δ 7D')]
+            ),
+        },
+        column_format={
+            'Δ 1H': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
+            'Δ 24H': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
+            'Δ 7D': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
+        },
     )
-    sys.stdout = old_stdout
+    # sys.stdout = old_stdout
 
     # TODO: incorporate colors directly into table rendering function
     # - the current solution is very hacky
 
-    # colorize table and print
-    all_lines = table['as_str'].split('\n')
-    cell_lines = all_lines[2:]
-    console = rich.console.Console(theme=rich.theme.Theme(inherit=False))
-    print(all_lines[0])
-    print(all_lines[1])
-    for rank, (line, row_colors) in enumerate(zip(cell_lines, rows_colors)):
+    # # colorize table and print
+    # all_lines = table['as_str'].split('\n')
+    # cell_lines = all_lines[2:]
+    # console = rich.console.Console(theme=rich.theme.Theme(inherit=False))
+    # print(all_lines[0])
+    # print(all_lines[1])
+    # for rank, (line, row_colors) in enumerate(zip(cell_lines, rows_colors)):
 
-        # split row into cells
-        cells = line.split('│')
+    #     # split row into cells
+    #     cells = line.split('│')
 
-        # create link around token symbol
-        if include_links:
-            name = data[rank]['id']
-            url = token_url_template.format(name=name)
-            left_whitespace = len(cells[1]) - len(cells[1].lstrip())
-            right_whitespace = len(cells[1]) - len(cells[1].rstrip())
-            cells[1] = (
-                '[link ' + url + ']' + cells[1].strip() + '[/link ' + url + ']'
-            )
-            cells[1] = ' ' * left_whitespace + cells[1] + ' ' * right_whitespace
+    #     # create link around token symbol
+    #     if include_links:
+    #         name = data[rank]['id']
+    #         url = token_url_template.format(name=name)
+    #         left_whitespace = len(cells[1]) - len(cells[1].lstrip())
+    #         right_whitespace = len(cells[1]) - len(cells[1].rstrip())
+    #         cells[1] = (
+    #             '[link ' + url + ']' + cells[1].strip() + '[/link ' + url + ']'
+    #         )
+    #         cells[1] = ' ' * left_whitespace + cells[1] + ' ' * right_whitespace
 
-        # colorize price changes
-        for rc, color in enumerate(row_colors):
-            cells[3 + rc] = (
-                '[' + color + ']' + cells[3 + rc] + '[/' + color + ']'
-            )
+    #     # colorize price changes
+    #     for rc, color in enumerate(row_colors):
+    #         cells[3 + rc] = (
+    #             '[' + color + ']' + cells[3 + rc] + '[/' + color + ']'
+    #         )
 
-        # colorize sparklink
-        if verbose:
-            cells[-1] = (
-                '['
-                + row_colors[-1]
-                + ' bold]'
-                + cells[-1]
-                + '[/'
-                + row_colors[-1]
-                + ' bold]'
-            )
+    #     # colorize sparklink
+    #     if verbose:
+    #         cells[-1] = (
+    #             '['
+    #             + row_colors[-1]
+    #             + ' bold]'
+    #             + cells[-1]
+    #             + '[/'
+    #             + row_colors[-1]
+    #             + ' bold]'
+    #         )
 
-        color_line = '│'.join(cells)
-        console.print(color_line)
+    #     color_line = '│'.join(cells)
+    #     console.print(color_line)

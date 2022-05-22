@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing
 
 import toolstr
-import tooltable  # type: ignore
 
 from . import cpmm_spec
 from . import cpmm_trade
@@ -153,7 +152,7 @@ def print_liquidity_depth(
         trades.append(trade)
 
     indent = ' ' * 4 + toolstr.indent_to_str(indent)
-    tooltable.print_table(rows=trades, headers=headers, indent=indent)
+    toolstr.print_table(rows=trades, headers=headers, indent=indent)
 
 
 def print_trade_summary(
@@ -162,7 +161,7 @@ def print_trade_summary(
     x_holdings_before: int | float | None = None,
     y_holdings_before: int | float | None = None,
     indent: int | str | None = None,
-    **trade_kwargs: typing.Any
+    **trade_kwargs: typing.Any,
 ) -> None:
 
     if x_name is None:
@@ -218,8 +217,11 @@ def print_trade_summary(
     ]
     rows.append(row)
     print()
-    tooltable.print_table(
-        rows=rows, headers=headers, indent='    ' + indent, column_gap_spaces=1
+    toolstr.print_table(
+        rows=rows,
+        headers=headers,
+        indent='    ' + indent,
+        column_gap=1,
     )
 
     print()
@@ -244,12 +246,12 @@ def print_trade_summary(
             toolstr.format(y_change),
         ],
     ]
-    tooltable.print_table(
+    toolstr.print_table(
         rows=rows,
         headers=headers,
         indent='    ' + indent,
-        column_gap_spaces=1,
-        decimal_places=2,
+        column_gap=1,
+        format={'decimals': 2, 'trailing_zeros': True},
     )
 
 
@@ -300,4 +302,3 @@ def summarize_trade(**trade_kwargs: typing.Any) -> cpmm_spec.TradeSummary:
         'y_fees': y_fees,
         'trade_results': results,
     }
-

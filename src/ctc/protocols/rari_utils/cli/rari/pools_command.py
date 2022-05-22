@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import toolcli
-import tooltable  # type: ignore
+import toolstr
 import tooltime
 
 from ctc import rpc
@@ -53,7 +53,6 @@ async def pools_command(verbose: bool) -> None:
             headers = ['index', 'name', 'date', 'comptroller']
         rows.append(row)
     print(len(rows))
-    tooltable.print_table(rows, headers=headers)
+    toolstr.print_table(rows, headers=headers)
 
     await rpc.async_close_http_session()
-

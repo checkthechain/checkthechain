@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 import toolcli
-import tooltable  # type: ignore
+import toolstr
 
 from ctc.protocols import fourbyte_utils
 
@@ -113,7 +113,7 @@ async def async_fourbyte_command(
         else:
             print(len(results), 'results')
         print()
-        tooltable.print_table(rows, headers=headers)
+        toolstr.print_table(rows, headers=headers)
 
     elif signature_type == 'event':
         if len(results) == 0:

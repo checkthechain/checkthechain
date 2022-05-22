@@ -5,7 +5,6 @@ import asyncio
 import toolcli
 import tooltime
 import toolstr
-import tooltable  # type: ignore
 
 from ctc.protocols.fei_utils import fei_psms
 from ctc import rpc
@@ -119,4 +118,4 @@ async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
             psm_address,
         ]
         rows.append(row)
-    tooltable.print_table(rows=rows, headers=headers)
+    toolstr.print_table(rows=rows, headers=headers)
