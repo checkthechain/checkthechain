@@ -32,7 +32,10 @@ async def async_select_timestamp_block(
     """
 
     if mode == 'before':
-        query = {'where_lte': {'timestamp': timestamp}}
+        query = {
+            'where_lte': {'timestamp': timestamp},
+            'order_by': {'column': 'block_number', 'order': 'descending'},
+        }
     elif mode == 'after':
         query = {'where_gte': {'timestamp': timestamp}}
     elif mode == 'equal':
@@ -208,8 +211,7 @@ async def async_select_block_timestamps(
         }
 
         return [
-            block_timestamps.get(block_number)
-            for block_number in block_numbers
+            block_timestamps.get(block_number) for block_number in block_numbers
         ]
 
     elif timestamp_schema == 'blocks':

@@ -1,9 +1,10 @@
+# TODO: rename this file to block_time_rpc
 from __future__ import annotations
 
 import functools
 import typing
 
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, Literal
 
 from ctc.toolbox import search_utils
 from ctc import spec
@@ -20,9 +21,11 @@ async def async_get_block_of_timestamp_from_node(
     nary: typing.Optional[int] = None,
     cache: typing.Optional[BlockTimestampSearchCache] = None,
     provider: spec.ProviderSpec = None,
+    mode: Literal['before', 'after', 'equal'] = 'after',
     verbose: bool = True,
 ) -> int:
     """
+
     - could make this efficiently parallelizable to multiple timestamps by sharing cache
         - would need to remove the initializing key from the shared cache
     """
@@ -47,18 +50,32 @@ async def async_get_block_of_timestamp_from_node(
         provider=provider
     )
 
-    block = await search_utils.async_nary_search(
-        nary=nary,
-        start_index=1,
-        end_index=end_index,
-        async_is_match=async_is_match,
-        get_next_probes=get_next_probes,
-    )
+    try:
+        block = await search_utils.async_nary_search(
+            nary=nary,
+            start_index=1,
+            end_index=end_index,
+            async_is_match=async_is_match,
+            get_next_probes=get_next_probes,
+        )
+    except search_utils.SearchRangeTooLow:
+        if mode == 'before':
+            return end_index
+        else:
+            raise Exception('no block after timestamp: ' + str(timestamp))
 
     if block is None:
         raise Exception('could not find block for timestamp')
 
-    return block
+
+    if mode == 'equal':
+        raise NotImplementedError()
+    elif mode == 'before':
+        if block == 0:
+            raise Exception('no block exists before timestamp')
+        return block - 1
+    else:
+        return block
 
 
 async def _async_is_match_block_of_timestamp(

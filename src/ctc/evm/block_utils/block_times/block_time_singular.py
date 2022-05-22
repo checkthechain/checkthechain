@@ -20,6 +20,7 @@ async def async_get_block_of_timestamp(
     verbose: bool = False,
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
+    mode: typing.Literal['before', 'after', 'equal'] = 'after',
 ) -> int:
 
     if not isinstance(timestamp, int):
@@ -44,6 +45,7 @@ async def async_get_block_of_timestamp(
             block = await db.async_query_timestamp_block(
                 network=network,
                 timestamp=timestamp,
+                mode=mode,
             )
             if block is not None:
                 return block
@@ -55,6 +57,7 @@ async def async_get_block_of_timestamp(
             cache=cache,
             verbose=verbose,
             provider=provider,
+            mode=mode,
         )
 
 
