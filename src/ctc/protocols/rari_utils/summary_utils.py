@@ -84,7 +84,7 @@ def print_fuse_pool_summary(
     print('- TVB:', toolstr.format(tvb, prefix='$', order_of_magnitude=True))
     print('- block:', block_number)
     print()
-    toolstr.print_table(rows, headers=headers.values())
+    toolstr.print_table(rows, headers=list(headers.values()))
 
 
 async def async_print_all_pool_summary(

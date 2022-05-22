@@ -51,7 +51,7 @@ async def async_depth_command(
     else:
         rows = []
         for pool in pool_price_depth.keys():
-            row = [pool]
+            row: list[typing.Any] = [pool]
             for price in prices_float:
                 value = pool_price_depth[pool][price] / 1e18
                 row.append(value)

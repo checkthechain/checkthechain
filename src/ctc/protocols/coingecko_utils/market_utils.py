@@ -85,7 +85,7 @@ def print_market_data(
 
         rows.append(row)
 
-    def color_polarity(value):
+    def color_polarity(value: int | float) -> str:
         if value > 0:
             return '#4eaf0a'
         elif value < 0:

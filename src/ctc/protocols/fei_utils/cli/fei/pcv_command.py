@@ -4,14 +4,6 @@ import toolcli
 import toolstr
 import typing
 
-if typing.TYPE_CHECKING:
-    from typing_extensions import TypedDict
-
-    class NumberFormat(TypedDict):
-        order_of_magnitude: bool
-        prefix: str
-
-
 from ctc import evm
 from ctc import directory
 from ctc import spec
@@ -48,7 +40,7 @@ async def async_pcv_command(
     # output = 'list'
     output = 'table'
 
-    format_kwargs: NumberFormat = {
+    format_kwargs: toolstr.NumberFormat = {
         'order_of_magnitude': True,
         'prefix': '$',
         'oom_blank': ' ',

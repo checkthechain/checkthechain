@@ -1,11 +1,23 @@
+from __future__ import annotations
+
+import typing
+
+if typing.TYPE_CHECKING:
+    import types
+
 
 class AsyncContextManager:
     """performs cleanup before eventloop is closed"""
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> None:
         pass
 
-    async def __aexit__(self, exc_type, exc, tb):
+    async def __aexit__(
+        self,
+        exception_type: typing.Type[BaseException] | None,
+        exception: BaseException | None,
+        traceback: types.TracebackType | None,
+    ) -> None:
         from ctc import rpc
 
         # TODO: close all sessions, not just default session
