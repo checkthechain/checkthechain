@@ -1,19 +1,20 @@
 from __future__ import annotations
 
+import toolcli
 import toolstr
 
 from ctc import config
 from ctc import directory
 
 
-def get_command_spec():
+def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_chains_command,
         'help': 'print information about configured chains',
     }
 
 
-async def async_chains_command():
+async def async_chains_command() -> None:
     directory_networks = directory.get_networks()
     config_networks = config.get_networks()
     default_network = config.get_default_network()
@@ -56,7 +57,7 @@ async def async_chains_command():
         ]
         rows.append(row)
 
-    rows = sorted(rows, key=lambda row: (row[3], row[4], -row[1]), reverse=True)
+    rows = sorted(rows, key=lambda row: (row[3], row[4], -row[1]), reverse=True)  # type: ignore
 
     toolstr.print_text_box('EVM Chains')
     print()

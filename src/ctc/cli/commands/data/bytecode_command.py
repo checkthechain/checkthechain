@@ -15,6 +15,6 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_bytecode_command(address):
+async def async_bytecode_command(address: str) -> None:
     bytecode = await rpc.async_eth_get_code(address)
     print(bytecode)

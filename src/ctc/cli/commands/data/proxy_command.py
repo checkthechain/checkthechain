@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 import toolcli
 import toolstr
 
@@ -27,7 +29,11 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_proxy_command(contract_address, verbose, block):
+async def async_proxy_command(
+    contract_address: spec.Address,
+    verbose: bool,
+    block: spec.BlockNumberReference,
+) -> None:
 
     if verbose:
         eip_1967_address = (
@@ -62,7 +68,7 @@ async def async_proxy_command(contract_address, verbose, block):
             proxy_address = eip_1967_address
 
         toolstr.print_text_box('Proxy Summary for ' + str(contract_address))
-        rows = [
+        rows: typing.Sequence[typing.Sequence[typing.Any]] = [
             ['block', block],
             ['uses EIP-897', uses_eip_897],
             ['uses EIP-1967', uses_eip_1967],

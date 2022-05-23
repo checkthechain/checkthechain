@@ -25,7 +25,9 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'compute': {
         ('checksum',): 'ctc.cli.commands.compute.checksum_command',
         ('decode',): 'ctc.cli.commands.compute.decode_command',
+        ('encode',): 'ctc.cli.commands.compute.encode_command',
         ('keccak',): 'ctc.cli.commands.compute.keccak_command',
+        ('limits',): 'ctc.cli.commands.compute.limits_command',
         ('lower',): 'ctc.cli.commands.compute.lower_command',
         ('ascii',): 'ctc.cli.commands.compute.ascii_command',
         ('hex',): 'ctc.cli.commands.compute.hex_command',
@@ -59,6 +61,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('find',): 'ctc.cli.commands.data.find_command',
         ('gas',): 'ctc.cli.commands.data.gas_command',
         ('proxy',): 'ctc.cli.commands.data.proxy_command',
+        ('storage',): 'ctc.cli.commands.data.storage_command',
         ('transaction',): 'ctc.cli.commands.data.transaction_command',
         ('timestamp',): 'ctc.cli.commands.data.timestamp_command',
     },
