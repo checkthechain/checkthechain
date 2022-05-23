@@ -55,7 +55,11 @@ def print_market_data(
     verbose: bool,
     include_links: bool = False,
     height: int | None = None,
+    width: int | None = None,
 ) -> None:
+
+    if width is None:
+        width = 8
 
     # create headers
     headers = ['token', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
@@ -89,7 +93,7 @@ def print_market_data(
             sparkline = braille.create_braille_sparkline(
                 data=item['sparkline_in_7d']['price'],
                 # width=20,
-                width=8,
+                width=width,
                 height=height,
             )
 

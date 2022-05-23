@@ -20,6 +20,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--include-links', 'help': 'include links in output'},
             {'name': '--height', 'help': 'height, number of rows per asset'},
+            {'name': '--width', 'help': 'width of sparklines'},
         ],
         'examples': [
             '',
@@ -29,11 +30,14 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_cg_command(
-    n: int, verbose: bool, include_links: bool, height: int
+        n: int, verbose: bool, include_links: bool, height: int | None, width: str | int | None,
 ) -> None:
     if height is None:
         height = 1
     height = int(height)
+
+    if isinstance(width, str):
+        width = int(width)
 
     if n is None:
         n = toolcli.get_n_terminal_rows() - 3
@@ -51,4 +55,5 @@ async def async_cg_command(
         verbose=verbose,
         include_links=include_links,
         height=height,
+        width=width,
     )
