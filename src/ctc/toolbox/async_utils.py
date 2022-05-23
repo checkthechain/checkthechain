@@ -23,7 +23,7 @@ R = typing.TypeVar('R')
 #
 
 
-async def gather_coroutines(
+async def async_gather_coroutines(
     *coroutines: typing.Coroutine[typing.Any, typing.Any, R]
 ) -> list[R]:
     """gather without erasing type information"""
@@ -31,7 +31,7 @@ async def gather_coroutines(
     return typing.cast(list[R], results)
 
 
-async def gather_dict(
+async def async_gather_dict(
     d: typing.Mapping[T, typing.Coroutine[typing.Any, typing.Any, R]]
 ) -> dict[T, R]:
 
@@ -75,7 +75,7 @@ async def gather_dict(
 #             tasks[key] = value
 
 #     # await results
-#     results = await gather_dict(tasks)
+#     results = await async_gather_dict(tasks)
 
 #     # compile output
 #     output = {}

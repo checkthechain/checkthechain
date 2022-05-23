@@ -9,7 +9,7 @@ from ctc import spec
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': address_transactions_command,
+        'f': async_address_transactions_command,
         'help': 'output all transactions from address',
         'args': [
             {'name': 'address', 'help': 'get transactions from this address'},
@@ -18,7 +18,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def address_transactions_command(address: spec.Address) -> None:
+async def async_address_transactions_command(address: spec.Address) -> None:
 
     print('fetching transactions from address', address)
     print()

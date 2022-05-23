@@ -55,12 +55,12 @@ async def async_get_transaction_traces_df(
     df = df.drop(remove_columns, axis=1)
 
     # decode call data and parameters
-    await _add_trace_call_data(df)
+    await _async_add_trace_call_data(df)
 
     return df
 
 
-async def _add_trace_call_data(df: spec.DataFrame) -> None:
+async def _async_add_trace_call_data(df: spec.DataFrame) -> None:
 
     contract_abis = {}
     for contract_address in set(df['action__to']):

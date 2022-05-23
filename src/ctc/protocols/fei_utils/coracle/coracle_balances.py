@@ -311,7 +311,7 @@ async def async_get_tokens_balances_by_block(
         )
         for block in blocks
     ]
-    block_token_balances = await async_utils.gather_coroutines(*coroutines)
+    block_token_balances = await async_utils.async_gather_coroutines(*coroutines)
 
     if normalize:
         int_type = typing.List[typing.Dict[spec.Address, int]]

@@ -22,7 +22,7 @@ async def async_get_fei_yield_data(
         G_UNI_FEI_USDC,
         G_UNI_FEI_DAI,
     ]:
-        coroutine = compute_g_uni_yield_data(
+        coroutine = async_compute_g_uni_yield_data(
             block_numbers=block_numbers, g_uni_pool=g_uni_pool
         )
         task = asyncio.create_task(coroutine)
@@ -33,7 +33,7 @@ async def async_get_fei_yield_data(
     return {yield_data['name']: yield_data for yield_data in yield_datas}
 
 
-async def compute_g_uni_yield_data(
+async def async_compute_g_uni_yield_data(
     block_numbers: typing.Sequence[spec.BlockNumberReference],
     g_uni_pool: spec.Address,
 ) -> yields_spec.YieldSourceData:

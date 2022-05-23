@@ -11,7 +11,7 @@ from . import uniswap_v2_metadata
 from . import uniswap_v2_spec
 
 
-async def replace_pool_state_symbols(
+async def async_replace_pool_state_symbols(
     pool_state: typing.Mapping[str, typing.Any],
     *,
     pool: spec.Address | None = None,

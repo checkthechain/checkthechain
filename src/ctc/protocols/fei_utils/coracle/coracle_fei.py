@@ -85,7 +85,7 @@ async def async_get_fei_deposit_balances_by_block(
         async_get_fei_deposit_balances(block=block, provider=provider)
         for block in blocks
     ]
-    results = await async_utils.gather_coroutines(*coroutines)
+    results = await async_utils.async_gather_coroutines(*coroutines)
     return nested_utils.list_of_dicts_to_dict_of_lists(results)
 
 

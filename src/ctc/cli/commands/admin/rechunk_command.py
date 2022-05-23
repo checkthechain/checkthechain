@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 import toolcli
 
 from ctc import evm
@@ -10,7 +8,7 @@ from ctc import spec
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': rechunk_command,
+        'f': async_rechunk,
         'help': 'rechunk events by specific chunk size',
         'args': [
             {
@@ -69,33 +67,8 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def rechunk_command(
+async def async_rechunk(
     contract: spec.Address,
-    event: str,
-    all_events: bool,
-    start_block: int,
-    end_block: int,
-    chunk_bytes: int,
-    dry: bool,
-    verbose: bool,
-    network: spec.NetworkReference,
-) -> None:
-    coroutine = run(
-        contract_address=contract,
-        event=event,
-        all_events=all_events,
-        start_block=start_block,
-        end_block=end_block,
-        chunk_bytes=chunk_bytes,
-        dry=dry,
-        verbose=verbose,
-        network=network,
-    )
-    asyncio.run(coroutine)
-
-
-async def run(
-    contract_address: spec.Address,
     event: str,
     all_events: bool,
     start_block: int,
@@ -117,7 +90,7 @@ async def run(
             verbose=verbose,
         )
 
-    elif contract_address is not None and event is not None:
+    elif contract is not None and event is not None:
 
         if evm.is_event_hash(event):
             event_name = event
@@ -127,7 +100,7 @@ async def run(
             event_hash = event
 
         await evm.async_rechunk_events(
-            contract_address=contract_address,
+            contract_address=contract,
             network=network,
             event_name=event_name,
             event_hash=event_hash,

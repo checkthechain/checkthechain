@@ -13,7 +13,7 @@ from ctc import spec
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': psms_command,
+        'f': async_psms_command,
         'help': 'display recent FEI redemptions',
         'args': [
             {
@@ -40,7 +40,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def psms_command(
+async def async_psms_command(
     time: tooltime.Timelength,
     token: str,
     block: spec.BlockNumberReference,

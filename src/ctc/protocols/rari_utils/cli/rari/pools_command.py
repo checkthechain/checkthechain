@@ -9,7 +9,7 @@ from ctc.protocols import rari_utils
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': pools_command,
+        'f': async_pools_command,
         'help': 'list all Rari fuse pools',
         'args': [
             {
@@ -21,7 +21,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def pools_command(verbose: bool) -> None:
+async def async_pools_command(verbose: bool) -> None:
     all_pools = await rari_utils.async_get_all_pools()
     rows = []
     for p, pool in enumerate(all_pools):

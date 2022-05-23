@@ -11,7 +11,7 @@ from ctc import evm
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': timestamp_command,
+        'f': async_timestamp_command,
         'help': 'get block of timestamp',
         'args': [
             {
@@ -23,7 +23,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def timestamp_command(timestamp: str) -> None:
+async def async_timestamp_command(timestamp: str) -> None:
     if timestamp is None:
         timestamp = time.time()
 

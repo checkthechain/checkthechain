@@ -13,7 +13,7 @@ from ctc.protocols import ens_utils
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': ens_command,
+        'f': async_ens_command,
         'help': 'summarize ENS entry',
         'args': [
             {
@@ -26,7 +26,10 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def ens_command(name_or_address: str, block: spec.BlockNumberReference) -> None:
+async def async_ens_command(
+    name_or_address: str,
+    block: spec.BlockNumberReference,
+) -> None:
     arg = name_or_address[0]
 
     if block is not None:
