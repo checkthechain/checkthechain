@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import rpc
@@ -93,6 +92,8 @@ async def async_get_eth_balance_by_block(
             address=address, provider=provider, block=block, normalize=normalize
         )
         coroutines.append(coroutine)
+
+    import asyncio
 
     return await asyncio.gather(*coroutines)
 

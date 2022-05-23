@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 import tooltime
@@ -42,6 +41,7 @@ async def async_predict_block_timestamps(
     provider: spec.ProviderSpec = None,
     window_size: int = 100000,
 ) -> typing.Sequence[int]:
+    import asyncio
 
     int_blocks = [int(block) for block in blocks]
 
@@ -124,6 +124,7 @@ async def async_predict_timestamp_blocks(
     provider: spec.ProviderSpec = None,
     window_size: int = 86400 * 16,
 ) -> typing.Sequence[int]:
+    import asyncio
 
     int_timestamps = [
         tooltime.timestamp_to_seconds(timestamp) for timestamp in timestamps

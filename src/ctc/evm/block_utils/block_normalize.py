@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import binary
@@ -28,6 +27,8 @@ async def async_block_numbers_to_int(
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
 ) -> list[int]:
+    import asyncio
+
     coroutines = [
         async_block_number_to_int(block=block, provider=provider)
         for block in blocks

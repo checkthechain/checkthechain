@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 import math
 import random
@@ -138,6 +137,9 @@ async def async_send(
                 provider=full_provider,
             )
             coroutines.append(coroutine)
+
+        import asyncio
+
         response_chunks = await asyncio.gather(*coroutines)
 
         # reorder chunks

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-import asyncio
 import time
 import typing
 from typing_extensions import TypedDict
+
+if typing.TYPE_CHECKING:
+    import asyncio
 
 from ctc import binary
 from ctc import rpc
@@ -116,6 +118,8 @@ async def async_get_latest_block_number(
         # see https://stackoverflow.com/a/55918049
         lock = _latest_block_lock['lock']
         if lock is None:
+            import asyncio
+
             lock = asyncio.Lock()
             _latest_block_lock['lock'] = lock
 

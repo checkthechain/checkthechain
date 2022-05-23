@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from . import fourbyte_spec
@@ -79,6 +78,8 @@ async def async_scrape_set(
 
             # wait between responses
             if wait_time is not None:
+                import asyncio
+
                 await asyncio.sleep(wait_time)
 
     return results

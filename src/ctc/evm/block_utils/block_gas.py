@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 from typing_extensions import TypedDict
 
@@ -9,59 +8,60 @@ from . import block_normalize
 from ctc import spec
 
 
-class BlockGasStats(TypedDict):
-    base_fee: int | float | None
-    min_gas_price: int | float | None
-    median_gas_price: int | float | None
-    mean_gas_price: float | None
-    max_gas_price: int | float | None
-    gas_used: int
-    gas_limit: int
-    n_transactions: int
+if typing.TYPE_CHECKING:
+    class BlockGasStats(TypedDict):
+        base_fee: int | float | None
+        min_gas_price: int | float | None
+        median_gas_price: int | float | None
+        mean_gas_price: float | None
+        max_gas_price: int | float | None
+        gas_used: int
+        gas_limit: int
+        n_transactions: int
 
 
-class BlocksGasStats(TypedDict):
-    min_base_fee: int | float | None
-    median_base_fee: int | float | None
-    mean_base_fee: int | float | None
-    max_base_fee: int | float | None
+    class BlocksGasStats(TypedDict):
+        min_base_fee: int | float | None
+        median_base_fee: int | float | None
+        mean_base_fee: int | float | None
+        max_base_fee: int | float | None
 
-    min_gas_price: int | float | None
-    min_median_gas_price: int | float | None
-    min_mean_gas_price: int | float | None
-    min_max_gas_price: int | float | None
+        min_gas_price: int | float | None
+        min_median_gas_price: int | float | None
+        min_mean_gas_price: int | float | None
+        min_max_gas_price: int | float | None
 
-    median_min_gas_price: int | float | None
-    median_median_gas_price: int | float | None
-    median_mean_gas_price: int | float | None
-    median_max_gas_price: int | float | None
+        median_min_gas_price: int | float | None
+        median_median_gas_price: int | float | None
+        median_mean_gas_price: int | float | None
+        median_max_gas_price: int | float | None
 
-    mean_min_gas_price: int | float | None
-    mean_median_gas_price: int | float | None
-    mean_gas_price: int | float | None
-    mean_max_gas_price: int | float | None
+        mean_min_gas_price: int | float | None
+        mean_median_gas_price: int | float | None
+        mean_gas_price: int | float | None
+        mean_max_gas_price: int | float | None
 
-    max_min_gas_price: int | float | None
-    max_median_gas_price: int | float | None
-    max_mean_gas_price: int | float | None
-    max_gas_price: int | float | None
+        max_min_gas_price: int | float | None
+        max_median_gas_price: int | float | None
+        max_mean_gas_price: int | float | None
+        max_gas_price: int | float | None
 
-    min_gas_used: int | float | None
-    median_gas_used: int | float | None
-    mean_gas_used: int | float | None
-    max_gas_used: int | float | None
+        min_gas_used: int | float | None
+        median_gas_used: int | float | None
+        mean_gas_used: int | float | None
+        max_gas_used: int | float | None
 
-    min_gas_limit: int | float | None
-    median_gas_limit: int | float | None
-    mean_gas_limit: int | float | None
-    max_gas_limit: int | float | None
+        min_gas_limit: int | float | None
+        median_gas_limit: int | float | None
+        mean_gas_limit: int | float | None
+        max_gas_limit: int | float | None
 
-    min_n_transactions: int | float | None
-    median_n_transactions: int | float | None
-    mean_n_transactions: int | float | None
-    max_n_transactions: int | float | None
+        min_n_transactions: int | float | None
+        median_n_transactions: int | float | None
+        mean_n_transactions: int | float | None
+        max_n_transactions: int | float | None
 
-    n_blocks: int
+        n_blocks: int
 
 
 async def async_get_block_gas_stats(
@@ -132,6 +132,7 @@ async def async_get_gas_stats_by_block(
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
 ) -> list[BlockGasStats]:
+    import asyncio
 
     coroutines = [
         async_get_block_gas_stats(
@@ -305,4 +306,3 @@ def aggregate_blocks_gas_stats(
         #
         'n_blocks': len(blocks_gas_stats),
     }
-

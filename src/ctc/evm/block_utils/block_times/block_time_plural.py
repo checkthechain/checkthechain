@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import spec
@@ -85,6 +84,8 @@ async def async_get_blocks_of_timestamps(
                     use_db=False,
                 )
                 coroutines.append(coroutine)
+            import asyncio
+
             node_blocks = await asyncio.gather(*coroutines)
             node_results = dict(zip(remaining_timestamps, node_blocks))
             results.update(node_results)

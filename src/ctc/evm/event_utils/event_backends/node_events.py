@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import binary
@@ -24,6 +23,7 @@ async def async_get_events_from_node(
     provider: spec.ProviderSpec = None,
 ) -> spec.DataFrame:
     """see fetch_events() for complete kwarg list"""
+    import asyncio
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -204,4 +204,3 @@ def create_empty_event_dataframe(
     df = df.set_index(['block_number', 'transaction_index', 'log_index'])
 
     return df
-

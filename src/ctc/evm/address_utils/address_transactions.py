@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 from typing_extensions import TypedDict
 
@@ -87,6 +86,8 @@ class AddressTransactionCounts(TypedDict):
 async def async_get_address_transaction_counts_by_block(
     address: spec.Address, nary: int = 3
 ) -> AddressTransactionCounts:
+    import asyncio
+
     address = address.lower()
 
     # get initial data
@@ -141,6 +142,7 @@ async def _async_get_block_range_transaction_counts(
     block_counts: dict[int, int],
     nary: int,
 ) -> None:
+    import asyncio
     import numpy as np
 
     n_unknown_blocks = max_block - min_block - 1

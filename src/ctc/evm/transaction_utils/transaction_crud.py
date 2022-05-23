@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import rpc
@@ -18,6 +17,8 @@ async def async_get_transaction_count(address: spec.Address) -> int:
 async def async_get_transactions(
     transaction_hashes: typing.Sequence[str],
 ) -> list[spec.Transaction]:
+    import asyncio
+
     coroutines = [
         async_get_transaction(transaction_hash)
         for transaction_hash in transaction_hashes
