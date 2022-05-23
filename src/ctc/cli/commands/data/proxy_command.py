@@ -66,6 +66,8 @@ async def async_proxy_command(
             proxy_address = eip_897_address
         elif uses_eip_1967:
             proxy_address = eip_1967_address
+        else:
+            proxy_address = 'None'
 
         toolstr.print_text_box('Proxy Summary for ' + str(contract_address))
         rows: typing.Sequence[typing.Sequence[typing.Any]] = [
