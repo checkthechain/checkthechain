@@ -61,4 +61,3 @@ class ConfigSpec(TypedDict):
 
     log_rpc_calls: bool
     log_sql_queries: bool
-

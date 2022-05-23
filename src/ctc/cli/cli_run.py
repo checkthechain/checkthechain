@@ -20,6 +20,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('log',): 'ctc.cli.commands.admin.log_command',
         ('setup',): 'ctc.cli.commands.admin.setup_command',
         ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
+        ('chains',): 'ctc.cli.commands.admin.chains_command',
     },
     'compute': {
         ('checksum',): 'ctc.cli.commands.compute.checksum_command',
@@ -36,6 +37,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'address',
             'transactions',
         ): 'ctc.cli.commands.data.address_transactions_command',
+        ('bytecode',): 'ctc.cli.commands.data.bytecode_command',
         (
             'db',
             'create',
@@ -56,6 +58,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('events',): 'ctc.cli.commands.data.events_command',
         ('find',): 'ctc.cli.commands.data.find_command',
         ('gas',): 'ctc.cli.commands.data.gas_command',
+        ('proxy',): 'ctc.cli.commands.data.proxy_command',
         ('transaction',): 'ctc.cli.commands.data.transaction_command',
         ('timestamp',): 'ctc.cli.commands.data.timestamp_command',
     },
