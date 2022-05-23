@@ -2,13 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import math
-import os
-import sys
 import typing
 
 import aiohttp
-import rich.console
-import rich.theme
 import toolstr
 
 
@@ -42,19 +38,32 @@ async def async_get_page(
         return page
 
 
+def color_polarity(value: int | float | None) -> str:
+    if value is None:
+        return ''
+
+    if value > 0:
+        return '#4eaf0a'
+    elif value < 0:
+        return '#e15241'
+    else:
+        return 'gray'
+
+
 def print_market_data(
     data: typing.Sequence[typing.Any],
     verbose: bool,
-    include_links: bool,
+    include_links: bool = False,
+    height: int | None = None,
 ) -> None:
 
     # create headers
-    headers = ['symbol', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
+    headers = ['token', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
     if verbose:
         headers.append('7D chart')
 
     # create rows
-    rows = []
+    rows: list[typing.Sequence[typing.Any]] = []
     for item in data:
 
         row = []
@@ -79,38 +88,64 @@ def print_market_data(
 
             sparkline = braille.create_braille_sparkline(
                 data=item['sparkline_in_7d']['price'],
+                # width=20,
                 width=8,
+                height=height,
             )
+
             row.append(sparkline)
 
         rows.append(row)
 
-    def color_polarity(value: int | float) -> str:
-        if value > 0:
-            return '#4eaf0a'
-        elif value < 0:
-            return '#e15241'
-        else:
-            return 'gray'
+    if height is None:
+        height = 1
+
+    def get_row_color(r: int) -> str:
+        if height is None:
+            raise Exception('height not set')
+        datum = data[int(r / height)]
+        diff = (
+            datum['sparkline_in_7d']['price'][-1]
+            - datum['sparkline_in_7d']['price'][0]
+        )
+        return color_polarity(diff)
 
     # print table
-    toolstr.print_table(
+    toolstr.print_multiline_table(
         rows,
         headers=headers,
+        column_gap=1,
+        # compact=True,
         add_row_index=True,
+        separate_all_rows=False,
         # max_table_width=os.get_terminal_size().columns,
+        vertical_justify='center',
         column_style={
             'Δ 1H': lambda context: 'bold ' + color_polarity(context['cell']),
             'Δ 24H': lambda context: 'bold ' + color_polarity(context['cell']),
             'Δ 7D': lambda context: 'bold ' + color_polarity(context['cell']),
-            '7D chart': lambda context: 'bold '
-            + color_polarity(context['row'][context['labels'].index('Δ 7D')]),
+            '7D chart': lambda context: 'bold ' + get_row_color(context['r']),
         },
         column_format={
             'price': {'decimals': 2, 'trailing_zeros': True, 'prefix': '$'},
-            'Δ 1H': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
-            'Δ 24H': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
-            'Δ 7D': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
+            'Δ 1H': {
+                'scientific': False,
+                'postfix': '%',
+                'decimals': 2,
+                'trailing_zeros': True,
+            },
+            'Δ 24H': {
+                'scientific': False,
+                'postfix': '%',
+                'decimals': 2,
+                'trailing_zeros': True,
+            },
+            'Δ 7D': {
+                'scientific': False,
+                'postfix': '%',
+                'decimals': 2,
+                'trailing_zeros': True,
+            },
             'volume': {
                 'decimals': 1,
                 'trailing_zeros': True,

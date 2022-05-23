@@ -19,6 +19,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'include extra data',
             },
             {'name': '--include-links', 'help': 'include links in output'},
+            {'name': '--height', 'help': 'height, number of rows per asset'},
         ],
         'examples': [
             '',
@@ -27,10 +28,16 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_cg_command(n: int, verbose: bool, include_links: bool) -> None:
+async def async_cg_command(
+    n: int, verbose: bool, include_links: bool, height: int
+) -> None:
+    if height is None:
+        height = 1
+    height = int(height)
 
     if n is None:
         n = toolcli.get_n_terminal_rows() - 3
+        n = int(n / height)
     else:
         n = int(n)
 
@@ -43,4 +50,5 @@ async def async_cg_command(n: int, verbose: bool, include_links: bool) -> None:
         data=data,
         verbose=verbose,
         include_links=include_links,
+        height=height,
     )
