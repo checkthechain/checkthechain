@@ -9,6 +9,7 @@ from ctc import spec
 async def async_get_proxy_address(
     contract_address: spec.Address,
     provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> spec.Address | None:
 
     # try eip897
@@ -16,6 +17,7 @@ async def async_get_proxy_address(
         eip897_address = await _async_get_eip897_implementation(
             contract_address=contract_address,
             provider=provider,
+            block=block,
         )
         if eip897_address is not None:
             return eip897_address
@@ -26,6 +28,7 @@ async def async_get_proxy_address(
     eip1967_address = await _async_get_eip1967_proxy_logic_address(
         contract_address=contract_address,
         provider=provider,
+        block=block,
     )
     if eip1967_address != '0x0000000000000000000000000000000000000000':
         return eip1967_address
@@ -39,7 +42,9 @@ async def async_get_proxy_address(
 
 
 async def _async_get_eip897_proxy_type(
-    contract_address: spec.Address, provider: spec.ProviderSpec = None
+    contract_address: spec.Address,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> int | None:
 
     function_abi: spec.FunctionABI = {
@@ -55,11 +60,14 @@ async def _async_get_eip897_proxy_type(
         to_address=contract_address,
         function_abi=function_abi,
         provider=provider,
+        block_number=block,
     )
 
 
 async def _async_get_eip897_implementation(
-    contract_address: spec.Address, provider: spec.ProviderSpec = None
+    contract_address: spec.Address,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
 
     function_abi: spec.FunctionABI = {
@@ -75,6 +83,7 @@ async def _async_get_eip897_implementation(
         to_address=contract_address,
         function_abi=function_abi,
         provider=provider,
+        block_number=block,
     )
 
 
