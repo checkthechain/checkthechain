@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 from typing_extensions import TypedDict
 
@@ -52,6 +51,7 @@ async def async_get_pcv_stats_by_block(
     provider: spec.ProviderSpec = None,
 ) -> spec.DataFrame:
 
+    import asyncio
     import numpy as np
 
     if blocks is not None:

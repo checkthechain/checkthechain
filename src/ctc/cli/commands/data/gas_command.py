@@ -16,8 +16,6 @@ from __future__ import annotations
 import time
 import typing
 
-import numpy as np
-import pandas as pd
 import toolcli
 import toolstr
 import tooltime
@@ -61,6 +59,9 @@ async def async_gas_command(
     output: str,
     overwrite: bool,
 ) -> None:
+
+    import numpy as np
+    import pandas as pd
 
     if last is None:
         last_as_int = [1, 10, 100]

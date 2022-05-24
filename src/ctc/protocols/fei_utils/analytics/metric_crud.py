@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from . import analytics_spec
 from . import metric_groups
 
@@ -25,6 +23,7 @@ async def async_get_metrics(
     blocks: list[int],
     verbose: bool = False,
 ) -> dict[str, analytics_spec.MetricGroup]:
+    import asyncio
 
     # create coroutines
     mg_coroutines = [f(blocks, verbose) for f in f_metric_group.values()]

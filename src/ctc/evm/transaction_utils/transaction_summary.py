@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import time
 
-import toolstr
-import tooltime
 
 from ctc import binary
 from ctc import evm
@@ -18,6 +16,8 @@ async def async_print_transaction_summary(
 ) -> None:
 
     import asyncio
+    import toolstr
+    import tooltime
     from ctc.protocols import chainlink_utils
 
     transaction_coroutine = rpc.async_eth_get_transaction_by_hash(

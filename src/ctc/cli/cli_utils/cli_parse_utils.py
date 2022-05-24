@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
-from ctc import evm
 from ctc import spec
 
 
@@ -11,6 +10,7 @@ async def async_resolve_block_range(
     block_range: typing.Union[str, typing.Sequence[str], spec.BlockRange],
     provider: spec.ProviderSpec = None,
 ) -> tuple[int, int]:
+    from ctc import evm
 
     if not isinstance(block_range, dict):
         parsed_range = parse_block_range(block_range)
@@ -37,6 +37,7 @@ async def async_resolve_block_sample(
     block_sample: typing.Union[str, typing.Sequence[str], spec.BlockSample],
     provider: spec.ProviderSpec = None,
 ) -> list[int]:
+    from ctc import evm
 
     if not isinstance(block_sample, dict):
         block_sample = parse_block_sample(block_sample)

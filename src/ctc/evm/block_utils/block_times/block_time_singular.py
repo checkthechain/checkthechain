@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 
-import tooltime
+if typing.TYPE_CHECKING:
+    import tooltime
 
 from ctc import rpc
 from ctc import spec
@@ -24,6 +25,8 @@ async def async_get_block_of_timestamp(
 ) -> int:
 
     if not isinstance(timestamp, int):
+        import tooltime
+
         timestamp = tooltime.timestamp_to_seconds(timestamp)
 
     if block_timestamps is not None or (
@@ -80,6 +83,8 @@ def get_block_of_timestamp_from_arrays(
         block_number_array = np.array(list(block_timestamps.keys()))
 
     if not isinstance(timestamp, int):
+        import tooltime
+
         timestamp = tooltime.timestamp_to_seconds(timestamp)
 
     index = np.searchsorted(block_timestamp_array, timestamp)

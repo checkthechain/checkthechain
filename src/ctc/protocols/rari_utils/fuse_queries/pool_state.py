@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc.protocols import chainlink_utils
@@ -18,6 +17,8 @@ async def async_get_pool_prices(
     block: spec.BlockNumberReference = 'latest',
     to_usd: bool = True,
 ) -> dict[spec.Address, spec.Number]:
+    import asyncio
+
     if oracle is None:
         if comptroller is None:
             raise Exception('specify comptroller')
@@ -53,6 +54,9 @@ async def async_get_pool_tvl_and_tvb(
     oracle: spec.Address | None = None,
     block: spec.BlockNumberReference = 'latest',
 ) -> dict[str, spec.Number]:
+
+    import asyncio
+
     if ctokens is None:
         if comptroller is None:
             raise Exception(

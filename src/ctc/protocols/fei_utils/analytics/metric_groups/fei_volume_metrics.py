@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
-import pandas as pd
-
 from ctc import evm
 from ctc import spec
 from .. import analytics_spec
@@ -12,6 +8,7 @@ from .. import analytics_spec
 async def async_compute_dex_volume(
     blocks: list[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
+    import asyncio
 
     volume_tasks = []
     for pool_name, pool_info in analytics_spec.dex_pools.items():

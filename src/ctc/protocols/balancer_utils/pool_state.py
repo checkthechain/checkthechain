@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import directory
@@ -37,6 +36,7 @@ async def async_get_pool_weights(
     dict[spec.ContractAddress, int],
     dict[spec.ContractAddress, float],
 ]:
+    import asyncio
 
     tokens_coroutine = pool_metadata.async_get_pool_tokens(
         pool_address=pool_address, block=block
@@ -157,6 +157,7 @@ async def async_get_pool_balances_by_block(
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
 ) -> typing.Union[dict[spec.Address, list[int | float]]]:
+    import asyncio
 
     coroutines = [
         async_get_pool_balances(

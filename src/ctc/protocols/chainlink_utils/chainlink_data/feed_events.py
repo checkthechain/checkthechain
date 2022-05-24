@@ -4,7 +4,6 @@ import typing
 
 from ctc import evm
 from ctc import spec
-from ctc.toolbox import pd_utils
 
 from .. import chainlink_feed_metadata
 from .. import chainlink_spec
@@ -24,6 +23,7 @@ async def async_get_full_feed_event_data(
     """
     TODO: be able to gather data across multiple aggregator changes
     """
+    from ctc.toolbox import pd_utils
 
     # get feed address
     feed = await chainlink_feed_metadata.async_resolve_feed_address(

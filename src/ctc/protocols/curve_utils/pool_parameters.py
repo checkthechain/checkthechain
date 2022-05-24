@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc.toolbox import pd_utils
 
 
 async def async_get_pool_A(
@@ -87,7 +85,9 @@ async def async_get_A_history(
 ) -> typing.Sequence[float]:
     """get history of pool's A parameter"""
 
+    import asyncio
     import numpy as np
+    from ctc.toolbox import pd_utils
 
     # get ramp events
     pool_start_block = await evm.async_get_contract_creation_block(

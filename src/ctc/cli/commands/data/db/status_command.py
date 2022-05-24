@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 
 from ctc import config
-from ctc import db
 
 
 def get_command_spec() -> toolcli.CommandSpec:

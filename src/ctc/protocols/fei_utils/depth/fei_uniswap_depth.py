@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import directory
@@ -27,6 +26,8 @@ async def async_get_fei_uniswap_pools() -> list[list[typing.Any]]:
 async def async_get_fei_uniswap_pool_price_depth(
     pools: list[list[typing.Any]] | None = None, prices: typing.Sequence[float] | None = None
 ) -> dict[str, dict[float, float]]:
+    import asyncio
+
     if pools is None:
         pools = await async_get_fei_uniswap_pools()
 

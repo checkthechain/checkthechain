@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 
-import tooltime
+if typing.TYPE_CHECKING:
+    import tooltime
 
 from ctc import evm
 from ctc import spec
@@ -96,6 +97,8 @@ async def async_predict_timestamp_block(
     window_size: int = 86400 * 16,
 ) -> int:
 
+    import tooltime
+
     timestamp = tooltime.timestamp_to_seconds(timestamp)
 
     latest_block = await evm.async_get_block('latest', provider=provider)
@@ -125,6 +128,8 @@ async def async_predict_timestamp_blocks(
     window_size: int = 86400 * 16,
 ) -> typing.Sequence[int]:
     import asyncio
+
+    import tooltime
 
     int_timestamps = [
         tooltime.timestamp_to_seconds(timestamp) for timestamp in timestamps

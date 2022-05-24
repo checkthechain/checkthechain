@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 import toolcli
 import toolstr
 
@@ -21,6 +19,8 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_dexes_command(block: spec.BlockNumberReference | None) -> None:
+    import asyncio
+
     if block is None:
         block = 'latest'
     blocks = [block]

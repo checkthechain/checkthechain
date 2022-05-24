@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import rpc
@@ -41,6 +40,8 @@ async def async_get_pool_underlying_tokens(
     comptroller: spec.Address | None = None,
     block: spec.BlockNumberReference = 'latest',
 ) -> dict[spec.Address, spec.Address]:
+    import asyncio
+
     if ctokens is None:
         if comptroller is None:
             raise Exception('specify comptroller')

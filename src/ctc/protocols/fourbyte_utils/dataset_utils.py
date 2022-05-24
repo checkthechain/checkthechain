@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 
 from . import fourbyte_spec
 from . import io_utils
@@ -19,6 +18,8 @@ def local_event_signatures_exist() -> bool:
 
 
 async def async_build_function_signatures_dataset() -> None:
+
+    import shutil
 
     path = fourbyte_spec.get_default_path('function_signatures')
 
@@ -54,6 +55,8 @@ async def async_build_function_signatures_dataset() -> None:
 
 
 async def async_build_event_signatures_dataset() -> None:
+
+    import shutil
 
     path = fourbyte_spec.get_default_path('event_signatures')
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -18,6 +17,7 @@ async def async_get_pool_swaps(
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
+    import asyncio
 
     if replace_symbols:
         symbols_task = asyncio.create_task(
@@ -91,6 +91,7 @@ async def async_get_pool_mints(
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
+    import asyncio
     if normalize:
         decimals_task = asyncio.create_task(
             uniswap_v2_metadata.async_get_pool_decimals(
@@ -148,6 +149,7 @@ async def async_get_pool_burns(
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
+    import asyncio
 
     if normalize:
         decimals_task = asyncio.create_task(

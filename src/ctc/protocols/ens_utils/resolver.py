@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import binary
@@ -123,6 +122,7 @@ async def async_get_text_records(
     """
     https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records
     """
+    import asyncio
 
     if node is None:
         if name is None:

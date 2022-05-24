@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing_extensions import TypedDict
 
-import asyncio
 import typing
 
 from ctc import directory
@@ -72,6 +71,7 @@ def get_token_map() -> dict[str, spec.Address]:
 async def async_get_stable_dex_balances_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Mapping[str, spec.NumpyArray]:
+    import asyncio
     import numpy as np
 
     token_map = get_token_map()

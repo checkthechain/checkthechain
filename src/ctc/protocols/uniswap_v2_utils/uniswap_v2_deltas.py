@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -16,6 +15,7 @@ async def async_get_pool_log_deltas(
     normalize: bool = True,
     include_initial_state: bool = True,
 ) -> spec.DataFrame:
+    import asyncio
     import pandas as pd
 
     # get start_block and initial conditions

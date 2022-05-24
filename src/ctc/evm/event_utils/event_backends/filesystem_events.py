@@ -8,8 +8,6 @@ import os
 import typing
 from typing_extensions import TypedDict
 
-import toolstr
-
 import ctc.config
 from ctc import binary
 from ctc import directory
@@ -390,6 +388,8 @@ async def async_get_events_from_filesystem(
     # print summary
     if verbose:
         if len(paths_to_load) > 0:
+            import toolstr
+
             n_files = len(paths_to_load)
             n_bytes_int = sum(os.path.getsize(path) for path in paths_to_load)
             n_bytes = toolstr.format(n_bytes_int / 1024 / 1024) + 'M'

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import math
 import typing
 
@@ -164,6 +163,7 @@ async def _async_get_all_pools_stats(
     all_pools: list[list[typing.Any]],
     block: spec.BlockNumberReference,
 ) -> list[dict[str, spec.Number]]:
+    import asyncio
 
     n_pools = len(all_pools)
     chunk_size = 300
@@ -198,6 +198,8 @@ async def async_get_token_multipool_stats(
     block: spec.BlockNumberReference = 'latest',
     in_usd: bool = True,
 ) -> dict[str, typing.Any]:
+    import asyncio
+
     pools = await fuse_queries.async_get_all_pools(block=block)
 
     eth_price = await chainlink_utils.async_get_eth_price(block=block)

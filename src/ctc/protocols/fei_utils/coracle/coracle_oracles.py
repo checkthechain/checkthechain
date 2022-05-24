@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -85,6 +84,8 @@ async def async_get_token_oracle_by_block(
     provider: spec.ProviderSpec = None,
 ) -> list[spec.ContractAddress]:
 
+    import asyncio
+
     coroutines = []
     for block in blocks:
         coroutine = async_get_token_oracle(
@@ -135,6 +136,7 @@ async def async_get_token_price_by_block(
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
+    import asyncio
 
     # need to use c
     coroutines = []

@@ -5,8 +5,10 @@ import typing
 
 import toolcli
 
+if typing.TYPE_CHECKING:
+    import toolsql
+
 import ctc
-import ctc.config
 from .plugins import toolsql_plugin
 from . import cli_utils
 
@@ -210,6 +212,12 @@ def help_url_getter(
     )
 
 
+def _db_config_getter() -> toolsql.DBConfig | None:
+    import ctc.config
+
+    return ctc.config.get_db_config()
+
+
 def run_cli(
     raw_command: str | None = None,
     **toolcli_kwargs: typing.Any,
@@ -248,7 +256,7 @@ def run_cli(
         # plugins
         'plugins': [toolsql_plugin.plugin],
         'extra_data_getters': {
-            'db_config': ctc.config.get_db_config,
+            'db_config': _db_config_getter,
             'db_schema': ('ctc.db', 'get_complete_prepared_schema'),
         },
     }

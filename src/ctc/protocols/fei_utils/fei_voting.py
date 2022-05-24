@@ -8,8 +8,6 @@ import os
 import typing
 from typing_extensions import TypedDict
 
-import numpy as np
-import pandas
 import tooltime
 
 from ctc import spec
@@ -246,6 +244,9 @@ def create_vote_dataframe(
     - tags_of_addresses: {address: {tag_name: tag_value}}
     """
 
+    import numpy as pd
+    import pandas as pd
+
     votes = copy.deepcopy(votes)
 
     # create separate column for each voting strategy
@@ -273,7 +274,7 @@ def create_vote_dataframe(
                 if address in votes:
                     votes[address][tag_name] = tag_value
 
-    votes_df = pandas.DataFrame(votes).transpose()
+    votes_df = pd.DataFrame(votes).transpose()
 
     # convert dtypes
     votes_df = votes_df.convert_dtypes()

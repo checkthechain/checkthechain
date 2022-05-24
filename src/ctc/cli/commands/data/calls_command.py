@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import pandas as pd
 import toolcli
 
 from ctc import binary
@@ -71,6 +70,8 @@ async def async_calls_command(
     overwrite: bool,
     from_address: typing.Optional[spec.Address],
 ) -> None:
+
+    import pandas as pd
 
     if blocks is not None and addresses is not None:
         raise Exception('cannot specify both --blocks or --to-addresses')

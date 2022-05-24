@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import config
-
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
@@ -14,5 +12,6 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def setup_command() -> None:
-    config.setup_ctc()
+    from ctc.config import setup_utils
 
+    setup_utils.setup_ctc()

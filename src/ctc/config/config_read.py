@@ -5,8 +5,10 @@ from __future__ import annotations
 import typing
 from typing_extensions import TypedDict
 
-import toolconfig
 import toolcache
+
+if typing.TYPE_CHECKING:
+    import toolconfig
 
 from ctc import spec
 from . import config_spec
@@ -29,10 +31,14 @@ _kwargs: _ToolconfigKwargs = {
 
 
 def get_config_path(*, raise_if_dne: bool = True) -> str:
+    import toolconfig
+
     return toolconfig.get_config_path(raise_if_dne=raise_if_dne, **_kwargs)
 
 
 def config_path_exists() -> bool:
+    import toolconfig
+
     return toolconfig.config_path_exists(**_kwargs)
 
 
@@ -52,6 +58,7 @@ def get_config(
 def get_config(
     validate: toolconfig.ValidationOption = False,
 ) -> typing.Union[spec.ConfigSpec, typing.MutableMapping[str, typing.Any]]:
+    import toolconfig
 
     # load from file
     config_from_file = toolconfig.get_config(

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import math
 import random
 import typing
@@ -120,6 +119,8 @@ async def async_send(
         # chunk request
         request_chunks = chunk_request(request=request, provider=full_provider)
 
+        import logging
+
         logger = logging.getLogger()
         logger.info(
             'chunking batch of '
@@ -212,6 +213,8 @@ async def async_send_raw(
 
 
 def _log_request(request: spec.RpcRequest, provider: spec.Provider) -> None:
+    import logging
+
     logger = logging.getLogger()
     if isinstance(request, dict):
         logger.info('singular request: ' + request['method'])

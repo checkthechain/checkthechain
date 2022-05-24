@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import numpy as np
-import pandas as pd
 import toolcli
 import tooltime
 
@@ -51,6 +49,8 @@ async def async_block_command(
     overwrite: bool,
     provider: typing.Optional[str],
 ) -> None:
+    import numpy as np
+    import pandas as pd
 
     if attributes is None:
         # gas stats as well

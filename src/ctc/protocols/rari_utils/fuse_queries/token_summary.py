@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from typing_extensions import TypedDict
@@ -42,6 +41,8 @@ async def async_get_token_multipool_history(
 ) -> dict[spec.Address, CTokenMetricsByBlock]:
     """get token metrics across multiple pools and blocks"""
 
+    import asyncio
+
     if comptrollers is None:
         pools = await directory_metadata.async_get_all_pools()
         comptrollers = [pool[2] for pool in pools]
@@ -68,6 +69,8 @@ async def async_get_pool_token_history(
     metrics: CTokenMetricSpec | None = None,
 ) -> CTokenMetricsByBlock | None:
     """get metrics of a token in a pool across blocks"""
+    import asyncio
+
     ctokens = await pool_metadata.async_get_pool_ctokens(comptroller)
     coroutines = []
     for ctoken in ctokens:
@@ -112,6 +115,8 @@ async def async_get_ctoken_state_by_block(
     eth_price: spec.Number | None = None,
     in_usd: bool = True,
 ) -> CTokenMetricsByBlock:
+    import asyncio
+
     coroutines = []
     for block in blocks:
         coroutine = async_get_ctoken_state(
@@ -136,6 +141,8 @@ async def async_get_ctoken_state(
     eth_price: spec.Number | None = None,
     in_usd: bool = True,
 ) -> CTokenMetrics:
+    import asyncio
+
     if metrics is None:
         metrics = {
             'tvl': True,

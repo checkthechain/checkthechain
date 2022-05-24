@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import os
+import typing
 
 import toolcli
 
-from ctc import spec
+if typing.TYPE_CHECKING:
+    from ctc import spec
 
 
 def output_data(

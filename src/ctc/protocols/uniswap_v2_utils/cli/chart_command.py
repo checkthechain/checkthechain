@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import functools
 import os
 import math
@@ -49,6 +48,7 @@ async def async_chart_command(
     timescale: str,
     no_volume: bool,
 ) -> None:
+    import asyncio
     import numpy as np
 
     metadata_task = asyncio.create_task(

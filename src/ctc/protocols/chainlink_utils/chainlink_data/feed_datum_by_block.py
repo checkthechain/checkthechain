@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-import asyncio
 import typing
-
-import pandas as pd
 
 from ctc import spec
 from ctc import evm
-from ctc.toolbox import pd_utils
 
 from .. import chainlink_spec
 from . import feed_datum
@@ -21,6 +17,9 @@ async def async_get_feed_answer_datum_by_block(
     interpolate: bool = True,
     invert: bool = False,
 ) -> spec.Series:
+    import asyncio
+    import pandas as pd
+    from ctc.toolbox import pd_utils
 
     int_blocks = await evm.async_block_numbers_to_int(blocks=blocks)
 
@@ -56,6 +55,9 @@ async def async_get_feed_full_datum_by_block(
     interpolate: bool = True,
     invert: bool = False,
 ) -> spec.DataFrame:
+    import asyncio
+    import pandas as pd
+    from ctc.toolbox import pd_utils
 
     int_blocks = await evm.async_block_numbers_to_int(blocks=blocks)
 

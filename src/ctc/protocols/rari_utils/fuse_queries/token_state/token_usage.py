@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from ctc import rpc
 from ctc import spec
 from ctc.protocols import chainlink_utils
@@ -71,6 +69,8 @@ async def async_get_ctoken_tvl_and_tvb(
     in_usd: bool = True,
 ) -> dict[str, spec.Number]:
     """combined into one function because tvl requires both to compute anyway"""
+    import asyncio
+
     if not in_usd:
         borrowed_coroutine = asyncio.create_task(
             async_get_total_borrowed(ctoken=ctoken, block=block)

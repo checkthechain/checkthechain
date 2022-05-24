@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import time
 
 import tooltime
@@ -14,6 +13,8 @@ from . import chainlink_spec
 
 
 async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
+
+    import asyncio
 
     if evm.is_address_str(feed):
         feed_address = feed

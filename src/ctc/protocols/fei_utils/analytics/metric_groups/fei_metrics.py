@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
 from ctc.protocols import chainlink_utils
 from ctc.protocols import fei_utils
-from ctc.toolbox import pd_utils
 
 from .. import analytics_spec
 
@@ -14,6 +12,8 @@ from .. import analytics_spec
 async def async_compute_prices(
     blocks: list[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
+    from ctc.toolbox import pd_utils
+
     feed_data = await chainlink_utils.async_get_feed_data(
         feed='FEI_USD', start_block=blocks[0] - 10000
     )
@@ -74,6 +74,7 @@ async def async_compute_dex_tvls(
     blocks: list[int],
     verbose: bool = False,
 ) -> analytics_spec.MetricGroup:
+    import asyncio
 
     pools = analytics_spec.dex_pools
 

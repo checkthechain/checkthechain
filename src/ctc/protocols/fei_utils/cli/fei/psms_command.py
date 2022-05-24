@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 import toolcli
 import tooltime
 import toolstr
@@ -46,6 +44,7 @@ async def async_psms_command(
     block: spec.BlockNumberReference,
     limit: int,
 ) -> None:
+    import asyncio
 
     mints_task = asyncio.create_task(
         fei_psms.async_get_fei_psm_mints(start_block=14700000)
@@ -68,6 +67,8 @@ async def async_psms_command(
 
 
 async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
+    import asyncio
+
     psms = fei_psms.get_psms()
 
     mint_paused_coroutines = [

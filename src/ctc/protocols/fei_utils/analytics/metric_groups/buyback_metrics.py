@@ -4,7 +4,6 @@ import typing
 
 from ctc import spec
 from ctc.protocols import balancer_utils
-from ctc.toolbox import pd_utils
 
 from .. import analytics_spec
 
@@ -24,6 +23,7 @@ async def async_compute_buybacks(
 async def async_compute_tribe_buybacks_usd(
     blocks: list[int], swaps: typing.Optional[spec.DataFrame] = None
 ) -> analytics_spec.MetricData:
+    from ctc.toolbox import pd_utils
 
     # load swaps
     if swaps is None:

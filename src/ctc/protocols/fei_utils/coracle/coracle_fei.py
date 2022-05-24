@@ -4,7 +4,6 @@ import typing
 
 from ctc import directory
 from ctc import spec
-from ctc.toolbox import async_utils
 from ctc.toolbox import nested_utils
 
 from . import coracle_spec
@@ -80,6 +79,7 @@ async def async_get_fei_deposit_balances_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderSpec = None,
 ) -> dict[spec.ContractAddress, list[typing.Union[int, float]]]:
+    from ctc.toolbox import async_utils
 
     coroutines = [
         async_get_fei_deposit_balances(block=block, provider=provider)

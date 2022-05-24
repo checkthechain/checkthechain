@@ -4,7 +4,8 @@ import typing
 
 from ctc import spec
 
-import toolconfig
+if typing.TYPE_CHECKING:
+    import toolconfig
 
 
 def write_config_file(
@@ -13,6 +14,7 @@ def write_config_file(
     overwrite: toolconfig.OverwriteOption = False,
     style: typing.Optional[str] = None
 ) -> None:
+    import toolconfig
 
     toolconfig.write_config_file(
         config_data=typing.cast(
@@ -23,4 +25,3 @@ def write_config_file(
         overwrite=overwrite,
         style=style,
     )
-

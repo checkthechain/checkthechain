@@ -3,8 +3,6 @@ from __future__ import annotations
 import asyncio
 import typing
 
-import numpy as np
-
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -54,6 +52,8 @@ async def async_compute_wallet_rewards(
     provider: spec.ProviderSpec = None,
     replace_symbol: bool = True,
 ) -> typing.Mapping[str, spec.NumpyArray]:
+
+    import numpy as np
 
     # add reward token
     reward_token = '0x4da27a545c0c5b758a6ba100e3a049001de870f5'

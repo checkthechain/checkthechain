@@ -4,8 +4,6 @@ import typing
 
 import toolcli
 
-from ctc import db
-
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
@@ -31,6 +29,8 @@ async def async_create_tables_command(
     datatypes: typing.Sequence[str],
     networks: typing.Sequence[str],
 ) -> None:
+    from ctc import db
+
     if datatypes is not None:
         for datatype in datatypes:
             if datatype not in db.DBDatatype.__args__:  # type: ignore

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 from typing_extensions import TypedDict
 
@@ -26,6 +25,8 @@ async def async_get_factory_pool_data(
     factory: spec.Address,
     include_balances: bool = False,
 ) -> list[CurvePoolData]:
+    import asyncio
+
     n_pools = await rpc.async_eth_call(
         to_address=factory,
         function_name='pool_count',
@@ -110,6 +111,7 @@ async def async_get_base_pools(
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
+    import asyncio
     import pandas as pd
 
     if start_block is None:
@@ -192,6 +194,7 @@ async def async_get_meta_pools(
     provider: spec.ProviderSpec = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
+    import asyncio
     import pandas as pd
 
     # gather data

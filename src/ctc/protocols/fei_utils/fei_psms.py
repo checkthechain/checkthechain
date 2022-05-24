@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import asyncio
 import time
 import typing
 
-import pandas as pd
 import tooltime
 import toolstr
 
@@ -45,6 +43,9 @@ async def async_get_fei_psm_mints(
     timestamp: bool = True,
     normalize: bool = True,
 ) -> spec.DataFrame:
+
+    import asyncio
+    import pandas as pd
 
     if psms is None:
         psms = get_psms()
@@ -88,6 +89,9 @@ async def async_get_fei_psm_redemptions(
     timestamp: bool = True,
     normalize: bool = True,
 ) -> spec.DataFrame:
+    import asyncio
+    import pandas as pd
+
     if psms is None:
         psms = get_psms()
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 from typing_extensions import TypedDict
 
@@ -29,6 +28,8 @@ async def async_get_pool_tokens(
     pool_address: spec.Address,
     **rpc_kwargs: typing.Any,
 ) -> tuple[spec.Address, spec.Address]:
+    import asyncio
+
     token0_abi = await uniswap_v3_spec.async_get_function_abi('token0', 'pool')
     token1_abi = await uniswap_v3_spec.async_get_function_abi('token1', 'pool')
     kwargs = dict(rpc_kwargs, to_address=pool_address)
@@ -70,6 +71,8 @@ async def async_get_pool_swaps(
     replace_symbols: bool = False,
     normalize: bool = True,
 ) -> spec.DataFrame:
+
+    import asyncio
 
     if normalize or replace_symbols:
         metadata_task = asyncio.create_task(

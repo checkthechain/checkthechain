@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc.toolbox import async_utils
 from ctc.toolbox import nested_utils
 
 from . import coracle_tokens
@@ -185,6 +183,7 @@ async def async_get_token_balance_by_block(
     normalize: bool = True,
     usd: bool = False,
 ) -> typing.Union[list[int], list[float]]:
+    import asyncio
 
     coroutines = [
         async_get_token_balance(
@@ -299,6 +298,7 @@ async def async_get_tokens_balances_by_block(
     typing.Mapping[spec.Address, list[int]],
     typing.Mapping[spec.Address, list[float]],
 ]:
+    from ctc.toolbox import async_utils
 
     coroutines = [
         async_get_tokens_balances(

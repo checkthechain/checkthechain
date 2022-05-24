@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import typing
-
-import numpy as np
+import math
 
 T = typing.TypeVar('T')
 
@@ -17,7 +16,7 @@ def _ensure_exactly_one(*args: T) -> T:
 
 
 def _ensure_positive(value: typing.Any, error: bool = True) -> bool:
-    if isinstance(value, (np.ndarray, tuple, list)):
+    if hasattr(value, '__getitem__') and hasattr(value, '__iter__'):
         positive = all(subvalue > 0 for subvalue in value)
     else:
         positive = value > 0
@@ -29,13 +28,13 @@ def _ensure_positive(value: typing.Any, error: bool = True) -> bool:
 
 
 def _ensure_non_negative(value: typing.Any, error: bool = True) -> bool:
-    if isinstance(value, (np.ndarray, tuple, list)):
+    if hasattr(value, '__getitem__') and hasattr(value, '__iter__'):
         non_negative = all(
-            subvalue >= 0 or np.isclose(subvalue, 0, atol=1e-7)
+            subvalue >= 0 or math.isclose(subvalue, 0, abs_tol=1e-7)
             for subvalue in value
         )
     else:
-        non_negative = value >= 0 or np.isclose(value, 0, atol=1e-7)
+        non_negative = value >= 0 or math.isclose(value, 0, abs_tol=1e-7)
 
     if error and not non_negative:
         raise Exception('value must be non negative')
@@ -49,5 +48,4 @@ def _ensure_values_equal(lhs: typing.Any, rhs: typing.Any) -> None:
         for key in lhs.keys():
             _ensure_values_equal(lhs[key], rhs[key])
     else:
-        assert np.isclose(lhs, rhs)
-
+        assert math.isclose(lhs, rhs)

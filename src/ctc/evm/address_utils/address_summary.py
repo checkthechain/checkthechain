@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import json
-
-import toolstr
-
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -59,6 +55,9 @@ async def async_print_address_summary(
         )
 
         if raw:
+            import json
+            import toolstr
+
             toolstr.print_header('Raw JSON ABI')
             as_str = json.dumps(contract_abi, sort_keys=True, indent=4)
             print(as_str)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 
 import toolcli
 
@@ -22,6 +21,8 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_curve_pools_command(verbose: bool) -> None:
+    import asyncio
+
     factories = [
         '0xB9fC157394Af804a3578134A6585C0dc9cc990d4',
         '0x90E00ACe148ca3b23Ac1bC8C240C2a7Dd9c2d7f5',

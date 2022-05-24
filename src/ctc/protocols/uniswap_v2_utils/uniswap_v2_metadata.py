@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -13,6 +11,7 @@ async def async_get_pool_tokens(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
 ) -> tuple[spec.Address, spec.Address]:
+    import asyncio
 
     token0 = rpc.async_eth_call(
         function_name='token0', to_address=pool, provider=provider
@@ -70,6 +69,7 @@ async def async_get_pool_tokens_metadata(
     pool: spec.Address,
     provider: spec.ProviderSpec = None,
 ) -> uniswap_v2_spec.PoolTokensMetadata:
+    import asyncio
 
     x_address, y_address = await async_get_pool_tokens(
         pool=pool,

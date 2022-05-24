@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from . import optimize_exceptions
@@ -20,6 +19,7 @@ async def async_bisect(
     f_kwargs: typing.Mapping[str, typing.Any] | None = None,
     verbose: bool = False,
 ) -> float:
+    import asyncio
 
     # ensure that bounds are valid
     if a > b:

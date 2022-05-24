@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -43,6 +42,7 @@ async def async_get_pool_state(
     normalize: bool = True,
     fill_empty: bool = True,
 ) -> uniswap_v2_spec.PoolState:
+    import asyncio
 
     block = await evm.async_block_number_to_int(block, provider=provider)
 
@@ -96,6 +96,7 @@ async def async_get_pool_state_by_block(
     provider: spec.ProviderSpec = None,
     normalize: bool = True,
 ) -> uniswap_v2_spec.PoolStateByBlock:
+    import asyncio
 
     if normalize:
         decimals_coroutine = uniswap_v2_metadata.async_get_pool_decimals(

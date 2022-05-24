@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 import toolstr
@@ -15,6 +14,7 @@ from . import coracle
 async def async_print_pcv_assets(
     block: spec.BlockNumberReference | None = None,
 ) -> None:
+    import asyncio
 
     if block is not None:
         if isinstance(block, str) and block.isnumeric():
@@ -115,6 +115,7 @@ async def async_print_pcv_assets(
 async def async_print_pcv_deposits(
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> None:
+    import asyncio
 
     if block is not None:
         block = await evm.async_block_number_to_int(block=block)

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from ctc import evm
 from ctc import spec
 from ctc.protocols import fei_utils
@@ -12,6 +10,8 @@ async def async_compute_pcv_stats(
     blocks: list[int],
     verbose: bool = False,
 ) -> dict[str, analytics_spec.MetricGroup]:
+
+    import asyncio
 
     pcv_stats_task = asyncio.create_task(
         fei_utils.async_get_pcv_stats_by_block(blocks=blocks)

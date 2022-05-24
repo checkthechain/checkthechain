@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import asyncio
 import math
 import typing
 
-import aiohttp
+if typing.TYPE_CHECKING:
+    import aiohttp
+
 import toolstr
 
 
@@ -15,6 +16,9 @@ token_url_template = 'https://www.coingecko.com/en/coins/{name}'
 async def async_get_market_data(
     n: int,
 ) -> typing.Sequence[typing.Mapping[typing.Any, typing.Any]]:
+    import asyncio
+    import aiohttp
+
     n_per_page = 100
     n_pages = math.ceil(n / n_per_page)
 

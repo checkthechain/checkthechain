@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -15,6 +14,8 @@ async def async_get_pool_addresses(
     n_tokens: int | None = None,
     provider: spec.ProviderSpec = None,
 ) -> list[spec.Address]:
+    import asyncio
+
     if n_tokens is None:
         token_addresses = []
         t = 0
@@ -108,6 +109,8 @@ async def async_get_pool_metadata(
     n_tokens: int | None = None,
     provider: spec.ProviderSpec = None,
 ) -> curve_spec.CurvePoolMetadata:
+
+    import asyncio
 
     a_coroutine = rpc.async_eth_call(
         to_address=pool,

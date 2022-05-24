@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import typing
 
-import pandas as pd
 import toolcli
 
 from ctc import evm
@@ -66,6 +65,8 @@ async def async_balances_command(
     output: str,
     overwrite: bool,
 ) -> None:
+    import pandas as pd
+
     indent = None
     wallets = [wallet.lower() for wallet in wallets]
 

@@ -3,13 +3,13 @@ from __future__ import annotations
 import typing
 import re
 
-from ctc.protocols import fourbyte_utils
-
 
 async def async_decompile_function_abis(
     bytecode: str,
     sort: str | None = None,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
+    from ctc.protocols import fourbyte_utils
+
     function_selectors = re.findall('8063([a-f0-9]{8})146', bytecode)
 
     coroutines = [

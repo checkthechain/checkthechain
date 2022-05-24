@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import pandas as pd
 import toolcli
 import toolstr
 
@@ -82,6 +81,9 @@ async def async_balances_command(
     overwrite: bool,
     top: typing.Optional[str],
 ) -> None:
+
+    import pandas as pd
+    
     indent = None
 
     if len(args) == 1 and erc20s is not None:

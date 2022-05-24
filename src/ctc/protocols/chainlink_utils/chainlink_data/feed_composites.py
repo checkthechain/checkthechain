@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import spec
@@ -17,6 +16,7 @@ async def async_get_composite_feed_data(
     provider: spec.ProviderSpec = None,
 ) -> spec.Series:
     # TODO: other ways of specifying composites
+    import asyncio
 
     # queue requests
     coroutines = []

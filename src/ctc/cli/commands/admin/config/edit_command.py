@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 
 import os
-import subprocess
 
 import ctc.config
 
@@ -18,6 +17,8 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def edit_config_command() -> None:
+    import subprocess
+
     editor = os.environ.get('EDITOR')
     if editor is None or editor == '':
         editor = 'editor'

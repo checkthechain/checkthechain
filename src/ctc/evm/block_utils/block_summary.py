@@ -3,9 +3,6 @@ from __future__ import annotations
 import typing
 import time
 
-import tooltime
-import toolstr
-
 from ctc import binary
 from ctc import spec
 
@@ -16,6 +13,9 @@ async def async_print_block_summary(
     block: spec.Block | spec.BlockNumberReference,
     provider: spec.ProviderSpec = None,
 ) -> None:
+
+    import toolstr
+    import tooltime
 
     if not isinstance(block, dict):
         block = await block_crud.async_get_block(block=block, provider=provider)

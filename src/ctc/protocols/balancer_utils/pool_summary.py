@@ -4,9 +4,6 @@ import decimal
 import typing
 from typing_extensions import TypedDict
 
-import numpy as np
-import pandas as pd
-
 from ctc import directory
 from ctc import evm
 from ctc import spec
@@ -97,6 +94,8 @@ def summarize_pool_swaps(
     as_dataframe: bool = True,
 ) -> typing.Mapping[tuple[str, str], spec.DataFrame]:
 
+    import numpy as np
+
     trade_pairs = set()
     for i, row in swaps[['arg__tokenIn', 'arg__tokenOut']].iterrows():
         trade_pairs.add(tuple(row.values))
@@ -141,6 +140,8 @@ def summarize_pool_swaps(
             data['weight_' + str(c)] = pair_weights[weight_column].values
 
         if as_dataframe:
+            import pandas as pd
+
             df = pd.DataFrame(data)
 
         pair_data[(token_in, token_out)] = df

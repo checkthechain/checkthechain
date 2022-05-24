@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -31,6 +30,8 @@ async def async_get_tokens_deposits(
     provider: spec.ProviderSpec = None,
 ) -> dict[spec.Address, typing.Tuple[spec.ContractAddress, ...]]:
     """get all deposits of all tokens in pcv"""
+
+    import asyncio
 
     if block is None:
         block = 'latest'

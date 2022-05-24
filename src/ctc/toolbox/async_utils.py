@@ -10,8 +10,6 @@ import concurrent.futures
 import functools
 import typing
 
-import pandas as pd
-
 from ctc import spec
 
 
@@ -157,6 +155,8 @@ async def async_read_csv_processes(
     path: str,
     pool: concurrent.futures.ProcessPoolExecutor | None = None,
 ) -> spec.DataFrame:
+    import pandas as pd
+
     loop = asyncio.get_running_loop()
 
     if pool is None:
@@ -176,6 +176,8 @@ async def async_read_csv_threads(
     path: str,
     pool: concurrent.futures.ThreadPoolExecutor | None = None,
 ) -> spec.DataFrame:
+    import pandas as pd
+
     loop = asyncio.get_running_loop()
 
     if pool is None:
@@ -204,6 +206,7 @@ async def async_read_csv_dask(path: str) -> spec.DataFrame:
 async def async_read_csv_aiofiles(path: str) -> spec.DataFrame:
     import io
     import aiofiles
+    import pandas as pd
 
     async with aiofiles.open(path, 'r') as f:
         contents = await f.read()
@@ -214,6 +217,7 @@ async def async_read_csv_aiofiles(path: str) -> spec.DataFrame:
 
 async def async_read_csv_anyio(path: str) -> spec.DataFrame:
     import anyio.to_process
+    import pandas as pd
 
     return await anyio.to_process.run_sync(pd.read_csv, path)
 

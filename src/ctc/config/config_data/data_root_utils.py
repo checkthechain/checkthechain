@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import filecmp
 import os
-import shutil
 
 import toolcli
 
@@ -117,6 +116,8 @@ def initialize_data_root(
 
     # create directory
     try:
+        import shutil
+
         shutil.copytree(default_data_dir, path, dirs_exist_ok=True)
     except TypeError:
         # python3.7 compatibility
@@ -141,5 +142,7 @@ def _py37_copytree(source: str, destination: str) -> None:
                 destination_path = os.path.join(destination, filename)
             else:
                 destination_path = os.path.join(destination, relroot, filename)
+            import shutil
+
             shutil.copy(source_path, destination_path)
 
