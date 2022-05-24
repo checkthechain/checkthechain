@@ -5,6 +5,13 @@ import typing
 from ctc import rpc
 from ctc import spec
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict, Literal
+
+    class ProxyAddressMetadata(TypedDict):
+        address: spec.Address | None
+        proxy_type: Literal['eip897', 'eip1967', 'gnosis_safe'] | None
+
 
 async def async_get_proxy_address(
     contract_address: spec.Address,
@@ -12,6 +19,20 @@ async def async_get_proxy_address(
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address | None:
 
+    proxy_metadata = await async_get_proxy_metadata(
+        contract_address=contract_address,
+        provider=provider,
+        block=block
+    )
+
+    return proxy_metadata['address']
+
+
+async def async_get_proxy_metadata(
+    contract_address: spec.Address,
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> ProxyAddressMetadata:
     # try eip897
     try:
         eip897_address = await _async_get_eip897_implementation(
@@ -20,8 +41,11 @@ async def async_get_proxy_address(
             block=block,
         )
         if eip897_address is not None:
-            return eip897_address
-    except spec.exceptions.rpc_exceptions.RpcException:
+            return {
+                'address': eip897_address,
+                'proxy_type': 'eip897',
+            }
+    except (spec.exceptions.rpc_exceptions.RpcException, Exception):
         pass
 
     # try eip1967
@@ -31,9 +55,27 @@ async def async_get_proxy_address(
         block=block,
     )
     if eip1967_address != '0x0000000000000000000000000000000000000000':
-        return eip1967_address
+        return {
+            'address': eip1967_address,
+            'proxy_type': 'eip1967',
+        }
 
-    return None
+    # try gnosis proxy
+    gnosis_proxy_address = await async_get_gnosis_safe_proxy_address(
+        contract_address,
+        provider=provider,
+        block=block,
+    )
+    if gnosis_proxy_address is not None:
+        return {
+            'address': gnosis_proxy_address,
+            'proxy_type': 'gnosis_safe',
+        }
+
+    return {
+        'address': None,
+        'proxy_type': None,
+    }
 
 
 #
@@ -147,6 +189,7 @@ async def _async_get_eip1967_proxy_beacon_address(
 async def _async_get_eip1967_proxy_admin_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderSpec = None,
 ) -> spec.Address:
     """get a contract's logic address
 
@@ -163,6 +206,39 @@ async def _async_get_eip1967_proxy_admin_address(
     result = await rpc.async_eth_get_storage_at(
         address=contract_address,
         position=position,
+        block_number=block,
+        provider=provider,
+    )
+
+    return '0x' + result[-40:]
+
+
+async def async_get_eip1967_history():
+    raise NotImplementedError('use events here, see https://docs.openzeppelin.com/contracts/4.x/api/proxy#BeaconProxy')
+
+
+#
+# # gnosisc
+#
+
+
+async def async_get_gnosis_safe_proxy_address(
+    contract_address: spec.Address,
+    block: spec.BlockNumberReference | None = None,
+    confirm_bytecode: bool = True,
+    provider: spec.ProviderSpec = None,
+) -> spec.Address | None:
+
+    if confirm_bytecode:
+        gnosis_proxy_code = '0x608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea2646970667358221220d1429297349653a4918076d650332de1a1068c5f3e07c5c82360c277770b955264736f6c63430007060033'
+        bytecode = await rpc.async_eth_get_code(contract_address, block_number=block)
+        if bytecode != gnosis_proxy_code:
+            return None
+
+    result = await rpc.async_eth_get_storage_at(
+        address=contract_address,
+        position='0x0',
+        provider=provider,
         block_number=block,
     )
 

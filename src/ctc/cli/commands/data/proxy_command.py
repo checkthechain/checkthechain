@@ -36,44 +36,21 @@ async def async_proxy_command(
 ) -> None:
 
     if verbose:
-        eip_1967_address = (
-            await proxy_utils._async_get_eip1967_proxy_logic_address(
-                contract_address,
-                block=block,
-            )
+
+        proxy_metadata = await evm.async_get_proxy_metadata(
+            contract_address=contract_address,
+            block=block,
         )
-        uses_eip_1967 = (
-            eip_1967_address != '0x0000000000000000000000000000000000000000'
-        )
-
-        try:
-            eip_897_address = (
-                await proxy_utils._async_get_eip897_implementation(
-                    contract_address,
-                    block=block,
-                )
-            )
-            uses_eip_897 = True
-        except spec.exceptions.rpc_exceptions.RpcException:
-            eip_897_address = None
-            uses_eip_897 = False
-
-        if eip_897_address is not None and eip_1967_address != eip_897_address:
-            print('EIP-897 and EIP-1967 both used, but addresses do not match')
-            return
-
-        if uses_eip_897:
-            proxy_address = eip_897_address
-        elif uses_eip_1967:
-            proxy_address = eip_1967_address
-        else:
-            proxy_address = 'None'
+        proxy_address = proxy_metadata['address']
+        if proxy_address is None:
+            proxy_address = 'none'
 
         toolstr.print_text_box('Proxy Summary for ' + str(contract_address))
         rows: typing.Sequence[typing.Sequence[typing.Any]] = [
             ['block', block],
-            ['uses EIP-897', uses_eip_897],
-            ['uses EIP-1967', uses_eip_1967],
+            ['uses EIP-897', proxy_metadata['proxy_type'] == 'eip897'],
+            ['uses EIP-1967', proxy_metadata['proxy_type'] == 'eip1967'],
+            ['uses gnosis-proxy', proxy_metadata['proxy_type'] == 'gnosis_safe'],
             ['contract_address', contract_address],
             ['proxy_address', proxy_address],
         ]
