@@ -8,7 +8,7 @@ from ctc import evm
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_transaction_command,
-        'help': 'summarize transaction and its receipt',
+        'help': 'summarize transaction data including its receipt, call data, and logs',
         'args': [
             {'name': 'transaction', 'help': 'hash of transaction'},
             {'name': '--sort', 'help': 'attribute to sort logs by'},

@@ -25,6 +25,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'compute': {
         ('checksum',): 'ctc.cli.commands.compute.checksum_command',
         ('decode',): 'ctc.cli.commands.compute.decode_command',
+        ('decode', 'call'): 'ctc.cli.commands.compute.decode_call_command',
         ('encode',): 'ctc.cli.commands.compute.encode_command',
         ('keccak',): 'ctc.cli.commands.compute.keccak_command',
         ('limits',): 'ctc.cli.commands.compute.limits_command',
