@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 import toolstr
 import tooltime
 
@@ -14,33 +16,51 @@ async def async_print_transaction_summary(
     transaction_hash: str,
     sort_logs_by: str | None = None,
 ) -> None:
-    transaction = await rpc.async_eth_get_transaction_by_hash(transaction_hash)
-    transaction_receipt = await rpc.async_eth_get_transaction_receipt(
-        transaction_hash=transaction_hash
-    )
-    block = await block_utils.async_get_block(
-        transaction['block_number'], include_full_transactions=False
-    )
 
+    import asyncio
     from ctc.protocols import chainlink_utils
 
-    eth_usd = await chainlink_utils.async_get_eth_price(
-        block=transaction['block_number']
+    transaction_coroutine = rpc.async_eth_get_transaction_by_hash(
+        transaction_hash
+    )
+    transaction_receipt_task = asyncio.create_task(
+        rpc.async_eth_get_transaction_receipt(transaction_hash=transaction_hash)
     )
 
-    print('Transaction')
-    print('-----------')
+    transaction = await transaction_coroutine
+    block_task = asyncio.create_task(
+        block_utils.async_get_block(
+            transaction['block_number'], include_full_transactions=False
+        )
+    )
+    eth_usd_task = asyncio.create_task(
+        chainlink_utils.async_get_eth_price(block=transaction['block_number'])
+    )
+    contract_abi_task = asyncio.create_task(
+        evm.async_get_contract_abi(
+            contract_address=transaction['to'],
+            verbose=False,
+        )
+    )
+
+    toolstr.print_text_box('Transaction Summary')
     print('- hash:', transaction['hash'])
     print('- from:', transaction['from'])
     print('- to:', transaction['to'])
-    print()
-    print()
-    print('Receipt')
-    print('-------')
-    print('- success:', bool(transaction_receipt['status']))
-    print('- time:', block['timestamp'])
-    print('- timestamp:', tooltime.timestamp_to_iso(block['timestamp']))
     print('- block number:', transaction['block_number'])
+    print('- call data length:', len(transaction['input']))
+
+    block, eth_usd = await asyncio.gather(block_task, eth_usd_task)
+    timestamp = block['timestamp']
+    print('- timestamp:', timestamp)
+    print('- time:', tooltime.timestamp_to_iso(timestamp))
+    age = int(time.time()) - timestamp
+    print('- age:', tooltime.timelength_to_phrase(age))
+    print()
+    print()
+    transaction_receipt = await transaction_receipt_task
+    toolstr.print_text_box('Transaction Receipt')
+    print('- success:', bool(transaction_receipt['status']))
     print(
         '- transaction index:',
         transaction_receipt['transaction_index'],
@@ -53,7 +73,9 @@ async def async_print_transaction_summary(
         '/',
         toolstr.format(transaction['gas']),
     )
-    print('- gas price:', toolstr.format(transaction['gas_price'] / 1e9))
+    print(
+        '- gas price:', toolstr.format(transaction['gas_price'] / 1e9), 'gwei'
+    )
     if 'max_priority_fee_per_gas' in transaction:
         print(
             '- priority + base:',
@@ -73,19 +95,15 @@ async def async_print_transaction_summary(
     if transaction['input'] == '0x':
         print()
         print()
-        print('Call Data')
-        print('---------')
+        toolstr.print_text_box('Call Data')
         print('[none]')
     else:
         try:
-            contract_abi = await evm.async_get_contract_abi(
-                contract_address=transaction['to']
-            )
+            contract_abi = await contract_abi_task
         except spec.AbiNotFoundException:
             print()
             print()
-            print('No Contract ABI Available')
-            print('-------------------------')
+            print('[no contract ABI available]')
             return
 
         function_abi = await evm.async_get_function_abi(
@@ -98,8 +116,7 @@ async def async_print_transaction_summary(
         )
         print()
         print()
-        print('Call Data')
-        print('---------')
+        toolstr.print_text_box('Call Data')
         print(
             call_data['function_selector'],
             '-->',
@@ -117,8 +134,7 @@ async def async_print_transaction_summary(
 
     print()
     print()
-    print('Logs')
-    print('----')
+    toolstr.print_text_box('Logs')
     logs = transaction_receipt['logs']
     if len(logs) == 0:
         print('[none]')
@@ -159,4 +175,3 @@ async def async_print_transaction_summary(
                     value = binary.convert(value, 'prefix_hex')
 
                 print('    ' + str(e + 1) + '.', name, '=', value)
-

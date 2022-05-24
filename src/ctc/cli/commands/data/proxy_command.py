@@ -6,7 +6,6 @@ import toolcli
 import toolstr
 
 from ctc import evm
-from ctc.evm.address_utils import proxy_utils
 from ctc import spec
 
 

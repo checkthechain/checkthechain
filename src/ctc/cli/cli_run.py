@@ -62,8 +62,8 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('gas',): 'ctc.cli.commands.data.gas_command',
         ('proxy',): 'ctc.cli.commands.data.proxy_command',
         ('storage',): 'ctc.cli.commands.data.storage_command',
-        ('transaction',): 'ctc.cli.commands.data.transaction_command',
         ('timestamp',): 'ctc.cli.commands.data.timestamp_command',
+        ('tx',): 'ctc.cli.commands.data.tx_command',
     },
     'protocol': {
         ('cg',): 'ctc.cli.commands.data.cg_command',

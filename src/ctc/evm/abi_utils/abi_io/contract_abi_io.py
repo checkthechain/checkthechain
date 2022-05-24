@@ -12,6 +12,7 @@ async def async_get_contract_abi(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
+    verbose: bool = True,
 ) -> spec.ContractABI:
 
     if network is None:
@@ -34,6 +35,7 @@ async def async_get_contract_abi(
     abi = await etherscan_utils.async_get_contract_abi(
         contract_address,
         network=network,
+        verbose=verbose,
     )
 
     # get proxy abi
@@ -48,6 +50,7 @@ async def async_get_contract_abi(
         proxy_abi = await etherscan_utils.async_get_contract_abi(
             contract_address=proxy_address,
             network=network,
+            verbose=verbose,
         )
         abi = abi_modify.combine_contract_abis([abi, proxy_abi])
         includes_proxy = True

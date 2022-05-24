@@ -213,7 +213,7 @@ async def _async_get_eip1967_proxy_admin_address(
     return '0x' + result[-40:]
 
 
-async def async_get_eip1967_history():
+async def async_get_eip1967_history() -> None:
     raise NotImplementedError('use events here, see https://docs.openzeppelin.com/contracts/4.x/api/proxy#BeaconProxy')
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+import time
 
 import tooltime
 import toolstr
@@ -47,6 +48,7 @@ async def async_print_block_summary(
     print('─' * len(title))
     print('- timestamp:', block['timestamp'])
     print('- time:', tooltime.timestamp_to_iso(block['timestamp']))
+    print('- age:', tooltime.timelength_to_phrase(round(time.time()) - block['timestamp']))
     print('- block_hash:', block['hash'])
     print('- n_transactions:', len(block['transactions']))
     print(
