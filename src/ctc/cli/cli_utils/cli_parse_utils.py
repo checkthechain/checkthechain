@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
-from ctc import spec
+if typing.TYPE_CHECKING:
+    from ctc import spec
 
 
 async def async_resolve_block_range(
@@ -100,6 +100,8 @@ def parse_block_range(
     - "[ 123 ,456]"
     """
 
+    from ctc import binary
+
     tokens = tokenize(block_spec)
 
     # parse out the four components
@@ -110,14 +112,12 @@ def parse_block_range(
     start_type, start_block_str, end_block_str, end_type = tokens
 
     # convert to int if applicable
-    if start_block_str in spec.block_number_names:
-        start_block_str = typing.cast(spec.BlockNumberName, start_block_str)
-        start_block: spec.StandardBlockNumber = start_block_str
+    if start_block_str in ['latest', 'earliest', 'pending']:
+        start_block: spec.StandardBlockNumber = start_block_str  # type: ignore
     else:
         start_block = binary.raw_block_number_to_int(start_block_str)
-    if end_block_str in spec.block_number_names:
-        end_block_str = typing.cast(spec.BlockNumberName, end_block_str)
-        end_block: spec.StandardBlockNumber = end_block_str
+    if end_block_str in ['latest', 'earliest', 'pending']:
+        end_block: spec.StandardBlockNumber = end_block_str  # type: ignore
     else:
         end_block = binary.raw_block_number_to_int(end_block_str)
 
@@ -150,6 +150,8 @@ def parse_block_range(
 def parse_block_sample(
     block_spec: typing.Union[str, typing.Sequence[str]]
 ) -> spec.BlockSample:
+
+    from ctc import binary
 
     tokens = tokenize(block_spec)
 

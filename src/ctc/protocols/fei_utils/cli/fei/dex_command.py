@@ -77,7 +77,7 @@ def print_dex_table(
     ]
     rows.append(row)
 
-    toolstr.print_text_box('Fei Stable DEX State')
+    toolstr.print_text_box('Fei Stableswaps')
     print('(block = ' + str(block) + ')')
     print()
     format = {'trailing_zeros': 2, 'decimals': 2, 'order_of_magnitude': True}

@@ -3,10 +3,10 @@ from __future__ import annotations
 import os
 import typing
 
-import toolcli
-
 if typing.TYPE_CHECKING:
     import toolsql
+
+import toolcli
 
 import ctc
 from .plugins import toolsql_plugin
@@ -218,12 +218,63 @@ def _db_config_getter() -> toolsql.DBConfig | None:
     return ctc.config.get_db_config()
 
 
+# def _is_root_help(raw_command):
+#     import sys
+
+#     for command in [raw_command, sys.argv]:
+#         if command is None:
+#             continue
+#         if '--cd-destination-tempfile' in command:
+#             index = command.index('--cd-destination-tempfile')
+#             command = command[:index] + command[index + 2 :]
+#         if all(item.startswith('-') for item in command[1:]):
+#             return True
+#     return False
+
+
+# def _print_help_from_cache(command_index, help_cache_dir):
+#     help_cache_path = get_help_dir_hash_path(command_index, help_cache_dir)
+#     if os.path.isfile(help_cache_path):
+#         with open(help_cache_path, 'r') as f:
+#             contents = f.read()
+#         print(contents, end='')
+#         return True
+#     else:
+#         return False
+
+
+# def get_help_dir_hash_path(command_index, help_cache_dir):
+#     import hashlib
+
+#     command_index_str = str(sorted(command_index.items()))
+#     name_hash = hashlib.md5(command_index_str.encode()).hexdigest()
+#     help_cache_path = os.path.join(help_cache_dir, name_hash)
+#     return help_cache_path
+
+
 def run_cli(
     raw_command: str | None = None,
     **toolcli_kwargs: typing.Any,
 ) -> None:
 
-    config = {
+    import tempfile
+
+    help_cache_dir = os.path.join(tempfile.gettempdir(), 'ctc', 'help_cache')
+
+    # the goal of the below code would be to avoid having to import toolcli and
+    # save 6 ms of startup time. but the problem with the below code is that
+    # it produces a different cache key because the plugins have not been added
+#     if _is_root_help(raw_command):
+#         try:
+#             printed = _print_help_from_cache(
+#                 command_index, help_cache_dir
+#             )
+#             if printed:
+#                 return
+#         except Exception:
+#             pass
+
+    config: toolcli.CLIConfig = {
         #
         # metadata
         'base_command': 'ctc',
@@ -231,7 +282,8 @@ def run_cli(
         'version': ctc.__version__,
         'cd_dir_help': cd_dir_help,
         'cd_dir_getter': cd_dir_getter,
-        'help_url_getter': help_url_getter,
+        'help_url_getter': help_url_getter,  # type: ignore
+        'help_cache_dir': help_cache_dir,
         'help_subcommand_categories': help_subcommand_categories,
         'async_context_manager': cli_utils.AsyncContextManager,
         #
@@ -246,18 +298,15 @@ def run_cli(
             # 'comment': '#8be9fd',
         },
         #
-        # subcommands
+        # standard subcommands and standard args
         'include_standard_subcommands': True,
-        'include_cd_subcommand': True,
-        #
-        # args
         'include_debug_arg': True,
         #
         # plugins
         'plugins': [toolsql_plugin.plugin],
         'extra_data_getters': {
             'db_config': _db_config_getter,
-            'db_schema': ('ctc.db', 'get_complete_prepared_schema'),
+            'db_schema': ('ctc.db', 'get_complete_prepared_schema'),  # type: ignore
         },
     }
 
