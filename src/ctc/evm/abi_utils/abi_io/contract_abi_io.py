@@ -12,14 +12,23 @@ async def async_get_contract_abi(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
+    db_query: bool | None = None,
+    db_intake: bool | None = None,
+    block: spec.BlockNumberReference | None = None,
     verbose: bool = True,
 ) -> spec.ContractABI:
+    """for addresses that change ABI's over time, use db_query=False to skip cache"""
+
+    if db_query is None:
+        db_query = use_db
+    if db_intake is None:
+        db_intake = use_db
 
     if network is None:
         network = rpc.get_provider_network(provider)
 
     # load from db
-    if use_db:
+    if db_query:
         from ctc import db
 
         abi = await db.async_query_contract_abi(
@@ -44,6 +53,7 @@ async def async_get_contract_abi(
     proxy_address = await address_utils.async_get_proxy_address(
         contract_address=contract_address,
         provider=provider,
+        block=block,
     )
     includes_proxy = False
     if proxy_address is not None:
@@ -56,7 +66,7 @@ async def async_get_contract_abi(
         includes_proxy = True
 
     # save to db
-    if use_db:
+    if db_intake:
         await db.async_intake_contract_abi(
             contract_address=contract_address,
             network=network,

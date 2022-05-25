@@ -25,11 +25,31 @@ async def async_get_function_abi(
             network=network,
         )
 
-    return binary.get_function_abi(
-        function_name=function_name,
-        contract_abi=contract_abi,
-        n_parameters=n_parameters,
-        parameter_types=parameter_types,
-        function_selector=function_selector,
-    )
+    try:
+        return binary.get_function_abi(
+            function_name=function_name,
+            contract_abi=contract_abi,
+            n_parameters=n_parameters,
+            parameter_types=parameter_types,
+            function_selector=function_selector,
+        )
 
+    except LookupError as e:
+
+        # query contract_abi again if contract abi might have changed since db
+        if contract_address is not None:
+            contract_abi = await contract_abi_io.async_get_contract_abi(
+                contract_address=contract_address,
+                network=network,
+            )
+
+            return binary.get_function_abi(
+                function_name=function_name,
+                contract_abi=contract_abi,
+                n_parameters=n_parameters,
+                parameter_types=parameter_types,
+                function_selector=function_selector,
+            )
+
+        else:
+            raise e
