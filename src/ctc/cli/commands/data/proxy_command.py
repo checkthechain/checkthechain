@@ -34,6 +34,11 @@ async def async_proxy_command(
     block: spec.BlockNumberReference,
 ) -> None:
 
+    contract_address = await evm.async_resolve_address(
+        contract_address,
+        block=block,
+    )
+
     if verbose:
 
         proxy_metadata = await evm.async_get_proxy_metadata(
@@ -49,7 +54,10 @@ async def async_proxy_command(
             ['block', block],
             ['uses EIP-897', proxy_metadata['proxy_type'] == 'eip897'],
             ['uses EIP-1967', proxy_metadata['proxy_type'] == 'eip1967'],
-            ['uses gnosis-proxy', proxy_metadata['proxy_type'] == 'gnosis_safe'],
+            [
+                'uses gnosis-proxy',
+                proxy_metadata['proxy_type'] == 'gnosis_safe',
+            ],
             ['contract_address', contract_address],
             ['proxy_address', proxy_address],
         ]

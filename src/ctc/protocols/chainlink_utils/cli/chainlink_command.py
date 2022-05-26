@@ -64,7 +64,9 @@ async def async_chainlink_command(
     shell: bool,
 ) -> None:
 
-    feed = '_'.join(feed)
+    feed_str = '_'.join(feed)
+
+    feed_str = await evm.async_resolve_address(feed_str)
 
     if all_fields:
         fields: typing.Literal['full', 'answer'] = 'full'
@@ -72,23 +74,23 @@ async def async_chainlink_command(
         fields = 'answer'
 
     if blocks is None:
-        await chainlink_utils.async_summarize_feed(feed=feed)
+        await chainlink_utils.async_summarize_feed(feed=feed_str)
     else:
-        if evm.is_address_str(feed):
-            feed_address = feed
-        elif isinstance(feed, str):
+        if evm.is_address_str(feed_str):
+            feed_address = feed_str
+        elif isinstance(feed_str, str):
             feed_address = directory.get_oracle_address(
-                name=feed, protocol='chainlink'
+                name=feed_str, protocol='chainlink'
             )
         else:
-            raise Exception('unknown feed specification: ' + str(feed))
+            raise Exception('unknown feed specification: ' + str(feed_str))
         name = await rpc.async_eth_call(
             feed_address,
             function_abi=chainlink_utils.feed_function_abis['description'],
         )
         toolstr.print_text_box('Chainlink Feed: ' + name)
         print('- feed address')
-        print('- feed:', feed)
+        print('- feed:', feed_str)
         print('- fields:', fields)
         print('- output:', output)
 
@@ -112,7 +114,7 @@ async def async_chainlink_command(
             print('- end_block:', end_block)
 
         feed_data = await chainlink_utils.async_get_feed_data(
-            feed,
+            feed_str,
             provider=provider,
             fields=fields,
             start_block=start_block,

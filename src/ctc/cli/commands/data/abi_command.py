@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-import json
 import os
+import typing
 
 import toolcli
 
 from ctc import evm
-from ctc import spec
+
+if typing.TYPE_CHECKING:
+    from ctc import spec
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -63,6 +65,8 @@ async def async_abi_command(
     events: bool,
     search: str,
 ) -> None:
+
+    address = await evm.async_resolve_address(address)
     contract_abi = await evm.async_get_contract_abi(contract_address=address)
 
     # filter by name
@@ -92,6 +96,8 @@ async def async_abi_command(
 
     # output abis
     if not human_only:
+        import json
+
         as_str = json.dumps(contract_abi, indent=4, sort_keys=True)
         print(as_str)
     if not json_only and not human_only:

@@ -7,7 +7,6 @@ from ctc import binary
 from ctc import spec
 
 from . import abi_io
-from .. import event_utils
 
 
 #
@@ -72,18 +71,11 @@ def print_contract_abi_human_readable(
     max_width: int = 80,
     verbose: bool | int = False,
 ) -> None:
-    df = contract_abi_to_dataframe(
-        contract_abi=contract_abi, human_readable=False
-    )
-
-    functions = df[df['type'] == 'function']
-    functions = functions.drop(columns=['type', 'anonymous'])
+    functions = binary.get_function_abis(contract_abi)
 
     print('Contract ABI Functions')
     print('──────────────────────')
-    for i, (f, function_row) in enumerate(functions.iterrows()):
-
-        function = typing.cast(spec.FunctionABI, function_row)
+    for i, function in enumerate(functions):
 
         if len(function['outputs']) == 0:
             output_str = '[none]'
@@ -128,14 +120,13 @@ def print_contract_abi_human_readable(
                 )
             print()
 
-    events = df[df['type'] == 'event']
+    events = binary.get_event_abis(contract_abi)
     print()
     print('Contract ABI Events')
     print('───────────────────')
     if len(events) == 0:
         print('[none]')
-    for i, (e, event) in enumerate(events.iterrows()):
-        event_abi = typing.cast(spec.EventABI, event)
+    for i, event_abi in enumerate(events):
         event_hash = binary.get_event_hash(event_abi=event_abi)
         signature = binary.get_event_signature(event_abi=event_abi)
         line = str(i + 1) + '. ' + signature

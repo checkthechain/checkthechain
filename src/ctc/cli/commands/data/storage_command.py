@@ -3,6 +3,7 @@ from __future__ import annotations
 import toolcli
 
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -30,6 +31,12 @@ async def async_storage_command(
     block: spec.BlockNumberReference | None,
     datatype: str | None,
 ) -> None:
+
+    contract_address = await evm.async_resolve_address(
+        contract_address,
+        block=block,
+    )
+
     result = await rpc.async_eth_get_storage_at(
         contract_address,
         position=slot,

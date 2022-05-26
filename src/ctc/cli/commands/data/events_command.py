@@ -59,6 +59,8 @@ async def async_events_command(
     verbose: bool,
 ) -> None:
 
+    contract = await evm.async_resolve_address(contract)
+
     if blocks is not None:
         all_blocks = await cli_utils.async_resolve_block_range(blocks)
         start_block = all_blocks[0]

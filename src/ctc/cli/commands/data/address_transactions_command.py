@@ -25,6 +25,7 @@ async def async_address_transactions_command(address: spec.Address) -> None:
     print('this may take some time...')
     print()
 
+    address = await evm.async_resolve_address(address)
     transactions = await evm.async_get_transactions_from_address(address)
 
     rows = []

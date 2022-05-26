@@ -21,14 +21,24 @@ async def async_print_address_summary(
     - transactions
     - transfers
     """
+    import asyncio
 
-    eth_balance = await evm.async_get_eth_balance(address, provider=provider)
-    transaction_count = await rpc.async_eth_get_transaction_count(
+    eth_balance_coroutine = evm.async_get_eth_balance(
+        address, provider=provider
+    )
+    transaction_count_coroutine = rpc.async_eth_get_transaction_count(
         address, provider=provider
     )
 
     # contract data
-    code = await rpc.async_eth_get_code(address, provider=provider)
+    code_coroutine = rpc.async_eth_get_code(address, provider=provider)
+
+    [eth_balance, transaction_count, code] = await asyncio.gather(
+        eth_balance_coroutine,
+        transaction_count_coroutine,
+        code_coroutine,
+    )
+
     is_contract = code != '0x'
     if is_contract:
         address_type = 'contract'
@@ -67,4 +77,3 @@ async def async_print_address_summary(
                 max_width=max_width,
                 verbose=verbose,
             )
-

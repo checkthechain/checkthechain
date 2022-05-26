@@ -71,11 +71,11 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_balances_command(
-    args: list[str],
+    args: typing.Sequence[str],
     block: typing.Optional[spec.BlockNumberReference],
-    wallets: typing.Optional[list[str]],
-    blocks: typing.Optional[list[str]],
-    erc20s: typing.Optional[list[str]],
+    wallets: typing.Optional[typing.Sequence[str]],
+    blocks: typing.Optional[typing.Sequence[str]],
+    erc20s: typing.Optional[typing.Sequence[str]],
     raw: bool,
     output: str,
     overwrite: bool,
@@ -83,7 +83,12 @@ async def async_balances_command(
 ) -> None:
 
     import pandas as pd
-    
+
+    if wallets is not None:
+        wallets = await evm.async_resolve_addresses(wallets, block=block)
+    if erc20s is not None:
+        erc20s = await evm.async_resolve_addresses(erc20s, block=block)
+
     indent = None
 
     if len(args) == 1 and erc20s is not None:
@@ -97,6 +102,7 @@ async def async_balances_command(
         if block is None:
             block = 'latest'
         block = await evm.async_block_number_to_int(block)
+        wallet = await evm.async_resolve_address(wallet, block=block)
         symbols_coroutine = evm.async_get_erc20s_symbols(erc20s)
         balances = await evm.async_get_erc20s_balance_of(
             address=wallet,
@@ -129,6 +135,7 @@ async def async_balances_command(
         if block is None:
             block = 'latest'
         block = await evm.async_block_number_to_int(block)
+        erc20 = await evm.async_resolve_address(erc20, block=block)
         symbol_coroutine = evm.async_get_erc20_symbol(erc20)
 
         if wallets is not None:
@@ -197,8 +204,9 @@ async def async_balances_command(
                 'can only specify one of --erc20s --wallets, --blocks'
             )
         erc20, wallet = args
-
         resolved_blocks = await cli_utils.async_resolve_block_range(blocks)
+        erc20 = await evm.async_resolve_address(erc20, block=resolved_blocks[-1])
+        wallet = await evm.async_resolve_address(wallet, block=resolved_blocks[-1])
         balances = await evm.async_get_erc20_balance_of_by_block(
             address=wallet,
             token=erc20,

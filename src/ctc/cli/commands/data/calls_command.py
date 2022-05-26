@@ -73,6 +73,10 @@ async def async_calls_command(
 
     import pandas as pd
 
+    if addresses is not None:
+        addresses = await evm.async_resolve_addresses(addresses, block=block)
+    from_address = await evm.async_resolve_address(from_address, block=block)
+
     if blocks is not None and addresses is not None:
         raise Exception('cannot specify both --blocks or --to-addresses')
     if blocks is None and addresses is None:

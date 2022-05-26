@@ -63,6 +63,22 @@ async def async_resolve_name(
     return result
 
 
+async def async_resolve_names(
+    names: typing.Sequence[str],
+    provider: spec.ProviderSpec = None,
+    block: spec.BlockNumberReference | None = None,
+) -> typing.Sequence[spec.Address]:
+
+    import asyncio
+
+    coroutines = [
+        async_resolve_name(name=name, provider=provider, block=block)
+        for name in names
+    ]
+
+    return await asyncio.gather(*coroutines)
+
+
 async def async_reverse_lookup(
     address: spec.Address,
     provider: spec.ProviderSpec = None,

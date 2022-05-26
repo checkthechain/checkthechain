@@ -1,3 +1,7 @@
+# TODO: update with additional proxy types, see:
+# - https://github.com/ApeWorX/ape/pull/750
+# - https://docs.openzeppelin.com/contracts/4.x/api/proxy
+
 from __future__ import annotations
 
 import typing

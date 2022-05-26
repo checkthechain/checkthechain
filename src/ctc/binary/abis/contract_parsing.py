@@ -64,6 +64,12 @@ def get_function_abi(
         raise Exception('internal error')
 
 
+def get_function_abis(
+    contract_abi: spec.ContractABI,
+) -> typing.Sequence[spec.FunctionABI]:
+    return [item for item in contract_abi if item['type'] == 'function']
+
+
 def get_event_abi(
     *,
     contract_abi: spec.ContractABI,
@@ -99,3 +105,8 @@ def get_event_abi(
     else:
         raise Exception('found too many candidates for event abi')
 
+
+def get_event_abis(
+    contract_abi: spec.ContractABI,
+) -> typing.Sequence[spec.EventABI]:
+    return [item for item in contract_abi if item['type'] == 'event']

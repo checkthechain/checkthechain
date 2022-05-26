@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
+from ctc import evm
 from ctc import rpc
 
 
@@ -16,5 +17,6 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_bytecode_command(address: str) -> None:
+    address = await evm.async_resolve_address(address)
     bytecode = await rpc.async_eth_get_code(address)
     print(bytecode)

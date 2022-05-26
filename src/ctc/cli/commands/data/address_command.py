@@ -46,6 +46,8 @@ async def async_address_command(
     except OSError:
         max_width = 80
 
+    address = await evm.async_resolve_address(address)
+
     if verbose:
         verbose = 2
     await evm.async_print_address_summary(

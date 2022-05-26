@@ -33,6 +33,9 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_decompile_command(address_or_bytecode: str) -> None:
+
+    address_or_bytecode = await evm.async_resolve_address(address_or_bytecode)
+
     if len(address_or_bytecode) == 42:
         bytecode = await rpc.async_eth_get_code(address_or_bytecode)
     else:

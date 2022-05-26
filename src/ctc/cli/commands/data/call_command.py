@@ -46,11 +46,18 @@ async def async_call_command(
     from_address: spec.Address,
     block: str,
 ) -> None:
+    import asyncio
+
+    address_task = asyncio.create_task(
+        evm.async_resolve_address(address, block=block)
+    )
 
     if block is not None:
         block_number = await evm.async_block_number_to_int(block)
     else:
         block_number = 'latest'
+
+    address = await address_task
 
     if verbose:
         print('performing eth_call')

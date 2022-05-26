@@ -28,6 +28,7 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
     elif len(query) == 1:
         item = query[0]
         if len(item) <= 9 and str.isnumeric(item):
+            # treat as block number
             block = int(item)
             toolcli.execute_other_command_sequence(
                 command_sequence=('block',),
@@ -36,6 +37,7 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
             )
 
         elif item.startswith('0x') and len(item) == 66:
+            # treat as transaction hash
             transaction = item
             toolcli.execute_other_command_sequence(
                 command_sequence=('transaction',),
@@ -43,7 +45,8 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
                 parse_spec=parse_spec,
             )
 
-        elif item.startswith('0x') and len(item) == 42:
+        elif (item.startswith('0x') and len(item) == 42) or item.endswith('.eth'):
+            # treat as address
             address = item
             toolcli.execute_other_command_sequence(
                 command_sequence=('address',),
@@ -55,6 +58,7 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
             from ctc import directory
 
             try:
+                # create as ERC20 symbol
                 metadata = directory.get_erc20_metadata(symbol=item)
                 address = metadata['address']
                 toolcli.execute_other_command_sequence(
@@ -73,4 +77,3 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
             raise Exception('unknown query: ' + str(query))
     else:
         raise Exception('unknown query: ' + str(query))
-

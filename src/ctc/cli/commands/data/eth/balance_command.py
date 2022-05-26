@@ -36,6 +36,8 @@ async def async_balance_command(
     raw: bool,
 ) -> None:
 
+    address = await evm.async_resolve_address(address, block=block)
+
     if block is not None:
         block = await evm.async_block_number_to_int(block)
 

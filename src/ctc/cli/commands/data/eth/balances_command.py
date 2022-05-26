@@ -58,7 +58,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_balances_command(
-    wallets: list[str],
+    wallets: typing.Sequence[str],
     block: typing.Optional[spec.BlockNumberReference],
     blocks: typing.Optional[typing.Sequence[str]],
     raw: bool,
@@ -78,6 +78,7 @@ async def async_balances_command(
             )
 
         wallet = wallets[0]
+        wallet = await evm.async_resolve_address(wallet, block=blocks[-1])
         resolved_blocks = await cli_utils.async_resolve_block_range(blocks)
         balances = await evm.async_get_eth_balance_by_block(
             address=wallet,
@@ -101,6 +102,7 @@ async def async_balances_command(
         block = await evm.async_block_number_to_int(block)
 
         if wallets is not None:
+            wallets = await evm.async_resolve_addresses(wallets, block=block)
             balances = await evm.async_get_eth_balance_of_addresses(
                 addresses=wallets,
                 block=block,

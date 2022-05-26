@@ -5,6 +5,7 @@ import typing
 from ctc import spec
 from ctc import rpc
 
+from .. import address_utils
 from .. import evm_spec
 from . import erc20_normalize
 from . import erc20_generic
@@ -115,6 +116,12 @@ async def async_get_erc20_balance_of(
     if block is None:
         block = 'latest'
 
+    address = await address_utils.async_resolve_address(
+        address,
+        block=block,
+        provider=provider,
+    )
+
     balance = await erc20_generic.async_erc20_eth_call(
         token=token,
         function_name='balanceOf',
@@ -143,6 +150,12 @@ async def async_get_erc20_balance_of_addresses(
 
     if block is None:
         block = 'latest'
+
+    addresses = await address_utils.async_resolve_addresses(
+        addresses,
+        block=block,
+        provider=provider,
+    )
 
     balances = await rpc.async_batch_eth_call(
         to_address=token,
@@ -174,6 +187,12 @@ async def async_get_erc20s_balance_of(
     if block is None:
         block = 'latest'
 
+    address = await address_utils.async_resolve_address(
+        address,
+        block=block,
+        provider=provider,
+    )
+
     balances = await erc20_generic.async_erc20s_eth_calls(
         tokens=tokens,
         function_name='balanceOf',
@@ -204,6 +223,12 @@ async def async_get_erc20_balance_of_by_block(
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
     """"""
+
+    address = await address_utils.async_resolve_address(
+        address,
+        block=blocks[-1],
+        provider=provider,
+    )
 
     balances = await erc20_generic.async_erc20_eth_call_by_block(
         token=token,
@@ -241,6 +266,12 @@ async def async_get_erc20_allowance(
     provider: spec.ProviderSpec = None,
 ) -> typing.Union[int, float]:
 
+    address = await address_utils.async_resolve_address(
+        address,
+        block=block,
+        provider=provider,
+    )
+
     allowance = await erc20_generic.async_erc20_eth_call(
         token=token,
         function_name='allowance',
@@ -264,6 +295,12 @@ async def async_get_erc20_allowance_by_block(
     normalize: bool = True,
     provider: spec.ProviderSpec = None,
 ) -> typing.Union[list[int], list[float]]:
+
+    address = await address_utils.async_resolve_address(
+        address,
+        block=blocks[-1],
+        provider=provider,
+    )
 
     allowances = await erc20_generic.async_erc20_eth_call_by_block(
         token=token,
@@ -294,6 +331,12 @@ async def async_get_erc20s_allowances(
     provider: spec.ProviderSpec = None,
 ) -> typing.Union[list[int], list[float]]:
 
+    address = await address_utils.async_resolve_address(
+        address,
+        block=block,
+        provider=provider,
+    )
+
     allowances = await erc20_generic.async_erc20s_eth_calls(
         tokens=tokens,
         function_name='allowance',
@@ -318,6 +361,12 @@ async def async_get_erc20s_allowances_by_address(
     provider: spec.ProviderSpec = None,
 ) -> typing.Sequence[int | float]:
 
+    addresses = await address_utils.async_resolve_addresses(
+        addresses,
+        block=block,
+        provider=provider,
+    )
+
     allowances = await rpc.async_batch_eth_call(
         to_address=token,
         block_number=block,
@@ -332,4 +381,3 @@ async def async_get_erc20s_allowances_by_address(
         )
 
     return allowances
-
