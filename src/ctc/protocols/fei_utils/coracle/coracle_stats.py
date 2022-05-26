@@ -49,6 +49,7 @@ async def async_get_pcv_stats_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     wrapper: bool = False,
     provider: spec.ProviderSpec = None,
+    nullify_invalid: bool = True,
 ) -> spec.DataFrame:
 
     import asyncio
@@ -62,18 +63,28 @@ async def async_get_pcv_stats_by_block(
     if provider['chunk_size'] is None:
         provider['chunk_size'] = 1
 
+    async def _wrapped_call(block, to_address):
+        try:
+            return await rpc.async_eth_call(
+                function_name='pcvStats',
+                block_number=block,
+                provider=provider,
+                to_address=to_address,
+            )
+        except spec.RpcException as e:
+            invalid_message = 'execution reverted: chainlink is down'
+            if nullify_invalid and len(e.args) > 0 and e.args[0].endswith(invalid_message):
+                return [None] * 4
+            else:
+                raise e
+
     coroutines = []
     for block in blocks:
         to_address = coracle_spec.get_coracle_address(
             wrapper,
             block=block,
         )
-        coroutine = rpc.async_eth_call(
-            function_name='pcvStats',
-            block_number=block,
-            provider=provider,
-            to_address=to_address,
-        )
+        coroutine = _wrapped_call(block, to_address)
         coroutines.append(coroutine)
     result = await asyncio.gather(*coroutines)
 
@@ -85,9 +96,9 @@ async def async_get_pcv_stats_by_block(
         data[key] = transpose[k]
 
     as_array = {
-        'pcv': np.array(data['pcv']) / 1e18,
-        'user_fei': np.array(data['user_fei']) / 1e18,
-        'protocol_equity': np.array(data['protocol_equity']) / 1e18,
+        'pcv': np.array(data['pcv'], dtype=float) / 1e18,
+        'user_fei': np.array(data['user_fei'], dtype=float) / 1e18,
+        'protocol_equity': np.array(data['protocol_equity'], dtype=float) / 1e18,
         'valid': data['valid'],
     }
 
