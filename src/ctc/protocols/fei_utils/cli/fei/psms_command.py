@@ -102,7 +102,7 @@ async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
     toolstr.print_text_box('FEI PSMs')
     print('(block = ' + str(block) + ')')
     print()
-    headers = [
+    labels = [
         'PSM',
         'minting',
         'redeeming',
@@ -117,4 +117,4 @@ async def async_print_psm_state(block: spec.BlockNumberReference) -> None:
             psm_address,
         ]
         rows.append(row)
-    toolstr.print_table(rows=rows, headers=headers)
+    toolstr.print_table(rows=rows, labels=labels)

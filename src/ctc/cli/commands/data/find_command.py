@@ -25,12 +25,12 @@ async def async_find_command(query: str) -> None:
     try:
         result = directory.get_erc20_metadata(symbol=query)
         row = []
-        headers: typing.Sequence[
+        labels: typing.Sequence[
             typing.Literal['symbol', 'decimals', 'address']
         ] = ['symbol', 'decimals', 'address']
-        for key in headers:
+        for key in labels:
             row.append(result[key])
         rows = [row]
-        toolstr.print_table(rows=rows, headers=headers)
+        toolstr.print_table(rows=rows, labels=labels)
     except LookupError:
         print('could not find anything')

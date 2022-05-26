@@ -47,7 +47,7 @@ def print_fuse_pool_summary(
     # get block data
     block_number = block['number']
 
-    headers = {
+    labels = {
         'name': 'token',
         'supplied_tvl': 'TVL',
         'borrowed_tvl': 'TVB',
@@ -62,7 +62,7 @@ def print_fuse_pool_summary(
     rows = []
     for token_name, token_data in tokens_data.items():
         row = []
-        for column in headers:
+        for column in labels:
             datum = token_data[column]
             if column in ['utilization', 'supply_apy', 'borrow_apy']:
                 datum = toolstr.format(datum, percentage=True, decimals=2)
@@ -83,7 +83,7 @@ def print_fuse_pool_summary(
     print('- TVB:', toolstr.format(tvb, prefix='$', order_of_magnitude=True))
     print('- block:', block_number)
     print()
-    toolstr.print_table(rows, headers=list(headers.values()))
+    toolstr.print_table(rows, labels=list(labels.values()))
 
 
 async def async_print_all_pool_summary(
@@ -156,7 +156,7 @@ async def async_print_all_pool_summary(
     print('- block:', block)
     # print('- time:', timestamp)
     print()
-    toolstr.print_table(rows, headers=['#', 'pool', 'TVL', 'TVB'])
+    toolstr.print_table(rows, labels=['#', 'pool', 'TVL', 'TVB'])
 
 
 async def _async_get_all_pools_stats(
@@ -350,7 +350,7 @@ async def async_print_fuse_token_summary(
 
     include_empty = False
 
-    headers = [
+    labels = [
         'pool',
         'TVL',
         'TVB',
@@ -397,4 +397,4 @@ async def async_print_fuse_token_summary(
     print('- block:', block_data['number'])
     # print('- time:', timestamp)
     print()
-    toolstr.print_table(rows, headers=headers)
+    toolstr.print_table(rows, labels=labels)

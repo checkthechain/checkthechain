@@ -58,7 +58,7 @@ def output_data(
             columns = [data.index.name, data.name]
         else:
             raise Exception('unknown data format')
-        toolstr.print_table(rows=rows, headers=columns, indent=indent)
+        toolstr.print_table(rows=rows, labels=columns, indent=indent)
 
     else:
 

@@ -66,7 +66,7 @@ async def async_pcv_command(
         toolstr.print_text_box('Fei PCV Summary')
         toolstr.print_table(
             rows,
-            headers=['', 'amount'],
+            labels=['', 'amount'],
             format=format_kwargs,
             column_format={'CR': {'percentage': True}},
         )

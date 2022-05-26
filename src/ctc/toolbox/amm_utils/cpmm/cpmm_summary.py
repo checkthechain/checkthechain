@@ -103,7 +103,7 @@ def print_liquidity_depth(
     format_str = '{:,.2f}'
 
     current_x_per_y = x_reserves / y_reserves
-    headers = ['depth', 'new price', x_name, y_name]
+    labels = ['depth', 'new price', x_name, y_name]
 
     trades = []
     for depth in depths:
@@ -152,7 +152,7 @@ def print_liquidity_depth(
         trades.append(trade)
 
     indent = ' ' * 4 + toolstr.indent_to_str(indent)
-    toolstr.print_table(rows=trades, headers=headers, indent=indent)
+    toolstr.print_table(rows=trades, labels=labels, indent=indent)
 
 
 def print_trade_summary(
@@ -189,7 +189,7 @@ def print_trade_summary(
         fees = trade_summary['y_fees']
         print(indent + '- fees:', toolstr.format(fees), y_name)
     print(indent + '- prices:')
-    headers = [
+    labels = [
         '',
         'P_mean',
         'P_start',
@@ -219,7 +219,7 @@ def print_trade_summary(
     print()
     toolstr.print_table(
         rows=rows,
-        headers=headers,
+        labels=labels,
         indent='    ' + indent,
         column_gap=1,
     )
@@ -227,7 +227,7 @@ def print_trade_summary(
     print()
     print(indent + '- pool reserve sizes:')
     print()
-    headers = ['', 'before', 'after', 'change']
+    labels = ['', 'before', 'after', 'change']
     new_x_reserves = trade_summary['trade_results']['new_pool']['x_reserves']
     new_y_reserves = trade_summary['trade_results']['new_pool']['y_reserves']
     x_change = new_x_reserves / trade_kwargs['x_reserves'] - 1
@@ -248,7 +248,7 @@ def print_trade_summary(
     ]
     toolstr.print_table(
         rows=rows,
-        headers=headers,
+        labels=labels,
         indent='    ' + indent,
         column_gap=1,
         format={'decimals': 2, 'trailing_zeros': True},

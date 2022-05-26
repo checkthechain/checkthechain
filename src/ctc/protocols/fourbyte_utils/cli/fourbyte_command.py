@@ -102,7 +102,7 @@ async def async_fourbyte_command(
             ]
             rows.append(row)
 
-        headers = [
+        labels = [
             'hex',
             'text',
             '4byte id',
@@ -113,7 +113,7 @@ async def async_fourbyte_command(
         else:
             print(len(results), 'results')
         print()
-        toolstr.print_table(rows, headers=headers)
+        toolstr.print_table(rows, labels=labels)
 
     elif signature_type == 'event':
         if len(results) == 0:

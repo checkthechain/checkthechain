@@ -31,7 +31,7 @@ async def async_chains_command() -> None:
     }
 
     already_used = set()
-    headers = [
+    labels = [
         'name',
         'chain_id',
         'block explorer',
@@ -63,7 +63,7 @@ async def async_chains_command() -> None:
     print()
     toolstr.print_table(
         rows,
-        headers=headers,
+        labels=labels,
         column_justify={
             'default': 'center',
             'has rpc': 'center',

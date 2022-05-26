@@ -65,10 +65,10 @@ def print_market_data(
     if width is None:
         width = 8
 
-    # create headers
-    headers = ['token', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
+    # create labels
+    labels = ['token', 'price', 'Δ 1H', 'Δ 24H', 'Δ 7D', 'volume', 'mkt cap']
     if verbose:
-        headers.append('7D chart')
+        labels.append('7D chart')
 
     # create rows
     rows: list[typing.Sequence[typing.Any]] = []
@@ -121,7 +121,7 @@ def print_market_data(
     # print table
     toolstr.print_multiline_table(
         rows,
-        headers=headers,
+        labels=labels,
         column_gap=1,
         # compact=True,
         add_row_index=True,

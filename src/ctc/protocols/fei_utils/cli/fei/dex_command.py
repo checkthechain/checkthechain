@@ -44,7 +44,7 @@ def print_dex_table(
     block: spec.BlockNumberReference,
 ) -> None:
 
-    headers = [
+    labels = [
         'Pool',
         'Total TVL',
         'FEI TVL',
@@ -83,7 +83,7 @@ def print_dex_table(
     format = {'trailing_zeros': 2, 'decimals': 2, 'order_of_magnitude': True}
     toolstr.print_table(
         rows,
-        headers=headers,
+        labels=labels,
         format=format,
         column_format={'Total TVL': dict(format, prefix='$')},
     )

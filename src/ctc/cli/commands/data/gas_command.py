@@ -117,7 +117,7 @@ async def async_gas_command(
     toolstr.print_header('Previous Blocks')
     print('aggregated using median price of transactions in each block')
     print()
-    headers = ['blocks', 'time', 'min', 'median', 'mean', 'max']
+    labels = ['blocks', 'time', 'min', 'median', 'mean', 'max']
     rows = []
     for l, last_n in enumerate(last_as_int + last_blocks):
 
@@ -152,7 +152,7 @@ async def async_gas_command(
         rows.append(row)
 
     final_df = pd.DataFrame(rows)
-    final_df.columns = headers
+    final_df.columns = labels
     final_df = final_df.sort_values(by='time')
     final_df = final_df.set_index('blocks')
 

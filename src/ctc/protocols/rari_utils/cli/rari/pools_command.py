@@ -34,7 +34,7 @@ async def async_pools_command(verbose: bool) -> None:
                 pool[2],  # comptroller
                 pool[1],  # creator
             ]
-            headers = [
+            labels = [
                 'index',
                 'name',
                 'create block',
@@ -49,7 +49,7 @@ async def async_pools_command(verbose: bool) -> None:
                 tooltime.timestamp_to_iso(pool[4])[:10],  # creation time
                 pool[2],  # comptroller
             ]
-            headers = ['index', 'name', 'date', 'comptroller']
+            labels = ['index', 'name', 'date', 'comptroller']
         rows.append(row)
     print(len(rows))
-    toolstr.print_table(rows, headers=headers)
+    toolstr.print_table(rows, labels=labels)

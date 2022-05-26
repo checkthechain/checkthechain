@@ -33,6 +33,6 @@ def chainlink_ls_command(query: str) -> None:
             feed['address'][:42],
         ]
         rows.append(row)
-    headers = ['name', 'delta', 'rate', 'address']
+    labels = ['name', 'delta', 'rate', 'address']
     print(len(rows))
-    toolstr.print_table(rows, headers=headers)
+    toolstr.print_table(rows, labels=labels)

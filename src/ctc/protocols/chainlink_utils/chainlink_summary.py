@@ -80,11 +80,11 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
     print()
     toolstr.print_header('Recent Updates')
     print()
-    headers = ['value', 'age', 'block', 'timestamp', 'time']
+    labels = ['value', 'age', 'block', 'timestamp', 'time']
 
     toolstr.print_table(
         updates[-n_recent:][::-1],
-        headers=headers,
+        labels=labels,
         indent='    ',
         column_format={'value': {'decimals': 5}},
     )

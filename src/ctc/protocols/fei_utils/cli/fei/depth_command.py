@@ -57,7 +57,7 @@ async def async_depth_command(
                 row.append(value)
             rows.append(row)
 
-        headers = ['pool'] + ['to $' + str(price) for price in prices_float]
+        labels = ['pool'] + ['to $' + str(price) for price in prices_float]
         toolstr.print_text_box('FEI Liquidity Depth')
         print()
         print(
@@ -67,7 +67,7 @@ async def async_depth_command(
         print()
         toolstr.print_table(
             rows,
-            headers=headers,
+            labels=labels,
             format={
                 'order_of_magnitude': True,
                 'prefix': '$',

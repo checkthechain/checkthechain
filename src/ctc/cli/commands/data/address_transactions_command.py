@@ -37,9 +37,9 @@ async def async_address_transactions_command(address: spec.Address) -> None:
         ]
         rows.append(row)
 
-    headers = ['#', 'block', 'transaction hash']
+    labels = ['#', 'block', 'transaction hash']
     toolstr.print_table(
         rows,
-        headers=headers,
+        labels=labels,
         compact=True,
     )

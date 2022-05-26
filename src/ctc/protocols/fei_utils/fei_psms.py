@@ -133,7 +133,7 @@ async def async_get_fei_psm_redemptions(
 
 def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
 
-    headers = [
+    labels = [
         'block',
         'age',
         'token',
@@ -168,7 +168,7 @@ def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
         'trailing_zeros': True,
         'oom_blank': ' ',
     }
-    toolstr.print_table(rows, headers=headers, format=format)
+    toolstr.print_table(rows, labels=labels, format=format)
 
 
 def print_fei_psm_redemptions(
@@ -176,7 +176,7 @@ def print_fei_psm_redemptions(
     limit: int = 30,
 ) -> None:
 
-    headers = [
+    labels = [
         'block',
         'age',
         'token',
@@ -211,4 +211,4 @@ def print_fei_psm_redemptions(
         'trailing_zeros': True,
         'oom_blank': ' ',
     }
-    toolstr.print_table(rows, headers=headers, format=format)
+    toolstr.print_table(rows, labels=labels, format=format)

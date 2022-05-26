@@ -72,7 +72,7 @@ async def async_print_pcv_assets(
 
     # total for each token
     rows = []
-    headers = [
+    labels = [
         'asset',
         'amount',
         # 'deposits',
@@ -109,7 +109,7 @@ async def async_print_pcv_assets(
     )
     print('total', total_usd)
     print()
-    toolstr.print_table(rows, headers=headers)
+    toolstr.print_table(rows, labels=labels)
 
 
 async def async_print_pcv_deposits(
@@ -209,13 +209,13 @@ async def async_print_pcv_deposits(
             row.append(deposit)
             rows.append(row)
 
-    headers = [
+    labels = [
         'asset',
         'balance',
         'name',
         'address',
     ]
-    toolstr.print_table(rows, headers=headers)
+    toolstr.print_table(rows, labels=labels)
     print()
 
     toolstr.print_text_box('FEI Deployments')
@@ -242,5 +242,5 @@ async def async_print_pcv_deposits(
             address,
         ]
         rows.append(row)
-    headers = ['asset', 'balance', 'name', 'address']
-    toolstr.print_table(rows, headers=headers)
+    labels = ['asset', 'balance', 'name', 'address']
+    toolstr.print_table(rows, labels=labels)
