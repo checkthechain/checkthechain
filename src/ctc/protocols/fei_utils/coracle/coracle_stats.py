@@ -63,7 +63,9 @@ async def async_get_pcv_stats_by_block(
     if provider['chunk_size'] is None:
         provider['chunk_size'] = 1
 
-    async def _wrapped_call(block, to_address):
+    async def _wrapped_call(
+        block: spec.BlockNumberReference, to_address: spec.Address
+    ) -> typing.Sequence[None | list[typing.Any]]:
         try:
             return await rpc.async_eth_call(
                 function_name='pcvStats',
@@ -73,7 +75,11 @@ async def async_get_pcv_stats_by_block(
             )
         except spec.RpcException as e:
             invalid_message = 'execution reverted: chainlink is down'
-            if nullify_invalid and len(e.args) > 0 and e.args[0].endswith(invalid_message):
+            if (
+                nullify_invalid
+                and len(e.args) > 0
+                and e.args[0].endswith(invalid_message)
+            ):
                 return [None] * 4
             else:
                 raise e
@@ -98,7 +104,8 @@ async def async_get_pcv_stats_by_block(
     as_array = {
         'pcv': np.array(data['pcv'], dtype=float) / 1e18,
         'user_fei': np.array(data['user_fei'], dtype=float) / 1e18,
-        'protocol_equity': np.array(data['protocol_equity'], dtype=float) / 1e18,
+        'protocol_equity': np.array(data['protocol_equity'], dtype=float)
+        / 1e18,
         'valid': data['valid'],
     }
 
@@ -108,4 +115,3 @@ async def async_get_pcv_stats_by_block(
     df = pd.DataFrame(as_array, index=blocks)
 
     return df
-

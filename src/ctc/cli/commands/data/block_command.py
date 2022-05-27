@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import time
+
 import toolcli
+import tooltime
 
 from ctc import evm
 
@@ -27,6 +30,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
+        'extra_data': ['parse_spec'],
         'examples': [
             '14000000',
             '14000000 --json',
@@ -40,10 +44,14 @@ async def async_block_command(
     timestamp: str | int,
     verbose: bool,
     as_json: bool,
+    parse_spec: toolcli.ParseSpec,
 ) -> None:
 
     if block is None:
         if timestamp is not None:
+
+            if not isinstance(timestamp, str):
+                raise Exception('function input should be str')
 
             if len(timestamp) == 4 or (
                 len(timestamp) == 10 and timestamp.count('-') == 2
@@ -52,13 +60,21 @@ async def async_block_command(
             else:
                 timestamp = int(timestamp)
 
-            print('searching for block at timestamp:', timestamp)
-            block_number = await evm.async_get_block_of_timestamp(
-                timestamp=timestamp,
-                verbose=False,
-            )
-            print('found block', block_number)
-            print()
+            timestamp_seconds = tooltime.timestamp_to_seconds(timestamp)
+
+            if timestamp_seconds > time.time():
+                block_number = await evm.async_predict_timestamp_block(timestamp)
+                print('predicting future block...')
+                print(block_number)
+                return
+            else:
+                print('searching for block at timestamp:', timestamp)
+                block_number = await evm.async_get_block_of_timestamp(
+                    timestamp=timestamp,
+                    verbose=False,
+                )
+                print('found block', block_number)
+                print()
         else:
             raise Exception('must specify block or timestamp')
     else:
