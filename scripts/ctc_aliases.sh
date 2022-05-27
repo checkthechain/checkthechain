@@ -13,7 +13,7 @@
 # compute commands
 alias ascii="ctc ascii"
 alias hex="ctc hex"
-alias keccak="ctc keccack"
+alias keccak="ctc keccak"
 alias lower="ctc lower"
 
 # data commands
@@ -21,12 +21,13 @@ alias abi="ctc abi"
 alias address="ctc address"
 alias block="ctc block"
 alias blocks="ctc blocks"
+alias bytecode="ctc bytecode"
 alias call="ctc call"
 alias calls="ctc calls"
 alias erc20="ctc erc20"
 alias eth="ctc eth"
 alias gas="ctc gas"
-alias transaction="ctc transaction"
+alias tx="ctc tx"
 
 # protocol commands
 alias 4byte="ctc 4byte"
@@ -36,4 +37,4 @@ alias curve="ctc curve"
 alias ens="ctc ens"
 alias fei="ctc fei"
 alias rari="ctc rari"
-
+alias uniswap="ctc uniswap"
