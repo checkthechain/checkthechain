@@ -55,7 +55,7 @@ dependencies = [
     'toolcli>=0.5.3',
     'toolconf>=0.1.0',
     'toolsql>=0.3.1',
-    'toolstr>=0.4.0',
+    'toolstr>=0.4.1',
     'tooltime>=0.2.0',
     #
     # EVM dependencies
@@ -182,6 +182,7 @@ deps =
     pytest >= 6
     pytest-asyncio
     rlp
+    matplotlib
 commands = pytest
 
 ; the legacy environment uses the oldest allowed dependencies
@@ -190,6 +191,8 @@ deps =
     pytest >= 6
     pytest-asyncio
     rlp
+    matplotlib
+    typing-extensions==4.2.0
     ;
     ; data science
     numpy==1.19.0
@@ -203,18 +206,16 @@ deps =
     ;
     ; tool suite
     toolcache==0.4.0
-    toolcli==0.5.0
+    toolcli==0.5.3
     toolconf==0.1.0
-    toolsql==0.3.0
-    toolstr==0.2.2
-    tooltable==0.1.0
-    tooltime==0.1.4
+    toolsql==0.3.1
+    toolstr==0.4.1
+    tooltime==0.2.0
     ;
     ; EVM dependencies
     pycryptodome==3.9.1
-    eth_abi==3.0.0
+    eth_abi_lite==3.0.2
     idna==3.3
-    eth_utils==2.0
 
 commands = pytest --disable-warnings
 """
