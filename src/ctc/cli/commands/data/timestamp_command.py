@@ -23,17 +23,23 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_timestamp_command(timestamp: str) -> None:
+async def async_timestamp_command(timestamp: str | int) -> None:
     if timestamp is None:
         timestamp = time.time()
 
-    timestamp_int = int(timestamp)
-    pretty = tooltime.convert_timestamp(timestamp_int, 'TimestampISO')
-    block = await evm.async_get_block_of_timestamp(timestamp_int, mode='before')
+    if len(timestamp) == 4 or (
+        len(timestamp) == 10 and timestamp.count('-') == 2
+    ):
+        pass
+    else:
+        timestamp = int(timestamp)
+    pretty = tooltime.convert_timestamp(timestamp, 'TimestampISO')
+    block = await evm.async_get_block_of_timestamp(timestamp, mode='before')
+    timestamp_seconds = tooltime.timestamp_to_seconds(timestamp)
 
     rows = [
         ['ISO time', pretty],
-        ['timestamp', str(timestamp_int)],
+        ['timestamp', str(timestamp_seconds)],
         ['block before', str(block)],
     ]
     toolstr.print_table(rows, column_justify=['right', 'left'])

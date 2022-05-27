@@ -13,7 +13,6 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': 'block', 'nargs': '?', 'help': 'block number'},
             {
                 'name': '--timestamp',
-                'type': int,
                 'help': 'specify block by timestamp',
             },
             {
@@ -38,19 +37,27 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_block_command(
     block: str | None,
-    timestamp: int,
+    timestamp: str | int,
     verbose: bool,
     as_json: bool,
 ) -> None:
 
     if block is None:
         if timestamp is not None:
+
+            if len(timestamp) == 4 or (
+                len(timestamp) == 10 and timestamp.count('-') == 2
+            ):
+                pass
+            else:
+                timestamp = int(timestamp)
+
             print('searching for block at timestamp:', timestamp)
             block_number = await evm.async_get_block_of_timestamp(
                 timestamp=timestamp,
                 verbose=False,
             )
-            print('found block', block)
+            print('found block', block_number)
             print()
         else:
             raise Exception('must specify block or timestamp')
