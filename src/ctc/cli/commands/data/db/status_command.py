@@ -19,6 +19,10 @@ def status_command() -> None:
     toolstr.print_text_box('Database Status')
     print()
     db_config = config.get_db_config()
+    if db_config is None:
+        print('[no db configured]')
+        return
+
     toolstr.print_header('Database Config')
     print('- dbms:', db_config['dbms'])
     if db_config['dbms'] == 'sqlite':
