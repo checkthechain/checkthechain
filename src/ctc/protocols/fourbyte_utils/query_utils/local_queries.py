@@ -80,7 +80,7 @@ def search_signatures(
             hex_signature = '0x' + hex_signature
 
         # query result
-        result = signatures_by_hex[hex_signature]
+        result = signatures_by_hex.get(hex_signature, [])
 
         # assert that other signatures match
         return search_utils.get_matching_entries(

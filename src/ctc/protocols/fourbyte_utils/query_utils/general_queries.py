@@ -13,24 +13,32 @@ async def async_query_function_signature(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-    source: typing.Literal['local', 'remote'] = 'local',
+    use_local: bool = True,
+    use_remote: bool = True,
 ) -> list[fourbyte_spec.Entry]:
-    if source == 'local':
-        return local_queries.query_function_signature(
+
+    if not use_local and not use_remote:
+        raise Exception('should use at least one of use_local or use_remote')
+
+    if use_local:
+        result = local_queries.query_function_signature(
             id=id,
             bytes_signature=bytes_signature,
             hex_signature=hex_signature,
             text_signature=text_signature,
         )
-    elif source == 'remote':
+        if len(result) > 0:
+            return result
+
+    if use_remote:
         return await remote_queries.async_query_function_signature_remote(
             id=id,
             bytes_signature=bytes_signature,
             hex_signature=hex_signature,
             text_signature=text_signature,
         )
-    else:
-        raise Exception('unknown source: ' + str(source))
+
+    return []
 
 
 async def async_query_event_signature(
@@ -39,22 +47,29 @@ async def async_query_event_signature(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-    source: typing.Literal['local', 'remote'] = 'local',
+    use_local: bool = True,
+    use_remote: bool = True,
 ) -> list[fourbyte_spec.Entry]:
-    if source == 'local':
-        return local_queries.query_event_signature(
+
+    if not use_local and not use_remote:
+        raise Exception('should use at least one of use_local or use_remote')
+
+    if use_local:
+        result = local_queries.query_event_signature(
             id=id,
             bytes_signature=bytes_signature,
             hex_signature=hex_signature,
             text_signature=text_signature,
         )
-    elif source == 'remote':
+        if len(result) > 0:
+            return result
+
+    if use_remote:
         return await remote_queries.async_query_event_signature_remote(
             id=id,
             bytes_signature=bytes_signature,
             hex_signature=hex_signature,
             text_signature=text_signature,
         )
-    else:
-        raise Exception('unknown source: ' + str(source))
 
+    return []

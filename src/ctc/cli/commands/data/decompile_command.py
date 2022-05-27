@@ -10,7 +10,10 @@ TODO:
 """
 from __future__ import annotations
 
+import os
+
 import toolcli
+import toolstr
 
 from ctc import evm
 from ctc import rpc
@@ -25,14 +28,19 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': 'address_or_bytecode',
                 'help': 'contract address or hex bytecode',
             },
+            {
+                'name': ['-v', '--verbose'],
+                'help': 'do not clip long names',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
-        ]
+        ],
     }
 
 
-async def async_decompile_command(address_or_bytecode: str) -> None:
+async def async_decompile_command(address_or_bytecode: str, verbose: bool) -> None:
 
     address_or_bytecode = await evm.async_resolve_address(address_or_bytecode)
 
@@ -41,13 +49,43 @@ async def async_decompile_command(address_or_bytecode: str) -> None:
     else:
         bytecode = address_or_bytecode
 
+    # get function selectors
+    function_selectors = evm.extract_bytecode_function_selectors(bytecode)
+
+    # match against 4bytes
     decompiled_function_abis = await evm.async_decompile_function_abis(
         bytecode,
         sort='text_signature',
     )
 
+    if len(decompiled_function_abis) > 0:
+        toolstr.print_header('Known selectors')
+    rows = []
     for entry in decompiled_function_abis:
-        print(entry['hex_signature'], entry['text_signature'])
+        row = [entry['hex_signature'], entry['text_signature']]
+        rows.append(row)
+    if verbose:
+        width = None
+    else:
+        width = os.get_terminal_size().columns
+    toolstr.print_table(
+        rows,
+        column_justify=['right', 'left'],
+        add_row_index=True,
+        compact=2,
+        max_table_width=width,
+    )
+
+    decompiled_selectors = set(
+        entry['hex_signature'] for entry in decompiled_function_abis
+    )
+    unknown_selectors = set(function_selectors) - decompiled_selectors
+    if len(unknown_selectors) > 0:
+        print()
+        toolstr.print_header('Unknown selectors')
+        for unknown_selector in unknown_selectors:
+            print(unknown_selector)
 
     if len(decompiled_function_abis) == 0:
+        print()
         print('could not detect any function signatures')
