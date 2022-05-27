@@ -20,7 +20,7 @@ async def async_query_timestamp_block(
     if timestamp_schema is None:
         return None
     engine = db_connect.create_engine(
-        datatype=timestamp_schema,
+        schema_name=timestamp_schema,
         network=network,
     )
     if engine is None:
@@ -43,7 +43,7 @@ async def async_query_block_timestamp(
     if timestamp_schema is None:
         return None
     engine = db_connect.create_engine(
-        datatype=timestamp_schema,
+        schema_name=timestamp_schema,
         network=network,
     )
     if engine is None:
@@ -64,7 +64,7 @@ async def async_query_max_block_number(
     if timestamp_schema is None:
         return None
     engine = db_connect.create_engine(
-        datatype=timestamp_schema,
+        schema_name=timestamp_schema,
         network=network,
     )
     if engine is None:
@@ -84,7 +84,7 @@ async def async_query_max_block_timestamp(
     if timestamp_schema is None:
         return None
     engine = db_connect.create_engine(
-        datatype=timestamp_schema,
+        schema_name=timestamp_schema,
         network=network,
     )
     if engine is None:
@@ -106,7 +106,7 @@ async def async_query_timestamps_blocks(
     if timestamp_schema is None:
         return [None] * len(timestamps)
     engine = db_connect.create_engine(
-        datatype=timestamp_schema,
+        schema_name=timestamp_schema,
         network=network,
     )
     if engine is None:
@@ -129,7 +129,7 @@ async def async_query_block_timestamps(
     if timestamp_schema is None:
         return [None] * len(block_numbers)
     engine = db_connect.create_engine(
-        datatype=timestamp_schema,
+        schema_name=timestamp_schema,
         network=network,
     )
     if engine is None:

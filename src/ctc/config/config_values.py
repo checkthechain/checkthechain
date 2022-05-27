@@ -122,7 +122,7 @@ def get_default_provider(
 @typing.overload
 def get_db_config(
     *,
-    datatype: str | None = None,
+    schema_name: str | None = None,
     network: spec.NetworkReference | None = None,
     require: Literal[True],
 ) -> 'toolsql.DBConfig':
@@ -132,7 +132,7 @@ def get_db_config(
 @typing.overload
 def get_db_config(
     *,
-    datatype: str | None = None,
+    schema_name: str | None = None,
     network: spec.NetworkReference | None = None,
     require: bool = False,
 ) -> 'toolsql.DBConfig' | None:
@@ -141,12 +141,12 @@ def get_db_config(
 
 def get_db_config(
     *,
-    datatype: str | None = None,
+    schema_name: str | None = None,
     network: spec.NetworkReference | None = None,
     require: bool = False,
 ) -> 'toolsql.DBConfig' | None:
 
-    # for now, use same database for all datatypes and networks
+    # for now, use same database for all schema_names and networks
     config = config_read.get_config()
     db_config = config.get('db_configs', {}).get('main')
     if require and db_config is None:

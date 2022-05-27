@@ -11,7 +11,7 @@ async def async_query_contract_abi(
     network: spec.NetworkReference,
 ) -> spec.ContractABI | None:
     engine = db_connect.create_engine(
-        datatype='contract_abis',
+        schema_name='contract_abis',
         network=network,
     )
     if engine is None:

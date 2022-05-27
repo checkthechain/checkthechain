@@ -32,7 +32,7 @@ def get_test_db_config():
 async def test_create_schema():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
-        datatype='contract_creation_blocks',
+        schema_name='contract_creation_blocks',
         network='mainnet',
     )
     toolsql.create_tables(

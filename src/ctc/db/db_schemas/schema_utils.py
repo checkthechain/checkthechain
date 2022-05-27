@@ -11,48 +11,48 @@ from ctc import spec
 from .. import db_spec
 
 
-def get_raw_schema(datatype: db_spec.DBDatatype) -> toolsql.DBSchema:
-    if datatype == 'block_gas_stats':
+def get_raw_schema(schema_name: db_spec.DBSchemaName) -> toolsql.DBSchema:
+    if schema_name == 'block_gas_stats':
         from .schemas import block_gas_stats_schema_defs
 
         return block_gas_stats_schema_defs.block_gas_stats_schema
-    elif datatype == 'block_timestamps':
+    elif schema_name == 'block_timestamps':
         from .schemas import block_timestamps_schema_defs
 
         return block_timestamps_schema_defs.block_timestamps_schema
-    elif datatype == 'blocks':
+    elif schema_name == 'blocks':
         from .schemas import blocks_schema_defs
 
         return blocks_schema_defs.blocks_schema
-    elif datatype == 'contract_abis':
+    elif schema_name == 'contract_abis':
         from .schemas import contract_abis_schema_defs
 
         return contract_abis_schema_defs.contract_abis_schema
-    elif datatype == 'contract_creation_blocks':
+    elif schema_name == 'contract_creation_blocks':
         from .schemas import contract_creation_blocks_schema_defs
 
         return (
             contract_creation_blocks_schema_defs.contract_creation_blocks_schema
         )
-    elif datatype == 'erc20_metadata':
+    elif schema_name == 'erc20_metadata':
         from .schemas import erc20_metadata_schema_defs
 
         return erc20_metadata_schema_defs.erc20_metadata_schema
-    elif datatype == 'erc20_state':
+    elif schema_name == 'erc20_state':
         from .schemas import erc20_state_schema_defs
 
         return erc20_state_schema_defs.erc20_state_schema
     else:
-        raise Exception('unknown datatype: ' + str(datatype))
+        raise Exception('unknown schema: ' + str(schema_name))
 
 
 def get_prepared_schema(
-    datatype: db_spec.DBDatatype,
+    schema_name: db_spec.DBSchemaName,
     network: spec.NetworkReference | None = None,
 ) -> toolsql.DBSchema:
 
     # get schema
-    schema = get_raw_schema(datatype)
+    schema = get_raw_schema(schema_name)
     schema = copy.deepcopy(schema)
 
     if network is None:
@@ -60,7 +60,7 @@ def get_prepared_schema(
 
     # add network to table name
     for table_name, table in list(schema['tables'].items()):
-        full_name = get_table_name(network=network, table_name=datatype)
+        full_name = get_table_name(network=network, table_name=table_name)
         if table.get('name') is not None:
             table['name'] = full_name
         schema['tables'][full_name] = schema['tables'].pop(table_name)  # type: ignore
@@ -80,11 +80,11 @@ def get_table_name(
 
 
 def get_complete_raw_schema() -> toolsql.DBSchema:
-    datatypes = db_spec.get_all_datatypes()
-    datatype_schemas = [
-        get_raw_schema(datatype=datatype) for datatype in datatypes
+    schema_names = db_spec.get_schema_names()
+    schemas = [
+        get_raw_schema(schema_name=schema_name) for schema_name in schema_names
     ]
-    return _combine_db_schemas(datatype_schemas)
+    return _combine_db_schemas(schemas)
 
 
 def get_complete_prepared_schema(
@@ -96,8 +96,8 @@ def get_complete_prepared_schema(
 
     all_schemas = []
     for network in networks:
-        for datatype in db_spec.get_all_datatypes():
-            schema = get_prepared_schema(network=network, datatype=datatype)
+        for schema_name in db_spec.get_schema_names():
+            schema = get_prepared_schema(network=network, schema_name=schema_name)
             all_schemas.append(schema)
 
     return _combine_db_schemas(all_schemas)

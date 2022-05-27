@@ -22,7 +22,7 @@ async def async_intake_contract_creation_block(
         return
 
     engine = db_connect.create_engine(
-        datatype='contract_creation_blocks',
+        schema_name='contract_creation_blocks',
         network=network,
     )
     if engine is not None:
@@ -51,7 +51,7 @@ async def async_intake_contract_abi(
     if not db_management.get_active_schemas().get('contract_abis'):
         return
     engine = db_connect.create_engine(
-        datatype='contract_abis',
+        schema_name='contract_abis',
         network=network,
     )
     if engine is not None:

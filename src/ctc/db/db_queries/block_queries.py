@@ -13,7 +13,7 @@ async def async_query_block(
     network: spec.NetworkReference,
 ) -> spec.Block | None:
     engine = db_connect.create_engine(
-        datatype='blocks',
+        schema_name='blocks',
         network=network,
     )
     if engine is None:
@@ -31,7 +31,7 @@ async def async_query_blocks(
     network: spec.NetworkReference,
 ) -> typing.Sequence[spec.Block | None]:
     engine = db_connect.create_engine(
-        datatype='blocks',
+        schema_name='blocks',
         network=network,
     )
     if engine is None:

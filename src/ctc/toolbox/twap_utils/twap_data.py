@@ -29,4 +29,3 @@ async def async_get_data_feed(
     #     )
     else:
         raise Exception('unknown data source protocol: ' + str(protocol))
-

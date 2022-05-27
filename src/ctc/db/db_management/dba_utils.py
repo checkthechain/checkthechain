@@ -13,32 +13,32 @@ from .. import db_spec
 
 def create_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
-    datatypes: typing.Sequence[db_spec.DBDatatype] | None = None,
+    schema_names: typing.Sequence[db_spec.DBSchemaName] | None = None,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
 
-    # get netowrks and datatypes
+    # get netowrks and schemas
     if networks is None:
         networks = config.get_used_networks()
-    if datatypes is None:
-        datatypes = db_spec.get_all_datatypes()
+    if schema_names is None:
+        schema_names = db_spec.get_schema_names()
 
     # get preamble
     if verbose or not confirm:
         print(
             'creating tables for',
-            len(datatypes),
-            'datatype(s) across',
+            len(schema_names),
+            'schema(s) across',
             len(networks),
             'network(s)',
         )
-        if len(datatypes) > 1:
-            print('    - datatypes:')
-            for datatype in datatypes:
-                print('        -', datatype)
+        if len(schema_names) > 1:
+            print('    - schemas:')
+            for schema_name in schema_names:
+                print('        -', schema_name)
         else:
-            print('    - datatype:', datatype)
+            print('    - schema:', schema_name)
         if len(networks) > 1:
             print('    - networks:')
             for network in networks:
@@ -47,16 +47,16 @@ def create_tables(
             print('    - network:', network)
 
     # get missing tables
-    tables_to_create = []
+    tables_to_create: list[str] = []
     for network in networks:
-        for datatype in datatypes:
+        for schema_name in schema_names:
             db_config = config.get_db_config(
                 network=network,
-                datatype=datatype,
+                schema_name=schema_name,
                 require=True,
             )
             schema = db_schemas.get_prepared_schema(
-                datatype=datatype,
+                schema_name=schema_name,
                 network=network,
             )
             tables_to_create += toolsql.get_missing_tables(
@@ -84,7 +84,11 @@ def create_tables(
     # create tables
     print()
     for network in networks:
-        for datatype in datatypes:
+        for schema_name in schema_names:
+            schema = db_schemas.get_prepared_schema(
+                schema_name=schema_name,
+                network=network,
+            )
             toolsql.create_tables(
                 db_schema=schema,
                 db_config=db_config,

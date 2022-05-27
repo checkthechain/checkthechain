@@ -35,7 +35,7 @@ def get_test_db_config():
 async def test_create_schema():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
-        datatype='erc20_metadata',
+        schema_name='erc20_metadata',
         network='mainnet',
     )
     toolsql.create_tables(

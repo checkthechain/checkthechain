@@ -7,7 +7,6 @@ if typing.TYPE_CHECKING:
 
 import matplotlib.pyplot as plt  # type: ignore
 import toolstr
-import tooltime
 
 from ctc import evm
 from ctc import spec
@@ -19,6 +18,8 @@ T = typing.TypeVar('T')
 async def async_xtick_block_dates(
     provider: spec.ProviderSpec = None,
 ) -> None:
+    import tooltime
+
     start_block, end_block = plt.xlim()
     start_time, end_time = await evm.async_predict_block_timestamps(
         [round(start_block), round(end_block)], provider=provider

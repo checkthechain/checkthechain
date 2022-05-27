@@ -11,9 +11,9 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'create tables for database',
         'args': [
             {
-                'name': '--datatypes',
+                'name': '--schema_names',
                 'nargs': '+',
-                'help': 'datatypes to create tables for',
+                'help': 'schemas to create tables for',
             },
             {
                 'name': '--networks',
@@ -26,16 +26,16 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_create_tables_command(
-    datatypes: typing.Sequence[str],
+    schema_names: typing.Sequence[str],
     networks: typing.Sequence[str],
 ) -> None:
     from ctc import db
 
-    if datatypes is not None:
-        for datatype in datatypes:
-            if datatype not in db.DBDatatype.__args__:  # type: ignore
-                raise Exception('unknown datatype: ' + str(datatype))
+    if schema_names is not None:
+        for schema_name in schema_names:
+            if schema_name not in db.DBSchemaName.__args__:  # type: ignore
+                raise Exception('unknown schema_name: ' + str(schema_name))
     db.create_tables(
-        datatypes=typing.cast(typing.Sequence[db.DBDatatype], datatypes),
+        schema_names=typing.cast(typing.Sequence[db.DBSchemaName], schema_names),
         networks=networks,
     )

@@ -4,8 +4,7 @@ from typing_extensions import Literal, TypedDict
 
 from ctc import spec
 
-
-DBDatatype = Literal[
+DBSchemaName = Literal[
     'block_gas_stats',
     'block_timestamps',
     'blocks',
@@ -23,5 +22,5 @@ class ERC20Metadata(TypedDict):
     decimals: int
 
 
-def get_all_datatypes() -> tuple[DBDatatype]:
-    return DBDatatype.__args__  # type: ignore
+def get_schema_names() -> tuple[DBSchemaName]:
+    return DBSchemaName.__args__  # type: ignore

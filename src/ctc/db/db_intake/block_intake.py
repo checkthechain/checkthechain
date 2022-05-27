@@ -48,7 +48,7 @@ async def async_intake_raw_block(
 
     # store in db
     engine = db_connect.create_engine(
-        datatype='block_timestamps',
+        schema_name='block_timestamps',
         network=network,
     )
     if engine is None:
@@ -85,7 +85,7 @@ async def async_intake_block_timestamp(
 
     # store in db
     engine = db_connect.create_engine(
-        datatype='block_timestamps',
+        schema_name='block_timestamps',
         network=network,
     )
     if engine is None:
@@ -122,7 +122,7 @@ async def async_intake_raw_blocks(
         network=network,
     )
     if len(confirmed) > 0:
-        engine = db_connect.create_engine(datatype='blocks', network=network)
+        engine = db_connect.create_engine(schema_name='blocks', network=network)
         if engine is None:
             return
         with engine.begin() as conn:
@@ -175,7 +175,7 @@ async def async_intake_block_timestamps(
 
     # store in database
     engine = db_connect.create_engine(
-        datatype='block_timestamps',
+        schema_name='block_timestamps',
         network=network,
     )
     if engine is None:
@@ -271,11 +271,11 @@ async def async_intake_block_timestamps(
 #    # determine whether to store block
 #    network = rpc.get_provider_network(provider=provider)
 #    min_confirmations = db_management.get_min_confirmations(
-#        datatype='block_timestamps',
+#        schema='block_timestamps',
 #        network=network,
 #    )
 #    engine = db_connect.create_engine(
-#        datatype='block_timestamps',
+#        schema='block_timestamps',
 #        network=network,
 #    )
 #    if engine is None:
@@ -325,11 +325,11 @@ async def async_intake_block_timestamps(
 #    # determine whether to store block
 #    network = rpc.get_provider_network(provider=provider)
 #    min_confirmations = db_management.get_min_confirmations(
-#        datatype='block_timestamps',
+#        schema='block_timestamps',
 #        network=network,
 #    )
 #    engine = db_connect.create_engine(
-#        datatype='block_timestamps',
+#        schema='block_timestamps',
 #        network=network,
 #    )
 #    if engine is None:

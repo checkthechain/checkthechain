@@ -10,15 +10,16 @@ from . import db_spec
 
 
 def create_engine(
-    datatype: db_spec.DBDatatype,
+    schema_name: db_spec.DBSchemaName,
     network: spec.NetworkReference,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""
 
     # get db config
     data_source: config.DataSource | config.LeafDataSource = (
-        config.get_data_source(datatype=datatype, network=network)
+        config.get_data_source(datatype=schema_name, network=network)
     )
+    print('uggg', data_source)
     if data_source['backend'] == 'hybrid':
         data_source = typing.cast(config.DataSource, data_source)[
             'hybrid_order'

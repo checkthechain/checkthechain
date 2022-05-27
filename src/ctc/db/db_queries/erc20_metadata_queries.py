@@ -14,7 +14,7 @@ async def async_query_erc20_metadata(
     network: spec.NetworkReference,
 ) -> db_spec.ERC20Metadata | None:
     engine = db_connect.create_engine(
-        datatype='erc20_metadata',
+        schema_name='erc20_metadata',
         network=network,
     )
     if engine is None:
@@ -32,7 +32,7 @@ async def async_query_erc20s_metadata(
     network: spec.NetworkReference,
 ) -> typing.Sequence[db_spec.ERC20Metadata | None]:
     engine = db_connect.create_engine(
-        datatype='erc20_metadata',
+        schema_name='erc20_metadata',
         network=network,
     )
     if engine is None:

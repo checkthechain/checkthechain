@@ -11,7 +11,7 @@ async def async_query_contract_creation_block(
     network: spec.NetworkReference,
 ) -> int | None:
     engine = db_connect.create_engine(
-        datatype='contract_creation_blocks',
+        schema_name='contract_creation_blocks',
         network=network,
     )
     if engine is None:

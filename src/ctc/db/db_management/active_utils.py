@@ -1,23 +1,23 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
+# from typing_extensions import TypedDict
 
 from .. import db_spec
 
 
-class ActiveSchemas(TypedDict, total=False):
-    block_gas_stats: bool
-    block_timestamps: bool
-    blocks: bool
-    contract_abis: bool
-    contract_creation_blocks: bool
-    erc20_metadata: bool
-    erc20_state: bool
-    # events: bool
+# class ActiveSchemas(TypedDict, total=False):
+#     block_gas_stats: bool
+#     block_timestamps: bool
+#     blocks: bool
+#     contract_abis: bool
+#     contract_creation_blocks: bool
+#     erc20_metadata: bool
+#     erc20_state: bool
+#     # events: bool
 
 
-def get_active_schemas() -> typing.Mapping[db_spec.DBDatatype, bool]:
+def get_active_schemas() -> typing.Mapping[db_spec.DBSchemaName, bool]:
     """return specification of which subset of incoming data to store in db"""
     return {
         'block_gas_stats': False,
@@ -31,7 +31,7 @@ def get_active_schemas() -> typing.Mapping[db_spec.DBDatatype, bool]:
     }
 
 
-def get_active_timestamp_schema() -> db_spec.DBDatatype | None:
+def get_active_timestamp_schema() -> db_spec.DBSchemaName | None:
     active_schemas = get_active_schemas()
     if active_schemas['block_timestamps']:
         return 'block_timestamps'

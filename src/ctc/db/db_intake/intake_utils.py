@@ -78,7 +78,7 @@ async def _async_get_max_block_number(
     network: spec.NetworkReference,
 ) -> int | None:
     engine = db_connect.create_engine(
-        datatype='block_timestamps',
+        schema_name='block_timestamps',
         network=network,
     )
     if engine is None:

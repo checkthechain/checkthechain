@@ -61,7 +61,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         'contract_creation_blocks',
     ]:
 
-        db_config = config_values.get_db_config(datatype=tags['datatype'])
+        db_config = config_values.get_db_config(schema_name=tags['datatype'])
         if db_config is None:
             raise Exception('db_config not properly set')
 
