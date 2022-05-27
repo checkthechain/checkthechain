@@ -48,7 +48,6 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'create',
             'tables',
         ): 'ctc.cli.commands.data.db.create_tables_command',
-        ('db', 'connect'): 'ctc.cli.commands.data.db.connect_command',
         ('db', 'status'): 'ctc.cli.commands.data.db.status_command',
         ('block',): 'ctc.cli.commands.data.block_command',
         ('blocks',): 'ctc.cli.commands.data.blocks_command',

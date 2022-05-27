@@ -46,12 +46,8 @@ def create_tables(
         else:
             print('    - network:', network)
 
-    # get confirmation
-    if not confirm:
-        if not toolcli.input_yes_or_no('continue? '):
-            raise Exception('aborted creation of tables')
-
-    # create tables
+    # get missing tables
+    tables_to_create = []
     for network in networks:
         for datatype in datatypes:
             db_config = config.get_db_config(
@@ -63,8 +59,33 @@ def create_tables(
                 datatype=datatype,
                 network=network,
             )
-            toolsql.create_tables(
+            tables_to_create += toolsql.get_missing_tables(
                 db_schema=schema,
                 db_config=db_config,
             )
 
+    # print missing tables
+    if len(tables_to_create) == 0:
+        print()
+        print('all tables already exist')
+        return
+    else:
+        print()
+        print('tables to create:')
+        for table in tables_to_create:
+            print('-', table)
+
+    # get confirmation
+    if not confirm:
+        print()
+        if not toolcli.input_yes_or_no('continue? '):
+            raise Exception('aborted creation of tables')
+
+    # create tables
+    print()
+    for network in networks:
+        for datatype in datatypes:
+            toolsql.create_tables(
+                db_schema=schema,
+                db_config=db_config,
+            )
