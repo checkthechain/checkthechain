@@ -47,5 +47,5 @@ required_extra_data: typing.Sequence[str] = ['db_config', 'db_schema']
 plugin: toolcli.Plugin = {
     'command_index': command_index,
     'required_extra_data': required_extra_data,
-    'help_category': 'data',
+    'help_category': 'admin',
 }

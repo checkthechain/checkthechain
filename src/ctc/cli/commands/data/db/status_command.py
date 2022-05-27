@@ -24,7 +24,7 @@ def status_command() -> None:
     if db_config['dbms'] == 'sqlite':
         print('- path:', db_config['path'])
     else:
-        raise NotImplementedEror()
+        raise NotImplementedError()
 
     print()
     toolstr.print_header('Data to Store')
