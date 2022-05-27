@@ -10,3 +10,5 @@ build/*
 .tox/*
 .coverage
 .coverage_html/*
+pytestdebug.log
+
