@@ -10,7 +10,7 @@ from . import schema_utils
 
 
 def create_engine(
-    schema_name: schema_utils.DBSchemaName,
+    schema_name: schema_utils.SchemaName,
     network: spec.NetworkReference,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""

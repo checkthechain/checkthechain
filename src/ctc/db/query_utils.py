@@ -12,7 +12,7 @@ R = TypeVar('R')
 
 def with_connection(
     async_f: Callable[..., Coroutine[Any, Any, R | None]],
-    schema_name: schema_utils.EVMSchemaName,
+    schema_name: schema_utils.SchemaName,
 ) -> Callable[..., Coroutine[Any, Any, R | None]]:
 
     # define new function

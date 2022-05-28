@@ -22,19 +22,22 @@ EVMSchemaName = Literal[
     'erc20_metadata',
     'erc20_state',
     # 'events',
-    'schema_updates',
 ]
 
 AdminSchemaName = Literal['schema_updates']
 
-DBSchemaName = typing.Union[EVMSchemaName, AdminSchemaName]
+SchemaName = typing.Union[EVMSchemaName, AdminSchemaName]
+
+
+def get_admin_schema_names() -> tuple[AdminSchemaName]:
+    return AdminSchemaName.__args__  # type: ignore
 
 
 def get_evm_schema_names() -> tuple[EVMSchemaName]:
     return EVMSchemaName.__args__  # type: ignore
 
 
-def get_raw_schema(schema_name: DBSchemaName) -> toolsql.DBSchema:
+def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
     if schema_name == 'block_gas_stats':
         return schemas.block_gas_stats_schema
     elif schema_name == 'block_timestamps':
