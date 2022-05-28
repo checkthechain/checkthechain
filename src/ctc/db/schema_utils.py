@@ -22,6 +22,7 @@ EVMSchemaName = Literal[
     'erc20_metadata',
     'erc20_state',
     # 'events',
+    'schema_updates',
 ]
 
 AdminSchemaName = Literal['schema_updates']
