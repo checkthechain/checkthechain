@@ -33,13 +33,17 @@ def status_command() -> None:
     print()
     toolstr.print_header('Data to Store')
     networks = config.get_used_networks()
-    datatypes = db.get_evm_schema_names()
+    admin_schemas = db.get_admin_schema_names()
+    evm_schemas = db.get_evm_schema_names()
+    print('- admin schemas')
+    for admin_schema in admin_schemas:
+        print('    -', admin_schema)
+    print('- evm schemas')
+    for datatype in evm_schemas:
+        print('    -', datatype)
     print('- networks')
     for network in networks:
         print('    -', network)
-    print('- schemas')
-    for datatype in datatypes:
-        print('    -', datatype)
 
     print()
     db_exists = toolsql.does_db_exist(db_config=db_config)
