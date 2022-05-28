@@ -17,10 +17,53 @@ from ctc.toolbox import store_utils
 
 
 def get_network_name(network: spec.NetworkReference) -> spec.NetworkName:
+
+    if isinstance(network, str):
+        return network
+
+    network_names_by_id = {
+        1: 'mainnet',
+        3: 'ropsten',
+        4: 'rinkeby',
+        5: 'goerli',
+        42: 'kovan',
+        137: 'polygon',
+        57: 'bsc',
+        100: 'xdai',
+        43114: 'avax',
+        250: 'fantom',
+        42161: 'arbitrum',
+        10: 'optimism',
+    }
+    if network in network_names_by_id:
+        return network_names_by_id[network]
+
     return get_network_metadata(network=network)['name']
 
 
 def get_network_chain_id(network: spec.NetworkReference) -> spec.NetworkId:
+
+    if isinstance(network, int):
+        return network
+
+    network_ids_by_name = {
+        'mainnet': 1,
+        'ropsten': 3,
+        'rinkeby': 4,
+        'goerli': 5,
+        'kovan': 42,
+        'polygon': 137,
+        'bsc': 56,
+        'xdai': 100,
+        'avax': 43114,
+        'fantom': 250,
+        'arbitrum': 42161,
+        'optimism': 10,
+    }
+
+    if network in network_ids_by_name:
+        return network_ids_by_name[network]
+
     return get_network_metadata(network=network)['chain_id']
 
 
@@ -76,4 +119,3 @@ def get_networks_file_path(use_default: bool = False) -> str:
     else:
         data_root = config.get_data_dir()
     return os.path.join(data_root, 'networks.csv')
-

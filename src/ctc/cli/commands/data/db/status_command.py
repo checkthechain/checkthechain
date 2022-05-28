@@ -33,7 +33,7 @@ def status_command() -> None:
     print()
     toolstr.print_header('Data to Store')
     networks = config.get_used_networks()
-    datatypes = db.get_schema_names()
+    datatypes = db.get_evm_schema_names()
     print('- networks')
     for network in networks:
         print('    -', network)
