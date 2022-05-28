@@ -15,7 +15,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def selector_command(text_signature):
+def selector_command(text_signature: str) -> None:
     if '(' not in text_signature and ')' not in text_signature:
         text_signature = text_signature + '()'
     selector = binary.keccak_text(text_signature)[:10]

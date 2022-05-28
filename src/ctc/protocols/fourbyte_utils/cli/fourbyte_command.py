@@ -38,15 +38,6 @@ async def async_fourbyte_command(
     except ValueError:
         is_hex = False
 
-    if local and remote:
-        raise Exception('cannot specify both local and remote')
-    if local:
-        source: typing.Literal['local', 'remote'] = 'local'
-    elif remote:
-        source = 'remote'
-    else:
-        source = 'remote'
-
     if is_hex:
 
         if (signature.startswith('0x') and len(signature) == 10) or len(
@@ -55,7 +46,8 @@ async def async_fourbyte_command(
             signature_type = 'function'
             results = await fourbyte_utils.async_query_function_signature(
                 hex_signature=signature,
-                source=source,
+                use_local=local,
+                use_remote=remote,
             )
 
         elif (signature.startswith('0x') and len(signature) == 66) or len(
@@ -64,7 +56,8 @@ async def async_fourbyte_command(
             signature_type = 'event'
             results = await fourbyte_utils.async_query_event_signature(
                 hex_signature=signature,
-                source=source,
+                use_local=local,
+                use_remote=remote,
             )
 
         else:
@@ -76,14 +69,16 @@ async def async_fourbyte_command(
             signature_type = 'event'
             results = await fourbyte_utils.async_query_event_signature(
                 text_signature=signature,
-                source=source,
+                use_local=local,
+                use_remote=remote,
             )
 
         else:
             signature_type = 'function'
             results = await fourbyte_utils.async_query_function_signature(
                 text_signature=signature,
-                source=source,
+                use_local=local,
+                use_remote=remote,
             )
     else:
         raise Exception('could not parse signature: ' + str(signature))

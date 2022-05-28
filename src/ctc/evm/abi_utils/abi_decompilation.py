@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 
-def extract_bytecode_function_selectors(bytecode):
+def extract_bytecode_function_selectors(bytecode: str) -> typing.Sequence[str]:
     import re
 
     results = re.findall('8063([a-f0-9]{8})146', bytecode)
