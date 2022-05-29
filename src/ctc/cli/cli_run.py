@@ -23,7 +23,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'db',
             'create',
             'tables',
-        ): 'ctc.cli.commands.data.admin.create_tables_command',
+        ): 'ctc.cli.commands.admin.db.create_tables_command',
         ('db', 'status'): 'ctc.cli.commands.admin.db.status_command',
         ('log',): 'ctc.cli.commands.admin.log_command',
         ('setup',): 'ctc.cli.commands.admin.setup_command',

@@ -4,13 +4,19 @@ import typing
 
 import toolsql
 
+import ctc
+
 
 async def async_upsert_schema_update(
     table_name: str,
-    version: str,
+    version: str | None = None,
+    *,
     conn: toolsql.SAConnection,
     upsert: bool = True,
 ) -> None:
+
+    if version is None:
+        version = ctc.__version__
 
     # construct row
     row = {
@@ -35,7 +41,7 @@ async def async_upsert_schema_update(
 
 async def async_select_schema_updates(
     conn: toolsql.SAConnection,
-    table_name: str,
+    table_name: str | None = None,
 ) -> typing.Sequence[typing.Mapping[typing.Any, typing.Any]]:
 
     return toolsql.select(

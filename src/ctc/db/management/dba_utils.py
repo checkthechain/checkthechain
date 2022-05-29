@@ -7,10 +7,12 @@ import toolsql
 
 from ctc import config
 from ctc import spec
+from .. import connect_utils
 from .. import schema_utils
+from .. import schemas
 
 
-def create_evm_tables(
+async def async_create_evm_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[schema_utils.EVMSchemaName] | None = None,
     verbose: bool = True,
@@ -58,10 +60,11 @@ def create_evm_tables(
                 schema_name=schema_name,
                 network=network,
             )
-            tables_to_create += toolsql.get_missing_tables(
+            missing_tables = toolsql.get_missing_tables(
                 db_schema=schema,
                 db_config=db_config,
             )
+            tables_to_create += missing_tables['missing_from_db']
 
     # print missing tables
     if len(tables_to_create) == 0:
@@ -81,14 +84,26 @@ def create_evm_tables(
             raise Exception('aborted creation of tables')
 
     # create tables
+    # for now, use same database for all tables
+    engine = connect_utils.create_engine('schema_updates', network=None)
+    with engine.begin() as conn:
+        for network in networks:
+            for schema_name in schema_names:
+                schema = schema_utils.get_prepared_schema(
+                    schema_name=schema_name,
+                    network=network,
+                )
+                for table_name, table_schema in schema['tables'].items():
+                    if table_name not in tables_to_create:
+                        continue
+                    toolsql.create_table(
+                        table_name,
+                        table_schema=table_schema,
+                        conn=conn,
+                    )
+                    await schemas.async_upsert_schema_update(
+                        table_name,
+                        conn=conn,
+                    )
     print()
-    for network in networks:
-        for schema_name in schema_names:
-            schema = schema_utils.get_prepared_schema(
-                schema_name=schema_name,
-                network=network,
-            )
-            toolsql.create_tables(
-                db_schema=schema,
-                db_config=db_config,
-            )
+    print('all tables created')

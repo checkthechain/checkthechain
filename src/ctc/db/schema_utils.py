@@ -114,6 +114,10 @@ def get_complete_prepared_schema(
             )
             all_schemas.append(schema)
 
+    for schema_name in get_admin_schema_names():
+        schema = get_raw_schema(schema_name)
+        all_schemas.append(schema)
+
     return _combine_db_schemas(all_schemas)
 
 

@@ -54,7 +54,17 @@ def get_data_source(**tags: typing.Any) -> DataSource:
 
     format is WIP and subject to change
     """
-    if tags.get('datatype') in [
+    if tags.get('datatype') == 'schema_updates':
+
+        db_config = config_values.get_db_config(schema_name=tags['datatype'])
+        if db_config is None:
+            raise Exception('db_config not properly set')
+
+        return {
+            'backend': 'db',
+            'db_config': db_config,
+        }
+    elif tags.get('datatype') in [
         'erc20_metadata',
         'block_timestamps',
         'contract_abis',
