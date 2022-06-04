@@ -5,6 +5,7 @@ import typing
 import toolsql
 
 from ctc import spec
+from ... import schema_utils
 
 
 async def async_upsert_block(
@@ -12,7 +13,14 @@ async def async_upsert_block(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+    toolsql.insert(
+        conn=conn,
+        table=table,
+        row=block,
+        upsert='do_update',
+    )
 
 
 async def async_upsert_blocks(
@@ -20,7 +28,14 @@ async def async_upsert_blocks(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+    toolsql.insert(
+        conn=conn,
+        table=table,
+        rows=blocks,
+        upsert='do_update',
+    )
 
 
 async def async_select_block(
@@ -28,7 +43,15 @@ async def async_select_block(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> spec.Block | None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+
+    return toolsql.select(
+        conn=conn,
+        table=table,
+        where_equals={'number': block_number},
+        return_count='one',
+    )
 
 
 async def async_select_blocks(
@@ -39,7 +62,33 @@ async def async_select_blocks(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> typing.Sequence[spec.Block | None]:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+
+    if block_numbers is not None:
+        return toolsql.select(
+            conn=conn,
+            table=table,
+            where_in={'number': block_numbers},
+        )
+
+    elif start_block is not None and end_block is not None:
+        blocks = toolsql.select(
+            conn=conn,
+            table=table,
+            where_gte={'number': start_block},
+            where_lte={'number': end_block},
+        )
+        blocks_by_number = {block['number']: block for block in blocks}
+        return [
+            blocks_by_number.get(number)
+            for number in range(start_block, end_block + 1)
+        ]
+
+    else:
+        raise Exception(
+            'must specify block_numbers or start_block and end_block'
+        )
 
 
 async def async_delete_block(
@@ -47,18 +96,44 @@ async def async_delete_block(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+
+    toolsql.delete(
+        conn=conn,
+        table=table,
+        where_equals={'number': block_number},
+    )
 
 
 async def async_delete_blocks(
-    block_nubmers: typing.Sequence[int | str] | None = None,
+    block_numbers: typing.Sequence[int | str] | None = None,
     *,
     start_block: int | None = None,
     end_block: int | None = None,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+
+    if block_numbers is not None:
+        toolsql.delete(
+            conn=conn,
+            table=table,
+            where_in={'number': block_numbers},
+        )
+    elif start_block is not None and end_block is not None:
+        toolsql.delete(
+            conn=conn,
+            table=table,
+            where_gte={'number': start_block},
+            where_lte={'number': end_block},
+        )
+    else:
+        raise Exception(
+            'must specify block_numbrs or start_block and end_block'
+        )
 
 
 #
@@ -71,7 +146,17 @@ async def async_select_block_timestamp(
     block_number: int,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+
+    return toolsql.select(
+        conn=conn,
+        table=table,
+        where_equals={'number': block_number},
+        row_format='only_column',
+        only_columns=['timestamp'],
+        return_count='one',
+    )
 
 
 async def async_select_block_timestamps(
@@ -79,21 +164,56 @@ async def async_select_block_timestamps(
     block_numbers: typing.Sequence[typing.SupportsInt],
     network: spec.NetworkReference | None = None,
 ) -> list[int | None]:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+
+    block_numbers_int = [int(item) for item in block_numbers]
+
+    results = toolsql.select(
+        conn=conn,
+        table=table,
+        where_in={'number': block_numbers_int},
+    )
+
+    block_timestamps = {row['number']: row['timestamp'] for row in results}
+
+    return [
+        block_timestamps.get(block_number) for block_number in block_numbers
+    ]
 
 
 async def async_select_max_block_number(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+    result = toolsql.select(
+        conn=conn,
+        table=table,
+        sql_functions=[
+            ['max', 'number'],
+        ],
+        return_count='one',
+    )
+    return result['max__block_number']
 
 
 async def async_select_max_block_timestamp(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
-    raise NotImplementedError()
+
+    table = schema_utils.get_table_name('blocks', network=network)
+    result = toolsql.select(
+        conn=conn,
+        table=table,
+        sql_functions=[
+            ['max', 'timestamp'],
+        ],
+        return_count='one',
+    )
+    return result['max__timestamp']
 
 
 __all__ = (

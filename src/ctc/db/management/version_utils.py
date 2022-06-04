@@ -5,18 +5,23 @@ import typing
 from .. import schemas
 
 
-async def async_get_table_version(table_name) -> str:
+async def async_get_table_version(table_name: str) -> str | None:
     updates = await schemas.async_query_schema_updates(
         table_name=table_name,
     )
+    if updates is None:
+        return None
     most_recent = sorted(updates, key=lambda update: update['timestamp'])[-1]
     return most_recent['version']
 
 
-async def async_get_tables_versions() -> typing.Mapping[str, str]:
+async def async_get_tables_versions() -> typing.Mapping[str, str] | None:
 
     # load updates
     updates = await schemas.async_query_schema_updates()
+
+    if updates is None:
+        return None
 
     # find most recent update for each table
     table_timestamps = {}

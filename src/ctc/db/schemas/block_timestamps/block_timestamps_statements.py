@@ -51,6 +51,41 @@ async def async_upsert_block_timestamps(
     )
 
 
+async def async_delete_block_timestamp(
+    conn: toolsql.SAConnection,
+    block_number: typing.Sequence[int],
+    network: spec.NetworkReference | None = None,
+) -> None:
+
+    table = schema_utils.get_table_name('block_timestamps', network=network)
+
+    toolsql.delete(
+        conn=conn,
+        table=table,
+        where_equals={'block_number': block_number},
+    )
+
+
+async def async_delete_block_timestamps(
+    conn: toolsql.SAConnection,
+    block_numbers: typing.Sequence[int],
+    network: spec.NetworkReference | None = None,
+) -> None:
+
+    table = schema_utils.get_table_name('block_timestamps', network=network)
+
+    toolsql.delete(
+        conn=conn,
+        table=table,
+        where_in={'block_number': block_numbers},
+    )
+
+
+#
+# # do not export
+#
+
+
 async def async_select_block_timestamp(
     conn: toolsql.SAConnection,
     block_number: int,
@@ -126,36 +161,6 @@ async def async_select_max_block_timestamp(
         return_count='one',
     )
     return result['max__timestamp']
-
-
-async def async_delete_block_timestamp(
-    conn: toolsql.SAConnection,
-    block_number: typing.Sequence[int],
-    network: spec.NetworkReference | None = None,
-) -> None:
-
-    table = schema_utils.get_table_name('block_timestamps', network=network)
-
-    toolsql.delete(
-        conn=conn,
-        table=table,
-        where_equals={'block_number': block_number},
-    )
-
-
-async def async_delete_block_timestamps(
-    conn: toolsql.SAConnection,
-    block_numbers: typing.Sequence[int],
-    network: spec.NetworkReference | None = None,
-) -> None:
-
-    table = schema_utils.get_table_name('block_timestamps', network=network)
-
-    toolsql.delete(
-        conn=conn,
-        table=table,
-        where_in={'block_number': block_numbers},
-    )
 
 
 __all__ = (

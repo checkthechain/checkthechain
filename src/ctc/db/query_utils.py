@@ -21,7 +21,7 @@ def with_connection(
     @functools.wraps(async_f)
     async def async_connected_f(
         *args: Any,
-        network: str = None,
+        network: str | None = None,
         **kwargs: Any,
     ) -> R | None:
 
