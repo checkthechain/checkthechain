@@ -14,15 +14,19 @@ def with_connection(
     async_f: Callable[..., Coroutine[Any, Any, R | None]],
     schema_name: schema_utils.SchemaName
     | Callable[..., schema_utils.SchemaName | None],
+    require_network: bool = True,
 ) -> Callable[..., Coroutine[Any, Any, R | None]]:
 
     # define new function
     @functools.wraps(async_f)
     async def async_connected_f(
         *args: Any,
-        network: str,
+        network: str = None,
         **kwargs: Any,
     ) -> R | None:
+
+        if network is None and require_network:
+            raise Exception('must specify network')
 
         if not isinstance(schema_name, str) and hasattr(
             schema_name, '__call__'

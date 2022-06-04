@@ -7,4 +7,5 @@ from . import schema_updates_statements
 async_query_schema_updates = query_utils.with_connection(
     schema_updates_statements.async_select_schema_updates,
     'schema_updates',
+    require_network=False,
 )

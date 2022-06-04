@@ -44,10 +44,15 @@ async def async_select_schema_updates(
     table_name: str | None = None,
 ) -> typing.Sequence[typing.Mapping[typing.Any, typing.Any]]:
 
+    if table_name is not None:
+        where_equals = {'table_name': table_name}
+    else:
+        where_equals = {}
+
     return toolsql.select(
         conn=conn,
         table='schema_updates',
-        where_equals={'table_name': table_name},
+        where_equals=where_equals,
     )
 
 
