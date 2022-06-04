@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from .. import schema_utils
+if typing.TYPE_CHECKING:
+    from .. import schema_utils
 
 
 def get_active_evm_schemas() -> typing.Mapping[

@@ -88,6 +88,8 @@ async def async_create_evm_tables(
     engine = connect_utils.create_engine('schema_updates', network=None)
     if engine is None:
         raise Exception('could not create engine for database')
+    if 'schema_updates' not in engine.table_names():
+        await async_initialize_schema_updates_table(engine)
     with engine.begin() as conn:
         for network in networks:
             for schema_name in schema_names:
@@ -109,3 +111,24 @@ async def async_create_evm_tables(
                     )
     print()
     print('all tables created')
+
+
+async def async_initialize_schema_updates_table(
+    engine: toolsql.SAEngine,
+) -> None:
+    table_name = 'schema_updates'
+    table_schema = schema_utils.get_raw_schema('schema_updates')
+
+    if 'schema_updates' in engine.table_names():
+        raise Exception('table already in database')
+
+    with engine.begin() as conn:
+        toolsql.create_table(
+            table_name,
+            table_schema=table_schema,
+            conn=conn,
+        )
+        await schemas.async_upsert_schema_update(
+            table_name,
+            conn=conn,
+        )
