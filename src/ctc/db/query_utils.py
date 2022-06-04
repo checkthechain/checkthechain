@@ -12,7 +12,8 @@ R = TypeVar('R')
 
 def with_connection(
     async_f: Callable[..., Coroutine[Any, Any, R | None]],
-    schema_name: schema_utils.SchemaName,
+    schema_name: schema_utils.SchemaName
+    | Callable[..., schema_utils.SchemaName | None],
 ) -> Callable[..., Coroutine[Any, Any, R | None]]:
 
     # define new function
@@ -23,9 +24,20 @@ def with_connection(
         **kwargs: Any,
     ) -> R | None:
 
+        if not isinstance(schema_name, str) and hasattr(
+            schema_name, '__call__'
+        ):
+            name = schema_name()
+            if name is None:
+                return None
+        elif isinstance(schema_name, str):
+            name = schema_name
+        else:
+            raise Exception('unknown schema_name format')
+
         # create engine
         engine = connect_utils.create_engine(
-            schema_name=schema_name,
+            schema_name=name,
             network=network,
         )
 

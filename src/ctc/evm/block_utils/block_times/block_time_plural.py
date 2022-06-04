@@ -58,9 +58,11 @@ async def async_get_blocks_of_timestamps(
                 network=network,
                 timestamps=timestamps,
             )
+            if db_blocks is None:
+                db_blocks = [None for timestamp in timestamps]
 
             # package non-null results
-            results = {}
+            results: dict[int, int] = {}
             remaining_timestamps: list[int] = []
             for possible_block, timestamp in zip(db_blocks, timestamps):
                 if possible_block is None:

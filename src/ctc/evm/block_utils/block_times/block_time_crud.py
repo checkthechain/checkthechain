@@ -52,7 +52,9 @@ async def async_get_block_timestamps(
             block_numbers=blocks,
             network=network,
         )
-        results = dict(zip(blocks, db_timestamps))
+        if db_timestamps is None:
+            db_timestamps = [None for block in blocks]
+        results: dict[int, int | None] = dict(zip(blocks, db_timestamps))
         remaining_blocks = [
             block
             for block, timestamp in zip(blocks, db_timestamps)
