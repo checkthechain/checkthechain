@@ -7,7 +7,7 @@ from ctc import spec
 
 from ... import connect_utils
 from ... import management
-from . import multischema_statements
+from . import multischema_block_timestamps_statements
 
 
 async def async_query_timestamp_block(
@@ -26,7 +26,7 @@ async def async_query_timestamp_block(
     if engine is None:
         return None
     with engine.connect() as conn:
-        return await multischema_statements.async_select_timestamp_block(
+        return await multischema_block_timestamps_statements.async_select_timestamp_block(
             timestamp=timestamp,
             mode=mode,
             network=network,
@@ -49,7 +49,7 @@ async def async_query_block_timestamp(
     if engine is None:
         return None
     with engine.connect() as conn:
-        return await multischema_statements.async_select_block_timestamp(
+        return await multischema_block_timestamps_statements.async_select_block_timestamp(
             block_number=block_number,
             network=network,
             conn=conn,
@@ -70,7 +70,7 @@ async def async_query_max_block_number(
     if engine is None:
         return None
     with engine.connect() as conn:
-        return await multischema_statements.async_select_max_block_number(
+        return await multischema_block_timestamps_statements.async_select_max_block_number(
             network=network,
             conn=conn,
         )
@@ -90,7 +90,7 @@ async def async_query_max_block_timestamp(
     if engine is None:
         return None
     with engine.connect() as conn:
-        return await multischema_statements.async_select_max_block_timestamp(
+        return await multischema_block_timestamps_statements.async_select_max_block_timestamp(
             network=network,
             conn=conn,
         )
@@ -112,7 +112,7 @@ async def async_query_timestamps_blocks(
     if engine is None:
         return [None] * len(timestamps)
     with engine.connect() as conn:
-        return await multischema_statements.async_select_timestamps_blocks(
+        return await multischema_block_timestamps_statements.async_select_timestamps_blocks(
             timestamps=timestamps,
             network=network,
             mode=mode,
@@ -135,7 +135,7 @@ async def async_query_block_timestamps(
     if engine is None:
         return [None] * len(block_numbers)
     with engine.connect() as conn:
-        return await multischema_statements.async_select_block_timestamps(
+        return await multischema_block_timestamps_statements.async_select_block_timestamps(
             block_numbers=block_numbers,
             network=network,
             conn=conn,

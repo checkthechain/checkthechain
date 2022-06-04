@@ -40,7 +40,7 @@ async def async_intake_raw_block(
 ) -> None:
 
     # check whether to intake
-    if not management.get_active_schemas().get('blocks'):
+    if not management.get_active_evm_schemas().get('blocks'):
         return
     if not await intake_utils.async_is_block_fully_confirmed(
         block=block, network=network
@@ -77,7 +77,7 @@ async def async_intake_block_timestamp(
         timestamp = block['timestamp']
 
     # check whether to intake
-    if not management.get_active_schemas().get('block_timestamps'):
+    if not management.get_active_evm_schemas().get('block_timestamps'):
         return
     if not await intake_utils.async_is_block_fully_confirmed(
         block=block_number, network=network
@@ -116,7 +116,7 @@ async def async_intake_raw_blocks(
     network: spec.NetworkReference,
 ) -> None:
 
-    if not management.get_active_schemas().get('blocks'):
+    if not management.get_active_evm_schemas().get('blocks'):
         return
     confirmed = await intake_utils.async_filter_fully_confirmed_blocks(
         blocks=blocks,
@@ -144,7 +144,7 @@ async def async_intake_block_timestamps(
     if blocks is not None and block_timestamps is not None:
         raise Exception('cannot specify both blocks and block_timestamps')
 
-    if not management.get_active_schemas().get('block_timestamps'):
+    if not management.get_active_evm_schemas().get('block_timestamps'):
         return
 
     # determine which blocks have enough confirmations
@@ -200,7 +200,7 @@ async def async_intake_block_timestamps(
 # ) -> None:
 #     """intake block and extract relevant information to db tables"""
 
-#     active_block_schemas = get_active_schemas('block')
+#     active_block_schemas = get_active_evm_schemas('block')
 #     if len(active_block_schemas) == 0:
 #         return
 

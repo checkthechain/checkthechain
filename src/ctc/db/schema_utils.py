@@ -14,13 +14,13 @@ from . import schemas
 
 
 EVMSchemaName = Literal[
-    'block_gas_stats',
+    # 'block_gas_stats',
     'block_timestamps',
     'blocks',
     'contract_abis',
     'contract_creation_blocks',
     'erc20_metadata',
-    'erc20_state',
+    # 'erc20_state',
     # 'events',
 ]
 
@@ -38,9 +38,9 @@ def get_evm_schema_names() -> tuple[EVMSchemaName]:
 
 
 def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
-    if schema_name == 'block_gas_stats':
-        return schemas.block_gas_stats_schema
-    elif schema_name == 'block_timestamps':
+    # if schema_name == 'block_gas_stats':
+    #     return schemas.block_gas_stats_schema
+    if schema_name == 'block_timestamps':
         return schemas.block_timestamps_schema
     elif schema_name == 'blocks':
         return schemas.blocks_schema
@@ -50,8 +50,8 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
         return schemas.contract_creation_blocks_schema
     elif schema_name == 'erc20_metadata':
         return schemas.erc20_metadata_schema
-    elif schema_name == 'erc20_state':
-        return schemas.erc20_state_schema
+    # elif schema_name == 'erc20_state':
+    #     return schemas.erc20_state_schema
     elif schema_name == 'schema_updates':
         return schemas.schema_updates_schema
     else:
