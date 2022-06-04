@@ -106,6 +106,7 @@ def get_complete_prepared_schema(
     if networks is None:
         networks = config.get_used_networks()
 
+    schema_name: SchemaName
     all_schemas = []
     for network in networks:
         for schema_name in get_evm_schema_names():

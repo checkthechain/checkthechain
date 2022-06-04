@@ -86,6 +86,8 @@ async def async_create_evm_tables(
     # create tables
     # for now, use same database for all tables
     engine = connect_utils.create_engine('schema_updates', network=None)
+    if engine is None:
+        raise Exception('could not create engine for database')
     with engine.begin() as conn:
         for network in networks:
             for schema_name in schema_names:
