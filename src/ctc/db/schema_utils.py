@@ -88,7 +88,7 @@ def get_table_name(
     if network is None:
         network = config.get_default_network()
     chain_id = directory.get_network_chain_id(network)
-    return table_name + '__network_' + str(chain_id)
+    return 'chain_' + str(chain_id) + '__' + table_name
 
 
 def get_complete_raw_schema() -> toolsql.DBSchema:
