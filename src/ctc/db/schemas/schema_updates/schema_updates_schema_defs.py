@@ -13,7 +13,7 @@ schema_updates_schema: toolsql.DBSchema = {
                     'name': 'timestamp',
                     'type': 'Timestamp',
                     'index': True,
-                    'modified_time': True,
+                    'created_time': True,
                 },
             ],
         },

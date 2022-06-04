@@ -117,7 +117,8 @@ async def async_initialize_schema_updates_table(
     engine: toolsql.SAEngine,
 ) -> None:
     table_name = 'schema_updates'
-    table_schema = schema_utils.get_raw_schema('schema_updates')
+    schema = schema_utils.get_raw_schema('schema_updates')
+    table_schema = schema['tables']['schema_updates']
 
     if 'schema_updates' in engine.table_names():
         raise Exception('table already in database')
