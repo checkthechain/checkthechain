@@ -30,6 +30,8 @@ def status_command() -> None:
     else:
         raise NotImplementedError()
 
+    # print data being stored
+    active_evm_schemas = db.get_active_evm_schemas()
     print()
     toolstr.print_header('Data to Store')
     networks = config.get_used_networks()
@@ -40,7 +42,10 @@ def status_command() -> None:
         print('    -', admin_schema)
     print('- evm schemas')
     for datatype in evm_schemas:
-        print('    -', datatype)
+        if active_evm_schemas.get(datatype):
+            print('    -', datatype)
+        else:
+            print('    -', datatype, '(inactive)')
     print('- networks')
     for network in networks:
         print('    -', network)
