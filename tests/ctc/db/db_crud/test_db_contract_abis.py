@@ -5,8 +5,21 @@ import toolsql
 from ctc import db
 
 
-example_data = {
-}
+example_data = [
+    {
+        'address': '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+        'abi': {'fake': 'abi', 'nested': {'attribute': 'value'}},
+        'includes_proxy': False,
+    },
+    {
+        'address': '0x9928e4046d7c6513326ccea028cd3e7a91c7590a',
+        'abi': {
+            'another_fake': 'abi',
+            'another_nested': {'attribute': 'value'},
+        },
+        'includes_proxy': False,
+    },
+]
 
 
 def get_test_db_config():
@@ -18,6 +31,7 @@ def get_test_db_config():
 
 
 async def test_contract_abis_crud():
+
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='contract_abis',
@@ -45,8 +59,9 @@ async def test_contract_abis_crud():
                     conn=conn,
                     address=datum['address'],
                 )
-                for key, target_value in datum.items():
-                    assert target_value == db_contract_abi[key]
+                assert datum['abi'] == db_contract_abi
+                # for key, target_value in datum.items():
+                #     assert target_value == db_contract_abi[key]
 
         # get data collectively
         all_addresses = [datum['address'] for datum in example_data]
@@ -55,14 +70,11 @@ async def test_contract_abis_crud():
                 conn=conn,
                 addresses=all_addresses,
             )
-            sorted_example_data = sorted(
-                example_data, key=lambda x: x['address']
-            )
-            sorted_db_data = sorted(
-                db_contract_abis, key=lambda x: x['address']
-            )
-            for target_db, db_data in zip(sorted_example_data, sorted_db_data):
-                assert target_db == db_data
+            packaged_example_data = {
+                datum['address']: datum['abi']
+                for datum in example_data
+            }
+            assert db_contract_abis == packaged_example_data
 
         # delete entries one by one
         with conn.begin():
