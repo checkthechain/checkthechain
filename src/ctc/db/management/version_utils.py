@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 import typing
 
+import sqlalchemy
 import toolsql
 
 import ctc
@@ -18,7 +19,7 @@ _schema_version_cache = {
 
 
 def is_schema_versions_initialized(engine: toolsql.SAEngine) -> bool:
-    return 'schema_versions' in engine.table_names()
+    return sqlalchemy.inspect(engine).has_table('schema_versions')
 
 
 def get_schema_version(

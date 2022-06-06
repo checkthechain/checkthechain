@@ -27,3 +27,11 @@ def test_subcommands_have_help(spec_reference):
         assert (
             arg_spec.get('help') is not None
         ), 'missing help for arg in ' + str(spec_reference)
+
+
+# @pytest.mark.parametrize('spec_reference', list(cli_run.command_index.values()))
+# def test_subcommands_have_examples(spec_reference):
+#     command_spec = toolcli.resolve_command_spec(spec_reference)
+#     assert (
+#         command_spec.get('examples') is not None
+#     ), 'missing examples for command for ' + str(spec_reference)

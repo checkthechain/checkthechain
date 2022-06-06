@@ -32,7 +32,7 @@ def get_test_db_config():
     }
 
 
-async def test_create_schema():
+async def test_erc20_metadata_crud():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='erc20_metadata',

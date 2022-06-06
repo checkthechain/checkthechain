@@ -29,7 +29,7 @@ def get_test_db_config():
     }
 
 
-async def test_create_schema():
+async def test_create_creation_blocks_crud():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='contract_creation_blocks',
