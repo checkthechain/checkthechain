@@ -24,7 +24,7 @@ EVMSchemaName = Literal[
     # 'events',
 ]
 
-AdminSchemaName = Literal['schema_updates']
+AdminSchemaName = Literal['schema_versions']
 
 SchemaName = typing.Union[EVMSchemaName, AdminSchemaName]
 
@@ -52,8 +52,8 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
         return schemas.erc20_metadata_schema
     # elif schema_name == 'erc20_state':
     #     return schemas.erc20_state_schema
-    elif schema_name == 'schema_updates':
-        return schemas.schema_updates_schema
+    elif schema_name == 'schema_versions':
+        return schemas.schema_versions_schema
     else:
         raise Exception('unknown schema: ' + str(schema_name))
 

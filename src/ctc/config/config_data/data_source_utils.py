@@ -54,7 +54,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
 
     format is WIP and subject to change
     """
-    if tags.get('datatype') == 'schema_updates':
+    if tags.get('datatype') == 'schema_versions':
 
         db_config = config_values.get_db_config(schema_name=tags['datatype'])
         if db_config is None:
