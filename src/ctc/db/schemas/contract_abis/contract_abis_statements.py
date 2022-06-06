@@ -61,6 +61,7 @@ async def async_select_contract_abi(
 
 async def async_select_contract_abis(
     network: spec.NetworkReference | None = None,
+    addresses: typing.Sequence[spec.Address] | None = None,
     *,
     conn: toolsql.SAConnection,
 ) -> typing.Mapping[spec.Address, spec.ContractABI]:
@@ -70,9 +71,14 @@ async def async_select_contract_abis(
         network=network,
     )
 
+    if addresses is not None:
+        where_in = {'address': addresses}
+    else:
+        where_in = None
     results = toolsql.select(
         conn=conn,
         table=table,
+        where_in=where_in,
     )
 
     return {
