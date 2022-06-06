@@ -3,7 +3,7 @@ from __future__ import annotations
 import threading
 import typing
 
-import sqlalchemy
+import sqlalchemy  # type: ignore
 import toolsql
 
 import ctc

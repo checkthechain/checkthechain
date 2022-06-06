@@ -133,7 +133,7 @@ def initialize_schema(
     # check that schema versions are being tracked
     if not version_utils.is_schema_versions_initialized(engine=conn.engine):
         if schema_name != 'schema_versions':
-            raise Exception('must initialize schema_versions schema')
+            initialize_schema_versions(conn=conn)
     else:
         # check that schema not already initialized
         schema_version = version_utils.get_schema_version(
