@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import typing
+
 import toolsql
 
 from ctc import config
@@ -31,6 +33,11 @@ def create_engine(
     db_config = data_source['db_config']
     if db_config is None:
         raise Exception('invalid db_config')
+
+    # create directory if need be
+    if db_config['dbms'] == 'sqlite':
+        pathdir = os.path.dirname(os.path.abspath(db_config['path']))
+        os.makedirs(pathdir, exist_ok=True)
 
     # create engine
     engine = toolsql.create_engine(db_config=db_config)
