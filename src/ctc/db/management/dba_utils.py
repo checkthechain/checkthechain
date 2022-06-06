@@ -9,7 +9,7 @@ from ctc import config
 from ctc import spec
 from .. import connect_utils
 from .. import schema_utils
-from .. import schemas
+from . import version_utils
 
 
 async def async_create_evm_tables(
@@ -84,52 +84,86 @@ async def async_create_evm_tables(
             raise Exception('aborted creation of tables')
 
     # create tables
-    # for now, use same database for all tables
-    engine = connect_utils.create_engine('schema_updates', network=None)
+    # (for now, use same database for all tables)
+    engine = connect_utils.create_engine(
+        'schema_versions',
+        network=None,
+        create_missing_schema=False,
+    )
     if engine is None:
         raise Exception('could not create engine for database')
-    if 'schema_updates' not in engine.table_names():
-        await async_initialize_schema_updates_table(engine)
+
+    # initialize schema versions schema if need be
     with engine.begin() as conn:
+        if not version_utils.is_schema_versions_initialized(engine=engine):
+            initialize_schema_versions(conn=conn)
+
+    with engine.begin() as conn:
+
+        # create each schema for each used network
         for network in networks:
             for schema_name in schema_names:
-                schema = schema_utils.get_prepared_schema(
+                initialize_schema(
                     schema_name=schema_name,
                     network=network,
+                    conn=conn,
                 )
-                for table_name, table_schema in schema['tables'].items():
-                    if table_name not in tables_to_create:
-                        continue
-                    toolsql.create_table(
-                        table_name,
-                        table_schema=table_schema,
-                        conn=conn,
-                    )
-                    await schemas.async_upsert_schema_update(
-                        table_name,
-                        conn=conn,
-                    )
+
     print()
     print('all tables created')
 
 
-async def async_initialize_schema_updates_table(
-    engine: toolsql.SAEngine,
+def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
+    initialize_schema(
+        'schema_versions',
+        network=-1,
+        conn=conn,
+        prepared_schema=False,
+    )
+
+
+def initialize_schema(
+    schema_name: schema_utils.SchemaName,
+    network: spec.NetworkReference,
+    conn: toolsql.SAConnection,
+    prepared_schema: bool = True,
 ) -> None:
-    table_name = 'schema_updates'
-    schema = schema_utils.get_raw_schema('schema_updates')
-    table_schema = schema['tables']['schema_updates']
+    """initialize schema by creating its table and other objects"""
 
-    if 'schema_updates' in engine.table_names():
-        raise Exception('table already in database')
+    # check that schema versions are being tracked
+    if not version_utils.is_schema_versions_initialized(engine=conn.engine):
+        if schema_name != 'schema_versions':
+            raise Exception('must initialize schema_versions schema')
+    else:
+        # check that schema not already initialized
+        schema_version = version_utils.get_schema_version(
+            schema_name=schema_name,
+            network=network,
+            conn=conn,
+        )
+        if schema_version is not None:
+            raise Exception('schema already initialized')
 
-    with engine.begin() as conn:
+    # load schema data
+    if prepared_schema:
+        schema = schema_utils.get_prepared_schema(
+            schema_name=typing.cast(schema_utils.EVMSchemaName, schema_name),
+            network=network,
+        )
+    else:
+        schema = schema_utils.get_raw_schema(schema_name=schema_name)
+
+    # create tables
+    for table_name, table_schema in schema['tables'].items():
         toolsql.create_table(
             table_name,
             table_schema=table_schema,
             conn=conn,
         )
-        await schemas.async_upsert_schema_update(
-            table_name,
-            conn=conn,
-        )
+
+    # set version in schema version table
+    version_utils.set_schema_version(
+        schema_name=schema_name,
+        network=network,
+        conn=conn,
+    )

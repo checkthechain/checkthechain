@@ -7,11 +7,14 @@ from ctc import config
 from ctc import spec
 
 from . import schema_utils
+from .management import dba_utils
+from .management import version_utils
 
 
 def create_engine(
     schema_name: schema_utils.SchemaName,
     network: spec.NetworkReference,
+    create_missing_schema: bool = True,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""
 
@@ -30,4 +33,28 @@ def create_engine(
         raise Exception('invalid db_config')
 
     # create engine
-    return toolsql.create_engine(db_config=db_config)
+    engine = toolsql.create_engine(db_config=db_config)
+
+    # create missing tables
+    if create_missing_schema:
+        with engine.begin() as conn:
+
+            # check that schema versions being tracked
+            if not version_utils.is_schema_versions_initialized(engine=engine):
+                dba_utils.initialize_schema_versions(conn=conn)
+
+            # check if schema in database
+            schema_version = version_utils.get_schema_version(
+                schema_name=schema_name,
+                network=network,
+            )
+
+            # create schema if missing
+            if schema_version is None:
+                dba_utils.initialize_schema(
+                    schema_name=schema_name,
+                    network=network,
+                    conn=conn,
+                )
+
+    return engine
