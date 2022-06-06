@@ -26,8 +26,13 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': '--json',
-                'dest': 'json_only',
-                'help': 'json only, no human readble',
+                'dest': 'json_pretty',
+                'help': 'json only',
+                'action': 'store_true',
+            },
+            {
+                'name': '--json-raw',
+                'help': 'json only, without sorting or indentations',
                 'action': 'store_true',
             },
             {
@@ -60,11 +65,14 @@ async def async_abi_command(
     address: spec.Address,
     name: str | None,
     human_only: bool,
-    json_only: bool,
+    json_pretty: bool,
+    json_raw: bool,
     functions: bool,
     events: bool,
     search: str,
 ) -> None:
+
+    json_only = json_pretty or json_raw
 
     address = await evm.async_resolve_address(address)
     contract_abi = await evm.async_get_contract_abi(contract_address=address)
@@ -98,7 +106,10 @@ async def async_abi_command(
     if not human_only:
         import json
 
-        as_str = json.dumps(contract_abi, indent=4, sort_keys=True)
+        if json_raw:
+            as_str = json.dumps(contract_abi)
+        else:
+            as_str = json.dumps(contract_abi, indent=4, sort_keys=True)
         print(as_str)
     if not json_only and not human_only:
         print()
