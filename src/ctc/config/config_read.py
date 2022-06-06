@@ -91,20 +91,18 @@ def get_config_overrides() -> spec.PartialConfigSpec:
 
 def set_config_override(key: str, value: typing.Any) -> None:
     _config_cache['overrides'][key] = value  # type: ignore
-    get_config.cache.delete_all_entries()
+    get_config.cache.delete_all_entries()  # type: ignore
 
 
 def clear_config_override(key: str) -> None:
     if key in _config_cache['overrides']:
         del _config_cache['overrides'][key]  # type: ignore
-
-    # clear get_config cache
+    get_config.cache.delete_all_entries()  # type: ignore
 
 
 def clear_config_overrides() -> None:
     _config_cache['overrides'] = {}
-
-    # clear get_config cache
+    get_config.cache.delete_all_entries()  # type: ignore
 
 
 #

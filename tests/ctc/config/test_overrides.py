@@ -1,8 +1,15 @@
+import pytest
 
 from ctc import config
 
 
-def test_config_overrides():
+@pytest.fixture
+def override_clearer():
+    yield
+    config.clear_config_overrides()
+
+
+def test_config_overrides(override_clearer):
 
     # get old config
     old_config = config.get_config()
@@ -20,3 +27,8 @@ def test_config_overrides():
     # confirm override in config
     new_config = config.get_config()
     assert value == new_config[key]
+
+    # clear override
+    config.clear_config_override(key)
+    newest_config = config.get_config()
+    assert old_config[key] == newest_config[key]
