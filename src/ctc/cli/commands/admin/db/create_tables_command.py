@@ -35,7 +35,7 @@ async def async_create_tables_command(
         for schema_name in schema_names:
             if schema_name not in db.DBSchemaName.__args__:  # type: ignore
                 raise Exception('unknown schema_name: ' + str(schema_name))
-    await db.async_create_evm_tables(
+    db.create_evm_tables(
         schema_names=typing.cast(typing.Sequence[db.EVMSchemaName], schema_names),
         networks=networks,
     )

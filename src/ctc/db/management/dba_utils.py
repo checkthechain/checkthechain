@@ -12,7 +12,7 @@ from .. import schema_utils
 from . import version_utils
 
 
-async def async_create_evm_tables(
+def create_evm_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[schema_utils.EVMSchemaName] | None = None,
     verbose: bool = True,
