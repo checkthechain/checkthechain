@@ -48,6 +48,7 @@ async def async_select_contract_creation_block(
         return_count='one',
         only_columns=['block_number'],
         row_format='only_column',
+        raise_if_table_dne=False,
     )
     return result
 
@@ -64,6 +65,7 @@ async def async_select_contract_creation_blocks(
     result = toolsql.select(
         conn=conn,
         table=table,
+        raise_if_table_dne=False,
     )
     return result
 

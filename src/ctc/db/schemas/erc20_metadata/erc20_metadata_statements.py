@@ -73,6 +73,7 @@ async def async_select_erc20_metadata(
         row_count='at_most_one',
         row_format='dict',
         return_count='one',
+        raise_if_table_dne=False,
     )
 
 
@@ -88,7 +89,11 @@ async def async_select_erc20_metadatas(
         conn=conn,
         table=table,
         row_ids=[address.lower() for address in addresses],
+        raise_if_table_dne=False,
     )
+
+    if results is None:
+        return None
 
     # package into output
     results_by_address = {result['address']: result for result in results}

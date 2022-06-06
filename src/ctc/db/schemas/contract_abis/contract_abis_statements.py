@@ -52,6 +52,7 @@ async def async_select_contract_abi(
         return_count='one',
         only_columns=['abi_text'],
         row_format='only_column',
+        raise_if_table_dne=False,
     )
     if abi_text is not None:
         return json.loads(abi_text)
@@ -64,7 +65,7 @@ async def async_select_contract_abis(
     addresses: typing.Sequence[spec.Address] | None = None,
     *,
     conn: toolsql.SAConnection,
-) -> typing.Mapping[spec.Address, spec.ContractABI]:
+) -> typing.Mapping[spec.Address, spec.ContractABI] | None:
 
     table = schema_utils.get_table_name(
         'contract_abis',
@@ -79,7 +80,11 @@ async def async_select_contract_abis(
         conn=conn,
         table=table,
         where_in=where_in,
+        raise_if_table_dne=False,
     )
+
+    if results is None:
+        return None
 
     return {
         result['address']: json.loads(result['abi_text'])

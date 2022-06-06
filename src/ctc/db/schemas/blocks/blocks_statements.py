@@ -51,6 +51,7 @@ async def async_select_block(
         table=table,
         where_equals={'number': block_number},
         return_count='one',
+        raise_if_table_dne=False,
     )
 
 
@@ -70,6 +71,7 @@ async def async_select_blocks(
             conn=conn,
             table=table,
             where_in={'number': block_numbers},
+            raise_if_table_dne=False,
         )
 
     elif start_block is not None and end_block is not None:
@@ -78,6 +80,7 @@ async def async_select_blocks(
             table=table,
             where_gte={'number': start_block},
             where_lte={'number': end_block},
+            raise_if_table_dne=False,
         )
         blocks_by_number = {block['number']: block for block in blocks}
         return [
@@ -156,6 +159,7 @@ async def async_select_block_timestamp(
         row_format='only_column',
         only_columns=['timestamp'],
         return_count='one',
+        raise_if_table_dne=False,
     )
 
 
@@ -173,6 +177,7 @@ async def async_select_block_timestamps(
         conn=conn,
         table=table,
         where_in={'number': block_numbers_int},
+        raise_if_table_dne=False,
     )
 
     block_timestamps = {row['number']: row['timestamp'] for row in results}
@@ -195,6 +200,7 @@ async def async_select_max_block_number(
             ['max', 'number'],
         ],
         return_count='one',
+        raise_if_table_dne=False,
     )
     return result['max__block_number']
 
@@ -212,6 +218,7 @@ async def async_select_max_block_timestamp(
             ['max', 'timestamp'],
         ],
         return_count='one',
+        raise_if_table_dne=False,
     )
     return result['max__timestamp']
 

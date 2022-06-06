@@ -101,6 +101,7 @@ async def async_select_block_timestamp(
         row_format='only_column',
         only_columns=['timestamp'],
         return_count='one',
+        raise_if_table_dne=False,
     )
 
 
@@ -108,7 +109,7 @@ async def async_select_block_timestamps(
     conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[typing.SupportsInt],
     network: spec.NetworkReference | None = None,
-) -> list[int | None]:
+) -> list[int | None] | None:
 
     table = schema_utils.get_table_name('block_timestamps', network=network)
 
@@ -118,7 +119,11 @@ async def async_select_block_timestamps(
         conn=conn,
         table=table,
         where_in={'block_number': block_numbers_int},
+        raise_if_table_dne=False,
     )
+
+    if results is None:
+        return results
 
     block_timestamps = {
         row['block_number']: row['timestamp'] for row in results
@@ -142,6 +147,7 @@ async def async_select_max_block_number(
             ['max', 'block_number'],
         ],
         return_count='one',
+        raise_if_table_dne=False,
     )
     return result['max__block_number']
 
@@ -159,6 +165,7 @@ async def async_select_max_block_timestamp(
             ['max', 'timestamp'],
         ],
         return_count='one',
+        raise_if_table_dne=False,
     )
     return result['max__timestamp']
 
