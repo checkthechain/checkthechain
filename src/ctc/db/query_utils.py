@@ -3,6 +3,9 @@ from __future__ import annotations
 import functools
 from typing import Callable, Coroutine, Any, TypeVar
 
+import sqlalchemy
+import toolsql
+
 from . import connect_utils
 from . import schema_utils
 
@@ -22,6 +25,7 @@ def with_connection(
     async def async_connected_f(
         *args: Any,
         network: str | None = None,
+        engine: toolsql.SAEngine | None = None,
         **kwargs: Any,
     ) -> R | None:
 
@@ -40,17 +44,21 @@ def with_connection(
             raise Exception('unknown schema_name format')
 
         # create engine
-        engine = connect_utils.create_engine(
-            schema_name=name,
-            network=network,
-        )
+        if engine is None:
+            engine = connect_utils.create_engine(
+                schema_name=name,
+                network=network,
+            )
 
         # if cannot create engine, return None
         if engine is None:
             return None
 
         # connect and execute
-        with engine.connect() as conn:
-            return await async_f(*args, conn=conn, **kwargs)
+        try:
+            with engine.connect() as conn:
+                return await async_f(*args, conn=conn, **kwargs)
+        except sqlalchemy.exc.OperationalError:
+            return None
 
     return async_connected_f
