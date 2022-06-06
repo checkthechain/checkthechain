@@ -144,6 +144,50 @@ async def test_query_when_schema_not_initialized(schema_data):
     assert result is None
 
 
-# @pytest.mark.parametrize('schema_data', schema_datas)
-# def test_select_when_row_does_not_exist():
-#     pass
+@pytest.mark.parametrize('schema_data', schema_datas)
+async def test_select_when_row_does_not_exist(schema_data):
+
+    db_config = get_test_db_config()
+    engine = toolsql.create_engine(**db_config)
+    with engine.begin() as conn:
+        db.initialize_schema(
+            schema_name=schema_data['schema_name'],
+            network=1,
+            conn=conn,
+        )
+
+    with engine.begin() as conn:
+        result = await schema_data['selector'](
+            network=1, conn=conn, **schema_data['query']
+        )
+
+    assert result is None
+
+    if 'plural_selector' in schema_data:
+        with engine.begin() as conn:
+            result = await schema_data['plural_selector'](
+                network=1,
+                conn=conn,
+                **schema_data['plural_query'],
+            )
+
+        assert result is None
+
+
+@pytest.mark.parametrize('schema_data', schema_datas)
+async def test_query_when_row_does_not_exist(schema_data):
+
+    db_config = get_test_db_config()
+    engine = toolsql.create_engine(**db_config)
+    with engine.begin() as conn:
+        db.initialize_schema(
+            schema_name=schema_data['schema_name'],
+            network=1,
+            conn=conn,
+        )
+
+    result = await schema_data['queryer'](
+        network=1, engine=engine, **schema_data['query']
+    )
+
+    assert result is None
