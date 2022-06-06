@@ -55,6 +55,8 @@ def with_connection(
             return None
 
         # connect and execute
+        if require_network:
+            kwargs['network'] = network
         try:
             with engine.connect() as conn:
                 return await async_f(*args, conn=conn, **kwargs)
