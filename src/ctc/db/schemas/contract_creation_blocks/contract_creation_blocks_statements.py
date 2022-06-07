@@ -57,7 +57,7 @@ async def async_select_contract_creation_blocks(
     network: spec.NetworkReference | None = None,
     *,
     conn: toolsql.SAConnection,
-) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
+) -> typing.Sequence[typing.Mapping[str, typing.Any]] | None:
     table = schema_utils.get_table_name(
         'contract_creation_blocks',
         network=network,

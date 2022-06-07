@@ -149,6 +149,8 @@ async def async_select_max_block_number(
         return_count='one',
         raise_if_table_dne=False,
     )
+    if result is None:
+        return None
     return result['max__block_number']
 
 
@@ -167,6 +169,8 @@ async def async_select_max_block_timestamp(
         return_count='one',
         raise_if_table_dne=False,
     )
+    if result is None:
+        return None
     return result['max__timestamp']
 
 
