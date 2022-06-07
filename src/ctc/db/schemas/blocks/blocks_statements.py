@@ -46,13 +46,18 @@ async def async_select_block(
 
     table = schema_utils.get_table_name('blocks', network=network)
 
-    return toolsql.select(
+    block = toolsql.select(
         conn=conn,
         table=table,
         where_equals={'number': block_number},
         return_count='one',
         raise_if_table_dne=False,
     )
+
+    if block is not None and block['base_fee_per_gas'] is None:
+        del block['base_fee_per_gas']
+
+    return block
 
 
 async def async_select_blocks(
@@ -62,12 +67,12 @@ async def async_select_blocks(
     end_block: int | None = None,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
-) -> typing.Sequence[spec.Block | None]:
+) -> typing.Sequence[spec.Block | None] | None:
 
     table = schema_utils.get_table_name('blocks', network=network)
 
     if block_numbers is not None:
-        return toolsql.select(
+        blocks = toolsql.select(
             conn=conn,
             table=table,
             where_in={'number': block_numbers},
@@ -82,16 +87,25 @@ async def async_select_blocks(
             where_lte={'number': end_block},
             raise_if_table_dne=False,
         )
-        blocks_by_number = {block['number']: block for block in blocks}
-        return [
-            blocks_by_number.get(number)
-            for number in range(start_block, end_block + 1)
-        ]
+        block_numbers = range(start_block, end_block + 1)
 
     else:
         raise Exception(
             'must specify block_numbers or start_block and end_block'
         )
+
+    if blocks is None:
+        return None
+
+    for block in blocks:
+        if block is not None and block['base_fee_per_gas'] is None:
+            del block['base_fee_per_gas']
+
+    blocks_by_number = {
+        block['number']: block for block in blocks if block is not None
+    }
+
+    return [blocks_by_number.get(number) for number in block_numbers]
 
 
 async def async_delete_block(
