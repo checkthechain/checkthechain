@@ -39,6 +39,8 @@ def digest_eth_get_block_by_number(
         quantities = rpc_spec.rpc_block_quantities
         response = rpc_format.decode_response(response, quantities=quantities)
 
+    response['totalDifficulty'] = str(response['totalDifficulty'])
+
     if snake_case_response:
         response = rpc_format.keys_to_snake_case(response)
 
