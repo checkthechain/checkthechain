@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 from typing import Callable, Coroutine, Any, TypeVar
 
-import sqlalchemy
+import sqlalchemy # type: ignore
 import toolsql
 
 from . import connect_utils

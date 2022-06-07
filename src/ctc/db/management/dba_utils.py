@@ -48,7 +48,9 @@ def create_evm_tables(
             print('    - network:', network)
 
     # get missing tables
-    tables_to_create: list[str] = []
+    schemas_to_create: list[
+        tuple[spec.NetworkReference, schema_utils.EVMSchemaName]
+    ] = []
     for network in networks:
         for schema_name in schema_names:
             db_config = config.get_db_config(
@@ -64,18 +66,19 @@ def create_evm_tables(
                 db_schema=schema,
                 db_config=db_config,
             )
-            tables_to_create += missing_tables['missing_from_db']
+            if len(missing_tables['missing_from_db']) > 0:
+                schemas_to_create.append((network, schema_name))
 
     # print missing tables
-    if len(tables_to_create) == 0:
+    if len(schemas_to_create) == 0:
         print()
         print('all tables already exist')
         return
     else:
         print()
-        print('tables to create:')
-        for table in tables_to_create:
-            print('-', table)
+        print('schemas to create:')
+        for network, schema_name in schemas_to_create:
+            print('-', network, '-', schema_name)
 
     # get confirmation
     if not confirm:
@@ -101,13 +104,12 @@ def create_evm_tables(
     with engine.begin() as conn:
 
         # create each schema for each used network
-        for network in networks:
-            for schema_name in schema_names:
-                initialize_schema(
-                    schema_name=schema_name,
-                    network=network,
-                    conn=conn,
-                )
+        for network, schema_name in schemas_to_create:
+            initialize_schema(
+                schema_name=schema_name,
+                network=network,
+                conn=conn,
+            )
 
     print()
     print('all tables created')

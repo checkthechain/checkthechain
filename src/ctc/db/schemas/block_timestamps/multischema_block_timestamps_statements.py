@@ -40,7 +40,7 @@ async def async_select_block_timestamps(
     conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[typing.SupportsInt],
     network: spec.NetworkReference | None = None,
-) -> list[int | None]:
+) -> list[int | None] | None:
 
     timestamp_schema = management.get_active_timestamp_schema()
 
