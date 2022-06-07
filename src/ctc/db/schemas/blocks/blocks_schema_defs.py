@@ -16,7 +16,7 @@ blocks_schema: toolsql.DBSchema = {
                 {'name': 'logs_bloom', 'type': 'Text'},
                 {'name': 'miner', 'type': 'Text'},
                 {'name': 'mix_hash', 'type': 'Text'},
-                {'name': 'nonce', 'type': 'Integer'},
+                {'name': 'nonce', 'type': 'Text'},
                 {'name': 'number', 'type': 'Integer', 'primary': True},
                 {'name': 'parent_hash', 'type': 'Text'},
                 {'name': 'receipts_root', 'type': 'Text'},

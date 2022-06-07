@@ -78,7 +78,7 @@ class RawBlock(TypedDict):
 
 
 class Block(TypedDict):
-    number: int
+    base_fee_per_gas: NotRequired[int]
     difficulty: int
     extra_data: binary_types.PrefixHexData
     gas_limit: int
@@ -88,19 +88,19 @@ class Block(TypedDict):
     miner: address_types.Address
     mix_hash: BlockHash
     nonce: binary_types.PrefixHexData
+    number: int
     parent_hash: BlockHash
     receipts_root: binary_types.PrefixHexData
     sha3_uncles: binary_types.PrefixHexData
     size: int
     state_root: binary_types.PrefixHexData
     timestamp: int
-    total_difficulty: int
+    total_difficulty: str
     transactions: typing.Union[
         typing.List[TransactionHash], typing.List[Transaction]
     ]
     transactions_root: binary_types.PrefixHexData
     uncles: typing.List[BlockHash]
-    base_fee_per_gas: NotRequired[int]
 
 
 class RawLog(TypedDict):
