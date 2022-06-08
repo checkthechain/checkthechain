@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-import toolsql
+import typing
+
+if typing.TYPE_CHECKING:
+    import toolsql
+
 
 fourbyte_schema: toolsql.DBSchema = {
     'tables': {

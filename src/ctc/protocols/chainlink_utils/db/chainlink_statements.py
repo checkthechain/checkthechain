@@ -5,7 +5,7 @@ import typing
 import toolsql
 
 from ctc import spec
-from ... import schema_utils
+from ctc import db
 from . import chainlink_schema_defs
 
 
@@ -15,7 +15,7 @@ async def async_upsert_chainlink_feed(
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('oracle_feeds', network=network)
+    table = db.get_table_name('oracle_feeds', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -30,7 +30,7 @@ async def async_upsert_chainlink_feeds(
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('oracle_feeds', network=network)
+    table = db.get_table_name('oracle_feeds', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -46,7 +46,7 @@ async def async_select_chainlink_feed(
     name: str | None = None,
     asset: str | None = None,
 ) -> chainlink_schema_defs.ChainlinkFeed:
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = db.get_table_name('block_timestamps', network=network)
 
     where_equals = {
         'address': address,
@@ -85,7 +85,7 @@ async def async_delete_chainlink_feed(
     if len(where_equals) == 0:
         raise Exception('must specify which feeds to delete')
 
-    table = schema_utils.get_table_name('chainlink_feed', network=network)
+    table = db.get_table_name('chainlink_feed', network=network)
 
     toolsql.delete(
         conn=conn,

@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-from typing_extensions import TypedDict
+import typing
 
-import toolsql
+if typing.TYPE_CHECKING:
 
+    from typing_extensions import TypedDict
 
-class ChainlinkFeed(TypedDict):
-    address: str
-    name: str
-    deviation: str
-    heartbeat: str
-    decimals: int
-    asset: str
-    asset_type: str
-    status: str
+    import toolsql
+
+    class ChainlinkFeed(TypedDict):
+        address: str
+        name: str
+        deviation: str
+        heartbeat: str
+        decimals: int
+        asset: str
+        asset_type: str
+        status: str
 
 
 chainlink_schema: toolsql.DBSchema = {

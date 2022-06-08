@@ -62,13 +62,13 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
     # # protocols
     #
     elif schema_name == '4byte':
-        from .schemas.protocols import fourbyte
+        from ctc.protocols import fourbyte_utils
 
-        return fourbyte.fourbyte_schema
+        return fourbyte_utils.fourbyte_schema
     elif schema_name == 'chainlink':
-        from .schemas.protocols import chainlink
+        from ctc.protocols import chainlink_utils
 
-        return chainlink.chainlink_schema
+        return chainlink_utils.chainlink_schema
     else:
         raise Exception('unknown schema: ' + str(schema_name))
 
