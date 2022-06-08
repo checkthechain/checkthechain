@@ -11,10 +11,13 @@ from ctc import config
 
 if typing.TYPE_CHECKING:
 
-    class DataDirSpec(TypedDict):
+    class DataDirSpec(TypedDict, total=False):
         # for now, only specifieds entries in root data dir
         files: list[str]  # list of expected file paths
         directories: list[str]  # list of expected directory paths
+        directory_contents: typing.Mapping[
+            str, typing.Sequence[str]
+        ]  # list of items in each directory
 
     DataSpecVersion = Literal['0.2.0', '0.3.0']
 
@@ -36,10 +39,11 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
         'directories': [
             'dbs',
             'logs',
-            'logs/rpc',
-            'logs/db',
             'evm',
         ],
+        'directory_contents': {
+            'logs': ['rpc', 'db'],
+        },
     },
 }
 
@@ -75,10 +79,9 @@ def fully_migrate_data_dir(data_dir: str) -> None:
 
     # perform each upgrade function sequentially
     index = data_spec_order.index(current_version)
-    steps = data_spec_order[index + 1:]
+    steps = data_spec_order[index + 1 :]
     for step in steps:
         migrate_functions[step](data_dir=data_dir)
-
 
 
 def migrate_data_dir__0_2_0__to__0_3_0(
@@ -113,7 +116,9 @@ def migrate_data_dir__0_2_0__to__0_3_0(
                 for item in sorted(to_delete):
                     print('-', item)
                 if not toolcli.input_yes_or_no('continue? '):
-                    raise Exception('migration unfinished, must delete old files')
+                    raise Exception(
+                        'migration unfinished, must delete old files'
+                    )
 
             for path in to_delete:
                 os.remove(os.path.join(data_dir, path))
