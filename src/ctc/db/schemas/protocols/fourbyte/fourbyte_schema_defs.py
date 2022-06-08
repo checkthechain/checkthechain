@@ -17,7 +17,7 @@ fourbyte_schema: toolsql.DBSchema = {
                     'index': True,
                 },
                 {
-                    'name': 'function_hex',
+                    'name': 'function_text',
                     'type': 'Text',
                     'index': True,
                 },
@@ -36,7 +36,7 @@ fourbyte_schema: toolsql.DBSchema = {
                     'index': True,
                 },
                 {
-                    'name': 'event_hex',
+                    'name': 'event_text',
                     'type': 'Text',
                     'index': True,
                 },

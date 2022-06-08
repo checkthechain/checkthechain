@@ -20,6 +20,8 @@ def get_active_evm_schemas() -> typing.Mapping[
         'erc20_metadata': True,
         # 'erc20_state': False,
         # 'events': False,
+        '4byte': True,
+        'chainlink': True,
     }
 
 

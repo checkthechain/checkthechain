@@ -25,7 +25,7 @@ async def async_upsert_chainlink_feed(
 
 
 async def async_upsert_chainlink_feeds(
-    feeds: typing.List[typing.Mapping[str, typing.Any]],
+    feeds: typing.Sequence[typing.Mapping[str, typing.Any]],
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> None:
