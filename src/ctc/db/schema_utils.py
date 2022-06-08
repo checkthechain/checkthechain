@@ -22,6 +22,10 @@ EVMSchemaName = Literal[
     'erc20_metadata',
     # 'erc20_state',
     # 'events',
+    #
+    # protocols
+    '4byte',
+    'chainlink',
 ]
 
 AdminSchemaName = Literal['schema_versions']
@@ -54,6 +58,17 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
     #     return schemas.erc20_state_schema
     elif schema_name == 'schema_versions':
         return schemas.schema_versions_schema
+    #
+    # # protocols
+    #
+    elif schema_name == '4byte':
+        from .schemas.protocols import fourbyte
+
+        return fourbyte.fourbyte_schema
+    elif schema_name == 'chainlink':
+        from .schemas.protocols import chainlink
+
+        return chainlink.chainlink_schema
     else:
         raise Exception('unknown schema: ' + str(schema_name))
 
