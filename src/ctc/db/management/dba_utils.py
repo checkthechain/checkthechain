@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import sqlalchemy  # type: ignore
 import toolcli
 import toolsql
 
@@ -169,3 +170,81 @@ def initialize_schema(
         network=network,
         conn=conn,
     )
+
+
+def drop_schema(
+    schema_name: schema_utils.EVMSchemaName,
+    network: spec.NetworkReference | None = None,
+    confirm: bool = False,
+) -> None:
+
+    if not confirm:
+        if network is not None:
+            answer = toolcli.input_yes_or_no(
+                'delete version row for schema '
+                + schema_name
+                + ' for network '
+                + str(network)
+                + '? '
+            )
+            if not answer:
+                raise Exception('aborting')
+        else:
+            answer = toolcli.input_yes_or_no(
+                'delete ALL version rows for schema ' + schema_name + '? '
+            )
+            if not answer:
+                raise Exception('aborting')
+
+    if network is not None:
+        networks: typing.Sequence[spec.NetworkReference] = [network]
+    else:
+        networks = config.get_used_networks()
+
+    for network in networks:
+
+        # determine tables in db
+        engine = connect_utils.create_engine(
+            schema_name=schema_name,
+            network=network,
+            create_missing_schema=False,
+        )
+        if engine is None:
+            continue
+        db_table_names = sqlalchemy.inspect(engine).get_table_names()
+
+        # determine tables in schema
+        schema_data = schema_utils.get_prepared_schema(
+            schema_name=schema_name,
+            network=network,
+        )
+        schema_table_names = schema_data['tables']
+
+        # determine which tables to drop
+        drop_table_names = set(db_table_names) & set(schema_table_names)
+
+        # drop schema tables
+        with engine.begin() as conn:
+            for table_name in drop_table_names:
+                print('dropping table', table_name)
+                table_object = toolsql.create_table_object_from_db(
+                    engine=engine,
+                    table_name=table_name,
+                )
+                table_object.drop(bind=engine)
+
+    # delete rows from schema_versions table
+    schema_version_engine = connect_utils.create_engine(
+        schema_name='schema_versions',
+        network=None,
+        create_missing_schema=False,
+    )
+    if schema_version_engine is not None:
+        with schema_version_engine.begin() as conn:
+            for network in networks:
+                version_utils.delete_schema_version(
+                    schema_name=schema_name,
+                    network=network,
+                    conn=conn,
+                    confirm_delete_row=True,
+                )

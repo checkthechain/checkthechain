@@ -84,3 +84,62 @@ def set_schema_version(
             'version': version,
         },
     )
+
+
+def delete_schema_version(
+    schema_name: str | None,
+    network: spec.NetworkReference | None,
+    conn: toolsql.SAConnection,
+    confirm_delete_row: bool = False,
+    confirm_delete_network: bool = False,
+    confirm_delete_schema: bool = False,
+    confirm_delete_all: bool = False,
+) -> None:
+
+    if schema_name is None and network is None:
+        if not confirm_delete_all:
+            import toolcli
+
+            answer = toolcli.input_yes_or_no(
+                'delete ALL version rows for ALL schemas? '
+            )
+            if not answer:
+                raise Exception('aborting')
+
+    elif schema_name is not None and network is not None:
+        if not confirm_delete_row:
+            answer = toolcli.input_yes_or_no(
+                'delete version row for schema '
+                + schema_name
+                + ' for network '
+                + str(network)
+                + ' ? '
+            )
+            if not answer:
+                raise Exception('aborting')
+
+    elif schema_name is not None:
+        if not confirm_delete_schema:
+            answer = toolcli.input_yes_or_no(
+                'delete ALL version rows for schema ' + schema_name + '? '
+            )
+            if not answer:
+                raise Exception('aborting')
+
+    elif network is not None:
+        if not confirm_delete_network:
+            answer = toolcli.input_yes_or_no(
+                'delete ALL version rows for network ' + str(network) + '? '
+            )
+            if not answer:
+                raise Exception('aborting')
+
+    if schema_name is not None:
+        where_equals = {'schema_name': schema_name}
+    else:
+        where_equals = {}
+    toolsql.delete(
+        conn=conn,
+        table='schema_versions',
+        where_equals=where_equals,
+    )
