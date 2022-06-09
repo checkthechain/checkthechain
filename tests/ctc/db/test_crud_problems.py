@@ -67,8 +67,8 @@ schema_datas = [
         'selector': db.async_select_erc20_metadata,
         'queryer': db.async_query_erc20_metadata,
         'query': {'address': '0x956f47f50a910163d8bf957cf5846d573e7f87ca'},
-        'plural_selector': db.async_select_erc20_metadatas,
-        'plural_queryer': db.async_query_erc20_metadatas,
+        'plural_selector': db.async_select_erc20s_metadata,
+        'plural_queryer': db.async_query_erc20s_metadata,
         'plural_query': {
             'addresses': ['0x956f47f50a910163d8bf957cf5846d573e7f87ca'],
         },

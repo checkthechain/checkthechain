@@ -46,15 +46,15 @@ async def async_upsert_erc20_metadata(
     )
 
 
-async def async_upsert_erc20_metadatas(
-    metadatas: typing.Sequence[erc20_metadata_schema_defs.ERC20Metadata],
+async def async_upsert_erc20s_metadata(
+    erc20s_metadata: typing.Sequence[erc20_metadata_schema_defs.ERC20Metadata],
     network: spec.NetworkReference | None = None,
     *,
     conn: toolsql.SAConnection,
 ) -> None:
     coroutines = [
         async_upsert_erc20_metadata(conn=conn, network=network, **metadata)
-        for metadata in metadatas
+        for metadata in erc20s_metadata
     ]
     await asyncio.gather(*coroutines)
 
@@ -77,7 +77,7 @@ async def async_select_erc20_metadata(
     )
 
 
-async def async_select_erc20_metadatas(
+async def async_select_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
     network: spec.NetworkReference | None = None,
     *,

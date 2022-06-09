@@ -10,7 +10,7 @@ async_query_erc20_metadata = query_utils.with_connection(
 )
 
 
-async_query_erc20_metadatas = query_utils.with_connection(
-    erc20_metadata_statements.async_select_erc20_metadatas,
+async_query_erc20s_metadata = query_utils.with_connection(
+    erc20_metadata_statements.async_select_erc20s_metadata,
     'erc20_metadata',
 )

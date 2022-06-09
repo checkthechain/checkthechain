@@ -50,9 +50,9 @@ async def test_erc20_metadata_crud():
 
         # insert data
         with conn.begin():
-            await db.async_upsert_erc20_metadatas(
+            await db.async_upsert_erc20s_metadata(
                 conn=conn,
-                metadatas=example_data,
+                erc20s_metadata=example_data,
             )
 
         # get data individually
@@ -68,7 +68,7 @@ async def test_erc20_metadata_crud():
         # get data collectively
         all_addresses = [datum['address'] for datum in example_data]
         with conn.begin():
-            actual_metadatas = await db.async_select_erc20_metadatas(
+            actual_metadatas = await db.async_select_erc20s_metadata(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -91,7 +91,7 @@ async def test_erc20_metadata_crud():
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = await db.async_select_erc20_metadatas(
+            actual_metadatas = await db.async_select_erc20s_metadata(
                 conn=conn,
                 addresses=all_addresses,
             )
@@ -111,7 +111,7 @@ async def test_erc20_metadata_crud():
 
         # ensure all entries deleted
         with conn.begin():
-            actual_metadatas = await db.async_select_erc20_metadatas(
+            actual_metadatas = await db.async_select_erc20s_metadata(
                 conn=conn,
                 addresses=all_addresses,
             )
