@@ -14,6 +14,7 @@ async def async_upsert_erc20_metadata(
     address: spec.Address,
     symbol: str | None = None,
     decimals: int | None = None,
+    name: str | None = None,
     upsert: bool = True,
     network: spec.NetworkReference | None = None,
     *,
@@ -25,6 +26,7 @@ async def async_upsert_erc20_metadata(
         'address': address.lower(),
         'symbol': symbol,
         'decimals': decimals,
+        'name': name,
     }
     row = {k: v for k, v in row.items() if v is not None}
 
@@ -60,20 +62,29 @@ async def async_upsert_erc20s_metadata(
 
 
 async def async_select_erc20_metadata(
-    address: spec.Address,
+    address: spec.Address | None = None,
+    symbol: str | None = None,
     network: spec.NetworkReference | None = None,
     *,
     conn: toolsql.SAConnection,
 ) -> erc20_metadata_schema_defs.ERC20Metadata | None:
     table = schema_utils.get_table_name('erc20_metadata', network=network)
+
+    if address is not None:
+        query: typing.Mapping[str, typing.Any] = {'row_id': address.lower()}
+    elif symbol is not None:
+        query = {'where_equals': {'symbol': symbol}}
+    else:
+        raise Exception('must specify address or symbol')
+
     return toolsql.select(
         conn=conn,
         table=table,
-        row_id=address.lower(),
         row_count='at_most_one',
         row_format='dict',
         return_count='one',
         raise_if_table_dne=False,
+        **query,
     )
 
 

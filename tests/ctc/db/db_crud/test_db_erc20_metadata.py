@@ -10,16 +10,13 @@ example_data = [
         'address': '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
         'symbol': 'FEI',
         'decimals': 18,
+        'name': 'Fei USD',
     },
     {
         'address': '0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
         'symbol': 'TRIBE',
         'decimals': 18,
-    },
-    {
-        'address': '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640',
-        'symbol': 'USDC',
-        'decimals': 6,
+        'name': 'Tribe',
     },
 ]
 

@@ -31,6 +31,11 @@ erc20_metadata_schema: toolsql.DBSchema = {
                     'name': 'decimals',
                     'type': 'Integer',
                 },
+                {
+                    'name': 'name',
+                    'type': 'Text',
+                    'index': True,
+                },
             ],
         },
     },
