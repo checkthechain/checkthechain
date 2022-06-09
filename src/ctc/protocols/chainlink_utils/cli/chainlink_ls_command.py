@@ -3,12 +3,12 @@ from __future__ import annotations
 import toolcli
 import toolstr
 
-from ctc import directory
+from ctc.protocols import chainlink_utils
 
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': chainlink_ls_command,
+        'f': async_chainlink_ls_command,
         'help': 'list all Chainlink feeds',
         'args': [
             {
@@ -20,10 +20,14 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def chainlink_ls_command(query: str) -> None:
-    oracle_feeds = directory.load_oracle_feeds(protocol='chainlink')
+async def async_chainlink_ls_command(query: str) -> None:
+    oracle_feeds = await chainlink_utils.async_query_feeds(network='mainnet')
+    if oracle_feeds is None:
+        return
     rows = []
-    for feed in oracle_feeds.values():
+    for feed in oracle_feeds:
+        if feed is None:
+            continue
         if query is not None and query.lower() not in feed['name'].lower():
             continue
         row = [
@@ -34,5 +38,9 @@ def chainlink_ls_command(query: str) -> None:
         ]
         rows.append(row)
     labels = ['name', 'delta', 'rate', 'address']
-    print(len(rows))
-    toolstr.print_table(rows, labels=labels)
+    toolstr.print_table(
+        rows,
+        labels=labels,
+        column_gap=1,
+        column_widths=[20, 5, 4, 42],
+    )

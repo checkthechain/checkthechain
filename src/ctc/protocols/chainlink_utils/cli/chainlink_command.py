@@ -5,9 +5,9 @@ import typing
 import toolcli
 import toolstr
 
-from ctc import directory
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.cli import cli_utils
 from ctc.protocols import chainlink_utils
 
@@ -34,6 +34,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify that output path can be overwritten',
             },
             {'name': '--provider', 'help': 'rpc provider name or url'},
+            {'name': '--network', 'help': 'network name or chain_id'},
             {
                 'name': '--all-fields',
                 'action': 'store_true',
@@ -59,6 +60,7 @@ async def async_chainlink_command(
     output: str,
     overwrite: bool,
     provider: typing.Optional[str],
+    network: spec.NetworkReference | None,
     all_fields: typing.Optional[bool],
     interpolate: bool,
     shell: bool,
@@ -76,14 +78,11 @@ async def async_chainlink_command(
     if blocks is None:
         await chainlink_utils.async_summarize_feed(feed=feed_str)
     else:
-        if evm.is_address_str(feed_str):
-            feed_address = feed_str
-        elif isinstance(feed_str, str):
-            feed_address = directory.get_oracle_address(
-                name=feed_str, protocol='chainlink'
-            )
-        else:
-            raise Exception('unknown feed specification: ' + str(feed_str))
+        feed_address = await chainlink_utils.async_resolve_feed_address(
+            feed=feed_str,
+            network=network,
+            provider=provider,
+        )
         name = await rpc.async_eth_call(
             feed_address,
             function_abi=chainlink_utils.feed_function_abis['description'],

@@ -2,54 +2,87 @@ from __future__ import annotations
 
 import typing
 
-from ctc import directory
+from ctc import config
 from ctc import evm
 from ctc import rpc
 from ctc import spec
 
+from . import chainlink_db
 from . import chainlink_spec
+
+
+def _build_feed_query(
+    feed: chainlink_spec._FeedReference,
+) -> typing.Mapping[str, typing.Any]:
+    if isinstance(feed, str):
+        if evm.is_address_str(feed):
+            return {'address': feed}
+        elif '_' in feed:
+            return {'short_name': feed}
+        else:
+            return {'name': feed}
+    else:
+        raise Exception('unknown feed reference type')
 
 
 async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
+    network: spec.NetworkReference | None = None,
     provider: spec.ProviderSpec = None,
+    use_db: bool = True,
 ) -> int:
-    provider = rpc.get_provider(provider)
-    feed = await async_resolve_feed_address(feed, provider=provider)
-    network = provider['network']
-    if network is None:
-        raise Exception('could not determine network')
-    metadata = directory.get_oracle_feed_metadata(
-        address=feed,
-        network=network,
-        protocol='chainlink',
-    )
-    return metadata['decimals']
+
+    # try database
+    if use_db:
+        query = _build_feed_query(feed)
+        if network is None:
+            if provider is not None:
+                network = rpc.get_provider_network(provider)
+            else:
+                network = config.get_default_network()
+
+        feed_data = await chainlink_db.async_query_feed(
+            network=network, **query
+        )
+        if feed_data is not None:
+            return feed_data['decimals']
+
+    # query rpc
+    if evm.is_address_str(feed):
+        if provider is None and network is not None:
+            provider = {'network': network}
+        return await rpc.async_eth_call(
+            feed,
+            provider=provider,
+            function_abi=chainlink_spec.feed_function_abis['decimals'],
+        )
+
+    else:
+        raise Exception('could not find address for feed: ' + str(feed))
 
 
 async def async_resolve_feed_address(
     feed: str,
     *,
+    network: spec.NetworkReference | None = None,
     provider: spec.ProviderSpec = None,
-    block: spec.BlockNumberReference = 'latest',
 ) -> spec.Address:
-
-    provider = rpc.get_provider(provider)
-    network = provider['network']
-    if network is None:
-        raise Exception('could not determine network')
 
     if evm.is_address_str(feed):
         return feed
-    elif isinstance(feed, str):
-        return directory.get_oracle_address(
-            name=feed,
-            protocol='chainlink',
-            network=network,
-            block=block,
-        )
+
+    query = _build_feed_query(feed)
+    if network is None:
+        if provider is not None:
+            network = rpc.get_provider_network(provider)
+        else:
+            network = config.get_default_network()
+
+    feed_data = await chainlink_db.async_query_feed(network=network, **query)
+    if feed_data is not None:
+        return feed_data['address']
     else:
-        raise Exception('invalid feed reference: ' + str(feed))
+        raise Exception('could not resolve feed address')
 
 
 async def async_get_feed_aggregator(
@@ -60,9 +93,7 @@ async def async_get_feed_aggregator(
     fill_empty: bool = True,
 ) -> spec.Address:
 
-    feed = await async_resolve_feed_address(
-        feed, block=block, provider=provider
-    )
+    feed = await async_resolve_feed_address(feed, provider=provider)
 
     aggregator = await rpc.async_eth_call(
         to_address=feed,

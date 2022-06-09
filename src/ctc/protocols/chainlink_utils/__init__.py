@@ -1,5 +1,5 @@
 from .chainlink_data import *
-from .db import *
+from .chainlink_db import *
 
 from .chainlink_helpers import *
 from .chainlink_feed_metadata import *

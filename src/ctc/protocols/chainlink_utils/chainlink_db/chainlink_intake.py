@@ -128,7 +128,7 @@ async def async_import_network_to_db(
 
     with engine.begin() as conn:
 
-        await chainlink_statements.async_upsert_chainlink_feeds(
+        await chainlink_statements.async_upsert_feeds(
             feeds=feeds,
             network=network,
             conn=conn,

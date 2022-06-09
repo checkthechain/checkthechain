@@ -9,13 +9,15 @@ from ctc import db
 from . import chainlink_schema_defs
 
 
-async def async_upsert_chainlink_feed(
+async def async_upsert_feed(
     feed: dict,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = db.get_table_name('oracle_feeds', network=network)
+    feed = dict(feed, address=feed['address'].lower())
+
+    table = db.get_table_name('chainlink_feeds', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -24,13 +26,18 @@ async def async_upsert_chainlink_feed(
     )
 
 
-async def async_upsert_chainlink_feeds(
+async def async_upsert_feeds(
     feeds: typing.Sequence[typing.Mapping[str, typing.Any]],
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = db.get_table_name('oracle_feeds', network=network)
+    feeds = [
+        dict(feed, address=feed['address'].lower())
+        for feed in feeds
+    ]
+
+    table = db.get_table_name('chainlink_feeds', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -39,14 +46,14 @@ async def async_upsert_chainlink_feeds(
     )
 
 
-async def async_select_chainlink_feed(
+async def async_select_feed(
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,
-) -> chainlink_schema_defs.ChainlinkFeed:
-    table = db.get_table_name('block_timestamps', network=network)
+) -> chainlink_schema_defs.ChainlinkFeed | None:
+    table = db.get_table_name('chainlink_feeds', network=network)
 
     where_equals = {
         'address': address,
@@ -66,7 +73,43 @@ async def async_select_chainlink_feed(
     )
 
 
-async def async_delete_chainlink_feed(
+async def async_select_feeds(
+    network: spec.NetworkReference | None,
+    conn: toolsql.SAConnection,
+    address: spec.Address | None = None,
+    name: str | None = None,
+    asset: str | None = None,
+    addresses: typing.Sequence[str] | None = None
+) -> typing.Sequence[chainlink_schema_defs.ChainlinkFeed | None] | None:
+
+    table = db.get_table_name('chainlink_feeds', network=network)
+
+    where_equals = {
+        'address': address,
+        'name': name,
+        'asset': asset,
+    }
+    where_equals = {
+        key: value for key, value in where_equals.items() if value is not None
+    }
+
+    if addresses is not None:
+        where_in = {'address': addresses}
+    else:
+        where_in = None
+
+    result = toolsql.select(
+        conn=conn,
+        table=table,
+        where_equals=where_equals,
+        where_in=where_in,
+        raise_if_table_dne=False,
+    )
+
+    return result
+
+
+async def async_delete_feed(
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,

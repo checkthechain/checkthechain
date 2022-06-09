@@ -5,10 +5,9 @@ import time
 import tooltime
 import toolstr
 
-from ctc import directory
-from ctc import evm
 from ctc import rpc
 from ctc.protocols import chainlink_utils
+from . import chainlink_feed_metadata
 from . import chainlink_spec
 
 
@@ -16,14 +15,9 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
 
     import asyncio
 
-    if evm.is_address_str(feed):
-        feed_address = feed
-    elif isinstance(feed, str):
-        feed_address = directory.get_oracle_address(
-            name=feed, protocol='chainlink'
-        )
-    else:
-        raise Exception('unknown feed specification: ' + str(feed))
+    feed_address = await chainlink_feed_metadata.async_resolve_feed_address(
+        feed,
+    )
 
     name_coroutine = rpc.async_eth_call(
         function_abi=chainlink_spec.feed_function_abis['description'],

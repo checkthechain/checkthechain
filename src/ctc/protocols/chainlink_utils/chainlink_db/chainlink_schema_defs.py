@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:
 
 chainlink_schema: toolsql.DBSchema = {
     'tables': {
-        'oracle_feeds': {
+        'chainlink_feeds': {
             'columns': [
                 {'name': 'address', 'type': 'Text', 'primary': True},
                 {'name': 'name', 'type': 'Text', 'index': True},
