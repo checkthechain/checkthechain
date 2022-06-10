@@ -3,8 +3,6 @@ from __future__ import annotations
 import filecmp
 import os
 
-import toolcli
-
 import ctc
 
 
@@ -44,6 +42,8 @@ def is_data_root_initialized(data_root_path: str) -> bool:
 def initialize_data_root(
     path: str, confirm: bool = False, raise_if_unconfirmed: bool = True
 ) -> bool:
+
+    import toolcli
 
     default_data_dir = get_default_data_dir()
 
