@@ -48,17 +48,22 @@ async def async_select_function_signatures(
     conn: toolsql.SAConnection,
     hex_signature: str | None = None,
     text_signature: str | None = None,
+    id: int | None = None,
+    bytes_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
     table = db.get_table_name('function_signatures', network=network)
 
     where_equals = {
+        'id': id,
         'hex_signature': hex_signature,
         'text_signature': text_signature,
+        'bytes_signature': bytes_signature,
     }
     where_equals = {
         key: value for key, value in where_equals.items() if value is not None
     }
+
 
     return toolsql.select(
         conn=conn,
