@@ -8,7 +8,6 @@ import json
 import time
 
 from ctc import config
-from ctc import directory
 from ctc import evm
 from ctc import spec
 
@@ -50,7 +49,7 @@ async def async_get_contract_abi(
         raise Exception('not a valid address: ' + str(contract_address))
 
     if verbose:
-        network = directory.get_network_name(network)
+        network = evm.get_network_name(network)
         print(
             'fetching ' + str(network) + ' abi from etherscan:',
             contract_address,

@@ -5,6 +5,7 @@ import typing
 
 import toolcache
 
+from ctc import evm
 import ctc.config
 from ctc import spec
 from ctc.toolbox import search_utils
@@ -141,26 +142,26 @@ def get_erc20_symbol(
 #
 
 
-@toolcache.cache(cachetype='memory')
-def load_filesystem_erc20_data(
-    network: spec.NetworkReference,
-    label: typing.Optional[str] = None,
-) -> list[spec.ERC20Metadata]:
+# @toolcache.cache(cachetype='memory')
+# def load_filesystem_erc20_data(
+#     network: spec.NetworkReference,
+#     label: typing.Optional[str] = None,
+# ) -> list[spec.ERC20Metadata]:
 
-    # set default label
-    if label is None:
-        label = '1inch'
+#     # set default label
+#     if label is None:
+#         label = '1inch'
 
-    # build path
-    path = get_erc20_data_path(network=network, label=label)
+#     # build path
+#     path = get_erc20_data_path(network=network, label=label)
 
-    # load data
-    return store_utils.load_file_data(path)
+#     # load data
+#     return store_utils.load_file_data(path)
 
 
-def get_erc20_data_path(network: spec.NetworkReference, label: str) -> str:
-    network_name = networks.get_network_name(network=network)
-    data_dir = ctc.config.get_data_dir()
-    filename = label + '.csv'
-    return os.path.join(data_dir, network_name, 'erc20s', filename)
+# def get_erc20_data_path(network: spec.NetworkReference, label: str) -> str:
+#     network_name = evm.get_network_name(network=network)
+#     data_dir = ctc.config.get_data_dir()
+#     filename = label + '.csv'
+#     return os.path.join(data_dir, network_name, 'erc20s', filename)
 

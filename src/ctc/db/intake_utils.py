@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import directory
+from ctc import config
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -30,7 +31,9 @@ async def async_is_block_fully_confirmed(
         return True
 
     # check whether block has enough confirmations
-    network_name = directory.get_network_name(network)
+    if network is None:
+        network = config.get_default_network()
+    network_name = evm.get_network_name(network)
     provider: spec.ProviderSpec = {'network': network_name}
     rpc_latest_block = await rpc.async_eth_block_number(provider=provider)
     required_confirmations = management.get_required_confirmations(
@@ -60,7 +63,9 @@ async def async_filter_fully_confirmed_blocks(
         return blocks
 
     # check whether blocks have enough confirmations
-    network_name = directory.get_network_name(network)
+    if network is None:
+        network = config.get_default_network()
+    network_name = evm.get_network_name(network)
     provider: spec.ProviderSpec = {'network': network_name}
     rpc_latest_block = await rpc.async_eth_block_number(provider=provider)
     required_confirmations = management.get_required_confirmations(

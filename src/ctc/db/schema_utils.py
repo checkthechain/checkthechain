@@ -7,7 +7,7 @@ from typing_extensions import Literal
 import toolsql
 
 from ctc import config
-from ctc import directory
+from ctc import evm
 from ctc import spec
 
 from . import schemas
@@ -102,7 +102,7 @@ def get_table_name(
     """get full table name, incorporating chain information"""
     if network is None:
         network = config.get_default_network()
-    chain_id = directory.get_network_chain_id(network)
+    chain_id = evm.get_network_chain_id(network)
     return 'network_' + str(chain_id) + '__' + table_name
 
 

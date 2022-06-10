@@ -14,4 +14,3 @@ class NetworkMetadata(TypedDict):
     name: NetworkName
     chain_id: int
     block_explorer: str  # url
-

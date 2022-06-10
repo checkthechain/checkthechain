@@ -6,9 +6,10 @@ import urllib.parse
 
 import toolcli
 
+from ctc import directory
+from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc import directory
 from ctc.toolbox import nested_utils
 from .. import config_read
 
@@ -26,7 +27,7 @@ def setup_networks(styles: typing.Mapping[str, str]) -> tuple[_NetworkData, bool
 
     print()
     print('The following networks are already added:')
-    default_networks = directory.load_networks_from_disk(use_default=True)
+    default_networks = evm.get_default_networks_metadata()
     for network_name, network_metadata in default_networks.items():
         print('-', network_name)
 
@@ -300,7 +301,7 @@ def specify_network_defaults(
         network = provider_metadata['network']
         if network is None:
             raise Exception('unknown network for provider: ' + str(provider_metadata))
-        network_name = directory.get_network_name(network)
+        network_name = evm.get_network_name(network)
         providers_per_network.setdefault(network_name, [])
         providers_per_network[network_name].append(provider_name)
 

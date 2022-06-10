@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ctc import directory
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -15,7 +15,7 @@ async def async_get_eth_total_supply(
     if network != 'mainnet':
         raise NotImplementedError('total supply only implemented for mainnet')
     if isinstance(network, int):
-        network = directory.get_network_name(network)
+        network = evm.get_network_name(network)
 
     url = 'http://api.etherscan.io/api?module=stats&action=ethsupply'
     async with aiohttp.ClientSession() as session:

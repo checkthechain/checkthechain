@@ -42,9 +42,9 @@ def get_used_networks() -> list[spec.NetworkName]:
     for provider in providers.values():
         network = provider.get('network')
         if network is not None:
-            from ctc import directory
+            from ctc import evm
 
-            network_name = directory.get_network_name(network)
+            network_name = evm.get_network_name(network)
             provider_networks.append(network_name)
     custom_networks: list[str] = list(ctc_config['networks'].keys())
 
@@ -55,6 +55,23 @@ def get_used_networks() -> list[spec.NetworkName]:
             networks.append(network)
 
     return networks
+
+
+def get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
+
+    networks = config_read.get_config()['networks']
+    return {
+        network_name: network_metadata['chain_id']
+        for network_name, network_metadata in networks.items()
+    }
+
+
+def get_network_names_by_chain_id() -> typing.Mapping[int, spec.NetworkName]:
+    networks = config_read.get_config()['networks']
+    return {
+        network_metadata['chain_id']: network_name
+        for network_name, network_metadata in networks.items()
+    }
 
 
 def get_providers() -> dict[spec.NetworkName, spec.Provider]:

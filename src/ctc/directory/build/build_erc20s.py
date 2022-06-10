@@ -6,7 +6,9 @@ from __future__ import annotations
 import typing
 from typing_extensions import TypedDict
 
+from ctc import config
 from ctc import directory
+from ctc import evm
 from ctc import spec
 from ctc.toolbox import store_utils
 
@@ -46,7 +48,9 @@ def import_erc20_list_payload(
         raise NotImplementedError('backend ' + str(backend))
 
     # check that all erc20s are from specified network
-    chain_id = directory.get_network_chain_id(network=network)
+    if network is None:
+        network = config.get_default_network()
+    chain_id = evm.get_network_chain_id(network=network)
     for erc20 in erc20_list_payload['erc20s']:
         if erc20['chainId'] != chain_id:
             raise Exception('erc20s from other network in list')

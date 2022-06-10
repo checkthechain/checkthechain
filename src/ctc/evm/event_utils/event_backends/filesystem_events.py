@@ -10,13 +10,14 @@ from typing_extensions import TypedDict
 
 import ctc.config
 from ctc import binary
-from ctc import directory
+from ctc import config
 from ctc import spec
 from ctc import rpc
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
 from ... import abi_utils
 from ... import block_utils
+from ... import network_utils
 from ... import evm_spec
 
 
@@ -28,7 +29,9 @@ from ... import evm_spec
 def get_events_root(
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> str:
-    network_name = directory.get_network_name(network)
+    if network is None:
+        network = config.get_default_network()
+    network_name = network_utils.get_network_name(network)
     return os.path.join(ctc.config.get_data_dir(), network_name, 'events')
 
 
@@ -83,7 +86,9 @@ def get_events_filepath(
     )
 
     # add parent directory
-    network_name = directory.get_network_name(network)
+    if network is None:
+        network = config.get_default_network()
+    network_name = network_utils.get_network_name(network)
     return os.path.join(ctc.config.get_data_dir(), network_name, subpath)
 
 
@@ -283,7 +288,7 @@ async def async_save_events_to_filesystem(
         if network is None:
             raise Exception('could not determine network')
     else:
-        network = directory.get_network_name(network)
+        network = network_utils.get_network_name(network)
 
     contract_address = contract_address.lower()
 
@@ -336,7 +341,7 @@ async def async_get_events_from_filesystem(
         if network is None:
             raise Exception('could not determine network')
     else:
-        network = directory.get_network_name(network)
+        network = network_utils.get_network_name(network)
 
     # resolve start_block and end_block
     if start_block is not None:

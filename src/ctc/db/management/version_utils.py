@@ -8,7 +8,7 @@ import toolsql
 
 import ctc
 from ctc import config
-from ctc import directory
+from ctc import evm
 from ctc import spec
 
 
@@ -28,7 +28,9 @@ def get_schema_version(
     conn: toolsql.SAConnection | None = None,
 ) -> str | None:
 
-    chain_id = directory.get_network_chain_id(network)
+    if network is None:
+        network = config.get_default_network()
+    chain_id = evm.get_network_chain_id(network)
 
     if conn is None:
         engine = _get_schema_version_engine()
@@ -73,7 +75,9 @@ def set_schema_version(
     if version is None:
         version = ctc.__version__
 
-    chain_id = directory.get_network_chain_id(network)
+    if network is None:
+        network = config.get_default_network()
+    chain_id = evm.get_network_chain_id(network)
 
     toolsql.insert(
         conn=conn,

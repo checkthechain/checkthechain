@@ -4,4 +4,5 @@ from .block_utils import *
 from .erc20_utils import *
 from .eth_utils import *
 from .event_utils import *
+from .network_utils import *
 from .transaction_utils import *

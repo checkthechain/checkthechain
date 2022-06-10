@@ -4,6 +4,7 @@ import os
 import typing
 
 import ctc.config
+from ctc import evm
 from ctc import spec
 from ctc.toolbox import store_utils
 from ctc.toolbox import search_utils
@@ -158,6 +159,7 @@ def get_filesystem_address_path(
     else:
         raise Exception()
 
-    network_name = networks.get_network_name(network=network)
+    if network is None:
+        network = ctc.config.get_default_network()
+    network_name = evm.get_network_name(network=network)
     return os.path.join(data_dir, network_name, 'addresses', label + '.csv')
-

@@ -6,7 +6,7 @@ import typing
 import toolcache
 
 from ctc import config
-from ctc import directory
+from ctc import evm
 from ctc import spec
 from ctc.toolbox import store_utils
 from .. import connect_utils
@@ -55,7 +55,9 @@ def load_filesystem_erc20_data(
 
 
 def _get_erc20_data_path(network: spec.NetworkReference, label: str) -> str:
-    network_name = directory.get_network_name(network=network)
+    if network is None:
+        network = config.get_default_network()
+    network_name = evm.get_network_name(network=network)
     data_dir = config.get_data_dir()
     filename = label + '.csv'
     return os.path.join(data_dir, network_name, 'erc20s', filename)
