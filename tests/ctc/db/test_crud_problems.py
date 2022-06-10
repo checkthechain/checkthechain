@@ -5,6 +5,8 @@ import pytest
 import toolsql
 
 from ctc import db
+from ctc.protocols import chainlink_utils
+from ctc.protocols import fourbyte_utils
 
 
 schema_datas = [
@@ -73,6 +75,28 @@ schema_datas = [
             'addresses': ['0x956f47f50a910163d8bf957cf5846d573e7f87ca'],
         },
     },
+    {
+        'schema_name': 'chainlink',
+        'selector': chainlink_utils.async_select_feed,
+        'queryer': chainlink_utils.async_query_feed,
+        'query': {'address': '0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'},
+        'plural_selector': chainlink_utils.async_select_feeds,
+        'plural_queryer': chainlink_utils.async_query_feeds,
+        'plural_query': {
+            'addresses': ['0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'],
+        },
+    },
+    {
+        'schema_name': '4byte',
+        # 'selector': fourbyte_utils.async_select_function_entries,
+        # 'queryer': fourbyte_utils.async_query_function_entries,
+        # 'query': {'address': '0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'},
+        'plural_selector': fourbyte_utils.async_select_function_signatures,
+        'plural_queryer': fourbyte_utils.async_query_function_signatures,
+        'plural_query': {
+            'text_signature': 'transfer(address,uint256)',
+        },
+    },
 ]
 
 
@@ -131,12 +155,13 @@ async def test_select_when_schema_not_initialized(schema_data):
     with engine.begin() as conn:
         db.initialize_schema_versions(conn=conn)
 
-    with engine.begin() as conn:
-        result = await schema_data['selector'](
-            network=1, conn=conn, **schema_data['query']
-        )
+    if schema_data.get('selector') is not None:
+        with engine.begin() as conn:
+            result = await schema_data['selector'](
+                network=1, conn=conn, **schema_data['query']
+            )
 
-    assert result is None
+        assert result is None
 
     if 'plural_selector' in schema_data:
         with engine.begin() as conn:
@@ -177,12 +202,13 @@ async def test_select_when_row_does_not_exist(schema_data):
             conn=conn,
         )
 
-    with engine.begin() as conn:
-        result = await schema_data['selector'](
-            network=1, conn=conn, **schema_data['query']
-        )
+    if schema_data.get('selector') is not None:
+        with engine.begin() as conn:
+            result = await schema_data['selector'](
+                network=1, conn=conn, **schema_data['query']
+            )
 
-    assert result is None
+        assert result is None
 
     if 'plural_selector' in schema_data:
         with engine.begin() as conn:

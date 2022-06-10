@@ -44,7 +44,7 @@ async def async_decode_command(
 
         call_data = args[0]
         signature = call_data[:10]
-        result = await fourbyte_utils.async_query_function_signature(signature)
+        result = await fourbyte_utils.async_query_function_signatures(signature)
         print(result)
         return
     elif len(args) == 2:

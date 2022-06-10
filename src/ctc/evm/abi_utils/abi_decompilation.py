@@ -21,7 +21,7 @@ async def async_decompile_function_abis(
     function_selectors = extract_bytecode_function_selectors(bytecode)
 
     coroutines = [
-        fourbyte_utils.async_query_function_signature(selector)
+        fourbyte_utils.async_query_function_signatures(selector)
         for selector in function_selectors
     ]
 

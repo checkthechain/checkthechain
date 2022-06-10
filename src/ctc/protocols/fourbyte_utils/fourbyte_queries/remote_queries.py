@@ -6,7 +6,7 @@ import typing
 from .. import fourbyte_spec
 
 
-async def async_query_function_signature_remote(
+async def async_query_remote_function_signatures(
     hex_signature: typing.Optional[str] = None,
     *,
     id: typing.Optional[int] = None,
@@ -45,7 +45,7 @@ async def async_query_function_signature_remote(
                 return result['results']  # type: ignore
 
 
-async def async_query_event_signature_remote(
+async def async_query_remote_event_signatures(
     hex_signature: typing.Optional[str] = None,
     *,
     id: typing.Optional[int] = None,

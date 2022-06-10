@@ -44,7 +44,7 @@ async def async_fourbyte_command(
             signature
         ) == 8:
             signature_type = 'function'
-            results = await fourbyte_utils.async_query_function_signature(
+            results = await fourbyte_utils.async_query_function_signatures(
                 hex_signature=signature,
                 use_local=local,
                 use_remote=remote,
@@ -54,7 +54,7 @@ async def async_fourbyte_command(
             signature
         ) == 64:
             signature_type = 'event'
-            results = await fourbyte_utils.async_query_event_signature(
+            results = await fourbyte_utils.async_query_event_signatures(
                 hex_signature=signature,
                 use_local=local,
                 use_remote=remote,
@@ -67,7 +67,7 @@ async def async_fourbyte_command(
 
         if signature[0].isupper():
             signature_type = 'event'
-            results = await fourbyte_utils.async_query_event_signature(
+            results = await fourbyte_utils.async_query_event_signatures(
                 text_signature=signature,
                 use_local=local,
                 use_remote=remote,
@@ -75,7 +75,7 @@ async def async_fourbyte_command(
 
         else:
             signature_type = 'function'
-            results = await fourbyte_utils.async_query_function_signature(
+            results = await fourbyte_utils.async_query_function_signatures(
                 text_signature=signature,
                 use_local=local,
                 use_remote=remote,
@@ -123,4 +123,3 @@ async def async_fourbyte_command(
 
     else:
         raise Exception('unknown signature_type: ' + str(signature_type))
-
