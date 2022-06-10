@@ -11,38 +11,54 @@ fourbyte_schema: toolsql.DBSchema = {
         'function_signatures': {
             'columns': [
                 {
-                    'name': 'function_id',
+                    'name': 'id',
                     'type': 'Integer',
                     'primary': True,
                 },
                 {
-                    'name': 'function_hex',
+                    'name': 'created_at',
+                    'type': 'Text',
+                },
+                {
+                    'name': 'hex_signature',
                     'type': 'Text',
                     'index': True,
                 },
                 {
-                    'name': 'function_text',
+                    'name': 'text_signature',
                     'type': 'Text',
                     'index': True,
+                },
+                {
+                    'name': 'bytes_signature',
+                    'type': 'Text',
                 },
             ],
         },
         'event_signatures': {
             'columns': [
                 {
-                    'name': 'event_id',
+                    'name': 'id',
                     'type': 'Integer',
                     'primary': True,
                 },
                 {
-                    'name': 'event_hex',
+                    'name': 'created_at',
+                    'type': 'Text',
+                },
+                {
+                    'name': 'hex_signature',
                     'type': 'Text',
                     'index': True,
                 },
                 {
-                    'name': 'event_text',
+                    'name': 'text_signature',
                     'type': 'Text',
                     'index': True,
+                },
+                {
+                    'name': 'bytes_signature',
+                    'type': 'Text',
                 },
             ],
         },
