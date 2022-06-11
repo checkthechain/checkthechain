@@ -93,7 +93,7 @@ async def async_get_contract_abi(
 
         # process request
         if content == 'Contract source code not verified':
-            raise spec.AbiNotFoundException()
+            raise spec.AbiNotFoundException('could not obtain contract ABI from etherscan')
         abi = json.loads(content)
         if isinstance(abi, dict) and abi.get('status') == '0':
             raise Exception(
