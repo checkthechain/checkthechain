@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from ctc.toolbox.amm_utils import cpmm
+from ctc.toolbox.default_utils.amm_utils import cpmm
 from ctc.toolbox import validate_utils
 
 
