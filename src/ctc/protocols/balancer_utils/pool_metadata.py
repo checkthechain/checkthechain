@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from ctc import directory
 from ctc import rpc
 from ctc import spec
+
+from . import balancer_spec
 
 
 async def async_get_pool_id(
@@ -19,10 +20,9 @@ async def async_get_pool_id(
 async def async_get_pool_address(
     pool_id: str,
     block: spec.BlockNumberReference | None = None,
-    vault: spec.Address | None = None,
 ) -> spec.Address:
-    if vault is None:
-        vault = directory.get_address(name='Vault', label='balancer')
+
+    vault = balancer_spec.vault
 
     pool = await rpc.async_eth_call(
         to_address=vault,
@@ -38,11 +38,9 @@ async def async_get_pool_tokens(
     pool_address: spec.Address | None = None,
     pool_id: str | None = None,
     block: spec.BlockNumberReference | None = None,
-    vault: spec.Address | None = None,
 ) -> list[spec.Address]:
 
-    if vault is None:
-        vault = directory.get_address(name='Vault', label='balancer')
+    vault = balancer_spec.vault
     if pool_id is None:
         if pool_address is None:
             raise Exception('must specify pool_id or pool_address')

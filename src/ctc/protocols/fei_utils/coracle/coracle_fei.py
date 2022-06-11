@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import directory
 from ctc import spec
 from ctc.toolbox import nested_utils
 

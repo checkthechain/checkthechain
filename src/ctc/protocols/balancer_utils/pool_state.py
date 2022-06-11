@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import typing
 
-from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc import spec
 from ctc.toolbox import nested_utils
 
+from . import balancer_spec
 from . import pool_metadata
 
 
@@ -119,7 +119,7 @@ async def async_get_pool_balances(
 ]:
 
     if vault is None:
-        vault = directory.get_address(name='Vault', label='balancer')
+        vault = balancer_spec.vault
     if pool_id is None:
         if pool_address is None:
             raise Exception('must specify pool_id or pool_address')

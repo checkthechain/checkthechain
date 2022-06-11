@@ -6,7 +6,6 @@ import urllib.parse
 
 import toolcli
 
-from ctc import directory
 from ctc import evm
 from ctc import rpc
 from ctc import spec

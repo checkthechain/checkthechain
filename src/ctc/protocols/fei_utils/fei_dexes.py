@@ -6,7 +6,6 @@ from typing_extensions import TypedDict
 
 import typing
 
-from ctc import directory
 from ctc import evm
 from ctc import spec
 

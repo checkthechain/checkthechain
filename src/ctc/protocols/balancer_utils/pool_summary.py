@@ -4,10 +4,10 @@ import decimal
 import typing
 from typing_extensions import TypedDict
 
-from ctc import directory
 from ctc import evm
 from ctc import spec
 
+from . import balancer_spec
 from . import pool_metadata
 from . import pool_state
 
@@ -63,16 +63,12 @@ async def async_get_pool_swaps(
     pool_address: typing.Optional[spec.Address] = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    vault: typing.Optional[spec.Address] = None,
 ) -> spec.DataFrame:
 
-    if vault is None:
-        vault = directory.get_address(name='Vault', label='balancer')
+    vault = balancer_spec.vault
 
     if start_block is None:
-        start_block = directory.get_address_first_block(
-            name='Vault', label='balancer'
-        )
+        start_block = await evm.async_get_contract_creation_block(vault)
 
     swaps = await evm.async_get_events(
         contract_address=vault,

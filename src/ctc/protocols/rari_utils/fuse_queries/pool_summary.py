@@ -6,7 +6,6 @@ import typing
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc import directory
 
 from . import irm_metadata
 from . import pool_metadata

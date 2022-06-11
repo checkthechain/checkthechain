@@ -5,7 +5,6 @@ import toolstr
 import typing
 
 from ctc import evm
-from ctc import directory
 from ctc import spec
 from ctc.protocols import fei_utils
 
