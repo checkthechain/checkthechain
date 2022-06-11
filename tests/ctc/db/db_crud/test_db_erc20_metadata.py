@@ -50,6 +50,7 @@ async def test_erc20_metadata_crud():
             await db.async_upsert_erc20s_metadata(
                 conn=conn,
                 erc20s_metadata=example_data,
+                network=1,
             )
 
         # get data individually
@@ -84,6 +85,7 @@ async def test_erc20_metadata_crud():
                 await db.async_delete_erc20_metadata(
                     conn=conn,
                     address=datum['address'],
+                    network=1,
                 )
 
         # ensure all entries deleted
@@ -97,13 +99,16 @@ async def test_erc20_metadata_crud():
         # insert data again
         with conn.begin():
             for datum in example_data:
-                await db.async_upsert_erc20_metadata(conn=conn, **datum)
+                await db.async_upsert_erc20_metadata(
+                    conn=conn, network=1, **datum
+                )
 
         # delete entries all at once
         with conn.begin():
             await db.async_delete_erc20s_metadata(
                 conn=conn,
                 addresses=all_addresses,
+                network=1,
             )
 
         # ensure all entries deleted

@@ -5,6 +5,7 @@ import typing
 
 import toolsql
 
+from ctc import config
 from ctc import spec
 from ... import schema_utils
 from . import erc20_metadata_schema_defs
@@ -12,11 +13,11 @@ from . import erc20_metadata_schema_defs
 
 async def async_upsert_erc20_metadata(
     address: spec.Address,
+    network: spec.NetworkReference,
     symbol: str | None = None,
     decimals: int | None = None,
     name: str | None = None,
     upsert: bool = True,
-    network: spec.NetworkReference | None = None,
     *,
     conn: toolsql.SAConnection,
 ) -> None:
@@ -50,7 +51,7 @@ async def async_upsert_erc20_metadata(
 
 async def async_upsert_erc20s_metadata(
     erc20s_metadata: typing.Sequence[erc20_metadata_schema_defs.ERC20Metadata],
-    network: spec.NetworkReference | None = None,
+    network: spec.NetworkReference,
     *,
     conn: toolsql.SAConnection,
 ) -> None:
@@ -68,6 +69,10 @@ async def async_select_erc20_metadata(
     *,
     conn: toolsql.SAConnection,
 ) -> erc20_metadata_schema_defs.ERC20Metadata | None:
+
+    if network is None:
+        network = config.get_default_network()
+
     table = schema_utils.get_table_name('erc20_metadata', network=network)
 
     if address is not None:
@@ -95,6 +100,9 @@ async def async_select_erc20s_metadata(
     conn: toolsql.SAConnection,
 ) -> typing.Sequence[erc20_metadata_schema_defs.ERC20Metadata | None] | None:
 
+    if network is None:
+        network = config.get_default_network()
+
     table = schema_utils.get_table_name('erc20_metadata', network=network)
     results = toolsql.select(
         conn=conn,
@@ -114,7 +122,7 @@ async def async_select_erc20s_metadata(
 
 async def async_delete_erc20_metadata(
     address: spec.Address,
-    network: spec.NetworkReference | None = None,
+    network: spec.NetworkReference,
     *,
     conn: toolsql.SAConnection,
 ) -> None:
@@ -124,7 +132,7 @@ async def async_delete_erc20_metadata(
 
 async def async_delete_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
-    network: spec.NetworkReference | None = None,
+    network: spec.NetworkReference,
     *,
     conn: toolsql.SAConnection,
 ) -> None:

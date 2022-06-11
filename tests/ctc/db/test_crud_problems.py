@@ -99,6 +99,8 @@ schema_datas = [
     },
 ]
 
+non_network_schemas = ['4byte']
+
 
 def get_test_db_config():
     tempdir = tempfile.mkdtemp()
@@ -164,11 +166,15 @@ async def test_select_when_schema_not_initialized(schema_data):
         assert result is None
 
     if 'plural_selector' in schema_data:
+        if schema_data['schema_name'] in non_network_schemas:
+            network_kwargs = {}
+        else:
+            network_kwargs = {'network': 1}
         with engine.begin() as conn:
             result = await schema_data['plural_selector'](
-                network=1,
                 conn=conn,
                 **schema_data['plural_query'],
+                **network_kwargs,
             )
 
         assert result is None
@@ -212,10 +218,14 @@ async def test_select_when_row_does_not_exist(schema_data):
 
     if 'plural_selector' in schema_data:
         with engine.begin() as conn:
+            if schema_data['schema_name'] in non_network_schemas:
+                network_kwargs = {}
+            else:
+                network_kwargs = {'network': 1}
             result = await schema_data['plural_selector'](
-                network=1,
                 conn=conn,
                 **schema_data['plural_query'],
+                **network_kwargs,
             )
 
         assert result is None or all(item is None for item in result)

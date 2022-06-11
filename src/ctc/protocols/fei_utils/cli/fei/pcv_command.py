@@ -28,7 +28,7 @@ async def async_pcv_command(
         block = await evm.async_block_number_to_int(block)
 
     pcv_stats = await fei_utils.async_get_pcv_stats(block=block)
-    FEI = directory.get_erc20_address('FEI')
+    FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
     total_fei = await evm.async_get_erc20_total_supply(FEI, block=block)
 
     total_pcv = pcv_stats['pcv'] / 1e18

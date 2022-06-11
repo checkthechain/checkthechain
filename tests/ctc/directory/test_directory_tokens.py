@@ -1,21 +1,8 @@
 import pytest
 import toolconfig
 
+from ctc import evm
 from ctc import spec
-from ctc import directory
-
-
-@pytest.mark.parametrize(
-    'query',
-    [
-        {'symbol': 'USDC'},
-        {'address': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'},
-        {'address': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'},
-    ],
-)
-def test_get_erc20_metadata(query):
-    metadata = directory.get_erc20_metadata(network='mainnet', **query)
-    toolconfig.conforms_to_spec(metadata, spec.ERC20Metadata)
 
 
 @pytest.mark.parametrize(
@@ -24,9 +11,9 @@ def test_get_erc20_metadata(query):
         ['USDC', '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'],
     ],
 )
-def test_get_erc20_address(test):
+async def test_get_erc20_address(test):
     symbol, address = test
-    actual_address = directory.get_erc20_address(symbol=symbol)
+    actual_address = await evm.async_get_erc20_address(symbol)
     assert address == actual_address
 
 
@@ -34,14 +21,7 @@ def test_get_erc20_address(test):
     'test',
     [['0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 'USDC']],
 )
-def test_get_erc20_symbol(test):
+async def test_get_erc20_symbol(test):
     address, symbol = test
-    actual_symbol = directory.get_erc20_symbol(address=address)
+    actual_symbol = await evm.async_get_erc20_symbol(address)
     assert symbol == actual_symbol
-
-
-def test_load_filesystem_erc20s_data():
-    erc20s_data = directory.load_filesystem_erc20_data('mainnet')
-    for erc20_data in erc20s_data:
-        toolconfig.conforms_to_spec(erc20_data, spec.ERC20Metadata)
-

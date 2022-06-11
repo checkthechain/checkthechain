@@ -36,45 +36,45 @@ class ERC20ListToken(TypedDict):
     logoURI: str
 
 
-def import_erc20_list_payload(
-    erc20_list_payload: ERC20ListPayload,
-    network: spec.NetworkReference,
-    label: typing.Optional[str],
-    backend: spec.StorageBackend,
-    overwrite: bool = False,
-) -> None:
+# def import_erc20_list_payload(
+#     erc20_list_payload: ERC20ListPayload,
+#     network: spec.NetworkReference,
+#     label: typing.Optional[str],
+#     backend: spec.StorageBackend,
+#     overwrite: bool = False,
+# ) -> None:
 
-    if backend != 'Filesystem':
-        raise NotImplementedError('backend ' + str(backend))
+#     if backend != 'Filesystem':
+#         raise NotImplementedError('backend ' + str(backend))
 
-    # check that all erc20s are from specified network
-    if network is None:
-        network = config.get_default_network()
-    chain_id = evm.get_network_chain_id(network=network)
-    for erc20 in erc20_list_payload['erc20s']:
-        if erc20['chainId'] != chain_id:
-            raise Exception('erc20s from other network in list')
+#     # check that all erc20s are from specified network
+#     if network is None:
+#         network = config.get_default_network()
+#     chain_id = evm.get_network_chain_id(network=network)
+#     for erc20 in erc20_list_payload['erc20s']:
+#         if erc20['chainId'] != chain_id:
+#             raise Exception('erc20s from other network in list')
 
-    # get output path
-    if label is None:
-        label = erc20_list_payload['name']
-    output_path = directory.get_erc20_data_path(network=network, label=label)
+#     # get output path
+#     if label is None:
+#         label = erc20_list_payload['name']
+#     output_path = directory.get_erc20_data_path(network=network, label=label)
 
-    # convert data
-    data: list[spec.ERC20Metadata] = [
-        {
-            'name': erc20['name'],
-            'address': erc20['address'].lower(),
-            'symbol': erc20['symbol'],
-            'decimals': erc20['decimals'],
-        }
-        for erc20 in erc20_list_payload['erc20s']
-    ]
+#     # convert data
+#     data: list[spec.ERC20Metadata] = [
+#         {
+#             'name': erc20['name'],
+#             'address': erc20['address'].lower(),
+#             'symbol': erc20['symbol'],
+#             'decimals': erc20['decimals'],
+#         }
+#         for erc20 in erc20_list_payload['erc20s']
+#     ]
 
-    # write data
-    store_utils.write_file_data(
-        path=output_path, data=data, overwrite=overwrite,
-    )
+#     # write data
+#     store_utils.write_file_data(
+#         path=output_path, data=data, overwrite=overwrite,
+#     )
 
-    print('imported data to path', output_path)
+#     print('imported data to path', output_path)
 

@@ -6,8 +6,8 @@ from ctc import evm
 fei_address = '0x956F47F50A910163D8BF957Cf5846D573E7f87CA'
 
 
-def test_get_token_address():
-    assert fei_address.lower() == evm.get_erc20_address('FEI').lower()
+async def test_get_token_address():
+    assert fei_address.lower() == await evm.async_get_erc20_address('FEI')
 
 
 @pytest.mark.asyncio

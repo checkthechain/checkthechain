@@ -328,8 +328,8 @@ async def async_print_fuse_token_summary(
     in_usd: bool = True,
 ) -> None:
 
-    if directory.has_erc20_metadata(symbol=token):
-        token = directory.get_erc20_address(symbol=token)
+    token = await evm.async_get_erc20_address(token)
+
     if token == '0x0000000000000000000000000000000000000000':
         symbol = 'ETH'
     else:

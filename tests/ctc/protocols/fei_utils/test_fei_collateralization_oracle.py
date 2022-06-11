@@ -1,6 +1,5 @@
 import pytest
 
-from ctc import directory
 from ctc.protocols import fei_utils
 
 
@@ -8,7 +7,7 @@ from ctc.protocols import fei_utils
 async def test_get_tokens_deposits():
 
     deposits = await fei_utils.async_get_token_deposits(
-        directory.get_erc20_address('DPI'),
+        '0x1494CA1F11D487c2bBe4543E90080AeBa4BA3C2b',
         block=13570382,
     )
     assert deposits == (

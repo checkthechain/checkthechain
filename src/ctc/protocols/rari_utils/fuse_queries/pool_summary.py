@@ -35,8 +35,6 @@ async def async_get_pool_summary(
     for underlying in underlyings.values():
         if underlying == '0x0000000000000000000000000000000000000000':
             token_name = 'ETH'
-        elif directory.has_erc20_metadata(address=underlying):
-            token_name = directory.get_erc20_symbol(address=underlying)
         else:
             token_name = await evm.async_get_erc20_symbol(underlying)
         token_names.append(token_name)

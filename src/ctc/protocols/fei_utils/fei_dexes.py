@@ -58,12 +58,12 @@ pool_colors = {
 
 def get_token_map() -> dict[str, spec.Address]:
     return {
-        'FEI': directory.get_erc20_address('FEI'),
-        'LUSD': directory.get_erc20_address('LUSD'),
-        'alUSD': directory.get_erc20_address('alUSD'),
-        'FRAX': directory.get_erc20_address('FRAX'),
-        'DAI': directory.get_erc20_address('DAI'),
-        'USDC': directory.get_erc20_address('USDC'),
+        'FEI': '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+        'LUSD': '0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
+        'alUSD': '0xbc6da0fe9ad5f3b0d58160288917aa56653660e9',
+        'FRAX': '0x853d955acef822db058eb8505911ed77f175b99e',
+        'DAI': '0x6b175474e89094c44da98b954eedeac495271d0f',
+        'USDC': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
         '3CRV': '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490',
     }
 

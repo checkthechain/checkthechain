@@ -22,7 +22,7 @@ async def async_get_fei_deposit_balances(
     normalize: bool = True,
 ) -> dict[spec.ContractAddress, typing.Union[int, float]]:
 
-    FEI = directory.get_erc20_address(symbol='FEI')
+    FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
     fei_deposits = await coracle_deposits.async_get_token_deposits(
         token=FEI,
         block=block,

@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import typing
 
-from ctc import directory
+from ctc import evm
 from ctc.protocols import uniswap_v3_utils
 
 
 async def async_get_fei_uniswap_pools() -> list[list[typing.Any]]:
     # TODO: automate
 
-    FEI = directory.get_erc20_address('FEI')
-    DAI = directory.get_erc20_address('DAI')
-    USDC = directory.get_erc20_address('USDC')
+    FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
+    DAI = '0x6b175474e89094c44da98b954eedeac495271d0f'
+    USDC = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
 
     # token_in, token_out, fee
     pools = [
@@ -71,8 +71,8 @@ async def async_get_fei_uniswap_pool_price_depth(
             p
         ]
 
-        symbol_in = directory.get_erc20_metadata(address=token_in)['symbol']
-        symbol_out = directory.get_erc20_metadata(address=token_out)['symbol']
+        symbol_in = await evm.async_get_erc20_symbol(token_in)
+        symbol_out = await evm.async_get_erc20_symbol(token_out)
         pool = (
             'Uniswap V3 '
             + symbol_in

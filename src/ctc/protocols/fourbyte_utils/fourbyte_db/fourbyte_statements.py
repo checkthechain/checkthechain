@@ -16,10 +16,9 @@ from .. import fourbyte_spec
 async def async_upsert_function_signature(
     function_signature: fourbyte_spec.PartialEntry,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = db.get_table_name('function_signatures', network=network)
+    table = db.get_table_name('function_signatures', network=-1)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -31,10 +30,9 @@ async def async_upsert_function_signature(
 async def async_upsert_function_signatures(
     function_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = db.get_table_name('function_signatures', network=network)
+    table = db.get_table_name('function_signatures', network=-1)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -44,7 +42,6 @@ async def async_upsert_function_signatures(
 
 
 async def async_select_function_signatures(
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     hex_signature: str | None = None,
     text_signature: str | None = None,
@@ -52,7 +49,7 @@ async def async_select_function_signatures(
     bytes_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
-    table = db.get_table_name('function_signatures', network=network)
+    table = db.get_table_name('function_signatures', network=-1)
 
     where_equals = {
         'id': id,
@@ -74,13 +71,12 @@ async def async_select_function_signatures(
 
 
 async def async_delete_function_signatures(
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> None:
 
-    table = db.get_table_name('function_signatures', network=network)
+    table = db.get_table_name('function_signatures', network=-1)
 
     where_equals = {
         'hex_signature': hex_signature,
@@ -107,10 +103,9 @@ async def async_delete_function_signatures(
 async def async_upsert_event_signature(
     event_signature: fourbyte_spec.PartialEntry,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = db.get_table_name('event_signatures', network=network)
+    table = db.get_table_name('event_signatures', network=-1)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -122,10 +117,9 @@ async def async_upsert_event_signature(
 async def async_upsert_event_signatures(
     event_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
 ) -> None:
 
-    table = db.get_table_name('event_signatures', network=network)
+    table = db.get_table_name('event_signatures', network=-1)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -135,13 +129,12 @@ async def async_upsert_event_signatures(
 
 
 async def async_select_event_signatures(
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
-    table = db.get_table_name('event_signatures', network=network)
+    table = db.get_table_name('event_signatures', network=-1)
 
     where_equals = {
         'hex_signature': hex_signature,
@@ -160,13 +153,12 @@ async def async_select_event_signatures(
 
 
 async def async_delete_event_signatures(
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> None:
 
-    table = db.get_table_name('event_signatures', network=network)
+    table = db.get_table_name('event_signatures', network=-1)
 
     where_equals = {
         'hex_signature': hex_signature,

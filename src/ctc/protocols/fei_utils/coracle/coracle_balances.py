@@ -215,7 +215,7 @@ async def async_get_tokens_balances(
             block=block, provider=provider
         )
     if exclude_fei:
-        FEI = directory.get_erc20_address(symbol='FEI')
+        FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
         tokens = [token for token in tokens if token != FEI]
 
     # get deposits for each token

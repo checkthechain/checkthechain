@@ -5,7 +5,7 @@ import typing
 import toolcli
 import toolstr
 
-from ctc import directory
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -23,7 +23,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_find_command(query: str) -> None:
     try:
-        result = directory.get_erc20_metadata(symbol=query)
+        result = await evm.async_get_erc20_metadata(query)
         row = []
         labels: typing.Sequence[
             typing.Literal['symbol', 'decimals', 'address']
