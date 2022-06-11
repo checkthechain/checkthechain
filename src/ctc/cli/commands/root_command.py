@@ -55,15 +55,10 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
             )
 
         elif str.isalnum(item) and len(item) <= 20:
-            from ctc import directory
-
             try:
-                # create as ERC20 symbol
-                metadata = directory.get_erc20_metadata(symbol=item)
-                address = metadata['address']
                 toolcli.execute_other_command_sequence(
-                    command_sequence=('address',),
-                    args={'parse_spec': parse_spec, 'address': address},
+                    command_sequence=('symbol',),
+                    args={'parse_spec': parse_spec, 'symbol': item},
                     parse_spec=parse_spec,
                 )
             except LookupError:
