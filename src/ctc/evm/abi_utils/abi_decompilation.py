@@ -6,7 +6,12 @@ import typing
 def extract_bytecode_function_selectors(bytecode: str) -> typing.Sequence[str]:
     import re
 
+    # solidity style signatures
     results = re.findall('8063([a-f0-9]{8})146', bytecode)
+
+    # vyper style signatures
+    if len(results) == 0:
+        results = re.findall('5[b,2]63([0-9a-f]{8})600051141561', bytecode)
 
     return ['0x' + result for result in results]
 
