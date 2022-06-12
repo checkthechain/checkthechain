@@ -50,7 +50,7 @@ async def async_upsert_erc20_metadata(
 
 
 async def async_upsert_erc20s_metadata(
-    erc20s_metadata: typing.Sequence[erc20_metadata_schema_defs.ERC20Metadata],
+    erc20s_metadata: typing.Sequence[spec.ERC20Metadata],
     network: spec.NetworkReference,
     *,
     conn: toolsql.SAConnection,
@@ -68,7 +68,7 @@ async def async_select_erc20_metadata(
     network: spec.NetworkReference | None = None,
     *,
     conn: toolsql.SAConnection,
-) -> erc20_metadata_schema_defs.ERC20Metadata | None:
+) -> spec.ERC20Metadata | None:
 
     if network is None:
         network = config.get_default_network()
@@ -98,7 +98,7 @@ async def async_select_erc20s_metadata(
     network: spec.NetworkReference | None = None,
     *,
     conn: toolsql.SAConnection,
-) -> typing.Sequence[erc20_metadata_schema_defs.ERC20Metadata | None] | None:
+) -> typing.Sequence[spec.ERC20Metadata | None] | None:
 
     if network is None:
         network = config.get_default_network()

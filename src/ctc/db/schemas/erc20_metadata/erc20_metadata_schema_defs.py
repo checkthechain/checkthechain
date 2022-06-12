@@ -1,16 +1,6 @@
 from __future__ import annotations
 
-from typing_extensions import TypedDict
-
 import toolsql
-
-from ctc import spec
-
-
-class ERC20Metadata(TypedDict):
-    address: spec.Address
-    symbol: str
-    decimals: int
 
 
 erc20_metadata_schema: toolsql.DBSchema = {
