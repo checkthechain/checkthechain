@@ -112,6 +112,8 @@ def delete_schema_version(
 
     elif schema_name is not None and network is not None:
         if not confirm_delete_row:
+            import toolcli
+
             answer = toolcli.input_yes_or_no(
                 'delete version row for schema '
                 + schema_name
@@ -124,6 +126,8 @@ def delete_schema_version(
 
     elif schema_name is not None:
         if not confirm_delete_schema:
+            import toolcli
+
             answer = toolcli.input_yes_or_no(
                 'delete ALL version rows for schema ' + schema_name + '? '
             )
@@ -132,6 +136,8 @@ def delete_schema_version(
 
     elif network is not None:
         if not confirm_delete_network:
+            import toolcli
+
             answer = toolcli.input_yes_or_no(
                 'delete ALL version rows for network ' + str(network) + '? '
             )

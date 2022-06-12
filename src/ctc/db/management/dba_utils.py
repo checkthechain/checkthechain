@@ -126,6 +126,7 @@ def create_evm_tables(
                 schema_name=schema_name,
                 network=network,
                 conn=conn,
+                prepared_schema=(schema_name in network_schema_names),
             )
 
     print()
@@ -214,10 +215,15 @@ def drop_schema(
             if not answer:
                 raise Exception('aborting')
 
-    if network is not None:
-        networks: typing.Sequence[spec.NetworkReference] = [network]
+    if network is None:
+        if schema_name in schema_utils.get_network_schema_names():
+            networks: typing.Sequence[
+                spec.NetworkReference | None
+            ] = config.get_used_networks()
+        else:
+            networks = [None]
     else:
-        networks = config.get_used_networks()
+        networks = [network]
 
     for network in networks:
 
@@ -270,4 +276,5 @@ def drop_schema(
                     network=network,
                     conn=conn,
                     confirm_delete_row=True,
+                    confirm_delete_schema=True,
                 )

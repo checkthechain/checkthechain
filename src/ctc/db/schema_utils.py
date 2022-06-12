@@ -127,9 +127,9 @@ def get_complete_prepared_schema(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
 ) -> toolsql.DBSchema:
 
+    # include network schemas
     if networks is None:
         networks = config.get_used_networks()
-
     schema_name: SchemaName
     all_schemas = []
     for network in networks:
@@ -139,6 +139,12 @@ def get_complete_prepared_schema(
             )
             all_schemas.append(schema)
 
+    # include generic schemas
+    for schema_name in get_generic_schema_names():
+        schema = get_raw_schema(schema_name)
+        all_schemas.append(schema)
+
+    # include admin schemas
     for schema_name in get_admin_schema_names():
         schema = get_raw_schema(schema_name)
         all_schemas.append(schema)
