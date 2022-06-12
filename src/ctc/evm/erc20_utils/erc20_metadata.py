@@ -54,12 +54,47 @@ async def async_get_erc20_metadata(
 async def async_get_erc20_decimals(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    use_db: bool = True,
+    provider: spec.ProviderSpec = None,
     **rpc_kwargs: typing.Any,
 ) -> int:
     """get decimals of an erc20"""
-    return await erc20_generic.async_erc20_eth_call(
-        function_name='decimals', token=token, block=block, **rpc_kwargs
+
+    if use_db:
+        from ctc import db
+
+        network = rpc.get_provider_network(provider)
+        token = await erc20_generic.async_get_erc20_address(
+            token, network=network
+        )
+        result: spec.ERC20Metadata | None = (
+            await db.async_query_erc20_metadata(address=token, network=network)
+        )
+        if result is not None and result['decimals'] is not None:
+            return result['decimals']
+
+    decimals = await erc20_generic.async_erc20_eth_call(
+        function_name='decimals',
+        token=token,
+        block=block,
+        provider=provider,
+        **rpc_kwargs,
     )
+
+    if use_db:
+        if result is not None:
+            result['decimals'] = decimals
+        else:
+            result = typing.cast(
+                spec.ERC20Metadata,
+                {
+                    'address': token,
+                    'decimals': decimals,
+                }
+            )
+        await db.async_intake_erc20_metadata(network=network, **result)
+
+    return decimals
 
 
 async def async_get_erc20s_decimals(
@@ -95,12 +130,44 @@ async def async_get_erc20_decimals_by_block(
 async def async_get_erc20_name(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    use_db: bool = True,
+    provider: spec.ProviderSpec = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get name of an erc20"""
-    return await erc20_generic.async_erc20_eth_call(
-        function_name='name', token=token, block=block, **rpc_kwargs
+
+    if use_db:
+        from ctc import db
+
+        network = rpc.get_provider_network(provider)
+        token = await erc20_generic.async_get_erc20_address(
+            token, network=network
+        )
+        result: spec.ERC20Metadata | None = await db.async_query_erc20_metadata(
+            address=token, network=network
+        )
+        if result is not None and result['name'] is not None:
+            return result['name']
+
+    name = await erc20_generic.async_erc20_eth_call(
+        function_name='name',
+        token=token,
+        block=block,
+        provider=provider,
+        **rpc_kwargs,
     )
+
+    if use_db:
+        if result is not None:
+            result['name'] = name
+        else:
+            result = typing.cast(
+                spec.ERC20Metadata,
+                {'address': token, 'name': name},
+            )
+        await db.async_intake_erc20_metadata(network=network, **result)
+
+    return name
 
 
 async def async_get_erc20s_names(
@@ -142,18 +209,46 @@ def _decode_raw_symbol(data: str) -> str:
 async def async_get_erc20_symbol(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    use_db: bool = True,
+    provider: spec.ProviderSpec = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get symbol of an erc20"""
 
-    result = await erc20_generic.async_erc20_eth_call(
+    if use_db:
+        from ctc import db
+
+        network = rpc.get_provider_network(provider)
+        token = await erc20_generic.async_get_erc20_address(
+            token, network=network
+        )
+        result: spec.ERC20Metadata | None = await db.async_query_erc20_metadata(
+            address=token, network=network
+        )
+        if result is not None and result['symbol'] is not None:
+            return result['symbol']
+
+    symbol = await erc20_generic.async_erc20_eth_call(
         function_name='symbol',
         token=token,
         block=block,
         decode_response=False,
+        provider=provider,
         **rpc_kwargs,
     )
-    return _decode_raw_symbol(result)
+    symbol = _decode_raw_symbol(symbol)
+
+    if use_db:
+        if result is not None:
+            result['symbol'] = symbol
+        else:
+            result = typing.cast(
+                spec.ERC20Metadata,
+                {'address': token, 'symbol': symbol},
+            )
+        await db.async_intake_erc20_metadata(network=network, **result)
+
+    return symbol
 
 
 async def async_get_erc20s_symbols(

@@ -61,3 +61,28 @@ def _get_erc20_data_path(network: spec.NetworkReference, label: str) -> str:
     data_dir = config.get_data_dir()
     filename = label + '.csv'
     return os.path.join(data_dir, network_name, 'erc20s', filename)
+
+
+async def async_intake_erc20_metadata(
+    address: spec.Address,
+    network: spec.NetworkReference,
+    decimals: int | None = None,
+    symbol: str | None = None,
+    name: str | None = None,
+) -> None:
+
+    engine = connect_utils.create_engine(
+        schema_name='erc20_metadata',
+        network=network,
+    )
+    if engine is None:
+        return
+    with engine.begin() as conn:
+        await erc20_metadata_statements.async_upsert_erc20_metadata(
+            conn=conn,
+            network=network,
+            address=address,
+            decimals=decimals,
+            symbol=symbol,
+            name=name,
+        )
