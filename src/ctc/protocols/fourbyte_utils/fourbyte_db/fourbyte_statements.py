@@ -4,8 +4,6 @@ import typing
 
 import toolsql
 
-from ctc import spec
-from ctc import db
 from .. import fourbyte_spec
 
 
@@ -13,15 +11,15 @@ from .. import fourbyte_spec
 # # functions
 #
 
+
 async def async_upsert_function_signature(
     function_signature: fourbyte_spec.PartialEntry,
     conn: toolsql.SAConnection,
 ) -> None:
 
-    table = db.get_table_name('function_signatures', network=-1)
     toolsql.insert(
         conn=conn,
-        table=table,
+        table='function_signatures',
         row=function_signature,
         upsert='do_update',
     )
@@ -32,10 +30,9 @@ async def async_upsert_function_signatures(
     conn: toolsql.SAConnection,
 ) -> None:
 
-    table = db.get_table_name('function_signatures', network=-1)
     toolsql.insert(
         conn=conn,
-        table=table,
+        table='function_signatures',
         rows=function_signatures,
         upsert='do_update',
     )
@@ -49,8 +46,6 @@ async def async_select_function_signatures(
     bytes_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
-    table = db.get_table_name('function_signatures', network=-1)
-
     where_equals = {
         'id': id,
         'hex_signature': hex_signature,
@@ -61,10 +56,9 @@ async def async_select_function_signatures(
         key: value for key, value in where_equals.items() if value is not None
     }
 
-
     return toolsql.select(
         conn=conn,
-        table=table,
+        table='function_signatures',
         where_equals=where_equals,
         raise_if_table_dne=False,
     )
@@ -75,8 +69,6 @@ async def async_delete_function_signatures(
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> None:
-
-    table = db.get_table_name('function_signatures', network=-1)
 
     where_equals = {
         'hex_signature': hex_signature,
@@ -90,7 +82,7 @@ async def async_delete_function_signatures(
 
     toolsql.delete(
         conn=conn,
-        table=table,
+        table='function_signatures',
         where_equals=where_equals,
     )
 
@@ -105,10 +97,9 @@ async def async_upsert_event_signature(
     conn: toolsql.SAConnection,
 ) -> None:
 
-    table = db.get_table_name('event_signatures', network=-1)
     toolsql.insert(
         conn=conn,
-        table=table,
+        table='event_signatures',
         row=event_signature,
         upsert='do_update',
     )
@@ -119,10 +110,9 @@ async def async_upsert_event_signatures(
     conn: toolsql.SAConnection,
 ) -> None:
 
-    table = db.get_table_name('event_signatures', network=-1)
     toolsql.insert(
         conn=conn,
-        table=table,
+        table='event_signatures',
         rows=event_signatures,
         upsert='do_update',
     )
@@ -134,8 +124,6 @@ async def async_select_event_signatures(
     text_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
-    table = db.get_table_name('event_signatures', network=-1)
-
     where_equals = {
         'hex_signature': hex_signature,
         'text_signature': text_signature,
@@ -146,7 +134,7 @@ async def async_select_event_signatures(
 
     return toolsql.select(
         conn=conn,
-        table=table,
+        table='event_signatures',
         where_equals=where_equals,
         raise_if_table_dne=False,
     )
@@ -157,8 +145,6 @@ async def async_delete_event_signatures(
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> None:
-
-    table = db.get_table_name('event_signatures', network=-1)
 
     where_equals = {
         'hex_signature': hex_signature,
@@ -172,6 +158,6 @@ async def async_delete_event_signatures(
 
     toolsql.delete(
         conn=conn,
-        table=table,
+        table='event_signatures',
         where_equals=where_equals,
     )
