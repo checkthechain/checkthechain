@@ -6,8 +6,8 @@ if typing.TYPE_CHECKING:
     from .. import schema_utils
 
 
-def get_active_evm_schemas() -> typing.Mapping[
-    schema_utils.EVMSchemaName,
+def get_active_schemas() -> typing.Mapping[
+    schema_utils.SchemaName,
     bool,
 ]:
     """return specification of which subset of incoming data to store in db"""
@@ -22,11 +22,12 @@ def get_active_evm_schemas() -> typing.Mapping[
         # 'events': False,
         '4byte': True,
         'chainlink': True,
+        'schema_versions': True,
     }
 
 
-def get_active_timestamp_schema() -> schema_utils.EVMSchemaName | None:
-    active_schemas = get_active_evm_schemas()
+def get_active_timestamp_schema() -> schema_utils.NetworkSchemaName | None:
+    active_schemas = get_active_schemas()
     if active_schemas['block_timestamps']:
         return 'block_timestamps'
     elif active_schemas['blocks']:

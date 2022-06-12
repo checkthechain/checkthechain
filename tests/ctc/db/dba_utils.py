@@ -24,7 +24,9 @@ def test_initialize_schema_version_schema():
     assert db.is_schema_versions_initialized(engine=engine)
 
 
-@pytest.mark.parametrize('schema_name', db.get_evm_schema_names())
+@pytest.mark.parametrize(
+    'schema_name', db.get_evm_schema_names() + db.get_generic_schema_names()
+)
 def test_initialize_schemas(schema_name):
 
     db_config = get_test_db_config()

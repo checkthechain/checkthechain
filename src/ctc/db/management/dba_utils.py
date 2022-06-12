@@ -15,16 +15,18 @@ from . import version_utils
 
 def create_evm_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
-    schema_names: typing.Sequence[schema_utils.EVMSchemaName] | None = None,
+    schema_names: typing.Sequence[schema_utils.SchemaName] | None = None,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
+    network_schema_names = schema_utils.get_network_schema_names()
+    generic_schema_names = schema_utils.get_generic_schema_names()
 
     # get netowrks and schemas
     if networks is None:
         networks = config.get_used_networks()
     if schema_names is None:
-        schema_names = schema_utils.get_evm_schema_names()
+        schema_names = network_schema_names + generic_schema_names
 
     # get preamble
     if verbose or not confirm:
@@ -50,19 +52,33 @@ def create_evm_tables(
 
     # get missing tables
     schemas_to_create: list[
-        tuple[spec.NetworkReference, schema_utils.EVMSchemaName]
+        tuple[spec.NetworkReference, schema_utils.SchemaName]
     ] = []
-    for network in networks:
-        for schema_name in schema_names:
+    for schema_name in schema_names:
+
+        # determine schema networks
+        if schema_name in network_schema_names:
+            schema_networks = networks
+        else:
+            schema_networks = [None]
+
+        for network in schema_networks:
             db_config = config.get_db_config(
                 network=network,
                 schema_name=schema_name,
                 require=True,
             )
-            schema = schema_utils.get_prepared_schema(
-                schema_name=schema_name,
-                network=network,
-            )
+
+            if network is not None:
+                schema = schema_utils.get_prepared_schema(
+                    schema_name=typing.cast(
+                        schema_utils.NetworkSchemaName, schema_name
+                    ),
+                    network=network,
+                )
+            else:
+                schema = schema_utils.get_raw_schema(schema_name=schema_name)
+
             missing_tables = toolsql.get_missing_tables(
                 db_schema=schema,
                 db_config=db_config,
@@ -79,7 +95,7 @@ def create_evm_tables(
         print()
         print('schemas to create:')
         for network, schema_name in schemas_to_create:
-            print('-', network, '-', schema_name)
+            print('-', schema_name, '[network = ' + str(network) + ']')
 
     # get confirmation
     if not confirm:
@@ -150,7 +166,9 @@ def initialize_schema(
     # load schema data
     if prepared_schema:
         schema = schema_utils.get_prepared_schema(
-            schema_name=typing.cast(schema_utils.EVMSchemaName, schema_name),
+            schema_name=typing.cast(
+                schema_utils.NetworkSchemaName, schema_name
+            ),
             network=network,
         )
     else:
@@ -173,7 +191,7 @@ def initialize_schema(
 
 
 def drop_schema(
-    schema_name: schema_utils.EVMSchemaName,
+    schema_name: schema_utils.SchemaName,
     network: spec.NetworkReference | None = None,
     confirm: bool = False,
 ) -> None:
@@ -214,10 +232,15 @@ def drop_schema(
         db_table_names = sqlalchemy.inspect(engine).get_table_names()
 
         # determine tables in schema
-        schema_data = schema_utils.get_prepared_schema(
-            schema_name=schema_name,
-            network=network,
-        )
+        if network is not None:
+            schema_data = schema_utils.get_prepared_schema(
+                schema_name=typing.cast(
+                    schema_utils.NetworkSchemaName, schema_name
+                ),
+                network=network,
+            )
+        else:
+            schema_data = schema_utils.get_raw_schema(schema_name=schema_name)
         schema_table_names = schema_data['tables']
 
         # determine which tables to drop

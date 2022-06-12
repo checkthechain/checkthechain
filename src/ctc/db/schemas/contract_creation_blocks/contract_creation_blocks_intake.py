@@ -14,7 +14,7 @@ async def async_intake_contract_creation_block(
     network: spec.NetworkReference,
 ) -> None:
 
-    if not management.get_active_evm_schemas().get('contract_creation_blocks'):
+    if not management.get_active_schemas().get('contract_creation_blocks'):
         return
     confirmed = await intake_utils.async_is_block_fully_confirmed(
         block=block, network=network

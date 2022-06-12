@@ -22,7 +22,7 @@ async def async_intake_contract_abi(
     if any(not isinstance(item, dict) for item in abi):
         raise Exception('bad format for contract abi')
 
-    if not management.get_active_evm_schemas().get('contract_abis'):
+    if not management.get_active_schemas().get('contract_abis'):
         return
 
     engine = connect_utils.create_engine(

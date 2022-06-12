@@ -31,18 +31,22 @@ def status_command() -> None:
         raise NotImplementedError()
 
     # print data being stored
-    active_evm_schemas = db.get_active_evm_schemas()
+    active_schemas = db.get_active_schemas()
     print()
     toolstr.print_header('Data to Store')
     networks = config.get_used_networks()
     admin_schemas = db.get_admin_schema_names()
-    evm_schemas = db.get_evm_schema_names()
+    generic_schemas = db.get_generic_schema_names()
+    network_schemas = db.get_network_schema_names()
     print('- admin schemas')
     for admin_schema in admin_schemas:
         print('    -', admin_schema)
+    print('- generic schemas')
+    for generic_schema in generic_schemas:
+        print('    -', generic_schema)
     print('- evm schemas')
-    for datatype in evm_schemas:
-        if active_evm_schemas.get(datatype):
+    for datatype in network_schemas:
+        if active_schemas.get(datatype):
             print('    -', datatype)
         else:
             print('    -', datatype, '(inactive)')

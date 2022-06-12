@@ -12,8 +12,16 @@ from ctc import spec
 
 from . import schemas
 
+# admin schemas = those related to managing ctc
+AdminSchemaName = Literal['schema_versions']
 
-EVMSchemaName = Literal[
+# generic schemas = those agnostic to network
+GenericSchemaName = Literal[
+    '4byte',
+]
+
+# network schemas = those that have unique data on each network
+NetworkSchemaName = Literal[
     # 'block_gas_stats',
     'block_timestamps',
     'blocks',
@@ -24,21 +32,22 @@ EVMSchemaName = Literal[
     # 'events',
     #
     # protocols
-    '4byte',
     'chainlink',
 ]
 
-AdminSchemaName = Literal['schema_versions']
-
-SchemaName = typing.Union[EVMSchemaName, AdminSchemaName]
+SchemaName = typing.Union[NetworkSchemaName, GenericSchemaName, AdminSchemaName]
 
 
 def get_admin_schema_names() -> tuple[AdminSchemaName]:
     return AdminSchemaName.__args__  # type: ignore
 
 
-def get_evm_schema_names() -> tuple[EVMSchemaName]:
-    return EVMSchemaName.__args__  # type: ignore
+def get_generic_schema_names() -> tuple[GenericSchemaName]:
+    return GenericSchemaName.__args__  # type: ignore
+
+
+def get_network_schema_names() -> tuple[NetworkSchemaName]:
+    return NetworkSchemaName.__args__  # type: ignore
 
 
 def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
@@ -74,7 +83,7 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
 
 
 def get_prepared_schema(
-    schema_name: EVMSchemaName,
+    schema_name: NetworkSchemaName,
     network: spec.NetworkReference | None = None,
 ) -> toolsql.DBSchema:
 
@@ -106,12 +115,12 @@ def get_table_name(
     return 'network_' + str(chain_id) + '__' + table_name
 
 
-def get_complete_raw_schema() -> toolsql.DBSchema:
-    schema_names = get_evm_schema_names()
-    schemas = [
-        get_raw_schema(schema_name=schema_name) for schema_name in schema_names
-    ]
-    return _combine_db_schemas(schemas)
+# def get_complete_raw_schema() -> toolsql.DBSchema:
+#     schema_names = get_evm_schema_names()
+#     schemas = [
+#         get_raw_schema(schema_name=schema_name) for schema_name in schema_names
+#     ]
+#     return _combine_db_schemas(schemas)
 
 
 def get_complete_prepared_schema(
@@ -124,7 +133,7 @@ def get_complete_prepared_schema(
     schema_name: SchemaName
     all_schemas = []
     for network in networks:
-        for schema_name in get_evm_schema_names():
+        for schema_name in get_network_schema_names():
             schema = get_prepared_schema(
                 network=network, schema_name=schema_name
             )

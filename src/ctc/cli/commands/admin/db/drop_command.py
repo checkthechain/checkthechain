@@ -30,11 +30,12 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def drop_command(schema_name: str, network: str | int, confirm: bool) -> None:
 
-    if isinstance(network, str) and network.isdigit():
-        network = int(network)
+    if isinstance(network, str):
+        if network.isdigit() or (network[0] == '-' and network[1:].isdigit()):
+            network = int(network)
 
     db.drop_schema(
-        schema_name=typing.cast(db.EVMSchemaName, schema_name),
+        schema_name=typing.cast(db.SchemaName, schema_name),
         network=network,
         confirm=confirm,
     )
