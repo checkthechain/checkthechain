@@ -47,6 +47,7 @@ async def async_upsert_feeds(
 
 
 async def async_select_feed(
+    *,
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,
@@ -74,6 +75,7 @@ async def async_select_feed(
 
 
 async def async_select_feeds(
+    *,
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,
@@ -128,7 +130,7 @@ async def async_delete_feed(
     if len(where_equals) == 0:
         raise Exception('must specify which feeds to delete')
 
-    table = db.get_table_name('chainlink_feed', network=network)
+    table = db.get_table_name('chainlink_feeds', network=network)
 
     toolsql.delete(
         conn=conn,
