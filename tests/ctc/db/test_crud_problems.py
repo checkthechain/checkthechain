@@ -113,7 +113,7 @@ def get_test_db_config():
 def test_all_evm_schemas_tested_for_problems():
     tested = {schema_datum['schema_name'] for schema_datum in schema_datas}
     assert tested == set(
-        db.get_evm_schema_names() + db.get_generic_schema_names()
+        db.get_network_schema_names() + db.get_generic_schema_names()
     ), 'not all EVM schema types being tested for common db problems'
 
 
