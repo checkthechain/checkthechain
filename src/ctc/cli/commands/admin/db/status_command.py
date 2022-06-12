@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import typing
+
 import toolcli
 import toolstr
 import toolsql
 
 from ctc import config
 from ctc import db
+from ctc import spec
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -59,6 +62,30 @@ def status_command() -> None:
     if db_exists:
         db_schema = db.get_complete_prepared_schema()
         toolsql.print_schema(db_config=db_config, db_schema=db_schema)
+
+        print()
+        toolstr.print_header('Schema Versions')
+        rows = []
+        for schema_name in active_schemas:
+            if schema_name in network_schemas:
+                schema_networks: typing.Sequence[
+                    spec.NetworkReference
+                ] | typing.Sequence[None] = config.get_used_networks()
+            else:
+                schema_networks = [None]
+
+            for schema_network in schema_networks:
+                version = db.get_schema_version(
+                    schema_name, network=schema_network
+                )
+                if version is None:
+                    version = '[DNE]'
+                row = [schema_name, schema_network, version]
+                rows.append(row)
+            rows = sorted(rows, key=lambda row: tuple(row))
+        toolstr.print_table(
+            rows, labels=['schema', 'network', 'version'], indent=4
+        )
     else:
         toolstr.print_text_box('Schema Summary')
         print('- db does not exist')
