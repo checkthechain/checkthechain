@@ -40,7 +40,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_decompile_command(address_or_bytecode: str, verbose: bool) -> None:
+async def async_decompile_command(
+    address_or_bytecode: str, verbose: bool
+) -> None:
 
     address_or_bytecode = await evm.async_resolve_address(address_or_bytecode)
 
@@ -51,18 +53,29 @@ async def async_decompile_command(address_or_bytecode: str, verbose: bool) -> No
 
     # get function selectors
     function_selectors = evm.extract_bytecode_function_selectors(bytecode)
+    function_selector_indices = {
+        function_selector: index
+        for index, function_selector in enumerate(sorted(function_selectors))
+    }
+
+    print('Found', len(function_selectors), 'function selectors')
 
     # match against 4bytes
     decompiled_function_abis = await evm.async_decompile_function_abis(
         bytecode,
-        sort='text_signature',
+        sort='hex_signature',
     )
 
     if len(decompiled_function_abis) > 0:
+        print()
         toolstr.print_header('Known selectors')
     rows = []
     for entry in decompiled_function_abis:
-        row = [entry['hex_signature'], entry['text_signature']]
+        row = [
+            function_selector_indices[entry['hex_signature']],
+            entry['hex_signature'],
+            entry['text_signature'],
+        ]
         rows.append(row)
     if verbose:
         width = None
@@ -70,8 +83,8 @@ async def async_decompile_command(address_or_bytecode: str, verbose: bool) -> No
         width = os.get_terminal_size().columns
     toolstr.print_table(
         rows,
-        column_justify=['right', 'left'],
-        add_row_index=True,
+        column_justify=['right', 'right', 'left'],
+        # add_row_index=True,
         compact=2,
         max_table_width=width,
     )
