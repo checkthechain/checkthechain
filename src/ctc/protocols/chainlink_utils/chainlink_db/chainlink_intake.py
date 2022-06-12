@@ -10,6 +10,8 @@ from . import chainlink_statements
 
 if typing.TYPE_CHECKING:
 
+    import toolsql
+
     RawChainlinkFeed = typing.Mapping[typing.Any, typing.Any]
 
     ChainlinkFeedPayload = typing.Mapping[
@@ -99,6 +101,7 @@ async def async_get_network_feed_data(
 async def async_import_network_to_db(
     network: ChainlinkNetworkName,
     payload: ChainlinkFeedPayload | None = None,
+    engine: toolsql.SAEngine | None = None,
 ) -> None:
 
     raw_feeds = await async_get_network_feed_data(
@@ -121,7 +124,8 @@ async def async_import_network_to_db(
         for raw_feed in raw_feeds
     ]
 
-    engine = db.create_engine(schema_name='chainlink', network=network)
+    if engine is None:
+        engine = db.create_engine(schema_name='chainlink', network=network)
 
     if engine is None:
         raise Exception('cannot find db table to import to')
