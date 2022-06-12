@@ -89,19 +89,30 @@ def get_network_chain_id(network: spec.NetworkName | int) -> spec.NetworkId:
         raise Exception('unknown network: ' + str(network))
 
 
-def get_network_metadata(network: spec.NetworkReference) -> spec.NetworkMetadata:
+def get_network_metadata(
+    network: spec.NetworkReference,
+) -> spec.NetworkMetadata:
+    config_networks = config.get_networks()
     if isinstance(network, str):
-        if network in default_chain_ids_by_network_name:
+        if network in config_networks:
+            return config_networks[network]
+        elif network in default_chain_ids_by_network_name:
             name = network
             chain_id = default_chain_ids_by_network_name[network]
         else:
-            raise Exception()
+            raise Exception('unkown network: ' + str(network))
     elif isinstance(network, int):
-        if network in default_network_names_by_chain_id:
+        config_networks_by_id = {
+            network_metadata['chain_id']: network_metadata
+            for network_metadata in config_networks.values()
+        }
+        if network in config_networks_by_id:
+            return config_networks_by_id[network]
+        elif network in default_network_names_by_chain_id:
             chain_id = network
             name = default_network_names_by_chain_id[network]
         else:
-            raise Exception()
+            raise Exception('unkown network: ' + str(network))
 
     block_explorer = default_block_explorers.get(name)
 
