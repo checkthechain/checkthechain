@@ -52,29 +52,29 @@ def create_evm_tables(
 
     # get missing tables
     schemas_to_create: list[
-        tuple[spec.NetworkReference, schema_utils.SchemaName]
+        tuple[spec.NetworkReference | None, schema_utils.SchemaName]
     ] = []
     for schema_name in schema_names:
 
         # determine schema networks
         if schema_name in network_schema_names:
-            schema_networks = networks
+            schema_networks: typing.Sequence[spec.NetworkReference | None] = networks
         else:
             schema_networks = [None]
 
-        for network in schema_networks:
+        for schema_network in schema_networks:
             db_config = config.get_db_config(
-                network=network,
+                network=schema_network,
                 schema_name=schema_name,
                 require=True,
             )
 
-            if network is not None:
+            if schema_network is not None:
                 schema = schema_utils.get_prepared_schema(
                     schema_name=typing.cast(
                         schema_utils.NetworkSchemaName, schema_name
                     ),
-                    network=network,
+                    network=schema_network,
                 )
             else:
                 schema = schema_utils.get_raw_schema(schema_name=schema_name)
@@ -84,7 +84,7 @@ def create_evm_tables(
                 db_config=db_config,
             )
             if len(missing_tables['missing_from_db']) > 0:
-                schemas_to_create.append((network, schema_name))
+                schemas_to_create.append((schema_network, schema_name))
 
     # print missing tables
     if len(schemas_to_create) == 0:
@@ -94,8 +94,8 @@ def create_evm_tables(
     else:
         print()
         print('schemas to create:')
-        for network, schema_name in schemas_to_create:
-            print('-', schema_name, '[network = ' + str(network) + ']')
+        for schema_network, schema_name in schemas_to_create:
+            print('-', schema_name, '[network = ' + str(schema_network) + ']')
 
     # get confirmation
     if not confirm:
@@ -121,10 +121,10 @@ def create_evm_tables(
     with engine.begin() as conn:
 
         # create each schema for each used network
-        for network, schema_name in schemas_to_create:
+        for schema_network, schema_name in schemas_to_create:
             initialize_schema(
                 schema_name=schema_name,
-                network=network,
+                network=schema_network,
                 conn=conn,
                 prepared_schema=(schema_name in network_schema_names),
             )
@@ -144,7 +144,7 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
 
 def initialize_schema(
     schema_name: schema_utils.SchemaName,
-    network: spec.NetworkReference,
+    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     prepared_schema: bool = True,
 ) -> None:

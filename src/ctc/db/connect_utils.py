@@ -15,7 +15,7 @@ from .management import version_utils
 
 def create_engine(
     schema_name: schema_utils.SchemaName,
-    network: spec.NetworkReference,
+    network: spec.NetworkReference | None,
     create_missing_schema: bool = True,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""

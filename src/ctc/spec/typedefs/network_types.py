@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 
 NetworkId = int
 NetworkName = str
-NetworkReference = typing.Union[NetworkId, NetworkName, None]
+NetworkReference = typing.Union[NetworkId, NetworkName]
 
 
 class NetworkMetadata(TypedDict):

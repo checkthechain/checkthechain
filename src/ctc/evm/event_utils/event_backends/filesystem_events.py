@@ -331,7 +331,7 @@ async def async_get_events_from_filesystem(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderSpec = None,
-    network: spec.NetworkReference = None,
+    network: spec.NetworkReference | None = None,
 ) -> spec.DataFrame:
 
     # get network

@@ -10,7 +10,7 @@ from .. import evm_spec
 
 async def async_get_erc20_address(
     token: spec.ERC20Reference,
-    network: spec.NetworkReference = None,
+    network: spec.NetworkReference | None = None,
 ) -> spec.ERC20Address:
     """return address of input token, input as either symbol or address"""
 
