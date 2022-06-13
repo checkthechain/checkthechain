@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import typing
 
+
 from ctc import binary
 from ctc import spec
 
@@ -71,10 +72,13 @@ def print_contract_abi_human_readable(
     max_width: int = 80,
     verbose: bool | int = False,
 ) -> None:
+    import toolstr
+
     functions = binary.get_function_abis(contract_abi)
 
-    print('Contract ABI Functions')
-    print('──────────────────────')
+    toolstr.print_text_box('Contract ABI Functions')
+    print()
+    rows = []
     for i, function in enumerate(functions):
 
         if len(function['outputs']) == 0:
@@ -103,40 +107,98 @@ def print_contract_abi_human_readable(
         if len(text) > max_width:
             text = text[: max_width - 3] + '...'
 
-        print(text)
+        inputs = function.get('inputs', [])
+        if len(inputs) == 0:
+            inputs = [{'name': '-', 'type': '-'}]
+
+        row = [
+            binary.get_function_selector(function),
+            function['name'],
+        ]
+
         if verbose:
-            indent = ''
-            if verbose > 1:
-                indent = '    '
-                print(indent + '- mutability:', function['stateMutability'])
-                print(indent + '- inputs:')
-            if len(function['inputs']) == 0:
-                print(indent + '    [no inputs]')
-            for i, item in enumerate(function['inputs']):
-                print(
-                    indent + '    ' + str(i + 1) + '.',
-                    item['type'],
-                    item['name'],
-                )
-            print()
+            input_items = []
+            for item in function.get('inputs', []):
+                item_str = item.get('type', '') + ' ' + item.get('name', '')
+                item_str = item_str.strip()
+                input_items.append(item_str)
+            input_str = '\n'.join(input_items)
+
+            row.append(input_str)
+            row.append(output_str.strip())
+        else:
+            row.append(' '.join(item['type'] for item in inputs))
+            row.append(output_str.strip())
+        rows.append(row)
+
+    labels = [
+        'selector',
+        'name',
+        'inputs',
+        'outputs',
+    ]
+    if verbose:
+        max_column_widths: typing.Mapping[int | str, int] | None = None
+    else:
+        max_column_widths = {'inputs': 25}
+
+    if verbose:
+        toolstr.print_multiline_table(
+            rows,
+            add_row_index=True,
+            labels=labels,
+            max_column_widths=max_column_widths,
+            compact=4,
+        )
+    else:
+        toolstr.print_table(
+            rows,
+            add_row_index=True,
+            labels=labels,
+            max_column_widths=max_column_widths,
+        )
 
     events = binary.get_event_abis(contract_abi)
     print()
-    print('Contract ABI Events')
-    print('───────────────────')
+    print()
+    toolstr.print_text_box('Contract ABI Events')
+    rows = []
     if len(events) == 0:
         print('[none]')
     for i, event_abi in enumerate(events):
-        event_hash = binary.get_event_hash(event_abi=event_abi)
-        signature = binary.get_event_signature(event_abi=event_abi)
-        line = str(i + 1) + '. ' + signature
-        if len(line) > max_width:
-            line = line[: max_width - 3] + '...'
-        print(line)
+
+        row = [event_abi['name']]
+        input_cell = []
+        indexed_cell = []
+        for item in event_abi.get('inputs', []):
+            subitems = [item.get('type'), item.get('name')]
+            subitems_str = [subitem for subitem in subitems if subitem is not None]
+            input_str = ' '.join(subitems_str)
+            input_cell.append(input_str)
+            if item.get('indexed'):
+                indexed_cell.append('✓')
+            else:
+                indexed_cell.append('')
+        row.append('\n'.join(input_cell))
+        row.append('\n'.join(indexed_cell))
+
         if verbose:
-            print('  ', event_hash)
-            if i + 1 != len(events):
-                print()
+            row.append(binary.get_event_hash(event_abi))
+
+        rows.append(row)
+    labels = ['name', 'inputs', 'indexed']
+    if verbose:
+        labels.append('event hash')
+
+    toolstr.print_multiline_table(
+        rows,
+        add_row_index=True,
+        missing_columns='fill',
+        labels=labels,
+        vertical_justify='top',
+        compact=4,
+        column_justify={'indexed': 'center'},
+    )
 
 
 #

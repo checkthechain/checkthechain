@@ -19,12 +19,6 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': 'address', 'help': 'address of contract'},
             {'name': 'name', 'help': 'name of function or event', 'nargs': '?'},
             {
-                'name': '--human',
-                'dest': 'human_only',
-                'help': 'human readable only, no json',
-                'action': 'store_true',
-            },
-            {
                 'name': '--json',
                 'dest': 'json_pretty',
                 'help': 'json only',
@@ -50,6 +44,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': '--search',
                 'help': 'query of name of function or event abi',
             },
+            {
+                'name': '--verbose',
+                'help': 'include extra abi data',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
@@ -64,15 +63,13 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_abi_command(
     address: spec.Address,
     name: str | None,
-    human_only: bool,
     json_pretty: bool,
     json_raw: bool,
     functions: bool,
     events: bool,
     search: str,
+    verbose: bool,
 ) -> None:
-
-    json_only = json_pretty or json_raw
 
     address = await evm.async_resolve_address(address)
     contract_abi = await evm.async_get_contract_abi(contract_address=address)
@@ -103,6 +100,8 @@ async def async_abi_command(
         ]
 
     # output abis
+    json_only = json_pretty or json_raw
+    human_only = not json_only
     if not human_only:
         import json
 
@@ -118,4 +117,5 @@ async def async_abi_command(
         evm.print_contract_abi_human_readable(
             contract_abi,
             max_width=os.get_terminal_size().columns,
+            verbose=verbose,
         )
