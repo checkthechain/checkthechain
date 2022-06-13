@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import typing
 from typing_extensions import TypedDict, Literal
 
@@ -49,7 +50,9 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
 
 
 def get_data_dir_version(data_dir: str | None = None) -> DataSpecVersion:
-    data_dir = config.get_data_dir()
+    if data_dir is None:
+        data_dir = config.get_data_dir()
+
     version_file = os.path.join(data_dir, 'directory_version')
 
     if not os.path.isfile(version_file):
@@ -57,13 +60,16 @@ def get_data_dir_version(data_dir: str | None = None) -> DataSpecVersion:
     else:
         with open(version_file, 'r') as f:
             version = f.read()
-        if version not in data_spec_order:
-            raise Exception('unknown data_spec_version: ' + str(version))
+        if version in data_spec_order:
+            return version
         else:
-            return typing.cast(DataSpecVersion, version)
+            raise Exception('unknown data_spec_version: ' + str(version))
 
 
-def fully_migrate_data_dir(data_dir: str) -> None:
+def fully_migrate_data_dir(data_dir: str | None = None) -> None:
+
+    if data_dir is None:
+        data_dir = config.get_data_dir()
 
     # detect current version
     current_version = get_data_dir_version()
@@ -94,11 +100,14 @@ def migrate_data_dir__0_2_0__to__0_3_0(
 
     # create version file
     version_file = os.path.join(data_dir, 'directory_version')
+    print('creating new version indicator file:', version_file)
     with open(version_file, 'w') as f:
         f.write('0.3.0')
 
     # create new directories
-    for dirpath in data_dir_spec['directories']:
+    for relpath in data_dir_spec['directories']:
+        dirpath = os.path.join(data_dir, relpath)
+        print('creating directory:', dirpath)
         os.makedirs(dirpath, exist_ok=True)
 
     # delete old files
@@ -110,15 +119,31 @@ def migrate_data_dir__0_2_0__to__0_3_0(
                 and item not in data_dir_spec['files']
             ):
                 to_delete.append(item)
+            elif (
+                item in data_dir_spec['directories']
+                and item in data_dir_spec['directory_contents']
+            ):
+                directory_contents = data_dir_spec['directory_contents'][item]
+                for subitem in os.listdir(os.path.join(data_dir, item)):
+                    if subitem not in directory_contents:
+                        to_delete.append(os.path.join(item, subitem))
         if len(to_delete) > 0:
             if not confirm_delete:
-                print('will delete entries...')
+                print()
+                print('the following files and directories are not used in ctc 0.3.0:')
                 for item in sorted(to_delete):
                     print('-', item)
-                if not toolcli.input_yes_or_no('continue? '):
+                print()
+                if not toolcli.input_yes_or_no('delete these items? '):
                     raise Exception(
                         'migration unfinished, must delete old files'
                     )
 
             for path in to_delete:
-                os.remove(os.path.join(data_dir, path))
+                path = os.path.join(data_dir, path)
+                if os.path.isfile(path) or os.path.islink(path):
+                    os.remove(path)
+                elif os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    raise Exception('cannot process path: ' + str(path))
