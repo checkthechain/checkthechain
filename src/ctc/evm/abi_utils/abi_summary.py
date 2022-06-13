@@ -85,12 +85,11 @@ def print_contract_abi_human_readable(
             output_str = '[none]'
         else:
             output_str_list = [
-                item['type'] + ' ' + item['name']
+                (item['type'] + ' ' + item['name']).strip()
                 for item in function['outputs']
             ]
             output_str = ', '.join(output_str_list)
-            if len(function['outputs']) > 1:
-                output_str = '(' + output_str + ')'
+            output_str = output_str.strip()
 
         if not verbose:
             signature = binary.get_function_signature(
@@ -127,7 +126,7 @@ def print_contract_abi_human_readable(
             row.append(input_str)
             row.append(output_str.strip())
         else:
-            row.append(' '.join(item['type'] for item in inputs))
+            row.append(', '.join(item['type'] for item in inputs))
             row.append(output_str.strip())
         rows.append(row)
 
@@ -140,7 +139,7 @@ def print_contract_abi_human_readable(
     if verbose:
         max_column_widths: typing.Mapping[int | str, int] | None = None
     else:
-        max_column_widths = {'inputs': 25}
+        max_column_widths = {'inputs': 25, 'outputs': 25}
 
     if verbose:
         toolstr.print_multiline_table(
