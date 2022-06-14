@@ -58,6 +58,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('decompile',): 'ctc.cli.commands.data.decompile_command',
         ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
         ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
+        ('erc20',): 'ctc.cli.commands.data.erc20_command',
         ('erc20', 'balance'): 'ctc.cli.commands.data.erc20.balance_command',
         ('erc20', 'balances'): 'ctc.cli.commands.data.erc20.balances_command',
         ('erc20', 'transfers'): 'ctc.cli.commands.data.erc20.transfers_command',
