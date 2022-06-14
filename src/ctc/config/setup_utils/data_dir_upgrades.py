@@ -45,6 +45,9 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
         'directory_contents': {
             'logs': ['rpc', 'db'],
         },
+        'move_items': {
+            'mainnet/events': 'evm/networks/mainnet/events',
+        },
     },
 }
 
@@ -110,6 +113,17 @@ def migrate_data_dir__0_2_0__to__0_3_0(
         print('creating directory:', dirpath)
         os.makedirs(dirpath, exist_ok=True)
 
+    # migrate data (the only old data that is migrated is events)
+    print()
+    for old_item, new_item in data_dir_spec['move_items'].items():
+        old_path = os.path.join(data_dir, old_item)
+        new_path = os.path.join(data_dir, new_item)
+        if os.path.exists(old_path):
+            print('moving', old_item, 'to', new_item)
+            new_parent = os.path.dirname(new_path)
+            os.makedirs(new_parent, exist_ok=True)
+            shutil.move(old_path, new_path)
+
     # delete old files
     if delete_old_data:
         to_delete = []
@@ -147,3 +161,5 @@ def migrate_data_dir__0_2_0__to__0_3_0(
                     shutil.rmtree(path)
                 else:
                     raise Exception('cannot process path: ' + str(path))
+
+    print('data migration complete, now using the 0.3.0 data schema')

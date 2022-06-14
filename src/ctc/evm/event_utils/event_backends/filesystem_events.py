@@ -32,7 +32,9 @@ def get_events_root(
     if network is None:
         network = config.get_default_network()
     network_name = network_utils.get_network_name(network)
-    return os.path.join(ctc.config.get_data_dir(), network_name, 'events')
+    return os.path.join(
+        ctc.config.get_data_dir(), 'evm/networks', network_name, 'events'
+    )
 
 
 def get_events_contract_dir(
@@ -89,7 +91,9 @@ def get_events_filepath(
     if network is None:
         network = config.get_default_network()
     network_name = network_utils.get_network_name(network)
-    return os.path.join(ctc.config.get_data_dir(), network_name, subpath)
+    return os.path.join(
+        ctc.config.get_data_dir(), 'evm/networks', network_name, subpath
+    )
 
 
 #
@@ -452,4 +456,3 @@ async def async_get_events_from_filesystem(
             df[column] = df[column].map(ast.literal_eval).map(lam)
 
     return df
-

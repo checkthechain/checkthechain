@@ -42,7 +42,7 @@ def setup_dbs(
     if db_mode == 0:
         db_configs['main'] = {
             'dbms': 'sqlite',
-            'path': os.path.join(data_root, 'ctc.db'),
+            'path': os.path.join(data_root, 'dbs/ctc.db'),
         }
     elif db_mode == 1:
         path = toolcli.input(
@@ -52,7 +52,7 @@ def setup_dbs(
             filepath = path
         else:
             if os.path.isdir(path):
-                filepath = os.path.join(path, 'ctc.db')
+                filepath = os.path.join(path, 'dbs/ctc.db')
             else:
                 answer = toolcli.input_yes_or_no(
                     'Directory does not exist. Create it? '
