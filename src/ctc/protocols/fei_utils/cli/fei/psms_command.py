@@ -34,6 +34,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'type': int,
                 'default': 15,
             },
+            {
+                'name': '--verbose',
+                'help': 'display additional information',
+                'action': 'store_true',
+            },
         ],
     }
 
@@ -43,6 +48,7 @@ async def async_psms_command(
     token: str,
     block: spec.BlockNumberReference,
     limit: int,
+    verbose: bool,
 ) -> None:
     import asyncio
 
@@ -59,11 +65,13 @@ async def async_psms_command(
     print()
     print()
     mints = await mints_task
-    fei_psms.print_fei_psm_mints(mints, limit=limit)
+    fei_psms.print_fei_psm_mints(mints, limit=limit, verbose=verbose)
     print()
     print()
     redemptions = await redeems_task
-    fei_psms.print_fei_psm_redemptions(redemptions, limit=limit)
+    fei_psms.print_fei_psm_redemptions(
+        redemptions, limit=limit, verbose=verbose
+    )
 
 
 async def async_print_psm_state(block: spec.BlockNumberReference) -> None:

@@ -77,7 +77,10 @@ async def async_get_fei_psm_mints(
     if timestamp:
         mints['timestamp'] = await evm.async_get_block_timestamps(redeem_blocks)
     if normalize:
-        mints['arg__amountFeiOut'] = mints['arg__amountFeiOut'].map(int) / 1e18
+        mints['arg__amountFeiOut'] = (
+            mints['arg__amountFeiOut'].map(int) / 1e18
+        ).astype(float)
+        mints['arg__amountIn'] = mints['arg__amountIn'].astype(float)
 
     return mints
 
@@ -126,12 +129,15 @@ async def async_get_fei_psm_redemptions(
     if normalize:
         redemptions['arg__amountFeiIn'] = (
             redemptions['arg__amountFeiIn'].map(int) / 1e18
-        )
+        ).astype(float)
+        redemptions['arg__amountAssetOut'] = redemptions['arg__amountAssetOut'].astype(float)
 
     return redemptions
 
 
-def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
+def print_fei_psm_mints(
+    mints: spec.DataFrame, limit: int = 30, verbose: bool = False
+) -> None:
 
     labels = [
         'block',
@@ -140,6 +146,8 @@ def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
         'FEI',
         'total',
     ]
+    if verbose:
+        labels.append('hash')
 
     mints = mints.iloc[-limit:].copy()
     mints['cummulative'] = mints['arg__amountFeiOut'].cumsum()
@@ -159,6 +167,10 @@ def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
             mint['arg__amountFeiOut'],
             mint['cummulative'],
         ]
+
+        if verbose:
+            row.append(mint['transaction_hash'])
+
         rows.append(row)
 
     toolstr.print_text_box('Recent Mints')
@@ -174,6 +186,7 @@ def print_fei_psm_mints(mints: spec.DataFrame, limit: int = 30) -> None:
 def print_fei_psm_redemptions(
     redemptions: spec.DataFrame,
     limit: int = 30,
+    verbose: bool = False,
 ) -> None:
 
     labels = [
@@ -183,6 +196,8 @@ def print_fei_psm_redemptions(
         'FEI',
         'total',
     ]
+    if verbose:
+        labels.append('hash')
 
     redemptions = redemptions.iloc[-limit:].copy()
     redemptions['cummulative'] = redemptions['arg__amountFeiIn'].cumsum()
@@ -202,6 +217,10 @@ def print_fei_psm_redemptions(
             redeem['arg__amountFeiIn'],
             redeem['cummulative'],
         ]
+
+        if verbose:
+            row.append(redeem['transaction_hash'])
+
         rows.append(row)
 
     toolstr.print_text_box('Recent Redeems')
