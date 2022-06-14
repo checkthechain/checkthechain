@@ -18,7 +18,7 @@ def _build_feed_query(
         if evm.is_address_str(feed):
             return {'address': feed}
         elif '_' in feed:
-            return {'short_name': feed}
+            return {'name': feed.replace('_', ' / ')}
         else:
             return {'name': feed}
     else:
