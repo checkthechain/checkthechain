@@ -42,6 +42,7 @@ async def async_get_fei_psm_mints(
     psms: typing.Mapping[str, spec.Address] | None = None,
     timestamp: bool = True,
     normalize: bool = True,
+    include_price: bool = True,
 ) -> spec.DataFrame:
 
     import asyncio
@@ -82,6 +83,14 @@ async def async_get_fei_psm_mints(
         ).astype(float)
         mints['arg__amountIn'] = mints['arg__amountIn'].astype(float)
 
+    if include_price:
+        if not normalize:
+            raise Exception('must normalize to compute price')
+        mints['fei_per_token'] = (
+            mints['arg__amountFeiOut'] / mints['arg__amountIn'] * 1e18
+        )
+        mints['token_per_fei'] = 1 / mints['fei_per_token']
+
     return mints
 
 
@@ -91,6 +100,7 @@ async def async_get_fei_psm_redemptions(
     psms: typing.Mapping[str, spec.Address] | None = None,
     timestamp: bool = True,
     normalize: bool = True,
+    include_price: bool = True,
 ) -> spec.DataFrame:
     import asyncio
     import pandas as pd
@@ -130,7 +140,19 @@ async def async_get_fei_psm_redemptions(
         redemptions['arg__amountFeiIn'] = (
             redemptions['arg__amountFeiIn'].map(int) / 1e18
         ).astype(float)
-        redemptions['arg__amountAssetOut'] = redemptions['arg__amountAssetOut'].astype(float)
+        redemptions['arg__amountAssetOut'] = redemptions[
+            'arg__amountAssetOut'
+        ].astype(float)
+
+    if include_price:
+        if not normalize:
+            raise Exception('must normalize to compute price')
+        redemptions['fei_per_token'] = (
+            redemptions['arg__amountFeiIn']
+            / redemptions['arg__amountAssetOut']
+            * 1e18
+        )
+        redemptions['token_per_fei'] = 1 / redemptions['fei_per_token']
 
     return redemptions
 
