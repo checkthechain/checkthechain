@@ -8,13 +8,17 @@ from ctc import evm
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_symbol_command,
-        'help': 'output address of ERC20 symbol',
+        'help': 'convert ERC20 address to symbol, or convert symbol to address',
         'args': [
-            {'name': 'symbol', 'help': 'ERC20 symbol'},
+            {'name': 'query', 'help': 'ERC20 address or symbol'},
         ],
     }
 
 
-async def async_symbol_command(symbol: str) -> None:
-    address = await evm.async_get_erc20_address(symbol)
-    print(address)
+async def async_symbol_command(query: str) -> None:
+    if evm.is_address_str(query):
+        symbol = await evm.async_get_erc20_symbol(query)
+        print(symbol)
+    else:
+        address = await evm.async_get_erc20_address(query)
+        print(address)

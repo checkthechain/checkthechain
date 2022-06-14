@@ -15,6 +15,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {
                 'name': 'erc20',
+                'help': 'ERC20 address or symbol',
             },
         ],
     }
