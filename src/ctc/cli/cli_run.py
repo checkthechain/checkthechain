@@ -33,6 +33,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     },
     'compute': {
         ('ascii',): 'ctc.cli.commands.compute.ascii_command',
+        ('create', 'address'): 'ctc.cli.commands.compute.create_address_command',
         ('checksum',): 'ctc.cli.commands.compute.checksum_command',
         ('decode', 'call'): 'ctc.cli.commands.compute.decode_call_command',
         ('decode',): 'ctc.cli.commands.compute.decode_command',

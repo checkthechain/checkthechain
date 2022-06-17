@@ -16,7 +16,7 @@ def is_address_str(some_str: str) -> bool:
 
 def get_created_address(
     sender: spec.Address,
-    nonce: str | None = None,
+    nonce: int | None = None,
     salt: str | None = None,
     init_code: spec.HexData | None = None,
 ) -> spec.Address:
