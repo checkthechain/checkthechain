@@ -48,6 +48,8 @@ async def async_print_transaction_summary(
     print('- from:', transaction['from'])
     print('- to:', transaction['to'])
     print('- block number:', transaction['block_number'])
+    print('- transaction index:', transaction['transaction_index'])
+    print('- nonce:', transaction['nonce'])
     print('- call data length:', len(transaction['input']))
 
     block, eth_usd = await asyncio.gather(block_task, eth_usd_task)
