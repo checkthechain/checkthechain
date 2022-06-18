@@ -105,6 +105,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'deposits',
         ): 'ctc.protocols.fei_utils.cli.fei.pcv_deposits_command',
         ('fei', 'psms'): 'ctc.protocols.fei_utils.cli.fei.psms_command',
+        ('gnosis',): 'ctc.protocols.gnosis_utils.cli.gnosis_command',
         ('rari',): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
         ('rari', 'pools'): 'ctc.protocols.rari_utils.cli.rari.pools_command',
         (
