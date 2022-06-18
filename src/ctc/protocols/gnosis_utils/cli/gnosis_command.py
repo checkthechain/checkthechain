@@ -11,9 +11,14 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'print information about a gnosis safe',
         'args': [
             {'name': 'address', 'help': 'address of gnosis safe'},
+            {
+                'name': '--verbose',
+                'help': 'display additional information',
+                'action': 'store_true',
+            },
         ],
     }
 
 
-async def async_gnosis_command(address: str) -> None:
-    await gnosis_safe_data.async_print_safe_summary(address)
+async def async_gnosis_command(address: str, verbose: bool) -> None:
+    await gnosis_safe_data.async_print_safe_summary(address, verbose=verbose)

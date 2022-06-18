@@ -60,7 +60,7 @@ async def async_get_safe_nonce(address: spec.Address) -> int:
     )
 
 
-async def async_print_safe_summary(address: spec.Address) -> None:
+async def async_print_safe_summary(address: spec.Address, verbose: bool = False) -> None:
     import tooltime
 
     owners_coroutine = async_get_safe_owners(address)
@@ -78,7 +78,7 @@ async def async_print_safe_summary(address: spec.Address) -> None:
     creation_timestamp = await evm.async_get_block_timestamp(creation_block)
     age = tooltime.get_age(creation_timestamp, 'TimelengthPhrase')
 
-    toolstr.print_text_box('Gnosis Safe ' + str(address))
+    toolstr.print_text_box('Gnosis safe ' + str(address))
     print('- threshold:', threshold, '/', len(owners))
     print('- owners:')
     for owner in owners:
@@ -89,3 +89,26 @@ async def async_print_safe_summary(address: spec.Address) -> None:
         '- creation date:', tooltime.timestamp_to_iso_pretty(creation_timestamp)
     )
     print('- age:', age)
+
+    if verbose:
+        from ctc.evm.erc20_utils import erc20_defaults
+        default_erc20s = erc20_defaults.load_default_erc20s()
+        erc20_addresses = [default['address'] for default in default_erc20s]
+
+        print()
+        toolstr.print_text_box('Common ERC20s in safe')
+        balances = await evm.async_get_erc20s_balance_of(
+            address=address,
+            tokens=erc20_addresses,
+        )
+
+        rows = []
+        for erc20, balance in zip(default_erc20s, balances):
+            if balance > 0:
+                row = [erc20['symbol'], balance]
+                rows.append(row)
+        labels = ['token', 'balance']
+        if len(rows) == 0:
+            print('[none]')
+        else:
+            toolstr.print_table(rows, labels=labels)
