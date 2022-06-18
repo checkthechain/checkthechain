@@ -10,7 +10,7 @@ from ctc import rpc
 from ctc import spec
 
 
-function_abis = {
+function_abis: typing.Mapping[str, spec.FunctionABI] = {
     'getOwners': {
         'inputs': [],
         'name': 'getOwners',
@@ -75,8 +75,14 @@ async def async_print_safe_summary(address: spec.Address, verbose: bool = False)
         creation_block_coroutine,
     )
 
-    creation_timestamp = await evm.async_get_block_timestamp(creation_block)
-    age = tooltime.get_age(creation_timestamp, 'TimelengthPhrase')
+    if creation_block is not None:
+        creation_timestamp = await evm.async_get_block_timestamp(creation_block)
+        creation_date = tooltime.timestamp_to_iso_pretty(creation_timestamp)
+        age = tooltime.get_age(creation_timestamp, 'TimelengthPhrase')
+    else:
+        creation_timestamp = None
+        creation_date = None
+        age = None
 
     toolstr.print_text_box('Gnosis safe ' + str(address))
     print('- threshold:', threshold, '/', len(owners))
@@ -85,9 +91,7 @@ async def async_print_safe_summary(address: spec.Address, verbose: bool = False)
         print('    -', owner)
     print('- nonce:', nonce)
     print('- creation block:', creation_block)
-    print(
-        '- creation date:', tooltime.timestamp_to_iso_pretty(creation_timestamp)
-    )
+    print('- creation date:', creation_date)
     print('- age:', age)
 
     if verbose:
