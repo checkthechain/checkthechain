@@ -41,6 +41,7 @@ async def async_get_function_abi(
             contract_abi = await contract_abi_io.async_get_contract_abi(
                 contract_address=contract_address,
                 network=network,
+                db_query=False,
             )
 
             return binary.get_function_abi(

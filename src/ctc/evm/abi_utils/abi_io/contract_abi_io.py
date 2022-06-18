@@ -67,6 +67,8 @@ async def async_get_contract_abi(
 
     # save to db
     if db_intake:
+        from ctc import db
+
         await db.async_intake_contract_abi(
             contract_address=contract_address,
             network=network,
