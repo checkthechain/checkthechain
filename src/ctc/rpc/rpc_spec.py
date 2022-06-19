@@ -64,6 +64,7 @@ rpc_result_scalar_quantities = [
     'eth_newFilter',
     'eth_newBlockFilter',
     'eth_newPendingTransactionFilter',
+    'eth_chainId',
 ]
 rpc_result_map_quantities = {
     'eth_getBlockByHash': rpc_block_quantities,

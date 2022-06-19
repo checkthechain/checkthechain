@@ -51,3 +51,11 @@ def digest_eth_syncing(
             response = rpc_format.keys_to_snake_case(response)
     return response
 
+
+def digest_eth_chain_id(
+    response: spec.RpcSingularResponse,
+    decode_response: bool = True,
+) -> spec.RpcSingularResponse:
+    if decode_response:
+        response = binary.convert(response, 'integer')
+    return response

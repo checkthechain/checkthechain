@@ -352,6 +352,14 @@ def batch_construct_eth_syncing(
     )
 
 
+def batch_construct_eth_chain_id(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='eth_chain_id', **constructor_kwargs
+    )
+
+
 def batch_construct_eth_uninstall_filter(
     **constructor_kwargs: typing.Any,
 ) -> spec.RpcPluralRequest:
@@ -478,4 +486,3 @@ def batch_construct_web3_sha3(
     return rpc_batch_utils.batch_construct(
         method='web3_sha3', **constructor_kwargs
     )
-

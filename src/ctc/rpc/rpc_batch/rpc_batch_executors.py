@@ -364,6 +364,12 @@ async def async_batch_eth_syncing(
     return await rpc_batch_utils.async_batch_execute('eth_syncing', **kwargs)
 
 
+async def async_batch_eth_chain_id(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
+    return await rpc_batch_utils.async_batch_execute('eth_chain_id', **kwargs)
+
+
 async def async_batch_eth_uninstall_filter(
     **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:

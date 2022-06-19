@@ -31,3 +31,6 @@ def construct_eth_protocol_version() -> spec.RpcRequest:
 def construct_eth_syncing() -> spec.RpcRequest:
     return rpc_request.create('eth_syncing', [])
 
+
+def construct_eth_chain_id() -> spec.RpcRequest:
+    return rpc_request.create('eth_chainId', [])

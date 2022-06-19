@@ -71,3 +71,13 @@ async def async_eth_syncing(
         snake_case_response=snake_case_response,
     )
 
+
+async def async_eth_chain_id(
+    provider: spec.ProviderSpec = None, decode_response: bool = True
+) -> spec.RpcSingularResponse:
+    request = rpc_constructors.construct_eth_chain_id()
+    response = await rpc_request.async_send(request, provider=provider)
+    return rpc_digestors.digest_eth_chain_id(
+        response=response,
+        decode_response=decode_response,
+    )

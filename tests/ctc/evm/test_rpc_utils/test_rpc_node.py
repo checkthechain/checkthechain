@@ -41,3 +41,8 @@ async def test_eth_syncing():
     syncing = await rpc.async_eth_syncing()
     assert syncing is not None
 
+
+@pytest.mark.asyncio
+async def test_eth_chain_id():
+    chain_id = await rpc.async_eth_chain_id()
+    assert isinstance(chain_id, int)
