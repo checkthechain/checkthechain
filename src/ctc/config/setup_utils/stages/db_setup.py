@@ -16,7 +16,7 @@ def setup_dbs(
     styles: typing.Mapping[str, str],
     data_root: str,
     old_config: typing.Mapping[str, typing.Any],
-) -> tuple[spec.PartialConfigSpec, bool]:
+) -> spec.PartialConfigSpec:
     print()
     print()
     toolcli.print('## Database Setup', style=styles['header'])
@@ -97,9 +97,4 @@ def setup_dbs(
     else:
         raise Exception('unknown option')
 
-    write_config = json.dumps(db_configs, sort_keys=True) != json.dumps(
-        old_config.get('db_config'), sort_keys=True
-    )
-
-    return {'db_configs': db_configs}, write_config
-
+    return {'db_configs': db_configs}

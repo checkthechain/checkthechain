@@ -1,18 +1,11 @@
 from __future__ import annotations
 
-import typing
-
-import ctc
-from ctc import spec
-
 import toolcli
 
-from . import config_path_setup
-from . import data_root_setup
-from . import db_setup
-from . import final_setup
-from . import network_setup
-from . import validation_setup
+from . import setup_io
+from .stages import data_root_setup
+from .stages import db_setup
+from .stages import network_setup
 
 
 styles = {
@@ -26,9 +19,9 @@ styles = {
 def setup_ctc() -> None:
 
     # print intro
-    print('ctc initializing...')
+    print('setting up ctc...')
     print()
-    print('This process will make sure each of the following is completed:')
+    print('Tasks:')
     print('- setup config path')
     print('- setup data directory')
     print('- setup networks and providers')
@@ -40,53 +33,25 @@ def setup_ctc() -> None:
     toolcli.print('Can skip options by simply pressing enter', style='bold')
 
     # load old config data for passing to each option
-    old_config: typing.Mapping[typing.Any, typing.Any] = {}
-
-    # ensure file is valid
-    validation_setup.ensure_valid(styles=styles)
+    old_config = setup_io.load_old_config(convert_to_latest=True)
+    setup_io.setup_config_path()
 
     # collect new config file data
-    network_data, create_because_networks = network_setup.setup_networks(
+    network_data = network_setup.setup_networks(styles=styles)
+    data_root = data_root_setup.setup_data_root(
         styles=styles,
+        old_config=old_config,
     )
-    (
-        config_path,
-        create_because_config_path,
-    ) = config_path_setup.setup_config_path(styles=styles)
-    data_root, create_because_data_root = data_root_setup.setup_data_root(
-        styles=styles
-    )
-    db_data, create_because_dbs = db_setup.setup_dbs(
+    db_data = db_setup.setup_dbs(
         styles=styles,
         data_root=data_root,
         old_config=old_config,
     )
 
     # create new config file if need be
-    create_new_config = any(
-        [
-            create_because_config_path,
-            create_because_data_root,
-            create_because_networks,
-            create_because_dbs,
-        ]
-    )
-
-    config: spec.ConfigSpec = {
-        'config_spec_version': ctc.__version__,
-        'data_dir': data_root,
-        'networks': network_data['networks'],
-        'providers': network_data['providers'],
-        'network_defaults': network_data['network_defaults'],
-        'db_configs': db_data['db_configs'],
-        'log_rpc_calls': True,
-        'log_sql_queries': True,
-    }
-
-    final_setup.finalize_setup(
-        create_new_config=create_new_config,
-        config_path=config_path,
-        config=config,
+    setup_io.write_new_config(
+        network_data=network_data,
+        db_data=db_data,
+        data_root=data_root,
         styles=styles,
     )
-

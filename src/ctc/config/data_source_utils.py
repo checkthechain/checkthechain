@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from typing_extensions import TypedDict
 
 from ctc import spec
-from .. import config_values
+from . import config_values
 
 
 BackendType = Literal['filesystem', 'rpc', 'db', 'rest', 'hybrid']

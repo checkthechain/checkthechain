@@ -9,8 +9,7 @@ import toolcli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc.toolbox import nested_utils
-from .. import config_read
+from ... import config_read
 
 
 class _NetworkData(TypedDict):
@@ -19,7 +18,7 @@ class _NetworkData(TypedDict):
     network_defaults: spec.ConfigNetworkDefaults
 
 
-def setup_networks(styles: typing.Mapping[str, str]) -> tuple[_NetworkData, bool]:
+def setup_networks(styles: typing.Mapping[str, str]) -> spec.PartialConfigSpec:
     print()
     print()
     toolcli.print('## Network Setup', style=styles['header'])
@@ -103,21 +102,13 @@ def setup_networks(styles: typing.Mapping[str, str]) -> tuple[_NetworkData, bool
         styles=styles,
     )
 
-    data: _NetworkData = {
+    data: spec.PartialConfigSpec = {
         'networks': networks,
         'providers': providers,
         'network_defaults': network_defaults,
     }
 
-    # check if any settings have been changed
-    if config_read.config_path_exists() and config_read.config_is_valid():
-        old_config = config_read.get_config()
-        old_data = {key: old_config.get(key) for key in data.keys()}
-        create_new_config = not nested_utils.is_equal(data, old_data)
-    else:
-        create_new_config = True
-
-    return data, create_new_config
+    return data
 
 
 def get_default_provider_name(provider_url: str, network: str) -> str:

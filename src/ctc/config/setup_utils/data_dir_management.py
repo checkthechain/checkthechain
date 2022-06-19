@@ -19,6 +19,7 @@ if typing.TYPE_CHECKING:
         directory_contents: typing.Mapping[
             str, typing.Sequence[str]
         ]  # list of items in each directory
+        move_items: typing.Mapping[str, str]
 
     DataSpecVersion = Literal['0.2.0', '0.3.0']
 
@@ -64,7 +65,7 @@ def get_data_dir_version(data_dir: str | None = None) -> DataSpecVersion:
         with open(version_file, 'r') as f:
             version = f.read()
         if version in data_spec_order:
-            return version
+            return typing.cast(DataSpecVersion, version)
         else:
             raise Exception('unknown data_spec_version: ' + str(version))
 
