@@ -88,7 +88,7 @@ def get_provider_network(provider: spec.ProviderSpec) -> spec.NetworkName:
 
             return evm.get_network_name(network)
     else:
-        raise Exception('could not determine network')
+        raise spec.CouldNotDetermineNetwork('could not determine network')
 
 
 def add_provider_parameters(
