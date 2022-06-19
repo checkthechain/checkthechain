@@ -12,7 +12,11 @@ def get_command_spec() -> toolcli.CommandSpec:
         'f': async_chains_command,
         'help': 'display information about configured chains',
         'args': [
-            {'name': '--verbose', 'action': 'store_true'},
+            {
+                'name': '--verbose',
+                'help': 'display additional information including RPC urls',
+                'action': 'store_true',
+            },
         ],
     }
 
