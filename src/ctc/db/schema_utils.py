@@ -111,6 +111,8 @@ def get_table_name(
     """get full table name, incorporating chain information"""
     if network is None:
         network = config.get_default_network()
+        if network is None:
+            raise Exception('must specify network or configure default network')
     chain_id = evm.get_network_chain_id(network)
     return 'network_' + str(chain_id) + '__' + table_name
 

@@ -30,6 +30,8 @@ def get_schema_version(
 
     if network is None:
         network = config.get_default_network()
+        if network is None:
+            raise Exception('must specify network or configure default network')
     chain_id = evm.get_network_chain_id(network)
 
     if conn is None:
@@ -77,6 +79,8 @@ def set_schema_version(
 
     if network is None:
         network = config.get_default_network()
+        if network is None:
+            raise Exception('must specify network or configure default network')
     chain_id = evm.get_network_chain_id(network)
 
     toolsql.insert(

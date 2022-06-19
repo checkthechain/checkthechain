@@ -45,6 +45,8 @@ async def async_get_contract_abi(
     # process inputs
     if network is None:
         network = config.get_default_network()
+    if network is None:
+        raise Exception('must specify network or configure default network')
     if not evm.is_address_str(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
 
