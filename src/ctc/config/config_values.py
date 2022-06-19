@@ -82,9 +82,10 @@ def has_provider(
     *,
     name: typing.Optional[str] = None,
     network: typing.Optional[str] = None,
+    url: str | None = None,
 ) -> bool:
     try:
-        get_provider(name=name, network=network)
+        get_provider(name=name, network=network, url=url)
         return True
     except LookupError:
         return False
@@ -95,20 +96,23 @@ def get_provider(
     name: typing.Optional[str] = None,
     network: str | int | None = None,
     protocol: typing.Optional[str] = None,
+    url: str | None = None,
 ) -> spec.Provider:
 
     providers = list(get_providers().values())
 
     # build query
     query: typing.MutableMapping[str, str | int] = {}
-    if name is None and network is None:
-        raise Exception('specify network name or network')
+    if name is None and network is None and url is None:
+        raise Exception('specify network name or network or url')
     if name is not None:
         query['name'] = name
     if network is not None:
         query['network'] = network
     if protocol is not None:
         query['protocol'] = protocol
+    if url is not None:
+        query['url'] = url
 
     return search_utils.get_matching_entry(sequence=providers, query=query)
 

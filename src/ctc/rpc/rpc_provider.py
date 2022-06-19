@@ -19,14 +19,17 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
 
         # case: provider specified as url
         if provider.startswith('http'):
-            return {
-                'name': None,
-                'network': None,
-                'protocol': 'http',
-                'url': provider,
-                'session_kwargs': {},
-                'chunk_size': None,
-            }
+            if ctc.config.has_provider(url=provider):
+                return ctc.config.get_provider(url=provider)
+            else:
+                return {
+                    'name': None,
+                    'network': None,
+                    'protocol': 'http',
+                    'url': provider,
+                    'session_kwargs': {},
+                    'chunk_size': None,
+                }
 
         # case: provider specified as name in config
         elif ctc.config.has_provider(name=provider):
