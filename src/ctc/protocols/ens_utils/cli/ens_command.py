@@ -1,14 +1,25 @@
 from __future__ import annotations
 
+import asyncio
+
 import toolcli
 import toolstr
 import tooltime
+from typing_extensions import TypedDict
 
 from ctc import binary
 from ctc import evm
 from ctc import spec
 
 from ctc.protocols import ens_utils
+
+
+class ENSResult(TypedDict):
+    address: spec.Address | None
+    name: str | None
+    owner: str | None
+    expiration: int | None
+    resolver: str | None
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -19,9 +30,14 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': 'name_or_address',
                 'nargs': '+',
-                'help': 'name or address of ENS entry',
+                'help': 'ENS name(s) or address(es)',
             },
             {'name': '--block', 'help': 'block number'},
+            {
+                'name': '--verbose',
+                'help': 'display additional information',
+                'action': 'store_true',
+            },
         ],
     }
 
@@ -29,41 +45,96 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_ens_command(
     name_or_address: str,
     block: spec.BlockNumberReference,
+    verbose: bool,
 ) -> None:
-    arg = name_or_address[0]
 
     if block is not None:
         block = binary.standardize_block_number(block)
 
+    coroutines = [
+        async_process_ens_arg(arg=arg, block=block) for arg in name_or_address
+    ]
+    results = await asyncio.gather(*coroutines)
+
+    for r, result in enumerate(results):
+
+        if r > 0:
+            print()
+
+        if result['name'] is None:
+            toolstr.print_text_box(result['address'])
+            print('[no ENS records]')
+            continue
+        elif result['address'] is None:
+            toolstr.print_text_box(result['name'])
+            print('[no ENS records]')
+            continue
+
+        toolstr.print_text_box(result['name'])
+        print('- address:', result['address'])
+        print('- owner:', result['owner'])
+        print('- resolver:', result['resolver'])
+        print('- namehash:', ens_utils.hash_name(result['name']))
+        # print('- registered:', )
+        print(
+            '- expiration:',
+            tooltime.timestamp_to_iso(result['expiration']).replace('T', ' '),
+        )
+
+        if verbose:
+            text_records = await ens_utils.async_get_text_records(
+                name=result['name']
+            )
+            if len(text_records) > 0:
+                print()
+                print()
+                toolstr.print_header('Text Records')
+                for key, value in sorted(text_records.items()):
+                    print('-', key + ':', value)
+            else:
+                print('- no text records')
+
+
+async def async_process_ens_arg(
+    arg: str, block: spec.BlockNumberReference
+) -> ENSResult:
+
     if '.' in arg:
         name = arg
-        address = await ens_utils.async_resolve_name(name, block=block)
+        address = None
+        address_coroutine = ens_utils.async_resolve_name(name, block=block)
     elif evm.is_address_str(arg):
         address = arg
         name = await ens_utils.async_reverse_lookup(address, block=block)
     else:
         raise Exception('could not parse inputs')
 
-    owner = await ens_utils.async_get_owner(name=name)
-    expiration = await ens_utils.async_get_expiration(name=name)
-    resolver = await ens_utils.async_get_resolver(name=name)
+    if name == '':
+        return {
+            'address': address,
+            'name': None,
+            'owner': None,
+            'expiration': None,
+            'resolver': None,
+        }
 
-    toolstr.print_text_box(name)
-    print('- address:', address)
-    print('- owner:', owner)
-    print('- resolver:', resolver)
-    print('- namehash:', ens_utils.hash_name(name))
-    # print('- registered:', )
-    print(
-        '- expiration:', tooltime.timestamp_to_iso(expiration).replace('T', ' ')
+    owner_coroutine = ens_utils.async_get_owner(name=name)
+    expiration_coroutine = ens_utils.async_get_expiration(name=name)
+    resolver_coroutine = ens_utils.async_get_resolver(name=name)
+
+    owner, expiration, resolver = await asyncio.gather(
+        owner_coroutine,
+        expiration_coroutine,
+        resolver_coroutine,
     )
 
-    text_records = await ens_utils.async_get_text_records(name=name)
-    if len(text_records) > 0:
-        print()
-        print()
-        toolstr.print_header('Text Records')
-        for key, value in sorted(text_records.items()):
-            print('-', key + ':', value)
-    else:
-        print('- no text records')
+    if address is None:
+        address = await address_coroutine
+
+    return {
+        'address': address,
+        'name': name,
+        'owner': owner,
+        'expiration': expiration,
+        'resolver': resolver,
+    }
