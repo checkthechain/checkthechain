@@ -22,8 +22,6 @@ def get_data_dir() -> str:
     return data_dir
 
 
-def get_reports_dir() -> str:
-    return os.path.join(get_data_dir(), 'notebooks')
 
 
 def get_networks() -> dict[spec.NetworkName, spec.NetworkMetadata]:

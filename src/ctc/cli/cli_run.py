@@ -173,9 +173,7 @@ for quick lookups of an address, block, tx, or timestamp, run:
 cd_dir_help = {
     'code': 'directory where ctc code is stored',
     'data': 'directory where ctc stores data',
-    'default_data': 'directory where ctc stores default data',
     'config': 'directory where ctc stores config',
-    'notebooks': 'directory where ctc stores notebooks',
 }
 
 
@@ -189,14 +187,8 @@ def cd_dir_getter(dirname: str) -> str:
     elif dirname == 'data':
         return ctc.config.get_data_dir()
 
-    elif dirname == 'default_data':
-        return ctc.config.get_default_data_dir()
-
     elif dirname == 'config':
         return os.path.dirname(ctc.config.get_config_path())
-
-    elif dirname == 'notebooks':
-        return ctc.config.get_reports_dir()
 
     else:
         raise Exception('unknown directory: ' + str(dirname))
