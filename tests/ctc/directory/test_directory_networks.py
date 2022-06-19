@@ -5,6 +5,7 @@ import toolconfig
 
 from ctc import evm
 from ctc import spec
+from ctc.config import config_defaults
 
 
 @pytest.mark.parametrize(
@@ -47,7 +48,7 @@ def test_get_network_metadata():
 
 
 def test_get_networks():
-    networks = evm.get_default_networks_metadata()
+    networks = config_defaults.get_default_networks_metadata()
     for network_metadata in networks.values():
         toolconfig.conforms_to_spec(
             data=network_metadata, spec=spec.NetworkMetadata

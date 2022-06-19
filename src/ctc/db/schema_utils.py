@@ -117,14 +117,6 @@ def get_table_name(
     return 'network_' + str(chain_id) + '__' + table_name
 
 
-# def get_complete_raw_schema() -> toolsql.DBSchema:
-#     schema_names = get_evm_schema_names()
-#     schemas = [
-#         get_raw_schema(schema_name=schema_name) for schema_name in schema_names
-#     ]
-#     return _combine_db_schemas(schemas)
-
-
 def get_complete_prepared_schema(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
 ) -> toolsql.DBSchema:

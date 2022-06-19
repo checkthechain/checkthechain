@@ -10,7 +10,9 @@ import toolcache
 if typing.TYPE_CHECKING:
     import toolconfig
 
+import ctc
 from ctc import spec
+from . import config_defaults
 from . import config_spec
 
 
@@ -65,6 +67,10 @@ def get_config(
         config_spec=spec.ConfigSpec, validate=validate, **_kwargs
     )
 
+    if config_from_file.get('config_spec_version') != ctc.__version__:
+        print('[WARNING] using outdated config -- run `ctc setup` on command line')
+        config_from_file = upgrade_config(config_from_file)
+
     # load overrides
     config_overrides = _config_cache['overrides']
 
@@ -78,6 +84,45 @@ def get_config(
         return typing.cast(spec.ConfigSpec, config)
     else:
         return config
+
+
+def upgrade_config(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[str, typing.Any]:
+    """upgrade config to latest version as much as possible"""
+
+    version = old_config.get('config_spec_version')
+    if version is None:
+        version = old_config.get('version')
+
+    if isinstance(version, str):
+        if version.startswith('0.2.'):
+            upgraded = dict(old_config)
+            network_defaults = upgraded.pop('network_defaults', {})
+            upgraded['default_network'] = network_defaults.get(
+                'default_network'
+            )
+            upgraded['default_providers'] = network_defaults.get(
+                'default_providers', {}
+            )
+
+            # add default networks
+            upgraded['networks'] = dict(
+                upgraded.get('networks', {}),
+                **config_defaults.get_default_networks_metadata()
+            )
+
+            default_db_config = config_defaults.get_default_db_config(
+                data_dir=old_config['data_dir']
+            )
+            upgraded['db_configs'] = {'main': default_db_config}
+
+            return upgraded
+
+        else:
+            raise Exception('unknown version of old config')
+    else:
+        raise Exception('unknown version specification')
 
 
 #
