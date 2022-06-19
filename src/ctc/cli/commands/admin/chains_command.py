@@ -10,11 +10,14 @@ from ctc import evm
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_chains_command,
-        'help': 'print information about configured chains',
+        'help': 'display information about configured chains',
+        'args': [
+            {'name': '--verbose', 'action': 'store_true'},
+        ],
     }
 
 
-async def async_chains_command() -> None:
+async def async_chains_command(verbose: bool) -> None:
     default_networks = evm.get_default_networks_metadata()
     config_networks = config.get_networks()
     default_network = config.get_default_network()
@@ -35,9 +38,12 @@ async def async_chains_command() -> None:
         'name',
         'chain_id',
         'block explorer',
-        'has rpc',
         'default',
+        'has rpc',
     ]
+    if verbose:
+        labels[4] = 'rpc'
+
     rows = []
     for network in all_networks:
 
@@ -46,14 +52,21 @@ async def async_chains_command() -> None:
         already_used.add(network['chain_id'])
 
         is_default = '✓' if default_network == network['name'] else ''
-        has_provider = '✓' if network['name'] in providers_by_chain else ''
+
+        if not verbose:
+            has_provider = '✓' if network['name'] in providers_by_chain else ''
+        else:
+            if network['name'] in providers_by_chain:
+                has_provider = providers_by_chain[network['name']]['url']
+            else:
+                has_provider = ''
 
         row = [
             network['name'],
             network['chain_id'],
             network['block_explorer'],
-            has_provider,
             is_default,
+            has_provider,
         ]
         rows.append(row)
 
