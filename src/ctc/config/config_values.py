@@ -29,30 +29,14 @@ def get_networks() -> dict[spec.NetworkName, spec.NetworkMetadata]:
     return config_read.get_config()['networks']
 
 
-def get_used_networks() -> list[spec.NetworkName]:
+def get_networks_that_have_providers() -> typing.Sequence[spec.NetworkName]:
 
-    ctc_config = config_read.get_config()
+    config = config_read.get_config()
 
-    # collect all used networks
-    default_network = ctc_config['network_defaults']['default_network']
-    providers = ctc_config['providers']
-    provider_networks: list[str] = []
-    for provider in providers.values():
-        network = provider.get('network')
-        if network is not None:
-            from ctc import evm
 
-            network_name = evm.get_network_name(network)
-            provider_networks.append(network_name)
-    custom_networks: list[str] = list(ctc_config['networks'].keys())
-
-    # get ordered unique networks
-    networks: list[str] = [default_network]
-    for network in provider_networks + custom_networks:
-        if network not in networks:
-            networks.append(network)
-
-    return networks
+def get_networks_that_have_providers() -> typing.Sequence[spec.NetworkName]:
+    network_set = {provider.get('network') for provider in get_providers()}
+    return sorted(network for network in network_set if network is not None)
 
 
 def get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:

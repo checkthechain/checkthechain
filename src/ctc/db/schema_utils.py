@@ -129,7 +129,7 @@ def get_complete_prepared_schema(
 
     # include network schemas
     if networks is None:
-        networks = config.get_used_networks()
+        networks = config.get_networks_that_have_providers()
     schema_name: SchemaName
     all_schemas = []
     for network in networks:

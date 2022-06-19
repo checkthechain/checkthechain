@@ -37,7 +37,7 @@ def status_command() -> None:
     active_schemas = db.get_active_schemas()
     print()
     toolstr.print_header('Data to Store')
-    networks = config.get_used_networks()
+    networks = config.get_networks_that_have_providers()
     admin_schemas = db.get_admin_schema_names()
     generic_schemas = db.get_generic_schema_names()
     network_schemas = db.get_network_schema_names()
@@ -70,7 +70,9 @@ def status_command() -> None:
             if schema_name in network_schemas:
                 schema_networks: typing.Sequence[
                     spec.NetworkReference
-                ] | typing.Sequence[None] = config.get_used_networks()
+                ] | typing.Sequence[
+                    None
+                ] = config.get_networks_that_have_providers()
             else:
                 schema_networks = [None]
 

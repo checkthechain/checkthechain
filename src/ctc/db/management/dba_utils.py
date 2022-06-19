@@ -24,7 +24,7 @@ def create_evm_tables(
 
     # get netowrks and schemas
     if networks is None:
-        networks = config.get_used_networks()
+        networks = config.get_networks_that_have_providers()
     if schema_names is None:
         schema_names = network_schema_names + generic_schema_names
 
@@ -219,7 +219,7 @@ def drop_schema(
         if schema_name in schema_utils.get_network_schema_names():
             networks: typing.Sequence[
                 spec.NetworkReference | None
-            ] = config.get_used_networks()
+            ] = config.get_networks_that_have_providers()
         else:
             networks = [None]
     else:
