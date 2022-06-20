@@ -50,7 +50,7 @@ async def async_chains_command(verbose: bool) -> None:
             continue
         already_used.add(network['chain_id'])
 
-        is_default = '✓' if default_network == network['name'] else ''
+        is_default = '✓' if default_network == network['chain_id'] else ''
 
         if not verbose:
             has_provider = '✓' if network['name'] in providers_by_chain else ''

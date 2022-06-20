@@ -41,11 +41,11 @@ def get_data_dir() -> str:
 #
 
 
-def get_default_network() -> spec.NetworkName | None:
+def get_default_network() -> spec.ChainId | None:
     return config_read.get_config().get('default_network')
 
 
-def get_networks() -> typing.Mapping[spec.NetworkName, spec.NetworkMetadata]:
+def get_networks() -> typing.Mapping[spec.ChainId, spec.NetworkMetadata]:
     config = config_read.get_config()
     networks = config.get('networks')
     if networks is not None:
@@ -54,25 +54,25 @@ def get_networks() -> typing.Mapping[spec.NetworkName, spec.NetworkMetadata]:
         return config_defaults.get_default_networks_metadata()
 
 
-def get_networks_that_have_providers() -> typing.Sequence[spec.NetworkName]:
+def get_networks_that_have_providers() -> typing.Sequence[spec.ChainId]:
     providers = get_providers()
     all_networks = get_networks()
-    network_set: set[str] = set()
+    network_set: set[spec.ChainId] = set()
     for provider in providers.values():
         network = provider.get('network')
         if network is not None:
 
             # convert chain_id to name
-            if isinstance(network, int):
-                for network_name, network_metadata in all_networks.items():
-                    if network == network_metadata.get('chain_id'):
-                        network_set.add(network_name)
+            if isinstance(network, str):
+                for chain_id, network_metadata in all_networks.items():
+                    if network == network_metadata.get('name'):
+                        network_set.add(chain_id)
                         break
                 else:
-                    raise Exception('unknown chain_id: ' + str(network))
+                    raise Exception('unknown network name: ' + str(network))
 
             # add network
-            if isinstance(network, str):
+            if isinstance(network, int):
                 network_set.add(network)
             else:
                 raise Exception('unknown network specification')
@@ -129,14 +129,26 @@ def get_provider(
 
 
 def get_default_provider(
-    network: spec.NetworkName | None = None,
+    network: spec.NetworkName | spec.ChainId | None = None,
 ) -> spec.Provider:
+    """get default provider for network"""
 
     # if network not specified use default
     if network is None:
         network = get_default_network()
     if network is None:
         raise Exception('no default network specified')
+
+    if not isinstance(network, int):
+        if isinstance(network, str):
+            for chain_id, network_metadata in get_networks().items():
+                if network == network_metadata['name']:
+                    network = chain_id
+                    break
+            else:
+                raise Exception('unknown network name: ' + str(type(network)))
+        else:
+            raise Exception('unknown network type: ' + str(type(network)))
 
     # get provider of network
     config = config_read.get_config()

@@ -25,7 +25,7 @@ def get_network_name(network: spec.NetworkName | int) -> spec.NetworkName:
         raise Exception('unknown network: ' + str(network))
 
 
-def get_network_chain_id(network: spec.NetworkName | int) -> spec.NetworkId:
+def get_network_chain_id(network: spec.NetworkName | int) -> spec.ChainId:
 
     if isinstance(network, int):
         return network
@@ -39,23 +39,24 @@ def get_network_chain_id(network: spec.NetworkName | int) -> spec.NetworkId:
 
 def get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
     return {
-        network_name: network_metadata['chain_id']
-        for network_name, network_metadata in config.get_networks().items()
+        network_metadata['name']: chain_id
+        for chain_id, network_metadata in config.get_networks().items()
     }
 
 
 def get_network_names_by_chain_id() -> typing.Mapping[int, spec.NetworkName]:
     return {
-        network_metadata['chain_id']: network_name
-        for network_name, network_metadata in config.get_networks().items()
+        chain_id: network_metadata['name']
+        for chain_id, network_metadata in config.get_networks().items()
     }
 
 
 def get_network_metadata(
     network: spec.NetworkReference,
 ) -> spec.NetworkMetadata:
-    if isinstance(network, int):
-        network = get_network_name(network)
+
+    if isinstance(network, str):
+        network = get_network_chain_id(network)
 
     networks = config.get_networks()
     if network in networks:

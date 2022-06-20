@@ -68,7 +68,9 @@ def get_config(
     )
 
     if config_from_file.get('config_spec_version') != ctc.__version__:
-        print('[WARNING] using outdated config -- run `ctc setup` on command line')
+        print(
+            '[WARNING] using outdated config -- run `ctc setup` on command line'
+        )
         config_from_file = upgrade_config(config_from_file)
 
     # load overrides
@@ -107,11 +109,37 @@ def upgrade_config(
             )
 
             # add default networks
-            upgraded['networks'] = dict(
-                upgraded.get('networks', {}),
-                **config_defaults.get_default_networks_metadata()
-            )
+            upgraded['networks'] = dict(upgraded.get('networks', {}))
+            default_networks = config_defaults.get_default_networks_metadata()
+            for chain_id, network_metadata in default_networks.items():
+                name = network_metadata['name']
+                if name not in upgraded['networks']:
+                    upgraded['networks'][name] = network_metadata
 
+            # convert to integer network references
+            chain_ids_by_network_name = {
+                network_metadata['name']: network_metadata['chain_id']
+                for network_name, network_metadata in upgraded[
+                    'networks'
+                ].items()
+            }
+            upgraded['networks'] = {
+                chain_ids_by_network_name[network_name]: network_metadata
+                for network_name, network_metadata in upgraded[
+                    'networks'
+                ].items()
+            }
+            upgraded['default_network'] = chain_ids_by_network_name[
+                upgraded['default_network']
+            ]
+            upgraded['default_providers'] = {
+                chain_ids_by_network_name[network_name]: provider_name
+                for network_name, provider_name in upgraded[
+                    'default_providers'
+                ].items()
+            }
+
+            # set db config
             default_db_config = config_defaults.get_default_db_config(
                 data_dir=old_config['data_dir']
             )

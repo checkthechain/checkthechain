@@ -88,12 +88,12 @@ def get_default_block_explorers() -> typing.Mapping[str, str]:
 
 
 def get_default_networks_metadata() -> typing.Mapping[
-    str, spec.NetworkMetadata
+    spec.ChainId, spec.NetworkMetadata
 ]:
     block_explorers = get_default_block_explorers()
     chain_ids_by_network_name = get_default_chain_ids_by_network_name()
     return {
-        network_name: {
+        chain_id: {
             'name': network_name,
             'chain_id': chain_id,
             'block_explorer': block_explorers[network_name],

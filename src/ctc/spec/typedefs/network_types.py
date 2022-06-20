@@ -5,9 +5,9 @@ import typing
 from typing_extensions import TypedDict
 
 
-NetworkId = int
+ChainId = int
 NetworkName = str
-NetworkReference = typing.Union[NetworkId, NetworkName]
+NetworkReference = typing.Union[ChainId, NetworkName]
 
 
 class NetworkMetadata(TypedDict):

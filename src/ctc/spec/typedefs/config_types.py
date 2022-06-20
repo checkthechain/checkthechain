@@ -15,11 +15,11 @@ class PartialConfigSpec(TypedDict, total=False):
     data_dir: str
     providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
     networks: typing.Mapping[
-        network_types.NetworkName, network_types.NetworkMetadata
+        network_types.ChainId, network_types.NetworkMetadata
     ]
-    default_network: network_types.NetworkName | None
+    default_network: network_types.ChainId | None
     default_providers: typing.Mapping[
-        network_types.NetworkName, rpc_types.ProviderName
+        network_types.ChainId, rpc_types.ProviderName
     ]
     db_configs: typing.Mapping[str, toolsql.DBConfig]
 
@@ -32,11 +32,11 @@ class ConfigSpec(TypedDict):
     data_dir: str
     providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
     networks: typing.Mapping[
-        network_types.NetworkName, network_types.NetworkMetadata
+        network_types.ChainId, network_types.NetworkMetadata
     ]
-    default_network: network_types.NetworkName | None
+    default_network: network_types.ChainId | None
     default_providers: typing.Mapping[
-        network_types.NetworkName, rpc_types.ProviderName
+        network_types.ChainId, rpc_types.ProviderName
     ]
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]

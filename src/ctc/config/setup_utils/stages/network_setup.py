@@ -57,11 +57,11 @@ async def async_specify_providers(
     styles: typing.Mapping[str, str],
 ) -> tuple[
     typing.Mapping[str, spec.Provider],
-    typing.MutableMapping[str, spec.NetworkMetadata],
+    typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
 ]:
 
     providers: typing.MutableMapping[str, spec.Provider] = {}
-    networks: typing.MutableMapping[str, spec.NetworkMetadata] = dict(
+    networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata] = dict(
         config_defaults.get_default_networks_metadata()
     )
 
@@ -115,7 +115,7 @@ async def async_specify_providers(
 
 async def async_collect_provider_metadata(
     providers: typing.MutableMapping[str, spec.Provider],
-    networks: typing.MutableMapping[str, spec.NetworkMetadata],
+    networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     styles: typing.Mapping[str, str],
 ) -> None:
     """collect metadata for a provider"""
@@ -184,7 +184,7 @@ def create_default_provider_name(url: str, network: int) -> str:
 
 def collect_network_metadata(
     styles: typing.Mapping[str, str],
-    networks: typing.MutableMapping[str, spec.NetworkMetadata],
+    networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     name: str | None = None,
     chain_id: int | None = None,
 ) -> None:
@@ -211,13 +211,13 @@ def collect_network_metadata(
         'chain_id': chain_id,
         'block_explorer': block_explorer,
     }
-    networks[name] = network_metadata
+    networks[chain_id] = network_metadata
 
 
 def specify_networks(
-    networks: typing.MutableMapping[str, spec.NetworkMetadata],
+    networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     styles: typing.Mapping[str, str],
-) -> typing.MutableMapping[str, spec.NetworkMetadata]:
+) -> typing.MutableMapping[spec.ChainId, spec.NetworkMetadata]:
 
     # print current networks
     print()
@@ -240,10 +240,10 @@ def specify_networks(
 
 
 def specify_default_network(
-    networks: typing.Mapping[str, spec.NetworkMetadata],
+    networks: typing.Mapping[spec.ChainId, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
     styles: typing.Mapping[str, str],
-) -> str:
+) -> spec.ChainId:
 
     # set default network
     choices_set = [
@@ -277,26 +277,39 @@ def specify_default_network(
         style=styles['question'],
     )
     default_network = choices[default_network_index]
-    return default_network
+
+    for chain_id, network_metadata in networks.items():
+        if network_metadata['name'] == default_network:
+            return chain_id
+    else:
+        raise Exception('unknown network: ' + str(default_network))
 
 
 def specify_default_providers(
-    networks: typing.Mapping[str, spec.NetworkMetadata],
+    networks: typing.Mapping[spec.ChainId, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
     styles: typing.Mapping[str, str],
-) -> typing.Mapping[str, str]:
+) -> typing.Mapping[spec.ChainId, spec.ProviderName]:
 
     # compile providers for each network
-    providers_per_network: dict[str, list[str]] = {}
+    providers_per_network: dict[int, list[str]] = {}
     for provider_name, provider_metadata in providers.items():
         network = provider_metadata['network']
         if network is None:
             raise Exception(
                 'unknown network for provider: ' + str(provider_metadata)
             )
-        network_name = evm.get_network_name(network)
-        providers_per_network.setdefault(network_name, [])
-        providers_per_network[network_name].append(provider_name)
+        if not isinstance(network, int):
+            for chain_id, network_metadata in networks.items():
+                if network_metadata['name'] == network:
+                    network = chain_id
+                    break
+            else:
+                raise Exception(
+                    'could not determine chain_id for network: ' + str(network)
+                )
+        providers_per_network.setdefault(chain_id, [])
+        providers_per_network[chain_id].append(provider_name)
 
     # get default provider for each network
     default_providers = {}
@@ -305,8 +318,15 @@ def specify_default_providers(
         if n_providers == 1:
             default_providers[network] = providers_per_network[network][0]
         elif n_providers > 1:
+            prompt = (
+                'Which provider to use as default for '
+                + str(networks[network]['name'])
+                + ' (chain_id = '
+                + str(network)
+                + ')?'
+            )
             answer = toolcli.input_number_choice(
-                prompt='Which provider to use as default for ' + network + '?',
+                prompt=prompt,
                 choices=providers_per_network[network],
                 style=styles['question'],
             )
