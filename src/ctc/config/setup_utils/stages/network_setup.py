@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 import urllib.parse
 
 import toolcli
@@ -9,110 +8,168 @@ import toolcli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ... import config_read
+from ... import config_defaults
 
 
-class _NetworkData(TypedDict):
-    networks: dict[spec.NetworkName, spec.NetworkMetadata]
-    providers: dict[spec.ProviderName, spec.Provider]
-    network_defaults: spec.ConfigNetworkDefaults
+async def async_setup_networks(
+    old_config: typing.Mapping[typing.Any, typing.Any],
+    styles: typing.Mapping[str, str],
+) -> spec.PartialConfigSpec:
 
-
-def setup_networks(styles: typing.Mapping[str, str]) -> spec.PartialConfigSpec:
     print()
     print()
     toolcli.print('## Network Setup', style=styles['header'])
 
-    print()
-    print('The following networks are already added:')
-    default_networks = evm.get_default_networks_metadata()
-    for network_name, network_metadata in default_networks.items():
-        print('-', network_name)
-
-    # add new networks
-    networks: dict[spec.NetworkName, spec.NetworkMetadata] = {}
-    while toolcli.input_yes_or_no(
-        '\nWould you like to add additional networks? ',
-        style=styles['question'],
-        default='no',
-    ):
-
-        go_back = False
-        valid_answer = False
-        while not valid_answer:
-            name = toolcli.input_prompt(
-                'Network name? (to go back, input a blank line) ',
-                style=styles['question'],
-            )
-            if name == '':
-                go_back = True
-                break
-            elif name in default_networks or name in networks:
-                answer = toolcli.input_yes_or_no(
-                    'Network with this name already exists. Overwrite? ',
-                    style=styles['question'],
-                )
-                if answer:
-                    valid_answer = True
-            else:
-                valid_answer = True
-        if go_back:
-            break
-
-        network_id = toolcli.input_int(
-            'Network chain_id? ', style=styles['question']
-        )
-        block_explorer = toolcli.input_prompt(
-            'Network block explorer? ', style=styles['question']
-        )
-
-        if name in networks:
-            print()
-            print('Overwriting network with name', name)
-
-        networks[name] = {
-            'name': name,
-            'chain_id': network_id,
-            'block_explorer': block_explorer,
-        }
-
-    # set default network
-    choices_set = set(networks.keys()) | set(default_networks.keys())
-    choices = sorted(choices_set)
-    print()
-    default_network_index = toolcli.input_number_choice(
-        prompt='Which network to use as default?',
-        choices=choices,
-        default='mainnet',
-        style=styles['question'],
-    )
-    default_network = choices[default_network_index]
-
     # get providers
-    all_networks = dict(default_networks, **networks)
-    providers = specify_providers(
-        all_networks=all_networks,
-        config_networks=networks,
-        default_network=default_network,
-        styles=styles,
+    providers, networks = await async_specify_providers(
+        old_config=old_config, styles=styles
     )
-    network_defaults = specify_network_defaults(
-        default_network=default_network,
+
+    # get additional custom networks
+    networks = specify_networks(networks=networks, styles=styles)
+
+    # get default network
+    default_network = specify_default_network(
         providers=providers,
+        networks=networks,
         styles=styles,
     )
 
-    data: spec.PartialConfigSpec = {
-        'networks': networks,
-        'providers': providers,
-        'network_defaults': network_defaults,
-    }
+    # get default providers
+    default_providers = specify_default_providers(
+        providers=providers,
+        networks=networks,
+        styles=styles,
+    )
 
+    # return results
+    data: spec.PartialConfigSpec = {
+        'providers': providers,
+        'networks': networks,
+        'default_network': default_network,
+        'default_providers': default_providers,
+    }
     return data
 
 
-def get_default_provider_name(provider_url: str, network: str) -> str:
-    hostname = urllib.parse.urlparse(provider_url).hostname
+async def async_specify_providers(
+    old_config: typing.Mapping[str, typing.Any],
+    styles: typing.Mapping[str, str],
+) -> tuple[
+    typing.Mapping[str, spec.Provider],
+    typing.MutableMapping[str, spec.NetworkMetadata],
+]:
+
+    providers: typing.MutableMapping[str, spec.Provider] = {}
+    networks: typing.MutableMapping[str, spec.NetworkMetadata] = dict(
+        config_defaults.get_default_networks_metadata()
+    )
+
+    # add providers first, then configure their networks if those are unknown
+    old_providers = old_config.get('providers', {})
+    if len(old_providers) > 0:
+        answer = toolcli.input_yes_or_no(
+            'Would you like to continue using these providers? ',
+            style=styles['question'],
+            default='yes',
+        )
+        if answer:
+            # TODO: validate old_providers
+            providers.update(old_providers)
+
+    prompt_initial = (
+        'Would you like to specify an RPC provider? '
+        '(required for most ctc operations)\n'
+    )
+    prompt_additional = 'Would you like to specify additional RPC providers? '
+
+    if len(providers) == 0:
+        prompt = prompt_initial
+    else:
+        prompt = prompt_additional
+
+    answer = toolcli.input_yes_or_no(
+        prompt,
+        style=styles['question'],
+        default='yes',
+    )
+    while answer:
+
+        # collect provider
+        await async_collect_provider_metadata(
+            providers=providers,
+            networks=networks,
+            styles=styles,
+        )
+
+        # prompt for additional providers
+        print()
+        answer = toolcli.input_yes_or_no(
+            prompt_additional,
+            style=styles['question'],
+            default='no',
+        )
+
+    return providers, networks
+
+
+async def async_collect_provider_metadata(
+    providers: typing.MutableMapping[str, spec.Provider],
+    networks: typing.MutableMapping[str, spec.NetworkMetadata],
+    styles: typing.Mapping[str, str],
+) -> None:
+    """collect metadata for a provider"""
+
+    url = toolcli.input_prompt(
+        'What is the RPC provider URL?', style=styles['question']
+    )
+    try:
+        chain_id = await rpc.async_eth_chain_id(provider=url)
+    except Exception:
+        print('Could not query node for chain_id metadata')
+        chain_id = toolcli.input_int(
+            'What is the chain_id used by this node? ',
+            style=styles['question'],
+        )
+
+        # determine whether chain_id is of known network
+        if chain_id is None:
+            known_network = False
+        else:
+            known_network = any(
+                chain_id == network.get('chain_id')
+                for network in networks.values()
+            )
+
+        # if chain_id of unknown network, collect network metadata
+        if known_network:
+            collect_network_metadata(
+                chain_id=chain_id,
+                networks=networks,
+                styles=styles,
+            )
+
+    name = toolcli.input_prompt(
+        prompt='What should this node be called? ',
+        default=create_default_provider_name(url=url, network=chain_id),
+    )
+    if url.startswith('http'):
+        protocol: typing.Literal['http'] = 'http'
+    else:
+        raise Exception('unknown protocol, missing http(s) in url?')
+    provider: spec.Provider = {
+        'name': name,
+        'url': url,
+        'network': chain_id,
+        'protocol': protocol,
+        'session_kwargs': {},
+        'chunk_size': None,
+    }
+    providers[name] = provider
+
+
+def create_default_provider_name(url: str, network: int) -> str:
+    hostname = urllib.parse.urlparse(url).hostname
     if hostname is not None:
         hostname_pieces = hostname.split('.')
         if len(hostname_pieces) == 1:
@@ -120,177 +177,123 @@ def get_default_provider_name(provider_url: str, network: str) -> str:
         else:
             hostname_piece = hostname_pieces[-2]
     else:
-        hostname_piece = provider_url
+        hostname_piece = url
 
-    return hostname_piece + '_' + network
+    return hostname_piece + '__' + str(network)
 
 
-def specify_providers(
-    config_networks: typing.Mapping[spec.NetworkName, spec.NetworkMetadata],
-    all_networks: typing.Mapping[spec.NetworkName, spec.NetworkMetadata],
-    default_network: str,
+def collect_network_metadata(
     styles: typing.Mapping[str, str],
-) -> dict[spec.ProviderName, spec.Provider]:
+    networks: typing.MutableMapping[str, spec.NetworkMetadata],
+    name: str | None = None,
+    chain_id: int | None = None,
+) -> None:
+    """collect metadata for a network"""
 
-    # load old providers
-    if config_read.config_path_exists():
-        try:
-            old_config = config_read.get_config(validate=False)
-            default_providers: dict[str, spec.Provider] = {}
-            old_providers = old_config.get('providers', default_providers)
-        except Exception:
-            old_providers = {}
-    else:
-        old_providers = {}
-
-    # check whether to keep old providers
-    if len(old_providers) > 0:
-        print()
-        print('Currently installed providers:')
-        for provider_name, provider in old_providers.items():
-            network_value = provider.get('network')
-            if network_value is not None:
-                network_name = network_value
-            else:
-                network_name = 'UNKNOWN'
-            print('-', provider_name, '(network=' + network_name + ')')
-        print()
-        if toolcli.input_yes_or_no(
-            'Keep these providers? ',
-            default='yes',
+    if chain_id is None:
+        chain_id = toolcli.input_int(
+            'What is the network\'s chain_id? (enter a blank line to go back)\n',
             style=styles['question'],
-        ):
-            providers = old_providers
-        else:
-            providers = {}
-    else:
-        providers = {}
-
-    # check whether default network has a provider
-    default_network_has_providers = False
-    for provider_metadata in providers.values():
-        if provider_metadata['network'] == default_network:
-            default_network_has_providers = True
-            break
-    if not default_network_has_providers:
-        prompt = (
-            'Do you want to specify a provider node for '
-            + default_network
-            + '? '
         )
-        print()
-        if toolcli.input_yes_or_no(
-            prompt=prompt, default='yes', style=styles['question']
-        ):
-            provider_network = default_network
-            provider_url = toolcli.input_prompt(
-                prompt='Provider node URL? ', style=styles['question']
-            )
-            default_name = get_default_provider_name(
-                provider_url=provider_url, network=default_network
-            )
-            provider_name = toolcli.input_prompt(
-                'Provider node name? ',
-                style=styles['question'],
-                default=default_name,
-            )
+        # CHECK that chain_id is not already taken
+    if name is None:
+        name = toolcli.input_prompt(
+            'What is the network\'s name? (enter a blank line to go back)\n',
+            style=styles['question'],
+        )
+        # CHECK that name is not already taken
 
-            provider_spec: spec.PartialProvider = {
-                'name': provider_name,
-                'url': provider_url,
-                'network': provider_network,
-                'protocol': 'http',
-                'session_kwargs': None,
-                'chunk_size': None,
-            }
-            # should validate that this confirms to spec.ProviderSpec
-            providers[provider_name] = provider_spec
+    block_explorer = toolcli.input_prompt(
+        'Network block explorer? ', style=styles['question']
+    )
+    network_metadata: spec.NetworkMetadata = {
+        'name': name,
+        'chain_id': chain_id,
+        'block_explorer': block_explorer,
+    }
+    networks[name] = network_metadata
 
-    # specify additional providers
+
+def specify_networks(
+    networks: typing.MutableMapping[str, spec.NetworkMetadata],
+    styles: typing.Mapping[str, str],
+) -> typing.MutableMapping[str, spec.NetworkMetadata]:
+
+    # print current networks
     print()
-    answer = toolcli.input_yes_or_no(
-        prompt='Do you want to specify any additional providers? ',
+    print('Have metadata for the following networks:')
+    for number, network_name in enumerate(sorted(networks.keys())):
+        print('    ' + str(number) + '.', network_name)
+
+    # add new networks
+    while toolcli.input_yes_or_no(
+        '\nWould you like to add additional networks? ',
+        style=styles['question'],
         default='no',
+    ):
+        collect_network_metadata(styles=styles, networks=networks)
+
+    print()
+    print(len(networks), 'additional networks added')
+
+    return networks
+
+
+def specify_default_network(
+    networks: typing.Mapping[str, spec.NetworkMetadata],
+    providers: typing.Mapping[str, spec.Provider],
+    styles: typing.Mapping[str, str],
+) -> str:
+
+    # set default network
+    choices_set = [
+        str(network['name']) + '(chain_id = ' + str(network['chain_id']) + ')'
+        for network in networks.values()
+    ]
+    choices = sorted(choices_set)
+
+    # determine default choice
+    default: str | None = None
+    if len(providers) == 1:
+        provider = list(providers.values())[0]
+        network = provider.get('network')
+        if isinstance(network, int):
+            for network_metadata in networks.values():
+                if network == network_metadata['chain_id']:
+                    network = network_metadata['name']
+                    break
+        if isinstance(network, str):
+            default = network
+    elif len(providers) > 1:
+        for provider in providers.values():
+            if provider.get('network') in [1, 'mainnet']:
+                default = 'mainnet'
+
+    print()
+    default_network_index = toolcli.input_number_choice(
+        prompt='Which network to use as default?',
+        choices=choices,
+        default=default,
         style=styles['question'],
     )
-    while answer:
-
-        # specify network
-        go_back = False
-        valid_answer = False
-        while not valid_answer:
-            print()
-            print('Adding new provider node...')
-            provider_network = toolcli.input_prompt(
-                prompt='Network of provider? (see list of networks above) ',
-                style=styles['question'],
-            )
-            if provider_network == '':
-                go_back = True
-                break
-            elif provider_network not in all_networks:
-                print('unknown network')
-            else:
-                valid_answer = True
-        if go_back:
-            break
-
-        # specify url
-        provider_url = toolcli.input_prompt(
-            prompt='Provider URL? (enter blank line to go back) ',
-            style=styles['question'],
-        )
-        if provider_url == '':
-            break
-        default_name = get_default_provider_name(
-            provider_url=provider_url, network=provider_network
-        )
-
-        # specify name
-        valid_answer = False
-        while not valid_answer:
-            provider_name = toolcli.input_prompt(
-                'Provider name? (enter blank line to go back) ',
-                style=styles['question'],
-                default=default_name,
-            )
-            if provider_name == '':
-                go_back = True
-                break
-            elif provider_name in providers:
-                if toolcli.input_prompt(
-                    'Provider with this name already exists. Overwrite? '
-                ):
-                    valid_answer = True
-                else:
-                    continue
-            else:
-                valid_answer = True
-        if go_back:
-            break
-
-        provider_spec = {
-            'name': provider_name,
-            'url': provider_url,
-            'network': provider_network,
-        }
-        providers[provider_name] = rpc.get_provider(provider_spec)
-
-    return providers
+    default_network = choices[default_network_index]
+    return default_network
 
 
-def specify_network_defaults(
-    default_network: str,
+def specify_default_providers(
+    networks: typing.Mapping[str, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
-    styles: typing.Mapping[str, typing.Optional[str]],
-) -> spec.ConfigNetworkDefaults:
+    styles: typing.Mapping[str, str],
+) -> typing.Mapping[str, str]:
 
     # compile providers for each network
     providers_per_network: dict[str, list[str]] = {}
     for provider_name, provider_metadata in providers.items():
         network = provider_metadata['network']
         if network is None:
-            raise Exception('unknown network for provider: ' + str(provider_metadata))
+            raise Exception(
+                'unknown network for provider: ' + str(provider_metadata)
+            )
         network_name = evm.get_network_name(network)
         providers_per_network.setdefault(network_name, [])
         providers_per_network[network_name].append(provider_name)
@@ -309,8 +312,4 @@ def specify_network_defaults(
             )
             default_providers[network] = providers_per_network[network][answer]
 
-    return {
-        'default_network': default_network,
-        'default_providers': default_providers,
-    }
-
+    return default_providers

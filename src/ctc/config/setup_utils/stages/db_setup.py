@@ -39,6 +39,8 @@ def setup_dbs(
     )
 
     db_configs: typing.MutableMapping[str, 'toolsql.DBConfig'] = {}
+
+    # USE CONFIG_DEFAULTS get_default_db_config
     if db_mode == 0:
         db_configs['main'] = {
             'dbms': 'sqlite',

@@ -5,13 +5,13 @@ import toolcli
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': setup_command,
+        'f': async_setup_command,
         'help': 'run ctc setup wizard',
         'examples': [''],
     }
 
 
-def setup_command() -> None:
+async def async_setup_command() -> None:
     from ctc.config import setup_utils
 
-    setup_utils.setup_ctc()
+    await setup_utils.async_setup_ctc()

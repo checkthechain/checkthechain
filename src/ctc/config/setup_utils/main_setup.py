@@ -16,28 +16,27 @@ styles = {
 }
 
 
-def setup_ctc() -> None:
+async def async_setup_ctc() -> None:
 
     # print intro
     print('setting up ctc...')
     print()
-    print('Tasks:')
-    print('- setup config path')
-    print('- setup data directory')
-    print('- setup networks and providers')
+    print('Each step is optional')
+    print('- by default, setup process will leave existing settings unchanged')
+    print('- setup can be rerun multiple times idempotently')
     print()
-    print('Each step can be skipped depending on what you need')
-    print('- this wizard can be rerun multiple times idempotently')
-    print('- by default, wizard will leave current settings unchanged')
-    print()
-    toolcli.print('Can skip options by simply pressing enter', style='bold')
+    toolcli.print(
+        'Can skip options by pressing enter at each prompt', style='bold'
+    )
 
     # load old config data for passing to each option
     old_config = setup_io.load_old_config(convert_to_latest=True)
     setup_io.setup_config_path()
 
     # collect new config file data
-    network_data = network_setup.setup_networks(styles=styles)
+    network_data = await network_setup.async_setup_networks(
+        old_config=old_config, styles=styles
+    )
     data_root = data_root_setup.setup_data_root(
         styles=styles,
         old_config=old_config,
