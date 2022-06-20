@@ -51,9 +51,9 @@ async def async_get_contract_abi(
         raise Exception('not a valid address: ' + str(contract_address))
 
     if verbose:
-        network = evm.get_network_name(network)
+        network_name = evm.get_network_name(network)
         print(
-            'fetching ' + str(network) + ' abi from etherscan:',
+            'fetching ' + str(network_name) + ' abi from etherscan:',
             contract_address,
         )
 

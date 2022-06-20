@@ -57,7 +57,7 @@ def load_filesystem_erc20_data(
 def _get_erc20_data_path(network: spec.NetworkReference, label: str) -> str:
     if network is None:
         network = config.get_default_network()
-    network_name = evm.get_network_name(network=network)
+    network_name = evm.get_network_name(network=network, require=True)
     data_dir = config.get_data_dir()
     filename = label + '.csv'
     return os.path.join(data_dir, network_name, 'erc20s', filename)

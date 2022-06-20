@@ -26,7 +26,7 @@ def get_abi_url_template(network: spec.NetworkReference) -> str:
 
     if network is None:
         network = config.get_default_network()
-    network = evm.get_network_name(network)
+    network = evm.get_network_name(network, require=True)
 
     if network not in abi_url_templates:
         raise Exception('block explorer unknown for network=' + str(network))

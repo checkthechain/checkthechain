@@ -97,7 +97,7 @@ class LatestBlockCacheEntry(TypedDict, total=False):
     block_number: int
 
 
-_latest_block_cache: typing.MutableMapping[str, LatestBlockCacheEntry] = {}
+_latest_block_cache: typing.MutableMapping[int, LatestBlockCacheEntry] = {}
 _latest_block_lock: typing.MutableMapping[str, asyncio.Lock | None] = {
     'lock': None
 }

@@ -11,6 +11,6 @@ NetworkReference = typing.Union[ChainId, NetworkName]
 
 
 class NetworkMetadata(TypedDict):
-    name: NetworkName
+    name: NetworkName | None
     chain_id: int
     block_explorer: str | None  # url

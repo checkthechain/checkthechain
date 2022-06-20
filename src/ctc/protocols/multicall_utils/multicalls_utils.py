@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import typing
 
+from ctc import evm
 from ctc import spec
 from ctc import rpc
 from . import call_utils
@@ -20,9 +21,12 @@ from . import multicall_spec
 
 def get_multicall_address(
     *,
-    network: str = 'mainnet',
+    network: spec.NetworkReference = 'mainnet',
     version: str = 'maker',
 ) -> spec.Address:
+
+    network_name = evm.get_network_name(network, require=True)
+
     if version.lower() == 'Maker'.lower():
         multicall = {
             'mainnet': '0xeefba1e63905ef1d7acba5a8513c70307c1ce441',
@@ -34,7 +38,7 @@ def get_multicall_address(
             'polygon': '0x11ce4b23bd875d7f5c6a31084f55fde1e9a87507',
             'mumbai': '0x08411add0b5aa8ee47563b146743c13b3556c9cc',
         }
-        return multicall[network]
+        return multicall[network_name]
     elif version.lower() == 'Uniswap V3':
         # same across networks
         return '0x5ba1e12693dc8f9c48aad8770482f4739beed696'

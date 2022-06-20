@@ -33,7 +33,7 @@ def get_events_root(
         network = config.get_default_network()
         if network is None:
             raise Exception('must specify network or configure default network')
-    network_name = network_utils.get_network_name(network)
+    network_name = network_utils.get_network_name(network, require=True)
     return os.path.join(
         ctc.config.get_data_dir(), 'evm/networks', network_name, 'events'
     )
@@ -94,7 +94,7 @@ def get_events_filepath(
         network = config.get_default_network()
         if network is None:
             raise Exception('must specify network or configure default network')
-    network_name = network_utils.get_network_name(network)
+    network_name = network_utils.get_network_name(network, require=True)
     return os.path.join(
         ctc.config.get_data_dir(), 'evm/networks', network_name, subpath
     )

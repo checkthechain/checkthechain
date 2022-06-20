@@ -78,18 +78,18 @@ def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
     return (os.getpid(), provider['url'], tuple(session_kwargs.items()))
 
 
-def get_provider_network(provider: spec.ProviderSpec) -> spec.NetworkName:
+def get_provider_network(provider: spec.ProviderSpec) -> spec.ChainId:
     if provider is None or isinstance(provider, str):
         provider = get_provider(provider)
 
     network = provider.get('network')
     if network is not None:
-        if isinstance(network, str):
+        if isinstance(network, int):
             return network
         else:
             from ctc import evm
 
-            return evm.get_network_name(network)
+            return evm.get_network_chain_id(network)
     else:
         raise spec.CouldNotDetermineNetwork('could not determine network')
 
