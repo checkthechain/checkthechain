@@ -12,7 +12,6 @@ if typing.TYPE_CHECKING:
 
 import ctc
 from ctc import spec
-from . import config_defaults
 from . import config_spec
 
 
@@ -71,7 +70,9 @@ def get_config(
         print(
             '[WARNING] using outdated config -- run `ctc setup` on command line'
         )
-        config_from_file = upgrade_config(config_from_file)
+        from . import config_upgrade
+
+        config_from_file = config_upgrade.upgrade_config(config_from_file)
 
     # load overrides
     config_overrides = _config_cache['overrides']
@@ -86,71 +87,6 @@ def get_config(
         return typing.cast(spec.ConfigSpec, config)
     else:
         return config
-
-
-def upgrade_config(
-    old_config: typing.MutableMapping[typing.Any, typing.Any]
-) -> typing.MutableMapping[str, typing.Any]:
-    """upgrade config to latest version as much as possible"""
-
-    version = old_config.get('config_spec_version')
-    if version is None:
-        version = old_config.get('version')
-
-    if isinstance(version, str):
-        if version.startswith('0.2.'):
-            upgraded = dict(old_config)
-            network_defaults = upgraded.pop('network_defaults', {})
-            upgraded['default_network'] = network_defaults.get(
-                'default_network'
-            )
-            upgraded['default_providers'] = network_defaults.get(
-                'default_providers', {}
-            )
-
-            # add default networks
-            upgraded['networks'] = dict(upgraded.get('networks', {}))
-            default_networks = config_defaults.get_default_networks_metadata()
-            for chain_id, network_metadata in default_networks.items():
-                name = network_metadata['name']
-                if name not in upgraded['networks']:
-                    upgraded['networks'][name] = network_metadata
-
-            # convert to integer network references
-            chain_ids_by_network_name = {
-                network_metadata['name']: network_metadata['chain_id']
-                for network_name, network_metadata in upgraded[
-                    'networks'
-                ].items()
-            }
-            upgraded['networks'] = {
-                chain_ids_by_network_name[network_name]: network_metadata
-                for network_name, network_metadata in upgraded[
-                    'networks'
-                ].items()
-            }
-            upgraded['default_network'] = chain_ids_by_network_name[
-                upgraded['default_network']
-            ]
-            upgraded['default_providers'] = {
-                chain_ids_by_network_name[network_name]: provider_name
-                for network_name, provider_name in upgraded[
-                    'default_providers'
-                ].items()
-            }
-
-            # set db config
-            default_db_config = config_defaults.get_default_db_config(
-                data_dir=old_config['data_dir']
-            )
-            upgraded['db_configs'] = {'main': default_db_config}
-
-            return upgraded
-
-        else:
-            raise Exception('unknown version of old config')
-    else:
-        raise Exception('unknown version specification')
 
 
 #

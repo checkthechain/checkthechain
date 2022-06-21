@@ -33,7 +33,12 @@ def load_old_config(
         convert_to_latest
         and old_config['config_spec_version'] != ctc.__version__
     ):
-        raise NotImplementedError()
+        try:
+            old_config = config_read.upgrade_config(old_config)
+        except spec.ConfigUpgradeError:
+            print()
+            print('old config could not be processed, skipping it')
+            old_config = {}
 
     return old_config
 
