@@ -99,7 +99,10 @@ async def async_send(
 ) -> spec.RpcResponse:
     full_provider = rpc_provider.get_provider(provider)
 
-    logging_rpc_calls = config.get_log_rpc_calls()
+    try:
+        logging_rpc_calls = config.get_log_rpc_calls()
+    except Exception:
+        logging_rpc_calls = False
     if logging_rpc_calls:
         log_rpc_request(request=request, provider=full_provider)
 

@@ -76,8 +76,11 @@ async def async_close_http_session(provider: spec.ProviderSpec = None) -> None:
     if len(_http_sessions) == 0:
         return
 
-    provider = rpc_provider.get_provider(provider)
-    session = get_async_http_session(provider=provider)
+    if provider is None and len(_http_sessions) == 1:
+        session = list(_http_sessions.values())[0]
+    else:
+        provider = rpc_provider.get_provider(provider)
+        session = get_async_http_session(provider=provider)
 
     import asyncio
 

@@ -63,8 +63,10 @@ def write_new_config(
 
     config_path = config_read.get_config_path(raise_if_dne=False)
 
+    version = config_upgrade.omit_extra_version_data(ctc.__version__)
+
     config: spec.ConfigSpec = {
-        'config_spec_version': ctc.__version__,
+        'config_spec_version': version,
         'data_dir': data_root,
         'networks': network_data['networks'],
         'providers': network_data['providers'],
@@ -84,6 +86,8 @@ def write_new_config(
     toolcli.print('## Finalizing Configuration', style=styles['header'])
     print()
     if write_new:
+        with open(config_path, 'w') as f:
+            json.dump(config, f)
         toolcli.print(
             'Config file created at',
             toolcli.add_style(config_path, styles['path']),

@@ -28,7 +28,15 @@ def setup_data_root(
     if isinstance(old_data_root, str):
         old_data_root = os.path.abspath(old_data_root)
         if os.path.isdir(old_data_root):
-            prompt = 'Continue using data directory ' + str(old_data_root) + '? '
+            prompt = (
+                'Continue using data directory ['
+                + styles['path']
+                + ']'
+                + str(old_data_root)
+                + '[/'
+                + styles['path']
+                + ']? '
+            )
             if toolcli.input_yes_or_no(prompt, default='yes'):
                 new_data_root = old_data_root
             else:
@@ -40,7 +48,7 @@ def setup_data_root(
     # enter new data root
     if new_data_root is None:
         new_data_root = toolcli.input_directory_path(
-            prompt='Where should ctc store data? (specify a directory path)',
+            prompt='Where should ctc store data? (specify a directory path) ',
             default=config_defaults.get_default_data_dir(),
             require_absolute=True,
             must_already_exist=False,
@@ -62,5 +70,5 @@ def setup_data_root(
     return new_data_root
 
 
-def initialize_data_root(path: str) -> None:
+def initialize_data_root(data_root: str) -> None:
     pass

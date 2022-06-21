@@ -57,3 +57,9 @@ async def async_setup_ctc() -> None:
 
     # populate db
     await db_setup.async_populate_db_tables(styles=styles)
+
+    print()
+    print()
+    toolcli.print('## Finalizing steps', style=styles['header'])
+    print()
+    print('ctc setup compelete')

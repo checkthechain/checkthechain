@@ -41,7 +41,7 @@ def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
     elif isinstance(provider, dict):
 
         # case: partial provider
-        if set(provider.keys()) == set(spec.provider_keys):
+        if set(spec.provider_keys).issubset(set(provider.keys())):
             return provider  # type: ignore
 
         else:

@@ -53,9 +53,11 @@ async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
     # populate data: erc20s
     print()
     print('Populating database with metadata of common ERC20 tokens...')
+    print()
     await db.async_intake_default_tokens(network='mainnet')
 
     # populate data: chainlink
     print()
     print('Populating database with Chainlink oracle feeds...')
+    print()
     await chainlink_utils.async_import_networks_to_db()

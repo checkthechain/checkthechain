@@ -74,6 +74,22 @@ def get_config(
 
         config_from_file = config_upgrade.upgrade_config(config_from_file)
 
+    # convert int keys from str to int
+    if config_from_file.get('networks') is not None:
+        config_from_file['networks'] = {
+            int(chain_id): network_metadata
+            for chain_id, network_metadata in config_from_file[
+                'networks'
+            ].items()
+        }
+    if config_from_file.get('default_providers') is not None:
+        config_from_file['default_providers'] = {
+            int(chain_id): provider
+            for chain_id, provider in config_from_file[
+                'default_providers'
+            ].items()
+        }
+
     # load overrides
     config_overrides = _config_cache['overrides']
 

@@ -94,12 +94,17 @@ def upgrade__0_2_0__to__0_3_0(
     new_version = ctc.__version__
 
     # strip extra versioning data
-    for substr in ['a', 'b', 'rc']:
-        if substr in new_version:
-            index = new_version.index(substr)
-            new_version = new_version[:index]
+    new_version = omit_extra_version_data(new_version)
 
     # set version
     upgraded['config_spec_version'] = new_version
 
     return upgraded
+
+
+def omit_extra_version_data(version: str) -> str:
+    for substr in ['a', 'b', 'rc']:
+        if substr in version:
+            index = version.index(substr)
+            version = version[:index]
+    return version
