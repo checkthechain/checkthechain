@@ -50,11 +50,11 @@ network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, str]] = {
     'bnb': ('bnb-chain-addresses-price', 'BNB Chain Mainnet'),
     'bnb_testnet': ('bnb-chain-addresses-price', 'BNB Chain Testnet'),
     'polygon': ('matic-addresses', 'Polygon Mainnet'),
-    'polygon_testnet': ('matic-addresses', 'Polygon Mainnet'),
+    'polygon_mumbai': ('matic-addresses', 'Mumbai Testnet'),
     'gnosis': ('data-feeds-gnosis-chain', 'Gnosis Chain Mainnet'),
     'heco': ('huobi-eco-chain-price-feeds', 'HECO Mainnet'),
     'avalanche': ('avalanche-price-feeds', 'Avalanche Mainnet'),
-    'avalanche_testnet': ('avalanche-price-feeds', 'Avalanche Testnet'),
+    'avalanche_fuji': ('avalanche-price-feeds', 'Avalanche Testnet'),
     'fantom': ('fantom-price-feeds', 'Fantom Mainnet'),
     'arbitrum': ('arbitrum-price-feeds', 'Arbitrum Mainnet'),
     'arbitrum_rinkeby': ('arbitrum-price-feeds', 'Arbitrum Rinkeby'),
@@ -104,10 +104,10 @@ async def async_get_network_feed_data(
 
 
 async def async_import_networks_to_db(
-    networks: typing.Sequence[ChainlinkNetworkName] | None,
+    networks: typing.Sequence[ChainlinkNetworkName] | None = None,
     payload: ChainlinkFeedPayload | None = None,
     engine: toolsql.SAEngine | None = None,
-    verbose: bool = False,
+    verbose: bool = True,
 ) -> None:
     """import multiple networks of feeds to db
 
@@ -125,10 +125,18 @@ async def async_import_networks_to_db(
         }
         networks = []
         for key in payload.keys():
-            for subkey in payload[key].keys():
+            for network_data in payload[key]['networks']:
+                subkey = network_data['name']
                 if (key, subkey) in locations_to_network:
                     network = locations_to_network[(key, subkey)]
                     networks.append(network)
+
+    if verbose:
+        print(
+            'adding Chainlink feed metadata to db for',
+            len(networks),
+            'networks...',
+        )
 
     # add each network
     for network in networks:
@@ -137,6 +145,7 @@ async def async_import_networks_to_db(
             payload=payload,
             engine=engine,
             verbose=verbose,
+            indent=4,
         )
 
 
@@ -144,7 +153,8 @@ async def async_import_network_to_db(
     network: ChainlinkNetworkName,
     payload: ChainlinkFeedPayload | None = None,
     engine: toolsql.SAEngine | None = None,
-    verbose: bool = False,
+    verbose: bool = True,
+    indent: int | str | None = None,
 ) -> None:
 
     raw_feeds = await async_get_network_feed_data(
@@ -180,6 +190,13 @@ async def async_import_network_to_db(
             network=network,
             conn=conn,
         )
+
+    if verbose:
+        if indent is None:
+            indent = ''
+        if isinstance(indent, int):
+            indent = ' ' * indent
+        print(indent + 'added', len(feeds), network, 'Chainlink feeds to db')
 
 
 def summarize_payload(payload: ChainlinkFeedPayload) -> None:

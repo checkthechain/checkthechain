@@ -5,7 +5,6 @@ import urllib.parse
 
 import toolcli
 
-from ctc import evm
 from ctc import rpc
 from ctc import spec
 from ... import config_defaults
@@ -19,6 +18,7 @@ async def async_setup_networks(
     print()
     print()
     toolcli.print('## Network Setup', style=styles['header'])
+    print()
 
     # get providers
     providers, networks = await async_specify_providers(
@@ -41,6 +41,9 @@ async def async_setup_networks(
         networks=networks,
         styles=styles,
     )
+
+    print()
+    print('network setup complete')
 
     # return results
     data: spec.PartialConfigSpec = {
@@ -68,6 +71,10 @@ async def async_specify_providers(
     # add providers first, then configure their networks if those are unknown
     old_providers = old_config.get('providers', {})
     if len(old_providers) > 0:
+        print('Currently using these providers:')
+        for provider_name, provider_metadata in old_providers.items():
+            print('-', provider_name, provider_metadata['url'])
+        print()
         answer = toolcli.input_yes_or_no(
             'Would you like to continue using these providers? ',
             style=styles['question'],
@@ -81,17 +88,21 @@ async def async_specify_providers(
         'Would you like to specify an RPC provider? '
         '(required for most ctc operations)\n'
     )
+    default_initial = 'yes'
     prompt_additional = 'Would you like to specify additional RPC providers? '
+    default_additional = 'no'
 
     if len(providers) == 0:
         prompt = prompt_initial
+        default = default_initial
     else:
         prompt = prompt_additional
+        default = default_additional
 
     answer = toolcli.input_yes_or_no(
         prompt,
         style=styles['question'],
-        default='yes',
+        default=default,
     )
     while answer:
 
@@ -222,8 +233,12 @@ def specify_networks(
     # print current networks
     print()
     print('Have metadata for the following networks:')
-    for number, network_name in enumerate(sorted(networks.keys())):
-        print('    ' + str(number) + '.', network_name)
+    for number, chain_id in enumerate(sorted(networks.keys())):
+        print(
+            '    ' + str(number + 1) + '.',
+            networks[chain_id]['name'],
+            '(' + str(chain_id) + ')',
+        )
 
     # add new networks
     while toolcli.input_yes_or_no(
@@ -234,7 +249,7 @@ def specify_networks(
         collect_network_metadata(styles=styles, networks=networks)
 
     print()
-    print(len(networks), 'additional networks added')
+    print('using', len(networks), 'networks in config')
 
     return networks
 
@@ -247,7 +262,7 @@ def specify_default_network(
 
     # set default network
     choices_set = [
-        str(network['name']) + '(chain_id = ' + str(network['chain_id']) + ')'
+        str(network['name']) + ' (chain_id = ' + str(network['chain_id']) + ')'
         for network in networks.values()
     ]
     choices = sorted(choices_set)
@@ -257,17 +272,24 @@ def specify_default_network(
     if len(providers) == 1:
         provider = list(providers.values())[0]
         network = provider.get('network')
-        if isinstance(network, int):
-            for network_metadata in networks.values():
-                if network == network_metadata['chain_id']:
-                    network = network_metadata['name']
-                    break
-        if isinstance(network, str):
-            default = network
+        for network_metadata in networks.values():
+            if (
+                isinstance(network, int)
+                and network == network_metadata['chain_id']
+            ) or (
+                isinstance(network, str) and network == network_metadata['name']
+            ):
+                default = (
+                    str(network_metadata['name'])
+                    + ' (chain_id = '
+                    + str(network_metadata['chain_id'])
+                    + ')'
+                )
+                break
     elif len(providers) > 1:
         for provider in providers.values():
             if provider.get('network') in [1, 'mainnet']:
-                default = 'mainnet'
+                default = 'mainnet (chain_id = 1)'
 
     print()
     default_network_index = toolcli.input_number_choice(
@@ -276,13 +298,9 @@ def specify_default_network(
         default=default,
         style=styles['question'],
     )
-    default_network = choices[default_network_index]
 
-    for chain_id, network_metadata in networks.items():
-        if network_metadata['name'] == default_network:
-            return chain_id
-    else:
-        raise Exception('unknown network: ' + str(default_network))
+    # clean this horrorshow up
+    return int(choices[default_network_index].split(' ')[-1].strip(')'))
 
 
 def specify_default_providers(
@@ -308,8 +326,8 @@ def specify_default_providers(
                 raise Exception(
                     'could not determine chain_id for network: ' + str(network)
                 )
-        providers_per_network.setdefault(chain_id, [])
-        providers_per_network[chain_id].append(provider_name)
+        providers_per_network.setdefault(network, [])
+        providers_per_network[network].append(provider_name)
 
     # get default provider for each network
     default_providers = {}

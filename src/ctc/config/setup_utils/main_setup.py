@@ -35,16 +35,16 @@ async def async_setup_ctc() -> None:
 
     # collect new config file data
     network_data = await network_setup.async_setup_networks(
-        old_config=old_config, styles=styles
+        old_config=old_config,
+        styles=styles,
     )
     data_root = data_root_setup.setup_data_root(
-        styles=styles,
         old_config=old_config,
+        styles=styles,
     )
     db_data = db_setup.setup_dbs(
-        styles=styles,
         data_root=data_root,
-        old_config=old_config,
+        styles=styles,
     )
 
     # create new config file if need be
@@ -54,3 +54,6 @@ async def async_setup_ctc() -> None:
         data_root=data_root,
         styles=styles,
     )
+
+    # populate db
+    await db_setup.async_populate_db_tables(styles=styles)

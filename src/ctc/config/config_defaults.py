@@ -67,6 +67,7 @@ def get_default_network_names_by_chain_id() -> typing.Mapping[int, str]:
         43114: 'avalanche',
         43113: 'avalanche_fuji',
         80001: 'polygon_mumbai',
+        421611: 'arbitrum_rinkeby',
         1666600000: 'harmony',
         1666700000: 'harmony_testnet',
     }
@@ -100,6 +101,7 @@ def get_default_block_explorers() -> typing.Mapping[str, str]:
         'avalanche': 'snowtrace.io',
         'avalanche_fuji': 'testnet.snowtrace.io',
         'polygon_mumbai': 'mumbai.polygonscan.com',
+        'arbitrum_rinkeby': 'testnet.arbiscan.io',
         'harmony': 'explorer.harmony.one',
         'harmony_testnet': 'explorer.testnet.harmony.one',
     }

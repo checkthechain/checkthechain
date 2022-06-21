@@ -17,6 +17,7 @@ def setup_data_root(
     print()
     print()
     toolcli.print('## Data Root Directory', style=styles['header'])
+    print()
 
     new_data_root = None
 
@@ -27,7 +28,7 @@ def setup_data_root(
     if isinstance(old_data_root, str):
         old_data_root = os.path.abspath(old_data_root)
         if os.path.isdir(old_data_root):
-            prompt = 'Continue using data directory ' + str(old_data_root) + '?'
+            prompt = 'Continue using data directory ' + str(old_data_root) + '? '
             if toolcli.input_yes_or_no(prompt, default='yes'):
                 new_data_root = old_data_root
             else:

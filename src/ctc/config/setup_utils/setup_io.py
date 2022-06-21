@@ -11,6 +11,7 @@ import toolcli
 
 from .. import config_spec
 from .. import config_read
+from .. import config_upgrade
 
 
 def load_old_config(
@@ -34,7 +35,7 @@ def load_old_config(
         and old_config['config_spec_version'] != ctc.__version__
     ):
         try:
-            old_config = config_read.upgrade_config(old_config)
+            old_config = config_upgrade.upgrade_config(old_config)
         except spec.ConfigUpgradeError:
             print()
             print('old config could not be processed, skipping it')
@@ -77,8 +78,12 @@ def write_new_config(
     write_new = json.dumps(config, sort_keys=True) != json.dumps(
         old_config_raw, sort_keys=True
     )
+
+    print()
+    print()
+    toolcli.print('## Finalizing Configuration', style=styles['header'])
+    print()
     if write_new:
-        print()
         toolcli.print(
             'Config file created at',
             toolcli.add_style(config_path, styles['path']),
