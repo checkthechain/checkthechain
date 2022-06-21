@@ -85,14 +85,23 @@ def get_default_block_explorers() -> typing.Mapping[str, str]:
         'ropsten': 'ropsten.etherscan.io',
         'rinkeby': 'rinkeby.etherscan.io',
         'goerli': 'goerli.etherscan.io',
-        'kovan': 'kovan.etherscan.io',
-        'polygon': 'polygonscan.com',
-        'bsc': 'bscscan.com',
-        'xdai': 'blockscout.com',
-        'avax': 'snowtrace.io',
-        'fantom': 'ftmscan.com',
-        'arbitrum': 'arbiscan.io',
         'optimism': 'optimistic.etherscan.io',
+        'kovan': 'kovan.etherscan.io',
+        'bnb': 'bscscan.com',
+        'optimism_kovan': 'kovan-optimistic.etherscan.io',
+        'bnb_testnet': 'testnet.bscscan.com',
+        'gnosis': 'blockscout.com',
+        'heco': 'hecoinfo.com',
+        'polygon': 'polygonscan.com',
+        'fantom': 'ftmscan.com',
+        'moonbeam': 'moonbeam.moonscan.io',
+        'moonriver': 'moonriver.moonscan.io',
+        'arbitrum': 'arbiscan.io',
+        'avalanche': 'snowtrace.io',
+        'avalanche_fuji': 'testnet.snowtrace.io',
+        'polygon_mumbai': 'mumbai.polygonscan.com',
+        'harmony': 'explorer.harmony.one',
+        'harmony_testnet': 'explorer.testnet.harmony.one',
     }
 
 
@@ -115,6 +124,7 @@ def get_default_networks_metadata() -> typing.Mapping[
 # # db
 #
 
+
 def get_default_db_config(data_dir: str) -> toolsql.DBConfig:
     return {
         'dbms': 'sqlite',
@@ -122,9 +132,16 @@ def get_default_db_config(data_dir: str) -> toolsql.DBConfig:
     }
 
 
+def get_default_db_configs(
+    data_dir: str,
+) -> typing.Mapping[str, toolsql.DBConfig]:
+    return {'main': get_default_db_config(data_dir=data_dir)}
+
+
 #
 # # logging
 #
+
 
 def get_default_log_rpc_calls() -> bool:
     return False

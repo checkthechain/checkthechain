@@ -71,15 +71,35 @@ def upgrade__0_2_0__to__0_3_0(
         for network_name, provider_name in upgraded['default_providers'].items()
     }
 
+    # set provider network references to chain_id's instead of network names
+    new_providers = {}
+    for provider_name, provider in upgraded['providers'].items():
+        new_providers[provider_name] = dict(provider)
+        old_network = new_providers[provider_name].get('network')
+        if isinstance(old_network, str):
+            new_providers[provider_name]['network'] = chain_ids_by_network_name[
+                old_network
+            ]
+    upgraded['providers'] = new_providers
+
     # set db config
     default_db_config = config_defaults.get_default_db_config(
         data_dir=old_config['data_dir']
     )
     upgraded['db_configs'] = {'main': default_db_config}
 
-    # set version
+    # get version
     if 'version' in upgraded:
         del upgraded['version']
-    upgraded['config_spec_version'] = ctc.__version__
+    new_version = ctc.__version__
+
+    # strip extra versioning data
+    for substr in ['a', 'b', 'rc']:
+        if substr in new_version:
+            index = new_version.index(substr)
+            new_version = new_version[:index]
+
+    # set version
+    upgraded['config_spec_version'] = new_version
 
     return upgraded

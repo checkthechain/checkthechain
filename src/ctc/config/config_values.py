@@ -119,6 +119,10 @@ def get_provider(
     if name is not None:
         query['name'] = name
     if network is not None:
+        if isinstance(network, str):
+            from ctc import evm
+
+            network = evm.get_network_chain_id(network)
         query['network'] = network
     if protocol is not None:
         query['protocol'] = protocol

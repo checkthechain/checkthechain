@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import db
+from ctc import evm
 from ctc import spec
 
 from . import chainlink_statements
@@ -42,29 +43,29 @@ if typing.TYPE_CHECKING:
         feedType: str
 
 
-network_payload_locations = {
-    'mainnet': ['ethereum-addresses', 'Ethereum Mainnet'],
-    'kovan': ['ethereum-addresses', 'Kovan Testnet'],
-    'rinkeby': ['ethereum-addresses', 'Rinkeby Testnet'],
-    'bnb': ['bnb-chain-addresses-price', 'BNB Chain Mainnet'],
-    'bnb_testnet': ['bnb-chain-addresses-price', 'BNB Chain Testnet'],
-    'polygon': ['matic-addresses', 'Polygon Mainnet'],
-    'polygon_testnet': ['matic-addresses', 'Polygon Mainnet'],
-    'gnosis': ['data-feeds-gnosis-chain', 'Gnosis Chain Mainnet'],
-    'heco': ['huobi-eco-chain-price-feeds', 'HECO Mainnet'],
-    'avalanche': ['avalanche-price-feeds', 'Avalanche Mainnet'],
-    'avalanche_testnet': ['avalanche-price-feeds', 'Avalanche Testnet'],
-    'fantom': ['fantom-price-feeds', 'Fantom Mainnet'],
-    'arbitrum': ['arbitrum-price-feeds', 'Arbitrum Mainnet'],
-    'arbitrum_rinkeby': ['arbitrum-price-feeds', 'Arbitrum Rinkeby'],
-    'harmony': ['harmony-price-feeds', 'Harmony Mainnet'],
-    'harmony_testnet': ['harmony-price-feeds', 'Harmony Testnet'],
-    # 'solana': ['data-feeds-solana', 'Solana Mainnet'],
-    # 'solana_testnet': ['data-feeds-solana', 'Solana Devnet'],
-    'optimism': ['optimism-price-feeds', 'Optimism Mainnet'],
-    'optimism_kovan': ['optimism-price-feeds', 'Optimism Kovan'],
-    'moonriver': ['data-feeds-moonriver', 'Moonriver Mainnet'],
-    'moonbeam': ['data-feeds-moonbeam', 'Moonbeam Mainnet'],
+network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, str]] = {
+    'mainnet': ('ethereum-addresses', 'Ethereum Mainnet'),
+    'kovan': ('ethereum-addresses', 'Kovan Testnet'),
+    'rinkeby': ('ethereum-addresses', 'Rinkeby Testnet'),
+    'bnb': ('bnb-chain-addresses-price', 'BNB Chain Mainnet'),
+    'bnb_testnet': ('bnb-chain-addresses-price', 'BNB Chain Testnet'),
+    'polygon': ('matic-addresses', 'Polygon Mainnet'),
+    'polygon_testnet': ('matic-addresses', 'Polygon Mainnet'),
+    'gnosis': ('data-feeds-gnosis-chain', 'Gnosis Chain Mainnet'),
+    'heco': ('huobi-eco-chain-price-feeds', 'HECO Mainnet'),
+    'avalanche': ('avalanche-price-feeds', 'Avalanche Mainnet'),
+    'avalanche_testnet': ('avalanche-price-feeds', 'Avalanche Testnet'),
+    'fantom': ('fantom-price-feeds', 'Fantom Mainnet'),
+    'arbitrum': ('arbitrum-price-feeds', 'Arbitrum Mainnet'),
+    'arbitrum_rinkeby': ('arbitrum-price-feeds', 'Arbitrum Rinkeby'),
+    'harmony': ('harmony-price-feeds', 'Harmony Mainnet'),
+    'harmony_testnet': ('harmony-price-feeds', 'Harmony Testnet'),
+    # 'solana': ('data-feeds-solana', 'Solana Mainnet'),
+    # 'solana_testnet': ('data-feeds-solana', 'Solana Devnet'),
+    'optimism': ('optimism-price-feeds', 'Optimism Mainnet'),
+    'optimism_kovan': ('optimism-price-feeds', 'Optimism Kovan'),
+    'moonriver': ('data-feeds-moonriver', 'Moonriver Mainnet'),
+    'moonbeam': ('data-feeds-moonbeam', 'Moonbeam Mainnet'),
 }
 
 
@@ -80,13 +81,17 @@ async def async_get_complete_feed_payload() -> ChainlinkFeedPayload:
 
 
 async def async_get_network_feed_data(
-    network: spec.NetworkName,
+    network: spec.NetworkReference,
     payload: ChainlinkFeedPayload | None = None,
 ) -> typing.Sequence[ChainlinkProxyData]:
     if payload is None:
         payload = await async_get_complete_feed_payload()
 
     if network in network_payload_locations:
+        if isinstance(network, int):
+            network = evm.get_network_chain_id(network)
+        if not isinstance(network, str):
+            raise Exception('unknown network type: ' + str(type(network)))
         network_group, network_name = network_payload_locations[network]
     else:
         raise Exception('unknown network')
@@ -98,10 +103,48 @@ async def async_get_network_feed_data(
         raise Exception('could not find network feeds')
 
 
+async def async_import_networks_to_db(
+    networks: typing.Sequence[ChainlinkNetworkName] | None,
+    payload: ChainlinkFeedPayload | None = None,
+    engine: toolsql.SAEngine | None = None,
+    verbose: bool = False,
+) -> None:
+    """import multiple networks of feeds to db
+
+    by default import all networks
+    """
+
+    if payload is None:
+        payload = await async_get_complete_feed_payload()
+
+    # determine which networks to use
+    if networks is None:
+        # use all networks
+        locations_to_network = {
+            v: k for k, v in network_payload_locations.items()
+        }
+        networks = []
+        for key in payload.keys():
+            for subkey in payload[key].keys():
+                if (key, subkey) in locations_to_network:
+                    network = locations_to_network[(key, subkey)]
+                    networks.append(network)
+
+    # add each network
+    for network in networks:
+        await async_import_network_to_db(
+            network=network,
+            payload=payload,
+            engine=engine,
+            verbose=verbose,
+        )
+
+
 async def async_import_network_to_db(
     network: ChainlinkNetworkName,
     payload: ChainlinkFeedPayload | None = None,
     engine: toolsql.SAEngine | None = None,
+    verbose: bool = False,
 ) -> None:
 
     raw_feeds = await async_get_network_feed_data(
