@@ -38,9 +38,9 @@ def bin_by_blocks(
     new_data.index = pd.Index(standard_blocks)
     new_data.index.name = 'gte_this_block'
 
-    if isinstance(data, spec.DataFrame) and isinstance(new_data, spec.DataFrame):
+    if isinstance(data, pd.DataFrame) and isinstance(new_data, pd.DataFrame):
         return data
-    elif isinstance(data, spec.Series) and isinstance(new_data, spec.Series):
+    elif isinstance(data, pd.Series) and isinstance(new_data, pd.Series):
         return data
     else:
         raise Exception('could not compute valid result')
