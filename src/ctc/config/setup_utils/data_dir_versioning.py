@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
         # for now, only specifieds entries in root data dir
         files: list[str]  # list of expected file paths
         directories: list[str]  # list of expected directory paths
-        directory_contents: typing.Mapping[
+        directory_subdirs: typing.Mapping[
             str, typing.Sequence[str]
         ]  # list of items in each directory
         move_items: typing.Mapping[str, str]
@@ -43,7 +43,7 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
             'logs',
             'evm',
         ],
-        'directory_contents': {
+        'directory_subdirs': {
             'logs': ['rpc', 'db'],
         },
         'move_items': {
@@ -51,6 +51,17 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
         },
     },
 }
+
+
+def initialize_data_subdirs(data_dir: str, *, version: DataSpecVersion) -> None:
+    data_dir_spec = data_dir_specs[version]
+
+    for dirname in data_dir_spec.get('directories', []):
+        os.makedirs(os.path.join(data_dir, dirname))
+
+    for dirname in data_dir_spec.get('directory_subdirs', []):
+        for subdirname in data_dir_spec['directory_subdirs'][dirname]:
+            os.makedirs(os.path.join(data_dir, dirname, subdirname))
 
 
 def get_data_dir_version(data_dir: str | None = None) -> DataSpecVersion:
@@ -136,11 +147,11 @@ def migrate_data_dir__0_2_0__to__0_3_0(
                 to_delete.append(item)
             elif (
                 item in data_dir_spec['directories']
-                and item in data_dir_spec['directory_contents']
+                and item in data_dir_spec['directory_subdirs']
             ):
-                directory_contents = data_dir_spec['directory_contents'][item]
+                directory_subdirs = data_dir_spec['directory_subdirs'][item]
                 for subitem in os.listdir(os.path.join(data_dir, item)):
-                    if subitem not in directory_contents:
+                    if subitem not in directory_subdirs:
                         to_delete.append(os.path.join(item, subitem))
         if len(to_delete) > 0:
             if not confirm_delete:

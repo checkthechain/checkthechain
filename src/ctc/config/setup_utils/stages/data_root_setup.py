@@ -7,6 +7,7 @@ import typing
 import toolcli
 
 from ... import config_defaults
+from .. import data_dir_versioning
 
 
 def setup_data_root(
@@ -65,10 +66,6 @@ def setup_data_root(
                     shutil.move(old_data_root, new_data_root)
 
     # create files and subdirectories and upgrade if need be
-    initialize_data_root(new_data_root)
+    data_dir_versioning.initialize_data_subdirs(new_data_root, version='0.3.0')
 
     return new_data_root
-
-
-def initialize_data_root(data_root: str) -> None:
-    pass
