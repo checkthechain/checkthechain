@@ -62,9 +62,19 @@ def get_config(
     import toolconfig
 
     # load from file
-    config_from_file = toolconfig.get_config(
-        config_spec=spec.ConfigSpec, validate=validate, **_kwargs
-    )
+    try:
+        config_from_file = toolconfig.get_config(
+            config_spec=spec.ConfigSpec, validate=validate, **_kwargs
+        )
+    except toolconfig.ConfigDoesNotExist:
+        from . import config_defaults
+
+        print(
+            '[WARNING]'
+            ' using default ctc config because ctc config file does not exist;'
+            ' use `ctc setup` on command line to generate a config file'
+        )
+        config_from_file = config_defaults.get_default_config()  # type: ignore
 
     if config_from_file.get('config_spec_version') != ctc.__version__:
         print(
