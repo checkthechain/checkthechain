@@ -26,7 +26,6 @@ async def test_get_pool_address():
 async def test_get_pool_swaps():
     pool_address = '0xede4efcc5492cf41ed3f0109d60bc0543cfad23a'
     swaps = await balancer_utils.async_get_pool_swaps(
-        pool_address=pool_address, end_block=13613577
+        pool_address=pool_address, start_block=13591877, end_block=13613577,
     )
     assert len(swaps) == 5
-
