@@ -50,13 +50,6 @@ async def async_get_contract_abi(
     if not evm.is_address_str(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
 
-    if verbose:
-        network_name = evm.get_network_name(network)
-        print(
-            'fetching ' + str(network_name) + ' abi from etherscan:',
-            contract_address,
-        )
-
     # create lock
     lock = _etherscan_ratelimit['lock']
     if lock is None:
@@ -82,6 +75,13 @@ async def async_get_contract_abi(
                     + ' seconds'
                 )
             await asyncio.sleep(time_to_sleep)
+
+        if verbose:
+            network_name = evm.get_network_name(network)
+            print(
+                'fetching ' + str(network_name) + ' abi from etherscan:',
+                contract_address,
+            )
 
         # create url
         url_template = etherscan_spec.get_abi_url_template(network)
