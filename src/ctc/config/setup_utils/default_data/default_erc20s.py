@@ -3,6 +3,40 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from ctc import db
+
+
+async def async_intake_default_erc20s(
+    network: spec.NetworkReference = 'mainnet',
+    verbose: bool = True,
+) -> None:
+
+    if network not in ['mainnet', 1]:
+        print('no default tokens for network: ' + str(network))
+        return
+
+    # load data
+    data = load_default_erc20s(network=network)
+
+    # create engine
+    engine = db.create_engine(
+        schema_name='erc20_metadata',
+        network=network,
+    )
+    if engine is None:
+        return
+
+    # write to db
+    with engine.begin() as conn:
+        await db.async_upsert_erc20s_metadata(
+            erc20s_metadata=data,
+            conn=conn,
+            network=network,
+        )
+
+    # print summary
+    if verbose:
+        print('added metadata of', len(data), 'default ERC20 tokens to db')
 
 
 def load_default_erc20s(

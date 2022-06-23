@@ -8,6 +8,12 @@ from ctc import spec
 from . import erc20_generic
 
 
+async def async_get_default_erc20_tokens() -> typing.Sequence[spec.ERC20Metadata]:
+    from ctc.config.setup_utils.default_data import default_erc20s
+
+    return default_erc20s.load_default_erc20s()
+
+
 async def async_get_erc20_metadata(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,

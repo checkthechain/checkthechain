@@ -95,8 +95,7 @@ async def async_print_safe_summary(address: spec.Address, verbose: bool = False)
     print('- age:', age)
 
     if verbose:
-        from ctc.evm.erc20_utils import erc20_defaults
-        default_erc20s = erc20_defaults.load_default_erc20s()
+        default_erc20s = await evm.async_get_default_erc20_tokens()
         erc20_addresses = [default['address'] for default in default_erc20s]
 
         print()

@@ -43,8 +43,8 @@ def setup_dbs(
 
 
 async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
-    from ctc import db
     from ctc.protocols import chainlink_utils
+    from ..default_data import default_erc20s
 
     print()
     print()
@@ -54,7 +54,7 @@ async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
     print()
     print('Populating database with metadata of common ERC20 tokens...')
     print()
-    await db.async_intake_default_tokens(network='mainnet')
+    await default_erc20s.async_intake_default_erc20s(network='mainnet')
 
     # populate data: chainlink
     print()
