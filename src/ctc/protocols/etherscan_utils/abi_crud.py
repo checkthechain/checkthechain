@@ -11,7 +11,7 @@ from ctc import config
 from ctc import evm
 from ctc import spec
 
-from . import etherscan_spec
+from . import url_crud
 
 
 class EtherscanRatelimit(TypedDict):
@@ -84,8 +84,10 @@ async def async_get_contract_abi(
             )
 
         # create url
-        url_template = etherscan_spec.get_abi_url_template(network)
-        abi_endpoint = url_template.format(address=contract_address)
+        abi_endpoint = url_crud.create_abi_url(
+            address=contract_address,
+            network=network,
+        )
 
         # make request
         async with aiohttp.ClientSession() as session:
@@ -95,7 +97,9 @@ async def async_get_contract_abi(
 
         # process request
         if content == 'Contract source code not verified':
-            raise spec.AbiNotFoundException('could not obtain contract ABI from etherscan')
+            raise spec.AbiNotFoundException(
+                'could not obtain contract ABI from etherscan'
+            )
         abi = json.loads(content)
         if isinstance(abi, dict) and abi.get('status') == '0':
             raise Exception(

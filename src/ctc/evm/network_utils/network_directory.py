@@ -91,3 +91,8 @@ def get_network_metadata(
         return networks[network]
     else:
         raise Exception('unknown network: ' + str(network))
+
+
+def get_network_block_explorer(network: spec.NetworkReference) -> str | None:
+    network_metadata = get_network_metadata(network)
+    return network_metadata['block_explorer']
