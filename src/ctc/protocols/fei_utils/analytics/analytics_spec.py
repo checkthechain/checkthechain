@@ -39,7 +39,7 @@ class TimeData(TypedDict):
 class MetricData(TypedDict, total=False):
     values: typing.Union[list[float], list[int]]
     name: str
-    link: str
+    links: typing.Sequence[str]
     units: str
 
 

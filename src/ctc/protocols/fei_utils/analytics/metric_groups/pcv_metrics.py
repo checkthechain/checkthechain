@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import evm
 from ctc import spec
 from ctc.protocols import fei_utils
+from ctc.protocols import etherscan_utils
 from .. import analytics_spec
 
 
@@ -71,14 +74,22 @@ async def async_compute_pcv_by_asset(
         usd=True,
         exclude_fei=True,
     )
-
     tokens = list(tokens_balances.keys())
+
+    tokens_deposits_coroutine = fei_utils.async_get_tokens_deposits(tokens)
 
     symbols = await fei_utils.async_get_pcv_tokens_symbols(
         tokens=tokens,
         provider=provider,
         block=blocks[-1],
     )
+
+    tokens_deposits = await tokens_deposits_coroutine
+    links: typing.MutableMapping[str, typing.MutableSequence[str]] = {}
+    for token in tokens_deposits.keys():
+        links.setdefault(token, [])
+        for deposit in tokens_deposits[token]:
+            links[token].append(etherscan_utils.create_address_url(deposit))
 
     metrics: dict[str, analytics_spec.MetricData] = {}
     for token in tokens:
@@ -90,8 +101,8 @@ async def async_compute_pcv_by_asset(
         metrics[symbol] = {
             'name': symbol,
             'values': tokens_balances[token],
+            'links': links[token],
             'units': 'USD',
         }
 
     return {'name': 'PCV by Asset', 'metrics': metrics}
-

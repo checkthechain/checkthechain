@@ -5,7 +5,9 @@ import typing
 from ctc import evm
 from ctc.protocols import chainlink_utils
 from ctc.protocols import fei_utils
+from ctc.protocols import etherscan_utils
 
+from ...coracle import coracle_spec
 from .. import analytics_spec
 
 
@@ -51,11 +53,25 @@ async def async_compute_pfei_by_platform(
         deposit_balances
     )
 
+    # gather links
+    links_by_platform: typing.MutableMapping[
+        str, typing.MutableSequence[str]
+    ] = {}
+    for deposit in deposit_balances.keys():
+        platform = coracle_spec.deposit_metadata.get(deposit, {}).get(
+            'platform'
+        )
+        if platform is not None:
+            url = etherscan_utils.create_address_url(deposit)
+            links_by_platform.setdefault(platform, [])
+            links_by_platform[platform].append(url)
+
     metrics: dict[str, analytics_spec.MetricData] = {}
     for name, values in platform_balances.items():
         metrics[name] = {
             'name': name,
             'values': values,
+            'links': links_by_platform.get(name, []),
             'units': 'FEI',
         }
 
@@ -133,4 +149,3 @@ async def async_compute_dex_tvls(
         'name': 'DEX TVL by Platform',
         'metrics': tvl_by_platform,
     }
-
