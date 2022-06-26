@@ -21,6 +21,7 @@ async def async_get_block_of_timestamp(
     verbose: bool = False,
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
+    use_db_assist: bool = True,
     mode: typing.Literal['<=', '>=', '=='] = '>=',
 ) -> int:
 
@@ -44,6 +45,7 @@ async def async_get_block_of_timestamp(
         # db
         if use_db:
             from ctc import db
+
             network = rpc.get_provider_network(provider=provider)
             block = await db.async_query_timestamp_block(
                 network=network,
@@ -61,6 +63,7 @@ async def async_get_block_of_timestamp(
             verbose=verbose,
             provider=provider,
             mode=mode,
+            use_db_assist=use_db_assist,
         )
 
 
@@ -117,4 +120,3 @@ async def async_get_block_number_and_time(
 
     else:
         raise Exception('must specify start_time or block_number')
-

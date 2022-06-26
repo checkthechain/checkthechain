@@ -23,7 +23,7 @@ async def async_get_block_of_timestamp_from_node(
     provider: spec.ProviderSpec = None,
     mode: Literal['<=', '>=', '=='] = '>=',
     verbose: bool = True,
-    use_db: bool = True,
+    use_db_assist: bool = True,
 ) -> int:
     """
 
@@ -50,7 +50,7 @@ async def async_get_block_of_timestamp_from_node(
     # determine search range
     start_index: int | None = None
     end_index: int | None = None
-    if use_db:
+    if use_db_assist:
         from ctc import db
         from ctc import rpc
 
@@ -60,6 +60,8 @@ async def async_get_block_of_timestamp_from_node(
         )
         if result is not None:
             start_index, end_index = result
+            if start_index == end_index:
+                return start_index
     if start_index is None:
         start_index = 1
     if end_index is None:
