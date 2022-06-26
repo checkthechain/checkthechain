@@ -42,7 +42,7 @@ async def async_timestamp_command(timestamp: str | int) -> None:
         print()
         block = await evm.async_predict_timestamp_block(timestamp=timestamp)
     else:
-        block = await evm.async_get_block_of_timestamp(timestamp, mode='before')
+        block = await evm.async_get_block_of_timestamp(timestamp, mode='<=')
     pretty = tooltime.convert_timestamp(timestamp, 'TimestampISO')
 
     rows = [

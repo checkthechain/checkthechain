@@ -21,8 +21,9 @@ async def async_get_block_of_timestamp_from_node(
     nary: typing.Optional[int] = None,
     cache: typing.Optional[BlockTimestampSearchCache] = None,
     provider: spec.ProviderSpec = None,
-    mode: Literal['before', 'after', 'equal'] = 'after',
+    mode: Literal['<=', '>=', '=='] = '>=',
     verbose: bool = True,
+    use_db: bool = True,
 ) -> int:
     """
 
@@ -46,20 +47,36 @@ async def async_get_block_of_timestamp_from_node(
         debug=verbose,
     )
 
-    end_index = await block_crud.async_get_latest_block_number(
-        provider=provider
-    )
+    # determine search range
+    start_index: int | None = None
+    end_index: int | None = None
+    if use_db:
+        from ctc import db
+        from ctc import rpc
+
+        network = rpc.get_provider_network(provider)
+        result = await db.async_query_timestamp_block_range(
+            timestamp, network=network
+        )
+        if result is not None:
+            start_index, end_index = result
+    if start_index is None:
+        start_index = 1
+    if end_index is None:
+        end_index = await block_crud.async_get_latest_block_number(
+            provider=provider
+        )
 
     try:
         block = await search_utils.async_nary_search(
             nary=nary,
-            start_index=1,
+            start_index=start_index,
             end_index=end_index,
             async_is_match=async_is_match,
             get_next_probes=get_next_probes,
         )
     except search_utils.SearchRangeTooLow:
-        if mode == 'before':
+        if mode == '<=':
             return end_index
         else:
             raise Exception('no block after timestamp: ' + str(timestamp))
@@ -67,12 +84,11 @@ async def async_get_block_of_timestamp_from_node(
     if block is None:
         raise Exception('could not find block for timestamp')
 
-
-    if mode == 'equal':
+    if mode == '==':
         raise NotImplementedError()
-    elif mode == 'before':
+    elif mode == '<=':
         if block == 0:
-            raise Exception('no block exists before timestamp')
+            raise Exception('no block exists <= timestamp')
         return block - 1
     else:
         return block
@@ -158,4 +174,3 @@ def _get_next_probes_block_of_timestamp(
             probes = [target_index + i for i in range(-half, n_probes - half)]
 
             return probes
-

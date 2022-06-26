@@ -35,3 +35,8 @@ async_query_timestamps_blocks = query_utils.with_connection(
     multischema_block_timestamps_search.async_select_timestamps_blocks,
     active_utils.get_active_timestamp_schema,
 )
+
+async_query_timestamp_block_range = query_utils.with_connection(
+    multischema_block_timestamps_search.async_select_timestamp_block_range,
+    active_utils.get_active_timestamp_schema,
+)

@@ -174,6 +174,42 @@ async def async_select_max_block_timestamp(
     return result['max__timestamp']
 
 
+async def async_select_timestamp_block_range(
+    timestamp: int,
+    conn: toolsql.SAConnection,
+    network: spec.NetworkReference | None = None,
+) -> tuple[int | None, int | None]:
+    """return block range that must contain timestamp
+
+    this function is used to confine a block-of-timestamp search
+    """
+
+    table = schema_utils.get_table_name('block_timestamps', network=network)
+
+    lower_bound = toolsql.select(
+        conn=conn,
+        table=table,
+        where_lte={'timestamp': timestamp},
+        sql_functions=[
+            ['max', 'block_number'],
+        ],
+        return_count='one',
+        raise_if_table_dne=False,
+    )
+    upper_bound = toolsql.select(
+        conn=conn,
+        table=table,
+        where_gte={'timestamp': timestamp},
+        sql_functions=[
+            ['min', 'block_number'],
+        ],
+        return_count='one',
+        raise_if_table_dne=False,
+    )
+
+    return lower_bound['max__block_number'], upper_bound['min__block_number']
+
+
 __all__ = (
     'async_upsert_block_timestamp',
     'async_upsert_block_timestamps',

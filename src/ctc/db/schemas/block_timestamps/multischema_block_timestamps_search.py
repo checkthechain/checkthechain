@@ -9,6 +9,7 @@ import toolsql
 from ctc import spec
 from ... import management
 from ... import schema_utils
+from . import block_timestamps_statements
 
 from .multischema_block_timestamps_statements import async_select_block_timestamp
 
@@ -111,5 +112,25 @@ async def async_select_timestamps_blocks(
     elif timestamp_schema == 'blocks':
         raise NotImplementedError()
 
+    else:
+        raise Exception('unknown schema: ' + str(timestamp_schema))
+
+
+async def async_select_timestamp_block_range(
+    timestamp: int,
+    conn: toolsql.SAConnection,
+    network: spec.NetworkReference | None = None,
+) -> tuple[int | None, int | None]:
+
+    timestamp_schema = management.get_active_timestamp_schema()
+
+    if timestamp_schema == 'block_timestamps':
+        return await block_timestamps_statements.async_select_timestamp_block_range(
+            timestamp=timestamp,
+            conn=conn,
+            network=network,
+        )
+    elif timestamp_schema == 'blocks':
+        raise NotImplementedError()
     else:
         raise Exception('unknown schema: ' + str(timestamp_schema))

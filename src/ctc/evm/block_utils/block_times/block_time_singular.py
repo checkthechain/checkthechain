@@ -21,7 +21,7 @@ async def async_get_block_of_timestamp(
     verbose: bool = False,
     provider: spec.ProviderSpec = None,
     use_db: bool = True,
-    mode: typing.Literal['before', 'after', 'equal'] = 'after',
+    mode: typing.Literal['<=', '>=', '=='] = '>=',
 ) -> int:
 
     if not isinstance(timestamp, int):
