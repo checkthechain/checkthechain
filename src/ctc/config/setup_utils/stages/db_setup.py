@@ -4,7 +4,6 @@ import os
 import typing
 
 import toolcli
-import toolstr
 
 from ctc import db
 from ctc import spec
@@ -14,6 +13,7 @@ from ... import config_defaults
 def setup_dbs(
     styles: typing.Mapping[str, str],
     data_root: str,
+    network_data: spec.PartialConfigSpec,
 ) -> spec.PartialConfigSpec:
 
     print()
@@ -54,8 +54,15 @@ def setup_dbs(
             )
 
     # create tables
+    used_networks = set()
+    used_networks.add(network_data.get('default_network'))
+    for provider in network_data['providers'].values():
+        used_networks.add(provider.get('network'))
+    used_networks = {
+        network for network in used_networks if network is not None
+    }
     print()
-    db.create_evm_tables(confirm=True)
+    db.create_evm_tables(networks=list(used_networks), confirm=True)
 
     return {'db_configs': db_configs}
 

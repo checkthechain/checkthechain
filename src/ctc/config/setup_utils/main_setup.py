@@ -44,6 +44,7 @@ async def async_setup_ctc() -> None:
     )
     db_data = db_setup.setup_dbs(
         data_root=data_root,
+        network_data=network_data,
         styles=styles,
     )
 
