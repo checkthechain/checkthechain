@@ -6,6 +6,7 @@ from typing import Callable, Coroutine, Any, TypeVar
 import sqlalchemy  # type: ignore
 import toolsql
 
+from ctc import spec
 from . import connect_utils
 from . import schema_utils
 
@@ -24,7 +25,7 @@ def with_connection(
     @functools.wraps(async_f)
     async def async_connected_f(
         *args: Any,
-        network: str | None = None,
+        network: spec.NetworkReference | None = None,
         engine: toolsql.SAEngine | None = None,
         **kwargs: Any,
     ) -> R | None:

@@ -157,7 +157,9 @@ async def async_collect_provider_metadata(
         chain_id = await rpc.async_eth_chain_id(provider=temporary_provider)
         description = 'chain_id = ' + str(chain_id)
         if chain_id in networks:
-            description = description + ', network = ' + networks[chain_id]['name']
+            name = networks[chain_id]['name']
+            if name is not None:
+                description = description + ', network = ' + name
         print('provider reports using ' + description)
     except Exception as e:
         raise e

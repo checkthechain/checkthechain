@@ -54,10 +54,14 @@ def setup_dbs(
             )
 
     # create tables
-    used_networks = set()
-    used_networks.add(network_data.get('default_network'))
+    used_networks: set[spec.NetworkReference] = set()
+    default_network = network_data.get('default_network')
+    if default_network is not None:
+        used_networks.add(default_network)
     for provider in network_data['providers'].values():
-        used_networks.add(provider.get('network'))
+        network = provider.get('network')
+        if network is not None:
+            used_networks.add(network)
     used_networks = {
         network for network in used_networks if network is not None
     }
