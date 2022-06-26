@@ -57,11 +57,13 @@ def initialize_data_subdirs(data_dir: str, *, version: DataSpecVersion) -> None:
     data_dir_spec = data_dir_specs[version]
 
     for dirname in data_dir_spec.get('directories', []):
-        os.makedirs(os.path.join(data_dir, dirname))
+        path = os.path.join(data_dir, dirname)
+        os.makedirs(path, exist_ok=True)
 
     for dirname in data_dir_spec.get('directory_subdirs', []):
         for subdirname in data_dir_spec['directory_subdirs'][dirname]:
-            os.makedirs(os.path.join(data_dir, dirname, subdirname))
+            path = os.path.join(data_dir, dirname, subdirname)
+            os.makedirs(path, exist_ok=True)
 
 
 def get_data_dir_version(data_dir: str | None = None) -> DataSpecVersion:

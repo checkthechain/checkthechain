@@ -4,7 +4,9 @@ import os
 import typing
 
 import toolcli
+import toolstr
 
+from ctc import db
 from ctc import spec
 from ... import config_defaults
 
@@ -19,7 +21,6 @@ def setup_dbs(
     toolcli.print('## Database Setup', style=styles['header'])
     print()
     print('ctc stores its collected chain data in an sql database')
-    print()
 
     db_configs = config_defaults.get_default_db_configs(data_root)
 
@@ -32,12 +33,29 @@ def setup_dbs(
             os.makedirs(db_dirpath, exist_ok=True)
 
         if not os.path.isfile(db_path):
-            print('Creating database at path', db_path)
+            toolcli.print(
+                'Creating database at path ['
+                + styles['path']
+                + ']'
+                + db_path
+                + '[/'
+                + styles['path']
+                + ']'
+            )
         else:
-            print('Existing database detected at path', db_path)
+            toolcli.print(
+                'Existing database detected at path ['
+                + styles['path']
+                + ']'
+                + db_path
+                + '[/'
+                + styles['path']
+                + ']'
+            )
 
     # create tables
-    pass
+    print()
+    db.create_evm_tables(confirm=True)
 
     return {'db_configs': db_configs}
 

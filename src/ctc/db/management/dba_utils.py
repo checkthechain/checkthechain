@@ -47,8 +47,11 @@ def create_evm_tables(
             print('    - networks:')
             for network in networks:
                 print('        -', network)
+        elif len(networks) == 1:
+            print('    - network:', networks[0])
         else:
-            print('    - network:', network)
+            print()
+            print('no networks specified, creating no tables')
 
     # get missing tables
     schemas_to_create: list[
@@ -58,7 +61,9 @@ def create_evm_tables(
 
         # determine schema networks
         if schema_name in network_schema_names:
-            schema_networks: typing.Sequence[spec.NetworkReference | None] = networks
+            schema_networks: typing.Sequence[
+                spec.NetworkReference | None
+            ] = networks
         else:
             schema_networks = [None]
 
@@ -134,6 +139,7 @@ def create_evm_tables(
 
 
 def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
+    """initialize the schema_versions schema which manages versions of schemas"""
     initialize_schema(
         'schema_versions',
         network=-1,

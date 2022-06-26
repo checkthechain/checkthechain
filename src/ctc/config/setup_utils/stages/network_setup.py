@@ -4,6 +4,7 @@ import typing
 import urllib.parse
 
 import toolcli
+import toolstr
 
 from ctc import rpc
 from ctc import spec
@@ -73,7 +74,17 @@ async def async_specify_providers(
     if len(old_providers) > 0:
         print('Currently using these providers:')
         for provider_name, provider_metadata in old_providers.items():
-            print('-', provider_name, provider_metadata['url'])
+            toolcli.print(
+                '-',
+                provider_name,
+                '['
+                + styles['path']
+                + ']'
+                + provider_metadata['url']
+                + '[/'
+                + styles['path']
+                + ']',
+            )
         print()
         answer = toolcli.input_yes_or_no(
             'Would you like to continue using these providers? ',
@@ -144,7 +155,10 @@ async def async_collect_provider_metadata(
             'url': url,
         }
         chain_id = await rpc.async_eth_chain_id(provider=temporary_provider)
-        print('provider reports using chain_id =', chain_id)
+        description = 'chain_id = ' + str(chain_id)
+        if chain_id in networks:
+            description = description + ', network = ' + networks[chain_id]['name']
+        print('provider reports using ' + description)
     except Exception as e:
         raise e
         print('Could not query node for chain_id metadata')
@@ -244,16 +258,16 @@ def specify_networks(
     # print current networks
     print()
     print('Have metadata for the following networks:')
-    for number, chain_id in enumerate(sorted(networks.keys())):
-        print(
-            '    ' + str(number + 1) + '.',
-            networks[chain_id]['name'],
-            '(' + str(chain_id) + ')',
-        )
+    print()
+    rows = [
+        [networks[chain_id]['name'], chain_id]
+        for chain_id in sorted(networks.keys())
+    ]
+    toolstr.print_table(rows, labels=['name', 'chain_id'], add_row_index=True)
 
     # add new networks
     while toolcli.input_yes_or_no(
-        '\nWould you like to add additional networks? ',
+        '\nWould you like to add metadata for additional networks? ',
         style=styles['question'],
         default='no',
     ):
