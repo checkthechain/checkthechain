@@ -67,6 +67,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
     elif tags.get('datatype') in [
         'erc20_metadata',
         'block_timestamps',
+        'blocks',
         'contract_abis',
         'contract_creation_blocks',
         'chainlink',

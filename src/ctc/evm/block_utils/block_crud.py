@@ -16,9 +16,22 @@ async def async_get_block(
     block: spec.BlockReference,
     include_full_transactions: bool = False,
     provider: spec.ProviderSpec = None,
+    use_db: bool = True,
 ) -> spec.Block:
 
     if spec.is_block_number_reference(block):
+
+        from ctc import db
+
+        network = rpc.get_provider_network(provider)
+
+        if use_db:
+            db_block_data = await db.async_query_block(
+                block_number=block,
+                network=network,
+            )
+            if db_block_data is not None:
+                return db_block_data
 
         block_data = await rpc.async_eth_get_block_by_number(
             block_number=binary.standardize_block_number(block),
@@ -26,11 +39,9 @@ async def async_get_block(
             include_full_transactions=include_full_transactions,
         )
 
-        from ctc import db
-
         await db.async_intake_block(
             block=block_data,
-            network=rpc.get_provider_network(provider),
+            network=network,
         )
 
         return block_data

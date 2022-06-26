@@ -14,7 +14,7 @@ def get_active_schemas() -> typing.Mapping[
     return {
         # 'block_gas_stats': False,
         'block_timestamps': True,
-        'blocks': False,
+        'blocks': True,
         'contract_abis': True,
         'contract_creation_blocks': True,
         'erc20_metadata': True,

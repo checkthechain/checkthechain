@@ -44,8 +44,7 @@ async def async_print_block_summary(
         )
 
     title = 'Block ' + str(block['number'])
-    print(title)
-    print('─' * len(title))
+    toolstr.print_text_box(title)
     print('- timestamp:', block['timestamp'])
     print('- time:', tooltime.timestamp_to_iso(block['timestamp']))
     print('- age:', tooltime.timelength_to_phrase(round(time.time()) - block['timestamp']))
