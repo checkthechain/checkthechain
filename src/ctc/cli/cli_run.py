@@ -65,7 +65,6 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('erc20', 'balances'): 'ctc.cli.commands.data.erc20.balances_command',
         ('erc20', 'transfers'): 'ctc.cli.commands.data.erc20.transfers_command',
         ('events',): 'ctc.cli.commands.data.events_command',
-        ('find',): 'ctc.cli.commands.data.find_command',
         ('gas',): 'ctc.cli.commands.data.gas_command',
         ('proxy',): 'ctc.cli.commands.data.proxy_command',
         ('storage',): 'ctc.cli.commands.data.storage_command',
