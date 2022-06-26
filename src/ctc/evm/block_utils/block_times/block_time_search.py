@@ -60,7 +60,7 @@ async def async_get_block_of_timestamp_from_node(
         )
         if result is not None:
             start_index, end_index = result
-            if start_index == end_index:
+            if start_index == end_index and start_index is not None:
                 return start_index
     if start_index is None:
         start_index = 1
