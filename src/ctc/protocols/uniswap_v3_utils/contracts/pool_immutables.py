@@ -8,7 +8,7 @@ from .. import uniswap_v3_spec
 
 async def async_pool_factory(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -24,7 +24,7 @@ async def async_pool_factory(
 
 async def async_pool_token0(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -40,7 +40,7 @@ async def async_pool_token0(
 
 async def async_pool_token1(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -56,7 +56,7 @@ async def async_pool_token1(
 
 async def async_pool_fee(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi('fee', 'pool')
@@ -70,7 +70,7 @@ async def async_pool_fee(
 
 async def async_pool_tick_spacing(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -86,7 +86,7 @@ async def async_pool_tick_spacing(
 
 async def async_pool_max_liquidity_per_tick(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(

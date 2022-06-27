@@ -14,7 +14,7 @@ async def async_get_pool_swaps(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     replace_symbols: bool = False,
     normalize: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio
@@ -88,7 +88,7 @@ async def async_get_pool_mints(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     replace_symbols: bool = False,
     normalize: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio
@@ -146,7 +146,7 @@ async def async_get_pool_burns(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     replace_symbols: bool = False,
     normalize: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio

@@ -25,7 +25,7 @@ def hash_name(name: str) -> spec.PrefixHexData:
 
 async def async_resolve_name(
     name: str,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     name_hash = hash_name(name)
@@ -65,7 +65,7 @@ async def async_resolve_name(
 
 async def async_resolve_names(
     names: typing.Sequence[str],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[spec.Address]:
 
@@ -81,7 +81,7 @@ async def async_resolve_names(
 
 async def async_reverse_lookup(
     address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
     function_abi: spec.FunctionABI = {

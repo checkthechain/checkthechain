@@ -12,7 +12,7 @@ async def async_print_address_summary(
     address: spec.Address,
     verbose: bool | int = False,
     max_width: int = 80,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     raw: bool = False,
 ) -> None:
     """

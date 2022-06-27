@@ -15,7 +15,7 @@ from ctc import spec
 async def async_get_block(
     block: spec.BlockReference,
     include_full_transactions: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> spec.Block:
 
@@ -62,7 +62,7 @@ async def async_get_blocks(
     blocks: typing.Sequence[spec.BlockReference],
     include_full_transactions: bool = False,
     chunk_size: int = 500,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[spec.Block]:
 
     provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
@@ -115,7 +115,7 @@ _latest_block_lock: typing.MutableMapping[str, asyncio.Lock | None] = {
 
 
 async def async_get_latest_block_number(
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_cache: bool = True,
     cache_time: int | float = 1,
 ) -> int:

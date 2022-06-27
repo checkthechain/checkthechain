@@ -286,7 +286,7 @@ async def async_save_events_to_filesystem(
     event_name: typing.Optional[str] = None,
     overwrite: bool = False,
     verbose: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> spec.DataFrame:
 
@@ -338,7 +338,7 @@ async def async_get_events_from_filesystem(
     verbose: bool = True,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     network: spec.NetworkReference | None = None,
 ) -> spec.DataFrame:
 

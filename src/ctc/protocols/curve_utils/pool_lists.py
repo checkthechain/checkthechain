@@ -108,7 +108,7 @@ async def _async_get_pool_data(
 async def async_get_base_pools(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio
@@ -152,7 +152,7 @@ async def async_get_base_pools(
 async def async_get_plain_pools(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     if start_block is None:
@@ -191,7 +191,7 @@ async def async_get_plain_pools(
 async def async_get_meta_pools(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio

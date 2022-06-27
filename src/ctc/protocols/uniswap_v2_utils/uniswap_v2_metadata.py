@@ -9,7 +9,7 @@ from . import uniswap_v2_spec
 
 async def async_get_pool_tokens(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> tuple[spec.Address, spec.Address]:
     import asyncio
 
@@ -28,7 +28,7 @@ async def async_get_pool_symbols(
     *,
     x_address: spec.Address | None = None,
     y_address: spec.Address | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[str]:
 
     if x_address is None or y_address is None:
@@ -49,7 +49,7 @@ async def async_get_pool_decimals(
     *,
     x_address: spec.Address | None = None,
     y_address: spec.Address | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[int]:
 
     if x_address is None or y_address is None:
@@ -67,7 +67,7 @@ async def async_get_pool_decimals(
 
 async def async_get_pool_tokens_metadata(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> uniswap_v2_spec.PoolTokensMetadata:
     import asyncio
 

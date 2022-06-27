@@ -35,7 +35,7 @@ def setup_rpc_logger() -> None:
 
 
 def log_rpc_request(
-    request: spec.RpcRequest, provider: spec.ProviderSpec
+    request: spec.RpcRequest, provider: spec.ProviderReference
 ) -> None:
     try:
         import loguru
@@ -66,7 +66,7 @@ def log_rpc_request(
 def log_rpc_response(
     response: spec.RpcResponse,
     request: spec.RpcRequest,
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
 ) -> None:
     import loguru
 
@@ -95,7 +95,7 @@ def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
 
 async def async_send(
     request: spec.RpcRequest,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> spec.RpcResponse:
     full_provider = rpc_provider.get_provider(provider)
 

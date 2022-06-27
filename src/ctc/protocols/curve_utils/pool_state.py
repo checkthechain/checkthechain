@@ -12,7 +12,7 @@ from . import pool_parameters
 
 async def async_get_virtual_price(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     return await rpc.async_eth_call(
@@ -28,7 +28,7 @@ async def async_get_lp_withdrawal(
     pool: spec.Address,
     amount_lp: int,
     token_withdrawn: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
 
     token_index = await pool_metadata.async_get_token_index(
@@ -49,7 +49,7 @@ async def async_get_pool_state(
     pool: spec.Address,
     n_tokens: int | None = None,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> dict[str, typing.Any]:
 
@@ -91,7 +91,7 @@ async def async_get_trade(
     amount_in: typing.Union[int, float],
     input_normalized: bool = True,
     normalize_output: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
 

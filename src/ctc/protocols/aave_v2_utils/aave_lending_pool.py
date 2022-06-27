@@ -10,7 +10,7 @@ from . import aave_spec
 async def async_get_deposits(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
 
     provider = rpc.get_provider(provider)
@@ -45,7 +45,7 @@ async def async_get_deposits(
 async def async_get_withdrawals(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
 
     provider = rpc.get_provider(provider)

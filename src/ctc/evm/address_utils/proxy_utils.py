@@ -19,7 +19,7 @@ if typing.TYPE_CHECKING:
 
 async def async_get_proxy_address(
     contract_address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address | None:
 
@@ -34,7 +34,7 @@ async def async_get_proxy_address(
 
 async def async_get_proxy_metadata(
     contract_address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> ProxyAddressMetadata:
     # try eip897
@@ -89,7 +89,7 @@ async def async_get_proxy_metadata(
 
 async def _async_get_eip897_proxy_type(
     contract_address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int | None:
 
@@ -112,7 +112,7 @@ async def _async_get_eip897_proxy_type(
 
 async def _async_get_eip897_implementation(
     contract_address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
 
@@ -141,7 +141,7 @@ async def _async_get_eip897_implementation(
 async def _async_get_eip1967_proxy_logic_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
     """get a contract's logic address
 
@@ -193,7 +193,7 @@ async def _async_get_eip1967_proxy_beacon_address(
 async def _async_get_eip1967_proxy_admin_address(
     contract_address: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
     """get a contract's logic address
 
@@ -230,7 +230,7 @@ async def async_get_gnosis_safe_proxy_address(
     contract_address: spec.Address,
     block: spec.BlockNumberReference | None = None,
     confirm_bytecode: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address | None:
 
     if confirm_bytecode:

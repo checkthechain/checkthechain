@@ -22,7 +22,7 @@ async def async_eth_call(
     function_parameters: typing.Sequence[typing.Any]
     | typing.Mapping[str, typing.Any]
     | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = True,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
@@ -86,7 +86,7 @@ async def async_eth_estimate_gas(
     function_parameters: typing.Sequence[typing.Any]
     | typing.Mapping[str, typing.Any]
     | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = True,
     function_abi: spec.FunctionABI | None = None,
     function_name: typing.Optional[str] = None,
@@ -127,7 +127,7 @@ async def async_eth_estimate_gas(
 async def async_eth_get_balance(
     address: spec.Address,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if block_number is None:
@@ -147,7 +147,7 @@ async def async_eth_get_storage_at(
     address: spec.Address,
     position: spec.BinaryData,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     if block_number is None:
         block_number = 'latest'
@@ -163,7 +163,7 @@ async def async_eth_get_storage_at(
 async def async_eth_get_code(
     address: spec.Address,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     if block_number is None:
         block_number = 'latest'

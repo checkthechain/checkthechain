@@ -10,7 +10,7 @@ from .. import abi_modify
 async def async_get_contract_abi(
     contract_address: spec.Address,
     network: spec.NetworkReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_db: bool = True,
     db_query: bool | None = None,
     db_intake: bool | None = None,

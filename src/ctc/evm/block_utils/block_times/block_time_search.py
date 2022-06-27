@@ -20,7 +20,7 @@ async def async_get_block_of_timestamp_from_node(
     timestamp: int,
     nary: typing.Optional[int] = None,
     cache: typing.Optional[BlockTimestampSearchCache] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     mode: Literal['<=', '>=', '=='] = '>=',
     verbose: bool = True,
     use_db_assist: bool = True,
@@ -110,7 +110,7 @@ async def _async_is_match_block_of_timestamp(
     block_numbers: list[int],
     timestamp: int,
     cache: BlockTimestampSearchCache,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[bool]:
 
     # retrieve values not in cache

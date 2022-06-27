@@ -6,7 +6,7 @@ from ctc import spec
 
 async def async_get_underlying_asset(
     pool_token: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
     function_abi: spec.FunctionABI = {
         'name': 'UNDERLYING_ASSET_ADDRESS',

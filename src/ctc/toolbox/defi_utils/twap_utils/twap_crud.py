@@ -25,7 +25,7 @@ async def async_get_twap(
     output_end_time: typing.Optional[tooltime.Timestamp] = None,
     #
     # # other
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Series:
 
     # get block numbers and timestamps
@@ -78,7 +78,7 @@ async def async_get_twap_single_sample(
     filter_duration: tooltime.Timestamp,
     block: typing.Optional[spec.BlockNumberReference] = None,
     timestamp: typing.Optional[tooltime.Timestamp] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> float:
 
     series = await async_get_twap(

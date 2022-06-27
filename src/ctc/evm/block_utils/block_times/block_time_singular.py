@@ -19,7 +19,7 @@ async def async_get_block_of_timestamp(
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     verbose: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_db: bool = True,
     use_db_assist: bool = True,
     mode: typing.Literal['<=', '>=', '=='] = '>=',
@@ -97,7 +97,7 @@ def get_block_of_timestamp_from_arrays(
 async def async_get_block_number_and_time(
     block_number: typing.Optional[spec.BlockNumberReference] = None,
     block_timestamp: typing.Optional[tooltime.Timestamp] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> tuple[int, int]:
 
     if block_timestamp is not None and block_number is not None:

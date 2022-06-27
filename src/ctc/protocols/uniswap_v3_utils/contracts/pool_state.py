@@ -10,7 +10,7 @@ from .. import uniswap_v3_spec
 
 async def async_pool_slot0(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi('slot0', 'pool')
@@ -33,7 +33,7 @@ async def async_pool_slot0(
 
 async def async_pool_fee_growth_global_0_x128(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -50,7 +50,7 @@ async def async_pool_fee_growth_global_0_x128(
 
 async def async_pool_fee_growth_global_1_x128(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -67,7 +67,7 @@ async def async_pool_fee_growth_global_1_x128(
 
 async def async_pool_protocol_fees(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> tuple[int, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -84,7 +84,7 @@ async def async_pool_protocol_fees(
 
 async def async_pool_liquidity(
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -113,7 +113,7 @@ class UniswapV3Ticks(TypedDict):
 async def async_pool_ticks(
     tick: int,
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> UniswapV3Ticks:
     function_abi = await uniswap_v3_spec.async_get_function_abi('ticks', 'pool')
@@ -139,7 +139,7 @@ async def async_pool_ticks(
 async def async_pool_tick_bitmap(
     word_position: int,
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -158,7 +158,7 @@ async def async_pool_tick_bitmap(
 async def async_pool_positions(
     key: str,
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -191,7 +191,7 @@ class UniswapV3Observations(TypedDict):
 async def async_pool_observations(
     index: int,
     pool: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> UniswapV3Observations:
     function_abi = await uniswap_v3_spec.async_get_function_abi(

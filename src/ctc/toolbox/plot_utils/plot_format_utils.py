@@ -16,7 +16,7 @@ T = typing.TypeVar('T')
 
 
 async def async_xtick_block_dates(
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> None:
     import tooltime
 
@@ -62,7 +62,7 @@ def _select_interleaved(
 
 
 async def async_block_timestamp_xticks(
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     representation: tooltime.TimestampExtendedRepresentation | None = None,
     omit: str | None = 'year',
 ) -> None:

@@ -28,7 +28,7 @@ def _build_feed_query(
 async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
     network: spec.NetworkReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> int:
 
@@ -65,7 +65,7 @@ async def async_resolve_feed_address(
     feed: str,
     *,
     network: spec.NetworkReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
 
     if evm.is_address_str(feed):
@@ -89,7 +89,7 @@ async def async_get_feed_aggregator(
     feed: chainlink_spec._FeedReference,
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     fill_empty: bool = True,
 ) -> spec.Address:
 
@@ -110,7 +110,7 @@ async def async_get_feed_aggregator(
 
 async def async_get_feed_first_block(
     feed: chainlink_spec._FeedReference,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     start_search: typing.Optional[spec.BlockNumberReference] = None,
     end_search: typing.Optional[spec.BlockNumberReference] = None,
     verbose: bool = False,

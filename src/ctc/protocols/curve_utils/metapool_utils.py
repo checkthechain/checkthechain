@@ -18,7 +18,7 @@ async def async_get_metapool_trade(
     amount_sold: typing.Union[int, float],
     input_normalized: bool = True,
     normalize_output: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     parent_pool: typing.Optional[spec.Address] = None,
     parent_lp: typing.Optional[spec.Address] = None,
     parent_coins: typing.Optional[list[str]] = None,

@@ -9,7 +9,7 @@ async def async_get_data_feed(
     data_source: twap_spec.DataSource,
     start_block: int,
     end_block: int,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Series:
     # acquire data
     protocol = data_source['protocol']

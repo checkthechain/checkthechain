@@ -10,7 +10,7 @@ from . import erc20_metadata
 async def async_normalize_erc20_quantity(
     quantity: typing.SupportsFloat,
     token: typing.Optional[spec.ERC20Address] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> float:
@@ -38,7 +38,7 @@ async def async_normalize_erc20_quantity(
 async def async_normalize_erc20_quantities(
     quantities: typing.Sequence[typing.SupportsInt] | spec.Series,
     token: spec.ERC20Address | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> list[float]:
@@ -65,7 +65,7 @@ async def async_normalize_erc20s_quantities(
     tokens: typing.Optional[typing.Sequence[spec.ERC20Address]] = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[float]:
 
     # take subset of non zero values
@@ -120,7 +120,7 @@ async def async_normalize_erc20_quantities_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     token: typing.Optional[spec.ERC20Address] = None,
     decimals: typing.Optional[list[typing.SupportsInt]] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[float]:
 
     # take subset of non zero values

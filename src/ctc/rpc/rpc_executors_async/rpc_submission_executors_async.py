@@ -8,7 +8,7 @@ from .. import rpc_request
 
 
 async def async_eth_gas_price(
-    provider: spec.ProviderSpec = None, decode_response: bool = True
+    provider: spec.ProviderReference = None, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_gas_price()
     response = await rpc_request.async_send(request, provider=provider)
@@ -19,7 +19,7 @@ async def async_eth_gas_price(
 
 
 async def async_eth_accounts(
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_accounts()
     response = await rpc_request.async_send(request, provider=provider)
@@ -29,7 +29,7 @@ async def async_eth_accounts(
 async def async_eth_sign(
     address: spec.Address,
     message: str,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_sign(
         address=address,
@@ -47,7 +47,7 @@ async def async_eth_sign_transaction(
     gas_price: int | None = None,
     value: int | None = None,
     nonce: str | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_sign_transaction(
@@ -74,7 +74,7 @@ async def async_eth_send_transaction(
     gas_price: int | None = None,
     value: int | None = None,
     nonce: str | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_send_transaction(
@@ -94,7 +94,7 @@ async def async_eth_send_transaction(
 
 
 async def async_eth_send_raw_transaction(
-    data: str, provider: spec.ProviderSpec = None
+    data: str, provider: spec.ProviderReference = None
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_send_raw_transaction(data=data)
     response = await rpc_request.async_send(request, provider=provider)

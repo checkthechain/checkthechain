@@ -196,7 +196,7 @@ async def async_intake_block_timestamps(
 
 # async def async_intake_blocks(
 #     blocks: typing.Sequence[spec.Block],
-#     provider: spec.ProviderSpec = None,
+#     provider: spec.ProviderReference = None,
 # ) -> None:
 #     """intake block and extract relevant information to db tables"""
 
@@ -265,7 +265,7 @@ async def async_intake_block_timestamps(
 
 # async def async_intake_block(
 #    block: spec.Block,
-#    provider: spec.ProviderSpec = None,
+#    provider: spec.ProviderReference = None,
 # ) -> None:
 #    """intake block and extract relevant information to db tables"""
 
@@ -314,7 +314,7 @@ async def async_intake_block_timestamps(
 
 # async def async_intake_blocks(
 #    blocks: typing.Sequence[spec.Block],
-#    provider: spec.ProviderSpec = None,
+#    provider: spec.ProviderReference = None,
 # ) -> None:
 #    """
 

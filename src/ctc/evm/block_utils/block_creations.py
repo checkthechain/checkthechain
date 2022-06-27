@@ -12,7 +12,7 @@ from . import block_crud
 
 async def async_get_contract_creation_block(
     contract_address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_db: bool = True,
     **search_kwargs: typing.Any,
 ) -> int | None:
@@ -54,7 +54,7 @@ async def async_get_contract_creation_block_from_node(
     contract_address: spec.Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = True,
     nary: typing.Optional[int] = None,
 ) -> int | None:

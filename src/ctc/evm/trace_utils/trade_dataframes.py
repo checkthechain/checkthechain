@@ -14,7 +14,7 @@ from ctc import spec
 
 async def async_get_transaction_traces_df(
     transaction_hash: spec.PrefixHexData,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
     traces = await rpc_trace_executors_async.async_trace_transaction(
         transaction_hash=transaction_hash,

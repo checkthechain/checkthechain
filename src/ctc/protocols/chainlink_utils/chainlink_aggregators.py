@@ -15,7 +15,7 @@ from . import chainlink_feed_metadata
 
 async def async_get_aggregator_description(
     aggregator: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> str:
 
     function_abi: spec.FunctionABI = {
@@ -36,7 +36,7 @@ async def async_get_aggregator_description(
 
 async def async_get_aggregator_base_quote(
     aggregator: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> dict[str, str]:
     description = await async_get_aggregator_description(
         aggregator=aggregator,
@@ -53,7 +53,7 @@ async def async_get_aggregator_base_quote(
 
 
 async def async_get_feed_aggregator_history(
-    feed: str, provider: spec.ProviderSpec = None
+    feed: str, provider: spec.ProviderReference = None
 ) -> typing.Mapping[spec.Address, int]:
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
@@ -78,7 +78,7 @@ async def async_get_feed_aggregator_history(
 async def _async_get_aggregator_start_blocks(
     previous_aggregators: typing.Sequence[spec.Address],
     feed: spec.Address,
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
 ) -> typing.Mapping[spec.Address, int]:
 
     latest = await evm.async_get_latest_block_number(provider=provider)
@@ -133,7 +133,7 @@ async def _async_aggregator_transition(
 
 
 async def async_get_feed_previous_aggregators(
-    feed: str, provider: spec.ProviderSpec
+    feed: str, provider: spec.ProviderReference
 ) -> list[spec.Address]:
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(

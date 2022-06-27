@@ -13,7 +13,7 @@ fuse_directory = '0x835482fe0532f169024d5e9410199369aad5c77e'
 
 async def async_get_all_pools(
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[list[typing.Any]]:
 
     # TODO: convert output to dict

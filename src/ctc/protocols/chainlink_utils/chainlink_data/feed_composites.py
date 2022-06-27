@@ -13,7 +13,7 @@ async def async_get_composite_feed_data(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     invert: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Series:
     # TODO: other ways of specifying composites
     import asyncio

@@ -28,7 +28,7 @@ async def async_revalidate_blocks(
     start_time: tooltime.Timestamp | None = None,
     end_block: spec.BlockNumberReference | None = None,
     end_time: tooltime.Timestamp | None = None,
-    provider: spec.ProviderSpec | None = None,
+    provider: spec.ProviderReference | None = None,
 ) -> typing.Mapping[typing.Any, typing.Any]:
 
     if start_block is not None and start_time is not None:
@@ -97,7 +97,7 @@ async def async_revalidate_blocks(
 
 async def async_get_premature_blocks(
     conn: toolsql.SAConnection,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Mapping[typing.Any, typing.Any]:
     # get network
     network = rpc.get_provider_network(provider)
@@ -142,7 +142,7 @@ async def async_does_block_hash_match(
 async def async_detect_block_reorgs(
     conn: toolsql.SAConnection,
     check_block_number: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> None:
     # detect
     check_block = await evm.async_get_block(check_block_number, provider=provider)

@@ -11,7 +11,7 @@ from . import block_crud
 
 async def async_print_block_summary(
     block: spec.Block | spec.BlockNumberReference,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> None:
 
     import toolstr

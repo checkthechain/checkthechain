@@ -8,7 +8,7 @@ import ctc.config
 from ctc import spec
 
 
-def get_provider(provider: spec.ProviderSpec = None) -> spec.Provider:
+def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
 
     if provider is None:
 
@@ -78,7 +78,7 @@ def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
     return (os.getpid(), provider['url'], tuple(session_kwargs.items()))
 
 
-def get_provider_network(provider: spec.ProviderSpec) -> spec.ChainId:
+def get_provider_network(provider: spec.ProviderReference) -> spec.ChainId:
     if provider is None or isinstance(provider, str):
         provider = get_provider(provider)
 
@@ -95,7 +95,7 @@ def get_provider_network(provider: spec.ProviderSpec) -> spec.ChainId:
 
 
 def add_provider_parameters(
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
     parameters: spec.PartialProvider,
 ) -> spec.Provider:
     # TODO: decide whether parameters with value=None should be included

@@ -11,7 +11,7 @@ from . import resolver
 
 async def async_get_owner(
     name: str,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
     node = resolver.hash_name(name)
@@ -31,7 +31,7 @@ async def async_get_owner(
 
 async def async_record_exists(
     name: str,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> bool:
     node = resolver.hash_name(name)
@@ -51,7 +51,7 @@ async def async_record_exists(
 
 async def async_get_resolver(
     name: str,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     node = resolver.hash_name(name)

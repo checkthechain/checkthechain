@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:
 
 async def async_resolve_block_range(
     block_range: typing.Union[str, typing.Sequence[str], spec.BlockRange],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> tuple[int, int]:
     from ctc import evm
 
@@ -35,7 +35,7 @@ async def async_resolve_block_range(
 
 async def async_resolve_block_sample(
     block_sample: typing.Union[str, typing.Sequence[str], spec.BlockSample],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[int]:
     from ctc import evm
 

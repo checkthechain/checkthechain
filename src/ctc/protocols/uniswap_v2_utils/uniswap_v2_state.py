@@ -15,7 +15,7 @@ async def async_replace_pool_state_symbols(
     *,
     pool: spec.Address | None = None,
     symbols: typing.Optional[typing.Sequence[str]] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Mapping[str, typing.Any]:
 
     if symbols is None:
@@ -38,7 +38,7 @@ async def async_get_pool_state(
     pool: spec.Address,
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
     fill_empty: bool = True,
 ) -> uniswap_v2_spec.PoolState:
@@ -93,7 +93,7 @@ async def async_get_pool_state_by_block(
     pool: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> uniswap_v2_spec.PoolStateByBlock:
     import asyncio

@@ -10,7 +10,7 @@ async def async_get_chainlink_data(
     data_source: twap_spec.DataSource,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Series:
 
     from ctc.protocols import chainlink_utils
@@ -51,7 +51,7 @@ async def async_get_chainlink_data(
 #     data_source: twap_spec.DataSource,
 #     start_block: typing.Optional[spec.BlockNumberReference] = None,
 #     end_block: typing.Optional[spec.BlockNumberReference] = None,
-#     provider: spec.ProviderSpec = None,
+#     provider: spec.ProviderReference = None,
 # ) -> spec.Series:
 
 #     from ctc.protocols import uniswap_v2_utils

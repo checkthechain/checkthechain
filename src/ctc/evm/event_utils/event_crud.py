@@ -128,7 +128,7 @@ async def async_download_events(
     event_abi: spec.EventABI | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     verbose: bool = True,
 ) -> spec.DataFrame:
 

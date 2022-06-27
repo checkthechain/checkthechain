@@ -16,7 +16,7 @@ async def async_get_full_feed_event_data(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     keep_multiindex: bool = False,
     invert: bool = False,
 ) -> spec.DataFrame:
@@ -115,7 +115,7 @@ async def async_get_answer_feed_event_data(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     keep_multiindex: bool = False,
     invert: bool = False,
 ) -> spec.Series:

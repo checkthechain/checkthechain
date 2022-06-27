@@ -10,7 +10,7 @@ from ctc import spec
 async def async_get_eth_balance(
     address: spec.Address,
     normalize: typing.Literal[False],
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> int:
     ...
@@ -20,7 +20,7 @@ async def async_get_eth_balance(
 async def async_get_eth_balance(
     address: spec.Address,
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> float:
     ...
@@ -29,7 +29,7 @@ async def async_get_eth_balance(
 async def async_get_eth_balance(
     address: spec.Address,
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
 
@@ -51,7 +51,7 @@ async def async_get_eth_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: typing.Literal[False],
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> list[int]:
     ...
 
@@ -62,7 +62,7 @@ async def async_get_eth_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: typing.Literal[True] = True,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> list[float]:
     ...
 
@@ -73,7 +73,7 @@ async def async_get_eth_balance_by_block(
     *,
     normalize: bool = True,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> typing.Union[list[int], list[float]]:
     ...
 
@@ -83,7 +83,7 @@ async def async_get_eth_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> typing.Union[list[int], list[float]]:
 
     coroutines = []
@@ -104,7 +104,7 @@ async def async_get_eth_balance_of_addresses(
     *,
     normalize: typing.Literal[False],
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> list[int]:
     ...
 
@@ -115,7 +115,7 @@ async def async_get_eth_balance_of_addresses(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: typing.Literal[True] = True,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> list[float]:
     ...
 
@@ -126,7 +126,7 @@ async def async_get_eth_balance_of_addresses(
     *,
     normalize: bool = True,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
 ) -> typing.Union[list[int], list[float]]:
     ...
 
@@ -135,7 +135,7 @@ async def async_get_eth_balance_of_addresses(
     addresses: typing.Sequence[spec.Address],
     *,
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderSpec] = None,
+    provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[list[int], list[float]]:
 

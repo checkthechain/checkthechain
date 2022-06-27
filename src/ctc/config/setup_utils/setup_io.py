@@ -53,8 +53,8 @@ def setup_config_path() -> None:
 
 
 def write_new_config(
-    network_data: spec.PartialConfigSpec,
-    db_data: spec.PartialConfigSpec,
+    network_data: spec.PartialConfig,
+    db_data: spec.PartialConfig,
     data_root: str,
     styles: typing.Mapping[str, str],
 ) -> None:
@@ -65,7 +65,7 @@ def write_new_config(
 
     version = config_upgrade.omit_extra_version_data(ctc.__version__)
 
-    config: spec.ConfigSpec = {
+    config: spec.Config = {
         'config_spec_version': version,
         'data_dir': data_root,
         'networks': network_data['networks'],

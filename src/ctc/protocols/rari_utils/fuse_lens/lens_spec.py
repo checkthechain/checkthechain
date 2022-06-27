@@ -10,7 +10,7 @@ from ctc import spec
 def get_lens_address(
     lens_name: str,
     network: spec.NetworkReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
 
     if network is None:

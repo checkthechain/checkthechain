@@ -27,7 +27,7 @@ coracle_function_abis: dict[str, spec.FunctionABI] = {
 async def async_get_tokens_deposits(
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
     block: typing.Optional[spec.BlockReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> dict[spec.Address, typing.Tuple[spec.ContractAddress, ...]]:
     """get all deposits of all tokens in pcv"""
 
@@ -63,7 +63,7 @@ async def async_get_token_deposits(
     token: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
     wrapper: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Tuple[spec.ContractAddress, ...]:
     """get list of a token's deposits"""
 
@@ -84,7 +84,7 @@ async def async_get_token_deposits(
 async def async_get_deposit_token(
     deposit: spec.ContractAddress,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
     """get the token address of a deposit"""
     return await rpc.async_eth_call(

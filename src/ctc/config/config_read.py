@@ -15,7 +15,7 @@ from ctc import spec
 from . import config_spec
 
 
-_config_cache: typing.MutableMapping[str, spec.PartialConfigSpec] = {
+_config_cache: typing.MutableMapping[str, spec.PartialConfig] = {
     'overrides': {},
 }
 
@@ -44,7 +44,7 @@ def config_path_exists() -> bool:
 
 
 @typing.overload
-def get_config(validate: typing.Literal['raise'] = 'raise') -> spec.ConfigSpec:
+def get_config(validate: typing.Literal['raise'] = 'raise') -> spec.Config:
     ...
 
 
@@ -58,13 +58,13 @@ def get_config(
 @toolcache.cache('memory')
 def get_config(
     validate: toolconfig.ValidationOption = False,
-) -> typing.Union[spec.ConfigSpec, typing.MutableMapping[str, typing.Any]]:
+) -> typing.Union[spec.Config, typing.MutableMapping[str, typing.Any]]:
     import toolconfig
 
     # load from file
     try:
         config_from_file = toolconfig.get_config(
-            config_spec=spec.ConfigSpec, validate=validate, **_kwargs
+            config_spec=spec.Config, validate=validate, **_kwargs
         )
     except toolconfig.ConfigDoesNotExist:
         from . import config_defaults
@@ -110,7 +110,7 @@ def get_config(
     validate_config(config)
 
     if validate == 'raise':
-        return typing.cast(spec.ConfigSpec, config)
+        return typing.cast(spec.Config, config)
     else:
         return config
 
@@ -120,7 +120,7 @@ def get_config(
 #
 
 
-def get_config_overrides() -> spec.PartialConfigSpec:
+def get_config_overrides() -> spec.PartialConfig:
     return _config_cache['overrides']
 
 
@@ -167,7 +167,7 @@ def validate_config(config: typing.Any) -> ConfigValidation:
         # console.print(warning_text)
 
     # process keys
-    spec_keys = set(spec.ConfigSpec.__annotations__)
+    spec_keys = set(spec.Config.__annotations__)
     actual_keys = set(config.keys())
     missing_keys = spec_keys - actual_keys
     extra_keys = actual_keys - spec_keys
@@ -206,7 +206,7 @@ def validate_config(config: typing.Any) -> ConfigValidation:
         console.print(warning_text)
 
     # process datatypes
-    # toolconfig.config_is_valid(config_spec=spec.ConfigSpec, **_kwargs)
+    # toolconfig.config_is_valid(config_spec=spec.Config, **_kwargs)
 
     return validation
 

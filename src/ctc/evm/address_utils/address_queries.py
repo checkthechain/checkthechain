@@ -9,7 +9,7 @@ from ctc import spec
 async def async_is_contract_address(
     address: spec.Address,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> bool:
     code = await rpc.async_eth_get_code(
         address=address,
@@ -22,7 +22,7 @@ async def async_is_contract_address(
 async def async_are_contract_addresses(
     addresses: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> dict[spec.Address, bool]:
     codes = await rpc.async_batch_eth_get_code(
         addresses=addresses,

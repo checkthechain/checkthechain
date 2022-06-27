@@ -16,7 +16,7 @@ from . import coracle_spec
 async def async_get_token_oracle(
     token: spec.Address,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     replace_missing: bool = True,
     raise_if_missing: bool = True,
 ) -> spec.ContractAddress:
@@ -47,7 +47,7 @@ async def async_get_token_oracle(
 async def async_get_tokens_oracles(
     tokens: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     replace_missing: bool = True,
     raise_if_missing: bool = True,
 ) -> list[spec.ContractAddress]:
@@ -81,7 +81,7 @@ async def async_get_tokens_oracles(
 async def async_get_token_oracle_by_block(
     token: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[spec.ContractAddress]:
 
     import asyncio
@@ -105,7 +105,7 @@ async def async_get_token_oracle_by_block(
 async def async_get_token_price(
     token: spec.Address,
     block: spec.BlockReference = 'latest',
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> typing.Union[int, float]:
 
@@ -133,7 +133,7 @@ async def async_get_token_price(
 async def async_get_token_price_by_block(
     token: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
     import asyncio
@@ -154,7 +154,7 @@ async def async_get_token_price_by_block(
 async def async_get_tokens_prices(
     tokens: typing.Sequence[spec.Address],
     block: typing.Optional[spec.BlockReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
 
@@ -205,7 +205,7 @@ def _ensure_oracle_valid(
 async def _async_replace_missing_oracle(
     oracle: spec.ContractAddress,
     token: spec.Address,
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
     replacement_block: spec.BlockNumberReference,
 ) -> spec.Address:
 
@@ -224,7 +224,7 @@ async def _async_replace_missing_oracle(
 async def _async_replace_missing_oracles(
     oracles: typing.Sequence[spec.ContractAddress],
     tokens: typing.Sequence[spec.Address],
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
     replacement_block: spec.BlockNumberReference,
 ) -> typing.Sequence[spec.Address]:
     missing = [

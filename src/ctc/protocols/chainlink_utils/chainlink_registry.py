@@ -116,7 +116,7 @@ registry_function_abis: typing.Mapping[str, spec.FunctionABI] = {
 async def async_get_registry_feed(
     base: str,
     quote: str,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Address:
     network = rpc.get_provider_network(provider)
     registry_address = feed_registry[network]
@@ -133,7 +133,7 @@ async def async_get_phase_range(
     base: str,
     quote: str,
     phase: int,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Tuple[int, ...]:
     network = rpc.get_provider_network(provider)
     registry_address = feed_registry[network]

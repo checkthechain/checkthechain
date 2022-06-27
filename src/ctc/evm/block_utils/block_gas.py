@@ -67,7 +67,7 @@ if typing.TYPE_CHECKING:
 async def async_get_block_gas_stats(
     block: spec.BlockNumberReference | spec.Block,
     normalize: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> BlockGasStats:
     """get gas statistics for a given block"""
     if isinstance(block, dict):
@@ -130,7 +130,7 @@ def get_block_gas_stats(
 async def async_get_gas_stats_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference | spec.Block],
     normalize: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[BlockGasStats]:
     import asyncio
 
@@ -151,7 +151,7 @@ async def async_get_blocks_gas_stats(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> BlocksGasStats:
     """get gas statistics aggregated over multiple blocks"""
 

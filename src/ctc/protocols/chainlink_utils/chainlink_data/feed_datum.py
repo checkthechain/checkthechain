@@ -18,7 +18,7 @@ async def async_get_feed_datum(
     normalize: bool = True,
     invert: bool = False,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> chainlink_spec.FeedRoundData:
     ...
 
@@ -31,7 +31,7 @@ async def async_get_feed_datum(
     normalize: bool = True,
     invert: bool = False,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Union[int, float]:
     ...
 
@@ -43,7 +43,7 @@ async def async_get_feed_datum(
     normalize: bool = True,
     invert: bool = False,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Union[int, float, chainlink_spec.FeedRoundData]:
     """get feed data for a single block"""
 

@@ -23,7 +23,7 @@ def get_contract_type_guards() -> dict[
 
 async def async_get_contract_type(
     address: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> str:
 
     contract_guards = get_contract_type_guards()
@@ -52,7 +52,7 @@ async def async_get_contract_type(
 
 
 async def async_is_chainlink_feed(
-    address: spec.Address, provider: spec.ProviderSpec = None
+    address: spec.Address, provider: spec.ProviderReference = None
 ) -> bool:
     try:
         await rpc.async_eth_call(
@@ -66,7 +66,7 @@ async def async_is_chainlink_feed(
 
 
 async def async_is_uniswap_v2_pool(
-    address: spec.Address, provider: spec.ProviderSpec = None
+    address: spec.Address, provider: spec.ProviderReference = None
 ) -> bool:
     try:
         factory = await rpc.async_eth_call(
@@ -84,7 +84,7 @@ async def async_is_uniswap_v2_pool(
 
 
 async def async_is_uniswap_v3_pool(
-    address: spec.Address, provider: spec.ProviderSpec = None
+    address: spec.Address, provider: spec.ProviderReference = None
 ) -> bool:
     try:
         factory = await rpc.async_eth_call(
@@ -102,7 +102,7 @@ async def async_is_uniswap_v3_pool(
 
 
 async def async_is_curve_pool(
-    address: spec.Address, provider: spec.ProviderSpec = None
+    address: spec.Address, provider: spec.ProviderReference = None
 ) -> bool:
     # doesn't work for early pools
     try:
@@ -117,7 +117,7 @@ async def async_is_curve_pool(
 
 
 async def async_is_sushi_pool(
-    address: spec.Address, provider: spec.ProviderSpec = None
+    address: spec.Address, provider: spec.ProviderReference = None
 ) -> bool:
     try:
         factory = await rpc.async_eth_call(
@@ -135,7 +135,7 @@ async def async_is_sushi_pool(
 
 
 async def async_is_balancer_v2_pool(
-    address: spec.Address, provider: spec.ProviderSpec = None
+    address: spec.Address, provider: spec.ProviderReference = None
 ) -> bool:
     try:
         await rpc.async_eth_call(

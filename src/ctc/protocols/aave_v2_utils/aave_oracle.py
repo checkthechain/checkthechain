@@ -12,7 +12,7 @@ from . import aave_spec
 
 async def async_get_asset_price(
     asset: spec.Address,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     units: typing.Literal['usd', 'eth'] = 'usd',
@@ -56,7 +56,7 @@ async def async_get_asset_price(
 async def async_get_asset_price_by_block(
     asset: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     normalize: bool = True,
     units: typing.Literal['usd', 'eth'] = 'usd',
 ) -> typing.Sequence[int | float]:

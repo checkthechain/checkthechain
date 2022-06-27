@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     import toolsql
 
 
-class PartialConfigSpec(TypedDict, total=False):
+class PartialConfig(TypedDict, total=False):
     config_spec_version: str
     data_dir: str
     providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
@@ -27,7 +27,7 @@ class PartialConfigSpec(TypedDict, total=False):
     log_sql_queries: bool
 
 
-class ConfigSpec(TypedDict):
+class Config(TypedDict):
     config_spec_version: str
     data_dir: str
     providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]

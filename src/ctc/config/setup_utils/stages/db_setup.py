@@ -13,8 +13,8 @@ from ... import config_defaults
 def setup_dbs(
     styles: typing.Mapping[str, str],
     data_root: str,
-    network_data: spec.PartialConfigSpec,
-) -> spec.PartialConfigSpec:
+    network_data: spec.PartialConfig,
+) -> spec.PartialConfig:
 
     print()
     print()

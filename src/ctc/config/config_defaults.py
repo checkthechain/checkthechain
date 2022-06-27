@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
     import toolsql
 
 
-def get_default_config() -> spec.ConfigSpec:
+def get_default_config() -> spec.Config:
     return {
         'config_spec_version': ctc.__version__,
         'data_dir': get_default_data_dir(),

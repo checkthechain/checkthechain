@@ -17,7 +17,7 @@ async def async_get_default_erc20_tokens() -> typing.Sequence[spec.ERC20Metadata
 async def async_get_erc20_metadata(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> spec.ERC20Metadata:
 
@@ -61,7 +61,7 @@ async def async_get_erc20_decimals(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> int:
     """get decimals of an erc20"""
@@ -137,7 +137,7 @@ async def async_get_erc20_name(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get name of an erc20"""
@@ -216,7 +216,7 @@ async def async_get_erc20_symbol(
     token: spec.ERC20Reference,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get symbol of an erc20"""

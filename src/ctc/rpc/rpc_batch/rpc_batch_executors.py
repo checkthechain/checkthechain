@@ -27,7 +27,7 @@ async def async_batch_eth_call(
     function_abi: spec.FunctionABI | None = None,
     function_name: str | None = None,
     function_selector: spec.FunctionSelector | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     to_address: spec.Address | None = None,
     to_addresses: typing.Sequence[spec.Address] | None = None,
     **kwargs: typing.Any,

@@ -9,7 +9,7 @@ from . import block_crud
 
 async def async_block_number_to_int(
     block: typing.Optional[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
     """resolve block number reference to int (e.g. converting 'latest' to int)
 
@@ -25,7 +25,7 @@ async def async_block_number_to_int(
 
 async def async_block_numbers_to_int(
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[int]:
     import asyncio
 

@@ -49,7 +49,7 @@ def get_multicall_address(
 async def async_multicall(
     calls: typing.Sequence[multicall_spec.Call],
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.List[typing.Any]:
 
     network = rpc.get_provider_network(provider)
@@ -90,7 +90,7 @@ async def async_multicall(
 async def async_multicall_by_block(
     calls: typing.Sequence[multicall_spec.Call],
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Sequence[typing.Sequence[typing.Any]]:
     coroutines = [
         async_multicall(

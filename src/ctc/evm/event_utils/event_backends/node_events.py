@@ -20,7 +20,7 @@ async def async_get_events_from_node(
     contract_abi: spec.ContractABI | None = None,
     blocks_per_chunk: int = 2000,
     verbose: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
     """see fetch_events() for complete kwarg list"""
     import asyncio
@@ -118,7 +118,7 @@ async def _async_get_chunk_of_events_from_node(
     event_hash: str,
     contract_address: spec.Address | None,
     verbose: bool,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Sequence[spec.RawLog]:
 
     if verbose > 1:
@@ -146,7 +146,7 @@ async def _async_package_exported_events(
     event_hash: str,
     event_name: str,
     event_abi: spec.EventABI | None,
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
 ) -> spec.DataFrame:
 
     if event_abi is None:

@@ -16,7 +16,7 @@ async def async_get_blocks_of_timestamps(
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
     nary: typing.Optional[int] = None,
     cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> list[int]:
     """once parallel node search created, use that"""

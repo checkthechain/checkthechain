@@ -21,7 +21,7 @@ async def async_get_feed_data(
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
     ...
 
@@ -37,7 +37,7 @@ async def async_get_feed_data(
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.Series:
     ...
 
@@ -52,7 +52,7 @@ async def async_get_feed_data(
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Union[spec.DataFrame, spec.Series]:
 
     # determine blocks

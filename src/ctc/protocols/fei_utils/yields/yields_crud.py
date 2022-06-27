@@ -17,7 +17,7 @@ async def async_create_fei_yield_payload(
     end_time: analytics_spec.Timestamp | None = None,
     window_size: str | None = None,
     interval_size: str | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> yields_spec.FeiYieldPayload:
     """create data payload from scratch"""
 

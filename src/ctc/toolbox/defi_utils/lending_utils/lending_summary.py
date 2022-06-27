@@ -20,7 +20,7 @@ async def async_get_lending_flows(
     wallet_withdrawals: spec.DataFrame | None = None,
     withdrawals: spec.DataFrame | None = None,
     include_latest: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     replace_symbols: bool = True,
     normalize: bool = True,
     include_rewards: bool = True,
@@ -182,7 +182,7 @@ async def _async_create_raw_wallet_flows_df(
     wallet_withdrawals: spec.DataFrame | None = None,
     withdrawals: spec.DataFrame | None = None,
     include_latest: bool = True,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
 
     from ctc.protocols import aave_v2_utils

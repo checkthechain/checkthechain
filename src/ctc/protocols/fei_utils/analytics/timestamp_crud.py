@@ -18,7 +18,7 @@ async def async_get_time_data(
     end_time: analytics_spec.Timestamp | None = None,
     window_size: str | None = None,
     interval_size: str | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> analytics_spec.TimeData:
 
     if (
@@ -94,7 +94,7 @@ def get_timestamps(
 
 async def async_get_timestamps_blocks(
     timestamps: typing.Sequence[analytics_spec.Timestamp],
-    provider: spec.ProviderSpec,
+    provider: spec.ProviderReference,
     block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,

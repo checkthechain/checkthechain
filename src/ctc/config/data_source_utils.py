@@ -30,7 +30,7 @@ class DataSource(TypedDict, total=False):
     db_config: toolsql.DBConfig
     rest_endpoint: dict[str, typing.Any]
     filesystem_root: str
-    provider: spec.ProviderSpec
+    provider: spec.ProviderReference
 
     # hybrid parameters
     hybrid_order: typing.Sequence['LeafDataSource']
@@ -46,7 +46,7 @@ class LeafDataSource(TypedDict, total=False):
     db_config: toolsql.DBConfig
     rest_endpoint: str
     filesystem_root: str
-    provider: spec.ProviderSpec
+    provider: spec.ProviderReference
 
 
 def get_data_source(**tags: typing.Any) -> DataSource:

@@ -10,7 +10,7 @@ from ctc import spec
 async def async_get_pool_A(
     pool: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
@@ -23,7 +23,7 @@ async def async_get_pool_A(
 async def async_get_pool_future_A_time(
     pool: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
@@ -36,7 +36,7 @@ async def async_get_pool_future_A_time(
 async def async_get_pool_initial_A(
     pool: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
@@ -49,7 +49,7 @@ async def async_get_pool_initial_A(
 async def async_get_pool_initial_A_time(
     pool: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
@@ -62,7 +62,7 @@ async def async_get_pool_initial_A_time(
 async def async_get_pool_future_A(
     pool: spec.Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
     return await rpc.async_eth_call(
         to_address=pool,
@@ -81,7 +81,7 @@ async def async_get_A_history(
     pool: spec.Address,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Sequence[float]:
     """get history of pool's A parameter"""
 

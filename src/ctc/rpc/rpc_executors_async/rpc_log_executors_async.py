@@ -14,7 +14,7 @@ async def async_eth_new_filter(
     topics: typing.Sequence[spec.BinaryData] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = False,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_new_filter(
@@ -31,7 +31,7 @@ async def async_eth_new_filter(
 
 
 async def async_eth_new_block_filter(
-    provider: spec.ProviderSpec = None, decode_response: bool = False
+    provider: spec.ProviderReference = None, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_new_block_filter()
     response = await rpc_request.async_send(request, provider=provider)
@@ -42,7 +42,7 @@ async def async_eth_new_block_filter(
 
 
 async def async_eth_new_pending_transaction_filter(
-    provider: spec.ProviderSpec = None, decode_response: bool = False
+    provider: spec.ProviderReference = None, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_new_pending_transaction_filter()
     response = await rpc_request.async_send(request, provider=provider)
@@ -54,7 +54,7 @@ async def async_eth_new_pending_transaction_filter(
 
 async def async_eth_uninstall_filter(
     filter_id: spec.BinaryInteger,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = False,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_uninstall_filter(
@@ -69,7 +69,7 @@ async def async_eth_uninstall_filter(
 
 async def async_eth_get_filter_changes(
     filter_id: spec.BinaryInteger,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
     include_removed: bool = False,
@@ -88,7 +88,7 @@ async def async_eth_get_filter_changes(
 
 async def async_eth_get_filter_logs(
     filter_id: spec.BinaryInteger,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
     include_removed: bool = False,
@@ -111,7 +111,7 @@ async def async_eth_get_logs(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     block_hash: spec.BinaryData | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
     include_removed: bool = False,

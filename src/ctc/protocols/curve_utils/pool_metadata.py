@@ -12,7 +12,7 @@ from . import curve_spec
 async def async_get_pool_addresses(
     pool: spec.Address,
     n_tokens: int | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> list[spec.Address]:
     import asyncio
 
@@ -61,7 +61,7 @@ async def async_get_token_index(
     pool: spec.Address | None = None,
     metadata: curve_spec.CurvePoolMetadata | None = None,
     n_tokens: int | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> int:
 
     if isinstance(token, int):
@@ -107,7 +107,7 @@ async def async_get_token_index(
 async def async_get_pool_metadata(
     pool: spec.Address,
     n_tokens: int | None = None,
-    provider: spec.ProviderSpec = None,
+    provider: spec.ProviderReference = None,
 ) -> curve_spec.CurvePoolMetadata:
 
     import asyncio

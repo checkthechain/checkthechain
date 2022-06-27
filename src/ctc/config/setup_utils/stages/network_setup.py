@@ -14,7 +14,7 @@ from ... import config_defaults
 async def async_setup_networks(
     old_config: typing.Mapping[typing.Any, typing.Any],
     styles: typing.Mapping[str, str],
-) -> spec.PartialConfigSpec:
+) -> spec.PartialConfig:
 
     print()
     print()
@@ -47,7 +47,7 @@ async def async_setup_networks(
     print('network setup complete')
 
     # return results
-    data: spec.PartialConfigSpec = {
+    data: spec.PartialConfig = {
         'providers': providers,
         'networks': networks,
         'default_network': default_network,
