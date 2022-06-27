@@ -47,3 +47,51 @@ async def test_get_block_of_timestamp(block_timestamp):
         timestamp, use_db=True
     )
     assert block == obtained_block
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('block_timestamp', block_timestamps.items())
+@pytest.mark.parametrize(
+    'db_settings', [[False, False], [False, True], [True, True]]
+)
+async def test_block_of_timestamp_modes(block_timestamp, db_settings):
+    block, _ = block_timestamp
+    use_db, use_db_assist = db_settings
+
+    block_data = await evm.async_get_block(block)
+
+    timestamp = block_data['timestamp']
+    timestamp_after = timestamp + 1
+
+    # test using exact timestamp
+
+    obtained_block = await evm.async_get_block_of_timestamp(
+        timestamp, mode='==', use_db=use_db, use_db_assist=use_db_assist
+    )
+    assert obtained_block == block
+
+    obtained_block = await evm.async_get_block_of_timestamp(
+        timestamp, mode='<=', use_db=use_db, use_db_assist=use_db_assist
+    )
+    assert obtained_block == block
+
+    obtained_block = await evm.async_get_block_of_timestamp(
+        timestamp, mode='>=', use_db=use_db, use_db_assist=use_db_assist
+    )
+    assert obtained_block == block
+
+    # test using offset timestamp
+    with pytest.raises(Exception):
+        obtained_block = await evm.async_get_block_of_timestamp(
+            timestamp_after, mode='==', use_db=use_db, use_db_assist=use_db_assist
+        )
+
+    obtained_block = await evm.async_get_block_of_timestamp(
+        timestamp_after, mode='<=', use_db=use_db, use_db_assist=use_db_assist
+    )
+    assert obtained_block == block
+
+    obtained_block = await evm.async_get_block_of_timestamp(
+        timestamp_after, mode='>=', use_db=use_db, use_db_assist=use_db_assist
+    )
+    assert obtained_block == block + 1

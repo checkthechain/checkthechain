@@ -87,11 +87,21 @@ async def async_get_block_of_timestamp_from_node(
         raise Exception('could not find block for timestamp')
 
     if mode == '==':
-        raise NotImplementedError()
+        block_data = await block_crud.async_get_block(block)
+        if block_data['timestamp'] == timestamp:
+            return block
+        else:
+            raise Exception(
+                'there is no block with timestamp ' + str(timestamp)
+            )
     elif mode == '<=':
         if block == 0:
             raise Exception('no block exists <= timestamp')
-        return block - 1
+        block_data = await block_crud.async_get_block(block)
+        if block_data['timestamp'] == timestamp:
+            return block
+        else:
+            return block - 1
     else:
         return block
 
