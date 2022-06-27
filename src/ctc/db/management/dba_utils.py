@@ -198,6 +198,8 @@ def initialize_schema(
         conn=conn,
     )
 
+    toolsql.clear_table_caches(conn=conn)
+
 
 def drop_schema(
     schema_name: schema_utils.SchemaName,
