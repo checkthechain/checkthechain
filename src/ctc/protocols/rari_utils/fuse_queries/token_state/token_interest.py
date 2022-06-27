@@ -10,7 +10,7 @@ from .. import token_metadata
 from ... import rari_abis
 
 
-async def async_get_supply_interest_per_block(
+async def async_get_supply_interest_by_block(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
@@ -31,7 +31,7 @@ async def async_get_supply_interest_per_block(
     return result
 
 
-async def async_get_borrow_interest_per_block(
+async def async_get_borrow_interest_by_block(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
@@ -59,7 +59,7 @@ async def async_get_supply_apy(
     fill_empty: bool = False,
     empty_token: typing.Any = None,
 ) -> float | None:
-    supply_interest_per_block = await async_get_supply_interest_per_block(
+    supply_interest_per_block = await async_get_supply_interest_by_block(
         ctoken=ctoken,
         block=block,
         normalize=True,
@@ -89,7 +89,7 @@ async def async_get_borrow_apy(
     empty_token: typing.Any = None,
 ) -> float | None:
 
-    borrow_interest_per_block = await async_get_borrow_interest_per_block(
+    borrow_interest_per_block = await async_get_borrow_interest_by_block(
         ctoken=ctoken,
         block=block,
         normalize=True,
@@ -110,4 +110,3 @@ async def async_get_borrow_apy(
         )
 
     return (1 + borrow_interest_per_block) ** blocks_per_year - 1
-

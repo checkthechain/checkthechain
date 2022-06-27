@@ -177,7 +177,7 @@ async def async_get_pool_state_per_transaction(
     return state_per_transaction
 
 
-async def async_get_pool_state_per_block(
+async def async_integrate_pool_deltas(
     pool: typing.Optional[spec.Address] = None,
     interpolate: bool = False,
     log_deltas: typing.Optional[spec.DataFrame] = None,

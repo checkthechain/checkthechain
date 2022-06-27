@@ -56,6 +56,12 @@ def test_async_function_names():
 
     should_have_async_in_name = []
     should_not_have_async_in_name = []
+
+    should_use_by_block = []
+    by_block_exceptions = [
+        'bin_by_blocks',
+    ]
+
     for importer, modname, ispkg in pkgutil.walk_packages(
         path=ctc.__path__,
         prefix="ctc.",
@@ -70,6 +76,11 @@ def test_async_function_names():
         for attr_name in dir(module):
             module_attr = getattr(module, attr_name)
             if hasattr(module_attr, '__call__'):
+
+                if 'per_block' in attr_name or 'by_blocks' in attr_name:
+                    if attr_name not in by_block_exceptions:
+                        should_use_by_block.append(modname + '.' + attr_name)
+
                 named_as_async = attr_name.startswith(
                     'async'
                 ) or attr_name.startswith('_async')
@@ -88,5 +99,10 @@ def test_async_function_names():
     if len(should_not_have_async_in_name) > 0:
         message = 'names of these items should not start with async_ or _async_:'
         for attr in should_not_have_async_in_name:
+            message += '\n    - ' + attr
+        raise Exception(message)
+    if len(should_use_by_block) > 0:
+        message = 'functions should use by_block instead of per_block or by_blocks'
+        for attr in should_use_by_block:
             message += '\n    - ' + attr
         raise Exception(message)
