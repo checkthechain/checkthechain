@@ -125,6 +125,8 @@ async def async_select_event_signatures(
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
+    id: int | None = None,
+    bytes_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
     where_equals = {

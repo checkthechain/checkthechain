@@ -29,7 +29,7 @@ async def async_query_remote_function_signatures(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-) -> list[fourbyte_spec.Entry]:
+) -> typing.Sequence[fourbyte_spec.Entry]:
 
     import aiohttp
 
@@ -103,7 +103,7 @@ async def async_query_remote_event_signatures(
     id: typing.Optional[int] = None,
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
-) -> list[fourbyte_spec.Entry]:
+) -> typing.Sequence[fourbyte_spec.Entry]:
 
     import aiohttp
 

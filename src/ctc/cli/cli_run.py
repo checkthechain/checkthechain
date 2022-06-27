@@ -130,10 +130,6 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             '4byte',
             'build',
         ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_build_command',
-        (
-            '4byte',
-            'path',
-        ): 'ctc.protocols.fourbyte_utils.cli.fourbyte_path_command',
     },
 }
 

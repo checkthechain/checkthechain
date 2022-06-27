@@ -32,6 +32,10 @@ async def async_fourbyte_command(
     *, signature: str, local: bool, remote: bool
 ) -> None:
 
+    if not local and not remote:
+        local = True
+        remote = True
+
     try:
         int(signature, 16)
         is_hex = True
@@ -103,6 +107,7 @@ async def async_fourbyte_command(
             '4byte id',
         ]
 
+        toolstr.print_text_box('4byte query of ' + str(signature))
         if len(results) == 1:
             print('1 result')
         else:
@@ -117,7 +122,7 @@ async def async_fourbyte_command(
             raise Exception('event key collision, this should never happen')
         else:
             result = results[0]
-            print(result['text_signature'])
+            toolstr.print_text_box(result['text_signature'])
             print('- hash:', result['hex_signature'])
             print('- 4byte id:', result['id'])
 
