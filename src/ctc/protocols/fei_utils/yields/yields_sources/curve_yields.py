@@ -49,7 +49,7 @@ async def async_get_curve_farm_yield_data(
 ) -> yields_spec.YieldSourceData:
 
     underlying = await rari_utils.async_get_ctoken_underlying(ctoken)
-    pool_addresses_coroutine = curve_utils.async_get_pool_addresses(underlying)
+    pool_addresses_coroutine = curve_utils.async_get_pool_tokens(underlying)
     pool_addresses_task = asyncio.create_task(pool_addresses_coroutine)
 
     tvl_history_coroutine = async_get_rari_farm_tvl_history(

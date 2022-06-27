@@ -9,7 +9,7 @@ from ctc import spec
 from . import curve_spec
 
 
-async def async_get_pool_addresses(
+async def async_get_pool_tokens(
     pool: spec.Address,
     n_tokens: int | None = None,
     provider: spec.ProviderReference = None,
@@ -73,7 +73,7 @@ async def async_get_token_index(
         if metadata is not None:
             pool_addresses = metadata['token_addresses']
         elif pool is not None:
-            pool_addresses = await async_get_pool_addresses(
+            pool_addresses = await async_get_pool_tokens(
                 pool=pool,
                 n_tokens=n_tokens,
                 provider=provider,
@@ -87,7 +87,7 @@ async def async_get_token_index(
         if metadata is not None:
             pool_addresses = metadata['token_addresses']
         elif pool is not None:
-            pool_addresses = await async_get_pool_addresses(
+            pool_addresses = await async_get_pool_tokens(
                 pool=pool,
                 n_tokens=n_tokens,
                 provider=provider,
@@ -121,7 +121,7 @@ async def async_get_pool_metadata(
     a_task = asyncio.create_task(a_coroutine)
 
     # get addresses
-    token_addresses = await async_get_pool_addresses(
+    token_addresses = await async_get_pool_tokens(
         pool,
         n_tokens=n_tokens,
         provider=provider,

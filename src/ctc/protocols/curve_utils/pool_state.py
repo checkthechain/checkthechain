@@ -59,7 +59,7 @@ async def async_get_pool_state(
         provider=provider,
         normalize=normalize,
     )
-    token_addresses = await pool_metadata.async_get_pool_addresses(
+    token_addresses = await pool_metadata.async_get_pool_tokens(
         pool,
         n_tokens=n_tokens,
         provider=provider,
