@@ -39,7 +39,7 @@ for contracts, will display ABI""",
 
 
 async def async_address_command(
-    address: spec.Address, verbose: bool | int, network: str, raw: bool
+    *, address: spec.Address, verbose: bool | int, network: str, raw: bool
 ) -> None:
     try:
         max_width = os.get_terminal_size().columns

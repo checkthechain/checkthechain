@@ -31,6 +31,7 @@ async def async_get_pool_weights_raw(
 async def async_get_pool_weights(
     pool_address: spec.ContractAddress,
     block: spec.BlockNumberReference = 'latest',
+    *,
     normalize: bool = True,
 ) -> typing.Union[
     dict[spec.ContractAddress, int],
@@ -56,6 +57,7 @@ async def async_get_pool_weights(
 async def async_get_pool_weights_by_block(
     pool_address: spec.ContractAddress,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     normalize: bool = True,
 ) -> typing.Union[
     dict[spec.BlockNumberReference, int],
@@ -85,6 +87,7 @@ async def async_get_pool_weights_by_block(
 
 async def async_get_pool_fees(
     pool_address: spec.ContractAddress,
+    *,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
 ) -> typing.Union[int, float]:
@@ -173,4 +176,3 @@ async def async_get_pool_balances_by_block(
     balances_by_block = await asyncio.gather(*coroutines)
 
     return nested_utils.list_of_dicts_to_dict_of_lists(balances_by_block)
-

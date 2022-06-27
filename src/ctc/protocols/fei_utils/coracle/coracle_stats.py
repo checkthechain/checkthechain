@@ -18,6 +18,7 @@ class FeiPcvStats(TypedDict):
 
 async def async_get_pcv_stats(
     block: spec.BlockNumberReference | None = None,
+    *,
     wrapper: bool = False,
     provider: spec.ProviderReference = None,
 ) -> FeiPcvStats:
@@ -47,6 +48,7 @@ async def async_get_pcv_stats(
 
 async def async_get_pcv_stats_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     wrapper: bool = False,
     provider: spec.ProviderReference = None,
     nullify_invalid: bool = True,

@@ -16,6 +16,7 @@ from . import coracle_balances
 
 
 async def async_get_fei_deposit_balances(
+    *,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
     normalize: bool = True,
@@ -51,6 +52,7 @@ async def async_get_fei_deposit_balances(
 
 async def _async_get_non_fei_deposits_fei_balances(
     block: spec.BlockNumberReference,
+    *,
     provider: spec.ProviderReference = None,
 ) -> dict[str, int]:
 
@@ -75,6 +77,7 @@ async def _async_get_non_fei_deposits_fei_balances(
 
 
 async def async_get_fei_deposit_balances_by_block(
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
 ) -> dict[spec.ContractAddress, list[typing.Union[int, float]]]:
@@ -133,4 +136,3 @@ def fei_deposits_to_deployments_by_block(
         ]
 
     return deployment_balances_by_block
-

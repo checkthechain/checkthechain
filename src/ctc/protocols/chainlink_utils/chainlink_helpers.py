@@ -9,6 +9,7 @@ from . import chainlink_data
 
 async def async_get_eth_price(
     block: spec.BlockNumberReference = 'latest',
+    *,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> typing.Union[int, float]:
@@ -22,6 +23,7 @@ async def async_get_eth_price(
 
 async def async_get_eth_price_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
 ) -> typing.Union[spec.DataFrame, spec.Series]:
@@ -31,4 +33,3 @@ async def async_get_eth_price_by_block(
         provider=provider,
         blocks=blocks,
     )
-

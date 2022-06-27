@@ -50,6 +50,7 @@ class CurvePoolData(TypedDict):
 async def _async_get_pool_data(
     p: int,
     factory: spec.Address,
+    *,
     include_balances: bool = False,
 ) -> CurvePoolData:
     pool = await rpc.async_eth_call(
@@ -106,6 +107,7 @@ async def _async_get_pool_data(
 
 
 async def async_get_base_pools(
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
@@ -150,6 +152,7 @@ async def async_get_base_pools(
 
 
 async def async_get_plain_pools(
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
@@ -189,6 +192,7 @@ async def async_get_plain_pools(
 
 
 async def async_get_meta_pools(
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,

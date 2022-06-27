@@ -13,6 +13,7 @@ from . import contracts
 
 
 async def async_get_liquidity_depth(
+    *,
     new_price: int | float,
     token_in: str,
     token_out: str,
@@ -64,13 +65,19 @@ async def async_get_liquidity_depth(
 
 
 async def _async_new_price_distance(
-    amount_sold: int | float, target_new_price: float, swap_kwargs: typing.Any
+    *,
+    amount_sold: int | float,
+    target_new_price: float,
+    swap_kwargs: typing.Any,
 ) -> float:
-    actual_new_price = await async_get_new_price(amount_sold, **swap_kwargs)
+    actual_new_price = await async_get_new_price(
+        amount_sold=amount_sold, **swap_kwargs
+    )
     return actual_new_price - target_new_price
 
 
 async def async_get_new_price(
+    *,
     amount_sold: int | float,
     token_in: str,
     token_out: str,
@@ -111,4 +118,3 @@ async def async_get_new_price(
     )
 
     return probe_price
-

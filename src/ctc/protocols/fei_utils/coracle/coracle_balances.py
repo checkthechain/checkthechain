@@ -49,6 +49,7 @@ function_abis: dict[str, spec.FunctionABI] = {
 
 async def async_get_deposit_balance(
     deposit: spec.ContractAddress,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[int, list[int]]:
@@ -63,6 +64,7 @@ async def async_get_deposit_balance(
 
 async def async_get_deposits_balances(
     deposits: typing.Sequence[spec.ContractAddress],
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> list[int]:
@@ -76,6 +78,7 @@ async def async_get_deposits_balances(
 
 async def async_get_deposit_balance_by_block(
     deposit: spec.ContractAddress,
+    *,
     blocks: typing.Sequence[spec.BlockReference],
     provider: spec.ProviderReference = None,
 ) -> list[int]:
@@ -89,6 +92,7 @@ async def async_get_deposit_balance_by_block(
 
 async def async_get_deposit_resistant_balance_and_fei(
     deposit: spec.ContractAddress,
+    *,
     block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[int, list[int]]:
@@ -103,6 +107,7 @@ async def async_get_deposit_resistant_balance_and_fei(
 
 async def async_get_deposits_resistant_balances_and_fei(
     deposits: typing.Sequence[spec.ContractAddress],
+    *,
     block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderReference = None,
 ) -> list[tuple[int, int]]:
@@ -116,6 +121,7 @@ async def async_get_deposits_resistant_balances_and_fei(
 
 async def async_get_deposit_resistant_balance_and_fei_by_block(
     deposit: spec.ContractAddress,
+    *,
     blocks: typing.Sequence[spec.BlockReference],
     provider: spec.ProviderReference = None,
 ) -> list[int]:
@@ -134,6 +140,7 @@ async def async_get_deposit_resistant_balance_and_fei_by_block(
 
 async def async_get_token_balance(
     token: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
@@ -177,6 +184,7 @@ async def async_get_token_balance(
 
 async def async_get_token_balance_by_block(
     token: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
     normalize: bool = True,
@@ -198,6 +206,7 @@ async def async_get_token_balance_by_block(
 
 
 async def async_get_tokens_balances(
+    *,
     tokens: typing.Sequence[spec.Address] | None = None,
     block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
@@ -288,6 +297,7 @@ async def async_get_tokens_balances(
 
 async def async_get_tokens_balances_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
@@ -320,4 +330,3 @@ async def async_get_tokens_balances_by_block(
         float_type = typing.List[typing.Dict[spec.Address, float]]
         float_result = typing.cast(float_type, block_token_balances)
         return nested_utils.list_of_dicts_to_dict_of_lists(float_result)
-

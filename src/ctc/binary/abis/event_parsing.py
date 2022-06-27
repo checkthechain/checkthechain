@@ -42,4 +42,3 @@ def get_event_indexed_types(
 ) -> list[spec.ABIDatumType]:
     """get list of indexed types in signature of event"""
     return [var['type'] for var in event_abi['inputs'] if var['indexed']]
-

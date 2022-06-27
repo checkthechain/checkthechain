@@ -8,6 +8,7 @@ from ctc import spec
 
 async def async_is_contract_address(
     address: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> bool:
@@ -21,6 +22,7 @@ async def async_is_contract_address(
 
 async def async_are_contract_addresses(
     addresses: typing.Sequence[spec.Address],
+    *,
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> dict[spec.Address, bool]:
@@ -30,4 +32,3 @@ async def async_are_contract_addresses(
         provider=provider,
     )
     return {address: len(code) > 3 for address, code in zip(addresses, codes)}
-

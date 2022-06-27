@@ -25,4 +25,3 @@ def digest_eth_compile_serpent(
     response: spec.RpcSingularResponse,
 ) -> spec.RpcSingularResponse:
     return response
-

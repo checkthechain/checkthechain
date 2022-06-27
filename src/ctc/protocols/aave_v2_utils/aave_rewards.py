@@ -13,6 +13,7 @@ from . import aave_spec
 
 async def async_get_unclaimed_rewards(
     wallet: spec.Address,
+    *,
     block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -33,6 +34,7 @@ async def async_get_unclaimed_rewards(
 async def async_get_unclaimed_rewards_by_block(
     wallet: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int]:
     coroutines = [
@@ -49,6 +51,7 @@ async def async_get_unclaimed_rewards_by_block(
 async def async_compute_wallet_rewards(
     wallet: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     provider: spec.ProviderReference = None,
     replace_symbol: bool = True,
 ) -> typing.Mapping[str, spec.NumpyArray]:
@@ -101,4 +104,3 @@ async def async_compute_wallet_rewards(
             'reward_balance': reward_balance,
             'reward_balance_usd': reward_balance_usd,
         }
-

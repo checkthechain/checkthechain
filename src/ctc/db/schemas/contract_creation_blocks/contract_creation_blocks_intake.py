@@ -11,6 +11,7 @@ from . import contract_creation_blocks_statements
 async def async_intake_contract_creation_block(
     contract_address: spec.Address,
     block: int,
+    *,
     network: spec.NetworkReference,
 ) -> None:
 

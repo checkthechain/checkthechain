@@ -11,6 +11,7 @@ from . import cpmm_trade
 def print_pool_summary(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     lp_total_supply: int | float | None = None,
     x_name: str | None = None,
     y_name: str | None = None,
@@ -85,6 +86,7 @@ def print_pool_summary(
 def print_liquidity_depth(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     depths: typing.Sequence[float] | None = None,
     x_name: str | None = None,
     y_name: str | None = None,
@@ -156,6 +158,7 @@ def print_liquidity_depth(
 
 
 def print_trade_summary(
+    *,
     x_name: str | None = None,
     y_name: str | None = None,
     x_holdings_before: int | float | None = None,

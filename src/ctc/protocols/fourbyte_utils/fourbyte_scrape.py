@@ -47,6 +47,7 @@ async def async_build_event_signatures_dataset(
 
 
 async def async_scrape_function_signatures(
+    *,
     wait_time: typing.Optional[int] = None,
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,
@@ -61,6 +62,7 @@ async def async_scrape_function_signatures(
 
 
 async def async_scrape_event_signatures(
+    *,
     wait_time: typing.Optional[int] = None,
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,
@@ -76,6 +78,7 @@ async def async_scrape_event_signatures(
 
 async def async_scrape_set(
     url: str,
+    *,
     wait_time: typing.Optional[int] = None,
     print_every: typing.Optional[int] = 10000,
     min_id: typing.Optional[int] = None,

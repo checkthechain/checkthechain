@@ -9,6 +9,7 @@ from . import pool_summary
 
 
 async def async_plot_lbp_summary(
+    *,
     swaps: spec.DataFrame,
     weights: spec.DataFrame,
     pool_name: str,

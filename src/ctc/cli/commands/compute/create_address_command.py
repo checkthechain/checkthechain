@@ -25,6 +25,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def create_address_command(
+    *,
     sender: str,
     nonce_or_salt: str,
     init_code: str,

@@ -10,6 +10,7 @@ from . import uniswap_v2_state
 
 async def async_get_pool_log_deltas(
     pool: spec.Address,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -102,7 +103,7 @@ async def async_get_pool_log_deltas(
 async def async_get_pool_transaction_deltas(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
-    **log_delta_kwargs: typing.Any
+    **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
@@ -120,7 +121,7 @@ async def async_get_pool_transaction_deltas(
 async def async_get_pool_block_deltas(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
-    **log_delta_kwargs: typing.Any
+    **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
@@ -136,7 +137,7 @@ async def async_get_pool_block_deltas(
 async def async_get_pool_state_per_log(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
-    **log_delta_kwargs: typing.Any
+    **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
@@ -155,7 +156,7 @@ async def async_get_pool_state_per_log(
 async def async_get_pool_state_per_transaction(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
-    **log_delta_kwargs: typing.Any
+    **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
@@ -179,9 +180,10 @@ async def async_get_pool_state_per_transaction(
 
 async def async_integrate_pool_deltas(
     pool: typing.Optional[spec.Address] = None,
+    *,
     interpolate: bool = False,
     log_deltas: typing.Optional[spec.DataFrame] = None,
-    **log_delta_kwargs: typing.Any
+    **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
@@ -209,4 +211,3 @@ async def async_integrate_pool_deltas(
 def _put_price_in_state(state: spec.DataFrame) -> None:
     state['price_0_per_1'] = state['token0_reserves'] / state['token1_reserves']
     state['price_1_per_0'] = state['token1_reserves'] / state['token0_reserves']
-

@@ -61,6 +61,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_calls_command(
+    *,
     args: typing.Sequence[str],
     addresses: typing.Optional[typing.Sequence[str]],
     blocks: typing.Optional[typing.Sequence[str]],

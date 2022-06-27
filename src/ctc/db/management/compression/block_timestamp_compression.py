@@ -11,6 +11,7 @@ block_timestamps_template = (
 
 def save_compressed_block_timestamps(
     block_timestamps: typing.Mapping[int, int],
+    *,
     dirname: str | None = None,
     path: str | None = None,
     clip_t0: bool | None = None,
@@ -63,6 +64,7 @@ def save_compressed_block_timestamps(
 
 def load_compressed_block_times(
     path: str,
+    *,
     start_block: int | None = None,
     end_block: int | None = None,
     t0: int | None = None,
@@ -96,4 +98,3 @@ def load_compressed_block_times(
 
     blocks = range(start_block, end_block + 1)
     return dict(zip(blocks, timestamps))
-

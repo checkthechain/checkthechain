@@ -9,6 +9,7 @@ from . import cpmm_spec
 def trade(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     x_sold: int | float | None = None,
     x_bought: int | float | None = None,
     y_sold: int | float | None = None,
@@ -100,6 +101,7 @@ def trade(
 def trade_to_target_reserves(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     new_x_reserves: int | float | None = None,
     new_y_reserves: int | float | None = None,
     fee_rate: float | None = None,
@@ -152,6 +154,7 @@ def trade_to_target_reserves(
 def trade_to_price(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     new_x_per_y: int | float | None = None,
     new_y_per_x: int | float | None = None,
     fee_rate: float | None = None,
@@ -198,6 +201,7 @@ def trade_to_price(
 
 
 def compute_x_sold_to_reach_price(
+    *,
     x_reserves: int | float,
     y_reserves: int | float,
     new_x_per_y: int | float,
@@ -223,6 +227,7 @@ def compute_x_sold_to_reach_price(
 
 
 def compute_y_bought_when_x_sold(
+    *,
     x_sold: int | float,
     x_reserves: int | float,
     y_reserves: int | float,
@@ -239,6 +244,7 @@ def compute_y_bought_when_x_sold(
 
 
 def compute_x_sold_when_y_bought(
+    *,
     y_bought: int | float,
     x_reserves: int | float,
     y_reserves: int | float,

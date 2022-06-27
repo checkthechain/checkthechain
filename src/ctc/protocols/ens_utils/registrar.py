@@ -11,6 +11,7 @@ from . import resolver
 
 async def async_get_owner(
     name: str,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
@@ -31,6 +32,7 @@ async def async_get_owner(
 
 async def async_record_exists(
     name: str,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> bool:
@@ -51,6 +53,7 @@ async def async_record_exists(
 
 async def async_get_resolver(
     name: str,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
@@ -121,4 +124,3 @@ async def async_get_registrations() -> spec.DataFrame:
     )
     new_owners['arg__parent_node'] = new_owners.pop('arg__node')
     return new_owners
-

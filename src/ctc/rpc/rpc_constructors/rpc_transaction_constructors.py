@@ -75,4 +75,3 @@ def construct_eth_get_block_transaction_count_by_number(
         'eth_getBlockTransactionCountByNumber',
         [block_number],
     )
-

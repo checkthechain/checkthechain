@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 def output_data(
     data: spec.DataFrame | spec.Series,
     output: str,
+    *,
     overwrite: bool,
     top: int | None = None,
     indent: str | int | None = None,

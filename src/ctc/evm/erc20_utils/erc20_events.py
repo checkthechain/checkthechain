@@ -24,6 +24,7 @@ def get_token_amount_column(df: spec.DataFrame) -> str:
 
 async def async_get_erc20_transfers(
     token: spec.ERC20Reference,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -67,6 +68,7 @@ async def async_get_erc20_transfers(
 
 async def async_get_erc20_holdings_from_transfers(
     transfers: spec.DataFrame,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     dtype: typing.Optional[
         typing.Union[typing.Type[int], typing.Type[float]]

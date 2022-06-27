@@ -9,6 +9,7 @@ def construct_eth_get_work() -> spec.RpcRequest:
 
 
 def construct_eth_submit_work(
+    *,
     nonce: spec.BinaryData,
     pow_hash: spec.BinaryData,
     digest: spec.BinaryData,
@@ -33,4 +34,3 @@ def construct_eth_mining() -> spec.RpcRequest:
 
 def construct_eth_hashrate() -> spec.RpcRequest:
     return rpc_request.create('eth_hashrate', [])
-

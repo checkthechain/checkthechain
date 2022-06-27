@@ -38,6 +38,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_transfers_command(
+    *,
     erc20: str,
     blocks: typing.Sequence[str],
     output: str,

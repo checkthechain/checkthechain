@@ -36,6 +36,7 @@ def get_matching_entries(
 def get_matching_entry(
     sequence: typing.Sequence[M],
     query: typing.Mapping[typing.Any, typing.Any],
+    *,
     raise_if_not_found: typing.Literal[False],
 ) -> typing.Optional[M]:
     ...
@@ -45,6 +46,7 @@ def get_matching_entry(
 def get_matching_entry(
     sequence: typing.Sequence[M],
     query: typing.Mapping[typing.Any, typing.Any],
+    *,
     raise_if_not_found: typing.Literal[True] = True,
 ) -> M:
     ...
@@ -53,6 +55,7 @@ def get_matching_entry(
 def get_matching_entry(
     sequence: typing.Sequence[M],
     query: typing.Mapping[typing.Any, typing.Any],
+    *,
     raise_if_not_found: bool = True,
 ) -> typing.Optional[M]:
     matches = get_matching_entries(sequence=sequence, query=query)
@@ -154,6 +157,7 @@ async def async_binary_search(
 
 
 def nary_search(
+    *,
     nary: int,
     start_index: int,
     end_index: int,
@@ -233,6 +237,7 @@ def nary_search(
 
 
 async def async_nary_search(
+    *,
     nary: int,
     start_index: int,
     end_index: int,
@@ -315,6 +320,7 @@ async def async_nary_search(
 
 
 def get_next_probes_linear(
+    *,
     probe_min: int,
     probe_max: int,
     nary: int,

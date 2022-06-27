@@ -64,6 +64,7 @@ def _select_interleaved(
 async def async_block_timestamp_xticks(
     provider: spec.ProviderReference = None,
     representation: tooltime.TimestampExtendedRepresentation | None = None,
+    *,
     omit: str | None = 'year',
 ) -> None:
     """

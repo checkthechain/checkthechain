@@ -66,6 +66,7 @@ if typing.TYPE_CHECKING:
 
 async def async_get_block_gas_stats(
     block: spec.BlockNumberReference | spec.Block,
+    *,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> BlockGasStats:
@@ -82,6 +83,7 @@ async def async_get_block_gas_stats(
 
 def get_block_gas_stats(
     block: spec.Block,
+    *,
     normalize: bool = True,
 ) -> BlockGasStats:
     import numpy as np
@@ -129,6 +131,7 @@ def get_block_gas_stats(
 
 async def async_get_gas_stats_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference | spec.Block],
+    *,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> list[BlockGasStats]:
@@ -148,6 +151,7 @@ async def async_get_gas_stats_by_block(
 
 async def async_get_blocks_gas_stats(
     blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     normalize: bool = True,

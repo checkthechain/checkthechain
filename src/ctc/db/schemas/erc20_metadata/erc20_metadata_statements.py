@@ -12,13 +12,13 @@ from . import erc20_metadata_schema_defs
 
 
 async def async_upsert_erc20_metadata(
+    *,
     address: spec.Address,
     network: spec.NetworkReference,
     symbol: str | None = None,
     decimals: int | None = None,
     name: str | None = None,
     upsert: bool = True,
-    *,
     conn: toolsql.SAConnection,
 ) -> None:
 
@@ -50,9 +50,9 @@ async def async_upsert_erc20_metadata(
 
 
 async def async_upsert_erc20s_metadata(
+    *,
     erc20s_metadata: typing.Sequence[spec.ERC20Metadata],
     network: spec.NetworkReference,
-    *,
     conn: toolsql.SAConnection,
 ) -> None:
     coroutines = [
@@ -64,9 +64,9 @@ async def async_upsert_erc20s_metadata(
 
 async def async_select_erc20_metadata(
     address: spec.Address | None = None,
+    *,
     symbol: str | None = None,
     network: spec.NetworkReference | None = None,
-    *,
     conn: toolsql.SAConnection,
 ) -> spec.ERC20Metadata | None:
 
@@ -95,8 +95,8 @@ async def async_select_erc20_metadata(
 
 async def async_select_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
-    network: spec.NetworkReference | None = None,
     *,
+    network: spec.NetworkReference | None = None,
     conn: toolsql.SAConnection,
 ) -> typing.Sequence[spec.ERC20Metadata | None] | None:
 
@@ -122,8 +122,8 @@ async def async_select_erc20s_metadata(
 
 async def async_delete_erc20_metadata(
     address: spec.Address,
-    network: spec.NetworkReference,
     *,
+    network: spec.NetworkReference,
     conn: toolsql.SAConnection,
 ) -> None:
     table = schema_utils.get_table_name('erc20_metadata', network=network)
@@ -132,8 +132,8 @@ async def async_delete_erc20_metadata(
 
 async def async_delete_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
-    network: spec.NetworkReference,
     *,
+    network: spec.NetworkReference,
     conn: toolsql.SAConnection,
 ) -> None:
     table = schema_utils.get_table_name('erc20_metadata', network=network)

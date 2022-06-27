@@ -11,6 +11,7 @@ from .. import block_normalize
 
 async def async_get_block_timestamp(
     block: spec.BlockReference,
+    *,
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> int:
@@ -32,6 +33,7 @@ async def async_get_block_timestamp(
 
 async def async_get_block_timestamps(
     blocks: typing.Sequence[spec.BlockReference],
+    *,
     include_full_transactions: bool = False,
     chunk_size: int = 500,
     provider: spec.ProviderReference = None,

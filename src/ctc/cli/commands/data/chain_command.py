@@ -34,6 +34,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_chain_command(
+    *,
     provider: str,
     config: bool,
     verbose: bool,

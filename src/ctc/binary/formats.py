@@ -143,6 +143,7 @@ def convert(
 
 def add_binary_pad(
     data: spec.BinaryInteger,
+    *,
     pad_side: typing.Literal['left', 'right', None] = None,
     padded_size: int | None = None,
 ) -> spec.BinaryInteger:
@@ -202,6 +203,7 @@ def add_binary_pad(
 def match_format(
     format_this: spec.BinaryInteger,
     like_this: spec.BinaryInteger,
+    *,
     match_pad: bool = False,
 ) -> spec.BinaryInteger:
     """

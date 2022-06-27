@@ -113,6 +113,7 @@ def fully_migrate_data_dir(data_dir: str | None = None) -> None:
 
 def migrate_data_dir__0_2_0__to__0_3_0(
     data_dir: str,
+    *,
     delete_old_data: bool = True,
     confirm_delete: bool = False,
 ) -> None:

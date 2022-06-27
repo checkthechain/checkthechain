@@ -43,6 +43,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_chart_command(
+    *,
     pool: spec.Address,
     invert: bool,
     timescale: str,

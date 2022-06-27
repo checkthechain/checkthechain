@@ -8,6 +8,7 @@ from .. import rpc_request
 
 
 async def async_eth_get_work(
+    *,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_work()
@@ -16,6 +17,7 @@ async def async_eth_get_work(
 
 
 async def async_eth_submit_work(
+    *,
     nonce: spec.BinaryData,
     pow_hash: spec.BinaryData,
     digest: spec.BinaryData,
@@ -31,7 +33,10 @@ async def async_eth_submit_work(
 
 
 async def async_eth_submit_hashrate(
-    hashrate: spec.BinaryData, id: str, provider: spec.ProviderReference = None
+    hashrate: spec.BinaryData,
+    id: str,
+    *,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_submit_hashrate(
         hashrate=hashrate,
@@ -42,6 +47,7 @@ async def async_eth_submit_hashrate(
 
 
 async def async_eth_coinbase(
+    *,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_coinbase()
@@ -50,6 +56,7 @@ async def async_eth_coinbase(
 
 
 async def async_eth_mining(
+    *,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_mining()
@@ -58,9 +65,9 @@ async def async_eth_mining(
 
 
 async def async_eth_hashrate(
+    *,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_hashrate()
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_hashrate(response=response)
-

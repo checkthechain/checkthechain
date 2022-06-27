@@ -7,6 +7,7 @@ from . import twap_spec
 
 async def async_get_data_feed(
     data_source: twap_spec.DataSource,
+    *,
     start_block: int,
     end_block: int,
     provider: spec.ProviderReference = None,

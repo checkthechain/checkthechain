@@ -40,6 +40,7 @@ async def async_upsert_function_signatures(
 
 async def async_select_function_signatures(
     conn: toolsql.SAConnection,
+    *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
     id: int | None = None,
@@ -66,6 +67,7 @@ async def async_select_function_signatures(
 
 async def async_delete_function_signatures(
     conn: toolsql.SAConnection,
+    *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> None:
@@ -120,6 +122,7 @@ async def async_upsert_event_signatures(
 
 async def async_select_event_signatures(
     conn: toolsql.SAConnection,
+    *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
@@ -142,6 +145,7 @@ async def async_select_event_signatures(
 
 async def async_delete_event_signatures(
     conn: toolsql.SAConnection,
+    *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
 ) -> None:

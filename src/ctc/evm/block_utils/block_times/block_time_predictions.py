@@ -11,6 +11,7 @@ from ctc import spec
 
 async def async_predict_block_timestamp(
     block: typing.SupportsInt,
+    *,
     provider: spec.ProviderReference = None,
     window_size: int = 88295,
 ) -> int:
@@ -39,6 +40,7 @@ async def async_predict_block_timestamp(
 
 async def async_predict_block_timestamps(
     blocks: typing.Sequence[typing.SupportsInt],
+    *,
     provider: spec.ProviderReference = None,
     window_size: int = 100000,
 ) -> typing.Sequence[int]:
@@ -93,6 +95,7 @@ async def async_predict_block_timestamps(
 
 async def async_predict_timestamp_block(
     timestamp: tooltime.Timestamp,
+    *,
     provider: spec.ProviderReference = None,
     window_size: int = 86400 * 16,
 ) -> int:
@@ -124,6 +127,7 @@ async def async_predict_timestamp_block(
 
 async def async_predict_timestamp_blocks(
     timestamps: typing.Sequence[tooltime.Timestamp],
+    *,
     provider: spec.ProviderReference = None,
     window_size: int = 86400 * 16,
 ) -> typing.Sequence[int]:

@@ -20,6 +20,7 @@ async def async_get_default_erc20_tokens() -> typing.Sequence[spec.ERC20Metadata
 
 async def async_get_erc20_metadata(
     token: spec.ERC20Reference,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
@@ -63,6 +64,7 @@ async def async_get_erc20_metadata(
 
 async def async_get_erc20_decimals(
     token: spec.ERC20Reference,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
     provider: spec.ProviderReference = None,
@@ -109,6 +111,7 @@ async def async_get_erc20_decimals(
 
 async def async_get_erc20s_decimals(
     tokens: typing.Iterable[spec.ERC20Reference],
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs: typing.Any,
 ) -> list[int]:
@@ -120,6 +123,7 @@ async def async_get_erc20s_decimals(
 
 async def async_get_erc20_decimals_by_block(
     token: spec.ERC20Reference,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     **rpc_kwargs: typing.Any,
 ) -> list[int]:
@@ -139,6 +143,7 @@ async def async_get_erc20_decimals_by_block(
 
 async def async_get_erc20_name(
     token: spec.ERC20Reference,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
     provider: spec.ProviderReference = None,
@@ -218,6 +223,7 @@ def _decode_raw_symbol(data: str) -> str:
 
 async def async_get_erc20_symbol(
     token: spec.ERC20Reference,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
     provider: spec.ProviderReference = None,
@@ -263,6 +269,7 @@ async def async_get_erc20_symbol(
 
 async def async_get_erc20s_symbols(
     tokens: typing.Iterable[spec.ERC20Reference],
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     **rpc_kwargs: typing.Any,
 ) -> list[str]:
@@ -279,6 +286,7 @@ async def async_get_erc20s_symbols(
 
 async def async_get_erc20_symbol_by_block(
     token: spec.ERC20Reference,
+    *,
     blocks: typing.Iterable[spec.BlockNumberReference],
     **rpc_kwargs: typing.Any,
 ) -> list[str]:

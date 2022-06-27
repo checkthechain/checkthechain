@@ -31,6 +31,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_burns_command(
+    *,
     pool: spec.Address,
     blocks: typing.Sequence[str],
     output: str,
@@ -50,4 +51,4 @@ async def async_burns_command(
         start_block=start_block,
         end_block=end_block,
     )
-    cli_utils.output_data(burns, output, overwrite)
+    cli_utils.output_data(burns, output, overwrite=overwrite)

@@ -1,4 +1,5 @@
 import os
+import types
 
 import ctc
 
@@ -86,10 +87,14 @@ def test_async_function_names():
                 ) or attr_name.startswith('_async')
                 if inspect.iscoroutinefunction(module_attr):
                     if not named_as_async:
-                        should_have_async_in_name.append(modname + '.' + attr_name)
+                        should_have_async_in_name.append(
+                            modname + '.' + attr_name
+                        )
                 else:
                     if named_as_async:
-                        should_not_have_async_in_name.append(modname + '.' + attr_name)
+                        should_not_have_async_in_name.append(
+                            modname + '.' + attr_name
+                        )
 
     if len(should_have_async_in_name) > 0:
         message = 'names of these items should start with async_ or _async_:'
@@ -97,12 +102,84 @@ def test_async_function_names():
             message += '\n    - ' + attr
         raise Exception(message)
     if len(should_not_have_async_in_name) > 0:
-        message = 'names of these items should not start with async_ or _async_:'
+        message = (
+            'names of these items should not start with async_ or _async_:'
+        )
         for attr in should_not_have_async_in_name:
             message += '\n    - ' + attr
         raise Exception(message)
     if len(should_use_by_block) > 0:
-        message = 'functions should use by_block instead of per_block or by_blocks'
+        message = (
+            'functions should use by_block instead of per_block or by_blocks'
+        )
         for attr in should_use_by_block:
             message += '\n    - ' + attr
+        raise Exception(message)
+
+
+def iterate_package_functions(prefix):
+    import importlib
+    import pkgutil
+
+    functions = {}
+    function_to_name = {}
+
+    for importer, modname, ispkg in pkgutil.walk_packages(
+        path=ctc.__path__,
+        prefix=prefix,
+        onerror=lambda x: None,
+    ):
+
+        # skip files that run a lot of code
+        if modname.endswith('__main__'):
+            continue
+
+        module = importlib.import_module(modname)
+        for attr_name in dir(module):
+            module_attr = getattr(module, attr_name)
+            if isinstance(module_attr, types.FunctionType):
+
+                function_data = {
+                    'module_name': modname,
+                    'function_name': attr_name,
+                    'function': module_attr,
+                    'module': module,
+                }
+                name = modname + '.' + attr_name
+
+                if module_attr not in function_to_name:
+                    functions[name] = function_data
+                    function_to_name[module_attr] = name
+                else:
+                    # use longest valid name for function
+                    other_name = function_to_name[module_attr]
+                    if len(name) > len(other_name):
+                        del functions[other_name]
+                        functions[name] = function_data
+                        function_to_name[module_attr] = name
+
+    return functions
+
+
+def test_max_positional_args():
+    import inspect
+
+    max_positional_args = 2
+
+    too_many = []
+    for function_name, function_data in iterate_package_functions('ctc.').items():
+        argspec = inspect.getfullargspec(function_data['function'])
+        if len(argspec.args) > max_positional_args:
+            too_many.append(function_name)
+
+    if len(too_many) > 0:
+        message = (
+            'functions should take no more than '
+            + str(max_positional_args)
+            + ' positional args, use `*` to convert to keyword-only arguments'
+        )
+        for item in too_many:
+            message += '\n- ' + item
+        message += '\n' + str(len(too_many)) + ' violations'
+        message += '\n\nuse `*` to convert to keyword-only arguments'
         raise Exception(message)

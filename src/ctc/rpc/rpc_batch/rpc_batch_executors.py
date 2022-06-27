@@ -24,6 +24,7 @@ async def async_batch_eth_block_number(
 
 
 async def async_batch_eth_call(
+    *,
     function_abi: spec.FunctionABI | None = None,
     function_name: str | None = None,
     function_selector: spec.FunctionSelector | None = None,
@@ -476,4 +477,3 @@ async def async_batch_web3_client_version(
 
 async def async_batch_web3_sha3(**kwargs: typing.Any) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('web3_sha3', **kwargs)
-

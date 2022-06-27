@@ -46,6 +46,7 @@ def decode_event_topics(
 
 def decode_event_topics(
     topics: typing.Sequence[spec.BinaryData],
+    *,
     event_abi: typing.Optional[spec.EventABI] = None,
     indexed_types: typing.Optional[list[spec.ABIDatumType]] = None,
     indexed_names: typing.Optional[list[str]] = None,
@@ -154,6 +155,7 @@ def decode_event_unindexed_data(
 def normalize_event(
     event: spec.RawLog,
     event_abi: spec.EventABI,
+    *,
     arg_prefix: str = 'arg__',
 ) -> spec.NormalizedLog:
 
@@ -203,6 +205,7 @@ def normalize_event(
 def decode_events_dataframe(
     df: spec.DataFrame,
     event_abi: spec.EventABI,
+    *,
     delete_data_column: bool = True,
 ) -> spec.DataFrame:
     """decode dataframe that contains raw event data
@@ -290,4 +293,3 @@ def decode_events_dataframe(
         del new_df['topic3']
 
     return new_df
-

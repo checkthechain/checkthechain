@@ -28,6 +28,7 @@ def construct(
 def digest(
     response: spec.RpcRequest,
     request: spec.RpcResponse,
+    *,
     digest_kwargs: typing.Optional[dict[typing.Any, typing.Any]] = None,
 ) -> spec.RpcResponse:
     """process an rpc response"""
@@ -39,7 +40,7 @@ def digest(
         return digestor(response=response, **digest_kwargs)
     elif isinstance(request, list) and isinstance(response, list):
         return [
-            digest(subresponse, subrequest, digest_kwargs)
+            digest(subresponse, subrequest, digest_kwargs=digest_kwargs)
             for subresponse, subrequest in zip(response, request)
         ]
     else:
@@ -49,6 +50,7 @@ def digest(
 async def async_execute(
     request: spec.RpcRequest,
     provider: spec.ProviderReference = None,
+    *,
     digest_kwargs: typing.Optional[dict[typing.Any, typing.Any]] = None,
 ) -> spec.RpcResponse:
     response = await rpc_request.async_send(request=request, provider=provider)

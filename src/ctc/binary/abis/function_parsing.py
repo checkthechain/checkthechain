@@ -67,6 +67,7 @@ def get_function_parameter_names(
 
 def get_function_signature(
     function_abi: spec.FunctionABI | None = None,
+    *,
     parameter_types: typing.Optional[list[str]] = None,
     function_name: typing.Optional[str] = None,
     include_names: bool = False,
@@ -165,4 +166,3 @@ def get_function_output_names(
                     output_names[on] == 'output_' + str(on)
 
     return output_names
-

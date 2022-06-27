@@ -18,4 +18,3 @@ def construct_eth_compile_solidity(code: str) -> spec.RpcRequest:
 
 def construct_eth_compile_serpent(code: str) -> spec.RpcRequest:
     return rpc_request.create('eth_compileSerpent', [code])
-

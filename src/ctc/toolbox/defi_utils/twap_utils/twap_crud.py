@@ -17,6 +17,7 @@ async def async_get_twap(
     #
     # # data samples
     filter_duration: tooltime.Timestamp,
+    *,
     #
     # # output samples
     output_start_block: typing.Optional[spec.BlockNumberReference] = None,
@@ -76,6 +77,7 @@ async def async_get_twap(
 async def async_get_twap_single_sample(
     data_source: twap_spec.DataSource,
     filter_duration: tooltime.Timestamp,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     timestamp: typing.Optional[tooltime.Timestamp] = None,
     provider: spec.ProviderReference = None,
@@ -97,4 +99,3 @@ async def async_get_twap_single_sample(
         raise Exception()
     else:
         return series.values[0]
-

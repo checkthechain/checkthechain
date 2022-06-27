@@ -61,6 +61,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_abi_command(
+    *,
     address: spec.Address,
     name: str | None,
     json_pretty: bool,

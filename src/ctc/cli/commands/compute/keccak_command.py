@@ -37,7 +37,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def keccack_command(data: str, text: bool, hex: bool, raw: bool) -> None:
+def keccack_command(*, data: str, text: bool, hex: bool, raw: bool) -> None:
     if text:
         hex = False
     elif hex:

@@ -8,6 +8,7 @@ from ctc import spec
 
 
 def filter_twap(
+    *,
     raw_values: typing.Sequence[typing.Any],
     timestamps: typing.Sequence[typing.Any],
     filter_duration: tooltime.Timestamp,

@@ -12,6 +12,7 @@ from ... import rari_abis
 
 async def async_get_supply_interest_by_block(
     ctoken: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     fill_empty: bool = False,
@@ -33,6 +34,7 @@ async def async_get_supply_interest_by_block(
 
 async def async_get_borrow_interest_by_block(
     ctoken: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     fill_empty: bool = False,
@@ -54,6 +56,7 @@ async def async_get_borrow_interest_by_block(
 
 async def async_get_supply_apy(
     ctoken: spec.Address,
+    *,
     blocks_per_year: int | None = None,
     block: spec.BlockNumberReference = 'latest',
     fill_empty: bool = False,
@@ -83,6 +86,7 @@ async def async_get_supply_apy(
 
 async def async_get_borrow_apy(
     ctoken: spec.Address,
+    *,
     blocks_per_year: int | None = None,
     block: spec.BlockNumberReference = 'latest',
     fill_empty: bool = False,

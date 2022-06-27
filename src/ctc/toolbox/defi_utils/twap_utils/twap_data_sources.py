@@ -8,6 +8,7 @@ from . import twap_spec
 
 async def async_get_chainlink_data(
     data_source: twap_spec.DataSource,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,

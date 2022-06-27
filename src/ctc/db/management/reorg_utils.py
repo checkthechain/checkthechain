@@ -24,6 +24,7 @@ def get_required_confirmations(network: spec.NetworkReference) -> int:
 
 async def async_revalidate_blocks(
     conn: toolsql.SAConnection,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_block: spec.BlockNumberReference | None = None,
@@ -141,11 +142,14 @@ async def async_does_block_hash_match(
 
 async def async_detect_block_reorgs(
     conn: toolsql.SAConnection,
+    *,
     check_block_number: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> None:
     # detect
-    check_block = await evm.async_get_block(check_block_number, provider=provider)
+    check_block = await evm.async_get_block(
+        check_block_number, provider=provider
+    )
     block_number = check_block['number']
 
     # if block_db.has_block(block_number=block_number):
@@ -156,4 +160,3 @@ async def async_detect_block_reorgs(
 #     # assumes that
 #     start_block = events.get_event_data(columns['block_number'])
 #     block_hashes = events.get_event_data(columns=['block_hash'], unique=True)
-

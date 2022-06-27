@@ -64,6 +64,7 @@ def log_rpc_request(
 
 
 def log_rpc_response(
+    *,
     response: spec.RpcResponse,
     request: spec.RpcRequest,
     provider: spec.ProviderReference,

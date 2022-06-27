@@ -6,6 +6,7 @@ from ctc import spec
 
 async def async_get_pool_swaps(
     pool_address: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     replace_symbols: bool = False,
@@ -18,4 +19,3 @@ async def async_get_pool_swaps(
         replace_symbols=replace_symbols,
         normalize=normalize,
     )
-

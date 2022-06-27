@@ -34,6 +34,7 @@ syntax is one of
 
 
 async def async_decode_command(
+    *,
     args: typing.Sequence[str],
     nested: bool,
     title: str | None = None,
@@ -108,7 +109,7 @@ async def async_decode_command(
             )
             print()
             await async_decode_command(
-                nested_call,
+                args=nested_call,
                 nested=False,
                 title=title,
                 indent='',

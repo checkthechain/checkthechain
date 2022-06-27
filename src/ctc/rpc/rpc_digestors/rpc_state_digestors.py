@@ -9,6 +9,7 @@ from ctc import binary
 def digest_eth_call(
     response: spec.RpcSingularResponse,
     function_abi: spec.FunctionABI | None,
+    *,
     decode_response: bool = True,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
@@ -37,7 +38,7 @@ def digest_eth_call(
 
 
 def digest_eth_estimate_gas(
-    response: spec.RpcSingularResponse, decode_response: bool = True
+    response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -45,7 +46,7 @@ def digest_eth_estimate_gas(
 
 
 def digest_eth_get_balance(
-    response: spec.RpcSingularResponse, decode_response: bool = True
+    response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -62,4 +63,3 @@ def digest_eth_get_code(
     response: spec.RpcSingularResponse,
 ) -> spec.RpcSingularResponse:
     return response
-

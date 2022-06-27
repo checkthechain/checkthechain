@@ -28,6 +28,7 @@ def chunk_blocks_into_ranges(
 def get_chunks_in_range(
     start_block: int,
     end_block: int,
+    *,
     chunk_size: int,
     trim_excess: bool = False,
 ) -> list[list[int]]:

@@ -9,6 +9,7 @@ from .. import uniswap_v3_spec
 async def async_pool_observe(
     seconds_agos: list[int],
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
@@ -29,6 +30,7 @@ async def async_pool_observe(
 
 
 async def async_pool_snapshot_cumulatives_inside(
+    *,
     tick_lower: int,
     tick_upper: int,
     pool: spec.Address,

@@ -11,8 +11,9 @@ from ..blocks import blocks_statements
 
 
 async def async_select_block_timestamp(
-    conn: toolsql.SAConnection,
     block_number: int,
+    *,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
 
@@ -37,8 +38,9 @@ async def async_select_block_timestamp(
 
 
 async def async_select_block_timestamps(
-    conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[typing.SupportsInt],
+    *,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> list[int | None] | None:
 
@@ -63,6 +65,7 @@ async def async_select_block_timestamps(
 
 
 async def async_select_max_block_number(
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
@@ -86,15 +89,18 @@ async def async_select_max_block_number(
 
 
 async def async_select_max_block_timestamp(
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
     timestamp_schema = management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        return await block_timestamps_statements.async_select_max_block_timestamp(
-            conn=conn,
-            network=network,
+        return (
+            await block_timestamps_statements.async_select_max_block_timestamp(
+                conn=conn,
+                network=network,
+            )
         )
 
     elif timestamp_schema == 'blocks':

@@ -10,6 +10,7 @@ from . import contract_abis_statements
 async def async_intake_contract_abi(
     abi: spec.ContractABI,
     contract_address: spec.Address,
+    *,
     network: spec.NetworkReference,
     # block: int,
     includes_proxy: bool,

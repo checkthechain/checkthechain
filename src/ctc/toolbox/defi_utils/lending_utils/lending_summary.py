@@ -14,6 +14,7 @@ from ctc import spec
 async def async_get_lending_flows(
     wallet: spec.Address,
     pool_token: spec.ERC20Reference,
+    *,
     protocol: typing.Literal['aave', 'compound', 'rari'],
     wallet_deposits: spec.DataFrame | None = None,
     deposits: spec.DataFrame | None = None,
@@ -176,6 +177,7 @@ async def async_get_lending_flows(
 
 
 async def _async_create_raw_wallet_flows_df(
+    *,
     wallet: spec.Address,
     wallet_deposits: spec.DataFrame | None = None,
     deposits: spec.DataFrame | None = None,
@@ -231,4 +233,3 @@ async def _async_create_raw_wallet_flows_df(
         raw_df.loc[block] = [0, 0]
 
     return raw_df
-

@@ -16,6 +16,7 @@ from . import version_utils
 def create_evm_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[schema_utils.SchemaName] | None = None,
+    *,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
@@ -150,6 +151,7 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
 
 def initialize_schema(
     schema_name: schema_utils.SchemaName,
+    *,
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     prepared_schema: bool = True,
@@ -200,6 +202,7 @@ def initialize_schema(
 def drop_schema(
     schema_name: schema_utils.SchemaName,
     network: spec.NetworkReference | None = None,
+    *,
     confirm: bool = False,
 ) -> None:
 

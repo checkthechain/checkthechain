@@ -58,6 +58,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_balances_command(
+    *,
     wallets: typing.Sequence[str],
     block: typing.Optional[spec.BlockNumberReference],
     blocks: typing.Optional[typing.Sequence[str]],
@@ -115,5 +116,5 @@ async def async_balances_command(
             output_data = series
 
     cli_utils.output_data(
-        output_data, output, overwrite, indent=indent, raw=raw
+        output_data, output, overwrite=overwrite, indent=indent, raw=raw
     )

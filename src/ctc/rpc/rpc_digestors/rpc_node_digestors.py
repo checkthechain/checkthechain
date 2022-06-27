@@ -36,7 +36,7 @@ def digest_net_listening(
 
 
 def digest_eth_protocol_version(
-    response: spec.RpcSingularResponse, decode_response: bool = True
+    response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -44,7 +44,7 @@ def digest_eth_protocol_version(
 
 
 def digest_eth_syncing(
-    response: spec.RpcSingularResponse, snake_case_response: bool = True
+    response: spec.RpcSingularResponse, *, snake_case_response: bool = True
 ) -> spec.RpcSingularResponse:
     if snake_case_response:
         if isinstance(response, dict):
@@ -54,6 +54,7 @@ def digest_eth_syncing(
 
 def digest_eth_chain_id(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if decode_response:

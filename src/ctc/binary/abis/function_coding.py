@@ -50,6 +50,7 @@ def encode_call_data(
 def decode_call_data(
     call_data: spec.BinaryData,
     function_abi: typing.Optional[spec.FunctionABI] = None,
+    *,
     contract_abi: typing.Optional[spec.ContractABI] = None,
 ) -> spec.DecodedCallData:
 
@@ -103,6 +104,7 @@ def decode_call_data(
 
 
 def encode_function_parameters(
+    *,
     parameters: typing.Optional[_Parameters] = None,
     parameter_types: typing.Optional[typing.Sequence[spec.ABIDatumType]] = None,
     function_signature: typing.Optional[str] = None,
@@ -162,6 +164,7 @@ def decode_function_parameters(
 
 
 def decode_function_named_parameters(
+    *,
     function_abi: spec.FunctionABI,
     encoded_parameters: spec.BinaryData,
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
@@ -192,6 +195,7 @@ def decode_function_named_parameters(
 
 
 def decode_function_output(
+    *,
     encoded_output: spec.BinaryData,
     output_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_abi: spec.FunctionABI | None = None,

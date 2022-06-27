@@ -8,7 +8,7 @@ from .. import rpc_request
 
 
 async def async_eth_gas_price(
-    provider: spec.ProviderReference = None, decode_response: bool = True
+    *, provider: spec.ProviderReference = None, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_gas_price()
     response = await rpc_request.async_send(request, provider=provider)
@@ -19,6 +19,7 @@ async def async_eth_gas_price(
 
 
 async def async_eth_accounts(
+    *,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_accounts()
@@ -29,6 +30,7 @@ async def async_eth_accounts(
 async def async_eth_sign(
     address: spec.Address,
     message: str,
+    *,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_sign(
@@ -42,6 +44,7 @@ async def async_eth_sign(
 async def async_eth_sign_transaction(
     from_address: spec.Address,
     data: str,
+    *,
     to_address: spec.Address | None = None,
     gas: int | None = None,
     gas_price: int | None = None,
@@ -69,6 +72,7 @@ async def async_eth_sign_transaction(
 async def async_eth_send_transaction(
     from_address: spec.Address,
     data: str,
+    *,
     to_address: spec.Address | None = None,
     gas: int | None = None,
     gas_price: int | None = None,
@@ -94,9 +98,8 @@ async def async_eth_send_transaction(
 
 
 async def async_eth_send_raw_transaction(
-    data: str, provider: spec.ProviderReference = None
+    data: str, *, provider: spec.ProviderReference = None
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_send_raw_transaction(data=data)
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_send_raw_transaction(response=response)
-

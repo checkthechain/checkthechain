@@ -32,6 +32,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_payload_command(
+    *,
     timescale: str,
     path: str,
     overwrite: bool,

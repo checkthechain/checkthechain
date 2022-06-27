@@ -56,6 +56,7 @@ def color_polarity(value: int | float | None) -> str:
 
 def print_market_data(
     data: typing.Sequence[typing.Any],
+    *,
     verbose: bool,
     include_links: bool = False,
     height: int | None = None,

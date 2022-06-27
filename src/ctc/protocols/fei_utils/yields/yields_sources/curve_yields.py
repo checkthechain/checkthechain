@@ -45,6 +45,7 @@ async def async_get_fei_yield_data(
 async def async_get_curve_farm_yield_data(
     block_numbers: typing.Sequence[spec.BlockNumberReference],
     name: str,
+    *,
     ctoken: spec.Address,
 ) -> yields_spec.YieldSourceData:
 
@@ -110,4 +111,3 @@ async def async_get_fei_yield_history(
     ctoken: spec.Address,
 ) -> dict[str, list[float]]:
     return {'Staking': [0.01 for block in block_numbers]}
-

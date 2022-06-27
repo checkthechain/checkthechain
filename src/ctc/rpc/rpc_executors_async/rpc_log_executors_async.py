@@ -10,6 +10,7 @@ from .. import rpc_request
 
 
 async def async_eth_new_filter(
+    *,
     address: spec.Address | None = None,
     topics: typing.Sequence[spec.BinaryData] | None = None,
     start_block: spec.BlockNumberReference | None = None,
@@ -31,7 +32,7 @@ async def async_eth_new_filter(
 
 
 async def async_eth_new_block_filter(
-    provider: spec.ProviderReference = None, decode_response: bool = False
+    *, provider: spec.ProviderReference = None, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_new_block_filter()
     response = await rpc_request.async_send(request, provider=provider)
@@ -42,7 +43,7 @@ async def async_eth_new_block_filter(
 
 
 async def async_eth_new_pending_transaction_filter(
-    provider: spec.ProviderReference = None, decode_response: bool = False
+    *, provider: spec.ProviderReference = None, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_new_pending_transaction_filter()
     response = await rpc_request.async_send(request, provider=provider)
@@ -54,6 +55,7 @@ async def async_eth_new_pending_transaction_filter(
 
 async def async_eth_uninstall_filter(
     filter_id: spec.BinaryInteger,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = False,
 ) -> spec.RpcSingularResponse:
@@ -69,6 +71,7 @@ async def async_eth_uninstall_filter(
 
 async def async_eth_get_filter_changes(
     filter_id: spec.BinaryInteger,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -88,6 +91,7 @@ async def async_eth_get_filter_changes(
 
 async def async_eth_get_filter_logs(
     filter_id: spec.BinaryInteger,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -106,6 +110,7 @@ async def async_eth_get_filter_logs(
 
 
 async def async_eth_get_logs(
+    *,
     address: spec.BinaryData | None = None,
     topics: typing.Sequence[spec.BinaryData] | None = None,
     start_block: spec.BlockNumberReference | None = None,
@@ -131,4 +136,3 @@ async def async_eth_get_logs(
         snake_case_response=snake_case_response,
         include_removed=include_removed,
     )
-

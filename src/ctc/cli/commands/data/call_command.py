@@ -39,6 +39,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_call_command(
+    *,
     address: spec.Address,
     function_name: str,
     args: typing.Sequence[str],

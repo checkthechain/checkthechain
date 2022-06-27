@@ -10,6 +10,7 @@ from . import feed_data
 
 async def async_get_composite_feed_data(
     composite_feed: typing.Sequence[chainlink_spec._FeedReference],
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     invert: bool = False,
@@ -56,4 +57,3 @@ async def async_get_composite_feed_data(
         product = 1 / product
 
     return product
-

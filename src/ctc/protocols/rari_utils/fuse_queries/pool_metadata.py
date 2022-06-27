@@ -13,6 +13,7 @@ from . import token_metadata
 async def async_get_pool_ctoken(
     comptroller: spec.Address,
     underlying: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
 ) -> spec.Address:
     return await rpc.async_eth_call(
@@ -25,6 +26,7 @@ async def async_get_pool_ctoken(
 
 async def async_get_pool_ctokens(
     comptroller: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
 ) -> tuple[spec.Address]:
     return await rpc.async_eth_call(
@@ -57,6 +59,7 @@ async def async_get_pool_underlying_tokens(
 
 async def async_get_pool_oracle(
     comptroller: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
 ) -> spec.Address:
     return await rpc.async_eth_call(
@@ -68,6 +71,7 @@ async def async_get_pool_oracle(
 
 async def async_get_pool_name(
     comptroller: spec.Address,
+    *,
     all_pools: list[list[typing.Any]] | None = None,
     block: spec.BlockNumberReference = 'latest',
 ) -> str:
@@ -79,4 +83,3 @@ async def async_get_pool_name(
             return pool[0]
     else:
         raise Exception('could not find pool')
-

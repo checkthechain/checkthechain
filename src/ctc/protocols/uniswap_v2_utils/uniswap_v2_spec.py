@@ -28,4 +28,3 @@ class PoolStateByBlock(TypedDict):
     x_reserves: list[typing.Union[int, float]]
     y_reserves: list[typing.Union[int, float]]
     lp_total_supply: list[typing.Union[int, float]]
-

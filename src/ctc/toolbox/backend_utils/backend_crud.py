@@ -25,6 +25,7 @@ def get_backend_order(
 def run_on_backend(
     backend_functions: typing.Mapping[str, typing.Callable[..., T]],
     backend: str | None = None,
+    *,
     backend_order: typing.Sequence[str] | None = None,
     **function_kwargs: typing.Any,
 ) -> T:
@@ -46,6 +47,7 @@ async def async_run_on_backend(
         str, typing.Callable[..., typing.Coroutine[typing.Any, typing.Any, T]]
     ],
     backend: str | None = None,
+    *,
     backend_order: typing.Sequence[str] | None = None,
     **function_kwargs: typing.Any,
 ) -> T:
@@ -65,6 +67,7 @@ async def async_run_on_backend(
 def transfer_backends(
     get: typing.Callable[..., typing.Any],
     save: typing.Callable[..., typing.Any],
+    *,
     from_backend: str,
     to_backend: str,
     get_kwargs: typing.Mapping[str, typing.Any] | None = None,
@@ -91,6 +94,7 @@ def transfer_backends(
 async def async_transfer_backends(
     get: typing.Callable[..., typing.Any],
     save: typing.Callable[..., typing.Any],
+    *,
     from_backend: str,
     to_backend: str,
     get_kwargs: typing.Mapping[str, typing.Any] | None = None,
@@ -112,4 +116,3 @@ async def async_transfer_backends(
     save_kwargs = dict(common_kwargs, **get_kwargs)
 
     return await save(result, backend=to_backend, **save_kwargs)
-

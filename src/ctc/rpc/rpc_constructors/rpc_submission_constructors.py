@@ -19,6 +19,7 @@ def construct_eth_sign(address: spec.Address, message: str) -> spec.RpcRequest:
 def construct_eth_sign_transaction(
     from_address: spec.Address,
     data: str,
+    *,
     to_address: spec.Address | None = None,
     gas: int | None = None,
     gas_price: int | None = None,
@@ -43,6 +44,7 @@ def construct_eth_sign_transaction(
 def construct_eth_send_transaction(
     from_address: spec.BinaryData,
     data: spec.BinaryData,
+    *,
     to_address: spec.BinaryData | None = None,
     gas: int | None = None,
     gas_price: int | None = None,
@@ -67,4 +69,3 @@ def construct_eth_send_raw_transaction(
     data: spec.BinaryData,
 ) -> spec.RpcRequest:
     return rpc_request.create('eth_sendRawTransaction', [data])
-

@@ -25,7 +25,7 @@ display_names = {
 
 
 def sort_nested_by(
-    nested: typing.Mapping[K, V], key: str, reverse: bool = False
+    nested: typing.Mapping[K, V], key: str, *, reverse: bool = False
 ) -> typing.Mapping[K, V]:
     pairs = list(nested.items())
     sorted_pairs = sorted(pairs, key=lambda pair: pair[1][key], reverse=reverse)
@@ -195,6 +195,7 @@ async def _async_get_all_pools_stats(
 async def async_get_token_multipool_stats(
     token: spec.Address,
     block: spec.BlockNumberReference = 'latest',
+    *,
     in_usd: bool = True,
 ) -> dict[str, typing.Any]:
     import asyncio
@@ -282,6 +283,7 @@ async def async_get_token_multipool_stats(
 async def async_get_token_pool_stats(
     token: spec.Address,
     comptroller: spec.Address,
+    *,
     eth_price: spec.Number,
     block: spec.BlockNumberReference = 'latest',
     in_usd: bool = True,
@@ -305,8 +307,8 @@ async def async_get_token_pool_stats(
             matches.append(ctoken)
             stats = await fuse_queries.async_get_ctoken_tvl_and_tvb(
                 ctoken,
-                oracle,
-                eth_price,
+                oracle=oracle,
+                eth_price=eth_price,
                 block=block,
                 in_usd=in_usd,
             )
@@ -323,6 +325,7 @@ async def async_get_token_pool_stats(
 
 async def async_print_fuse_token_summary(
     token: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
     in_usd: bool = True,
 ) -> None:

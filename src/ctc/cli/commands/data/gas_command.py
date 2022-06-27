@@ -55,6 +55,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_gas_command(
+    *,
     last: typing.Optional[typing.Sequence[str]],
     output: str,
     overwrite: bool,
@@ -156,4 +157,4 @@ async def async_gas_command(
     final_df = final_df.sort_values(by='time')
     final_df = final_df.set_index('blocks')
 
-    cli_utils.output_data(final_df, output, overwrite)
+    cli_utils.output_data(final_df, output, overwrite=overwrite)

@@ -30,6 +30,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_balance_command(
+    *,
     erc20_address: spec.Address,
     wallet_address: spec.Address,
     block: str,

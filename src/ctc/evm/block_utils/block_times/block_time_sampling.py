@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 async def async_sample_blocks(
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     include_latest_if_trimmed: bool = True,

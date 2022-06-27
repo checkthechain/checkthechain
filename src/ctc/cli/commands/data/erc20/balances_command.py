@@ -71,6 +71,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_balances_command(
+    *,
     args: typing.Sequence[str],
     block: typing.Optional[spec.BlockNumberReference],
     wallets: typing.Optional[typing.Sequence[str]],

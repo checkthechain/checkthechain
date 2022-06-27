@@ -51,6 +51,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_events_command(
+    *,
     contract: str,
     event: str,
     blocks: typing.Sequence[str],

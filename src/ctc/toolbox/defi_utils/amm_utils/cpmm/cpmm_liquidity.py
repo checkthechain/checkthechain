@@ -10,6 +10,7 @@ from . import cpmm_spec
 def mint_liquidity(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     lp_total_supply: int | float,
     x_deposited: int | float | None = None,
     y_deposited: int | float | None = None,
@@ -53,6 +54,7 @@ def mint_liquidity(
 def burn_liquidity(
     x_reserves: int | float,
     y_reserves: int | float,
+    *,
     lp_total_supply: int | float,
     x_withdrawn: int | float | None = None,
     y_withdrawn: int | float | None = None,
@@ -91,4 +93,3 @@ def burn_liquidity(
             'lp_total_supply': lp_total_supply_new,
         },
     }
-

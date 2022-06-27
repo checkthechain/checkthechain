@@ -8,7 +8,7 @@ from .. import rpc_digestors
 
 
 async def async_eth_get_compilers(
-    provider: spec.ProviderReference = None,
+    *, provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_compilers()
     response = await rpc_request.async_send(request, provider=provider)
@@ -16,7 +16,7 @@ async def async_eth_get_compilers(
 
 
 async def async_eth_compile_lll(
-    code: str, provider: spec.ProviderReference = None
+    code: str, *, provider: spec.ProviderReference = None
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_compile_lll(code=code)
     response = await rpc_request.async_send(request, provider=provider)
@@ -24,7 +24,7 @@ async def async_eth_compile_lll(
 
 
 async def async_eth_compile_solidity(
-    code: str, provider: spec.ProviderReference = None
+    code: str, *, provider: spec.ProviderReference = None
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_compile_solidity(code=code)
     response = await rpc_request.async_send(request, provider=provider)
@@ -32,9 +32,8 @@ async def async_eth_compile_solidity(
 
 
 async def async_eth_compile_serpent(
-    code: str, provider: spec.ProviderReference = None
+    code: str, *, provider: spec.ProviderReference = None
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_compile_serpent(code=code)
     response = await rpc_request.async_send(request, provider=provider)
     return rpc_digestors.digest_eth_compile_serpent(response=response)
-

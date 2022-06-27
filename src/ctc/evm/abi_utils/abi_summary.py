@@ -69,6 +69,7 @@ async def async_get_contract_events(
 
 def print_contract_abi_human_readable(
     contract_abi: spec.ContractABI,
+    *,
     max_width: int = 80,
     verbose: bool | int = False,
 ) -> None:
@@ -270,6 +271,7 @@ def contract_abi_to_dataframe(
 
 async def async_get_contract_events_dataframe(
     contract_abi: spec.ContractABI,
+    *,
     contract_name: str | None = None,
     contract_address: spec.Address | None = None,
     protocol_name: str | None = None,

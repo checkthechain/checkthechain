@@ -26,6 +26,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_storage_command(
+    *,
     contract_address: str,
     slot: str,
     block: spec.BlockNumberReference | None,

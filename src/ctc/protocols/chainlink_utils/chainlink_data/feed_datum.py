@@ -112,4 +112,3 @@ async def async_get_feed_datum(
 
     else:
         raise Exception('unknown fields type: ' + str(fields))
-

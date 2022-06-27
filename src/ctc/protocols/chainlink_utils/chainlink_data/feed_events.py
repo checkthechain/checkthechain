@@ -12,6 +12,7 @@ from . import feed_datum
 
 async def async_get_full_feed_event_data(
     feed: chainlink_spec._FeedReference,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -111,6 +112,7 @@ async def async_get_full_feed_event_data(
 
 async def async_get_answer_feed_event_data(
     feed: chainlink_spec._FeedReference,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -132,4 +134,3 @@ async def async_get_answer_feed_event_data(
     )
 
     return df['answer']
-

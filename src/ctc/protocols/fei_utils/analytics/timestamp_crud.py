@@ -12,6 +12,7 @@ from . import analytics_spec
 
 
 async def async_get_time_data(
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
     timestamps: typing.Sequence[int] | None = None,
     timescale: analytics_spec.TimescaleSpec | None = None,
@@ -94,6 +95,7 @@ def get_timestamps(
 
 async def async_get_timestamps_blocks(
     timestamps: typing.Sequence[analytics_spec.Timestamp],
+    *,
     provider: spec.ProviderReference,
     block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
@@ -153,4 +155,3 @@ def summarize_timestamps(
             print('   ', tooltime.timestamp_to_iso(timestamp))
     print()
     print()
-

@@ -53,6 +53,7 @@ def setup_config_path() -> None:
 
 
 def write_new_config(
+    *,
     network_data: spec.PartialConfig,
     db_data: spec.PartialConfig,
     data_root: str,

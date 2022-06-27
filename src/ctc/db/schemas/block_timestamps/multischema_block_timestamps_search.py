@@ -15,8 +15,9 @@ from .multischema_block_timestamps_statements import async_select_block_timestam
 
 
 async def async_select_timestamp_block(
-    conn: toolsql.SAConnection,
     timestamp: int,
+    *,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> int | None:
@@ -89,8 +90,9 @@ async def async_select_timestamp_block(
 
 
 async def async_select_timestamps_blocks(
-    conn: toolsql.SAConnection,
     timestamps: typing.Sequence[int],
+    *,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> list[int | None]:
@@ -118,6 +120,7 @@ async def async_select_timestamps_blocks(
 
 async def async_select_timestamp_block_range(
     timestamp: int,
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> tuple[int | None, int | None]:

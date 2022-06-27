@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 def compute_ohlc(
     values: typing.Sequence[spec.Number],
     indices: typing.Sequence[spec.Number],
+    *,
     bin_size: spec.Number | None = None,
     bins: typing.Sequence[spec.Number] | None = None,
     volumes: typing.Sequence[spec.Number] | None = None,

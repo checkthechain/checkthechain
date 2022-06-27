@@ -18,6 +18,7 @@ class BlockTimestampSearchCache(TypedDict):
 
 async def async_get_block_of_timestamp_from_node(
     timestamp: int,
+    *,
     nary: typing.Optional[int] = None,
     cache: typing.Optional[BlockTimestampSearchCache] = None,
     provider: spec.ProviderReference = None,
@@ -109,6 +110,7 @@ async def async_get_block_of_timestamp_from_node(
 async def _async_is_match_block_of_timestamp(
     block_numbers: list[int],
     timestamp: int,
+    *,
     cache: BlockTimestampSearchCache,
     provider: spec.ProviderReference = None,
 ) -> list[bool]:
@@ -131,6 +133,7 @@ async def _async_is_match_block_of_timestamp(
 
 
 def _get_next_probes_block_of_timestamp(
+    *,
     nary: int,
     probe_min: int,
     probe_max: int,
@@ -142,7 +145,9 @@ def _get_next_probes_block_of_timestamp(
 
     if cache['initializing'][timestamp]:
         cache['initializing'][timestamp] = False
-        return search_utils.get_next_probes_linear(probe_min, probe_max, nary)
+        return search_utils.get_next_probes_linear(
+            probe_min=probe_min, probe_max=probe_max, nary=nary
+        )
     else:
 
         min_timestamp = cache['timestamps'][probe_min]

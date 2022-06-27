@@ -10,6 +10,7 @@ from ctc import spec
 
 
 def calc_out_given_in(
+    *,
     token_amount_in: spec.Number,
     token_balance_in: spec.Number,
     token_weight_in: float,

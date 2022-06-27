@@ -65,6 +65,7 @@ def write_file_data(
         typing.Sequence[typing.Mapping[str, typing.Any]],
         typing.Mapping[typing.Any, typing.Mapping[str, typing.Any]],
     ],
+    *,
     format: typing.Optional[DataFormat] = None,
     overwrite: bool = False,
     index_field: typing.Optional[str] = None,
@@ -103,6 +104,7 @@ def write_buffer_data(
         typing.Sequence[typing.Mapping[str, typing.Any]],
         typing.Mapping[typing.Any, typing.Mapping[str, typing.Any]],
     ],
+    *,
     format: DataFormat,
     index_field: typing.Optional[str] = None,
 ) -> None:

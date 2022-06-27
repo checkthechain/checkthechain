@@ -17,6 +17,7 @@ def is_address_str(some_str: str) -> bool:
 def get_created_address(
     sender: spec.Address,
     nonce: int | None = None,
+    *,
     salt: str | None = None,
     init_code: spec.HexData | None = None,
 ) -> spec.Address:
@@ -45,6 +46,7 @@ def get_created_address(
 
 def create_hash_preview(
     hash_data: str,
+    *,
     show_start: bool = True,
     show_end: bool = True,
     include_0x: bool = True,
@@ -110,6 +112,7 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
 
 def create_reverse_address_map(
     address_map: typing.Mapping[str, spec.Address],
+    *,
     include_lower: bool = True,
     include_checksum: bool = True,
 ) -> dict[spec.Address, str]:
@@ -126,4 +129,3 @@ def create_reverse_address_map(
             reverse_map[get_address_checksum(address)] = name
 
     return reverse_map
-

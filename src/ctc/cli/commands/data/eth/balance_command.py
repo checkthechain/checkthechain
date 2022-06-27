@@ -31,6 +31,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_balance_command(
+    *,
     address: str,
     block: typing.Optional[spec.BlockNumberReference],
     raw: bool,

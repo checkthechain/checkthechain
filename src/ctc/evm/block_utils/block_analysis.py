@@ -11,6 +11,7 @@ T = typing.TypeVar('T', spec.DataFrame, spec.Series)
 def bin_by_blocks(
     data: T,
     blocks: typing.Sequence[typing.SupportsInt],
+    *,
     block_index_name: typing.Optional[str] = 'block_number',
 ) -> T:
     """TODO: deprecate

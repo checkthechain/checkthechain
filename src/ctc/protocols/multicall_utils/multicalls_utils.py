@@ -48,6 +48,7 @@ def get_multicall_address(
 
 async def async_multicall(
     calls: typing.Sequence[multicall_spec.Call],
+    *,
     block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> typing.List[typing.Any]:
@@ -89,6 +90,7 @@ async def async_multicall(
 
 async def async_multicall_by_block(
     calls: typing.Sequence[multicall_spec.Call],
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[typing.Sequence[typing.Any]]:
@@ -102,4 +104,3 @@ async def async_multicall_by_block(
     ]
     results = asyncio.gather(*coroutines)
     return list(zip(*results))
-

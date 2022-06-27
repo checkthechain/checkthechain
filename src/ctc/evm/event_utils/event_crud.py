@@ -123,6 +123,7 @@ async def async_transfer_events(
 
 async def async_download_events(
     contract_address: spec.Address,
+    *,
     event_hash: str | None = None,
     event_name: str | None = None,
     event_abi: spec.EventABI | None = None,

@@ -25,6 +25,7 @@ coracle_function_abis: dict[str, spec.FunctionABI] = {
 
 
 async def async_get_tokens_deposits(
+    *,
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
     block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderReference = None,
@@ -61,6 +62,7 @@ async def async_get_tokens_deposits(
 
 async def async_get_token_deposits(
     token: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     wrapper: bool = False,
     provider: spec.ProviderReference = None,
@@ -83,6 +85,7 @@ async def async_get_token_deposits(
 
 async def async_get_deposit_token(
     deposit: spec.ContractAddress,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> spec.Address:
@@ -93,4 +96,3 @@ async def async_get_deposit_token(
         function_name='token',
         provider=provider,
     )
-

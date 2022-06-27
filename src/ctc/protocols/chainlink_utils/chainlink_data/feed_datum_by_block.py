@@ -12,6 +12,7 @@ from . import feed_datum
 async def async_get_feed_answer_datum_by_block(
     feed: chainlink_spec._FeedReference,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
     interpolate: bool = True,
@@ -50,6 +51,7 @@ async def async_get_feed_answer_datum_by_block(
 async def async_get_feed_full_datum_by_block(
     feed: chainlink_spec._FeedReference,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
     interpolate: bool = True,
@@ -83,4 +85,3 @@ async def async_get_feed_full_datum_by_block(
         df = pd_utils.interpolate_dataframe(df=df)
 
     return df
-

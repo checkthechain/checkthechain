@@ -40,6 +40,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_block_command(
+    *,
     block: str | None,
     timestamp: str | int,
     verbose: bool,

@@ -9,6 +9,7 @@ from ... import schema_utils
 
 
 async def async_upsert_block(
+    *,
     block: spec.Block,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
@@ -24,6 +25,7 @@ async def async_upsert_block(
 
 
 async def async_upsert_blocks(
+    *,
     blocks: typing.Sequence[spec.Block],
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
@@ -40,6 +42,7 @@ async def async_upsert_blocks(
 
 async def async_select_block(
     block_number: int | str,
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> spec.Block | None:
@@ -110,6 +113,7 @@ async def async_select_blocks(
 
 async def async_delete_block(
     block_number: int | str,
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> None:
@@ -159,8 +163,9 @@ async def async_delete_blocks(
 
 
 async def async_select_block_timestamp(
-    conn: toolsql.SAConnection,
     block_number: int,
+    *,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
 
@@ -178,8 +183,9 @@ async def async_select_block_timestamp(
 
 
 async def async_select_block_timestamps(
-    conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[typing.SupportsInt],
+    *,
+    conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> list[int | None] | None:
 
@@ -207,6 +213,7 @@ async def async_select_block_timestamps(
 
 
 async def async_select_max_block_number(
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:
@@ -228,6 +235,7 @@ async def async_select_max_block_number(
 
 
 async def async_select_max_block_timestamp(
+    *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> int | None:

@@ -37,4 +37,3 @@ def digest_eth_hashrate(
     response: spec.RpcSingularResponse,
 ) -> spec.RpcSingularResponse:
     return response
-

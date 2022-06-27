@@ -44,6 +44,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_psms_command(
+    *,
     time: tooltime.Timelength,
     token: str,
     block: spec.BlockNumberReference,

@@ -18,6 +18,7 @@ def with_connection(
     async_f: Callable[..., Coroutine[Any, Any, R | None]],
     schema_name: schema_utils.SchemaName
     | Callable[..., schema_utils.SchemaName | None],
+    *,
     require_network: bool = True,
 ) -> Callable[..., Coroutine[Any, Any, R | None]]:
 

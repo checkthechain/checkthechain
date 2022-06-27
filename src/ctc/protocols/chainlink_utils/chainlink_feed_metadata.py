@@ -27,6 +27,7 @@ def _build_feed_query(
 
 async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
+    *,
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference = None,
     use_db: bool = True,
@@ -110,6 +111,7 @@ async def async_get_feed_aggregator(
 
 async def async_get_feed_first_block(
     feed: chainlink_spec._FeedReference,
+    *,
     provider: spec.ProviderReference = None,
     start_search: typing.Optional[spec.BlockNumberReference] = None,
     end_search: typing.Optional[spec.BlockNumberReference] = None,

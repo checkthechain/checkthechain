@@ -13,6 +13,7 @@ def construct_shh_version() -> spec.RpcRequest:
 def construct_shh_post(
     from_address: spec.BinaryData,
     to_address: spec.BinaryData,
+    *,
     topics: list[spec.BinaryData],
     payload: spec.BinaryData,
     priority: spec.BinaryData,
@@ -70,4 +71,3 @@ def construct_shh_get_filter_changes(
 
 def construct_shh_get_messages(filter_id: spec.BinaryData) -> spec.RpcRequest:
     return rpc_request.create('shh_get_messages', [filter_id])
-

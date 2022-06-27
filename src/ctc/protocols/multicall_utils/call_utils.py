@@ -34,7 +34,9 @@ async def async_encode_call_data(
     # parse components
     if isinstance(call, dict):
         if 'call_data' in call:
-            return typing.cast(multicall_spec.EncodedCallDict, call)['call_data']
+            return typing.cast(multicall_spec.EncodedCallDict, call)[
+                'call_data'
+            ]
         elif 'function' in call:
             call = typing.cast(multicall_spec.UnencodedCallDict, call)
             contract = call['contract']
@@ -76,6 +78,7 @@ async def async_encode_call_data(
 async def async_decode_call_output(
     call: multicall_spec.Call,
     encoded_output: spec.BinaryData,
+    *,
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> typing.Any:
     function_abi = await async_get_call_function_abi(call)
@@ -94,9 +97,13 @@ async def async_get_call_function_abi(
     call_data: spec.BinaryData | None = None
     if isinstance(call, dict):
         if 'function' in call:
-            function = typing.cast(multicall_spec.UnencodedCallDict, call)['function']
+            function = typing.cast(multicall_spec.UnencodedCallDict, call)[
+                'function'
+            ]
         elif 'call_data' in call:
-            call_data = typing.cast(multicall_spec.EncodedCallDict, call)['call_data']
+            call_data = typing.cast(multicall_spec.EncodedCallDict, call)[
+                'call_data'
+            ]
         else:
             raise Exception('unknown call format')
     elif isinstance(call, (list, tuple)):
@@ -132,6 +139,3 @@ async def async_get_call_function_abi(
 
     else:
         raise Exception('unknown call format')
-
-
-

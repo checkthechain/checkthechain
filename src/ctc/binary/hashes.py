@@ -11,6 +11,7 @@ from . import formats
 def keccak(
     data: spec.BinaryInteger,
     output_format: Literal['integer'],
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> int:
     ...
@@ -20,6 +21,7 @@ def keccak(
 def keccak(
     data: spec.BinaryInteger,
     output_format: Literal['binary'],
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> bytes:
     ...
@@ -29,6 +31,7 @@ def keccak(
 def keccak(
     data: spec.BinaryInteger,
     output_format: Literal['prefix_hex', 'raw_hex', None] = 'prefix_hex',
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
     ...
@@ -37,6 +40,7 @@ def keccak(
 def keccak(
     data: spec.BinaryInteger,
     output_format: typing.Optional[spec.BinaryFormat] = 'prefix_hex',
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of hex or binary data"""
@@ -74,6 +78,7 @@ def keccak(
 def keccak_text(
     text: typing.Union[str, bytes],
     output_format: Literal['integer'],
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> int:
     ...
@@ -83,6 +88,7 @@ def keccak_text(
 def keccak_text(
     text: typing.Union[str, bytes],
     output_format: Literal['binary'],
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> bytes:
     ...
@@ -92,6 +98,7 @@ def keccak_text(
 def keccak_text(
     text: typing.Union[str, bytes],
     output_format: Literal['prefix_hex', 'raw_hex'] = 'prefix_hex',
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> str:
     ...
@@ -100,6 +107,7 @@ def keccak_text(
 def keccak_text(
     text: typing.Union[str, bytes],
     output_format: spec.BinaryFormat = 'prefix_hex',
+    *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
 ) -> spec.BinaryInteger:
     """return keccack-256 hash of text"""
@@ -108,4 +116,3 @@ def keccak_text(
         text = text.encode()
 
     return keccak(text, output_format=output_format, library=library)
-

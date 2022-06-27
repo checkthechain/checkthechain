@@ -11,6 +11,7 @@ from ... import block_utils
 
 
 async def async_get_events_from_node(
+    *,
     start_block: spec.BlockNumberReference = 'latest',
     end_block: spec.BlockNumberReference = 'latest',
     event_name: str | None = None,
@@ -116,6 +117,7 @@ async def async_get_events_from_node(
 async def _async_get_chunk_of_events_from_node(
     block_range: typing.Sequence[spec.BlockNumberReference],
     event_hash: str,
+    *,
     contract_address: spec.Address | None,
     verbose: bool,
     provider: spec.ProviderReference = None,
@@ -141,6 +143,7 @@ async def _async_get_chunk_of_events_from_node(
 
 async def _async_package_exported_events(
     entries: typing.Sequence[spec.RawLog],
+    *,
     contract_address: spec.Address | None,
     contract_abi: spec.ContractABI | None,
     event_hash: str,

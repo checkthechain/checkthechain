@@ -55,6 +55,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_chainlink_command(
+    *,
     feed: typing.Sequence[str],
     blocks: typing.Optional[typing.Sequence[str]],
     output: str,

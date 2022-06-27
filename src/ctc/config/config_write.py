@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 def write_config_file(
     config_data: spec.Config,
     path: str,
+    *,
     overwrite: toolconfig.OverwriteOption = False,
     style: typing.Optional[str] = None
 ) -> None:

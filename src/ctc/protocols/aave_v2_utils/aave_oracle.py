@@ -12,6 +12,7 @@ from . import aave_spec
 
 async def async_get_asset_price(
     asset: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
@@ -55,6 +56,7 @@ async def async_get_asset_price(
 
 async def async_get_asset_price_by_block(
     asset: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
     normalize: bool = True,
@@ -71,4 +73,3 @@ async def async_get_asset_price_by_block(
         for block in blocks
     ]
     return await asyncio.gather(*coroutines)
-

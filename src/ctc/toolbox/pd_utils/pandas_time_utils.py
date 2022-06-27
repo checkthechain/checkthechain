@@ -84,7 +84,7 @@ def create_week_column(
 
 
 def add_missing_series_dates(
-    series: spec.Series, datetimes: spec.Series, fill_value: int = 0
+    series: spec.Series, datetimes: spec.Series, *, fill_value: int = 0
 ) -> spec.Series:
     series = series.copy()
     all_days = np.arange(
@@ -101,7 +101,7 @@ def add_missing_series_dates(
 
 
 def add_missing_series_weeks(
-    series: spec.Series, datetimes: spec.Series, fill_value: int = 0
+    series: spec.Series, datetimes: spec.Series, *, fill_value: int = 0
 ) -> spec.Series:
 
     series = series.copy()
@@ -132,4 +132,3 @@ def add_missing_series_weeks(
     series = series.sort_index()
 
     return series
-

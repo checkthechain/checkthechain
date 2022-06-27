@@ -8,6 +8,7 @@ from . import contract_abi_io
 
 
 async def async_get_event_abi(
+    *,
     contract_abi: typing.Optional[spec.ContractABI] = None,
     contract_address: typing.Optional[spec.Address] = None,
     event_name: typing.Optional[str] = None,

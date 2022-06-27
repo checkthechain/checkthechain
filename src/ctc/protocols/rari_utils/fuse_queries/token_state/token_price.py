@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-import warnings
 
 from ctc import rpc
 from ctc import spec
@@ -36,6 +35,7 @@ async def async_get_ctoken_exchange_rate_by_block(
 
 async def async_get_ctoken_price(
     ctoken: spec.Address,
+    *,
     oracle: spec.Address | None = None,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
@@ -57,7 +57,6 @@ async def async_get_ctoken_price(
     except spec.RpcException as e:
         if raise_on_revert:
             raise e
-        # warnings.warn('price query failed for ctoken ' + str(ctoken))
         price = 0
 
     return price
@@ -67,4 +66,3 @@ async def _async_get_ctoken_oracle(ctoken: spec.Address) -> spec.Address:
     comptroller = await token_metadata.async_get_ctoken_comptroller(ctoken)
     oracle = await pool_metadata.async_get_pool_oracle(comptroller)
     return oracle
-

@@ -10,6 +10,7 @@ async def async_bisect(
         ...,
         typing.Coroutine[typing.Any, typing.Any, float],
     ],
+    *,
     a: int | float,
     b: int | float,
     input_tol: float | None = None,

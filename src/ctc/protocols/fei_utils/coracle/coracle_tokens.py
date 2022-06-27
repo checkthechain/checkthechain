@@ -8,6 +8,7 @@ from . import coracle_spec
 
 
 async def async_get_tokens_in_pcv(
+    *,
     block: spec.BlockReference = 'latest',
     wrapper: bool = False,
     provider: spec.ProviderReference = None,
@@ -26,6 +27,7 @@ async def async_get_tokens_in_pcv(
 
 
 async def async_get_pcv_tokens_symbols(
+    *,
     tokens: list[spec.ERC20Reference],
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
@@ -44,4 +46,3 @@ async def async_get_pcv_tokens_symbols(
         tokens_symbols[coracle_spec.usd_token] = 'USD'
 
     return tokens_symbols
-

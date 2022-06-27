@@ -8,6 +8,7 @@ from . import erc20_metadata_statements
 async def async_intake_erc20_metadata(
     address: spec.Address,
     network: spec.NetworkReference,
+    *,
     decimals: int | None = None,
     symbol: str | None = None,
     name: str | None = None,

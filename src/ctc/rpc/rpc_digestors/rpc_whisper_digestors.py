@@ -61,4 +61,3 @@ def digest_shh_get_messages(
     response: spec.RpcSingularResponse,
 ) -> spec.RpcSingularResponse:
     return response
-

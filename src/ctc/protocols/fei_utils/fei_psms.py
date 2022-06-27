@@ -37,6 +37,7 @@ def get_psms(
 
 
 async def async_get_fei_psm_mints(
+    *,
     start_block: spec.BlockNumberReference = 14000000,
     end_block: spec.BlockNumberReference = 'latest',
     psms: typing.Mapping[str, spec.Address] | None = None,
@@ -95,6 +96,7 @@ async def async_get_fei_psm_mints(
 
 
 async def async_get_fei_psm_redemptions(
+    *,
     start_block: spec.BlockNumberReference = 14000000,
     end_block: spec.BlockNumberReference = 'latest',
     psms: typing.Mapping[str, spec.Address] | None = None,
@@ -158,7 +160,7 @@ async def async_get_fei_psm_redemptions(
 
 
 def print_fei_psm_mints(
-    mints: spec.DataFrame, limit: int = 30, verbose: bool = False
+    mints: spec.DataFrame, *, limit: int = 30, verbose: bool = False
 ) -> None:
 
     labels = [
@@ -207,6 +209,7 @@ def print_fei_psm_mints(
 
 def print_fei_psm_redemptions(
     redemptions: spec.DataFrame,
+    *,
     limit: int = 30,
     verbose: bool = False,
 ) -> None:

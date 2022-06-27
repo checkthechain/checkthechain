@@ -40,6 +40,7 @@ choice_names = {
 
 def request_raw_vote_data(
     name: str,
+    *,
     save: bool = True,
     overwrite: bool = False,
     verbose: bool = True,
@@ -83,7 +84,7 @@ def get_vote_data_dir() -> str:
     raise NotImplementedError()
 
 
-def get_vote_data_path(name: str, datatype: str, timestamp: str) -> str:
+def get_vote_data_path(*, name: str, datatype: str, timestamp: str) -> str:
     filename = vote_data_file_template.format(
         name=name,
         datatype=datatype,
@@ -140,6 +141,7 @@ def parse_filename(filename: str) -> dict[str, str]:
 def load_raw_vote_data(
     name: str,
     datatype: str,
+    *,
     request: bool | None = None,
     timestamp: str | None = None,
     verbose: bool = True,
@@ -231,6 +233,7 @@ def get_vote_data(
 
 def create_vote_dataframe(
     votes: typing.Mapping[spec.Address, Vote],
+    *,
     tags_of_addresses: typing.Mapping[str, typing.Mapping[str, str]]
     | None = None,
     addresses_of_tags: typing.Mapping[str, typing.Mapping[str, str]]
@@ -244,7 +247,6 @@ def create_vote_dataframe(
     - tags_of_addresses: {address: {tag_name: tag_value}}
     """
 
-    import numpy as pd
     import pandas as pd
 
     votes = copy.deepcopy(votes)
@@ -281,4 +283,3 @@ def create_vote_dataframe(
     votes_df = votes_df.replace(np.nan, 0)
 
     return votes_df
-

@@ -13,6 +13,7 @@ from . import pool_state
 
 async def async_get_metapool_trade(
     metapool: spec.Address,
+    *,
     token_sold: typing.Union[spec.Address, str],
     token_bought: typing.Union[spec.Address, str],
     amount_sold: typing.Union[int, float],
@@ -91,4 +92,3 @@ async def async_get_metapool_trade(
         'amount_sold': amount_sold,
         'amount_bought': amount_bought,
     }
-

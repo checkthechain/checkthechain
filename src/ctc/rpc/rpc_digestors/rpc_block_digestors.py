@@ -7,7 +7,7 @@ from .. import rpc_spec
 
 
 def digest_eth_block_number(
-    response: spec.RpcSingularResponse, decode_response: bool = True
+    response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -16,6 +16,7 @@ def digest_eth_block_number(
 
 def digest_eth_get_block_by_hash(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -31,6 +32,7 @@ def digest_eth_get_block_by_hash(
 
 def digest_eth_get_block_by_number(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -70,7 +72,7 @@ def digest_eth_get_block_by_number(
 
 
 def digest_eth_get_uncle_count_by_block_hash(
-    response: spec.RpcSingularResponse, decode_response: bool = True
+    response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -78,7 +80,7 @@ def digest_eth_get_uncle_count_by_block_hash(
 
 
 def digest_eth_get_uncle_count_by_block_number(
-    response: spec.RpcSingularResponse, decode_response: bool = True
+    response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -87,6 +89,7 @@ def digest_eth_get_uncle_count_by_block_number(
 
 def digest_eth_get_uncle_by_block_hash_and_index(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -102,6 +105,7 @@ def digest_eth_get_uncle_by_block_hash_and_index(
 
 def digest_eth_get_uncle_by_block_number_and_index(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -113,4 +117,3 @@ def digest_eth_get_uncle_by_block_number_and_index(
         response = rpc_format.keys_to_snake_case(response)
 
     return response
-

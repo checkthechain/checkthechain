@@ -18,6 +18,7 @@ def keep_level(index: pd.MultiIndex, level: str) -> pd.Index:
 
 def interpolate_series(
     series: spec.Series,
+    *,
     start_index: typing.Optional[int] = None,
     end_index: typing.Optional[int] = None,
     pre_fill_value: typing.Any = None,
@@ -71,6 +72,7 @@ def interpolate_series(
 
 def interpolate_dataframe(
     df: spec.DataFrame,
+    *,
     start_index: typing.Optional[int] = None,
     end_index: typing.Optional[int] = None,
     level: typing.Optional[str] = None,
@@ -106,4 +108,3 @@ def interpolate_dataframe(
     new_df = new_df.fillna(method='ffill')
 
     return new_df
-

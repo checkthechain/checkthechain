@@ -13,6 +13,7 @@ from .. import rpc_provider
 
 async def async_eth_call(
     to_address: spec.Address,
+    *,
     from_address: spec.BinaryData | None = None,
     gas: spec.BinaryData | None = None,
     gas_price: spec.BinaryData | None = None,
@@ -78,6 +79,7 @@ async def async_eth_call(
 
 async def async_eth_estimate_gas(
     to_address: spec.Address,
+    *,
     from_address: spec.BinaryData | None = None,
     gas: spec.BinaryData | None = None,
     gas_price: spec.BinaryData | None = None,
@@ -126,6 +128,7 @@ async def async_eth_estimate_gas(
 
 async def async_eth_get_balance(
     address: spec.Address,
+    *,
     block_number: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
@@ -146,6 +149,7 @@ async def async_eth_get_balance(
 async def async_eth_get_storage_at(
     address: spec.Address,
     position: spec.BinaryData,
+    *,
     block_number: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
@@ -162,6 +166,7 @@ async def async_eth_get_storage_at(
 
 async def async_eth_get_code(
     address: spec.Address,
+    *,
     block_number: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:

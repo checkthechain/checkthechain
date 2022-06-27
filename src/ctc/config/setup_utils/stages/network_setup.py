@@ -12,6 +12,7 @@ from ... import config_defaults
 
 
 async def async_setup_networks(
+    *,
     old_config: typing.Mapping[typing.Any, typing.Any],
     styles: typing.Mapping[str, str],
 ) -> spec.PartialConfig:
@@ -136,6 +137,7 @@ async def async_specify_providers(
 
 
 async def async_collect_provider_metadata(
+    *,
     providers: typing.MutableMapping[str, spec.Provider],
     networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     styles: typing.Mapping[str, str],
@@ -221,6 +223,7 @@ def create_default_provider_name(url: str, network: int) -> str:
 
 
 def collect_network_metadata(
+    *,
     styles: typing.Mapping[str, str],
     networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     name: str | None = None,
@@ -282,6 +285,7 @@ def specify_networks(
 
 
 def specify_default_network(
+    *,
     networks: typing.Mapping[spec.ChainId, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
     styles: typing.Mapping[str, str],
@@ -331,6 +335,7 @@ def specify_default_network(
 
 
 def specify_default_providers(
+    *,
     networks: typing.Mapping[spec.ChainId, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
     styles: typing.Mapping[str, str],

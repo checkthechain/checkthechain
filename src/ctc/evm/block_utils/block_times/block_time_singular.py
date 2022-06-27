@@ -13,6 +13,7 @@ from . import block_time_search
 
 async def async_get_block_of_timestamp(
     timestamp: tooltime.Timestamp,
+    *,
     nary: typing.Optional[int] = None,
     cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
     block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
@@ -69,6 +70,7 @@ async def async_get_block_of_timestamp(
 
 def get_block_of_timestamp_from_arrays(
     timestamp: tooltime.Timestamp,
+    *,
     block_timestamp_array: spec.NumpyArray | None = None,
     block_number_array: spec.NumpyArray | None = None,
     block_timestamps: typing.Mapping[int, int] | None = None,
@@ -95,6 +97,7 @@ def get_block_of_timestamp_from_arrays(
 
 
 async def async_get_block_number_and_time(
+    *,
     block_number: typing.Optional[spec.BlockNumberReference] = None,
     block_timestamp: typing.Optional[tooltime.Timestamp] = None,
     provider: spec.ProviderReference = None,

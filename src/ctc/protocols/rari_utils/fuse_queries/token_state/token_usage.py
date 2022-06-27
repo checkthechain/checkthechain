@@ -63,6 +63,7 @@ async def async_get_ctoken_utilization(
 
 async def async_get_ctoken_tvl_and_tvb(
     ctoken: spec.Address,
+    *,
     oracle: spec.Address | None = None,
     eth_price: spec.Number | None = None,
     block: spec.BlockNumberReference = 'latest',
@@ -115,4 +116,3 @@ async def async_get_ctoken_tvl_and_tvb(
             'tvb': borrowed * price * eth_price,
             'tvl': (borrowed + liquidity) * price * eth_price,
         }
-

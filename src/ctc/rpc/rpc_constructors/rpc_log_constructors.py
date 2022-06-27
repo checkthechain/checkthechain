@@ -4,13 +4,13 @@ import typing
 
 from ctc import binary
 from ctc import spec
-from .. import rpc_format
 from .. import rpc_request
 
 
 def construct_eth_new_filter(
     address: spec.BinaryData | None = None,
     topics: typing.Sequence[spec.BinaryData] | None = None,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
 ) -> spec.RpcRequest:
@@ -60,6 +60,7 @@ def construct_eth_get_filter_logs(
 def construct_eth_get_logs(
     address: spec.BinaryData | None = None,
     topics: typing.Sequence[spec.BinaryData] | None = None,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     block_hash: spec.BinaryData | None = None,
@@ -80,4 +81,3 @@ def construct_eth_get_logs(
     parameters = {k: v for k, v in parameters.items() if v is not None}
 
     return rpc_request.create('eth_getLogs', [parameters])
-

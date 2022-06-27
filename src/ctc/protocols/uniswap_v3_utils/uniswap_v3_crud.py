@@ -66,6 +66,7 @@ async def async_get_pool_metadata(
 
 async def async_get_pool_swaps(
     pool_address: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     replace_symbols: bool = False,

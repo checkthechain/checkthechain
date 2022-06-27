@@ -9,6 +9,7 @@ from .. import rpc_request
 
 async def async_eth_get_transaction_count(
     from_address: spec.Address,
+    *,
     block_number: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
@@ -28,6 +29,7 @@ async def async_eth_get_transaction_count(
 
 async def async_eth_get_transaction_by_hash(
     transaction_hash: str,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -46,6 +48,7 @@ async def async_eth_get_transaction_by_hash(
 async def async_eth_get_transaction_by_block_hash_and_index(
     block_hash: spec.BinaryData,
     transaction_index: spec.BinaryData,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -67,6 +70,7 @@ async def async_eth_get_transaction_by_block_hash_and_index(
 async def async_eth_get_transaction_by_block_number_and_index(
     block_number: spec.BlockNumberReference,
     transaction_index: spec.BinaryData,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -85,6 +89,7 @@ async def async_eth_get_transaction_by_block_number_and_index(
 
 async def async_eth_get_transaction_receipt(
     transaction_hash: str,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -102,6 +107,7 @@ async def async_eth_get_transaction_receipt(
 
 async def async_eth_get_block_transaction_count_by_hash(
     block_hash: str,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -119,6 +125,7 @@ async def async_eth_get_block_transaction_count_by_hash(
 
 async def async_eth_get_block_transaction_count_by_number(
     block_number: spec.BlockNumberReference,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -132,4 +139,3 @@ async def async_eth_get_block_transaction_count_by_number(
         response=response,
         decode_response=decode_response,
     )
-

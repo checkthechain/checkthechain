@@ -29,7 +29,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_fourbyte_command(
-    signature: str, local: bool, remote: bool
+    *, signature: str, local: bool, remote: bool
 ) -> None:
 
     try:

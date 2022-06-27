@@ -77,7 +77,7 @@ async def async_get_pool_tvl_and_tvb(
     ctokens_stats_coroutine = [
         asyncio.create_task(
             token_state.async_get_ctoken_tvl_and_tvb(
-                ctoken, oracle, eth_price, block=block
+                ctoken, oracle=oracle, eth_price=eth_price, block=block
             )
         )
         for ctoken in ctokens
@@ -91,4 +91,3 @@ async def async_get_pool_tvl_and_tvb(
         tvb += ctoken_stats['tvb']
 
     return {'tvl': tvl, 'tvb': tvb}
-

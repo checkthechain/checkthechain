@@ -25,6 +25,7 @@ def hash_name(name: str) -> spec.PrefixHexData:
 
 async def async_resolve_name(
     name: str,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
@@ -65,6 +66,7 @@ async def async_resolve_name(
 
 async def async_resolve_names(
     names: typing.Sequence[str],
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[spec.Address]:
@@ -81,6 +83,7 @@ async def async_resolve_names(
 
 async def async_reverse_lookup(
     address: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
@@ -105,6 +108,7 @@ async def async_name_history() -> None:
 
 async def async_get_text_record(
     key: str,
+    *,
     name: str | None = None,
     node: str | None = None,
 ) -> str:
@@ -131,6 +135,7 @@ async def async_get_text_record(
 
 
 async def async_get_text_records(
+    *,
     name: str | None = None,
     node: str | None = None,
     keys: typing.Sequence[str] | None = None,
@@ -155,6 +160,7 @@ async def async_get_text_records(
 
 
 async def async_get_text_changes(
+    *,
     name: str | None = None,
     node: str | None = None,
 ) -> spec.DataFrame:
@@ -244,4 +250,3 @@ async def async_get_expiration(name: str) -> int:
         function_abi=function_abi,
         function_parameters=[label_id],
     )
-

@@ -12,6 +12,7 @@ from . import pool_parameters
 
 async def async_get_virtual_price(
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -27,6 +28,7 @@ async def async_get_virtual_price(
 async def async_get_lp_withdrawal(
     pool: spec.Address,
     amount_lp: int,
+    *,
     token_withdrawn: spec.Address,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -47,6 +49,7 @@ async def async_get_lp_withdrawal(
 
 async def async_get_pool_state(
     pool: spec.Address,
+    *,
     n_tokens: int | None = None,
     block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
@@ -86,6 +89,7 @@ async def async_get_pool_state(
 
 async def async_get_trade(
     pool: spec.Address,
+    *,
     token_in: typing.Union[int, spec.Address],
     token_out: typing.Union[int, spec.Address],
     amount_in: typing.Union[int, float],
@@ -133,4 +137,3 @@ async def async_get_trade(
         amount_out = amount_out / (10 ** metadata['token_decimals'][out_index])
 
     return amount_out
-

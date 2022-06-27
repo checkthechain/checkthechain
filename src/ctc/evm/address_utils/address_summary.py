@@ -10,6 +10,7 @@ from . import address_data
 
 async def async_print_address_summary(
     address: spec.Address,
+    *,
     verbose: bool | int = False,
     max_width: int = 80,
     provider: spec.ProviderReference = None,

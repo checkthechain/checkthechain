@@ -12,6 +12,7 @@ from . import event_parsing
 def get_function_abi(
     contract_abi: spec.ContractABI,
     function_name: typing.Optional[str] = None,
+    *,
     n_parameters: typing.Optional[int] = None,
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_selector: typing.Optional[spec.FunctionSelector] = None,

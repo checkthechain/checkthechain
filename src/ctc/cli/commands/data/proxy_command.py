@@ -29,6 +29,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_proxy_command(
+    *,
     contract_address: spec.Address,
     verbose: bool,
     block: spec.BlockNumberReference,

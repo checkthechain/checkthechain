@@ -11,6 +11,7 @@ from . import curve_spec
 
 async def async_get_pool_tokens(
     pool: spec.Address,
+    *,
     n_tokens: int | None = None,
     provider: spec.ProviderReference = None,
 ) -> list[spec.Address]:
@@ -59,6 +60,7 @@ async def async_get_pool_tokens(
 async def async_get_token_index(
     token: typing.Union[int, spec.Address, str],
     pool: spec.Address | None = None,
+    *,
     metadata: curve_spec.CurvePoolMetadata | None = None,
     n_tokens: int | None = None,
     provider: spec.ProviderReference = None,
@@ -106,6 +108,7 @@ async def async_get_token_index(
 
 async def async_get_pool_metadata(
     pool: spec.Address,
+    *,
     n_tokens: int | None = None,
     provider: spec.ProviderReference = None,
 ) -> curve_spec.CurvePoolMetadata:
@@ -151,4 +154,3 @@ async def async_get_pool_metadata(
         'A': A,
         # fee:
     }
-

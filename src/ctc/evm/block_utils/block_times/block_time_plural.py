@@ -11,6 +11,7 @@ from . import block_time_singular
 
 async def async_get_blocks_of_timestamps(
     timestamps: typing.Sequence[int],
+    *,
     block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,

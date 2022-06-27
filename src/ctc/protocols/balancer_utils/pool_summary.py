@@ -61,6 +61,7 @@ async def async_summarize_pool_state(
 
 async def async_get_pool_swaps(
     pool_address: typing.Optional[spec.Address] = None,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> spec.DataFrame:
@@ -87,6 +88,7 @@ async def async_get_pool_swaps(
 def summarize_pool_swaps(
     swaps: spec.DataFrame,
     weights: spec.DataFrame,
+    *,
     as_dataframe: bool = True,
 ) -> typing.Mapping[tuple[str, str], spec.DataFrame]:
 
@@ -143,4 +145,3 @@ def summarize_pool_swaps(
         pair_data[(token_in, token_out)] = df
 
     return pair_data
-

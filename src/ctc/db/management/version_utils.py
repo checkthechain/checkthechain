@@ -25,6 +25,7 @@ def is_schema_versions_initialized(engine: toolsql.SAEngine) -> bool:
 def get_schema_version(
     schema_name: str,
     network: spec.NetworkReference | None,
+    *,
     conn: toolsql.SAConnection | None = None,
 ) -> str | None:
 
@@ -70,6 +71,7 @@ def _get_schema_version_engine() -> toolsql.SAEngine:
 def set_schema_version(
     schema_name: str,
     network: spec.NetworkReference | None,
+    *,
     conn: toolsql.SAConnection,
     version: str | None = None,
 ) -> None:
@@ -97,6 +99,7 @@ def set_schema_version(
 def delete_schema_version(
     schema_name: str | None,
     network: spec.NetworkReference | None,
+    *,
     conn: toolsql.SAConnection,
     confirm_delete_row: bool = False,
     confirm_delete_network: bool = False,

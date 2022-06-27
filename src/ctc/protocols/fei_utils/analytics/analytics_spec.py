@@ -167,4 +167,3 @@ dex_pools: dict[str, DexPoolMetadata] = {
         'other_assets': ['DPI'],
     },
 }
-

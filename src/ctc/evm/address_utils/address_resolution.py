@@ -19,6 +19,7 @@ if typing.TYPE_CHECKING:
 
 async def async_resolve_address(
     name_or_address: N,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> N:
@@ -41,6 +42,7 @@ async def async_resolve_address(
 
 async def async_resolve_addresses(
     names_or_addresses: typing.Sequence[N],
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[N]:
@@ -76,6 +78,7 @@ async def async_resolve_addresses(
 
 async def async_resolve_address_by_block(
     name_or_address: N,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[N]:

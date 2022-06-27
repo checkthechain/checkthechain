@@ -7,7 +7,7 @@ from .. import rpc_spec
 
 
 def digest_eth_new_filter(
-    response: spec.RpcSingularResponse, decode_response: bool = False
+    response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -15,7 +15,7 @@ def digest_eth_new_filter(
 
 
 def digest_eth_new_block_filter(
-    response: spec.RpcSingularResponse, decode_response: bool = False
+    response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -23,7 +23,7 @@ def digest_eth_new_block_filter(
 
 
 def digest_eth_new_pending_transaction_filter(
-    response: spec.RpcSingularResponse, decode_response: bool = False
+    response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -31,7 +31,7 @@ def digest_eth_new_pending_transaction_filter(
 
 
 def digest_eth_uninstall_filter(
-    response: spec.RpcSingularResponse, decode_response: bool = False
+    response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
         response = binary.convert(response, 'integer')
@@ -40,6 +40,7 @@ def digest_eth_uninstall_filter(
 
 def digest_eth_get_filter_changes(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
     include_removed: bool = False,
@@ -76,6 +77,7 @@ def digest_eth_get_filter_changes(
 
 def digest_eth_get_filter_logs(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
     include_removed: bool = False,
@@ -109,6 +111,7 @@ def digest_eth_get_filter_logs(
 
 def digest_eth_get_logs(
     response: spec.RpcSingularResponse,
+    *,
     decode_response: bool = True,
     snake_case_response: bool = True,
     include_removed: bool = False,
@@ -137,4 +140,3 @@ def digest_eth_get_logs(
         ]
 
     return response
-

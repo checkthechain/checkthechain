@@ -120,4 +120,3 @@ async def async_get_feed_data(
 
     else:
         raise Exception('unknown fields format: ' + str(fields))
-

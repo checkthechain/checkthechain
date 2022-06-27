@@ -136,6 +136,7 @@ async def async_get_address_transaction_counts_by_block(
 
 
 async def _async_get_block_range_transaction_counts(
+    *,
     address: spec.Address,
     min_block: int,
     max_block: int,
@@ -192,4 +193,3 @@ async def _async_get_block_range_transaction_counts(
             )
             recursive_coroutines.append(coroutine)
     await asyncio.gather(*recursive_coroutines)
-

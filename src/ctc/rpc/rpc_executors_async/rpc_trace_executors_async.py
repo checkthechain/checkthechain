@@ -18,9 +18,8 @@ def digest_trace_transaction(
 
 
 async def async_trace_transaction(
-    transaction_hash: str, provider: spec.ProviderReference = None
+    transaction_hash: str, *, provider: spec.ProviderReference = None
 ) -> spec.RpcSingularResponse:
     request = construct_trace_transaction(transaction_hash=transaction_hash)
     response = await rpc_request.async_send(request, provider=provider)
     return digest_trace_transaction(response=response)
-

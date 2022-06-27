@@ -66,7 +66,10 @@ async def async_compute_pcv_stats(
 
 
 async def async_compute_pcv_by_asset(
-    blocks: list[int], verbose: bool = False, provider: spec.ProviderReference = None
+    blocks: list[int],
+    verbose: bool = False,
+    *,
+    provider: spec.ProviderReference = None,
 ) -> analytics_spec.MetricGroup:
 
     tokens_balances = await fei_utils.async_get_tokens_balances_by_block(
@@ -76,7 +79,9 @@ async def async_compute_pcv_by_asset(
     )
     tokens = list(tokens_balances.keys())
 
-    tokens_deposits_coroutine = fei_utils.async_get_tokens_deposits(tokens)
+    tokens_deposits_coroutine = fei_utils.async_get_tokens_deposits(
+        tokens=tokens
+    )
 
     symbols = await fei_utils.async_get_pcv_tokens_symbols(
         tokens=tokens,

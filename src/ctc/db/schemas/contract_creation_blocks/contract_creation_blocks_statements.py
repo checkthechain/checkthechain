@@ -9,10 +9,10 @@ from ... import schema_utils
 
 
 async def async_upsert_contract_creation_block(
+    *,
     address: spec.Address,
     block_number: int,
     network: spec.NetworkReference | None = None,
-    *,
     conn: toolsql.SAConnection,
 ) -> None:
 
@@ -32,8 +32,8 @@ async def async_upsert_contract_creation_block(
 
 async def async_select_contract_creation_block(
     address: spec.Address,
-    network: spec.NetworkReference | None = None,
     *,
+    network: spec.NetworkReference | None = None,
     conn: toolsql.SAConnection,
 ) -> int | None:
 
@@ -54,8 +54,8 @@ async def async_select_contract_creation_block(
 
 
 async def async_select_contract_creation_blocks(
-    network: spec.NetworkReference | None = None,
     *,
+    network: spec.NetworkReference | None = None,
     conn: toolsql.SAConnection,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]] | None:
     table = schema_utils.get_table_name(
@@ -72,8 +72,8 @@ async def async_select_contract_creation_blocks(
 
 async def async_delete_contract_creation_block(
     address: spec.Address,
-    network: spec.NetworkReference | None = None,
     *,
+    network: spec.NetworkReference | None = None,
     conn: toolsql.SAConnection,
 ) -> None:
     table = schema_utils.get_table_name(

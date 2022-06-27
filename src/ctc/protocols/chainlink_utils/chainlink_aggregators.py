@@ -78,6 +78,7 @@ async def async_get_feed_aggregator_history(
 async def _async_get_aggregator_start_blocks(
     previous_aggregators: typing.Sequence[spec.Address],
     feed: spec.Address,
+    *,
     provider: spec.ProviderReference,
 ) -> typing.Mapping[spec.Address, int]:
 
@@ -121,6 +122,7 @@ async def _async_get_aggregator_start_blocks(
 async def _async_aggregator_transition(
     block: int,
     next_aggregator: spec.Address,
+    *,
     feed: spec.Address,
 ) -> bool:
     return (
@@ -156,4 +158,3 @@ async def async_get_feed_previous_aggregators(
     aggregators = await asyncio.gather(*coroutines)
 
     return aggregators
-

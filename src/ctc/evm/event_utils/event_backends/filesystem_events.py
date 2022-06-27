@@ -51,6 +51,7 @@ def get_events_contract_dir(
 
 def get_events_event_dir(
     contract_address: spec.Address,
+    *,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     network: typing.Optional[spec.NetworkReference] = None,
@@ -66,6 +67,7 @@ def get_events_event_dir(
 
 def get_events_filepath(
     contract_address: spec.Address,
+    *,
     start_block: int,
     end_block: int,
     event_hash: typing.Optional[str] = None,
@@ -130,6 +132,7 @@ class _ListEventsResult(TypedDict):
 
 def list_contract_events(
     contract_address: spec.Address,
+    *,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     allow_missing_blocks: bool = False,
@@ -208,6 +211,7 @@ def list_contract_events(
 
 def list_events(
     contract_address: str,
+    *,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     allow_missing_blocks: bool = False,
@@ -279,6 +283,7 @@ def print_events_summary_filesystem() -> None:
 async def async_save_events_to_filesystem(
     events: spec.DataFrame,
     contract_address: spec.Address,
+    *,
     start_block: int,
     end_block: int,
     event_abi: typing.Optional[spec.EventABI] = None,
@@ -332,6 +337,7 @@ async def async_save_events_to_filesystem(
 
 async def async_get_events_from_filesystem(
     contract_address: spec.ContractAddress,
+    *,
     event_hash: typing.Optional[str] = None,
     event_name: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,

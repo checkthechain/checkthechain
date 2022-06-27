@@ -102,4 +102,3 @@ async def async_get_pool_tokens_metadata(
         'x_decimals': x_decimals,
         'y_decimals': y_decimals,
     }
-

@@ -30,7 +30,7 @@ async def async_compute_dex_volume(
         elif platform == 'Saddle':
             fei_index = pool_info['fei_index']
             task = async_compute_saddle_volume(
-                address, blocks, fei_index=fei_index
+                address, blocks=blocks, fei_index=fei_index
             )
         else:
             raise Exception('unknown platform: ' + str())
@@ -110,6 +110,7 @@ async def async_compute_sushiswap_volume(
 async def async_compute_curve_volume(
     pool_address: spec.ContractAddress,
     blocks: list[int],
+    *,
     fei_index: int,
     event_name: str,
 ) -> analytics_spec.MetricData:
@@ -141,7 +142,7 @@ async def async_compute_curve_volume(
 
 
 async def async_compute_saddle_volume(
-    pool_address: spec.ContractAddress, blocks: list[int], fei_index: int
+    pool_address: spec.ContractAddress, *, blocks: list[int], fei_index: int
 ) -> analytics_spec.MetricData:
 
     swaps = await evm.async_get_events(
@@ -169,4 +170,3 @@ async def async_compute_saddle_volume(
         'values': list(result.values),
         'units': 'FEI',
     }
-

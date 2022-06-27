@@ -43,6 +43,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_ens_command(
+    *,
     name_or_address: str,
     block: spec.BlockNumberReference,
     verbose: bool,

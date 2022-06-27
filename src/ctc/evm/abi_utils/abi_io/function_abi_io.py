@@ -8,6 +8,7 @@ from . import contract_abi_io
 
 
 async def async_get_function_abi(
+    *,
     function_name: typing.Optional[str] = None,
     contract_abi: typing.Optional[spec.ContractABI] = None,
     contract_address: typing.Optional[spec.Address] = None,

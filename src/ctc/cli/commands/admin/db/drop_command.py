@@ -28,7 +28,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def drop_command(schema_name: str, network: str | int, confirm: bool) -> None:
+def drop_command(
+    *, schema_name: str, network: str | int, confirm: bool
+) -> None:
 
     if isinstance(network, str):
         if network.isdigit() or (network[0] == '-' and network[1:].isdigit()):

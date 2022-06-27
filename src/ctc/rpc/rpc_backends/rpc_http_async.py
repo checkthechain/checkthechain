@@ -17,6 +17,7 @@ _http_sessions: dict[spec.ProviderKey, aiohttp.ClientSession] = {}
 async def async_send_http(
     request: spec.RpcRequest,
     provider: spec.ProviderReference,
+    *,
     n_attempts: int = 8,
 ) -> spec.RpcResponse:
     provider = rpc_provider.get_provider(provider)
@@ -63,6 +64,7 @@ def get_async_http_session(
     if key not in _http_sessions:
         if create:
             import aiohttp
+
             kwargs = provider['session_kwargs']
             if kwargs is None:
                 kwargs = {}
@@ -72,7 +74,9 @@ def get_async_http_session(
     return _http_sessions[key]
 
 
-async def async_close_http_session(provider: spec.ProviderReference = None) -> None:
+async def async_close_http_session(
+    provider: spec.ProviderReference = None,
+) -> None:
     if len(_http_sessions) == 0:
         return
 

@@ -12,6 +12,7 @@ from . import chainlink_schema_defs
 async def async_upsert_feed(
     feed: dict,
     conn: toolsql.SAConnection,
+    *,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
@@ -29,6 +30,7 @@ async def async_upsert_feed(
 async def async_upsert_feeds(
     feeds: typing.Sequence[typing.Mapping[str, typing.Any]],
     conn: toolsql.SAConnection,
+    *,
     network: spec.NetworkReference | None = None,
 ) -> None:
 
@@ -114,6 +116,7 @@ async def async_select_feeds(
 async def async_delete_feed(
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
+    *,
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,

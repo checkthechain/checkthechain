@@ -8,7 +8,7 @@ from .. import rpc_request
 
 
 async def async_eth_block_number(
-    provider: spec.ProviderReference = None, decode_response: bool = True
+    *, provider: spec.ProviderReference = None, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_block_number()
     response = await rpc_request.async_send(request, provider=provider)
@@ -20,6 +20,7 @@ async def async_eth_block_number(
 
 async def async_eth_get_block_by_hash(
     block_hash: str,
+    *,
     include_full_transactions: bool = False,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
@@ -39,6 +40,7 @@ async def async_eth_get_block_by_hash(
 
 async def async_eth_get_block_by_number(
     block_number: spec.StandardBlockNumber,
+    *,
     include_full_transactions: bool = True,
     decode_response: bool = True,
     provider: spec.ProviderReference = None,
@@ -58,6 +60,7 @@ async def async_eth_get_block_by_number(
 
 async def async_eth_get_uncle_count_by_block_hash(
     block_hash: str,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -73,6 +76,7 @@ async def async_eth_get_uncle_count_by_block_hash(
 
 async def async_eth_get_uncle_count_by_block_number(
     block_number: spec.StandardBlockNumber,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -89,6 +93,7 @@ async def async_eth_get_uncle_count_by_block_number(
 async def async_eth_get_uncle_by_block_hash_and_index(
     block_hash: str,
     uncle_index: str,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -108,6 +113,7 @@ async def async_eth_get_uncle_by_block_hash_and_index(
 async def async_eth_get_uncle_by_block_number_and_index(
     block_number: spec.StandardBlockNumber,
     uncle_index: str,
+    *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
@@ -124,4 +130,3 @@ async def async_eth_get_uncle_by_block_number_and_index(
         decode_response=decode_response,
         snake_case_response=snake_case_response,
     )
-

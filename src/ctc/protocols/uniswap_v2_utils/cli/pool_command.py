@@ -27,6 +27,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_pool_command(
+    *,
     pool: spec.Address,
     block: str,
     depths: typing.Sequence[str] | None,

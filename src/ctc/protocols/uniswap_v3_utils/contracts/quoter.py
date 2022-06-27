@@ -9,6 +9,7 @@ from .. import uniswap_v3_spec
 async def async_quote_exact_input_single(
     token_in: spec.Address,
     token_out: spec.Address,
+    *,
     fee: int,
     amount_in: int,
     sqrt_price_limit_x96: int = 0,
@@ -37,6 +38,7 @@ async def async_quote_exact_input_single(
 async def async_quote_exact_input(
     path: str,
     amount_in: int,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -56,6 +58,7 @@ async def async_quote_exact_input(
 async def async_quote_exact_output_single(
     token_in: spec.Address,
     token_out: spec.Address,
+    *,
     fee: int,
     amount_out: int,
     sqrt_price_limit_x96: int = 0,
@@ -84,6 +87,7 @@ async def async_quote_exact_output_single(
 async def async_quote_exact_output(
     path: str,
     amount_in: int,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -98,4 +102,3 @@ async def async_quote_exact_output(
         provider=provider,
         block_number=block,
     )
-

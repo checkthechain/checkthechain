@@ -135,4 +135,3 @@ async def async_get_pool_state_by_block(
         ]
 
     return output
-

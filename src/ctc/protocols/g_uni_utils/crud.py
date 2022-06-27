@@ -44,6 +44,7 @@ async def async_get_token_balances(
 async def async_get_token_balances_by_block(
     g_uni_pool: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     normalize: bool = True,
 ) -> typing.Sequence[typing.Sequence[int | float]]:
     balances_coroutine = rpc.async_batch_eth_call(
@@ -80,4 +81,3 @@ async def async_get_token_balances_by_block(
 
     else:
         return await balances_task
-

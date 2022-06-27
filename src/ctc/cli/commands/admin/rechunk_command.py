@@ -68,6 +68,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_rechunk(
+    *,
     contract: spec.Address,
     event: str,
     all_events: bool,

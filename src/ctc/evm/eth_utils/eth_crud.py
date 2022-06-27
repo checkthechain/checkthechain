@@ -9,6 +9,7 @@ from ctc import spec
 @typing.overload
 async def async_get_eth_balance(
     address: spec.Address,
+    *,
     normalize: typing.Literal[False],
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
@@ -19,6 +20,7 @@ async def async_get_eth_balance(
 @typing.overload
 async def async_get_eth_balance(
     address: spec.Address,
+    *,
     normalize: bool = True,
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
@@ -28,6 +30,7 @@ async def async_get_eth_balance(
 
 async def async_get_eth_balance(
     address: spec.Address,
+    *,
     normalize: bool = True,
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,

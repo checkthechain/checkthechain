@@ -18,6 +18,7 @@ from . import erc20_generic
 
 async def async_get_erc20_total_supply(
     token: spec.ERC20Reference,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -46,6 +47,7 @@ async def async_get_erc20_total_supply(
 
 async def async_get_erc20s_total_supplies(
     tokens: typing.Sequence[spec.ERC20Reference],
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -73,6 +75,7 @@ async def async_get_erc20s_total_supplies(
 async def async_get_erc20_total_supply_by_block(
     token: spec.ERC20Reference,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
@@ -107,6 +110,7 @@ async def async_get_erc20_total_supply_by_block(
 async def async_get_erc20_balance_of(
     wallet: spec.Address,
     token: spec.ERC20Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -142,6 +146,7 @@ async def async_get_erc20_balance_of(
 async def async_get_erc20_balance_of_addresses(
     wallets: typing.Sequence[spec.Address],
     token: spec.ERC20Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -177,6 +182,7 @@ async def async_get_erc20_balance_of_addresses(
 async def async_get_erc20s_balance_of(
     wallet: spec.Address,
     tokens: typing.Sequence[spec.ERC20Address],
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -216,6 +222,7 @@ async def async_get_erc20s_balance_of(
 async def async_get_erc20_balance_of_by_block(
     wallet: spec.Address,
     token: spec.ERC20Reference,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -261,10 +268,14 @@ async def async_get_erc20_balance_of_by_block(
 async def async_get_erc20_allowance(
     token: spec.ERC20Reference,
     wallet: spec.Address,
-    block: spec.BlockNumberReference,
+    *,
+    block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[int, float]:
+
+    if block is None:
+        block = 'latest'
 
     wallet = await address_utils.async_resolve_address(
         wallet,
@@ -291,6 +302,7 @@ async def async_get_erc20_allowance(
 async def async_get_erc20_allowance_by_block(
     token: spec.ERC20Reference,
     wallet: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: spec.ProviderReference = None,
@@ -326,7 +338,8 @@ async def async_get_erc20_allowance_by_block(
 async def async_get_erc20s_allowances(
     tokens: typing.Sequence[spec.ERC20Reference],
     wallet: spec.Address,
-    block: spec.BlockNumberReference,
+    *,
+    block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[list[int], list[float]]:
@@ -356,7 +369,8 @@ async def async_get_erc20s_allowances(
 async def async_get_erc20s_allowances_by_address(
     token: spec.ERC20Reference,
     wallets: typing.Sequence[spec.Address],
-    block: spec.BlockNumberReference,
+    *,
+    block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int | float]:

@@ -105,6 +105,7 @@ async def async_get_network_feed_data(
 
 async def async_import_networks_to_db(
     networks: typing.Sequence[ChainlinkNetworkName] | None = None,
+    *,
     payload: ChainlinkFeedPayload | None = None,
     engine: toolsql.SAEngine | None = None,
     verbose: bool = True,
@@ -151,6 +152,7 @@ async def async_import_networks_to_db(
 
 async def async_import_network_to_db(
     network: ChainlinkNetworkName,
+    *,
     payload: ChainlinkFeedPayload | None = None,
     engine: toolsql.SAEngine | None = None,
     verbose: bool = True,

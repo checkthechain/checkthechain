@@ -10,6 +10,7 @@ from . import uniswap_v2_metadata
 
 async def async_get_pool_swaps(
     pool_address: spec.Address,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     replace_symbols: bool = False,
@@ -84,6 +85,7 @@ async def async_get_pool_swaps(
 
 async def async_get_pool_mints(
     pool_address: spec.Address,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     replace_symbols: bool = False,
@@ -92,6 +94,7 @@ async def async_get_pool_mints(
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio
+
     if normalize:
         decimals_task = asyncio.create_task(
             uniswap_v2_metadata.async_get_pool_decimals(
@@ -142,6 +145,7 @@ async def async_get_pool_mints(
 
 async def async_get_pool_burns(
     pool_address: spec.Address,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     replace_symbols: bool = False,
@@ -197,4 +201,3 @@ async def async_get_pool_burns(
         burns = burns.rename(columns=new_names)
 
     return burns
-

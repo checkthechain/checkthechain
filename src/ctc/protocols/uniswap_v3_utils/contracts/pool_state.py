@@ -10,6 +10,7 @@ from .. import uniswap_v3_spec
 
 async def async_pool_slot0(
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
@@ -33,6 +34,7 @@ async def async_pool_slot0(
 
 async def async_pool_fee_growth_global_0_x128(
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -50,6 +52,7 @@ async def async_pool_fee_growth_global_0_x128(
 
 async def async_pool_fee_growth_global_1_x128(
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -67,6 +70,7 @@ async def async_pool_fee_growth_global_1_x128(
 
 async def async_pool_protocol_fees(
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> tuple[int, int]:
@@ -84,6 +88,7 @@ async def async_pool_protocol_fees(
 
 async def async_pool_liquidity(
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -113,6 +118,7 @@ class UniswapV3Ticks(TypedDict):
 async def async_pool_ticks(
     tick: int,
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> UniswapV3Ticks:
@@ -139,6 +145,7 @@ async def async_pool_ticks(
 async def async_pool_tick_bitmap(
     word_position: int,
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
@@ -158,6 +165,7 @@ async def async_pool_tick_bitmap(
 async def async_pool_positions(
     key: str,
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
@@ -191,6 +199,7 @@ class UniswapV3Observations(TypedDict):
 async def async_pool_observations(
     index: int,
     pool: spec.Address,
+    *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> UniswapV3Observations:
@@ -211,4 +220,3 @@ async def async_pool_observations(
         'seconds_per_liquidity_cummulative_x128': result[2],
         'initialized': result[3],
     }
-

@@ -36,6 +36,7 @@ class CTokenMetricsByBlock(TypedDict, total=False):
 async def async_get_token_multipool_history(
     token: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     metrics: CTokenMetricSpec | None = None,
     comptrollers: typing.Sequence[spec.Address] | None = None,
 ) -> dict[spec.Address, CTokenMetricsByBlock]:
@@ -50,7 +51,7 @@ async def async_get_token_multipool_history(
     coroutines = []
     for comptroller in comptrollers:
         coroutine = async_get_pool_token_history(
-            comptroller, token, blocks, metrics=metrics
+            comptroller, token, blocks=blocks, metrics=metrics
         )
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
@@ -65,6 +66,7 @@ async def async_get_token_multipool_history(
 async def async_get_pool_token_history(
     comptroller: spec.Address,
     token: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     metrics: CTokenMetricSpec | None = None,
 ) -> CTokenMetricsByBlock | None:
@@ -75,7 +77,7 @@ async def async_get_pool_token_history(
     coroutines = []
     for ctoken in ctokens:
         coroutine = _async_get_token_history_if_match(
-            ctoken, token, blocks, metrics=metrics
+            ctoken, token, blocks=blocks, metrics=metrics
         )
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
@@ -93,6 +95,7 @@ async def async_get_pool_token_history(
 async def _async_get_token_history_if_match(
     ctoken: spec.Address,
     token: spec.Address,
+    *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     metrics: CTokenMetricSpec | None = None,
 ) -> CTokenMetricsByBlock | None:
@@ -111,6 +114,7 @@ async def _async_get_token_history_if_match(
 async def async_get_ctoken_state_by_block(
     ctoken: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     metrics: CTokenMetricSpec | None = None,
     eth_price: spec.Number | None = None,
     in_usd: bool = True,
@@ -136,6 +140,7 @@ async def async_get_ctoken_state_by_block(
 
 async def async_get_ctoken_state(
     ctoken: spec.Address,
+    *,
     block: spec.BlockNumberReference = 'latest',
     metrics: CTokenMetricSpec | None = None,
     eth_price: spec.Number | None = None,
@@ -193,4 +198,3 @@ async def async_get_ctoken_state(
         output['borrow_apy'] = await borrow_task
 
     return output
-

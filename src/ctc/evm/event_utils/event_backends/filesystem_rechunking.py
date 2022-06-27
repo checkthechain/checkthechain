@@ -17,6 +17,7 @@ from ... import abi_utils
 async def async_rechunk_events(
     contract_address: spec.Address,
     chunk_target_bytes: int,
+    *,
     event_name: typing.Optional[str] = None,
     event_hash: typing.Optional[str] = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
@@ -229,6 +230,7 @@ async def async_rechunk_events(
 async def async_rechunk_all_events(
     chunk_target_bytes: int,
     network: spec.NetworkReference = 'mainnet',
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     chunk_size_tolerance: float = 0.1,
@@ -252,4 +254,3 @@ async def async_rechunk_all_events(
             if verbose:
                 print()
                 print()
-

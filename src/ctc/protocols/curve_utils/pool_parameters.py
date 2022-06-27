@@ -9,6 +9,7 @@ from ctc import spec
 
 async def async_get_pool_A(
     pool: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -22,6 +23,7 @@ async def async_get_pool_A(
 
 async def async_get_pool_future_A_time(
     pool: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -35,6 +37,7 @@ async def async_get_pool_future_A_time(
 
 async def async_get_pool_initial_A(
     pool: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -48,6 +51,7 @@ async def async_get_pool_initial_A(
 
 async def async_get_pool_initial_A_time(
     pool: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -61,6 +65,7 @@ async def async_get_pool_initial_A_time(
 
 async def async_get_pool_future_A(
     pool: spec.Address,
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
@@ -79,6 +84,7 @@ async def async_get_pool_ramps() -> spec.DataFrame:
 
 async def async_get_A_history(
     pool: spec.Address,
+    *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
@@ -152,6 +158,7 @@ async def async_get_A_history(
 
 
 def compute_A(
+    *,
     initial_A: typing.Sequence[int | float],
     initial_A_time: typing.Sequence[int | float],
     future_A: typing.Sequence[int | float],
@@ -177,6 +184,7 @@ def compute_A(
 
 
 def _compute_A(
+    *,
     initial_A: spec.NumpyArray,
     initial_A_time: spec.NumpyArray,
     future_A: spec.NumpyArray,

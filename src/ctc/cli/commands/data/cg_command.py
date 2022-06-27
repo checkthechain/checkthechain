@@ -30,7 +30,12 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_cg_command(
-        n: int, verbose: bool, include_links: bool, height: int | None, width: str | int | None,
+    *,
+    n: int,
+    verbose: bool,
+    include_links: bool,
+    height: int | None,
+    width: str | int | None,
 ) -> None:
     if height is None:
         height = 1

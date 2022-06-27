@@ -9,6 +9,7 @@ from .. import rpc_request
 
 def construct_eth_call(
     to_address: spec.BinaryData,
+    *,
     from_address: spec.BinaryData | None = None,
     gas: spec.BinaryData | None = None,
     gas_price: spec.BinaryData | None = None,
@@ -49,6 +50,7 @@ def construct_eth_call(
 
 def construct_eth_estimate_gas(
     to_address: spec.BinaryData,
+    *,
     from_address: spec.BinaryData | None = None,
     gas: spec.BinaryData | None = None,
     gas_price: spec.BinaryData | None = None,
@@ -83,6 +85,7 @@ def construct_eth_estimate_gas(
 
 def construct_eth_get_balance(
     address: spec.Address,
+    *,
     block_number: spec.BlockNumberReference | None = None,
 ) -> spec.RpcRequest:
 
@@ -96,6 +99,7 @@ def construct_eth_get_balance(
 def construct_eth_get_storage_at(
     address: spec.BinaryData,
     position: spec.BinaryData,
+    *,
     block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
@@ -108,6 +112,7 @@ def construct_eth_get_storage_at(
 
 def construct_eth_get_code(
     address: spec.BinaryData,
+    *,
     block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
