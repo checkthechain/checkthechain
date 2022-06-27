@@ -65,7 +65,7 @@ async def async_get_pool_state(
         provider=provider,
     )
     token_balances = await evm.async_get_erc20s_balance_of(
-        address=pool,
+        wallet=pool,
         tokens=token_addresses,
         block=block,
         provider=provider,

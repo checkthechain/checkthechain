@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import typing
 
+from ctc import rpc
 from ctc import spec
 
 from .. import event_utils
-from . import erc20_metadata
 from . import erc20_abis
+from . import erc20_generic
+from . import erc20_metadata
 
 
 def get_token_amount_column(df: spec.DataFrame) -> str:
@@ -21,14 +23,20 @@ def get_token_amount_column(df: spec.DataFrame) -> str:
 
 
 async def async_get_erc20_transfers(
-    token_address: spec.ERC20Address,
+    token: spec.ERC20Reference,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
     convert_from_str: bool = True,
     verbose: bool = False,
+    provider: spec.ProviderReference = None,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
+
+    network = rpc.get_provider_network(provider)
+    token_address = await erc20_generic.async_get_erc20_address(
+        token, network=network
+    )
 
     transfers = await event_utils.async_get_events(
         contract_address=token_address,
@@ -36,6 +44,7 @@ async def async_get_erc20_transfers(
         start_block=start_block,
         end_block=end_block,
         verbose=verbose,
+        provider=provider,
         **event_kwargs,
     )
 

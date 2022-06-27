@@ -69,7 +69,7 @@ async def async_get_lending_flows(
     pool_token_balances_before_coroutine = (
         evm.async_get_erc20_balance_of_by_block(
             token=pool_token,
-            address=wallet,
+            wallet=wallet,
             blocks=blocks_before,
             provider=provider,
         )
@@ -80,7 +80,7 @@ async def async_get_lending_flows(
     pool_token_balances_after_coroutine = (
         evm.async_get_erc20_balance_of_by_block(
             token=pool_token,
-            address=wallet,
+            wallet=wallet,
             blocks=blocks,
             provider=provider,
         )

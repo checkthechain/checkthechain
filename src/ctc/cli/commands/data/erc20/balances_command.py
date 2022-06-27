@@ -105,7 +105,7 @@ async def async_balances_command(
         wallet = await evm.async_resolve_address(wallet, block=block)
         symbols_coroutine = evm.async_get_erc20s_symbols(erc20s)
         balances = await evm.async_get_erc20s_balance_of(
-            address=wallet,
+            wallet=wallet,
             tokens=erc20s,
             block=block,
             normalize=(not raw),
@@ -140,7 +140,7 @@ async def async_balances_command(
 
         if wallets is not None:
             balances = await evm.async_get_erc20_balance_of_addresses(
-                addresses=wallets,
+                wallets=wallets,
                 token=erc20,
                 block=block,
                 normalize=(not raw),
@@ -208,7 +208,7 @@ async def async_balances_command(
         erc20 = await evm.async_resolve_address(erc20, block=resolved_blocks[-1])
         wallet = await evm.async_resolve_address(wallet, block=resolved_blocks[-1])
         balances = await evm.async_get_erc20_balance_of_by_block(
-            address=wallet,
+            wallet=wallet,
             token=erc20,
             blocks=resolved_blocks,
             normalize=(not raw),

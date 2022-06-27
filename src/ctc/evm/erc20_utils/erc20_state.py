@@ -105,7 +105,7 @@ async def async_get_erc20_total_supply_by_block(
 
 
 async def async_get_erc20_balance_of(
-    address: spec.Address,
+    wallet: spec.Address,
     token: spec.ERC20Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -116,8 +116,8 @@ async def async_get_erc20_balance_of(
     if block is None:
         block = 'latest'
 
-    address = await address_utils.async_resolve_address(
-        address,
+    wallet = await address_utils.async_resolve_address(
+        wallet,
         block=block,
         provider=provider,
     )
@@ -126,7 +126,7 @@ async def async_get_erc20_balance_of(
         token=token,
         function_name='balanceOf',
         block=block,
-        function_parameters=[address],
+        function_parameters=[wallet],
         provider=provider,
         **rpc_kwargs,
     )
@@ -140,7 +140,7 @@ async def async_get_erc20_balance_of(
 
 
 async def async_get_erc20_balance_of_addresses(
-    addresses: typing.Sequence[spec.Address],
+    wallets: typing.Sequence[spec.Address],
     token: spec.ERC20Address,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -151,8 +151,8 @@ async def async_get_erc20_balance_of_addresses(
     if block is None:
         block = 'latest'
 
-    addresses = await address_utils.async_resolve_addresses(
-        addresses,
+    wallets = await address_utils.async_resolve_addresses(
+        wallets,
         block=block,
         provider=provider,
     )
@@ -161,7 +161,7 @@ async def async_get_erc20_balance_of_addresses(
         to_address=token,
         block_number=block,
         function_abi=evm_spec.erc20_function_abis['balanceOf'],
-        function_parameter_list=[[address] for address in addresses],
+        function_parameter_list=[[wallet] for wallet in wallets],
         provider=provider,
         **rpc_kwargs,
     )
@@ -175,7 +175,7 @@ async def async_get_erc20_balance_of_addresses(
 
 
 async def async_get_erc20s_balance_of(
-    address: spec.Address,
+    wallet: spec.Address,
     tokens: typing.Sequence[spec.ERC20Address],
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
@@ -187,8 +187,8 @@ async def async_get_erc20s_balance_of(
     if block is None:
         block = 'latest'
 
-    address = await address_utils.async_resolve_address(
-        address,
+    wallet = await address_utils.async_resolve_address(
+        wallet,
         block=block,
         provider=provider,
     )
@@ -197,7 +197,7 @@ async def async_get_erc20s_balance_of(
         tokens=tokens,
         function_name='balanceOf',
         block=block,
-        function_parameters=[address],
+        function_parameters=[wallet],
         provider=provider,
         **rpc_kwargs,
     )
@@ -214,7 +214,7 @@ async def async_get_erc20s_balance_of(
 
 
 async def async_get_erc20_balance_of_by_block(
-    address: spec.Address,
+    wallet: spec.Address,
     token: spec.ERC20Reference,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
@@ -224,8 +224,8 @@ async def async_get_erc20_balance_of_by_block(
 ) -> typing.Union[list[int], list[float]]:
     """"""
 
-    address = await address_utils.async_resolve_address(
-        address,
+    wallet = await address_utils.async_resolve_address(
+        wallet,
         block=blocks[-1],
         provider=provider,
     )
@@ -234,7 +234,7 @@ async def async_get_erc20_balance_of_by_block(
         token=token,
         function_name='balanceOf',
         blocks=blocks,
-        function_parameters=[address],
+        function_parameters=[wallet],
         provider=provider,
         empty_token=empty_token,
         **rpc_kwargs,
@@ -260,14 +260,14 @@ async def async_get_erc20_balance_of_by_block(
 
 async def async_get_erc20_allowance(
     token: spec.ERC20Reference,
-    address: spec.Address,
+    wallet: spec.Address,
     block: spec.BlockNumberReference,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[int, float]:
 
-    address = await address_utils.async_resolve_address(
-        address,
+    wallet = await address_utils.async_resolve_address(
+        wallet,
         block=block,
         provider=provider,
     )
@@ -276,7 +276,7 @@ async def async_get_erc20_allowance(
         token=token,
         function_name='allowance',
         block=block,
-        function_parameters=[address],
+        function_parameters=[wallet],
         provider=provider,
     )
 
@@ -290,14 +290,14 @@ async def async_get_erc20_allowance(
 
 async def async_get_erc20_allowance_by_block(
     token: spec.ERC20Reference,
-    address: spec.Address,
+    wallet: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[list[int], list[float]]:
 
-    address = await address_utils.async_resolve_address(
-        address,
+    wallet = await address_utils.async_resolve_address(
+        wallet,
         block=blocks[-1],
         provider=provider,
     )
@@ -306,7 +306,7 @@ async def async_get_erc20_allowance_by_block(
         token=token,
         function_name='allowance',
         blocks=blocks,
-        function_parameters=[address],
+        function_parameters=[wallet],
         provider=provider,
     )
 
@@ -325,14 +325,14 @@ async def async_get_erc20_allowance_by_block(
 
 async def async_get_erc20s_allowances(
     tokens: typing.Sequence[spec.ERC20Reference],
-    address: spec.Address,
+    wallet: spec.Address,
     block: spec.BlockNumberReference,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[list[int], list[float]]:
 
-    address = await address_utils.async_resolve_address(
-        address,
+    wallet = await address_utils.async_resolve_address(
+        wallet,
         block=block,
         provider=provider,
     )
@@ -341,7 +341,7 @@ async def async_get_erc20s_allowances(
         tokens=tokens,
         function_name='allowance',
         block=block,
-        function_parameters=[address],
+        function_parameters=[wallet],
         provider=provider,
     )
 
@@ -355,14 +355,14 @@ async def async_get_erc20s_allowances(
 
 async def async_get_erc20s_allowances_by_address(
     token: spec.ERC20Reference,
-    addresses: typing.Sequence[spec.Address],
+    wallets: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int | float]:
 
-    addresses = await address_utils.async_resolve_addresses(
-        addresses,
+    wallets = await address_utils.async_resolve_addresses(
+        wallets,
         block=block,
         provider=provider,
     )
@@ -371,7 +371,7 @@ async def async_get_erc20s_allowances_by_address(
         to_address=token,
         block_number=block,
         function_abi=evm_spec.erc20_function_abis['allowance'],
-        function_parameter_list=[[address] for address in addresses],
+        function_parameter_list=[[wallet] for wallet in wallets],
         provider=provider,
     )
 

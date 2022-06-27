@@ -101,7 +101,7 @@ async def async_print_safe_summary(address: spec.Address, verbose: bool = False)
         print()
         toolstr.print_text_box('Common ERC20s in safe')
         balances = await evm.async_get_erc20s_balance_of(
-            address=address,
+            wallet=address,
             tokens=erc20_addresses,
         )
 

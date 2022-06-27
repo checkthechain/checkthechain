@@ -56,7 +56,7 @@ async def async_get_pool_state(
         pool=pool, provider=provider
     )
     reserves_coroutine = evm.async_get_erc20s_balance_of(
-        address=pool,
+        wallet=pool,
         tokens=[token_x, token_y],
         block=block,
         provider=provider,

@@ -41,7 +41,7 @@ async def async_balance_command(
         block=block,
     )
     balance = await evm.async_get_erc20_balance_of(
-        address=wallet_address,
+        wallet=wallet_address,
         token=erc20_address,
         block=block,
         normalize=(not raw),
