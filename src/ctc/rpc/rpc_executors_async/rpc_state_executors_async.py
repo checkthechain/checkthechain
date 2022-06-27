@@ -8,6 +8,7 @@ from ctc import spec
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
+from .. import rpc_provider
 
 
 async def async_eth_call(
@@ -21,20 +22,30 @@ async def async_eth_call(
     function_parameters: typing.Sequence[typing.Any]
     | typing.Mapping[str, typing.Any]
     | None = None,
-    function_abi: spec.FunctionABI | None = None,
     provider: spec.ProviderSpec = None,
     decode_response: bool = True,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
     fill_empty: bool = False,
     empty_token: typing.Any = None,
-    **function_abi_query: typing.Any,
+    function_abi: spec.FunctionABI | None = None,
+    function_name: typing.Optional[str] = None,
+    contract_abi: typing.Optional[spec.ContractABI] = None,
+    n_parameters: typing.Optional[int] = None,
+    parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    function_selector: typing.Optional[spec.FunctionSelector] = None,
 ) -> spec.RpcSingularResponse:
 
     if function_abi is None:
         if call_data is None or decode_response:
             function_abi = await evm.async_get_function_abi(
-                contract_address=to_address, **function_abi_query
+                contract_address=to_address,
+                contract_abi=contract_abi,
+                function_name=function_name,
+                n_parameters=n_parameters,
+                parameter_types=parameter_types,
+                function_selector=function_selector,
+                network=rpc_provider.get_provider_network(provider)
             )
 
     # construct request
@@ -75,15 +86,25 @@ async def async_eth_estimate_gas(
     function_parameters: typing.Sequence[typing.Any]
     | typing.Mapping[str, typing.Any]
     | None = None,
-    function_abi: spec.FunctionABI | None = None,
     provider: spec.ProviderSpec = None,
     decode_response: bool = True,
-    **function_abi_query: typing.Any,
+    function_abi: spec.FunctionABI | None = None,
+    function_name: typing.Optional[str] = None,
+    contract_abi: typing.Optional[spec.ContractABI] = None,
+    n_parameters: typing.Optional[int] = None,
+    parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    function_selector: typing.Optional[spec.FunctionSelector] = None,
 ) -> spec.RpcSingularResponse:
 
     if function_abi is None:
         function_abi = await evm.async_get_function_abi(
-            contract_address=to_address, **function_abi_query
+            contract_address=to_address,
+            contract_abi=contract_abi,
+            function_name=function_name,
+            n_parameters=n_parameters,
+            parameter_types=parameter_types,
+            function_selector=function_selector,
+            network=rpc_provider.get_provider_network(provider)
         )
 
     request = rpc_constructors.construct_eth_estimate_gas(
