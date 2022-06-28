@@ -4,7 +4,7 @@ import toolcli
 
 from . import setup_io
 from .stages import alias_setup
-from .stages import data_root_setup
+from .stages import data_dir_setup
 from .stages import db_setup
 from .stages import network_setup
 
@@ -40,12 +40,12 @@ async def async_setup_ctc() -> None:
         old_config=old_config,
         styles=styles,
     )
-    data_root = data_root_setup.setup_data_root(
+    data_dir_data = data_dir_setup.setup_data_dir(
         old_config=old_config,
         styles=styles,
     )
     db_data = db_setup.setup_dbs(
-        data_root=data_root,
+        data_dir=data_dir_data['data_dir'],
         network_data=network_data,
         styles=styles,
     )
@@ -54,7 +54,7 @@ async def async_setup_ctc() -> None:
     setup_io.write_new_config(
         network_data=network_data,
         db_data=db_data,
-        data_root=data_root,
+        data_dir_data=data_dir_data,
         styles=styles,
     )
 

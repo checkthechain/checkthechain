@@ -56,7 +56,7 @@ def write_new_config(
     *,
     network_data: spec.PartialConfig,
     db_data: spec.PartialConfig,
-    data_root: str,
+    data_dir_data: spec.PartialConfig,
     styles: typing.Mapping[str, str],
 ) -> None:
 
@@ -68,14 +68,14 @@ def write_new_config(
 
     config: spec.Config = {
         'config_spec_version': version,
-        'data_dir': data_root,
+        'data_dir': data_dir_data['data_dir'],
         'networks': network_data['networks'],
         'providers': network_data['providers'],
         'default_network': network_data['default_network'],
         'default_providers': network_data['default_providers'],
         'db_configs': db_data['db_configs'],
-        'log_rpc_calls': True,
-        'log_sql_queries': True,
+        'log_rpc_calls': data_dir_data['log_rpc_calls'],
+        'log_sql_queries': data_dir_data['log_sql_queries'],
     }
     old_config_raw = load_old_config(convert_to_latest=False)
     write_new = json.dumps(config, sort_keys=True) != json.dumps(

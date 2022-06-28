@@ -6,14 +6,15 @@ import typing
 
 import toolcli
 
+from ctc import spec
 from ... import config_defaults
 from .. import data_dir_versioning
 
 
-def setup_data_root(
+def setup_data_dir(
     styles: dict[str, str],
     old_config: typing.Mapping[typing.Any, typing.Any],
-) -> str:
+) -> spec.PartialConfig:
 
     print()
     print()
@@ -72,4 +73,14 @@ def setup_data_root(
     # create files and subdirectories and upgrade if need be
     data_dir_versioning.initialize_data_subdirs(new_data_root, version='0.3.0')
 
-    return new_data_root
+    print()
+    prompt = 'Do you want to disable ctc logging? '
+    disable_logs = toolcli.input_yes_or_no(
+        prompt, default='no', style=styles['question']
+    )
+
+    return {
+        'data_dir': new_data_root,
+        'log_rpc_calls': not disable_logs,
+        'log_sql_queries': not disable_logs,
+    }

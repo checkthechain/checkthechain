@@ -13,7 +13,7 @@ from ... import config_defaults
 def setup_dbs(
     *,
     styles: typing.Mapping[str, str],
-    data_root: str,
+    data_dir: str,
     network_data: spec.PartialConfig,
 ) -> spec.PartialConfig:
 
@@ -23,7 +23,7 @@ def setup_dbs(
     print()
     print('ctc stores its collected chain data in an sql database')
 
-    db_configs = config_defaults.get_default_db_configs(data_root)
+    db_configs = config_defaults.get_default_db_configs(data_dir)
 
     # create db
     print()

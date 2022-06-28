@@ -56,7 +56,7 @@ alias uniswap="ctc uniswap"
 """
 
 
-def is_ctc_on_path():
+def is_ctc_on_path() -> bool:
     import subprocess
 
     try:
@@ -66,8 +66,8 @@ def is_ctc_on_path():
         return False
 
 
-def create_root_ctc_alias():
-    return 'alias ctc="' + sys.executable() + '-m ctc"'
+def create_root_ctc_alias() -> str:
+    return 'alias ctc="' + sys.executable + '-m ctc"'
 
 
 def print_aliases() -> None:
