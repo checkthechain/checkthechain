@@ -45,7 +45,7 @@ async def async_setup_networks(
     )
 
     print()
-    print('network setup complete')
+    print('Network setup complete')
 
     # return results
     data: spec.PartialConfig = {
@@ -162,7 +162,7 @@ async def async_collect_provider_metadata(
             name = networks[chain_id]['name']
             if name is not None:
                 description = description + ', network = ' + name
-        print('provider reports using ' + description)
+        print('Provider reports using ' + description)
     except Exception as e:
         raise e
         print('Could not query node for chain_id metadata')
@@ -279,7 +279,7 @@ def specify_networks(
         collect_network_metadata(styles=styles, networks=networks)
 
     print()
-    print('using', len(networks), 'networks in config')
+    print('Using', len(networks), 'networks in config')
 
     return networks
 

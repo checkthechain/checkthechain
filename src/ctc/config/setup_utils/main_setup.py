@@ -3,6 +3,7 @@ from __future__ import annotations
 import toolcli
 
 from . import setup_io
+from .stages import alias_setup
 from .stages import data_root_setup
 from .stages import db_setup
 from .stages import network_setup
@@ -13,13 +14,14 @@ styles = {
     'path': '#b9f29f bold',
     'question': '#8be9fd',
     'quote': '#f1fa8c',
+    'command': '#64aaaa',
 }
 
 
 async def async_setup_ctc() -> None:
 
     # print intro
-    print('setting up ctc...')
+    print('Setting up ctc...')
     print()
     print('Each step is optional')
     print('- by default, setup process will leave existing settings unchanged')
@@ -59,8 +61,12 @@ async def async_setup_ctc() -> None:
     # populate db
     await db_setup.async_populate_db_tables(styles=styles)
 
+    # setup aliases
+    alias_setup.add_cli_aliases(styles=styles)
+
+    # finalize
     print()
     print()
-    toolcli.print('## Finalizing steps', style=styles['header'])
+    toolcli.print('## Final Steps', style=styles['header'])
     print()
     print('ctc setup compelete')

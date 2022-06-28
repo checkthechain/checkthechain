@@ -134,7 +134,7 @@ async def async_import_networks_to_db(
 
     if verbose:
         print(
-            'adding Chainlink feed metadata to db for',
+            'Adding Chainlink feed metadata to db for',
             len(networks),
             'networks...',
         )

@@ -38,7 +38,11 @@ def setup_data_root(
                 + styles['path']
                 + ']? '
             )
-            if toolcli.input_yes_or_no(prompt, default='yes'):
+            if toolcli.input_yes_or_no(
+                prompt,
+                default='yes',
+                style=styles['question'],
+            ):
                 new_data_root = old_data_root
             else:
                 print(

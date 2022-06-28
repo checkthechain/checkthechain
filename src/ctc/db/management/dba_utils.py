@@ -32,7 +32,7 @@ def create_evm_tables(
     # get preamble
     if verbose or not confirm:
         print(
-            'creating tables for',
+            'Creating tables for',
             len(schema_names),
             'schema(s) across',
             len(networks),
@@ -52,7 +52,7 @@ def create_evm_tables(
             print('    - network:', networks[0])
         else:
             print()
-            print('no networks specified, creating no tables')
+            print('No networks specified, creating no tables')
 
     # get missing tables
     schemas_to_create: list[
@@ -95,11 +95,11 @@ def create_evm_tables(
     # print missing tables
     if len(schemas_to_create) == 0:
         print()
-        print('all tables already exist')
+        print('All tables already exist')
         return
     else:
         print()
-        print('schemas to create:')
+        print('Schemas to create:')
         for schema_network, schema_name in schemas_to_create:
             print('-', schema_name, '[network = ' + str(schema_network) + ']')
 
@@ -107,7 +107,7 @@ def create_evm_tables(
     if not confirm:
         print()
         if not toolcli.input_yes_or_no('continue? '):
-            raise Exception('aborted creation of tables')
+            raise Exception('Skipping creation of tables')
 
     # create tables
     # (for now, use same database for all tables)
@@ -117,7 +117,7 @@ def create_evm_tables(
         create_missing_schema=False,
     )
     if engine is None:
-        raise Exception('could not create engine for database')
+        raise Exception('Could not create engine for database')
 
     # initialize schema versions schema if need be
     with engine.begin() as conn:
@@ -136,7 +136,7 @@ def create_evm_tables(
             )
 
     print()
-    print('all tables created')
+    print('All tables created')
 
 
 def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
@@ -211,7 +211,7 @@ def drop_schema(
     if not confirm:
         if network is not None:
             answer = toolcli.input_yes_or_no(
-                'delete version row for schema '
+                'Delete version row for schema '
                 + schema_name
                 + ' for network '
                 + str(network)
@@ -221,7 +221,7 @@ def drop_schema(
                 raise Exception('aborting')
         else:
             answer = toolcli.input_yes_or_no(
-                'delete ALL version rows for schema ' + schema_name + '? '
+                'Delete ALL version rows for schema ' + schema_name + '? '
             )
             if not answer:
                 raise Exception('aborting')
@@ -266,7 +266,7 @@ def drop_schema(
         # drop schema tables
         with engine.begin() as conn:
             for table_name in drop_table_names:
-                print('dropping table', table_name)
+                print('Dropping table', table_name)
                 table_object = toolsql.create_table_object_from_db(
                     engine=engine,
                     table_name=table_name,

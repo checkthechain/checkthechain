@@ -88,6 +88,6 @@ async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
 
     # populate data: chainlink
     print()
-    print('Populating database with Chainlink oracle feeds...')
+    print('Populating database with latest Chainlink oracle feeds...')
     print()
     await chainlink_utils.async_import_networks_to_db()

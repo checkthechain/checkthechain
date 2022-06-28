@@ -12,7 +12,7 @@ async def async_intake_default_erc20s(
 ) -> None:
 
     if network not in ['mainnet', 1]:
-        print('no default tokens for network: ' + str(network))
+        print('No default tokens for network: ' + str(network))
         return
 
     # load data
@@ -36,7 +36,7 @@ async def async_intake_default_erc20s(
 
     # print summary
     if verbose:
-        print('added metadata of', len(data), 'default ERC20 tokens to db')
+        print('Added metadata of', len(data), 'default ERC20 tokens to db')
 
 
 def load_default_erc20s(

@@ -84,7 +84,7 @@ def write_new_config(
 
     print()
     print()
-    toolcli.print('## Finalizing Configuration', style=styles['header'])
+    toolcli.print('## Creating Configuration File', style=styles['header'])
     print()
     if write_new:
         with open(config_path, 'w') as f:
