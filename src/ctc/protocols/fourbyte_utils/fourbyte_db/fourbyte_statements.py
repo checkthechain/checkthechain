@@ -132,6 +132,8 @@ async def async_select_event_signatures(
     where_equals = {
         'hex_signature': hex_signature,
         'text_signature': text_signature,
+        'id': id,
+        'bytes_signature': bytes_signature,
     }
     where_equals = {
         key: value for key, value in where_equals.items() if value is not None
