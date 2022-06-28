@@ -71,10 +71,12 @@ def get_config(
 
         print(
             '[WARNING]'
-            ' using default ctc config because ctc config file does not exist;'
+            ' ctc config file does not exist;'
             ' use `ctc setup` on command line to generate a config file'
         )
-        config_from_file = config_defaults.get_default_config()  # type: ignore
+        config_from_file = config_defaults.get_default_config(
+            use_env_variables=True,
+        )  # type: ignore
 
     if config_from_file.get('config_spec_version') != ctc.__version__:
         print(

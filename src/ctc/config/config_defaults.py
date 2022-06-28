@@ -15,10 +15,13 @@ if typing.TYPE_CHECKING:
     import toolsql
 
 
-def get_default_config() -> spec.Config:
-    return {
+def get_default_config(use_env_variables: bool = True) -> spec.Config:
+
+    data_dir = get_default_data_dir()
+
+    default_config: spec.Config = {
         'config_spec_version': ctc.__version__,
-        'data_dir': get_default_data_dir(),
+        'data_dir': data_dir,
         #
         # networks
         'default_network': None,
@@ -29,12 +32,54 @@ def get_default_config() -> spec.Config:
         'default_providers': {},
         #
         # db
-        'db_configs': {},
+        'db_configs': get_default_db_configs(data_dir=data_dir),
         #
         # logging
         'log_rpc_calls': get_default_log_rpc_calls(),
         'log_sql_queries': get_default_log_sql_queries(),
     }
+    # add in ETH_RPC_URL provider for no config mode
+    if use_env_variables:
+        add_env_var_rpc_provider(default_config)
+
+    return default_config
+
+
+def add_env_var_rpc_provider(default_config: spec.Config) -> None:
+    eth_rpc_url = os.environ.get('ETH_RPC_URL')
+    if eth_rpc_url is not None:
+        print('using RPC provider stored in ETH_RPC_URL')
+        provider_name = 'ETH_RPC_URL'
+        chain_id = _sync_get_chain_id(eth_rpc_url)
+        if chain_id not in default_config['networks']:
+            raise Exception(
+                'cannot use provider in ETH_RPC_URL because it uses unknown chain_id = '
+                + str(chain_id)
+            )
+        default_config['default_network'] = chain_id
+        default_config['providers'][provider_name] = {  # type: ignore
+            'name': provider_name,
+            'network': chain_id,
+            'protocol': 'http',
+            'url': eth_rpc_url,
+            'session_kwargs': {},
+            'chunk_size': None,
+        }
+        default_config['default_providers'][chain_id] = provider_name  # type: ignore
+
+
+def _sync_get_chain_id(provider_url: str) -> int:
+    import json
+    import urllib.request
+
+    from ctc import binary
+
+    data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
+    post_data = json.dumps(data).encode('utf-8')
+    request = urllib.request.Request(provider_url, data=post_data)
+    response = urllib.request.urlopen(request)
+    response_data = json.loads(response.read().decode())
+    return binary.convert(response_data['result'], 'integer')
 
 
 def get_default_data_dir() -> str:
