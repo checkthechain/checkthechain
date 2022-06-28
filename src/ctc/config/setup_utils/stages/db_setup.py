@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import typing
 
+import aiohttp
 import toolcli
 
 from ctc import db
@@ -90,4 +91,9 @@ async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
     print()
     print('Populating database with latest Chainlink oracle feeds...')
     print()
-    await chainlink_utils.async_import_networks_to_db()
+    try:
+        await chainlink_utils.async_import_networks_to_db()
+    except aiohttp.client_exceptions.ClientConnectorError:
+        print('Could not connect to Chainlink server, skipping')
+    except Exception:
+        print('Could not add feeds to db, skipping')

@@ -126,7 +126,6 @@ async def async_specify_providers(
         )
 
         # prompt for additional providers
-        print()
         answer = toolcli.input_yes_or_no(
             prompt_additional,
             style=styles['question'],
@@ -144,6 +143,7 @@ async def async_collect_provider_metadata(
 ) -> None:
     """collect metadata for a provider"""
 
+    print()
     url = toolcli.input_prompt(
         'What is the RPC provider URL? ', style=styles['question']
     )
@@ -156,13 +156,19 @@ async def async_collect_provider_metadata(
             'chunk_size': None,
             'url': url,
         }
-        chain_id = await rpc.async_eth_chain_id(provider=temporary_provider)
+        try:
+            chain_id = await rpc.async_eth_chain_id(provider=temporary_provider)
+        except Exception:
+            chain_id = toolcli.input_int(
+                'Could not connect to RPC provider. What is this provider\'s chain_id? ',
+                style=styles['question'],
+            )
         description = 'chain_id = ' + str(chain_id)
         if chain_id in networks:
             name = networks[chain_id]['name']
             if name is not None:
                 description = description + ', network = ' + name
-        print('Provider reports using ' + description)
+        print('Provider using ' + description)
     except Exception as e:
         raise e
         print('Could not query node for chain_id metadata')
