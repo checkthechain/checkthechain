@@ -36,12 +36,6 @@ async def async_print_transaction_summary(
     eth_usd_task = asyncio.create_task(
         chainlink_utils.async_get_eth_price(block=transaction['block_number'])
     )
-    contract_abi_task = asyncio.create_task(
-        evm.async_get_contract_abi(
-            contract_address=transaction['to'],
-            verbose=False,
-        )
-    )
 
     toolstr.print_text_box('Transaction Summary')
     print('- hash:', transaction['hash'])
@@ -101,6 +95,12 @@ async def async_print_transaction_summary(
         print('[none]')
     else:
         try:
+            contract_abi_task = asyncio.create_task(
+                evm.async_get_contract_abi(
+                    contract_address=transaction['to'],
+                    verbose=False,
+                )
+            )
             contract_abi = await contract_abi_task
         except spec.AbiNotFoundException:
             print()
