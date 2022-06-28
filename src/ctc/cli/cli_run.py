@@ -16,6 +16,7 @@ from . import cli_utils
 command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'admin': {
         (): 'ctc.cli.commands.root_command',
+        ('aliases',): 'ctc.cli.commands.admin.aliases_command',
         ('config',): 'ctc.cli.commands.admin.config_command',
         ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
         ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
@@ -283,7 +284,7 @@ def run_cli(
         'style_theme': {
             'title': 'bold #ce93f9',
             # 'description': '#f1fa8c',
-            # 'metavar': '#8be9fd',
+            'metavar': '#8be9fd',
             'description': '#b9f29f',
             'option': '#64aaaa',
             # 'description': '#64aaaa',
