@@ -77,7 +77,7 @@ async def async_print_transaction_summary(
             '- priority + base:',
             toolstr.format(transaction['max_priority_fee_per_gas'] / 1e9),
             '+',
-            toolstr.format(block['base_fee_per_gas'] / 1e9),
+            toolstr.format(int(block['base_fee_per_gas']) / 1e9),
         )
     fee = transaction_receipt['gas_used'] * transaction['gas_price'] / 1e18
     fee_usd = fee * eth_usd
@@ -160,7 +160,7 @@ async def async_print_transaction_summary(
             )
             normalized_event = binary.normalize_event(
                 event=log,
-                arg_prefix='',
+                arg_prefix=None,
                 event_abi=event_abi,
             )
             event_signature = binary.get_event_signature(event_abi=event_abi)

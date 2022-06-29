@@ -21,9 +21,6 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_transaction_command(transaction: str, sort: str) -> None:
 
-    try:
-        await evm.async_print_transaction_summary(
-            transaction_hash=transaction, sort_logs_by=sort
-        )
-    except Exception:
-        pass
+    await evm.async_print_transaction_summary(
+        transaction_hash=transaction, sort_logs_by=sort
+    )

@@ -129,4 +129,3 @@ class PendingRawLog(TypedDict):
 
 
 NormalizedLog = typing.Dict[str, typing.Any]
-

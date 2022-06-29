@@ -181,6 +181,7 @@ def normalize_event(
     normalized['event_hash'] = event['topics'][0]
 
     # add event args
+    # args either stored in 'args' key or directly in normalized event
     if arg_prefix is None:
         arg_container = {}
         normalized['args'] = arg_container
