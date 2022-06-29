@@ -20,5 +20,12 @@ async def async_symbol_command(query: str) -> None:
         symbol = await evm.async_get_erc20_symbol(query)
         print(symbol)
     else:
-        address = await evm.async_get_erc20_address(query)
-        print(address)
+        try:
+            address = await evm.async_get_erc20_address(query)
+            print(address)
+        except Exception:
+            print(
+                'could not find address for token with symbol "'
+                + str(query)
+                + '"'
+            )
