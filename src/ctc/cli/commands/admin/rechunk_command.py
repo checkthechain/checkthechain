@@ -64,6 +64,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
             '--all',
         ],
+        'hidden': True,
     }
 
 

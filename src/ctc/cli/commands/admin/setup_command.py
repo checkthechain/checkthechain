@@ -7,7 +7,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_setup_command,
         'help': 'run ctc setup wizard',
-        'examples': [''],
+        'examples': {
+            '': {'skip': True},
+        },
     }
 
 

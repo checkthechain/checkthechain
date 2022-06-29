@@ -20,7 +20,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'f': log_command,
         'help': 'display logs',
         'args': [],
-        'examples': [''],
+        'examples': {'': {'description': 'tail logs', 'runnable': False}},
     }
 
 

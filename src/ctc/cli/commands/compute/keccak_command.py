@@ -31,7 +31,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'examples': {
-            '0x678acb67e': 'take hash of hex data',
+            '0x678acb67': 'take hash of hex data',
             'vitalik': 'take hash of text',
         },
     }

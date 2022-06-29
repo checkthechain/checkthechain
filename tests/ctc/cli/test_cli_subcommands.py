@@ -1,3 +1,5 @@
+import subprocess
+
 import pytest
 import toolcli
 
@@ -35,3 +37,41 @@ def test_subcommands_have_examples(spec_reference):
     assert (
         command_spec.get('examples') is not None
     ), 'missing examples for command for ' + str(spec_reference)
+
+
+@pytest.mark.parametrize('subcommand_spec', list(cli_run.command_index.items()))
+def test_subcommand_examples(subcommand_spec):
+
+    # TODO: make a toolcli function to extract the examples
+
+    subcommand, spec_reference = subcommand_spec
+    command_spec = toolcli.resolve_command_spec(spec_reference)
+
+    if command_spec.get('hidden', False):
+        return
+
+    # collect examples
+    example_strs = []
+    examples = command_spec.get('examples', [])
+    if isinstance(examples, list):
+        example_strs = examples
+    elif isinstance(examples, dict):
+        for example_str, example_data in examples.items():
+            if isinstance(example_data, str):
+                example_strs.append(example_str)
+
+            elif isinstance(example_data, dict):
+
+                if (
+                    example_data.get('runnable', True)
+                    and not example_data.get('long', False)
+                    and not example_data.get('skip', False)
+                ):
+                    example_strs.append(example_str)
+
+    for example_str in example_strs:
+        command_pieces = ['ctc'] + list(subcommand) + [example_str]
+        command = ' '.join(command_pieces)
+        exit_code = subprocess.call(command, shell=True)
+        if exit_code != 0:
+            raise Exception('command failed with exit code ' + str(exit_code) + ': ' + command)

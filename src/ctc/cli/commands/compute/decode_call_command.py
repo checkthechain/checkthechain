@@ -29,7 +29,7 @@ syntax is one of
                 'action': 'store_true',
             },
         ],
-        'examples': ['0x956f47f50a910163d8bf957cf5846d573e7f87ca'],
+        'examples': ['0xdac17f958d2ee523a2206206994597c13d831ec7 0xa9059cbb00000000000000000000000021dd5c13925407e5bcec3f27ab11a355a9dafbe3000000000000000000000000000000000000000000000000000000003fd629c0'],
     }
 
 

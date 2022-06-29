@@ -51,7 +51,7 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
             # treat as transaction hash
             transaction = item
             execute_other_command_sequence(
-                command_sequence=('transaction',),
+                command_sequence=('tx',),
                 args={'parse_spec': parse_spec, 'transaction': transaction},
                 parse_spec=parse_spec,
             )
