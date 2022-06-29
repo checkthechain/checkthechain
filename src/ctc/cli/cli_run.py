@@ -48,10 +48,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'data': {
         ('abi',): 'ctc.cli.commands.data.abi_command',
         ('address',): 'ctc.cli.commands.data.address_command',
-        (
-            'address',
-            'transactions',
-        ): 'ctc.cli.commands.data.address_transactions_command',
+        ('address', 'txs'): 'ctc.cli.commands.data.address_txs_command',
         ('bytecode',): 'ctc.cli.commands.data.bytecode_command',
         ('block',): 'ctc.cli.commands.data.block_command',
         ('blocks',): 'ctc.cli.commands.data.blocks_command',
