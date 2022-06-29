@@ -26,7 +26,7 @@ async def async_get_pool_weights_raw(
         function_name='getNormalizedWeights',
         block_number=block,
     )
-    if not isinstance(result, list) or not all(
+    if not isinstance(result, (tuple, list)) or not all(
         isinstance(item, (int, float)) for item in result
     ):
         raise Exception('invalid rpc result')

@@ -23,8 +23,8 @@ async def async_get_all_pools(
         function_abi=rari_abis.pool_directory_function_abis['getAllPools'],
         provider=provider,
     )
-    if not isinstance(result, list) or not all(
-        isinstance(item, list) for item in result
+    if not isinstance(result, (list, tuple)) or not all(
+        isinstance(item, (list, tuple)) for item in result
     ):
         raise Exception('invalid rpc result')
     return result
