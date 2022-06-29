@@ -25,9 +25,7 @@ async def async_get_proxy_address(
 ) -> spec.Address | None:
 
     proxy_metadata = await async_get_proxy_metadata(
-        contract_address=contract_address,
-        provider=provider,
-        block=block
+        contract_address=contract_address, provider=provider, block=block
     )
 
     return proxy_metadata['address']
@@ -105,12 +103,15 @@ async def _async_get_eip897_proxy_type(
         ],
     }
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if result is not None and not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def _async_get_eip897_implementation(
@@ -129,12 +130,15 @@ async def _async_get_eip897_implementation(
         ],
     }
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 #
@@ -166,6 +170,8 @@ async def _async_get_eip1967_proxy_logic_address(
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
 
     return '0x' + result[-40:]
 
@@ -192,6 +198,8 @@ async def _async_get_eip1967_proxy_beacon_address(
         position=position,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
 
     return '0x' + result[-40:]
 
@@ -220,12 +228,16 @@ async def _async_get_eip1967_proxy_admin_address(
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
 
     return '0x' + result[-40:]
 
 
 async def async_get_eip1967_history() -> None:
-    raise NotImplementedError('use events here, see https://docs.openzeppelin.com/contracts/4.x/api/proxy#BeaconProxy')
+    raise NotImplementedError(
+        'use events here, see https://docs.openzeppelin.com/contracts/4.x/api/proxy#BeaconProxy'
+    )
 
 
 #
@@ -243,7 +255,9 @@ async def async_get_gnosis_safe_proxy_address(
 
     if confirm_bytecode:
         gnosis_proxy_code = '0x608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea2646970667358221220d1429297349653a4918076d650332de1a1068c5f3e07c5c82360c277770b955264736f6c63430007060033'
-        bytecode = await rpc.async_eth_get_code(contract_address, block_number=block)
+        bytecode = await rpc.async_eth_get_code(
+            contract_address, block_number=block
+        )
         if bytecode != gnosis_proxy_code:
             return None
 
@@ -253,5 +267,7 @@ async def async_get_gnosis_safe_proxy_address(
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
 
     return '0x' + result[-40:]

@@ -14,13 +14,17 @@ fuse_directory = '0x835482fe0532f169024d5e9410199369aad5c77e'
 async def async_get_all_pools(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
-) -> list[list[typing.Any]]:
+) -> typing.Sequence[typing.Sequence[typing.Any]]:
 
     # TODO: convert output to dict
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=fuse_directory,
         block_number=block,
         function_abi=rari_abis.pool_directory_function_abis['getAllPools'],
         provider=provider,
     )
-
+    if not isinstance(result, list) or not all(
+        isinstance(item, list) for item in result
+    ):
+        raise Exception('invalid rpc result')
+    return result

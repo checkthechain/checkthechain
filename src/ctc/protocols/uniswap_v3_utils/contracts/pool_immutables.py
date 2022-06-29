@@ -15,12 +15,15 @@ async def async_pool_factory(
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'factory', 'pool'
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_token0(
@@ -32,12 +35,15 @@ async def async_pool_token0(
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'token0', 'pool'
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_token1(
@@ -49,12 +55,15 @@ async def async_pool_token1(
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'token1', 'pool'
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_fee(
@@ -64,12 +73,15 @@ async def async_pool_fee(
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi('fee', 'pool')
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_tick_spacing(
@@ -81,12 +93,15 @@ async def async_pool_tick_spacing(
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'tickSpacing', 'pool'
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_max_liquidity_per_tick(
@@ -99,9 +114,12 @@ async def async_pool_max_liquidity_per_tick(
         'maxLiquidityPerTick',
         'pool',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result

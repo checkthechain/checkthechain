@@ -12,7 +12,7 @@ from . import registrar
 
 
 def hash_name(name: str) -> spec.PrefixHexData:
-    import idna  # type: ignore
+    import idna
 
     labels = name.split('.')
     output = '00' * 32
@@ -44,6 +44,8 @@ async def async_resolve_name(
         function_parameters=[name_hash],
         provider=provider,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
 
     if result == '0x0000000000000000000000000000000000000000':
         resolver = await registrar.async_get_resolver(
@@ -60,6 +62,8 @@ async def async_resolve_name(
             function_parameters=[name_hash],
             provider=provider,
         )
+        if not isinstance(result, str):
+            raise Exception('invalid rpc result')
 
     return result
 
@@ -99,7 +103,10 @@ async def async_reverse_lookup(
         function_parameters=[[address]],
         provider=provider,
     )
-    return names[0]
+    output = names[0]
+    if not isinstance(output, str):
+        raise Exception('invalid rpc result')
+    return output
 
 
 async def async_name_history() -> None:
@@ -127,11 +134,14 @@ async def async_get_text_record(
         'outputs': [{'name': '', 'type': 'string'}],
     }
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ens_directory.resolver,
         function_abi=function_abi,
         function_parameters=[node, key],
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_text_records(
@@ -224,11 +234,14 @@ async def async_get_content_hash(
         'outputs': [{'name': '', 'type': 'bytes'}],
     }
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ens_directory.resolver,
         function_abi=function_abi,
         function_parameters=[node],
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_expiration(name: str) -> int:
@@ -245,8 +258,11 @@ async def async_get_expiration(name: str) -> int:
         'outputs': [{'type': 'uint256'}],
     }
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ens_directory.base_registrar,
         function_abi=function_abi,
         function_parameters=[label_id],
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result

@@ -38,7 +38,12 @@ async def async_get_token_balances(
 
     else:
 
-        return await balances_task
+        result = await balances_task
+        if not isinstance(result, list) or not all(
+            isinstance(item, int) for item in result
+        ):
+            raise Exception('invalid rpc result')
+        return result
 
 
 async def async_get_token_balances_by_block(

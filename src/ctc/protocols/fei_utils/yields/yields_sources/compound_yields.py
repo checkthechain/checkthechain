@@ -56,14 +56,14 @@ async def async_get_compound_fei_tvl_history(
         token=cFEI,
         blocks=block_numbers,
     )
-    cFEI_total_supply_array = np.array(cFEI_total_supply)
+    cFEI_total_supply_array: spec.NumpyArray = np.array(cFEI_total_supply)
 
     cFEI_conversions = await rpc.async_batch_eth_call(
         to_address=cFEI,
         block_numbers=block_numbers,
         function_name='exchangeRateStored',
     )
-    cFEI_conversions_array = np.array(cFEI_conversions)
+    cFEI_conversions_array: spec.NumpyArray = np.array(cFEI_conversions)
 
     tvl_history = cFEI_total_supply_array * cFEI_conversions_array / 1e10 / 1e18
 

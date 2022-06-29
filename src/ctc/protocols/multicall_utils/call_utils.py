@@ -12,7 +12,10 @@ def get_call_contract(call: multicall_spec.Call) -> spec.Address:
     if isinstance(call, dict):
         return call['contract']
     elif isinstance(call, (list, tuple)):
-        return call[0]
+        result = call[0]
+        if not isinstance(result, str):
+            raise Exception('bad format for call')
+        return result
     else:
         raise Exception('unknown call format')
 

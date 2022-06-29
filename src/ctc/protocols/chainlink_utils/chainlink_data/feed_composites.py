@@ -33,7 +33,7 @@ async def async_get_composite_feed_data(
         )
         coroutines.append(coroutine)
 
-    datas = await asyncio.gather(*coroutines)
+    datas: typing.Sequence[spec.Series] = await asyncio.gather(*coroutines)
 
     # compute product
     product = datas[0] * datas[1]

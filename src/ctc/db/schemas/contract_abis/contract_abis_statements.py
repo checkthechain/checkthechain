@@ -56,7 +56,8 @@ async def async_select_contract_abi(
         raise_if_table_dne=False,
     )
     if abi_text is not None:
-        return json.loads(abi_text)
+        contract_abi: spec.ContractABI = json.loads(abi_text)
+        return contract_abi
     else:
         return None
 

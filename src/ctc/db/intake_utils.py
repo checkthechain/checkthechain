@@ -39,7 +39,7 @@ async def async_is_block_fully_confirmed(
     required_confirmations = management.get_required_confirmations(
         network=network,
     )
-    return block_number <= rpc_latest_block - required_confirmations
+    return bool(block_number <= rpc_latest_block - required_confirmations)
 
 
 async def async_filter_fully_confirmed_blocks(

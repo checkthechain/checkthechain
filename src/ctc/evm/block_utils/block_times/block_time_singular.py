@@ -93,7 +93,10 @@ def get_block_of_timestamp_from_arrays(
         timestamp = tooltime.timestamp_to_seconds(timestamp)
 
     index = np.searchsorted(block_timestamp_array, timestamp)
-    return block_number_array[index]
+    result = block_number_array[index]
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_block_number_and_time(

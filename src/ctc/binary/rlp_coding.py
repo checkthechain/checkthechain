@@ -23,7 +23,7 @@ def rlp_encode(data: typing.Any) -> str:
 
 def rlp_decode(data: spec.BinaryData) -> typing.Any:
     try:
-        import rlp  # type: ignore
+        import rlp
     except ImportError:
         raise Exception(
             'the rlp package is required for this feature, try `pip install rlp`'

@@ -98,4 +98,4 @@ async def async_get_twap_single_sample(
     elif len(series) > 1:
         raise Exception()
     else:
-        return series.values[0]
+        return typing.cast(float, series.values[0])

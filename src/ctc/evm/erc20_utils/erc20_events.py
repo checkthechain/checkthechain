@@ -91,7 +91,7 @@ async def async_get_erc20_holdings_from_transfers(
     # subtract transfers out from transfers in
     from_transfers = transfers.groupby('arg__from')[amount_key].sum()
     to_transfers = transfers.groupby('arg__to')[amount_key].sum()
-    balances = to_transfers.sub(from_transfers, fill_value=0)
+    balances: spec.DataFrame = to_transfers.sub(from_transfers, fill_value=0)
 
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
@@ -100,7 +100,7 @@ async def async_get_erc20_holdings_from_transfers(
         balances /= 10 ** decimals
 
     # sort
-    balances = balances.sort_values(ascending=False)
+    balances = balances.sort_values(ascending=False)  # type: ignore
 
     balances.name = 'balance'
     balances.index.name = 'address'

@@ -53,8 +53,8 @@ class FusePool(TypedDict):
 class FusePoolData(TypedDict):
     total_supply: int
     total_borrow: int
-    underlying_tokens: list[spec.Address]
-    underlying_symbols: list[str]
+    underlying_tokens: typing.Sequence[spec.Address]
+    underlying_symbols: typing.Sequence[str]
     whitelisted_admin: bool
 
 
@@ -88,7 +88,7 @@ class FusePoolUser(TypedDict):
     total_borrow: int
     total_collateral: int
     health: int
-    assets: list[FusePoolAsset]
+    assets: typing.Sequence[FusePoolAsset]
 
 
 class CTokenOwnership(TypedDict):
@@ -99,50 +99,50 @@ class CTokenOwnership(TypedDict):
 
 
 class PublicPoolsWithData(TypedDict):
-    public_pools: list[FusePool]
-    data: list['ReturnPoolSummary']
-    errored: list[bool]
+    public_pools: typing.Sequence[FusePool]
+    data: typing.Sequence['ReturnPoolSummary']
+    errored: typing.Sequence[bool]
 
 
 class ReturnPoolSummary(TypedDict):
     total_supply: int
     total_borrow: int
-    underlying_tokens: list[spec.Address]
-    underlying_symbols: list[str]
+    underlying_tokens: typing.Sequence[spec.Address]
+    underlying_symbols: typing.Sequence[str]
     whitelisted_admin: bool
 
 
 class ReturnPoolUsersWithData(TypedDict):
-    users: list[FusePoolUser]
+    users: typing.Sequence[FusePoolUser]
     close_factor: int
     liquidation_incentive: int
 
 
 class ReturnPoolsUsersWithData(TypedDict):
-    users: list[list[FusePoolUser]]
-    close_factors: list[int]
-    liquidation_incentives: list[int]
-    errored: list[bool]
+    users: typing.Sequence[typing.Sequence[FusePoolUser]]
+    close_factors: typing.Sequence[int]
+    liquidation_incentives: typing.Sequence[int]
+    errored: typing.Sequence[bool]
 
 
 class ReturnPublicPoolUsersWithData(TypedDict):
-    comptrollers: list[spec.Address]
-    users: list[FusePoolUser]
-    close_factors: list[int]
-    liquidation_incentives: list[int]
-    errored: list[bool]
+    comptrollers: typing.Sequence[spec.Address]
+    users: typing.Sequence[FusePoolUser]
+    close_factors: typing.Sequence[int]
+    liquidation_incentives: typing.Sequence[int]
+    errored: typing.Sequence[bool]
 
 
 class ReturnPoolsBySupplier(TypedDict):
-    indices: list[spec.Address]
-    account_pools: list[FusePool]
+    indices: typing.Sequence[spec.Address]
+    account_pools: typing.Sequence[FusePool]
 
 
 class ReturnPoolsBySupplierWithData(TypedDict):
-    indices: list[spec.Address]
-    account_pools: list[FusePool]
-    data: list[FusePoolData]
-    errored: list[bool]
+    indices: typing.Sequence[spec.Address]
+    account_pools: typing.Sequence[FusePool]
+    data: typing.Sequence[FusePoolData]
+    errored: typing.Sequence[bool]
 
 
 class UserSummary(TypedDict):
@@ -157,13 +157,13 @@ class PoolUserSummary(TypedDict):
 
 
 class ReturnWhitelistedPoolsByAccountWithData(TypedDict):
-    indices: list[int]
-    account_pools: list[FusePool]
-    data: list[FusePoolData]
-    errored: list[bool]
+    indices: typing.Sequence[int]
+    account_pools: typing.Sequence[FusePool]
+    data: typing.Sequence[FusePoolData]
+    errored: typing.Sequence[bool]
 
 
-def fuse_pool_to_dict(as_list: list[typing.Any]) -> FusePool:
+def fuse_pool_to_dict(as_list: typing.Sequence[typing.Any]) -> FusePool:
 
     keys = list(FusePool.__annotations__.keys())
     if len(as_list) != len(keys):
@@ -178,7 +178,9 @@ def fuse_pool_to_dict(as_list: list[typing.Any]) -> FusePool:
     }
 
 
-def fuse_pool_data_to_dict(as_list: list[typing.Any]) -> FusePoolData:
+def fuse_pool_data_to_dict(
+    as_list: typing.Sequence[typing.Any],
+) -> FusePoolData:
 
     keys = list(FusePoolData.__annotations__.keys())
     if len(as_list) != len(keys):
@@ -193,7 +195,9 @@ def fuse_pool_data_to_dict(as_list: list[typing.Any]) -> FusePoolData:
     }
 
 
-def fuse_pool_asset_to_dict(as_list: list[typing.Any]) -> FusePoolAsset:
+def fuse_pool_asset_to_dict(
+    as_list: typing.Sequence[typing.Any],
+) -> FusePoolAsset:
 
     keys = list(FusePoolAsset.__annotations__.keys())
     if len(as_list) != len(keys):
@@ -225,7 +229,9 @@ def fuse_pool_asset_to_dict(as_list: list[typing.Any]) -> FusePoolAsset:
     }
 
 
-def fuse_pool_user_to_dict(as_list: list[typing.Any]) -> FusePoolUser:
+def fuse_pool_user_to_dict(
+    as_list: typing.Sequence[typing.Any],
+) -> FusePoolUser:
 
     keys = list(FusePoolUser.__annotations__.keys())
     if len(as_list) != len(keys):
@@ -246,7 +252,9 @@ def fuse_pool_user_to_dict(as_list: list[typing.Any]) -> FusePoolUser:
     return result
 
 
-def return_pool_summary_to_dict(as_list: list[typing.Any]) -> ReturnPoolSummary:
+def return_pool_summary_to_dict(
+    as_list: typing.Sequence[typing.Any],
+) -> ReturnPoolSummary:
 
     keys = list(ReturnPoolSummary.__annotations__.keys())
     if len(as_list) != len(keys):
@@ -262,7 +270,7 @@ def return_pool_summary_to_dict(as_list: list[typing.Any]) -> ReturnPoolSummary:
 
 
 def return_pool_users_with_data_to_dict(
-    as_list: list[typing.Any],
+    as_list: typing.Sequence[typing.Any],
 ) -> ReturnPoolUsersWithData:
     keys = list(ReturnPoolUsersWithData.__annotations__.keys())
     if len(as_list) != len(keys):
@@ -280,4 +288,3 @@ def return_pool_users_with_data_to_dict(
     ]
 
     return result
-

@@ -7,11 +7,14 @@ from ctc import spec
 
 
 async def async_get_transaction(transaction_hash: str) -> spec.Transaction:
-    return await rpc.async_eth_get_transaction_by_hash(transaction_hash)
+    return await rpc.async_eth_get_transaction_by_hash(transaction_hash)  # type: ignore
 
 
 async def async_get_transaction_count(address: spec.Address) -> int:
-    return await rpc.async_eth_get_transaction_count(address)
+    result = await rpc.async_eth_get_transaction_count(address)
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_transactions(

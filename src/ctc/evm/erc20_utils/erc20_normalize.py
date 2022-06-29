@@ -24,16 +24,16 @@ async def async_normalize_erc20_quantity(
     if decimals is None:
         if token is None:
             raise Exception('must specify token or decimals')
-        decimals = await erc20_metadata.async_get_erc20_decimals(
+        decimals_value: int = await erc20_metadata.async_get_erc20_decimals(
             token,
             provider=provider,
             block=block,
         )
     else:
-        decimals = int(decimals)
+        decimals_value = int(decimals)
 
     # normalize
-    return float(quantity) / (10 ** decimals)
+    return float(quantity) / int(10 ** decimals_value)
 
 
 async def async_normalize_erc20_quantities(

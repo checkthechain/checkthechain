@@ -52,14 +52,17 @@ async def async_get_deposit_balance(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
-) -> typing.Union[int, list[int]]:
+) -> typing.Union[int, typing.Sequence[int]]:
     """get token balance of a particular deposit"""
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=deposit,
         function_abi=function_abis['balance'],
         block_number=block,
         provider=provider,
     )
+    if not (isinstance(result, int) or isinstance(result, list)):
+        raise Exception('invalid rpc result')
+    return typing.cast(typing.Union[int, typing.Sequence[int]], result)
 
 
 async def async_get_deposits_balances(
@@ -95,14 +98,17 @@ async def async_get_deposit_resistant_balance_and_fei(
     *,
     block: typing.Optional[spec.BlockReference] = None,
     provider: spec.ProviderReference = None,
-) -> typing.Union[int, list[int]]:
+) -> typing.Union[int, typing.Sequence[int]]:
     """get token balance of a particular deposit"""
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=deposit,
         function_abi=function_abis['resistantBalanceAndFei'],
         block_number=block,
         provider=provider,
     )
+    if not (isinstance(result, int) or isinstance(result, list)):
+        raise Exception('invalid rpc result')
+    return typing.cast(typing.Union[int, typing.Sequence[int]], result)
 
 
 async def async_get_deposits_resistant_balances_and_fei(
@@ -320,7 +326,9 @@ async def async_get_tokens_balances_by_block(
         )
         for block in blocks
     ]
-    block_token_balances = await async_utils.async_gather_coroutines(*coroutines)
+    block_token_balances = await async_utils.async_gather_coroutines(
+        *coroutines
+    )
 
     if normalize:
         int_type = typing.List[typing.Dict[spec.Address, int]]

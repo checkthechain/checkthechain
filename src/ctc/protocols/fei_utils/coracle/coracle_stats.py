@@ -69,11 +69,15 @@ async def async_get_pcv_stats_by_block(
         block: spec.BlockNumberReference, to_address: spec.Address
     ) -> typing.Sequence[None | list[typing.Any]]:
         try:
-            return await rpc.async_eth_call(
+            result = await rpc.async_eth_call(
                 function_name='pcvStats',
                 block_number=block,
                 provider=provider,
                 to_address=to_address,
+            )
+            return typing.cast(
+                typing.Sequence[typing.Optional[typing.List[typing.Any]]],
+                result,
             )
         except spec.RpcException as e:
             invalid_message = 'execution reverted: chainlink is down'

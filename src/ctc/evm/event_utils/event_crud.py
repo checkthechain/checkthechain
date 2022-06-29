@@ -111,7 +111,7 @@ async def async_transfer_events(
     elif end_block is not None:
         end_block = await block_utils.async_block_number_to_int(end_block)
 
-    return await backend_utils.async_transfer_backends(
+    result: spec.DataFrame = await backend_utils.async_transfer_backends(
         get=async_get_events,
         save=async_save_events,
         contract_address=contract_address,
@@ -119,6 +119,8 @@ async def async_transfer_events(
         end_block=end_block,
         **query,
     )
+
+    return result
 
 
 async def async_download_events(

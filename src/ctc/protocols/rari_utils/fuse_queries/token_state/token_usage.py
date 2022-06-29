@@ -12,35 +12,44 @@ async def async_get_total_borrowed(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ctoken,
         block_number=block,
         function_abi=rari_abis.ctoken_function_abis['totalBorrows'],
         empty_token=0,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_total_liquidity(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ctoken,
         block_number=block,
         function_abi=rari_abis.ctoken_function_abis['getCash'],
         empty_token=0,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_reserves(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ctoken,
         block_number=block,
         function_abi=rari_abis.ctoken_function_abis['totalReserves'],
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_ctoken_utilization(

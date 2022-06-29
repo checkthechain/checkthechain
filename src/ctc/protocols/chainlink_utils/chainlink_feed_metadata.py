@@ -52,11 +52,14 @@ async def async_get_feed_decimals(
     if evm.is_address_str(feed):
         if provider is None and network is not None:
             provider = {'network': network}
-        return await rpc.async_eth_call(
+        result = await rpc.async_eth_call(
             feed,
             provider=provider,
             function_abi=chainlink_spec.feed_function_abis['decimals'],
         )
+        if not isinstance(result, int):
+            raise Exception('invalid rpc result')
+        return result
 
     else:
         raise Exception('could not find address for feed: ' + str(feed))
@@ -102,9 +105,10 @@ async def async_get_feed_aggregator(
         block_number=block,
         fill_empty=fill_empty,
     )
-
     if aggregator is None:
         raise Exception('aggregator not specified')
+    if not isinstance(aggregator, str):
+        raise Exception('invalid rpc result')
 
     return aggregator
 

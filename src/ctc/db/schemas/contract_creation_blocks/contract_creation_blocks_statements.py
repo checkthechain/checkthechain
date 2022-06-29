@@ -50,6 +50,10 @@ async def async_select_contract_creation_block(
         row_format='only_column',
         raise_if_table_dne=False,
     )
+
+    if result is not None and not isinstance(result, int):
+        raise Exception('invalid db result')
+
     return result
 
 
@@ -62,7 +66,9 @@ async def async_select_contract_creation_blocks(
         'contract_creation_blocks',
         network=network,
     )
-    result = toolsql.select(
+    result: typing.Sequence[
+        typing.Mapping[str, typing.Any]
+    ] | None = toolsql.select(
         conn=conn,
         table=table,
         raise_if_table_dne=False,

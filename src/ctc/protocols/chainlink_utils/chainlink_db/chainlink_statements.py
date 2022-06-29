@@ -10,7 +10,7 @@ from . import chainlink_schema_defs
 
 
 async def async_upsert_feed(
-    feed: dict,
+    feed: typing.Mapping[typing.Any, typing.Any],
     conn: toolsql.SAConnection,
     *,
     network: spec.NetworkReference | None = None,
@@ -67,7 +67,7 @@ async def async_select_feed(
         key: value for key, value in where_equals.items() if value is not None
     }
 
-    return toolsql.select(
+    return toolsql.select(  # type: ignore
         conn=conn,
         table=table,
         where_equals=where_equals,
@@ -110,7 +110,7 @@ async def async_select_feeds(
         raise_if_table_dne=False,
     )
 
-    return result
+    return result  # type: ignore
 
 
 async def async_delete_feed(

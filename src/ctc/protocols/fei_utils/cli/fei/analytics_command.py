@@ -5,7 +5,7 @@ import os
 import time
 
 import toolcli
-import toolstr  # type: ignore
+import toolstr
 
 from ctc.protocols import fei_utils
 

@@ -57,7 +57,7 @@ async def async_select_function_signatures(
         key: value for key, value in where_equals.items() if value is not None
     }
 
-    return toolsql.select(
+    return toolsql.select(  # type: ignore
         conn=conn,
         table='function_signatures',
         where_equals=where_equals,
@@ -139,7 +139,7 @@ async def async_select_event_signatures(
         key: value for key, value in where_equals.items() if value is not None
     }
 
-    return toolsql.select(
+    return toolsql.select(  # type: ignore
         conn=conn,
         table='event_signatures',
         where_equals=where_equals,

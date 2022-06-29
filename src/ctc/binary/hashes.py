@@ -59,7 +59,7 @@ def keccak(
     data = formats.convert(data, 'binary')
 
     if library == 'pysha3':
-        import sha3  # type: ignore
+        import sha3
 
         binary = sha3.keccak_256(data).digest()
     elif library == 'pycryptodome':

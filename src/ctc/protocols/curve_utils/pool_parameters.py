@@ -13,12 +13,15 @@ async def async_get_pool_A(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='A',
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_future_A_time(
@@ -27,12 +30,15 @@ async def async_get_pool_future_A_time(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='future_A_time',
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_initial_A(
@@ -41,12 +47,15 @@ async def async_get_pool_initial_A(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='initial_A',
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_initial_A_time(
@@ -55,12 +64,15 @@ async def async_get_pool_initial_A_time(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='initial_A_time',
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_future_A(
@@ -69,12 +81,15 @@ async def async_get_pool_future_A(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='future_A',
         block_number=block,
         provider=provider,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_ramps() -> spec.DataFrame:
@@ -199,4 +214,4 @@ def _compute_A(
     mask = timestamps > future_A_time
     result[mask] = future_A
 
-    return result
+    return typing.cast(spec.NumpyArray, result)

@@ -28,7 +28,11 @@ def sort_nested_by(
     nested: typing.Mapping[K, V], key: str, *, reverse: bool = False
 ) -> typing.Mapping[K, V]:
     pairs = list(nested.items())
-    sorted_pairs = sorted(pairs, key=lambda pair: pair[1][key], reverse=reverse)
+    sorted_pairs = sorted(
+        pairs,
+        key=lambda pair: typing.cast(typing.Union[int, float], pair[1][key]),
+        reverse=reverse,
+    )
     return dict(sorted_pairs)
 
 
@@ -159,9 +163,9 @@ async def async_print_all_pool_summary(
 
 
 async def _async_get_all_pools_stats(
-    all_pools: list[list[typing.Any]],
+    all_pools: typing.Sequence[typing.Sequence[typing.Any]],
     block: spec.BlockNumberReference,
-) -> list[dict[str, spec.Number]]:
+) -> typing.Sequence[typing.Mapping[str, spec.Number]]:
     import asyncio
 
     n_pools = len(all_pools)
@@ -197,7 +201,7 @@ async def async_get_token_multipool_stats(
     block: spec.BlockNumberReference = 'latest',
     *,
     in_usd: bool = True,
-) -> dict[str, typing.Any]:
+) -> typing.Mapping[str, typing.Any]:
     import asyncio
 
     pools = await fuse_queries.async_get_all_pools(block=block)
@@ -219,14 +223,16 @@ async def async_get_token_multipool_stats(
     tvl = 0
     tvb = 0
     for pool_stats in pools_stats:
-        tvl = tvl + pool_stats['tvl']  # type: ignore
-        tvb = tvb + pool_stats['tvb']  # type: ignore
+        tvl = tvl + pool_stats['tvl']
+        tvb = tvb + pool_stats['tvb']
 
     comptrollers = [pool[2] for pool in pools]
     per_pool = dict(zip(comptrollers, pools_stats))
 
     per_pool_items = sorted(
-        per_pool.items(), key=lambda item: item[1]['tvl'], reverse=True
+        per_pool.items(),
+        key=lambda item: typing.cast(typing.Union[int, float], item[1]['tvl']),
+        reverse=True,
     )
     per_pool = dict(per_pool_items)
 

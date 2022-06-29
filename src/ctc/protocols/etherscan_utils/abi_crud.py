@@ -18,7 +18,7 @@ class EtherscanRatelimit(TypedDict):
     requests_per_second: int | float
     last_request_time: int | float
     lock: asyncio.Lock | None
-    recent_results: typing.MutableMapping[spec.Address, typing.Any]
+    recent_results: typing.MutableMapping[spec.Address, spec.ContractABI]
 
 
 _etherscan_ratelimit: EtherscanRatelimit = {
@@ -110,4 +110,4 @@ async def async_get_contract_abi(
 
         _etherscan_ratelimit['recent_results'][contract_address] = abi
 
-    return abi
+    return typing.cast(spec.ContractABI, abi)

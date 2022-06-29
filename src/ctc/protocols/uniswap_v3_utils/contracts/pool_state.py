@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from typing_extensions import TypedDict
 
 from ctc import rpc
@@ -42,12 +43,15 @@ async def async_pool_fee_growth_global_0_x128(
         'feeGrowthGlobal0X128',
         'pool',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_fee_growth_global_1_x128(
@@ -60,12 +64,15 @@ async def async_pool_fee_growth_global_1_x128(
         'feeGrowthGlobal1X128',
         'pool',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_protocol_fees(
@@ -78,12 +85,20 @@ async def async_pool_protocol_fees(
         'protocolFees',
         'pool',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if (
+        not isinstance(result, tuple)
+        or len(result) != 2
+        or not isinstance(result[0], int)
+        or not isinstance(result[1], int)
+    ):
+        raise Exception('invalid rpc result')
+    return typing.cast(typing.Tuple[int, int], result)
 
 
 async def async_pool_liquidity(
@@ -96,12 +111,15 @@ async def async_pool_liquidity(
         'liquidity',
         'pool',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 class UniswapV3Ticks(TypedDict):
@@ -153,13 +171,16 @@ async def async_pool_tick_bitmap(
         'tickBitmap',
         'pool',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
         provider=provider,
         block_number=block,
         function_parameters=[word_position],
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_pool_positions(

@@ -74,13 +74,18 @@ async def async_get_token_deposits(
     block = await evm.async_block_number_to_int(block=block, provider=provider)
 
     coracle = coracle_spec.get_coracle_address(wrapper=wrapper, block=block)
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=coracle,
         block_number=block,
         function_abi=coracle_function_abis['getDepositsForToken'],
         function_parameters={'_token': token},
         provider=provider,
     )
+    if not isinstance(result, tuple) or not all(
+        isinstance(item, str) for item in result
+    ):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_deposit_token(
@@ -90,9 +95,12 @@ async def async_get_deposit_token(
     provider: spec.ProviderReference = None,
 ) -> spec.Address:
     """get the token address of a deposit"""
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=deposit,
         block_number=block,
         function_name='token',
         provider=provider,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result

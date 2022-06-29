@@ -40,27 +40,40 @@ function_abis: typing.Mapping[str, spec.FunctionABI] = {
 async def async_get_safe_owners(
     address: spec.Address,
 ) -> typing.Sequence[spec.Address]:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=address,
         function_abi=function_abis['getOwners'],
     )
+    if not isinstance(result, list) or not all(
+        isinstance(item, str) for item in result
+    ):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_safe_threshold(address: spec.Address) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=address,
         function_abi=function_abis['getThreshold'],
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_safe_nonce(address: spec.Address) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=address,
         function_abi=function_abis['nonce'],
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
-async def async_print_safe_summary(address: spec.Address, verbose: bool = False) -> None:
+async def async_print_safe_summary(
+    address: spec.Address, verbose: bool = False
+) -> None:
     import tooltime
 
     owners_coroutine = async_get_safe_owners(address)

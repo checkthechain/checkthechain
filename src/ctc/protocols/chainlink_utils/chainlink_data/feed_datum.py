@@ -54,7 +54,7 @@ async def async_get_feed_datum(
 
     if fields == 'answer':
 
-        answer = await rpc.async_eth_call(
+        result = await rpc.async_eth_call(
             to_address=feed,
             function_abi=chainlink_spec.feed_function_abis['latestAnswer'],
             block_number=block,
@@ -63,15 +63,18 @@ async def async_get_feed_datum(
             empty_token=None,
         )
 
-        if answer is not None:
-            if normalize:
-                decimals = (
-                    await chainlink_feed_metadata.async_get_feed_decimals(feed)
-                )
-                answer /= 10 ** decimals
+        if not isinstance(result, (int, float)):
+            raise Exception('invalid rpc result')
+        answer = result
 
-            if invert:
-                answer = 1 / answer
+        if normalize:
+            decimals = (
+                await chainlink_feed_metadata.async_get_feed_decimals(feed)
+            )
+            answer /= 10 ** decimals
+
+        if invert:
+            answer = 1 / answer
 
         return answer
 

@@ -413,7 +413,7 @@ async def async_get_whitelisted_pools_by_account(
     lens_address: spec.Address | None = None,
     provider: spec.ProviderReference = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> list[lens_spec.FusePool]:
+) -> typing.Sequence[lens_spec.FusePool]:
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', provider=provider)
     function_abi = lens_abis.get_function_abi('getWhitelistedPoolsByAccount')
@@ -424,7 +424,8 @@ async def async_get_whitelisted_pools_by_account(
         block_number=block,
         provider=provider,
     )
-    return result[1]
+    output = result[1]
+    return typing.cast(typing.Sequence[lens_spec.FusePool], output)
 
 
 async def async_get_whitelisted_pools_by_account_with_data(

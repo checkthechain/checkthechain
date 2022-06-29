@@ -10,11 +10,14 @@ async def async_get_pool_id(
     pool_address: spec.Address,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool_address,
         function_name='getPoolId',
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_address(
@@ -30,7 +33,10 @@ async def async_get_pool_address(
         function_parameters=[pool_id],
         block_number=block,
     )
-    return pool[0]
+    address = pool[0]
+    if not isinstance(address, str):
+        raise Exception('invalid rpc result')
+    return address
 
 
 async def async_get_pool_tokens(
@@ -54,4 +60,3 @@ async def async_get_pool_tokens(
         package_named_outputs=True,
     )
     return list(pool_tokens['tokens'])
-

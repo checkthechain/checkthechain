@@ -19,7 +19,7 @@ def filter_twap(
     import pandas as pd
 
     # compute twap times
-    timestamps_array = np.array(timestamps)
+    timestamps_array: spec.NumpyArray = np.array(timestamps)
     filter_seconds = tooltime.timestamp_to_seconds(filter_duration)
     first_input_timestamp = timestamps[0]
     output_mask = timestamps_array > first_input_timestamp + filter_seconds
@@ -28,7 +28,7 @@ def filter_twap(
     # compute twap values
     # cannot use efficient numpy operation because filter size is variable
     # (because block times are variable)
-    raw_values_array = np.array(raw_values)
+    raw_values_array: spec.NumpyArray = np.array(raw_values)
     twap_values = []
     for twap_time in twap_times:
         lower_bound = twap_time - filter_seconds < timestamps_array

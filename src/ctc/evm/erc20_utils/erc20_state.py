@@ -29,13 +29,16 @@ async def async_get_erc20_total_supply(
     if block is None:
         block = 'latest'
 
-    total_supply = await erc20_generic.async_erc20_eth_call(
+    result = await erc20_generic.async_erc20_eth_call(
         token=token,
         function_name='totalSupply',
         block=block,
         provider=provider,
         **rpc_kwargs,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    total_supply: int | float = result
 
     if normalize:
         total_supply = await erc20_normalize.async_normalize_erc20_quantity(
@@ -126,7 +129,7 @@ async def async_get_erc20_balance_of(
         provider=provider,
     )
 
-    balance = await erc20_generic.async_erc20_eth_call(
+    result = await erc20_generic.async_erc20_eth_call(
         token=token,
         function_name='balanceOf',
         block=block,
@@ -134,6 +137,9 @@ async def async_get_erc20_balance_of(
         provider=provider,
         **rpc_kwargs,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    balance: int | float = result
 
     if normalize:
         balance = await erc20_normalize.async_normalize_erc20_quantity(
@@ -283,13 +289,16 @@ async def async_get_erc20_allowance(
         provider=provider,
     )
 
-    allowance = await erc20_generic.async_erc20_eth_call(
+    result = await erc20_generic.async_erc20_eth_call(
         token=token,
         function_name='allowance',
         block=block,
         function_parameters=[wallet],
         provider=provider,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    allowance: int | float = result
 
     if normalize:
         allowance = await erc20_normalize.async_normalize_erc20_quantity(

@@ -19,8 +19,13 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
+
+    execute_other_command_sequence = (
+        toolcli.command_utils.execution.execute_other_command_sequence
+    )
+
     if len(query) == 0:
-        toolcli.execute_other_command_sequence(
+        execute_other_command_sequence(
             command_sequence=('help',),
             args={'parse_spec': parse_spec},
             parse_spec=parse_spec,
@@ -30,7 +35,7 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
         if len(item) <= 9 and str.isnumeric(item):
             # treat as block number
             block = int(item)
-            toolcli.execute_other_command_sequence(
+            execute_other_command_sequence(
                 command_sequence=('block',),
                 args={'parse_spec': parse_spec, 'block': block},
                 parse_spec=parse_spec,
@@ -39,16 +44,18 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
         elif item.startswith('0x') and len(item) == 66:
             # treat as transaction hash
             transaction = item
-            toolcli.execute_other_command_sequence(
+            execute_other_command_sequence(
                 command_sequence=('transaction',),
                 args={'parse_spec': parse_spec, 'transaction': transaction},
                 parse_spec=parse_spec,
             )
 
-        elif (item.startswith('0x') and len(item) == 42) or item.endswith('.eth'):
+        elif (item.startswith('0x') and len(item) == 42) or item.endswith(
+            '.eth'
+        ):
             # treat as address
             address = item
-            toolcli.execute_other_command_sequence(
+            execute_other_command_sequence(
                 command_sequence=('address',),
                 args={'parse_spec': parse_spec, 'address': address},
                 parse_spec=parse_spec,
@@ -56,13 +63,13 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
 
         elif str.isalnum(item) and len(item) <= 20:
             try:
-                toolcli.execute_other_command_sequence(
+                execute_other_command_sequence(
                     command_sequence=('symbol',),
                     args={'parse_spec': parse_spec, 'query': item},
                     parse_spec=parse_spec,
                 )
             except LookupError:
-                toolcli.execute_other_command_sequence(
+                execute_other_command_sequence(
                     command_sequence=('help',),
                     args={'parse_spec': parse_spec},
                     parse_spec=parse_spec,

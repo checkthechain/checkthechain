@@ -22,13 +22,18 @@ async def async_get_unclaimed_rewards(
         network=rpc.get_provider_network(provider),
     )
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=aave_incentives_controller,
         function_name='getUserUnclaimedRewards',
         function_parameters=[wallet],
         block_number=block,
         provider=provider,
     )
+
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+
+    return result
 
 
 async def async_get_unclaimed_rewards_by_block(

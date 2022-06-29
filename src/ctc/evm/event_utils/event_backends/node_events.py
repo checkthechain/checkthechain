@@ -130,7 +130,7 @@ async def _async_get_chunk_of_events_from_node(
     start_block, end_block = block_range
     start_block = binary.standardize_block_number(start_block)
     end_block = binary.standardize_block_number(end_block)
-    entries = await rpc.async_eth_get_logs(
+    entries: typing.Sequence[spec.RawLog] = await rpc.async_eth_get_logs(
         address=contract_address,
         topics=[event_hash],
         start_block=start_block,

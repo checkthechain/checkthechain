@@ -25,11 +25,14 @@ async def async_get_supply_interest_by_block(
         fill_empty=fill_empty,
         empty_token=empty_token,
     )
-    if fill_empty and result is None:
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    output: int | float = result
+    if fill_empty and output is None:
         return None
     if normalize:
-        result /= 1e18
-    return result
+        output /= 1e18
+    return output
 
 
 async def async_get_borrow_interest_by_block(
@@ -47,11 +50,14 @@ async def async_get_borrow_interest_by_block(
         fill_empty=fill_empty,
         empty_token=empty_token,
     )
-    if fill_empty and result is None:
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    output: int | float = result
+    if fill_empty and output is None:
         return None
     if normalize:
-        result /= 1e18
-    return result
+        output /= 1e18
+    return output
 
 
 async def async_get_supply_apy(

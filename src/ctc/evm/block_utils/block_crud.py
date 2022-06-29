@@ -34,7 +34,7 @@ async def async_get_block(
             if db_block_data is not None:
                 return db_block_data
 
-        block_data = await rpc.async_eth_get_block_by_number(
+        block_data: spec.Block = await rpc.async_eth_get_block_by_number(
             block_number=binary.standardize_block_number(block),
             provider=provider,
             include_full_transactions=include_full_transactions,
@@ -49,11 +49,12 @@ async def async_get_block(
 
     elif spec.is_block_hash(block):
 
-        return await rpc.async_eth_get_block_by_hash(
+        block_data = await rpc.async_eth_get_block_by_hash(
             block_hash=block,
             provider=provider,
             include_full_transactions=include_full_transactions,
         )
+        return block_data
 
     else:
         raise Exception('unknown block specifier: ' + str(block))
@@ -124,7 +125,10 @@ async def async_get_latest_block_number(
 ) -> int:
 
     if not use_cache:
-        return await rpc.async_eth_block_number(provider=provider)
+        result = await rpc.async_eth_block_number(provider=provider)
+        if not isinstance(result, int):
+            raise Exception('invalid rpc result')
+        return result
 
     else:
 
@@ -149,6 +153,8 @@ async def async_get_latest_block_number(
                 return network_cache['block_number']
 
             result = await rpc.async_eth_block_number(provider=provider)
+            if not isinstance(result, int):
+                raise Exception('invalid rpc result')
 
             response_time = time.time()
             _latest_block_cache[network] = {

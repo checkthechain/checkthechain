@@ -24,7 +24,9 @@ async def async_get_erc20_address(
             network=network,
         )
         if metadata is not None:
-            return metadata['address']
+            address = metadata['address']
+            if isinstance(address, str):
+                return address
 
     raise Exception('could not get token address')
 

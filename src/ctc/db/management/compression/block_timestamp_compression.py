@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import typing
 
+from ctc import spec
+
 
 block_timestamps_template = (
     'block_timestamps__{start_block}_to_{end_block}__{t_index}_{t_start}.npz'
@@ -36,7 +38,7 @@ def save_compressed_block_timestamps(
     t_start = timestamps[0]
 
     # compute diffs
-    timestamps_array = np.array(timestamps)
+    timestamps_array: spec.NumpyArray = np.array(timestamps)
     timestamp_diffs = timestamps_array[1:] - timestamps_array[:-1]
 
     # convert to efficient dtype

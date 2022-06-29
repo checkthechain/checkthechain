@@ -13,9 +13,11 @@ async def async_get_underlying_asset(
         'inputs': [],
         'outputs': [{'type': 'address'}],
     }
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool_token,
         function_abi=function_abi,
         provider=provider,
     )
-
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result

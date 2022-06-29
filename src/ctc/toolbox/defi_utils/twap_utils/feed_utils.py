@@ -78,7 +78,7 @@ async def async_is_uniswap_v2_pool(
             },
             provider=provider,
         )
-        return factory == '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f'
+        return bool(factory == '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f')
     except spec.RpcException:
         return False
 
@@ -96,7 +96,7 @@ async def async_is_uniswap_v3_pool(
             },
             provider=provider,
         )
-        return factory == '0x1f98431c8ad98523631ae4a59f267346ea31f984'
+        return bool(factory == '0x1f98431c8ad98523631ae4a59f267346ea31f984')
     except spec.RpcException:
         return False
 
@@ -129,7 +129,7 @@ async def async_is_sushi_pool(
             },
             provider=provider,
         )
-        return factory == '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac'
+        return bool(factory == '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac')
     except spec.RpcException:
         return False
 

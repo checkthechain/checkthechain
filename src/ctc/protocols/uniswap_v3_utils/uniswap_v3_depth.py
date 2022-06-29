@@ -93,7 +93,7 @@ async def async_get_new_price(
     if probe_amount_sold is None:
         probe_amount_sold = 10 ** token_in_decimals
 
-    out_to_in = 10 ** (token_in_decimals - token_out_decimals)
+    out_to_in = typing.cast(int, 10 ** (token_in_decimals - token_out_decimals))
 
     amount_sold = int(amount_sold)
     total_input_probe = int(amount_sold + probe_amount_sold)
@@ -112,6 +112,11 @@ async def async_get_new_price(
         amount_in=total_input_probe,
         sqrt_price_limit_x96=0,
     )
+
+    if not isinstance(bought_amount, int):
+        raise Exception('invalid rpc result')
+    if not isinstance(probe_amount_bought, int):
+        raise Exception('invalid rpc result')
 
     probe_price = (
         out_to_in * (probe_amount_bought - bought_amount) / probe_amount_sold

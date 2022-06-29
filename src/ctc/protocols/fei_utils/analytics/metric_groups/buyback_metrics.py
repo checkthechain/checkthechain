@@ -37,7 +37,7 @@ async def async_compute_tribe_buybacks_usd(
 
     # filter tribe buys
     fei = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
-    tribe_buys: typing.Any = swaps[swaps['arg__tokenOut'] == fei]  # type: ignore
+    tribe_buys: typing.Any = swaps[swaps['arg__tokenOut'] == fei]
     tribe_buys = tribe_buys['arg__amountOut'].map(float) / 1e18
     cummulative_tribe_buys = tribe_buys.cumsum()
     # cummulative_tribe_buys = evm.interpolate_block_series(
@@ -54,7 +54,7 @@ async def async_compute_tribe_buybacks_usd(
     )
 
     # filter tribe sells
-    tribe_sells_df = swaps[swaps['arg__tokenIn'] == fei]  # type: ignore
+    tribe_sells_df = swaps[swaps['arg__tokenIn'] == fei]
     if len(tribe_sells_df) > 0:
         tribe_sells = tribe_sells_df['arg__amountIn'].map(float) / 1e18
         cummulative_tribe_sells = tribe_sells.cumsum()

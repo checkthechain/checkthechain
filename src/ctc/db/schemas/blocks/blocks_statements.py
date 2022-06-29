@@ -49,7 +49,7 @@ async def async_select_block(
 
     table = schema_utils.get_table_name('blocks', network=network)
 
-    block = toolsql.select(
+    block: spec.Block | None = toolsql.select(
         conn=conn,
         table=table,
         where_equals={'number': block_number},
@@ -171,7 +171,7 @@ async def async_select_block_timestamp(
 
     table = schema_utils.get_table_name('blocks', network=network)
 
-    return toolsql.select(
+    result = toolsql.select(
         conn=conn,
         table=table,
         where_equals={'number': block_number},
@@ -180,6 +180,9 @@ async def async_select_block_timestamp(
         return_count='one',
         raise_if_table_dne=False,
     )
+    if result is not None and not isinstance(result, int):
+        raise Exception('invalid db result')
+    return result
 
 
 async def async_select_block_timestamps(
@@ -229,7 +232,10 @@ async def async_select_max_block_number(
         raise_if_table_dne=False,
     )
     if result is not None:
-        return result['max__block_number']
+        output = result['max__block_number']
+        if output is not None and not isinstance(output, int):
+            raise Exception('invalid db result')
+        return output
     else:
         return None
 
@@ -253,7 +259,10 @@ async def async_select_max_block_timestamp(
     if result is None:
         return None
     else:
-        return result['max__timestamp']
+        max_timestamp = result['max__timestamp']
+        if max_timestamp is not None and not isinstance(max_timestamp, int):
+            raise Exception('invalid db output')
+        return max_timestamp
 
 
 __all__ = (

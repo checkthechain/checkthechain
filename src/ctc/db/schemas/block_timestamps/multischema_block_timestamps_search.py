@@ -51,7 +51,7 @@ async def async_select_timestamp_block(
 
     if timestamp_schema == 'block_timestamps':
         table = schema_utils.get_table_name('block_timestamps', network=network)
-        block_number = toolsql.select(
+        block_number: int = toolsql.select(
             conn=conn,
             table=table,
             return_count='one',

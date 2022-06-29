@@ -39,8 +39,9 @@ async def async_query_function_signatures(
             text_signature=text_signature,
         )
 
+        # type ignoring because of mypy bug
         await fourbyte_db.async_intake_function_signatures(
-            typing.cast(typing.Sequence[fourbyte_spec.PartialEntry], result)
+            typing.cast(typing.Sequence[fourbyte_spec.PartialEntry], result)  # type: ignore
         )
 
         return result
@@ -79,8 +80,9 @@ async def async_query_event_signatures(
             text_signature=text_signature,
         )
 
+        # type ignoring because of mypy bug
         await fourbyte_db.async_intake_event_signatures(
-            typing.cast(typing.Sequence[fourbyte_spec.PartialEntry], result)
+            typing.cast(typing.Sequence[fourbyte_spec.PartialEntry], result)  # type: ignore
         )
 
         return result

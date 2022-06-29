@@ -19,7 +19,10 @@ _schema_version_cache = {
 
 
 def is_schema_versions_initialized(engine: toolsql.SAEngine) -> bool:
-    return sqlalchemy.inspect(engine).has_table('schema_versions')
+    result = sqlalchemy.inspect(engine).has_table('schema_versions')
+    if not isinstance(result, bool):
+        raise Exception('invalid result')
+    return result
 
 
 def get_schema_version(
@@ -38,7 +41,7 @@ def get_schema_version(
     if conn is None:
         engine = _get_schema_version_engine()
         with engine.begin() as conn:
-            return toolsql.select(
+            result = toolsql.select(
                 conn=conn,
                 table='schema_versions',
                 where_equals={'chain_id': chain_id, 'schema_name': schema_name},
@@ -47,7 +50,7 @@ def get_schema_version(
                 row_format='only_column',
             )
     else:
-        return toolsql.select(
+        result = toolsql.select(
             conn=conn,
             table='schema_versions',
             where_equals={'chain_id': chain_id, 'schema_name': schema_name},
@@ -55,6 +58,10 @@ def get_schema_version(
             only_columns=['version'],
             row_format='only_column',
         )
+
+    if result is not None and not isinstance(result, str):
+        raise Exception('invalid result format')
+    return result
 
 
 def _get_schema_version_engine() -> toolsql.SAEngine:

@@ -20,7 +20,7 @@ async def async_quote_exact_input_single(
         'quoteExactInputSingle',
         'quoter',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[
@@ -33,6 +33,9 @@ async def async_quote_exact_input_single(
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_quote_exact_input(
@@ -46,13 +49,16 @@ async def async_quote_exact_input(
         'quoteExactInput',
         'quoter',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[path, amount_in],
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_quote_exact_output_single(
@@ -69,7 +75,7 @@ async def async_quote_exact_output_single(
         'quoteExactOutputSingle',
         'quoter',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[
@@ -82,6 +88,9 @@ async def async_quote_exact_output_single(
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_quote_exact_output(
@@ -95,10 +104,13 @@ async def async_quote_exact_output(
         'quoteExactOutput',
         'quoter',
     )
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[path, amount_in],
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result

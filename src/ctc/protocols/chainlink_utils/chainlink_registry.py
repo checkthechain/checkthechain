@@ -66,21 +66,9 @@ registry_function_abis: typing.Mapping[str, spec.FunctionABI] = {
     },
     'getPhase': {
         'inputs': [
-            {
-                'internalType': 'address',
-                'name': 'base',
-                'type': 'address'
-            },
-            {
-                'internalType': 'address',
-                'name': 'quote',
-                'type': 'address'
-            },
-            {
-                'internalType': 'uint16',
-                'name': 'phaseId',
-                'type': 'uint16'
-            }
+            {'internalType': 'address', 'name': 'base', 'type': 'address'},
+            {'internalType': 'address', 'name': 'quote', 'type': 'address'},
+            {'internalType': 'uint16', 'name': 'phaseId', 'type': 'uint16'},
         ],
         'name': 'getPhase',
         'outputs': [
@@ -89,26 +77,26 @@ registry_function_abis: typing.Mapping[str, spec.FunctionABI] = {
                     {
                         'internalType': 'uint16',
                         'name': 'phaseId',
-                        'type': 'uint16'
+                        'type': 'uint16',
                     },
                     {
                         'internalType': 'uint80',
                         'name': 'startingAggregatorRoundId',
-                        'type': 'uint80'
+                        'type': 'uint80',
                     },
                     {
                         'internalType': 'uint80',
                         'name': 'endingAggregatorRoundId',
-                        'type': 'uint80'
-                    }
+                        'type': 'uint80',
+                    },
                 ],
                 'internalType': 'struct FeedRegistryInterface.Phase',
                 'name': 'phase',
-                'type': 'tuple'
+                'type': 'tuple',
             }
         ],
         'stateMutability': 'view',
-        'type': 'function'
+        'type': 'function',
     },
 }
 
@@ -122,12 +110,16 @@ async def async_get_registry_feed(
     network = rpc.get_provider_network(provider)
     registry_address = feed_registry[network]
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=registry_address,
         function_abi=registry_function_abis['getFeed'],
         function_parameters=[base, quote],
         provider=provider,
     )
+
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_phase_range(
@@ -148,5 +140,8 @@ async def async_get_phase_range(
         provider=provider,
     )
 
+    if not isinstance(result, tuple) or not all(
+        isinstance(item, int) for item in result
+    ):
+        raise Exception('invalid rpc result')
     return result
-

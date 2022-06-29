@@ -16,12 +16,15 @@ async def async_get_pool_ctoken(
     *,
     block: spec.BlockNumberReference = 'latest',
 ) -> spec.Address:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
         function_abi=rari_abis.comptroller_function_abis['cTokensByUnderlying'],
         function_parameters=[underlying],
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_ctokens(
@@ -29,11 +32,16 @@ async def async_get_pool_ctokens(
     *,
     block: spec.BlockNumberReference = 'latest',
 ) -> tuple[spec.Address]:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
         function_abi=rari_abis.comptroller_function_abis['getAllMarkets'],
     )
+    if not isinstance(result, tuple) or not all(
+        isinstance(item, str) for item in result
+    ):
+        raise Exception('invalid rpc result')
+    return typing.cast(typing.Tuple[str], result)
 
 
 async def async_get_pool_underlying_tokens(
@@ -41,7 +49,7 @@ async def async_get_pool_underlying_tokens(
     ctokens: typing.Sequence[spec.Address] | None = None,
     comptroller: spec.Address | None = None,
     block: spec.BlockNumberReference = 'latest',
-) -> dict[spec.Address, spec.Address]:
+) -> typing.Mapping[spec.Address, spec.Address]:
     import asyncio
 
     if ctokens is None:
@@ -62,17 +70,20 @@ async def async_get_pool_oracle(
     *,
     block: spec.BlockNumberReference = 'latest',
 ) -> spec.Address:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=comptroller,
         block_number=block,
         function_abi=rari_abis.comptroller_function_abis['oracle'],
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_pool_name(
     comptroller: spec.Address,
     *,
-    all_pools: list[list[typing.Any]] | None = None,
+    all_pools: typing.Sequence[typing.Sequence[typing.Any]] | None = None,
     block: spec.BlockNumberReference = 'latest',
 ) -> str:
     comptroller = comptroller.lower()
@@ -80,6 +91,9 @@ async def async_get_pool_name(
         all_pools = await directory_metadata.async_get_all_pools(block=block)
     for pool in all_pools:
         if pool[2] == comptroller:
-            return pool[0]
+            output = pool[0]
+            if not isinstance(output, str):
+                raise Exception('invalid rpc result')
+            return output
     else:
         raise Exception('could not find pool')

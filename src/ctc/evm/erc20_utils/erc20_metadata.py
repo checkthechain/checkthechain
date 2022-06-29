@@ -85,13 +85,16 @@ async def async_get_erc20_decimals(
         if result is not None and result['decimals'] is not None:
             return result['decimals']
 
-    decimals = await erc20_generic.async_erc20_eth_call(
+    result = await erc20_generic.async_erc20_eth_call(
         function_name='decimals',
         token=token,
         block=block,
         provider=provider,
         **rpc_kwargs,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    decimals = result
 
     if use_db:
         if result is not None:
@@ -164,13 +167,16 @@ async def async_get_erc20_name(
         if result is not None and result['name'] is not None:
             return result['name']
 
-    name = await erc20_generic.async_erc20_eth_call(
+    result = await erc20_generic.async_erc20_eth_call(
         function_name='name',
         token=token,
         block=block,
         provider=provider,
         **rpc_kwargs,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    name = result
 
     if use_db:
         if result is not None:
@@ -218,7 +224,8 @@ def _decode_raw_symbol(data: str) -> str:
         return binary.hex_to_ascii(data).strip('\x00')
     else:
         as_binary = binary.convert(data, 'binary')
-        return binary.decode_types(as_binary, '(string)')[0]
+        as_str: str = binary.decode_types(as_binary, '(string)')[0]
+        return as_str
 
 
 async def async_get_erc20_symbol(
@@ -244,7 +251,7 @@ async def async_get_erc20_symbol(
         if result is not None and result['symbol'] is not None:
             return result['symbol']
 
-    symbol = await erc20_generic.async_erc20_eth_call(
+    symbol_raw = await erc20_generic.async_erc20_eth_call(
         function_name='symbol',
         token=token,
         block=block,
@@ -252,7 +259,7 @@ async def async_get_erc20_symbol(
         provider=provider,
         **rpc_kwargs,
     )
-    symbol = _decode_raw_symbol(symbol)
+    symbol = _decode_raw_symbol(symbol_raw)
 
     if use_db:
         if result is not None:

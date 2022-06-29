@@ -17,7 +17,7 @@ async def async_get_asset_price(
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     units: typing.Literal['usd', 'eth'] = 'usd',
-) -> typing.Sequence[int | float]:
+) -> int | float:
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -47,6 +47,9 @@ async def async_get_asset_price(
 
     else:
         raise Exception('unknown units: ' + str(units))
+
+    if not isinstance(price, (int, float)):
+        raise Exception('invalid rpc result')
 
     if normalize:
         price = price / 1e18

@@ -111,7 +111,7 @@ async def async_get_pool_transaction_deltas(
             raise Exception('must specify pool or log_deltas')
         log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
 
-    transaction_deltas = log_deltas.groupby(
+    transaction_deltas: spec.DataFrame = log_deltas.groupby(
         ['block_number', 'transaction_index']
     ).sum()
 
@@ -129,7 +129,7 @@ async def async_get_pool_block_deltas(
             raise Exception('must specify pool or log_deltas')
         log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
 
-    block_deltas = log_deltas.groupby(['block_number']).sum()
+    block_deltas: spec.DataFrame = log_deltas.groupby(['block_number']).sum()
 
     return block_deltas
 
@@ -145,7 +145,9 @@ async def async_get_pool_state_per_log(
             raise Exception('must specify pool or log_deltas')
         log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
 
-    state_per_log = log_deltas[['delta_token0', 'delta_token1']].cumsum()
+    state_per_log: spec.DataFrame = log_deltas[
+        ['delta_token0', 'delta_token1']
+    ].cumsum()
     state_per_log.columns = ['token0_reserves', 'token1_reserves']
 
     _put_price_in_state(state_per_log)
@@ -168,7 +170,7 @@ async def async_get_pool_state_per_transaction(
         log_deltas=log_deltas, **log_delta_kwargs
     )
 
-    state_per_transaction = transaction_deltas[
+    state_per_transaction: spec.DataFrame = transaction_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
     state_per_transaction.columns = ['token0_reserves', 'token1_reserves']
@@ -195,7 +197,9 @@ async def async_integrate_pool_deltas(
         log_deltas=log_deltas, **log_delta_kwargs
     )
 
-    state_per_block = block_deltas[['delta_token0', 'delta_token1']].cumsum()
+    state_per_block: spec.DataFrame = block_deltas[
+        ['delta_token0', 'delta_token1']
+    ].cumsum()
     state_per_block.columns = ['token0_reserves', 'token1_reserves']
 
     _put_price_in_state(state_per_block)

@@ -13,12 +13,15 @@ async def async_get_ctoken_exchange_rate(
     ctoken: spec.Address,
     block: spec.BlockNumberReference = 'latest',
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ctoken,
         function_abi=rari_abis.ctoken_function_abis['exchangeRateCurrent'],
         block_number=block,
         empty_token=None,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_ctoken_exchange_rate_by_block(
@@ -46,12 +49,15 @@ async def async_get_ctoken_price(
         oracle = await _async_get_ctoken_oracle(ctoken=ctoken)
 
     try:
-        price = await rpc.async_eth_call(
+        result = await rpc.async_eth_call(
             to_address=oracle,
             block_number=block,
             function_abi=rari_abis.oracle_function_abis['getUnderlyingPrice'],
             function_parameters=[ctoken],
         )
+        if not isinstance(result, int):
+            raise Exception('invalid rpc result')
+        price: int | float = result
         if normalize:
             price /= 1e18
     except spec.RpcException as e:

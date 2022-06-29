@@ -36,11 +36,14 @@ async def async_get_eth_balance(
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
 
-    balance = await rpc.async_eth_get_balance(
+    result = await rpc.async_eth_get_balance(
         address=address,
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    balance: int | float = result
 
     if normalize:
         balance /= 1e18

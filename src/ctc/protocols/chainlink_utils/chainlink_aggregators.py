@@ -27,11 +27,14 @@ async def async_get_aggregator_description(
     }
 
     provider = rpc.get_provider(provider)
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=aggregator,
         provider=provider,
         function_abi=function_abi,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_aggregator_base_quote(

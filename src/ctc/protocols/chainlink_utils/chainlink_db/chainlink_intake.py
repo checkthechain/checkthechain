@@ -77,7 +77,7 @@ async def async_get_complete_feed_payload() -> ChainlinkFeedPayload:
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            return await response.json()
+            return await response.json()  # type: ignore
 
 
 async def async_get_network_feed_data(

@@ -16,13 +16,18 @@ async def async_get_virtual_price(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='get_virtual_price',
         function_parameters=[],
         provider=provider,
         block_number=block,
     )
+
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+
+    return result
 
 
 async def async_get_lp_withdrawal(
@@ -39,12 +44,17 @@ async def async_get_lp_withdrawal(
         provider=provider,
     )
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool,
         function_name='calc_withdraw_one_coin',
         function_parameters=[amount_lp, token_index],
         provider=provider,
     )
+
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+
+    return result
 
 
 async def async_get_pool_state(
@@ -135,5 +145,8 @@ async def async_get_trade(
     # normalize output
     if normalize_output:
         amount_out = amount_out / (10 ** metadata['token_decimals'][out_index])
+
+    if not isinstance(amount_out, (int, float)):
+        raise Exception('invalid rpc result')
 
     return amount_out

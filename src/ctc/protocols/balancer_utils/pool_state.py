@@ -19,12 +19,19 @@ from . import pool_metadata
 async def async_get_pool_weights_raw(
     pool_address: spec.ContractAddress,
     block: spec.BlockNumberReference = 'latest',
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
 
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=pool_address,
         function_name='getNormalizedWeights',
         block_number=block,
+    )
+    if not isinstance(result, list) or not all(
+        isinstance(item, (int, float)) for item in result
+    ):
+        raise Exception('invalid rpc result')
+    return typing.cast(
+        typing.Union[typing.Sequence[int], typing.Sequence[float]], result
     )
 
 
@@ -98,10 +105,14 @@ async def async_get_pool_fees(
         block_number=block,
     )
 
-    if normalize:
-        fees /= 1e18
+    if not isinstance(fees, int):
+        raise Exception('invalid rpc result')
+    fees_result: int | float = fees
 
-    return fees
+    if normalize:
+        fees_result = fees_result / 1e18
+
+    return fees_result
 
 
 #
@@ -116,10 +127,7 @@ async def async_get_pool_balances(
     block: spec.BlockNumberReference = 'latest',
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
-) -> typing.Union[
-    dict[spec.Address, int],
-    dict[spec.Address, float],
-]:
+) -> typing.Union[dict[spec.Address, int], dict[spec.Address, float],]:
 
     if vault is None:
         vault = balancer_spec.vault

@@ -30,6 +30,8 @@ async def async_get_token_oracle(
         block_number=block,
         provider=provider,
     )
+    if not isinstance(oracle, str):
+        raise Exception('invalid rpc result')
 
     if replace_missing:
         oracle = await _async_replace_missing_oracle(
@@ -126,7 +128,10 @@ async def async_get_token_price(
         block_number=block,
         provider=provider,
     )
-    price = result[0][0]
+    subresult = result[0][0]
+    if not isinstance(subresult, int):
+        raise Exception('invalid rpc result')
+    price: int | float = subresult
 
     if normalize:
         price /= 1e18

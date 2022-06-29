@@ -82,7 +82,7 @@ async def async_select_erc20_metadata(
     else:
         raise Exception('must specify address or symbol')
 
-    return toolsql.select(
+    erc20_metadata: spec.ERC20Metadata = toolsql.select(
         conn=conn,
         table=table,
         row_count='at_most_one',
@@ -91,6 +91,8 @@ async def async_select_erc20_metadata(
         raise_if_table_dne=False,
         **query,
     )
+
+    return erc20_metadata
 
 
 async def async_select_erc20s_metadata(

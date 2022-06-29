@@ -21,13 +21,16 @@ async def async_get_owner(
         'inputs': [{'type': 'bytes32'}],
         'outputs': [{'type': 'address'}],
     }
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ens_directory.registry,
         function_abi=function_abi,
         function_parameters=[node],
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_record_exists(
@@ -42,13 +45,16 @@ async def async_record_exists(
         'inputs': [{'type': 'bytes32'}],
         'outputs': [{'type': 'bool'}],
     }
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ens_directory.registry,
         function_abi=function_abi,
         function_parameters=[node],
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, bool):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_resolver(
@@ -63,13 +69,16 @@ async def async_get_resolver(
         'inputs': [{'type': 'bytes32'}],
         'outputs': [{'type': 'address'}],
     }
-    return await rpc.async_eth_call(
+    result = await rpc.async_eth_call(
         to_address=ens_directory.registry,
         function_abi=function_abi,
         function_parameters=[node],
         provider=provider,
         block_number=block,
     )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+    return result
 
 
 async def async_get_registration_block(name: str) -> int:
@@ -80,7 +89,7 @@ async def async_get_registration_block(name: str) -> int:
     label, *parent = name.split('.')
     parent_node = resolver.hash_name('.'.join(parent))
 
-    registrations = await async_get_registrations()
+    registrations: spec.DataFrame = await async_get_registrations()
     mask = (registrations['arg__label'] == binary.keccak_text(label)) & (
         registrations['arg__parent_node'] == parent_node
     )
@@ -90,6 +99,9 @@ async def async_get_registration_block(name: str) -> int:
         raise Exception('could not find registration')
 
     block = result.iloc[0].name[0]
+
+    if not isinstance(block, int):
+        raise Exception('invalid rpc result')
 
     return block
 

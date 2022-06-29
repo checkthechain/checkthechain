@@ -87,7 +87,7 @@ async def async_get_pool_token_history(
     if len(matching_results) == 0:
         return None
     elif len(matching_results) == 1:
-        return matching_results[0]
+        return matching_results[0]  # type: ignore
     else:
         raise Exception('more than one ctoken found for underlying')
 
