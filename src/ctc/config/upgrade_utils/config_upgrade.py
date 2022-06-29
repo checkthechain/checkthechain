@@ -4,7 +4,7 @@ import typing
 
 import ctc
 from ctc import spec
-from . import config_defaults
+from .. import config_defaults
 
 
 def upgrade_config(

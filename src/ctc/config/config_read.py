@@ -82,9 +82,9 @@ def get_config(
         print(
             '[WARNING] using outdated config -- run `ctc setup` on command line'
         )
-        from . import config_upgrade
+        from . import upgrade_utils
 
-        config_from_file = config_upgrade.upgrade_config(config_from_file)
+        config_from_file = upgrade_utils.upgrade_config(config_from_file)
 
     # convert int keys from str to int
     if config_from_file.get('networks') is not None:

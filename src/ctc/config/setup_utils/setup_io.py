@@ -11,7 +11,7 @@ import toolcli
 
 from .. import config_spec
 from .. import config_read
-from .. import config_upgrade
+from .. import upgrade_utils
 
 
 def load_old_config(
@@ -35,7 +35,7 @@ def load_old_config(
         and old_config['config_spec_version'] != ctc.__version__
     ):
         try:
-            old_config = config_upgrade.upgrade_config(old_config)
+            old_config = upgrade_utils.upgrade_config(old_config)
         except spec.ConfigUpgradeError:
             print()
             print('old config could not be processed, skipping it')
@@ -64,7 +64,7 @@ def write_new_config(
 
     config_path = config_read.get_config_path(raise_if_dne=False)
 
-    version = config_upgrade.omit_extra_version_data(ctc.__version__)
+    version = upgrade_utils.omit_extra_version_data(ctc.__version__)
 
     config: spec.Config = {
         'config_spec_version': version,
