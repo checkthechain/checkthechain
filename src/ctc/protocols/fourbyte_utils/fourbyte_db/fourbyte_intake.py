@@ -32,6 +32,8 @@ async def async_intake_function_signature(
 async def async_intake_function_signatures(
     function_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
 ) -> None:
+    if len(function_signatures) == 0:
+        return
     engine = db.create_engine(schema_name='4byte', network=None)
     if engine is None:
         return
