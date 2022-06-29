@@ -22,6 +22,10 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
             },
             {'name': 'data', 'help': 'data to be encoded'},
         ],
+        'examples': [
+            'address 0x6b175474e89094c44da98b954eedeac495271d0f',
+            '"(int64,int64,int64)" "[1,2,3]"',
+        ],
     }
 
 

@@ -20,6 +20,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'timestamp (default = now)',
             },
         ],
+        'examples': ['1642114795'],
     }
 
 

@@ -11,7 +11,10 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'output hash of ENS name',
         'args': [
             {'name': 'name', 'help': 'ENS name'},
-        ]
+        ],
+        'examples': [
+            'vitalik.eth',
+        ],
     }
 
 

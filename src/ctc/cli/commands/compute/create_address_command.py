@@ -21,6 +21,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'initialization bytecode for CREATE2',
             },
         ],
+        'examples': [
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 123',
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 0xaabb 0xaabbccdd',
+        ],
     }
 
 

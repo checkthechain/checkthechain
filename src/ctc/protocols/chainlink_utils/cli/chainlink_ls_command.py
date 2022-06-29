@@ -17,6 +17,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'partial match of feed name, case insensitive',
             },
         ],
+        'examples': [
+            '',
+            'DAI',
+        ],
     }
 
 

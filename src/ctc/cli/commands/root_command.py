@@ -14,6 +14,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'address, block number, tx hash, or ERC20 symbol',
             }
         ],
+        'examples': [
+            '0x3a44deb6159843a584cf6ede188cd9f4161dc215',
+            '14000000',
+            '0xf48e1d4211c1df4cbf19aa0e99741ce0ad371a9906725bb60829147e763ffdf9',
+            'DAI',
+        ],
         'extra_data': ['parse_spec'],
     }
 

@@ -25,6 +25,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'use remote database',
             },
         ],
+        'examples': [
+            '0x18160ddd',
+            '0xa9059cbb',
+            '"totalSupply()"',
+            '"transfer(address,uint256)"',
+        ],
     }
 
 

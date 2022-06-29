@@ -8,7 +8,7 @@ from ctc.protocols import fourbyte_utils
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_fourbyte_build_command,
-        'help': 'build local copy of 4byte database',
+        'help': 'build local copy of 4byte database\n\nscrapes from 4byte.directory',
         'args': [
             {
                 'name': 'datatype',
@@ -17,6 +17,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': '"functions" or "events", omit to build database of both',
             },
         ],
+        'examples': {
+            'functions': {'description': 'build function signature db', 'long': True},
+            'events': {'description': 'build event signature db', 'long': True},
+        },
     }
 
 

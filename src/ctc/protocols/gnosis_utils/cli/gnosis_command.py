@@ -17,6 +17,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
+        'examples': [
+            '0x245cc372c84b3645bf0ffe6538620b04a217988b',
+            '0x245cc372c84b3645bf0ffe6538620b04a217988b --verbose',
+        ],
     }
 
 

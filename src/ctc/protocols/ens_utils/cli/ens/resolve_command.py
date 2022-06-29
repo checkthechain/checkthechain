@@ -14,7 +14,11 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'name', 'help': 'ENS name'},
             {'name': '--block', 'help': 'block number'},
-        ]
+        ],
+        'examples': [
+            'vitalik.eth',
+            'vitalik.eth --block 14000000',
+        ],
     }
 
 

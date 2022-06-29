@@ -44,7 +44,7 @@ async def async_get_safe_owners(
         to_address=address,
         function_abi=function_abis['getOwners'],
     )
-    if not isinstance(result, list) or not all(
+    if not isinstance(result, (tuple, list)) or not all(
         isinstance(item, str) for item in result
     ):
         raise Exception('invalid rpc result')

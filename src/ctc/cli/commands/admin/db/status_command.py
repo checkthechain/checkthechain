@@ -15,6 +15,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': status_command,
         'help': 'display database status',
+        'examples': [''],
     }
 
 

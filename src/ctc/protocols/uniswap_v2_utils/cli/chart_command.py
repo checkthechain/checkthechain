@@ -39,6 +39,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'hide volume data',
             },
         ],
+        'examples': ['0x9928e4046d7c6513326ccea028cd3e7a91c7590a'],
     }
 
 

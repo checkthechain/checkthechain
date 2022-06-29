@@ -28,6 +28,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'allow overwriting an already-existing file',
             },
         ],
+        'examples': {
+            '30d,1d': {
+                'description': 'create default payload for app.fei.money',
+                'runnable': False,
+            },
+        },
     }
 
 

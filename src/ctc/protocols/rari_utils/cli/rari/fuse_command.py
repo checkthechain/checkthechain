@@ -23,6 +23,13 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--block', 'default': 'latest', 'help': 'block number'},
         ],
+        'examples': {
+            '8': {'description': 'summarize a pool'},
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca': {
+                'description': 'summarize a token across all pools'
+            },
+            '': {'description': 'summarize all of Rari'},
+        },
     }
 
 
@@ -39,7 +46,9 @@ async def async_fuse_command(arg: str, block: str) -> None:
             arg_type = 'token'
 
         if arg_type == 'pool_index':
-            await async_summarize_fuse_pool(pool_index=pool_index, block=block_number)
+            await async_summarize_fuse_pool(
+                pool_index=pool_index, block=block_number
+            )
         elif arg_type == 'token':
             await async_summarize_fuse_token(token, block_number)
 
@@ -54,7 +63,9 @@ async def async_summarize_fuse_pool(
     pool = all_pools[pool_index]
     comptroller = pool[2]
     standard_block = binary.standardize_block_number(block)
-    block_data = await rpc.async_eth_get_block_by_number(block_number=standard_block)
+    block_data = await rpc.async_eth_get_block_by_number(
+        block_number=standard_block
+    )
 
     tokens_data = await rari_utils.async_get_pool_summary(
         comptroller=comptroller,
@@ -69,7 +80,9 @@ async def async_summarize_fuse_pool(
     )
 
 
-async def async_summarize_all_fuse_pools(block: spec.BlockNumberReference) -> None:
+async def async_summarize_all_fuse_pools(
+    block: spec.BlockNumberReference,
+) -> None:
 
     await rari_utils.async_print_all_pool_summary(block=block)
 

@@ -65,8 +65,8 @@ async def async_get_liquidity_depth(
 
 
 async def _async_new_price_distance(
-    *,
     amount_sold: int | float,
+    *,
     target_new_price: float,
     swap_kwargs: typing.Any,
 ) -> float:

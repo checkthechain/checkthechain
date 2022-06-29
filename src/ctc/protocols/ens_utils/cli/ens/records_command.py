@@ -12,6 +12,9 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'name', 'help': 'ENS name'},
         ],
+        'examples': [
+            'vitalik.eth',
+        ],
     }
 
 

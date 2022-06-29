@@ -18,6 +18,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'ERC20 address or symbol',
             },
         ],
+        'examples': [
+            'DAI',
+            '0x6b175474e89094c44da98b954eedeac495271d0f',
+        ],
     }
 
 
@@ -40,6 +44,7 @@ async def async_erc20_command(erc20: str) -> None:
         total_supply_coroutine,
     )
 
+    toolstr.print_text_box('ERC20 Summary')
     print('     address:', address)
     print('        name:', name)
     print('      symbol:', symbol)

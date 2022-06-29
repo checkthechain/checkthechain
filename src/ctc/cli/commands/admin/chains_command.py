@@ -17,6 +17,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
+        'examples': ['', '--verbose'],
     }
 
 
@@ -55,8 +56,8 @@ async def async_chains_command(verbose: bool) -> None:
         if not verbose:
             has_provider = '✓' if network['name'] in providers_by_chain else ''
         else:
-            if network['name'] in providers_by_chain:
-                has_provider = providers_by_chain[network['name']]['url']
+            if network['chain_id'] in providers_by_chain:
+                has_provider = providers_by_chain[network['chain_id']]['url']
             else:
                 has_provider = ''
 

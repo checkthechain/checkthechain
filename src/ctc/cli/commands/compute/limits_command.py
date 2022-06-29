@@ -22,6 +22,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '+',
             },
         ],
+        'examples': [
+            '',
+            '--verbose',
+            '--bits 256 512 1024',
+        ],
     }
 
 
@@ -68,9 +73,9 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
 
     # uint
     print()
-    toolstr.print_text_box('uint max')
+    toolstr.print_text_box('uint')
     rows = [
-        ['uint' + str(bit_value), str(1 << bit_value)]
+        ['uint' + str(bit_value), 'max', str(1 << bit_value)]
         for bit_value in bit_values
     ]
-    toolstr.print_table(rows, column_justify=['right', 'left'], compact=2)
+    toolstr.print_table(rows, column_justify=['right', 'center', 'left'], compact=2)

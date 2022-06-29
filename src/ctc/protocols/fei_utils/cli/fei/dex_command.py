@@ -15,6 +15,10 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': '--block', 'help': 'block number to query'},
         ],
+        'examples': [
+            '',
+            '--block 14000000',
+        ],
     }
 
 

@@ -22,6 +22,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'dest': 'datatype',
             },
         ],
+        'examples': [
+            '0x245cc372c84b3645bf0ffe6538620b04a217988b 0x0',
+            '0x245cc372c84b3645bf0ffe6538620b04a217988b 0x0 --type address',
+            '0x245cc372c84b3645bf0ffe6538620b04a217988b 0x0 --block 14000000',
+        ],
     }
 
 

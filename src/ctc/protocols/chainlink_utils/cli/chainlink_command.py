@@ -51,6 +51,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
+        'examples': [
+            'DAI_USD',
+            '0xaed0c38402a5d19df6e4c03f4e2dced6e29c1ee9',
+            'DAI_USD --blocks "[14000000, 14001000]"',
+        ],
     }
 
 

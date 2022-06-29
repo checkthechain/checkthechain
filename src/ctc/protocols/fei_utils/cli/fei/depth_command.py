@@ -17,6 +17,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': '--prices',
                 'help': 'specify which price levels to output depths of',
+                'nargs': '+',
             },
             {
                 'name': '--json',
@@ -24,6 +25,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'dest': 'as_json',
                 'action': 'store_true',
             },
+        ],
+        'examples': [
+            '',
+            '--prices "0.996" "0.997"',
         ],
     }
 
