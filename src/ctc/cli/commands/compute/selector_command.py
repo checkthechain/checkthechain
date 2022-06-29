@@ -8,10 +8,13 @@ from ctc import binary
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': selector_command,
-        'help': 'compute selector using text function signature',
+        'help': '''compute 4byte function selector using function signature
+
+in most cli shells must enclose parentheses in quotes " "''',
         'args': [
             {'name': 'text_signature', 'help': 'signature of function'},
         ],
+        'examples': ['"totalSupply()"', '"transfer(address,uint256)"'],
     }
 
 

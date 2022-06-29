@@ -51,7 +51,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def aliases_command(names: bool, append: bool, status: bool) -> None:
+def aliases_command(*, names: bool, append: bool, status: bool) -> None:
     if names:
         print('\n'.join(sorted(cli_alias_utils.get_alias_list())))
     elif status:

@@ -86,6 +86,7 @@ def get_alias_list() -> typing.Sequence[str]:
 
 def append_aliases_to_shell_configs(
     paths: typing.Sequence[str] | None = None,
+    *,
     confirm: bool = False,
     verbose: bool = True,
 ) -> None:

@@ -58,7 +58,7 @@ def root_command(query: str, parse_spec: toolcli.ParseSpec) -> None:
             try:
                 toolcli.execute_other_command_sequence(
                     command_sequence=('symbol',),
-                    args={'parse_spec': parse_spec, 'symbol': item},
+                    args={'parse_spec': parse_spec, 'query': item},
                     parse_spec=parse_spec,
                 )
             except LookupError:
