@@ -72,6 +72,8 @@ async def async_get_erc20_decimals(
 ) -> int:
     """get decimals of an erc20"""
 
+    result: spec.ERC20Metadata | None = None
+
     if use_db:
         from ctc import db
 
@@ -79,22 +81,22 @@ async def async_get_erc20_decimals(
         token = await erc20_generic.async_get_erc20_address(
             token, network=network
         )
-        result: spec.ERC20Metadata | None = (
+        result = (
             await db.async_query_erc20_metadata(address=token, network=network)
         )
         if result is not None and result['decimals'] is not None:
             return result['decimals']
 
-    result = await erc20_generic.async_erc20_eth_call(
+    decimals_result = await erc20_generic.async_erc20_eth_call(
         function_name='decimals',
         token=token,
         block=block,
         provider=provider,
         **rpc_kwargs,
     )
-    if not isinstance(result, int):
+    if not isinstance(decimals_result, int):
         raise Exception('invalid rpc result')
-    decimals = result
+    decimals = decimals_result
 
     if use_db:
         if result is not None:
