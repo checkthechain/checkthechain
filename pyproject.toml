@@ -51,16 +51,16 @@ dependencies = [
     'toml>=0.10.2',
     #
     # tool suite
-    'toolcache>=0.4.1',
+    'toolcache>=0.5.0',
     'toolcli>=0.5.4',
     'toolconf>=0.1.1',
-    'toolsql>=0.3.5',
+    'toolsql>=0.3.6',
     'toolstr>=0.4.3',
     'tooltime>=0.2.2',
     #
     # EVM dependencies
     'pycryptodome>=3.9.1',  # for keccak()
-    'eth_abi_lite>=3.0.2',  # for abi encoding
+    'eth_abi_lite>=3.0.3',  # for abi encoding
     'idna>=3.3',  # ENS resolution
 ]
 
@@ -203,16 +203,16 @@ deps =
     toml==0.10.2
     ;
     ; tool suite
-    toolcache==0.4.1
+    toolcache==0.5.0
     toolcli==0.5.4
     toolconf==0.1.1
-    toolsql==0.3.5
+    toolsql==0.3.6
     toolstr==0.4.3
     tooltime==0.2.2
     ;
     ; EVM dependencies
     pycryptodome==3.9.1
-    eth_abi_lite==3.0.2
+    eth_abi_lite==3.0.3
     idna==3.3
 
 commands = pytest --disable-warnings
