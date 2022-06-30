@@ -66,6 +66,7 @@ def load_default_erc20s(
     return erc20_metadatas
 
 
+# from 1inch default token list
 mainnet_erc20s_csv = """address,decimals,name,symbol
 0x006bea43baa3f7a6f765f14f10a1a1b08334ef45,18,Stox,STX
 0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd,18,PieDAOBTC++,BTC

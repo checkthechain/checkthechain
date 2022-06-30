@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import toolcli
+import toolstr
 
 from . import setup_io
 from .stages import alias_setup
@@ -27,7 +28,7 @@ async def async_setup_ctc() -> None:
     print('- by default, setup process will leave existing settings unchanged')
     print('- setup can be rerun multiple times idempotently')
     print()
-    toolcli.print(
+    toolstr.print(
         'Can skip options by pressing enter at each prompt', style='bold'
     )
 
@@ -67,6 +68,6 @@ async def async_setup_ctc() -> None:
     # finalize
     print()
     print()
-    toolcli.print('## Final Steps', style=styles['header'])
+    toolstr.print('## Final Steps', style=styles['header'])
     print()
     print('ctc setup compelete')

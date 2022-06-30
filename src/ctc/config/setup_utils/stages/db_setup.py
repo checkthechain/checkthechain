@@ -4,7 +4,7 @@ import os
 import typing
 
 import aiohttp
-import toolcli
+import toolstr
 
 from ctc import db
 from ctc import spec
@@ -20,7 +20,7 @@ def setup_dbs(
 
     print()
     print()
-    toolcli.print('## Database Setup', style=styles['header'])
+    toolstr.print('## Database Setup', style=styles['header'])
     print()
     print('ctc stores its collected chain data in an sql database')
 
@@ -35,7 +35,7 @@ def setup_dbs(
             os.makedirs(db_dirpath, exist_ok=True)
 
         if not os.path.isfile(db_path):
-            toolcli.print(
+            toolstr.print(
                 'Creating database at path ['
                 + styles['path']
                 + ']'
@@ -45,7 +45,7 @@ def setup_dbs(
                 + ']'
             )
         else:
-            toolcli.print(
+            toolstr.print(
                 'Existing database detected at path ['
                 + styles['path']
                 + ']'
@@ -79,7 +79,7 @@ async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
 
     print()
     print()
-    toolcli.print('## Populating Database', style=styles['header'])
+    toolstr.print('## Populating Database', style=styles['header'])
 
     # populate data: erc20s
     print()

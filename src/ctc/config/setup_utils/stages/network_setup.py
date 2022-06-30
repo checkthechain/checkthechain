@@ -19,7 +19,7 @@ async def async_setup_networks(
 
     print()
     print()
-    toolcli.print('## Network Setup', style=styles['header'])
+    toolstr.print('## Network Setup', style=styles['header'])
     print()
 
     # get providers
@@ -75,7 +75,7 @@ async def async_specify_providers(
     if len(old_providers) > 0:
         print('Currently using these providers:')
         for provider_name, provider_metadata in old_providers.items():
-            toolcli.print(
+            toolstr.print(
                 '-',
                 provider_name,
                 '['

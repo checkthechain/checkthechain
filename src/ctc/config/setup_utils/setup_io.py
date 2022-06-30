@@ -6,8 +6,9 @@ import typing
 import ctc
 from ctc import spec
 
-import toolconfig
 import toolcli
+import toolconfig
+import toolstr
 
 from .. import config_spec
 from .. import config_read
@@ -84,14 +85,14 @@ def write_new_config(
 
     print()
     print()
-    toolcli.print('## Creating Configuration File', style=styles['header'])
+    toolstr.print('## Creating Configuration File', style=styles['header'])
     print()
     if write_new:
         with open(config_path, 'w') as f:
             json.dump(config, f)
-        toolcli.print(
+        toolstr.print(
             'Config file created at',
-            toolcli.add_style(config_path, styles['path']),
+            toolstr.add_style(config_path, styles['path']),
         )
     else:
         print('Config unchanged')

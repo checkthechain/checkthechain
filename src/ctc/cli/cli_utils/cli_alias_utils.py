@@ -185,7 +185,7 @@ def print_alias_status(
     styles: typing.Mapping[str, str] | None = None,
 ) -> None:
     if styles is not None:
-        import toolcli
+        import toolstr
 
     if alias_status is None:
         alias_status = get_alias_status()
@@ -199,9 +199,9 @@ def print_alias_status(
         print('These shells do not have ctc aliases installed:')
         for shell, path in zip(no_shells, no_aliases):
             if styles is not None:
-                styled_shell = toolcli.add_style(shell, style=styles['command'])
-                styled_path = toolcli.add_style(path, style=styles['path'])
-                toolcli.print('-', styled_shell, '(' + styled_path + ')')
+                styled_shell = toolstr.add_style(shell, style=styles['command'])
+                styled_path = toolstr.add_style(path, style=styles['path'])
+                toolstr.print('-', styled_shell, '(' + styled_path + ')')
             else:
                 print('-', shell, '(' + path + ')')
     if len(yes_aliases) > 0 and len(no_aliases) > 0:
@@ -210,8 +210,8 @@ def print_alias_status(
         print('These shells already have ctc aliases installed:')
         for shell, path in zip(yes_shells, yes_aliases):
             if styles is not None:
-                styled_shell = toolcli.add_style(shell, style=styles['command'])
-                styled_path = toolcli.add_style(path, style=styles['path'])
-                toolcli.print('-', styled_shell, '(' + styled_path + ')')
+                styled_shell = toolstr.add_style(shell, style=styles['command'])
+                styled_path = toolstr.add_style(path, style=styles['path'])
+                toolstr.print('-', styled_shell, '(' + styled_path + ')')
             else:
                 print('-', shell, '(' + path + ')')

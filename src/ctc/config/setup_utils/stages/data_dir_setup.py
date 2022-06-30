@@ -5,6 +5,7 @@ import shutil
 import typing
 
 import toolcli
+import toolstr
 
 from ctc import spec
 from ... import config_defaults
@@ -18,7 +19,7 @@ def setup_data_dir(
 
     print()
     print()
-    toolcli.print('## Data Root Directory', style=styles['header'])
+    toolstr.print('## Data Root Directory', style=styles['header'])
     print()
 
     new_data_root = None
