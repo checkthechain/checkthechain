@@ -57,7 +57,11 @@ async def async_chart_command(
         uniswap_v2_utils.async_get_pool_tokens_metadata(pool)
     )
 
-    n_candles = math.floor((os.get_terminal_size().columns - 10) / 2)
+    try:
+        columns = os.get_terminal_size().columns
+    except Exception:
+        columns = 80
+    n_candles = math.floor((columns - 10) / 2)
     if timescale is None:
         candle_timescale = '1d'
     else:

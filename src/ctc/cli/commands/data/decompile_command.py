@@ -58,12 +58,18 @@ async def async_decompile_command(
         for index, function_selector in enumerate(sorted(function_selectors))
     }
 
-    print('Found', len(function_selectors), 'function selectors')
-
     # match against 4bytes
     decompiled_function_abis = await evm.async_decompile_function_abis(
         bytecode,
         sort='hex_signature',
+    )
+
+    print(
+        'Found',
+        len(function_selectors),
+        'function selectors matching',
+        len(decompiled_function_abis),
+        'total 4byte entries',
     )
 
     if len(decompiled_function_abis) > 0:
@@ -80,7 +86,10 @@ async def async_decompile_command(
     if verbose:
         width = None
     else:
-        width = os.get_terminal_size().columns
+        try:
+            width = os.get_terminal_size().columns
+        except Exception:
+            width = 80
     toolstr.print_table(
         rows,
         column_justify=['right', 'right', 'left'],

@@ -115,8 +115,12 @@ async def async_abi_command(
         print()
         print()
     if not json_only:
+        try:
+            columns = os.get_terminal_size().columns
+        except Exception:
+            columns = 80
         evm.print_contract_abi_human_readable(
             contract_abi,
-            max_width=os.get_terminal_size().columns,
+            max_width=columns,
             verbose=verbose,
         )
