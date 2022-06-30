@@ -69,9 +69,18 @@ def test_subcommand_examples(subcommand_spec):
                 ):
                     example_strs.append(example_str)
 
+    max_example_time = 30
+
     for example_str in example_strs:
-        command_pieces = ['ctc'] + list(subcommand) + [example_str]
-        command = ' '.join(command_pieces)
-        exit_code = subprocess.call(command, shell=True)
+        command_pieces = ['python3', '-m', 'ctc'] + list(subcommand)
+        command_pieces.extend(example_str.split(' '))
+        command_pieces = [piece.strip('"') for piece in command_pieces if piece != '']
+        exit_code = subprocess.call(command_pieces, timeout=max_example_time)
         if exit_code != 0:
-            raise Exception('command failed with exit code ' + str(exit_code) + ': ' + command)
+            # raise Exception('command failed with exit code ' + str(exit_code) + ': ' + command)
+            raise Exception(
+                'command failed with exit code '
+                + str(exit_code)
+                + ': '
+                + ' '.join(command_pieces)
+            )

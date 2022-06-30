@@ -43,10 +43,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
-        'examples': [
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer',
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks [14000000, 14100000]',
-        ],
+        'examples': {
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer': {
+                'long': True
+            },
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks [14000000, 14010000]': {},
+        },
     }
 
 
@@ -99,15 +101,18 @@ async def async_events_command(
                 [
                     str(value)
                     for value in events.index.get_level_values('block_number')
-                ]
+                ],
             )
             events.index.name = 'block'
             events = events[
-                [column for column in events.columns if column.startswith('arg__')]
+                [
+                    column
+                    for column in events.columns
+                    if column.startswith('arg__')
+                ]
             ]
             new_column_names = {
-                old_column: old_column[5:]
-                for old_column in events.columns
+                old_column: old_column[5:] for old_column in events.columns
             }
             events = events.rename(columns=new_column_names)
         cli_utils.output_data(events, output=output, overwrite=overwrite)

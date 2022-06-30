@@ -49,7 +49,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '',
-            '--last 1000',
+            '--last 300',
         ],
     }
 

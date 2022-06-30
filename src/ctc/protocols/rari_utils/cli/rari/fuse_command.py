@@ -26,9 +26,10 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': {
             '8': {'description': 'summarize a pool'},
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca': {
-                'description': 'summarize a token across all pools'
+                'description': 'summarize a token across all pools',
+                'long': True,
             },
-            '': {'description': 'summarize all of Rari'},
+            '': {'description': 'summarize all of Rari', 'long': True},
         },
     }
 

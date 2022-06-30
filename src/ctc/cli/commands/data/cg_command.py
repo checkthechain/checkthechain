@@ -18,7 +18,6 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'default': None,
                 'help': 'include extra data',
             },
-            {'name': '--include-links', 'help': 'include links in output'},
             {'name': '--height', 'help': 'height, number of rows per asset'},
             {'name': '--width', 'help': 'width of sparklines'},
         ],
@@ -33,7 +32,6 @@ async def async_cg_command(
     *,
     n: int,
     verbose: bool,
-    include_links: bool,
     height: int | None,
     width: str | int | None,
 ) -> None:
@@ -58,7 +56,6 @@ async def async_cg_command(
     coingecko_utils.print_market_data(
         data=data,
         verbose=verbose,
-        include_links=include_links,
         height=height,
         width=width,
     )

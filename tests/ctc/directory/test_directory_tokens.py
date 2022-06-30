@@ -1,8 +1,6 @@
 import pytest
-import toolconfig
 
 from ctc import evm
-from ctc import spec
 
 
 @pytest.mark.parametrize(
