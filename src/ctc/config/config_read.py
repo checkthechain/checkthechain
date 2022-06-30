@@ -13,6 +13,7 @@ if typing.TYPE_CHECKING:
 import ctc
 from ctc import spec
 from . import config_spec
+from . import config_validate
 
 
 _config_cache: typing.MutableMapping[str, spec.PartialConfig] = {
@@ -109,7 +110,7 @@ def get_config(
     config = dict(config_from_file, **config_overrides)
 
     # validate
-    validate_config(config)
+    config_validate.validate_config(config)
 
     if validate == 'raise':
         return typing.cast(spec.Config, config)
@@ -140,84 +141,6 @@ def clear_config_override(key: str) -> None:
 def clear_config_overrides() -> None:
     _config_cache['overrides'] = {}
     get_config.cache.delete_all_entries()  # type: ignore
-
-
-#
-# # validation
-#
-
-
-class ConfigValidation(TypedDict):
-    valid: bool
-    missing_keys: typing.Iterable[str]
-    extra_keys: typing.Iterable[str]
-
-
-def validate_config(config: typing.Any) -> ConfigValidation:
-    # process config version
-    version = get_config_version_tuple(config)
-    if version < config_spec.min_allowed_config_version:
-        raise Exception(
-            'config version is too old. upgrade by running `ctc setup` in a terminal'
-        )
-    if version < config_spec.min_recommended_config_version:
-        import rich.console
-
-        # warning_text = '[ctc] old config format, upgrade by running `ctc setup` in a terminal'
-        # warning_text = '[yellow]' + warning_text + '[/yellow]'
-        # console = rich.console.Console()
-        # console.print(warning_text)
-
-    # process keys
-    spec_keys = set(spec.Config.__annotations__)
-    actual_keys = set(config.keys())
-    missing_keys = spec_keys - actual_keys
-    extra_keys = actual_keys - spec_keys
-    valid = spec_keys == actual_keys
-
-    validation: ConfigValidation = {
-        'valid': valid,
-        'missing_keys': missing_keys,
-        'extra_keys': extra_keys,
-    }
-
-    # if not validation['valid']:
-    # disable validation until 0.3.0 and better upgrade utility in place
-    if False:
-        warning_text = (
-            '\n** ATTENTION **\nctc config is not formatted correctly'
-        )
-        if len(validation['missing_keys']) > 0:
-            warning_text += '\n    missing keys: ' + ', '.join(
-                str(key) for key in validation['missing_keys']
-            )
-        if len(validation['extra_keys']) > 0:
-            warning_text += '\n    extra keys: ' + ', '.join(
-                str(key) for key in validation['extra_keys']
-            )
-        warning_text += '\nview more config info by running `[#64aaaa]ctc config[/#64aaaa]` in terminal'
-        warning_text += (
-            '\nfix config by running `[#64aaaa]ctc setup[/#64aaaa]` in terminal'
-        )
-        warning_text += '\n'
-
-        import rich.console
-
-        warning_text = '[yellow]' + warning_text + '[/yellow]'
-        console = rich.console.Console()
-        console.print(warning_text)
-
-    # process datatypes
-    # toolconfig.config_is_valid(config_spec=spec.Config, **_kwargs)
-
-    return validation
-
-
-def config_is_valid(config: typing.Any | None = None) -> bool:
-    if config is None:
-        config = get_config()
-    validation = validate_config(config)
-    return validation['valid']
 
 
 def get_config_version_tuple(

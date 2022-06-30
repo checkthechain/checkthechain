@@ -29,7 +29,7 @@ def setup_data_dir(
     if old_data_root is not None and not isinstance(old_data_root, str):
         old_data_root = None
     if isinstance(old_data_root, str):
-        old_data_root = os.path.abspath(old_data_root)
+        old_data_root = os.path.abspath(os.path.expanduser(old_data_root))
         if os.path.isdir(old_data_root):
             prompt = (
                 'Continue using data directory ['
