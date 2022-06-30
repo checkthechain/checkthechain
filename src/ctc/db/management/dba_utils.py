@@ -143,7 +143,7 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
     """initialize the schema_versions schema which manages versions of schemas"""
     initialize_schema(
         'schema_versions',
-        network=-1,
+        network=None,
         conn=conn,
         prepared_schema=False,
     )

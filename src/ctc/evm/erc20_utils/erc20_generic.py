@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import config
 from ctc import rpc
 from ctc import spec
 from .. import address_utils
@@ -18,6 +19,9 @@ async def async_get_erc20_address(
         return token
     elif isinstance(token, str):
         from ctc import db
+
+        if network is None:
+            network = config.get_default_network()
 
         metadata = await db.async_query_erc20_metadata(
             symbol=token,

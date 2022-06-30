@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import threading
@@ -11,6 +12,7 @@ from ctc import config
 from ctc import evm
 from ctc import spec
 
+from .. import schema_utils
 
 _schema_version_cache = {
     'engine': None,
@@ -33,10 +35,15 @@ def get_schema_version(
 ) -> str | None:
 
     if network is None:
-        network = config.get_default_network()
-        if network is None:
-            raise Exception('must specify network or configure default network')
-    chain_id = evm.get_network_chain_id(network)
+        # use chain_id = -1 for dbs that have no network association
+        if schema_name not in schema_utils.get_network_schema_names():
+            chain_id = -1
+        else:
+            raise Exception(
+                'must specify network for schema ' + str(schema_name)
+            )
+    else:
+        chain_id = evm.get_network_chain_id(network)
 
     if conn is None:
         engine = _get_schema_version_engine()
@@ -87,10 +94,15 @@ def set_schema_version(
         version = ctc.__version__
 
     if network is None:
-        network = config.get_default_network()
-        if network is None:
-            raise Exception('must specify network or configure default network')
-    chain_id = evm.get_network_chain_id(network)
+        # use chain_id = -1 for dbs that have no network association
+        if schema_name not in schema_utils.get_network_schema_names():
+            chain_id = -1
+        else:
+            raise Exception(
+                'must specify network for schema ' + str(schema_name)
+            )
+    else:
+        chain_id = evm.get_network_chain_id(network)
 
     toolsql.insert(
         conn=conn,
