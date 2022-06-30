@@ -156,7 +156,7 @@ def normalize_event(
     event: spec.RawLog,
     event_abi: spec.EventABI,
     *,
-    arg_prefix: str = 'arg__',
+    arg_prefix: str | None = 'arg__',
 ) -> spec.NormalizedLog:
 
     # decode event args
@@ -183,7 +183,7 @@ def normalize_event(
     # add event args
     # args either stored in 'args' key or directly in normalized event
     if arg_prefix is None:
-        arg_container = {}
+        arg_container: typing.MutableMapping[typing.Any, typing.Any] = {}
         normalized['args'] = arg_container
         arg_prefix = ''
     else:
