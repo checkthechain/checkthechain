@@ -8,8 +8,8 @@ import toolcli
 import toolstr
 
 from ctc import spec
+from ...upgrade_utils import data_dir_versioning
 from ... import config_defaults
-from .. import data_dir_versioning
 
 
 def setup_data_dir(
