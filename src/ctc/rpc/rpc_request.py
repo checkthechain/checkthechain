@@ -196,7 +196,7 @@ async def async_send_raw(
     _log_request(request=request, provider=provider)
 
     if provider['protocol'] == 'http':
-        from .rpc_backends import rpc_http_async
+        from .rpc_protocols import rpc_http_async
 
         return await rpc_http_async.async_send_http(
             request=request,
@@ -204,7 +204,7 @@ async def async_send_raw(
         )
 
     elif provider['protocol'] == 'wss':
-        from .rpc_backends import rpc_websocket_async
+        from .rpc_protocols import rpc_websocket_async
 
         return await rpc_websocket_async.async_send_websocket(
             request=request,
