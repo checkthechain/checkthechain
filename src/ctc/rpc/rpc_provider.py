@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import os
 import typing
 
@@ -45,6 +44,8 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
             return provider  # type: ignore
 
         else:
+            import copy
+
             selection_keys = ['name', 'network', 'protocol']
             if any(provider.get(key) is not None for key in selection_keys):
                 base_provider = ctc.config.get_provider(
@@ -98,6 +99,8 @@ def add_provider_parameters(
     provider: spec.ProviderReference,
     parameters: spec.PartialProvider,
 ) -> spec.Provider:
+    import copy
+
     # TODO: decide whether parameters with value=None should be included
     provider = get_provider(provider)
     provider = copy.copy(provider)

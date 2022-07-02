@@ -7,8 +7,6 @@ from ctc import rpc
 from ctc import spec
 from ctc.toolbox import backend_utils
 
-from .event_backends import filesystem_events
-from .event_backends import node_events
 from .. import block_utils
 from .. import abi_utils
 
@@ -30,6 +28,9 @@ def get_event_backend_functions() -> dict[
         ],
     ],
 ]:
+    from .event_backends import filesystem_events
+    from .event_backends import node_events
+
     return {
         'get': {
             'filesystem': filesystem_events.async_get_events_from_filesystem,
@@ -134,6 +135,7 @@ async def async_download_events(
     provider: spec.ProviderReference = None,
     verbose: bool = True,
 ) -> spec.DataFrame:
+    from .event_backends import filesystem_events
 
     if event_hash is None and event_name is None and event_abi is None:
         raise Exception('must specify either event_hash or event_name')

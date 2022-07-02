@@ -3,6 +3,7 @@ from __future__ import annotations
 import toolcli
 
 from ctc import evm
+from ctc.evm.event_utils import event_backends
 from ctc import spec
 
 
@@ -83,7 +84,7 @@ async def async_rechunk(
 
     if all_events:
 
-        await evm.async_rechunk_all_events(
+        await event_backends.async_rechunk_all_events(
             network=network,
             start_block=start_block,
             end_block=end_block,
@@ -101,7 +102,7 @@ async def async_rechunk(
             event_name = None
             event_hash = event
 
-        await evm.async_rechunk_events(
+        await event_backends.async_rechunk_events(
             contract_address=contract,
             network=network,
             event_name=event_name,

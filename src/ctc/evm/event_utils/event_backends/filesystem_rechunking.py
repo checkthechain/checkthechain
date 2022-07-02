@@ -4,8 +4,6 @@ import math
 import os
 import typing
 
-import toolstr
-
 from ctc import evm
 from ctc import binary
 from ctc import spec
@@ -170,6 +168,8 @@ async def async_rechunk_events(
 
     # print summary
     if verbose or dry:
+        import toolstr
+
         event_dir = filesystem_events.get_events_event_dir(
             contract_address=contract_address,
             event_hash=event_hash,

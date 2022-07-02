@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import typing
 
 
@@ -212,6 +211,8 @@ def contract_abi_to_dataframe(
     contract_abi: spec.ContractABI,
     human_readable: bool,
 ) -> spec.DataFrame:
+    import copy
+
     contract_abi = copy.deepcopy(contract_abi)
     for entry in typing.cast(
         typing.List[typing.Dict[str, typing.Any]], contract_abi

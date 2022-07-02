@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 import typing
 import warnings
 
@@ -30,6 +29,8 @@ async def async_send_http(
             provider['url'], json=request, headers=headers
         ) as response:
             if response.status != 200:
+                import random
+
                 t_sleep = 2 ** attempt + random.random()
                 warnings.warn(
                     'request failed with code '

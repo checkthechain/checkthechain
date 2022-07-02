@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-import random
 import typing
 
 from ctc import config
@@ -86,6 +85,8 @@ def log_rpc_response(
 
 
 def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
+    import random
+
     return {
         'jsonrpc': '2.0',
         'method': method,
