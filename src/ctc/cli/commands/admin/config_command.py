@@ -4,6 +4,7 @@ import os
 import typing
 
 import toolcli
+import toolstr
 
 import ctc.config
 
@@ -63,7 +64,45 @@ def config_command(reveal: bool, as_json: bool) -> None:
             typing.Mapping[str, typing.Any], ctc.config.get_config()
         )
         for key in sorted(config.keys()):
-            if isinstance(config[key], dict) and len(config[key]) > 0:
+
+            if key == 'networks':
+                print('-', key + ':')
+                rows = []
+                for chain_id, network_metadata in config[key].items():
+                    row = [
+                        network_metadata['name'],
+                        str(network_metadata['chain_id']),
+                        network_metadata['block_explorer'],
+                    ]
+                    rows.append(row)
+                labels = ['name', 'chain_id', 'block_explorer']
+                toolstr.print_table(rows, labels=labels, indent=4)
+                print()
+
+            elif key == 'providers':
+                print('-', key + ':')
+                if len(config[key]) == 0:
+                    continue
+                if reveal:
+                    labels = list(config[key][0])
+                else:
+                    labels = ['name', 'network', 'url']
+                rows = []
+                for provider in config[key].values():
+                    row = []
+                    for label in labels:
+                        if label == 'url' and not reveal:
+                            cell = '*' * 8
+                        else:
+                            cell = provider[label]
+                        row.append(cell)
+                    rows.append(row)
+                toolstr.print_table(rows, labels=labels, indent=4)
+                if not reveal:
+                    print()
+                    print('    (use --reveal to reveal sensitive provider information)')
+
+            elif isinstance(config[key], dict) and len(config[key]) > 0:
                 print('-', str(key) + ':')
                 for subkey, subvalue in config[key].items():
                     if isinstance(subvalue, dict) and len(subvalue) > 0:

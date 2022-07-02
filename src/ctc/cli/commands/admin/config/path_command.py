@@ -10,6 +10,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'f': path_command,
         'help': 'print config path',
         'examples': [''],
+        'hidden': True,
     }
 
 
