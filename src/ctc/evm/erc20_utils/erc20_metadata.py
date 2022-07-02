@@ -8,7 +8,9 @@ from ctc import spec
 from . import erc20_generic
 
 
-async def async_get_default_erc20_tokens() -> typing.Sequence[spec.ERC20Metadata]:
+async def async_get_default_erc20_tokens() -> typing.Sequence[
+    spec.ERC20Metadata
+]:
     """TODO: add db table for tracking erc20 token lists
     - use a token list as tokens to check during block exploration
     - "default" can be one of the token lists
@@ -81,8 +83,8 @@ async def async_get_erc20_decimals(
         token = await erc20_generic.async_get_erc20_address(
             token, network=network
         )
-        result = (
-            await db.async_query_erc20_metadata(address=token, network=network)
+        result = await db.async_query_erc20_metadata(
+            address=token, network=network
         )
         if result is not None and result['decimals'] is not None:
             return result['decimals']
@@ -107,7 +109,7 @@ async def async_get_erc20_decimals(
                 {
                     'address': token,
                     'decimals': decimals,
-                }
+                },
             )
         await db.async_intake_erc20_metadata(network=network, **result)
 

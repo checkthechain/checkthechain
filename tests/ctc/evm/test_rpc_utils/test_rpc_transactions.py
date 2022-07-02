@@ -71,4 +71,3 @@ async def test_eth_get_block_transaction_count_by_number():
         block_number=12345678
     )
     assert result == 174
-

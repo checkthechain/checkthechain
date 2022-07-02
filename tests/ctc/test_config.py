@@ -42,10 +42,17 @@ def test_tox_legacy_config():
     # assert that legacy uses the min version number of each dependency
     for dep_name in legacy_deps.keys():
         if dep_name not in current_deps:
-            raise Exception(dep_name + ' in legacy dependencies but not in current dependencies')
+            raise Exception(
+                dep_name
+                + ' in legacy dependencies but not in current dependencies'
+            )
         assert current_deps[dep_name] == legacy_deps[dep_name], (
-            dep_name + ' has different versions in legacy vs current test environments'
+            dep_name
+            + ' has different versions in legacy vs current test environments'
         )
     for dep_name in current_deps:
         if dep_name not in legacy_deps:
-            raise Exception(dep_name + ' in current dependencies but not in legacy dependencies')
+            raise Exception(
+                dep_name
+                + ' in current dependencies but not in legacy dependencies'
+            )

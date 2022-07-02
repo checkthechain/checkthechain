@@ -68,8 +68,8 @@ async def async_get_feed_datum(
         answer = result
 
         if normalize:
-            decimals = (
-                await chainlink_feed_metadata.async_get_feed_decimals(feed)
+            decimals = await chainlink_feed_metadata.async_get_feed_decimals(
+                feed
             )
             answer /= 10 ** decimals
 

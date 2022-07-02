@@ -130,7 +130,9 @@ def get_function_selector(
             raise Exception('must specify function_abi or function_signature')
         function_signature = get_function_signature(function_abi)
 
-    full_hash = hashes.keccak(function_signature.encode(), output_format='raw_hex')
+    full_hash = hashes.keccak(
+        function_signature.encode(), output_format='raw_hex'
+    )
     return full_hash[:8]
 
 

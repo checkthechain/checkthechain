@@ -40,4 +40,3 @@ def get_function_abi(
         contract_abi=list(get_lens_abi().values()),
         **abi_query,
     )
-

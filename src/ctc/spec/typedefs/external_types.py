@@ -39,4 +39,3 @@ Float = typing.Union[
 ]
 
 Number = typing.Union[Integer, Float]
-

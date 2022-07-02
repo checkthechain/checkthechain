@@ -81,4 +81,3 @@ async def async_compute_tribe_buybacks_usd(
         'values': [net_tribe_buys[block] for block in blocks],
         'units': 'FEI',
     }
-

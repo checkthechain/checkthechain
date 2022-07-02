@@ -51,4 +51,3 @@ async def test_get_code():
     """.strip()
     code = await rpc.async_eth_get_code(address=address)
     assert code == target
-

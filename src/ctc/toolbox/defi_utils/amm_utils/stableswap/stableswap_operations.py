@@ -10,4 +10,3 @@ def get_stableswap_price(
     numerator = 1 + 2 * A * (x ** 2) * y / ((k / 2) ** 3)
     denominator = 1 + 2 * A * x * (y ** 2) / ((k / 2) ** 3)
     return float(y / x * numerator / denominator)
-

@@ -258,4 +258,3 @@ def compute_x_sold_when_y_bought(
     gamma = 1 - fee_rate
     x_sold = beta / (1 - beta) / gamma * x_reserves
     return x_sold
-

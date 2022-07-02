@@ -51,4 +51,3 @@ async def async_create_fei_yield_payload(
         # metric data
         'data': data,
     }
-

@@ -45,4 +45,3 @@ class YieldSourceData(TypedDict):
     current_yield_units: dict[str, str]  # either "APY" or "APR" for each entry
     yield_history: dict[str, list[float]]  # map of yield type name to % history
     yield_history_units: dict[str, str]  # either "APY" or "APR" for each entry
-

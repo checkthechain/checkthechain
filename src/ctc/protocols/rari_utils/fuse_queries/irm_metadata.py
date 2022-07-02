@@ -21,4 +21,3 @@ async def async_get_irm_blocks_per_year(
     #         block_number=block,
     #         function_abi=rari_abis.interest_rate_model_abis['blocksPerYear'],
     #     )
-

@@ -16,4 +16,3 @@ def typehints_formatter(
             tokens = match.split('.')
             output = output.replace(match, tokens[-1])
     return output
-

@@ -74,16 +74,16 @@ async def test_block_timestamps_db():
     # insert data
     with engine.connect() as conn:
 
-#         # insert data in bulk
-#         with conn.begin():
-#             data = {
-#                 datum['block_number']: datum['timestamp']
-#                 for datum in example_data
-#             }
-#             db.set_blocks_timestamps(
-#                 conn=conn,
-#                 blocks_timestamps=data,
-#             )
+        #         # insert data in bulk
+        #         with conn.begin():
+        #             data = {
+        #                 datum['block_number']: datum['timestamp']
+        #                 for datum in example_data
+        #             }
+        #             db.set_blocks_timestamps(
+        #                 conn=conn,
+        #                 blocks_timestamps=data,
+        #             )
 
         # insert data one-by-one
         with conn.begin():

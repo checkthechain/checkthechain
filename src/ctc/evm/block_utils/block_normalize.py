@@ -34,4 +34,3 @@ async def async_block_numbers_to_int(
         for block in blocks
     ]
     return await asyncio.gather(*coroutines)
-

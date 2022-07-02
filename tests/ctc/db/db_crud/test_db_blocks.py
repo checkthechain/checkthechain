@@ -105,7 +105,9 @@ async def test_blocks_crud():
         # insert data
         with conn.begin():
             for block in example_data:
-                await db.async_upsert_block(conn=conn, block=block, network=network)
+                await db.async_upsert_block(
+                    conn=conn, block=block, network=network
+                )
 
         # get data individually
         with conn.begin():
@@ -122,7 +124,9 @@ async def test_blocks_crud():
         with conn.begin():
             block_numbers = [block['number'] for block in example_data]
             db_blocks = await db.async_select_blocks(
-                conn=conn, block_numbers=block_numbers, network=network,
+                conn=conn,
+                block_numbers=block_numbers,
+                network=network,
             )
             db_blocks = sorted(db_blocks, key=lambda block: block['number'])
             assert db_blocks == example_data

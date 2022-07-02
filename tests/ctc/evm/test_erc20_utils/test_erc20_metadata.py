@@ -23,4 +23,3 @@ async def test_fetch_token_name():
 @pytest.mark.asyncio
 async def test_fetch_token_symbol():
     assert 'FEI' == await evm.async_get_erc20_symbol(fei_address)
-

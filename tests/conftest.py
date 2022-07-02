@@ -27,4 +27,3 @@ async def setup_teardown():
 
     # teardown
     await rpc.async_close_http_session()
-

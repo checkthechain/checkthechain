@@ -31,4 +31,3 @@ class CurveTrade(TypedDict):
     token_bought: spec.Address
     amount_sold: typing.Union[int, float]
     amount_bought: typing.Union[int, float]
-

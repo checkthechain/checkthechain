@@ -21,4 +21,3 @@ contract_creation_blocks_schema: toolsql.DBSchema = {
         },
     },
 }
-

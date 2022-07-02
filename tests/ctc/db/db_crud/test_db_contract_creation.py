@@ -55,11 +55,9 @@ async def test_create_creation_blocks_crud():
         # get data individually
         with conn.begin():
             for datum in example_data:
-                stored_block = (
-                    await db.async_select_contract_creation_block(
-                        conn=conn,
-                        address=datum['address'],
-                    )
+                stored_block = await db.async_select_contract_creation_block(
+                    conn=conn,
+                    address=datum['address'],
                 )
                 assert stored_block == datum['block_number']
 

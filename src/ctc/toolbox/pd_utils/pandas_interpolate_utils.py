@@ -96,7 +96,9 @@ def interpolate_dataframe(
         start_index = df.index.values[0]
     if end_index is None:
         end_index = df.index.values[-1]
-    new_index: spec.NumpyArray = np.arange(start_index, end_index + 1, 1, dtype=int)
+    new_index: spec.NumpyArray = np.arange(
+        start_index, end_index + 1, 1, dtype=int
+    )
 
     # create new series
     new_df = df.reindex(new_index, fill_value=pd.NA)

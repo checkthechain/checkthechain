@@ -71,4 +71,3 @@ class DecodedCallData(TypedDict):
     function_selector: str
     parameters: list[typing.Any]
     named_parameters: typing.Optional[dict[str, typing.Any]]
-

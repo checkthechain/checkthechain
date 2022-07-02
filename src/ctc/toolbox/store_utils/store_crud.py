@@ -148,4 +148,3 @@ def write_buffer_data(
         writer.writerows(data)
     else:
         raise Exception('unknown format: ' + str(format))
-

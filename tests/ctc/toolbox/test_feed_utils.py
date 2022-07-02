@@ -11,4 +11,3 @@
 #     print(target_contract_type)
 #     detected_contract_type = await async_get_contract_type(address)
 #     print(detected_contract_type)
-

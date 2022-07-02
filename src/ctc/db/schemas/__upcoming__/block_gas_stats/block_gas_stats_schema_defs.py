@@ -27,4 +27,3 @@ block_gas_stats_schema: toolsql.DBSchema = {
         },
     },
 }
-

@@ -57,7 +57,7 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
 
             non_none_keys = typing.cast(
                 spec.PartialProvider,
-                {k: v for k, v in provider.items() if v is not None}
+                {k: v for k, v in provider.items() if v is not None},
             )
             full_provider = copy.copy(base_provider)
             full_provider.update(non_none_keys)
@@ -103,4 +103,3 @@ def add_provider_parameters(
     provider = copy.copy(provider)
     provider.update(parameters)
     return provider
-

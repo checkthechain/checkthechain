@@ -47,7 +47,10 @@ async def async_print_block_summary(
     toolstr.print_text_box(title)
     print('- timestamp:', block['timestamp'])
     print('- time:', tooltime.timestamp_to_iso(block['timestamp']))
-    print('- age:', tooltime.timelength_to_phrase(round(time.time()) - block['timestamp']))
+    print(
+        '- age:',
+        tooltime.timelength_to_phrase(round(time.time()) - block['timestamp']),
+    )
     print('- block_hash:', block['hash'])
     print('- n_transactions:', len(block['transactions']))
     print(
@@ -80,4 +83,3 @@ async def async_print_block_summary(
         else:
             message = message
     print('- message:', message)
-

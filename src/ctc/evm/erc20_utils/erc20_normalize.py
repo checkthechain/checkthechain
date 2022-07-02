@@ -135,9 +135,7 @@ async def async_normalize_erc20_quantities_by_block(
         quantities = [
             quantity for quantity, nonzero in zip(quantities, mask) if nonzero
         ]
-        blocks = [
-            block for block, nonzero in zip(blocks, mask) if nonzero
-        ]
+        blocks = [block for block, nonzero in zip(blocks, mask) if nonzero]
         if decimals is not None:
             decimals = [
                 decimal for decimal, nonzero in zip(decimals, mask) if nonzero

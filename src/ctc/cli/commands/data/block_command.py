@@ -64,7 +64,9 @@ async def async_block_command(
             timestamp_seconds = tooltime.timestamp_to_seconds(timestamp)
 
             if timestamp_seconds > time.time():
-                block_number = await evm.async_predict_timestamp_block(timestamp)
+                block_number = await evm.async_predict_timestamp_block(
+                    timestamp
+                )
                 print('predicting future block...')
                 print(block_number)
                 return

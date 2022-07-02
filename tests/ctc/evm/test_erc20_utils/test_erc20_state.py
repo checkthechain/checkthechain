@@ -21,4 +21,3 @@ async def test_fetch_token_balance_of():
         wallet=address, token=token_address, block=13436621, normalize=False
     )
     assert balance == 137680097380114452997476874
-

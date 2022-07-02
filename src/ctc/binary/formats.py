@@ -237,4 +237,3 @@ def hex_to_ascii(data: str) -> str:
 
     cast_bytes = typing.cast(bytes, data)
     return codecs.decode(cast_bytes, encoding='hex').decode('ascii')
-

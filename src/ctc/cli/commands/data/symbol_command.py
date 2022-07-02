@@ -8,13 +8,13 @@ from ctc import evm
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_symbol_command,
-        'help': 'convert ERC20 address to symbol, or convert symbol to address',
+        'help': 'convert ERC20 address to symbol, or symbol to address',
         'args': [
             {'name': 'query', 'help': 'ERC20 address or symbol'},
         ],
         'examples': [
             'DAI',
-        ]
+        ],
     }
 
 

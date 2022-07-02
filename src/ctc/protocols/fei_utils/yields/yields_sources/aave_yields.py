@@ -63,4 +63,3 @@ async def async_get_aave_fei_yield_history(
         blocks=block_numbers,
     )
     return {'Lending Interest': list(interest_rates['supply_apy'])}
-

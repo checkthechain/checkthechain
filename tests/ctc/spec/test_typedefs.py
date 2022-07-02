@@ -8,4 +8,3 @@ def test_config_specs_match():
 
     for key, value in spec.Config.__annotations__.items():
         assert value == spec.PartialConfig.__annotations__[key]
-

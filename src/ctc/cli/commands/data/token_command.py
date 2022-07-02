@@ -12,4 +12,3 @@ Desired Information
 - how each of these values change over time
 """
 from __future__ import annotations
-

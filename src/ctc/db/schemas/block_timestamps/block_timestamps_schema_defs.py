@@ -22,4 +22,3 @@ block_timestamps_schema: toolsql.DBSchema = {
         },
     },
 }
-

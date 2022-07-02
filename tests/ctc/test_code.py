@@ -167,7 +167,9 @@ def test_max_positional_args():
     max_positional_args = 2
 
     too_many = []
-    for function_name, function_data in iterate_package_functions('ctc.').items():
+    for function_name, function_data in iterate_package_functions(
+        'ctc.'
+    ).items():
         argspec = inspect.getfullargspec(function_data['function'])
         if len(argspec.args) > max_positional_args:
             too_many.append(function_name)

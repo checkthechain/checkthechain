@@ -122,4 +122,3 @@ async def async_plot_lbp_summary(
         import toolplot  # type: ignore
 
         toolplot.plot_subplots(plot_data)
-

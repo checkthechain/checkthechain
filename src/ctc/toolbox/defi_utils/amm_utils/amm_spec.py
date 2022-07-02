@@ -41,4 +41,3 @@ contenttypes = {
         'y_fees': 'Number',
     },
 }
-

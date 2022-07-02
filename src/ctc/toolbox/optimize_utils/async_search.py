@@ -100,14 +100,8 @@ async def async_bisect(
 
     if verbose:
         summary = '\n'
-        summary += (
-            'found solution '
-            + str(c)
-        )
-        summary += (
-            '\n- iterations = '
-            + str(iteration + 1)
-        )
+        summary += 'found solution ' + str(c)
+        summary += '\n- iterations = ' + str(iteration + 1)
         if input_tol is not None:
             summary += (
                 '\n- input_precision = '
@@ -127,4 +121,3 @@ async def async_bisect(
         print(summary)
 
     return c
-

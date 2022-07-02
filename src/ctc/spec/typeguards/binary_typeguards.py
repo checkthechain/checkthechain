@@ -9,11 +9,7 @@ from ..typedefs import binary_types
 
 
 def is_data(data: typing.Any) -> TypeGuard[binary_types.Data]:
-    return (
-        is_integer_data(data)
-        or is_binary_data(data)
-        or is_hex_data(data)
-    )
+    return is_integer_data(data) or is_binary_data(data) or is_hex_data(data)
 
 
 def is_integer_data(data: typing.Any) -> TypeGuard[binary_types.IntegerData]:
@@ -58,4 +54,3 @@ def is_hex_data(data: typing.Any) -> TypeGuard[binary_types.HexData]:
         return True
     except ValueError:
         return False
-

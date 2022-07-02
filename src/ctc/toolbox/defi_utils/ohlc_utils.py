@@ -64,4 +64,3 @@ def compute_ohlc(
     df = df.sort_index()
 
     return df
-

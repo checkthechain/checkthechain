@@ -39,4 +39,3 @@ def filter_twap(
 
     # format as Series
     return pd.Series(twap_values, index=twap_times)
-

@@ -106,6 +106,7 @@ def append_aliases_to_shell_configs(
         if not confirm:
             print()
             import toolcli
+
             answer = toolcli.input_yes_or_no(
                 'Appending ctc aliases to ' + path + '\nContinue? '
             )

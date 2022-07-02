@@ -8,7 +8,8 @@ from .. import rpc_digestors
 
 
 async def async_eth_get_compilers(
-    *, provider: spec.ProviderReference = None,
+    *,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_compilers()
     response = await rpc_request.async_send(request, provider=provider)

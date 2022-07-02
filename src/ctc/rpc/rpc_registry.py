@@ -34,4 +34,3 @@ def get_constructor(method: str) -> spec.RpcConstructor:
 
 def get_digestor(method: str) -> spec.RpcDigestor:
     return get_digestors()[method]
-

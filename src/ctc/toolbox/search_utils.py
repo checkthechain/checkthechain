@@ -285,7 +285,9 @@ async def async_nary_search(
                 return start_index
             elif not end_result:
                 if raise_if_not_found:
-                    raise SearchRangeTooLow('search range does not go high enough')
+                    raise SearchRangeTooLow(
+                        'search range does not go high enough'
+                    )
                 else:
                     return None
             extra_probes = []

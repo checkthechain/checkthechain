@@ -220,4 +220,3 @@ async def async_read_csv_anyio(path: str) -> spec.DataFrame:
     import pandas as pd
 
     return await anyio.to_process.run_sync(pd.read_csv, path)
-

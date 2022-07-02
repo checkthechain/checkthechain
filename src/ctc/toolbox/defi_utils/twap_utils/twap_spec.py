@@ -13,4 +13,3 @@ class DataSource(TypedDict, total=False):
     invert: bool
     normalize: bool
     mode: typing.Literal['native', 'raw']
-

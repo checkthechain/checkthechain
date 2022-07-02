@@ -19,4 +19,3 @@ fuse_pools_schema: toolsql.DBSchema = {
         },
     },
 }
-

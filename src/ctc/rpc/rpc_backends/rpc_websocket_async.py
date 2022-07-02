@@ -16,4 +16,3 @@ async def async_send_websocket(
     # async with websockets.connect(provider['url']) as websocket:
     #     await websocket.send(request)
     #     return await websocket.recv()
-

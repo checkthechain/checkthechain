@@ -71,8 +71,7 @@ async def test_contract_abis_crud():
                 addresses=all_addresses,
             )
             packaged_example_data = {
-                datum['address']: datum['abi']
-                for datum in example_data
+                datum['address']: datum['abi'] for datum in example_data
             }
             assert db_contract_abis == packaged_example_data
 

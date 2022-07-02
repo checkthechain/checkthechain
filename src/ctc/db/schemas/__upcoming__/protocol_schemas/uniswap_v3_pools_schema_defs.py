@@ -14,4 +14,3 @@ uniswap_v3_pools_schema: toolsql.DBSchema = {
         },
     },
 }
-

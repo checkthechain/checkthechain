@@ -92,4 +92,3 @@ def raw_block_number_to_ints(
     blocks: typing.Iterable[spec.RawBlockNumber],
 ) -> list[int]:
     return [raw_block_number_to_int(block) for block in blocks]
-

@@ -115,4 +115,3 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         }
     else:
         return {'backend': 'rpc'}
-

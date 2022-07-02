@@ -32,9 +32,7 @@ for contracts, will display ABI""",
                 'help': 'network name or id to scan address of',
             },
         ],
-        'examples': [
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
-        ],
+        'examples': ['0x956f47f50a910163d8bf957cf5846d573e7f87ca'],
     }
 
 

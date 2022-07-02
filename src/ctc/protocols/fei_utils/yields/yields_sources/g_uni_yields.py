@@ -103,4 +103,3 @@ async def async_get_fei_yield_history(
     g_uni_pool: spec.Address,
 ) -> dict[str, list[float]]:
     return {'Staking': [0.01 for block in block_numbers]}
-

@@ -49,11 +49,7 @@ async def async_resolve_addresses(
 
     to_resolve = {}
     for i, item in enumerate(names_or_addresses):
-        if (
-            isinstance(item, str)
-            and len(item) > 4
-            and item.endswith('.eth')
-        ):
+        if isinstance(item, str) and len(item) > 4 and item.endswith('.eth'):
             to_resolve[i] = item
 
     if len(to_resolve) == 0:

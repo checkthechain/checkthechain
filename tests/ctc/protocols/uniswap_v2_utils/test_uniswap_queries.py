@@ -17,4 +17,3 @@ async def test_fetch_uni_v2_pool_state():
     assert results['y_reserves'] == 36632373146254861687157
     assert results['x_reserves'] == 136219847556588434237761989
     assert results['lp_total_supply'] == 2152734217700018553905574
-

@@ -5,4 +5,3 @@ import typing
 
 BuiltinNumber = typing.Union[int, float]
 SupportsNumber = typing.Union[typing.SupportsInt, typing.SupportsFloat]
-

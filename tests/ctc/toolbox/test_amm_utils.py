@@ -102,7 +102,7 @@ def test_trade_new_x_reserves(new_x_reserves):
             reverse_result = cpmm.trade(
                 x_reserves=x_reserves,
                 y_reserves=y_reserves,
-                **{name: result[name]}
+                **{name: result[name]},
             )
             validate_utils._ensure_values_equal(result, reverse_result)
             count += 1
@@ -127,7 +127,7 @@ def test_trade_y_reserves_new(new_y_reserves):
             reverse_result = cpmm.trade(
                 x_reserves=x_reserves,
                 y_reserves=y_reserves,
-                **{name: result[name]}
+                **{name: result[name]},
             )
             validate_utils._ensure_values_equal(result, reverse_result)
             count += 1
@@ -172,4 +172,3 @@ def test_reject_negative_values():
             cpmm.trade(
                 x_reserves=x_reserves, y_reserves=y_reserves, **{arg: -1}
             )
-

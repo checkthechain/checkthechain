@@ -163,7 +163,9 @@ def migrate_data_dir__0_2_0__to__0_3_0(
         if len(to_delete) > 0:
             if not confirm_delete:
                 print()
-                print('the following files and directories are not used in ctc 0.3.0:')
+                print(
+                    'the following files and directories are not used in ctc 0.3.0:'
+                )
                 for item in sorted(to_delete):
                     print('-', item)
                 print()

@@ -74,4 +74,3 @@ async def async_get_borrow_apy_by_block(
     as_array: spec.NumpyArray = np.array(borrow_rate_per_block)
     borrow_apy = (1 + as_array / 1e18 * blocks_per_day) ** 365 - 1
     return list(borrow_apy)
-

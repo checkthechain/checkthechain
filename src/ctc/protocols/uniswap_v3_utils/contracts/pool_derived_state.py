@@ -53,4 +53,3 @@ async def async_pool_snapshot_cumulatives_inside(
         'seconds_per_liquidity_x128': result[1],
         'seconds_inside': result[2],
     }
-

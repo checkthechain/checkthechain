@@ -13,4 +13,3 @@ async def test_eth_gas_price():
 async def test_eth_accounts():
     result = await rpc.async_eth_accounts()
     assert isinstance(result, list)
-

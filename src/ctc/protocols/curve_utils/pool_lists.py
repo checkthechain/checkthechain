@@ -81,11 +81,11 @@ async def _async_get_pool_data(
         symbols.insert(index, 'ETH')
 
     if include_balances:
-        balances: typing.MutableSequence[int | float | None] = (
-            await evm.async_get_erc20s_balance_of(  # type: ignore
-                tokens=valid_coins,
-                address=pool,
-            )
+        balances: typing.MutableSequence[
+            int | float | None
+        ] = await evm.async_get_erc20s_balance_of(  # type: ignore
+            tokens=valid_coins,
+            address=pool,
         )
         if eth_address in coins:
             eth_balance = await evm.async_get_eth_balance(pool)
@@ -247,4 +247,3 @@ async def async_get_meta_pools(
     )
 
     return events
-

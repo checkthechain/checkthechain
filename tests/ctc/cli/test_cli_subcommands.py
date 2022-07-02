@@ -74,7 +74,9 @@ def test_subcommand_examples(subcommand_spec):
     for example_str in example_strs:
         command_pieces = ['python3', '-m', 'ctc'] + list(subcommand)
         command_pieces.extend(example_str.split(' '))
-        command_pieces = [piece.strip('"') for piece in command_pieces if piece != '']
+        command_pieces = [
+            piece.strip('"') for piece in command_pieces if piece != ''
+        ]
         exit_code = subprocess.call(command_pieces, timeout=max_example_time)
         if exit_code != 0:
             # raise Exception('command failed with exit code ' + str(exit_code) + ': ' + command)

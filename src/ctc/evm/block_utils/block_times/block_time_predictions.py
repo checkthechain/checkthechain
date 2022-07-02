@@ -110,7 +110,9 @@ async def async_predict_timestamp_block(
     if timestamp == latest_timestamp:
         return latest_block['number']
     elif timestamp < latest_timestamp:
-        return await evm.async_get_block_of_timestamp(timestamp, provider=provider)
+        return await evm.async_get_block_of_timestamp(
+            timestamp, provider=provider
+        )
     else:
         old_timestamp = latest_timestamp - window_size
         old_block = await evm.async_get_block_of_timestamp(

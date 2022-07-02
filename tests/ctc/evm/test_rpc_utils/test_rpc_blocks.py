@@ -57,4 +57,3 @@ async def test_eth_get_uncle_by_block_number_and_index():
         block['hash']
         == '0x4cf24f3784d19179965ad4f8396fce0f2bf2466d1e25c197021c0969b686f236'
     )
-

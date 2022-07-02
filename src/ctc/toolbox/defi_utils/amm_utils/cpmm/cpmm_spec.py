@@ -46,4 +46,3 @@ class TradeSummary(TypedDict):
     x_fees: int | float
     y_fees: int | float
     trade_results: Trade
-

@@ -38,4 +38,3 @@ def is_float(value: typing.Any) -> TypeGuard['typedefs.Float']:
 
 def is_number(value: typing.Any) -> TypeGuard['typedefs.Number']:
     return is_int(value) or is_float(value)
-

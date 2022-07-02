@@ -123,7 +123,9 @@ async def async_intake_raw_blocks(
         network=network,
     )
     if len(confirmed) > 0:
-        engine = connect_utils.create_engine(schema_name='blocks', network=network)
+        engine = connect_utils.create_engine(
+            schema_name='blocks', network=network
+        )
         if engine is None:
             return
         with engine.begin() as conn:

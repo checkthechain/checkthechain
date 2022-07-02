@@ -83,7 +83,10 @@ async def test_block_of_timestamp_modes(block_timestamp, db_settings):
     # test using offset timestamp
     with pytest.raises(Exception):
         obtained_block = await evm.async_get_block_of_timestamp(
-            timestamp_after, mode='==', use_db=use_db, use_db_assist=use_db_assist
+            timestamp_after,
+            mode='==',
+            use_db=use_db,
+            use_db_assist=use_db_assist,
         )
 
     obtained_block = await evm.async_get_block_of_timestamp(

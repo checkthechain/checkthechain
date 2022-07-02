@@ -22,7 +22,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_resolve_command(name: str, block: spec.BlockNumberReference) -> None:
+async def async_resolve_command(
+    name: str, block: spec.BlockNumberReference
+) -> None:
     if block is not None:
         block = binary.standardize_block_number(block)
     address = await ens_utils.async_resolve_name(name, block=block)

@@ -257,4 +257,3 @@ def tokenize(data: typing.Union[str, typing.Sequence[str]]) -> list[str]:
                     tokens.append(token)
 
     return tokens
-

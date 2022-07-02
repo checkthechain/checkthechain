@@ -131,4 +131,3 @@ rpc_constructor_batch_inputs = {
         'block_numbers': 'block_number'
     },
 }
-

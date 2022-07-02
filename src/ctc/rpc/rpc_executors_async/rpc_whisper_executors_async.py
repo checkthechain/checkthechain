@@ -45,7 +45,8 @@ async def async_shh_post(
 
 
 async def async_shh_new_identity(
-    *, provider: spec.ProviderReference = None,
+    *,
+    provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_shh_new_identity()
     response = await rpc_request.async_send(request, provider=provider)

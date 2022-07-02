@@ -138,4 +138,3 @@ def batch_digest(
         result = digestor(subresponse, **digestor_kwargs)
         results.append(result)
     return results
-

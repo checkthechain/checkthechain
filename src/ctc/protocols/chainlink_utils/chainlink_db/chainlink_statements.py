@@ -34,10 +34,7 @@ async def async_upsert_feeds(
     network: spec.NetworkReference | None = None,
 ) -> None:
 
-    feeds = [
-        dict(feed, address=feed['address'].lower())
-        for feed in feeds
-    ]
+    feeds = [dict(feed, address=feed['address'].lower()) for feed in feeds]
 
     table = db.get_table_name('chainlink_feeds', network=network)
     toolsql.insert(
@@ -83,7 +80,7 @@ async def async_select_feeds(
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,
-    addresses: typing.Sequence[str] | None = None
+    addresses: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[chainlink_schema_defs.ChainlinkFeed | None] | None:
 
     table = db.get_table_name('chainlink_feeds', network=network)

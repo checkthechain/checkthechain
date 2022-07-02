@@ -80,4 +80,3 @@ async def async_get_event_abi(event_name: str, contract: str) -> spec.EventABI:
     if abi_entry is None:
         raise Exception('must load abi into cache')
     return typing.cast(spec.EventABI, abi_entry[event_name])
-

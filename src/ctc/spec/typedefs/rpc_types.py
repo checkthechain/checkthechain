@@ -82,7 +82,9 @@ provider_keys = [
 ]
 
 ProviderShortcut = str
-ProviderReference = typing.Union[ProviderShortcut, PartialProvider, Provider, None]
+ProviderReference = typing.Union[
+    ProviderShortcut, PartialProvider, Provider, None
+]
 ProviderKey = typing.Tuple[
     int, str, typing.Tuple[typing.Tuple[typing.Any, typing.Any], ...]
 ]

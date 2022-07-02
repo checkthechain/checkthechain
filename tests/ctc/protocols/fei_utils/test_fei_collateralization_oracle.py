@@ -30,7 +30,9 @@ async def test_get_deposit_token_balance():
 
 @pytest.mark.asyncio
 async def test_get_tokens_in_pcv():
-    tokens = await fei_utils.async_get_tokens_in_pcv(block=13570382, wrapper=False)
+    tokens = await fei_utils.async_get_tokens_in_pcv(
+        block=13570382, wrapper=False
+    )
     assert tokens == (
         '0x1111111111111111111111111111111111111111',
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -48,4 +50,3 @@ async def test_token_to_oracle():
         block=13570382,
     )
     assert oracle == '0x231ada12e273edf3fa54cbd90c5c1a73129d5bb9'
-

@@ -34,7 +34,10 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     },
     'compute': {
         ('ascii',): 'ctc.cli.commands.compute.ascii_command',
-        ('create', 'address'): 'ctc.cli.commands.compute.create_address_command',
+        (
+            'create',
+            'address',
+        ): 'ctc.cli.commands.compute.create_address_command',
         ('checksum',): 'ctc.cli.commands.compute.checksum_command',
         ('decode', 'call'): 'ctc.cli.commands.compute.decode_call_command',
         ('decode',): 'ctc.cli.commands.compute.decode_command',
@@ -255,15 +258,15 @@ def run_cli(
     # the goal of the below code would be to avoid having to import toolcli and
     # save 6 ms of startup time. but the problem with the below code is that
     # it produces a different cache key because the plugins have not been added
-#     if _is_root_help(raw_command):
-#         try:
-#             printed = _print_help_from_cache(
-#                 command_index, help_cache_dir
-#             )
-#             if printed:
-#                 return
-#         except Exception:
-#             pass
+    #     if _is_root_help(raw_command):
+    #         try:
+    #             printed = _print_help_from_cache(
+    #                 command_index, help_cache_dir
+    #             )
+    #             if printed:
+    #                 return
+    #         except Exception:
+    #             pass
 
     config: toolcli.CLIConfig = {
         #

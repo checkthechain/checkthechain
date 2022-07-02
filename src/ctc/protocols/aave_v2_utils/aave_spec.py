@@ -21,4 +21,3 @@ def get_aave_address(
             raise Exception('unknown contract: ' + str(name))
     else:
         raise Exception('invalid network: ' + str(network))
-

@@ -58,4 +58,3 @@ def keccack_command(*, data: str, text: bool, hex: bool, raw: bool) -> None:
         keccak = keccak[2:]
 
     print(keccak)
-

@@ -103,4 +103,3 @@ async def async_get_pool_summary(
         }
 
     return tokens_data
-

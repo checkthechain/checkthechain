@@ -263,7 +263,5 @@ def get_coracle_address_by_block(
     wrapper: bool = False,
 ) -> typing.Sequence[spec.Address]:
     return [
-        get_coracle_address(wrapper=wrapper, block=block)
-        for block in blocks
+        get_coracle_address(wrapper=wrapper, block=block) for block in blocks
     ]
-

@@ -11,7 +11,9 @@ from ... import management
 from ... import schema_utils
 from . import block_timestamps_statements
 
-from .multischema_block_timestamps_statements import async_select_block_timestamp
+from .multischema_block_timestamps_statements import (
+    async_select_block_timestamp,
+)
 
 
 async def async_select_timestamp_block(

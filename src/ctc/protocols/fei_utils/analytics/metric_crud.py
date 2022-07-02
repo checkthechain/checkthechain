@@ -61,4 +61,3 @@ def order_metrics_in_group(
     ]
     pairs = sorted(pairs, reverse=True)
     return [pair[-1] for pair in pairs]
-

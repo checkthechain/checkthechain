@@ -146,4 +146,3 @@ async def async_is_balancer_v2_pool(
         return True
     except spec.RpcException:
         return False
-

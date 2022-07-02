@@ -118,4 +118,3 @@ async def async_get_pool_swaps(
         ) / (10 ** y_decimals)
 
     return swaps
-

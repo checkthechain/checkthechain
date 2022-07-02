@@ -23,7 +23,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_exists_command(name: str, block: spec.BlockNumberReference) -> None:
+async def async_exists_command(
+    name: str, block: spec.BlockNumberReference
+) -> None:
 
     if block is not None:
         block = binary.standardize_block_number(block)

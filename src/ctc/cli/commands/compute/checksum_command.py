@@ -21,4 +21,3 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def checksum_command(address: spec.Address) -> None:
     print(evm.get_address_checksum(address))
-

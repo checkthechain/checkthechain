@@ -13,7 +13,7 @@ def write_config_file(
     path: str,
     *,
     overwrite: toolconfig.OverwriteOption = False,
-    style: typing.Optional[str] = None
+    style: typing.Optional[str] = None,
 ) -> None:
     import toolconfig
 

@@ -89,4 +89,3 @@
 #     if os.path.isfile(old_path):
 #         os.remove(old_path)
 #     print('dataset built with', len(signatures), 'signatures')
-

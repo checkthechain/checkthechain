@@ -78,4 +78,6 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
         ['uint' + str(bit_value), 'max', str(1 << bit_value)]
         for bit_value in bit_values
     ]
-    toolstr.print_table(rows, column_justify=['right', 'center', 'left'], compact=2)
+    toolstr.print_table(
+        rows, column_justify=['right', 'center', 'left'], compact=2
+    )

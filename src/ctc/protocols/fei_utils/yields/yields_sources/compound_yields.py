@@ -78,4 +78,3 @@ async def async_get_compound_fei_yield_history(
         blocks=block_numbers,
     )
     return {'Lending Interest': supply_apy}
-

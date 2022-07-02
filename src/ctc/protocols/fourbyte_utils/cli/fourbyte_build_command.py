@@ -18,7 +18,10 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'examples': {
-            'functions': {'description': 'build function signature db', 'long': True},
+            'functions': {
+                'description': 'build function signature db',
+                'long': True,
+            },
             'events': {'description': 'build event signature db', 'long': True},
         },
     }
@@ -42,4 +45,3 @@ async def async_fourbyte_build_command(datatype: str | None) -> None:
 
     print()
     print('local 4byte database up to date')
-

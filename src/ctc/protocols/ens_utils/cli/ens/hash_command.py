@@ -20,4 +20,3 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def hash_command(name: str) -> None:
     print(ens_utils.hash_name(name))
-

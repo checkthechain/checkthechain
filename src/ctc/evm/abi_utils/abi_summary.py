@@ -172,7 +172,9 @@ def print_contract_abi_human_readable(
         indexed_cell = []
         for item in event_abi.get('inputs', []):
             subitems = [item.get('type'), item.get('name')]
-            subitems_str = [subitem for subitem in subitems if subitem is not None]
+            subitems_str = [
+                subitem for subitem in subitems if subitem is not None
+            ]
             input_str = ' '.join(subitems_str)
             input_cell.append(input_str)
             if item.get('indexed'):

@@ -2819,4 +2819,3 @@ oracle_function_abis: dict[str, spec.FunctionABI] = {
         'type': 'function',
     },
 }
-

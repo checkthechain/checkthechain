@@ -51,4 +51,3 @@ def get_chunks_in_range(
                 chunks[-1] = [chunks[-1][0], end_block]
 
     return chunks
-

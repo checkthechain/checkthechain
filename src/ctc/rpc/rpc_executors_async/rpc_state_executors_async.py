@@ -46,7 +46,7 @@ async def async_eth_call(
                 n_parameters=n_parameters,
                 parameter_types=parameter_types,
                 function_selector=function_selector,
-                network=rpc_provider.get_provider_network(provider)
+                network=rpc_provider.get_provider_network(provider),
             )
 
     # construct request
@@ -106,7 +106,7 @@ async def async_eth_estimate_gas(
             n_parameters=n_parameters,
             parameter_types=parameter_types,
             function_selector=function_selector,
-            network=rpc_provider.get_provider_network(provider)
+            network=rpc_provider.get_provider_network(provider),
         )
 
     request = rpc_constructors.construct_eth_estimate_gas(

@@ -63,4 +63,3 @@ match_tests = [
 def test_match_format(test):
     format_this, like_this, target = test
     assert binary.match_format(format_this, like_this) == target
-

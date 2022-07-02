@@ -117,4 +117,3 @@ async def _async_add_trace_call_data(df: spec.DataFrame) -> None:
     df['action__name'] = action_call_data['action__name']
     df['action__parameters'] = action_call_data['action__parameters']
     df['result__outputs'] = action_call_data['result__outputs']
-

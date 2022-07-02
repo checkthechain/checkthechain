@@ -139,7 +139,9 @@ def decode_event_unindexed_data(
 
     # decode data
     data = formats.convert(data, 'binary')
-    decoded = abi_coding.decode_types(data, '(' + ','.join(unindexed_types) + ')')
+    decoded = abi_coding.decode_types(
+        data, '(' + ','.join(unindexed_types) + ')'
+    )
 
     # package outputs
     if not use_names:

@@ -206,8 +206,12 @@ async def async_balances_command(
             )
         erc20, wallet = args
         resolved_blocks = await cli_utils.async_resolve_block_range(blocks)
-        erc20 = await evm.async_resolve_address(erc20, block=resolved_blocks[-1])
-        wallet = await evm.async_resolve_address(wallet, block=resolved_blocks[-1])
+        erc20 = await evm.async_resolve_address(
+            erc20, block=resolved_blocks[-1]
+        )
+        wallet = await evm.async_resolve_address(
+            wallet, block=resolved_blocks[-1]
+        )
         balances = await evm.async_get_erc20_balance_of_by_block(
             wallet=wallet,
             token=erc20,

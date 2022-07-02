@@ -122,7 +122,9 @@ async def async_get_interest_rates_by_block(
         asset=token, blocks=blocks
     )
 
-    currrent_liquidity_rate: spec.NumpyArray = np.array(reserve_data['current_liquidity_rate'])
+    currrent_liquidity_rate: spec.NumpyArray = np.array(
+        reserve_data['current_liquidity_rate']
+    )
     current_variable_borrow_rate: spec.NumpyArray = np.array(
         reserve_data['current_variable_borrow_rate']
     )
@@ -138,4 +140,3 @@ async def async_get_interest_rates_by_block(
         'borrow_apr': list(borrow_apr),
         'borrow_apy': list(borrow_apy),
     }
-

@@ -30,4 +30,3 @@ def hex_command(data: str, raw: bool) -> None:
     else:
         output = binary.ascii_to_prefix_hex(data)
     print(output)
-

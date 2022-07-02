@@ -38,7 +38,9 @@ async def async_build_event_signatures_dataset(
         print('(building event signatures db from scratch, may take awhile')
         signature_data = await async_scrape_event_signatures()
 
-    await fourbyte_db.async_intake_event_signatures(event_signatures=signature_data)
+    await fourbyte_db.async_intake_event_signatures(
+        event_signatures=signature_data
+    )
 
 
 #

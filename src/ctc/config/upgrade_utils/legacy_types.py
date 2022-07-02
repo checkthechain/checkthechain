@@ -95,6 +95,7 @@ class LegacyProvider__0_2_1(TypedDict, total=True):
 # # toolsql
 #
 
+
 class ToolsqlDBConfig(TypedDict, total=False):
     dbms: Literal['sqlite', 'postgresql']
     path: str

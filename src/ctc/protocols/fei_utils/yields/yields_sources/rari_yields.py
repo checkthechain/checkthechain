@@ -88,4 +88,3 @@ async def async_get_fei_yield_data(
         }
 
     return output
-

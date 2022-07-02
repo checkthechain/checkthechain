@@ -56,4 +56,3 @@ class EncodedCallDict(TypedDict):
 EncodedCall = typing.Union[EncodedCallTuple, EncodedCallList, EncodedCallDict]
 
 Call = typing.Union[UnencodedCall, EncodedCall]
-

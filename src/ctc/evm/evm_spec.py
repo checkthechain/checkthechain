@@ -112,4 +112,3 @@ erc20_event_abis: dict[str, spec.EventABI] = {
         'type': 'event',
     },
 }
-

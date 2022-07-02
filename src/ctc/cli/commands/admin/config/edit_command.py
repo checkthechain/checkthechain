@@ -32,4 +32,3 @@ def edit_config_command() -> None:
     print()
     subprocess.call([editor, config_path])
     print('done editing config')
-

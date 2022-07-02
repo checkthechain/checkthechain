@@ -70,4 +70,3 @@ async def async_create_payload(
 #         old_payload=old_payload,
 #         new_metrics=new_metrics,
 #     )
-

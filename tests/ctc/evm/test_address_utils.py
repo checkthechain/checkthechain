@@ -136,4 +136,3 @@ def test_get_reated_address(test):
         init_code=init_code,
     )
     assert target_result == actual_result
-

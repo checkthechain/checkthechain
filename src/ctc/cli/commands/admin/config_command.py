@@ -100,7 +100,9 @@ def config_command(reveal: bool, as_json: bool) -> None:
                 toolstr.print_table(rows, labels=labels, indent=4)
                 if not reveal:
                     print()
-                    print('    (use --reveal to reveal sensitive provider information)')
+                    print(
+                        '    (use --reveal to reveal sensitive provider information)'
+                    )
 
             elif isinstance(config[key], dict) and len(config[key]) > 0:
                 print('-', str(key) + ':')

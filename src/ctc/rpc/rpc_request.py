@@ -279,4 +279,3 @@ def chunk_request_by_method(request: spec.RpcRequest) -> None:
 
 def chunk_request_by_block_range(request: spec.RpcRequest) -> None:
     raise NotImplementedError()
-

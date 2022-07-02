@@ -46,5 +46,3 @@ async def async_get_ctoken_irm(
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
     return result
-
-

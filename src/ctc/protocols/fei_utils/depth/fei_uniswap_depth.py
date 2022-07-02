@@ -24,7 +24,8 @@ async def async_get_fei_uniswap_pools() -> list[list[typing.Any]]:
 
 
 async def async_get_fei_uniswap_pool_price_depth(
-    pools: list[list[typing.Any]] | None = None, prices: typing.Sequence[float] | None = None
+    pools: list[list[typing.Any]] | None = None,
+    prices: typing.Sequence[float] | None = None,
 ) -> dict[str, dict[float, float]]:
     import asyncio
 
@@ -86,4 +87,3 @@ async def async_get_fei_uniswap_pool_price_depth(
         pool_price_depth[pool][price_level] = depth
 
     return pool_price_depth
-

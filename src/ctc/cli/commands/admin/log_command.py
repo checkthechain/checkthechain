@@ -34,4 +34,3 @@ def log_command() -> None:
         )
     except KeyboardInterrupt:
         print()
-

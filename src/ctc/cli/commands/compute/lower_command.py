@@ -18,4 +18,3 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def lower_command(text: str) -> None:
     print(text.lower())
-

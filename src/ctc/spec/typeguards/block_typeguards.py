@@ -50,4 +50,3 @@ def is_block_reference(
     block: typing.Any,
 ) -> TypeGuard[block_types.BlockReference]:
     return is_block_number_reference(block) or is_block_hash(block)
-

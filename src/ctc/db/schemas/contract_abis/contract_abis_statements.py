@@ -20,9 +20,7 @@ async def async_upsert_contract_abi(
 
     abi_text = json.dumps(abi)
 
-    table = schema_utils.get_table_name(
-        'contract_abis', network=network
-    )
+    table = schema_utils.get_table_name('contract_abis', network=network)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -89,8 +87,7 @@ async def async_select_contract_abis(
         return None
 
     return {
-        result['address']: json.loads(result['abi_text'])
-        for result in results
+        result['address']: json.loads(result['abi_text']) for result in results
     }
 
 

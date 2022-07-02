@@ -9,6 +9,7 @@ from ctc import spec
 
 
 if typing.TYPE_CHECKING:
+
     class BlockGasStats(TypedDict):
         base_fee: int | float | None
         min_gas_price: int | float | None
@@ -18,7 +19,6 @@ if typing.TYPE_CHECKING:
         gas_used: int
         gas_limit: int
         n_transactions: int
-
 
     class BlocksGasStats(TypedDict):
         min_base_fee: int | float | None

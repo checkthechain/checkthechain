@@ -14,4 +14,3 @@ old_resolvers = [
     '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     '0xdaaf96c344f63131acadd0ea35170e7892d3dfba',
 ]
-
