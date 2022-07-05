@@ -45,7 +45,7 @@ from ctc import evm
 
 # get token transfers
 transfers = await evm.async_get_erc20_transfers(
-    token_address='0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+    token='0x956f47f50a910163d8bf957cf5846d573e7f87ca',
     event_name='Transfer',
 )
 
