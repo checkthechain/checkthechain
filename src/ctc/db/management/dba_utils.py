@@ -32,7 +32,7 @@ def create_evm_tables(
     # get preamble
     if verbose or not confirm:
         print(
-            'Creating tables for',
+            'Actively using',
             len(schema_names),
             'schema(s) across',
             len(networks),

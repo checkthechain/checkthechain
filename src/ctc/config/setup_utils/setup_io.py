@@ -59,6 +59,8 @@ def write_new_config(
     db_data: spec.PartialConfig,
     data_dir_data: spec.PartialConfig,
     styles: typing.Mapping[str, str],
+    overwrite: bool = False,
+    headless: bool = False,
 ) -> None:
 
     import json
@@ -78,14 +80,29 @@ def write_new_config(
         'log_rpc_calls': data_dir_data['log_rpc_calls'],
         'log_sql_queries': data_dir_data['log_sql_queries'],
     }
-    old_config_raw = load_old_config(convert_to_latest=False)
-    write_new = json.dumps(config, sort_keys=True) != json.dumps(
-        old_config_raw, sort_keys=True
-    )
-
     print()
     print()
     toolstr.print('## Creating Configuration File', style=styles['header'])
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as f:
+            old_config_raw = json.load(f)
+        write_new = json.dumps(config, sort_keys=True) != json.dumps(
+            old_config_raw, sort_keys=True
+        )
+
+        # make sure file overwrite is confirmed
+        if write_new and not overwrite:
+            print()
+            if not toolcli.input_yes_or_no(
+                'Overwrite old config file? ',
+                default='yes',
+                style=styles['question'],
+                headless=headless,
+            ):
+                raise Exception('cannot continue without replacing config file')
+    else:
+        write_new = True
+
     print()
     if write_new:
         with open(config_path, 'w') as f:

@@ -14,6 +14,7 @@ def write_config_file(
     *,
     overwrite: toolconfig.OverwriteOption = False,
     style: typing.Optional[str] = None,
+    headless: bool = False,
 ) -> None:
     import toolconfig
 
@@ -25,4 +26,5 @@ def write_config_file(
         path=path,
         overwrite=overwrite,
         style=style,
+        headless=headless,
     )

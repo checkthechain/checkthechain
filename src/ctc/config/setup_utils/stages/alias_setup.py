@@ -8,7 +8,9 @@ import toolstr
 from ctc.cli.cli_utils import cli_alias_utils
 
 
-def add_cli_aliases(styles: typing.Mapping[str, str]) -> None:
+def add_cli_aliases(
+    styles: typing.Mapping[str, str], headless: bool, skip_aliases: bool
+) -> None:
 
     print()
     print()
@@ -45,10 +47,17 @@ def add_cli_aliases(styles: typing.Mapping[str, str]) -> None:
             alias_status=alias_status, styles=styles
         )
         print()
+
+        if skip_aliases:
+            default = 'no'
+        else:
+            default = 'yes'
+
         if toolcli.input_yes_or_no(
             'Do you want to install these aliases? ',
             style=styles['question'],
-            default='yes',
+            default=default,
+            headless=headless,
         ):
             cli_alias_utils.append_aliases_to_shell_configs(
                 confirm=True, verbose=False

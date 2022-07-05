@@ -14,6 +14,9 @@ from ... import config_defaults
 async def async_setup_networks(
     *,
     old_config: typing.Mapping[typing.Any, typing.Any],
+    headless: bool,
+    rpc_url: str | None,
+    rpc_chain_id: int | None,
     styles: typing.Mapping[str, str],
 ) -> spec.PartialConfig:
 
@@ -24,17 +27,27 @@ async def async_setup_networks(
 
     # get providers
     providers, networks = await async_specify_providers(
-        old_config=old_config, styles=styles
+        old_config=old_config,
+        styles=styles,
+        headless=headless,
+        rpc_url=rpc_url,
+        rpc_chain_id=rpc_chain_id,
     )
 
     # get additional custom networks
-    networks = specify_networks(networks=networks, styles=styles)
+    networks = specify_networks(
+        networks=networks,
+        styles=styles,
+        headless=headless,
+    )
 
     # get default network
     default_network = specify_default_network(
         providers=providers,
         networks=networks,
         styles=styles,
+        headless=headless,
+        rpc_url=rpc_url,
     )
 
     # get default providers
@@ -42,6 +55,7 @@ async def async_setup_networks(
         providers=providers,
         networks=networks,
         styles=styles,
+        headless=headless,
     )
 
     print()
@@ -59,6 +73,9 @@ async def async_setup_networks(
 
 async def async_specify_providers(
     old_config: typing.Mapping[str, typing.Any],
+    headless: bool,
+    rpc_url: str | None,
+    rpc_chain_id: int | None,
     styles: typing.Mapping[str, str],
 ) -> tuple[
     typing.Mapping[str, spec.Provider],
@@ -91,46 +108,68 @@ async def async_specify_providers(
             'Would you like to continue using these providers? ',
             style=styles['question'],
             default='yes',
+            headless=headless,
         )
         if answer:
             # TODO: validate old_providers
             providers.update(old_providers)
 
-    prompt_initial = (
-        'Would you like to specify an RPC provider? '
-        '(required for most ctc operations)\n'
-    )
-    default_initial = 'yes'
-    prompt_additional = 'Would you like to specify additional RPC providers? '
-    default_additional = 'no'
-
-    if len(providers) == 0:
-        prompt = prompt_initial
-        default = default_initial
-    else:
-        prompt = prompt_additional
-        default = default_additional
-
-    answer = toolcli.input_yes_or_no(
-        prompt,
-        style=styles['question'],
-        default=default,
-    )
-    while answer:
-
-        # collect provider
+    if rpc_url is not None:
         await async_collect_provider_metadata(
             providers=providers,
             networks=networks,
             styles=styles,
+            url=rpc_url,
+            chain_id=rpc_chain_id,
+            headless=headless,
         )
+    elif len(providers) == 0:
+        prompt = (
+            'Would you like to specify an RPC provider? '
+            '(required for most ctc operations)\n'
+        )
+        if toolcli.input_yes_or_no(
+            prompt=prompt,
+            style=styles['question'],
+            default='yes',
+            headless=headless,
+        ):
+            await async_collect_provider_metadata(
+                providers=providers,
+                networks=networks,
+                styles=styles,
+                headless=headless,
+                url=None,
+                chain_id=None,
+            )
 
-        # prompt for additional providers
+    # collect additional providers
+    if len(providers) > 0:
         answer = toolcli.input_yes_or_no(
-            prompt_additional,
+            prompt='Would you like to specify additional RPC providers? ',
             style=styles['question'],
             default='no',
+            headless=headless,
         )
+        while answer:
+
+            # collect provider
+            await async_collect_provider_metadata(
+                providers=providers,
+                networks=networks,
+                styles=styles,
+                headless=False,
+                url=None,
+                chain_id=None,
+            )
+
+            # prompt for additional providers
+            answer = toolcli.input_yes_or_no(
+                prompt='Would you like to specify additional RPC providers? ',
+                style=styles['question'],
+                default='no',
+                headless=False,
+            )
 
     return providers, networks
 
@@ -140,64 +179,86 @@ async def async_collect_provider_metadata(
     providers: typing.MutableMapping[str, spec.Provider],
     networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     styles: typing.Mapping[str, str],
+    headless: bool,
+    url: str | None,
+    chain_id: int | None,
 ) -> None:
     """collect metadata for a provider"""
 
     print()
-    url = toolcli.input_prompt(
-        'What is the RPC provider URL? ', style=styles['question']
-    )
-    try:
-        temporary_provider: spec.Provider = {
-            'name': None,
-            'network': None,
-            'protocol': 'http',
-            'session_kwargs': {},
-            'chunk_size': None,
-            'url': url,
-        }
-        try:
-            chain_id = await rpc.async_eth_chain_id(provider=temporary_provider)
-        except Exception:
-            chain_id = toolcli.input_int(
-                'Could not connect to RPC provider. What is this provider\'s chain_id? ',
-                style=styles['question'],
-            )
-        description = 'chain_id = ' + str(chain_id)
-        if chain_id in networks:
-            name = networks[chain_id]['name']
-            if name is not None:
-                description = description + ', network = ' + name
-        print('Provider using ' + description)
-    except Exception as e:
-        raise e
-        print('Could not query node for chain_id metadata')
-        chain_id = toolcli.input_int(
-            'What is the chain_id used by this node? ',
+    if url is None:
+        url = toolcli.input_prompt(
+            'What is the RPC provider URL? ',
             style=styles['question'],
         )
+    else:
+        print('Adding RPC provider: ' + str(url))
 
-        # determine whether chain_id is of known network
-        if chain_id is None:
-            known_network = False
-        else:
-            known_network = any(
-                chain_id == network.get('chain_id')
-                for network in networks.values()
+    if url.startswith('ws://'):
+        # TODO: take new input instead of raising exception
+        raise NotImplementedError('websockets not supported')
+    elif not url.startswith('https://') and not url.startswith('http://'):
+        print()
+        print('No prefix for url. Adding `https://`')
+        url = 'https://' + url
+
+    if chain_id is None:
+        try:
+            temporary_provider: spec.Provider = {
+                'name': None,
+                'network': None,
+                'protocol': 'http',
+                'session_kwargs': {},
+                'chunk_size': None,
+                'url': url,
+            }
+            try:
+                chain_id = await rpc.async_eth_chain_id(
+                    provider=temporary_provider
+                )
+            except Exception:
+                chain_id = toolcli.input_int(
+                    'Could not connect to RPC provider. What is this provider\'s chain_id? ',
+                    style=styles['question'],
+                    headless=False,
+                )
+            description = 'chain_id = ' + str(chain_id)
+            if chain_id in networks:
+                name = networks[chain_id]['name']
+                if name is not None:
+                    description = description + ', network = ' + name
+            print('Provider using ' + description)
+        except Exception as e:
+            raise e
+            print('Could not query node for chain_id metadata')
+            chain_id = toolcli.input_int(
+                'What is the chain_id used by this node? ',
+                style=styles['question'],
+                headless=False,
             )
 
-        # if chain_id of unknown network, collect network metadata
-        if known_network:
-            collect_network_metadata(
-                chain_id=chain_id,
-                networks=networks,
-                styles=styles,
+    # determine whether chain_id is of known network
+    known_network = any(
+        chain_id == network.get('chain_id') for network in networks.values()
+    )
+
+    # if chain_id of unknown network, collect network metadata
+    if not known_network:
+        if headless:
+            raise NotImplementedError(
+                'cannot use unknown network in headless mode'
             )
+        collect_network_metadata(
+            chain_id=chain_id,
+            networks=networks,
+            styles=styles,
+        )
 
     name = toolcli.input_prompt(
         prompt='What should this node be called? ',
         default=create_default_provider_name(url=url, network=chain_id),
         style=styles['question'],
+        headless=headless,
     )
     if url.startswith('http'):
         protocol: typing.Literal['http'] = 'http'
@@ -264,6 +325,7 @@ def collect_network_metadata(
 def specify_networks(
     networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     styles: typing.Mapping[str, str],
+    headless: bool,
 ) -> typing.MutableMapping[spec.ChainId, spec.NetworkMetadata]:
 
     # print current networks
@@ -281,8 +343,12 @@ def specify_networks(
         '\nWould you like to add metadata for additional networks? ',
         style=styles['question'],
         default='no',
+        headless=headless,
     ):
-        collect_network_metadata(styles=styles, networks=networks)
+        collect_network_metadata(
+            styles=styles,
+            networks=networks,
+        )
 
     print()
     print('Using', len(networks), 'networks in config')
@@ -295,6 +361,8 @@ def specify_default_network(
     networks: typing.Mapping[spec.ChainId, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
     styles: typing.Mapping[str, str],
+    headless: bool,
+    rpc_url: str | None,
 ) -> spec.ChainId:
 
     # set default network
@@ -303,6 +371,14 @@ def specify_default_network(
         for network in networks.values()
     ]
     choices = sorted(choices_set)
+
+    # only consider given provider if rpc_url is present
+    if rpc_url is not None:
+        providers = {
+            provider_name: provider
+            for provider_name, provider in providers.items()
+            if provider['url'] == rpc_url
+        }
 
     # determine default choice
     default: str | None = None
@@ -334,6 +410,7 @@ def specify_default_network(
         choices=choices,
         default=default,
         style=styles['question'],
+        headless=headless,
     )
 
     # clean this horrorshow up
@@ -345,6 +422,7 @@ def specify_default_providers(
     networks: typing.Mapping[spec.ChainId, spec.NetworkMetadata],
     providers: typing.Mapping[str, spec.Provider],
     styles: typing.Mapping[str, str],
+    headless: bool,
 ) -> typing.Mapping[spec.ChainId, spec.ProviderName]:
 
     # compile providers for each network
@@ -385,6 +463,7 @@ def specify_default_providers(
                 prompt=prompt,
                 choices=providers_per_network[network],
                 style=styles['question'],
+                headless=headless,
             )
             default_providers[network] = providers_per_network[network][answer]
 

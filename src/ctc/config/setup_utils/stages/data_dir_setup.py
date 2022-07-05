@@ -15,6 +15,9 @@ from ... import config_defaults
 def setup_data_dir(
     styles: dict[str, str],
     old_config: typing.Mapping[typing.Any, typing.Any],
+    headless: bool,
+    default_data_dir: str | None,
+    disable_logs: bool,
 ) -> spec.PartialConfig:
 
     print()
@@ -44,6 +47,7 @@ def setup_data_dir(
                 prompt,
                 default='yes',
                 style=styles['question'],
+                headless=headless,
             ):
                 new_data_root = old_data_root
             else:
@@ -54,19 +58,24 @@ def setup_data_dir(
 
     # enter new data root
     if new_data_root is None:
+        if default_data_dir is None:
+            default_data_dir = config_defaults.get_default_data_dir()
         new_data_root = toolcli.input_directory_path(
             prompt='Where should ctc store data? (specify a directory path) ',
-            default=config_defaults.get_default_data_dir(),
+            default=default_data_dir,
             require_absolute=True,
             must_already_exist=False,
             create_directory=False,
             style=styles['question'],
+            headless=headless,
         )
 
         # move old data
         if isinstance(old_data_root, str) and os.path.isdir(old_data_root):
             prompt = 'Move old ctc data to this new location?'
-            answer = toolcli.input_yes_or_no(prompt, default='yes')
+            answer = toolcli.input_yes_or_no(
+                prompt, default='yes', headless=headless
+            )
             if answer:
                 if not os.path.isdir(new_data_root):
                     shutil.move(old_data_root, new_data_root)
@@ -76,8 +85,15 @@ def setup_data_dir(
 
     print()
     prompt = 'Do you want to disable ctc logging? '
+    if disable_logs:
+        default = 'yes'
+    else:
+        default = 'no'
     disable_logs = toolcli.input_yes_or_no(
-        prompt, default='no', style=styles['question']
+        prompt,
+        default=default,
+        style=styles['question'],
+        headless=headless,
     )
 
     return {

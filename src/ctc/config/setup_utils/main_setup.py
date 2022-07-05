@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import toolcli
+import typing
+
 import toolstr
 
 from . import setup_io
@@ -19,7 +20,16 @@ styles = {
 }
 
 
-async def async_setup_ctc() -> None:
+async def async_setup_ctc(
+    headless: bool = False,
+    ignore_old_config: bool = False,
+    rpc_url: str | None = None,
+    rpc_chain_id: int | None = None,
+    data_dir: str | None = None,
+    disable_logs: bool = False,
+    overwrite: bool = True,
+    skip_aliases: bool = False,
+) -> None:
 
     # print intro
     print('Setting up ctc...')
@@ -33,17 +43,26 @@ async def async_setup_ctc() -> None:
     )
 
     # load old config data for passing to each option
-    old_config = setup_io.load_old_config(convert_to_latest=True)
+    if ignore_old_config:
+        old_config: typing.Mapping[typing.Any, typing.Any] = {}
+    else:
+        old_config = setup_io.load_old_config(convert_to_latest=True)
     setup_io.setup_config_path()
 
     # collect new config file data
     network_data = await network_setup.async_setup_networks(
+        rpc_url=rpc_url,
+        rpc_chain_id=rpc_chain_id,
         old_config=old_config,
         styles=styles,
+        headless=headless,
     )
     data_dir_data = data_dir_setup.setup_data_dir(
         old_config=old_config,
         styles=styles,
+        headless=headless,
+        default_data_dir=data_dir,
+        disable_logs=disable_logs,
     )
     db_data = db_setup.setup_dbs(
         data_dir=data_dir_data['data_dir'],
@@ -57,13 +76,19 @@ async def async_setup_ctc() -> None:
         db_data=db_data,
         data_dir_data=data_dir_data,
         styles=styles,
+        headless=headless,
+        overwrite=overwrite,
     )
 
     # populate db
     await db_setup.async_populate_db_tables(styles=styles)
 
     # setup aliases
-    alias_setup.add_cli_aliases(styles=styles)
+    alias_setup.add_cli_aliases(
+        styles=styles,
+        headless=headless,
+        skip_aliases=skip_aliases,
+    )
 
     # finalize
     print()
