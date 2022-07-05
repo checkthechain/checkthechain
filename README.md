@@ -50,7 +50,7 @@ transfers = await evm.async_get_erc20_transfers(
 )
 
 # get holdings of each address for a given block
-holdings = evm.async_get_erc20_holdings_from_transfers(transfers=transfers, block=12345789)
+holdings = await evm.async_get_erc20_holdings_from_transfers(transfers=transfers, block=12345789)
 ```
 
 ```bash
