@@ -15,4 +15,4 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def path_command() -> None:
-    print(config.get_config_path())
+    print(config.get_config_path(raise_if_dne=False))
