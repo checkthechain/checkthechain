@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing
 from typing_extensions import TypedDict
 
@@ -73,7 +74,8 @@ def get_config(
         print(
             '[WARNING]'
             ' ctc config file does not exist;'
-            ' use `ctc setup` on command line to generate a config file'
+            ' use `ctc setup` on command line to generate a config file',
+            file=sys.stderr,
         )
         config_from_file = config_defaults.get_default_config(
             use_env_variables=True,
