@@ -47,16 +47,14 @@ def config_command(reveal: bool, as_json: bool) -> None:
     else:
 
         print('# Config Summary')
-        print('- config env variable:', env_var)
-        if env_var not in os.environ:
-            print('-', env_var, 'not set')
+
+        # print config path
+        env_var_value = os.environ.get(env_var)
+        config_path = ctc.config.get_config_path(raise_if_dne=False)
+        if env_var_value in (None, ''):
+            print('using default config path:', config_path)
         else:
-            env_value = os.environ[env_var]
-            if env_value is None or env_value == '':
-                print('-', env_var, 'set to null')
-            else:
-                print('-', env_var, 'set to:', env_value)
-        print('- config path:', ctc.config.get_config_path(raise_if_dne=False))
+            print('using config path in CTC_CONFIG_PATH:', config_path)
 
         print()
         print('## Config Values')
