@@ -17,8 +17,31 @@ async def async_setup_networks(
     headless: bool,
     rpc_url: str | None,
     rpc_chain_id: int | None,
+    skip_networking: bool = False,
     styles: typing.Mapping[str, str],
 ) -> spec.PartialConfig:
+
+    if skip_networking:
+        providers = old_config.get('providers')
+        if providers is None:
+            providers = {}
+
+        networks = old_config.get('networks')
+        if networks is None:
+            networks = config_defaults.get_default_networks_metadata()
+
+        default_network = old_config.get('default_network')
+
+        default_providers = old_config.get('default_providers')
+        if default_providers is None:
+            default_providers = {}
+
+        return {
+            'providers': providers,
+            'networks': networks,
+            'default_network': default_network,
+            'default_providers': default_providers,
+        }
 
     print()
     print()
@@ -187,9 +210,16 @@ async def async_collect_provider_metadata(
 
     print()
     if url is None:
+
+        if headless:
+            raise Exception(
+                'if using headless mode, must either specify --rpc-url or set the ETH_RPC_URL env var'
+            )
+
         url = toolcli.input_prompt(
             'What is the RPC provider URL? ',
             style=styles['question'],
+            allow_blank=False,
         )
     else:
         print('Adding RPC provider: ' + str(url))

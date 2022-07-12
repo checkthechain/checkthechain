@@ -23,16 +23,19 @@ styles = {
 async def async_setup_ctc(
     headless: bool = False,
     ignore_old_config: bool = False,
+    skip_networking: bool = False,
     rpc_url: str | None = None,
     rpc_chain_id: int | None = None,
     data_dir: str | None = None,
     disable_logs: bool = False,
+    skip_db: bool = False,
     overwrite: bool = True,
     skip_aliases: bool = False,
 ) -> None:
 
     # print intro
-    print('Setting up ctc...')
+    toolstr.print('# Setting up ctc...', style=styles['header'])
+    # toolstr.print_text_box('Setting up ctc', style=styles['header'])
     print()
     print('Each step is optional')
     print('- by default, setup process will leave existing settings unchanged')
@@ -51,6 +54,7 @@ async def async_setup_ctc(
 
     # collect new config file data
     network_data = await network_setup.async_setup_networks(
+        skip_networking=skip_networking,
         rpc_url=rpc_url,
         rpc_chain_id=rpc_chain_id,
         old_config=old_config,
@@ -64,11 +68,12 @@ async def async_setup_ctc(
         default_data_dir=data_dir,
         disable_logs=disable_logs,
     )
-    db_data = db_setup.setup_dbs(
-        data_dir=data_dir_data['data_dir'],
-        network_data=network_data,
-        styles=styles,
-    )
+    if not skip_db:
+        db_data = db_setup.setup_dbs(
+            data_dir=data_dir_data['data_dir'],
+            network_data=network_data,
+            styles=styles,
+        )
 
     # create new config file if need be
     setup_io.write_new_config(
