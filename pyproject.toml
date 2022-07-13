@@ -52,7 +52,7 @@ dependencies = [
     #
     # tool suite
     'toolcache>=0.5.0',
-    'toolcli>=0.6.2',
+    'toolcli>=0.6.3',
     'toolconf>=0.1.2',
     'toolsql>=0.3.6',
     'toolstr>=0.5.0',
@@ -204,7 +204,7 @@ deps =
     ;
     ; tool suite
     toolcache==0.5.0
-    toolcli==0.6.2
+    toolcli==0.6.3
     toolconf==0.1.2
     toolsql==0.3.6
     toolstr==0.5.0
