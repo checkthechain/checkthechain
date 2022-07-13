@@ -1,16 +1,22 @@
-TODO.md
+# specific files
 CHANGELOG.md
-ROADMAP.md
 CONTRIBUTING.md
-*.pyc
-__pycache__/*
-*.egg-info
-dist/*
-*/.hypothesis
-.hypothesis/
-build/*
-.tox/*
-.coverage
-.coverage_html/*
+ROADMAP.md
+TODO.md
 pytestdebug.log
 
+# filetypes
+*.egg-info
+*.pyc
+
+# folders
+*/.hypothesis
+.coverage
+.coverage_html/*
+.hypothesis/
+.tox/*
+__pycache__/*
+build/*
+dist/*
+notebooks
+notebooks/*
