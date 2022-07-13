@@ -166,7 +166,8 @@ def print_contract_abi_human_readable(
         print('[none]')
     for i, event_abi in enumerate(events):
 
-        row = [event_abi['name']]
+        name = event_abi['name']
+        row = [name]
         input_cell = []
         indexed_cell = []
         for item in event_abi.get('inputs', []):
@@ -183,13 +184,14 @@ def print_contract_abi_human_readable(
         row.append('\n'.join(input_cell))
         row.append('\n'.join(indexed_cell))
 
+        event_hash = binary.get_event_hash(event_abi)
         if verbose:
-            row.append(binary.get_event_hash(event_abi))
+            row.append(event_hash)
+        else:
+            row.append(event_hash[:6] + '...' + event_hash[-4:])
 
         rows.append(row)
-    labels = ['name', 'inputs', 'indexed']
-    if verbose:
-        labels.append('event hash')
+    labels = ['name', 'inputs', 'indexed', 'event_hash']
 
     toolstr.print_multiline_table(
         rows,
