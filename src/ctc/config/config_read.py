@@ -60,6 +60,7 @@ def get_config(
 @toolcache.cache('memory')
 def get_config(
     validate: toolconfig.ValidationOption = False,
+    warn_if_dne: bool = True,
 ) -> typing.Union[spec.Config, typing.MutableMapping[str, typing.Any]]:
     import toolconfig
 
@@ -71,12 +72,13 @@ def get_config(
     except toolconfig.ConfigDoesNotExist:
         from . import config_defaults
 
-        print(
-            '[WARNING]'
-            ' ctc config file does not exist;'
-            ' use `ctc setup` on command line to generate a config file',
-            file=sys.stderr,
-        )
+        if warn_if_dne:
+            print(
+                '[WARNING]'
+                ' ctc config file does not exist;'
+                ' use `ctc setup` on command line to generate a config file',
+                file=sys.stderr,
+            )
         config_from_file = config_defaults.get_default_config(
             use_env_variables=True,
         )  # type: ignore

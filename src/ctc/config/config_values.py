@@ -210,7 +210,7 @@ def get_db_config(
 
 
 def get_log_rpc_calls() -> bool:
-    config = config_read.get_config()
+    config = config_read.get_config(warn_if_dne=False)
     return config.get('log_rpc_calls', False)
 
 
