@@ -148,6 +148,7 @@ def print_contract_abi_human_readable(
             labels=labels,
             max_column_widths=max_column_widths,
             compact=4,
+            max_table_width=max_width,
         )
     else:
         toolstr.print_table(
@@ -155,6 +156,7 @@ def print_contract_abi_human_readable(
             add_row_index=True,
             labels=labels,
             max_column_widths=max_column_widths,
+            max_table_width=max_width,
         )
 
     events = binary.get_event_abis(contract_abi)
@@ -201,6 +203,7 @@ def print_contract_abi_human_readable(
         vertical_justify='top',
         compact=4,
         column_justify={'indexed': 'center'},
+        max_table_width=max_width,
     )
 
 
