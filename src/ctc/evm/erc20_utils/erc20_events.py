@@ -5,6 +5,7 @@ import typing
 from ctc import rpc
 from ctc import spec
 
+from .. import abi_utils
 from .. import event_utils
 from . import erc20_abis
 from . import erc20_generic
@@ -39,9 +40,18 @@ async def async_get_erc20_transfers(
         token, network=network
     )
 
+    # use token's own abi if available, otherwise fallback to standard
+    # do this because tokens sometimes have different values for event args
+    try:
+        event_abi = await abi_utils.async_get_event_abi(
+            contract_address=token, event_name='Transfer'
+        )
+    except Exception:
+        event_abi = erc20_abis.erc20_event_abis['Transfer']
+
     transfers = await event_utils.async_get_events(
         contract_address=token_address,
-        event_abi=erc20_abis.erc20_event_abis['Transfer'],
+        event_abi=event_abi,
         start_block=start_block,
         end_block=end_block,
         verbose=verbose,
@@ -49,12 +59,23 @@ async def async_get_erc20_transfers(
         **event_kwargs,
     )
 
-    # detect amount column
-    column = get_token_amount_column(df=transfers)
+    # make amount column name the same across all tokens
+    old_column = 'arg__' + event_abi['inputs'][2]['name']
+    column = 'arg__amount'
+    transfers = transfers.rename(columns={old_column: column})
+
+    # convert from str amounts to int amounts
     if convert_from_str:
         transfers[column] = transfers[column].map(int)
 
+    # normalize
     if normalize and len(transfers) > 0:
+
+        if not convert_from_str:
+            raise Exception(
+                'cannot normalize without str conversion'
+                ', use normalize=False or convert_from_str=True'
+            )
 
         decimals = await erc20_metadata.async_get_erc20_decimals(
             token=token_address,

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import typing
 
-erc20_event_abis = {
+from ctc import spec
+
+
+erc20_event_abis: typing.Mapping[str, spec.EventABI] = {
     'Transfer': {
         'anonymous': False,
         'inputs': [
