@@ -10,6 +10,9 @@ from .stages import data_dir_setup
 from .stages import db_setup
 from .stages import network_setup
 
+if typing.TYPE_CHECKING:
+    import toolsql
+
 
 styles = {
     'header': '#ce93f9 bold',
@@ -78,7 +81,11 @@ async def async_setup_ctc(
     else:
         from ctc.config import config_defaults
 
-        db_data = {'db_configs': config_defaults.get_default_db_configs(data_dir)}
+        db_data = {
+            'db_configs': config_defaults.get_default_db_configs(
+                data_dir_data['data_dir']
+            ),
+        }
 
     # create new config file if need be
     setup_io.write_new_config(

@@ -46,13 +46,17 @@ def config_path_exists() -> bool:
 
 
 @typing.overload
-def get_config(validate: typing.Literal['raise'] = 'raise') -> spec.Config:
+def get_config(
+    validate: typing.Literal['raise'] = 'raise',
+    warn_if_dne: bool = True,
+) -> spec.Config:
     ...
 
 
 @typing.overload
 def get_config(
-    validate: typing.Literal['warn', False]
+    validate: typing.Literal['warn', False],
+    warn_if_dne: bool = True,
 ) -> typing.MutableMapping[str, typing.Any]:
     ...
 

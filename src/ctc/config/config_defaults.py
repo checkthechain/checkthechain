@@ -52,10 +52,10 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
         provider_name = 'ETH_RPC_URL'
 
         # get chain id either 1) from env or 2) by querying node
-        chain_id = os.environ.get('ETH_RPC_CHAIN_ID')
+        chain_id: int | str | None = os.environ.get('ETH_RPC_CHAIN_ID')
         if chain_id not in [None, '']:
             try:
-                chain_id = int(chain_id)
+                chain_id = int(chain_id)  # type: ignore
             except Exception:
                 pass
         if chain_id is None:
@@ -74,6 +74,9 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
                 + str(chain_id)
             )
 
+        if not isinstance(chain_id, int) and chain_id is not None:
+            raise Exception('could not determine proper value of chain_id')
+
         default_config['default_network'] = chain_id
         default_config['providers'][provider_name] = {  # type: ignore
             'name': provider_name,
@@ -86,23 +89,9 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
         default_config['default_providers'][chain_id] = provider_name  # type: ignore
 
 
-# def _sync_get_chain_id(provider_url: str) -> int:
-#     import json
-#     import urllib.request
-
-#     from ctc import binary
-
-#     data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
-#     post_data = json.dumps(data).encode('utf-8')
-#     request = urllib.request.Request(provider_url, data=post_data)
-#     response = urllib.request.urlopen(request)
-#     response_data = json.loads(response.read().decode())
-#     return binary.convert(response_data['result'], 'integer')
-
-
-def _sync_get_chain_id(provider_url: str):
+def _sync_get_chain_id(provider_url: str) -> int:
     import json
-    import urllib3
+    import urllib3  # type: ignore
 
     from ctc import binary
 
