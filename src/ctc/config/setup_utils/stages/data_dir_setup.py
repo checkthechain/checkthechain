@@ -13,6 +13,7 @@ from ... import config_defaults
 
 
 def setup_data_dir(
+    *,
     styles: dict[str, str],
     old_config: typing.Mapping[typing.Any, typing.Any],
     headless: bool,

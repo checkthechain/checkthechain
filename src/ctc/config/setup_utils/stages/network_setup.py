@@ -96,6 +96,7 @@ async def async_setup_networks(
 
 
 async def async_specify_providers(
+    *,
     old_config: typing.Mapping[str, typing.Any],
     headless: bool,
     rpc_url: str | None,
@@ -374,6 +375,7 @@ def collect_network_metadata(
 
 
 def specify_networks(
+    *,
     networks: typing.MutableMapping[spec.ChainId, spec.NetworkMetadata],
     styles: typing.Mapping[str, str],
     headless: bool,

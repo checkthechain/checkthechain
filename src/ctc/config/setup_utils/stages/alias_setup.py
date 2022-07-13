@@ -9,7 +9,7 @@ from ctc.cli.cli_utils import cli_alias_utils
 
 
 def add_cli_aliases(
-    styles: typing.Mapping[str, str], headless: bool, skip_aliases: bool
+    *, styles: typing.Mapping[str, str], headless: bool, skip_aliases: bool
 ) -> None:
 
     print()

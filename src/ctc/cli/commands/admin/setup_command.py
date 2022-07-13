@@ -79,6 +79,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_setup_command(
+    *,
     headless: bool,
     ignore_old_config: bool,
     skip_networking: bool,

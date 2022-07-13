@@ -81,10 +81,7 @@ def config_command(reveal: bool, as_json: bool) -> None:
                 print('-', key + ':')
                 if len(config[key]) == 0:
                     continue
-                if reveal:
-                    labels = list(config[key][0])
-                else:
-                    labels = ['name', 'network', 'url']
+                labels = ['name', 'network', 'url']
                 rows = []
                 for provider in config[key].values():
                     row = []

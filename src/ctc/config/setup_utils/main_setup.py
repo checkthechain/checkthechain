@@ -21,6 +21,7 @@ styles = {
 
 
 async def async_setup_ctc(
+    *,
     headless: bool = False,
     ignore_old_config: bool = False,
     skip_networking: bool = False,
