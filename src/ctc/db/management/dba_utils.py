@@ -17,6 +17,7 @@ def create_evm_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[schema_utils.SchemaName] | None = None,
     *,
+    db_config: toolsql.DBConfig | None = None,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
@@ -54,6 +55,14 @@ def create_evm_tables(
             print()
             print('No networks specified, creating no tables')
 
+    # using single db config for all schemas
+    if db_config is None:
+        db_config = config.get_db_config(
+            schema_name='schema_versions',
+            network=None,
+            require=True,
+        )
+
     # get missing tables
     schemas_to_create: list[
         tuple[spec.NetworkReference | None, schema_utils.SchemaName]
@@ -69,11 +78,6 @@ def create_evm_tables(
             schema_networks = [None]
 
         for schema_network in schema_networks:
-            db_config = config.get_db_config(
-                network=schema_network,
-                schema_name=schema_name,
-                require=True,
-            )
 
             if schema_network is not None:
                 schema = schema_utils.get_prepared_schema(
@@ -111,11 +115,7 @@ def create_evm_tables(
 
     # create tables
     # (for now, use same database for all tables)
-    engine = connect_utils.create_engine(
-        'schema_versions',
-        network=None,
-        create_missing_schema=False,
-    )
+    engine = toolsql.create_engine(db_config=db_config)
     if engine is None:
         raise Exception('Could not create engine for database')
 

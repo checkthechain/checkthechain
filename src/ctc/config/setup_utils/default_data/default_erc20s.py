@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import typing
 
+if typing.TYPE_CHECKING:
+    import toolsql
+
 from ctc import spec
 from ctc import db
 
@@ -9,6 +12,8 @@ from ctc import db
 async def async_intake_default_erc20s(
     network: spec.NetworkReference = 'mainnet',
     verbose: bool = True,
+    *,
+    engine: toolsql.SAEngine | None = None,
 ) -> None:
 
     if network not in ['mainnet', 1]:
@@ -19,10 +24,11 @@ async def async_intake_default_erc20s(
     data = load_default_erc20s(network=network)
 
     # create engine
-    engine = db.create_engine(
-        schema_name='erc20_metadata',
-        network=network,
-    )
+    if engine is None:
+        engine = db.create_engine(
+            schema_name='erc20_metadata',
+            network=network,
+        )
     if engine is None:
         return
 

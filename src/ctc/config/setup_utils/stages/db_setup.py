@@ -5,6 +5,7 @@ import typing
 
 import aiohttp
 import toolstr
+import toolsql
 
 from ctc import db
 from ctc import spec
@@ -16,6 +17,7 @@ def setup_dbs(
     styles: typing.Mapping[str, str],
     data_dir: str,
     network_data: spec.PartialConfig,
+    db_config: toolsql.DBConfig | None = None,
 ) -> spec.PartialConfig:
 
     print()
@@ -68,14 +70,23 @@ def setup_dbs(
         network for network in used_networks if network is not None
     }
     print()
-    db.create_evm_tables(networks=list(used_networks), confirm=True)
+    db.create_evm_tables(
+        networks=list(used_networks),
+        db_config=db_configs['main'],
+        confirm=True,
+    )
 
     return {'db_configs': db_configs}
 
 
-async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
+async def async_populate_db_tables(
+    db_config: toolsql.SAEngine,
+    styles: typing.Mapping[str, str],
+) -> None:
     from ctc.protocols import chainlink_utils
     from ..default_data import default_erc20s
+
+    engine = toolsql.create_engine(db_config=db_config)
 
     print()
     print()
@@ -85,7 +96,10 @@ async def async_populate_db_tables(styles: typing.Mapping[str, str]) -> None:
     print()
     print('Populating database with metadata of common ERC20 tokens...')
     print()
-    await default_erc20s.async_intake_default_erc20s(network='mainnet')
+    await default_erc20s.async_intake_default_erc20s(
+        network='mainnet',
+        engine=engine,
+    )
 
     # populate data: chainlink
     print()

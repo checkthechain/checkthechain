@@ -86,7 +86,10 @@ async def async_setup_ctc(
     )
 
     # populate db
-    await db_setup.async_populate_db_tables(styles=styles)
+    await db_setup.async_populate_db_tables(
+        db_config=db_data['db_configs']['main'],
+        styles=styles,
+    )
 
     # setup aliases
     alias_setup.add_cli_aliases(
