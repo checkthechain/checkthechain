@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import typing
 import urllib.parse
 
@@ -147,9 +148,11 @@ async def async_specify_providers(
             headless=headless,
         )
     elif len(providers) == 0:
+        print()
+        print('Most ctc operations require an RPC provider')
+        print()
         prompt = (
             'Would you like to specify an RPC provider? '
-            '(required for most ctc operations)\n'
         )
         if toolcli.input_yes_or_no(
             prompt=prompt,
@@ -211,7 +214,12 @@ async def async_collect_provider_metadata(
     print()
     if url is None:
 
-        if headless:
+        if os.environ.get('ETH_RPC_URL') not in [None, '']:
+            default_url = os.environ['ETH_RPC_URL']
+        else:
+            default_url = None
+
+        if headless and default_url is None:
             raise Exception(
                 'if using headless mode, must either specify --rpc-url or set the ETH_RPC_URL env var'
             )
@@ -220,6 +228,8 @@ async def async_collect_provider_metadata(
             'What is the RPC provider URL? ',
             style=styles['question'],
             allow_blank=False,
+            default=default_url,
+            headless=headless,
         )
     else:
         print('Adding RPC provider: ' + str(url))
@@ -231,6 +241,17 @@ async def async_collect_provider_metadata(
         print()
         print('No prefix for url. Adding `https://`')
         url = 'https://' + url
+
+    if (
+        chain_id is None
+        and url == os.environ['ETH_RPC_URL']
+        and os.environ.get('ETH_RPC_CHAIN_ID') not in [None, '']
+    ):
+        try:
+            chain_id = int(os.environ['ETH_RPC_CHAIN_ID'])
+            print('could not use value of ETH_RPC_CHAIN_ID, not a valid integer')
+        except Exception:
+            pass
 
     if chain_id is None:
         try:
@@ -257,7 +278,7 @@ async def async_collect_provider_metadata(
                 name = networks[chain_id]['name']
                 if name is not None:
                     description = description + ', network = ' + name
-            print('Provider using ' + description)
+            print('Provider using: ' + description)
         except Exception as e:
             raise e
             print('Could not query node for chain_id metadata')

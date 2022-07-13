@@ -72,9 +72,12 @@ def setup_data_dir(
 
         # move old data
         if isinstance(old_data_root, str) and os.path.isdir(old_data_root):
-            prompt = 'Move old ctc data to this new location?'
+            prompt = 'Move old ctc data to this new location? '
             answer = toolcli.input_yes_or_no(
-                prompt, default='yes', headless=headless
+                prompt,
+                default='yes',
+                headless=headless,
+                style=styles['question'],
             )
             if answer:
                 if not os.path.isdir(new_data_root):

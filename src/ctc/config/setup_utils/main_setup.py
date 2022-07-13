@@ -74,6 +74,10 @@ async def async_setup_ctc(
             network_data=network_data,
             styles=styles,
         )
+    else:
+        from ctc.config import config_defaults
+
+        db_data = {'db_configs': config_defaults.get_default_db_configs(data_dir)}
 
     # create new config file if need be
     setup_io.write_new_config(
@@ -86,10 +90,11 @@ async def async_setup_ctc(
     )
 
     # populate db
-    await db_setup.async_populate_db_tables(
-        db_config=db_data['db_configs']['main'],
-        styles=styles,
-    )
+    if not skip_db:
+        await db_setup.async_populate_db_tables(
+            db_config=db_data['db_configs']['main'],
+            styles=styles,
+        )
 
     # setup aliases
     alias_setup.add_cli_aliases(
@@ -103,4 +108,4 @@ async def async_setup_ctc(
     print()
     toolstr.print('## Final Steps', style=styles['header'])
     print()
-    print('ctc setup compelete')
+    print('ctc setup complete')

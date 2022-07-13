@@ -10,7 +10,7 @@ each step is optional
 - by default, setup process will leave existing settings unchanged
 - setup can be rerun multiple times idempotently
 
-can be run in headless mode (non-interactive mode):
+can run in headless mode (non-interactive mode) using `--headless`:
 - headless mode will use the default values for each unspecified parameter
 - headless mode is useful in scripts when user input is not possible
 - if config file already exists, headless mode must be run with `--overwrite`"""

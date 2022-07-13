@@ -28,12 +28,12 @@ def load_old_config(
     if isinstance(config_path, str) and os.path.isfile(config_path):
         old_config = toolconfig.load_config_file(config_path)
     else:
-        return {}
+        old_config = {}
 
     # upgrade config file if need be
     if (
         convert_to_latest
-        and old_config['config_spec_version'] != ctc.__version__
+        and old_config.get('config_spec_version') != ctc.__version__
     ):
         try:
             old_config = upgrade_utils.upgrade_config(old_config)
