@@ -50,12 +50,30 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
     if eth_rpc_url is not None:
         print('using RPC provider stored in ETH_RPC_URL')
         provider_name = 'ETH_RPC_URL'
-        chain_id = _sync_get_chain_id(eth_rpc_url)
+
+        # get chain id either 1) from env or 2) by querying node
+        chain_id = os.environ.get('ETH_RPC_CHAIN_ID')
+        if chain_id not in [None, '']:
+            try:
+                chain_id = int(chain_id)
+            except Exception:
+                pass
+        if chain_id is None:
+            try:
+                chain_id = _sync_get_chain_id(eth_rpc_url)
+            except Exception:
+                print(
+                    '[WARNING] not using value in ETH_RPC_URL because could not determine its chain_id (value = '
+                    + str(eth_rpc_url)
+                    + ')'
+                )
+                return
         if chain_id not in default_config['networks']:
             raise Exception(
                 'cannot use provider in ETH_RPC_URL because it uses unknown chain_id = '
                 + str(chain_id)
             )
+
         default_config['default_network'] = chain_id
         default_config['providers'][provider_name] = {  # type: ignore
             'name': provider_name,
@@ -68,18 +86,41 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
         default_config['default_providers'][chain_id] = provider_name  # type: ignore
 
 
-def _sync_get_chain_id(provider_url: str) -> int:
+# def _sync_get_chain_id(provider_url: str) -> int:
+#     import json
+#     import urllib.request
+
+#     from ctc import binary
+
+#     data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
+#     post_data = json.dumps(data).encode('utf-8')
+#     request = urllib.request.Request(provider_url, data=post_data)
+#     response = urllib.request.urlopen(request)
+#     response_data = json.loads(response.read().decode())
+#     return binary.convert(response_data['result'], 'integer')
+
+
+def _sync_get_chain_id(provider_url: str):
     import json
-    import urllib.request
+    import urllib3
 
     from ctc import binary
 
     data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
-    post_data = json.dumps(data).encode('utf-8')
-    request = urllib.request.Request(provider_url, data=post_data)
-    response = urllib.request.urlopen(request)
-    response_data = json.loads(response.read().decode())
-    return binary.convert(response_data['result'], 'integer')
+    encoded_body = json.dumps(data)
+
+    http = urllib3.PoolManager()
+
+    response = http.request(
+        'POST',
+        provider_url,
+        headers={'Content-Type': 'application/json'},
+        body=encoded_body,
+    )
+
+    response_data = json.loads(response.data.decode('utf-8'))
+    raw_chain_id = response_data['result']
+    return binary.convert(raw_chain_id, 'integer')
 
 
 def get_default_data_dir() -> str:
