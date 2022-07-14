@@ -133,6 +133,9 @@ def test_ctc_setup__with_env_eth_rpc_url(monkeypatch):
 
     # requires internet to run properly
 
+    config_path = create_temp_config_path()
+    monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
+
     test_url = 'https://some/test/url'
 
     # set rpc in env var
@@ -150,6 +153,9 @@ def test_ctc_setup__with_env_eth_rpc_url(monkeypatch):
 
 def test_ctc_setup__with_rpc_command(monkeypatch):
     # test that ctc setup can use rpc-url
+
+    config_path = create_temp_config_path()
+    monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
 
     test_url = 'https://some/test/url'
     test_chain_id = '10'
@@ -169,6 +175,7 @@ def test_ctc_setup__with_rpc_command(monkeypatch):
 
 
 def test_ctc_setup__set_data_dir(monkeypatch):
+
     config_path = create_temp_config_path()
     monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
 
@@ -184,6 +191,7 @@ def test_ctc_setup__set_data_dir(monkeypatch):
 
 def test_ctc_setup__skip_db(monkeypatch):
     # test that skipping or not skipping db setup works properly
+
     config_path = create_temp_config_path()
     monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
 
