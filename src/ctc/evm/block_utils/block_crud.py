@@ -66,6 +66,7 @@ async def async_get_blocks(
     include_full_transactions: bool = False,
     chunk_size: int = 500,
     provider: spec.ProviderReference = None,
+    use_db: bool = True,
 ) -> list[spec.Block]:
 
     provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
@@ -75,19 +76,42 @@ async def async_get_blocks(
         standardized = [
             binary.standardize_block_number(block) for block in blocks
         ]
+        pending = standardized
+
+        if use_db:
+            from ctc import db
+
+            network = rpc.get_provider_network(provider)
+            db_block_datas = await db.async_query_blocks(
+                block_numbers=pending, network=network
+            )
+            if db_block_datas is None:
+                block_data_map = {}
+            else:
+                block_data_map = dict(zip(pending, db_block_datas))
+                pending = [
+                    block
+                    for block, db_block_data in block_data_map.items()
+                    if db_block_data is None
+                ]
 
         blocks_data = await rpc.async_batch_eth_get_block_by_number(
-            block_numbers=standardized,
+            block_numbers=pending,
             include_full_transactions=include_full_transactions,
             provider=provider,
         )
 
         from ctc import db
 
+        # intake rpc data to db
         await db.async_intake_blocks(
             blocks=blocks_data,
             network=rpc.get_provider_network(provider),
         )
+
+        if use_db:
+            block_data_map.update(dict(zip(pending, blocks_data)))
+            blocks_data = [block_data_map[block] for block in standardized]
 
         return blocks_data
 

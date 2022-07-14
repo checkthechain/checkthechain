@@ -104,6 +104,9 @@ async def async_intake_blocks(
     network: spec.NetworkReference,
 ) -> None:
 
+    if len(blocks) == 0:
+        return
+
     blocks_coroutine = async_intake_raw_blocks(blocks=blocks, network=network)
     timestamps_coroutine = async_intake_block_timestamps(
         blocks=blocks, network=network
@@ -115,6 +118,9 @@ async def async_intake_raw_blocks(
     blocks: typing.Sequence[spec.Block],
     network: spec.NetworkReference,
 ) -> None:
+
+    if len(blocks) == 0:
+        return
 
     if not management.get_active_schemas().get('blocks'):
         return
@@ -151,6 +157,8 @@ async def async_intake_block_timestamps(
 
     # determine which blocks have enough confirmations
     if blocks is not None:
+        if len(blocks) == 0:
+            return
         confirmed_blocks = (
             await intake_utils.async_filter_fully_confirmed_blocks(
                 blocks=blocks,
@@ -161,6 +169,8 @@ async def async_intake_block_timestamps(
             return
         confirmed_block_timestamps = None
     elif block_timestamps is not None:
+        if len(block_timestamps) == 0:
+            return
         confirmed_numbers = (
             await intake_utils.async_filter_fully_confirmed_blocks(
                 blocks=list(block_timestamps.keys()),
