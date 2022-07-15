@@ -84,17 +84,16 @@ def config_command(reveal: bool, as_json: bool, no_color: bool) -> None:
 
         styled_path = toolstr.add_style(config_path, path_style)
         if env_var_value in (None, ''):
-            # print('using default config path:', config_path)
             toolstr.print(
                 toolstr.add_style(
-                    'using default config path: ', chrome_style
+                    'using default config path: ', key_style
                 )
                 + styled_path
             )
         else:
             toolstr.print(
                 toolstr.add_style(
-                    'using config path in CTC_CONFIG_PATH:', chrome_style
+                    'using config path in CTC_CONFIG_PATH:', key_style
                 ),
                 styled_path,
             )
