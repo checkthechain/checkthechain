@@ -40,7 +40,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def config_command(reveal: bool, as_json: bool, no_color: bool) -> None:
+def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
 
     env_var = ctc.config.config_path_env_var
 

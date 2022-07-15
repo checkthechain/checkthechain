@@ -16,9 +16,10 @@ def test_tox_legacy_config():
     for dep_str in config['project']['dependencies']:
         if '>=' not in dep_str:
             raise Exception('need min version for dependency: ' + str(dep_str))
-        dep_name, version = dep_str.split('>=')
+        dep_name, version_tail = dep_str.split(' >=')
+        min_version, max_version = version_tail.split(', <')
         current_deps[dep_name] = tuple(
-            int(number) for number in version.split('.')
+            int(number) for number in min_version.split('.')
         )
 
     # load legacy deps
