@@ -91,6 +91,9 @@ def validate_config_spec_version(
     if not all(piece.isnumeric() for piece in pieces):
         raise spec.ConfigInvalid('invalid config_spec_version: ' + str(value))
 
+    if pieces[0] != '0' or pieces[1] != '3':
+        raise spec.ConfigInvalid('config must use a version 0.3.x')
+
 
 def validate_data_dir(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
@@ -164,6 +167,11 @@ def validate_providers(
             raise spec.ConfigInvalid('session_kwargs must be a dict')
         if chunk_size is not None and not isinstance(chunk_size, int):
             raise spec.ConfigInvalid('chunk_size is not int')
+
+        if not url.startswith('http'):
+            raise spec.ConfigInvalid(
+                'http provider url must start with "http://" or "https://"'
+            )
 
 
 def validate_default_network(
