@@ -246,6 +246,19 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 #     return help_cache_path
 
 
+def get_cli_styles() -> toolcli.StyleTheme:
+    return {
+        'title': 'bold #ce93f9',
+        'metavar': '#8be9fd',
+        'description': '#b9f29f',
+        'content': '#f1fa8c',
+        'option': '#64aaaa',
+        # 'description': '#64aaaa',
+        'comment': '#6272a4',
+        # 'comment': '#8be9fd',
+    }
+
+
 def run_cli(
     raw_command: str | None = None,
     **toolcli_kwargs: typing.Any,
@@ -281,16 +294,7 @@ def run_cli(
         'help_subcommand_categories': help_subcommand_categories,
         'async_context_manager': cli_utils.AsyncContextManager,
         #
-        'style_theme': {
-            'title': 'bold #ce93f9',
-            # 'description': '#f1fa8c',
-            'metavar': '#8be9fd',
-            'description': '#b9f29f',
-            'option': '#64aaaa',
-            # 'description': '#64aaaa',
-            'comment': '#6272a4',
-            # 'comment': '#8be9fd',
-        },
+        'style_theme': get_cli_styles(),
         #
         # standard subcommands and standard args
         'include_standard_subcommands': True,
