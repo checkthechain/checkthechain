@@ -8,6 +8,16 @@ from ctc import spec
 from ... import schema_utils
 
 
+def _remove_block_transactions(block: spec.Block) -> spec.Block:
+    txs = block['transactions']
+    if len(txs) > 0 and isinstance(txs[0], dict):
+        full_txs = typing.cast(list[spec.Transaction], txs)
+        tx_hashes = [tx['hash'] for tx in full_txs]
+        return dict(block, transactions=tx_hashes)  # type: ignore
+    else:
+        return block
+
+
 async def async_upsert_block(
     *,
     block: spec.Block,
@@ -16,6 +26,7 @@ async def async_upsert_block(
 ) -> None:
 
     table = schema_utils.get_table_name('blocks', network=network)
+    block = _remove_block_transactions(block)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -32,6 +43,7 @@ async def async_upsert_blocks(
 ) -> None:
 
     table = schema_utils.get_table_name('blocks', network=network)
+    blocks = [_remove_block_transactions(block) for block in blocks]
     toolsql.insert(
         conn=conn,
         table=table,
