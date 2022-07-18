@@ -138,22 +138,45 @@ async def _async_aggregator_transition(
 
 
 async def async_get_feed_previous_aggregators(
-    feed: str, provider: spec.ProviderReference
+    feed: str,
+    provider: spec.ProviderReference = None,
 ) -> list[spec.Address]:
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
         feed, provider=provider
     )
 
+    phase_id_abi: spec.FunctionABI = {
+        'inputs': [],
+        'name': 'phaseId',
+        'outputs': [{'internalType': 'uint16', 'name': '', 'type': 'uint16'}],
+        'stateMutability': 'view',
+        'type': 'function',
+    }
+
     current_phase = await rpc.async_eth_call(
         to_address=feed,
-        function_name='phaseId',
+        function_abi=phase_id_abi,
     )
+
+    phase_aggregators_abi = {
+        'inputs': [{'internalType': 'uint16', 'name': '', 'type': 'uint16'}],
+        'name': 'phaseAggregators',
+        'outputs': [
+            {
+                'internalType': 'contract AggregatorV2V3Interface',
+                'name': '',
+                'type': 'address',
+            }
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    }
 
     coroutines = [
         rpc.async_eth_call(
             to_address=feed,
-            function_name='phaseAggregators',
+            function_abi=phase_aggregators_abi,
             function_parameters=[i],
         )
         for i in range(1, current_phase + 1)
