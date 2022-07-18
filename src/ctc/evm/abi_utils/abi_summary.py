@@ -72,11 +72,35 @@ def print_contract_abi_human_readable(
     max_width: int = 80,
     verbose: bool | int = False,
 ) -> None:
+    print_contract_abi_functions_human_readable(
+        contract_abi=contract_abi,
+        max_width=max_width,
+        verbose=verbose,
+    )
+    print()
+    print()
+    print_contract_abi_events_human_readable(
+        contract_abi=contract_abi,
+        max_width=max_width,
+        verbose=verbose,
+    )
+
+
+def print_contract_abi_functions_human_readable(
+    contract_abi: spec.ContractABI,
+    *,
+    max_width: int | None = None,
+    verbose: bool | int = False,
+    title: str = 'Contract ABI Functions',
+) -> None:
     import toolstr
+    from ctc.cli import cli_run
+
+    styles = cli_run.get_cli_styles()
 
     functions = binary.get_function_abis(contract_abi)
 
-    toolstr.print_text_box('Contract ABI Functions')
+    toolstr.print_text_box(title, style=styles['title'])
     print()
     rows = []
     for i, function in enumerate(functions):
@@ -90,21 +114,6 @@ def print_contract_abi_human_readable(
             ]
             output_str = ', '.join(output_str_list)
             output_str = output_str.strip()
-
-        if not verbose:
-            signature = binary.get_function_signature(
-                function_abi=function,
-                include_names=True,
-            )
-        else:
-            signature = function['name'] + '()'
-        if verbose:
-            text = signature + ' --> ' + str(output_str)
-        else:
-            text = str(i + 1) + '. ' + signature + ' --> ' + str(output_str)
-
-        if len(text) > max_width:
-            text = text[: max_width - 3] + '...'
 
         inputs = function.get('inputs', [])
         if len(inputs) == 0:
@@ -148,7 +157,14 @@ def print_contract_abi_human_readable(
             labels=labels,
             max_column_widths=max_column_widths,
             compact=4,
-            max_table_width=max_width,
+            # max_table_width=max_width,
+            border=styles['comment'],
+            label_style=styles['title'],
+            column_style={
+                'selector': styles['metavar'],
+                'inputs': styles['option'],
+                'outputs': styles['option'],
+            },
         )
     else:
         toolstr.print_table(
@@ -156,13 +172,32 @@ def print_contract_abi_human_readable(
             add_row_index=True,
             labels=labels,
             max_column_widths=max_column_widths,
-            max_table_width=max_width,
+            # max_table_width=max_width,
+            border=styles['comment'],
+            label_style=styles['title'],
+            column_style={
+                'selector': styles['metavar'],
+                'inputs': styles['option'],
+                'outputs': styles['option'],
+            },
         )
 
+
+def print_contract_abi_events_human_readable(
+    contract_abi: spec.ContractABI,
+    *,
+    max_width: int | None = None,
+    verbose: bool | int = False,
+    title: str = 'Contract ABI Events',
+) -> None:
+    import toolstr
+    from ctc.cli import cli_run
+
+    styles = cli_run.get_cli_styles()
+
     events = binary.get_event_abis(contract_abi)
+    toolstr.print_text_box(title, style=styles['title'])
     print()
-    print()
-    toolstr.print_text_box('Contract ABI Events')
     rows = []
     if len(events) == 0:
         print('[none]')
@@ -203,7 +238,13 @@ def print_contract_abi_human_readable(
         vertical_justify='top',
         compact=4,
         column_justify={'indexed': 'center'},
-        max_table_width=max_width,
+        # max_table_width=max_width,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_style={
+            'event_hash': styles['metavar'],
+            'inputs': styles['option'],
+        },
     )
 
 

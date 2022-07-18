@@ -47,7 +47,8 @@ class ErrorABI(TypedDict):
     inputs: ABIFunctionArg
 
 
-ContractABI = typing.List[typing.Union[FunctionABI, EventABI, ErrorABI]]
+ContractABIEntry = typing.Union[FunctionABI, EventABI, ErrorABI]
+ContractABI = typing.List[ContractABIEntry]
 
 
 ABITupleComponents = typing.List['ABITupleComponent']
