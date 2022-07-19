@@ -42,7 +42,7 @@ async def async_batch_eth_call(
             contract_address = to_addresses[0]
         else:
             raise Exception(
-                'must specify contract_address or contract_addresses'
+                'must specify to_address or to_addresses'
             )
 
         provider = rpc_provider.get_provider(provider)
