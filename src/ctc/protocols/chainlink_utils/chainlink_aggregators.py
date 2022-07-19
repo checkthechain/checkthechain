@@ -58,6 +58,8 @@ async def async_get_aggregator_base_quote(
 async def async_get_feed_aggregator_history(
     feed: str, provider: spec.ProviderReference = None
 ) -> typing.Mapping[spec.Address, int]:
+    # TODO: can make it go 2x as fast by searching at start and end concurrently
+    # TODO: be able to give block range to search within
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
         feed,
