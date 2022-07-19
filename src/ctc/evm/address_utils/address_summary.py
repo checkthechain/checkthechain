@@ -24,6 +24,12 @@ async def async_print_address_summary(
     """
     import asyncio
 
+    import toolstr
+    import tooltime
+    from ctc.cli import cli_run
+
+    styles = cli_run.get_cli_styles()
+
     eth_balance_coroutine = evm.async_get_eth_balance(
         address, provider=provider
     )
@@ -47,12 +53,19 @@ async def async_print_address_summary(
         address_type = 'EOA'
 
     title = 'Address ' + address.lower()
-    print(title)
-    print('─' * len(title))
+    toolstr.print_text_box(title, style=styles['title'])
     print('- checksum:', address_data.get_address_checksum(address))
     print('- address type:', address_type)
     print('- ETH balance:', eth_balance)
     print('- transaction count:', transaction_count)
+
+    if verbose:
+        creation_block = await evm.async_get_contract_creation_block(address)
+        if creation_block is not None:
+            block_timestamp = await evm.async_get_block_timestamp(creation_block)
+            age = tooltime.get_age(block_timestamp, 'TimelengthPhrase')
+            print('- creation block:', creation_block)
+            print('- age:', age)
 
     if is_contract:
         print()
