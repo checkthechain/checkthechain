@@ -44,8 +44,8 @@ def get_event_backend_functions() -> dict[
 
 
 async def async_get_events(
-    *,
     contract_address: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     backend_order: typing.Sequence[str] | None = None,
