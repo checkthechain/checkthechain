@@ -4,7 +4,7 @@ import tempfile
 import toolsql
 
 from ctc import db
-from ctc.protocols import chainlink_utils
+from ctc.protocols.chainlink_utils import chainlink_db
 
 
 def get_test_db_config():
@@ -16,7 +16,7 @@ def get_test_db_config():
 
 
 async def test_get_chainlink_feed_payload():
-    await chainlink_utils.async_get_complete_feed_payload()
+    await chainlink_db.async_get_complete_feed_payload()
 
 
 async def test_populate_feeds():
@@ -26,7 +26,7 @@ async def test_populate_feeds():
         db.initialize_schema(
             schema_name='chainlink', network='mainnet', conn=conn
         )
-    await chainlink_utils.async_import_network_to_db(
+    await chainlink_db.async_import_network_to_db(
         network='mainnet', engine=engine
     )
 
@@ -77,14 +77,14 @@ async def test_chainlink_crud():
         # insert data
         with conn.begin():
             for feed_data in example_data:
-                await chainlink_utils.async_upsert_feed(
+                await chainlink_db.async_upsert_feed(
                     conn=conn, feed=feed_data, network=network
                 )
 
         # get data individually
         with conn.begin():
             for feed_data in example_data:
-                db_feed = await chainlink_utils.async_select_feed(
+                db_feed = await chainlink_db.async_select_feed(
                     conn=conn,
                     address=feed_data['address'],
                     network=network,
@@ -95,7 +95,7 @@ async def test_chainlink_crud():
         # get data collectively
         with conn.begin():
             addresses = [feed_data['address'] for feed_data in example_data]
-            db_feeds = await chainlink_utils.async_select_feeds(
+            db_feeds = await chainlink_db.async_select_feeds(
                 conn=conn,
                 addresses=addresses,
                 network=network,
@@ -106,7 +106,7 @@ async def test_chainlink_crud():
         # delete entries one by one
         with conn.begin():
             for feed_data in example_data:
-                await chainlink_utils.async_delete_feed(
+                await chainlink_db.async_delete_feed(
                     conn=conn,
                     address=feed_data['address'],
                     network=network,
@@ -114,7 +114,7 @@ async def test_chainlink_crud():
 
         # ensure all entries deleted
         with conn.begin():
-            db_feeds = await chainlink_utils.async_select_feeds(
+            db_feeds = await chainlink_db.async_select_feeds(
                 conn=conn,
                 addresses=addresses,
                 network=network,

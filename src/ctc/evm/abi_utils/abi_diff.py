@@ -10,7 +10,7 @@ from . import abi_summary
 def map_contract_abi_by_selectors(
     contract_abi: spec.ContractABI,
 ) -> typing.Mapping[str, spec.ContractABIEntry]:
-    by_selectors: typing.Mapping[str, spec.ContractABIEntry] = {}
+    by_selectors: typing.MutableMapping[str, spec.ContractABIEntry] = {}
     for item in contract_abi:
         if item['type'] == 'function':
             function_selector = binary.get_function_selector(item)
@@ -61,7 +61,7 @@ def print_contract_abi_diff(
     second_name: str | None = None,
     functions_only: bool = False,
     events_only: bool = False,
-) -> typing.Mapping[str, spec.ContractABI]:
+) -> None:
 
     if first_name is None:
         first_name = 'First Contract'

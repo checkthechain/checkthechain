@@ -159,7 +159,7 @@ async def async_get_feed_previous_aggregators(
         function_abi=phase_id_abi,
     )
 
-    phase_aggregators_abi = {
+    phase_aggregators_abi: spec.FunctionABI = {
         'inputs': [{'internalType': 'uint16', 'name': '', 'type': 'uint16'}],
         'name': 'phaseAggregators',
         'outputs': [

@@ -83,7 +83,7 @@ async def async_populate_db_tables(
     db_config: toolsql.SAEngine,
     styles: typing.Mapping[str, str],
 ) -> None:
-    from ctc.protocols import chainlink_utils
+    from ctc.protocols.chainlink_utils import chainlink_db
     from ..default_data import default_erc20s
 
     engine = toolsql.create_engine(db_config=db_config)
@@ -106,7 +106,7 @@ async def async_populate_db_tables(
     print('Populating database with latest Chainlink oracle feeds...')
     print()
     try:
-        await chainlink_utils.async_import_networks_to_db()
+        await chainlink_db.async_import_networks_to_db()
     except aiohttp.client_exceptions.ClientConnectorError:
         print('Could not connect to Chainlink server, skipping')
     except Exception:

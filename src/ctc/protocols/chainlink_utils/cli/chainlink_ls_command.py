@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolcli
 import toolstr
 
-from ctc.protocols import chainlink_utils
+from ctc.protocols.chainlink_utils import chainlink_db
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -25,7 +25,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_chainlink_ls_command(query: str) -> None:
-    oracle_feeds = await chainlink_utils.async_query_feeds(network='mainnet')
+    oracle_feeds = await chainlink_db.async_query_feeds(network='mainnet')
     if oracle_feeds is None:
         return
     rows = []

@@ -5,7 +5,7 @@ import pytest
 import toolsql
 
 from ctc import db
-from ctc.protocols import chainlink_utils
+from ctc.protocols.chainlink_utils import chainlink_db
 from ctc.protocols import fourbyte_utils
 
 
@@ -77,11 +77,11 @@ schema_datas = [
     },
     {
         'schema_name': 'chainlink',
-        'selector': chainlink_utils.async_select_feed,
-        'queryer': chainlink_utils.async_query_feed,
+        'selector': chainlink_db.async_select_feed,
+        'queryer': chainlink_db.async_query_feed,
         'query': {'address': '0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'},
-        'plural_selector': chainlink_utils.async_select_feeds,
-        'plural_queryer': chainlink_utils.async_query_feeds,
+        'plural_selector': chainlink_db.async_select_feeds,
+        'plural_queryer': chainlink_db.async_query_feeds,
         'plural_query': {
             'addresses': ['0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9'],
         },
