@@ -78,7 +78,7 @@ async def async_call_command(
     )
 
     if len(args) != len(function_abi['inputs']):
-        print('could not find appropriate function abi')
+        raise Exception('improper number of arguments for function')
 
     # convert args as needed
     typed_args: list[typing.Any] = []

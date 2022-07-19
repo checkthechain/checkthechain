@@ -143,6 +143,8 @@ def encode_function_parameters(
     parameters = new_parameters
 
     # encode
+    if len(parameters) != len(parameter_types):
+        raise Exception('improper number of arguments for function, cannot encode')
     encoded_bytes = binary.encode_types(
         parameters, '(' + ','.join(parameter_types) + ')'
     )
