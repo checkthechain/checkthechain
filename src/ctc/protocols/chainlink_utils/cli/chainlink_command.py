@@ -19,6 +19,11 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'feed', 'nargs': '+', 'help': 'name or address of feed'},
             {
+                'name': '--verbose',
+                'help': 'show additional information',
+                'action': 'store_true',
+            },
+            {
                 'name': '--blocks',
                 'nargs': '+',
                 'help': 'block range of datapoints',
@@ -62,6 +67,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_chainlink_command(
     *,
     feed: typing.Sequence[str],
+    verbose: bool,
     blocks: typing.Optional[typing.Sequence[str]],
     output: str,
     overwrite: bool,
@@ -82,7 +88,10 @@ async def async_chainlink_command(
         fields = 'answer'
 
     if blocks is None:
-        await chainlink_utils.async_summarize_feed(feed=feed_str)
+        await chainlink_utils.async_summarize_feed(
+            feed=feed_str,
+            verbose=verbose,
+        )
     else:
         feed_address = await chainlink_utils.async_resolve_feed_address(
             feed=feed_str,

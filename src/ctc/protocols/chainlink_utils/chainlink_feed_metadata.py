@@ -25,6 +25,21 @@ def _build_feed_query(
         raise Exception('unknown feed reference type')
 
 
+async def async_get_feed_metadata(
+    feed: chainlink_spec._FeedReference,
+    *,
+    network: spec.NetworkReference | None = None,
+) -> chainlink_db.ChainlinkFeed:
+    query = _build_feed_query(feed)
+    if network is None:
+        network = config.get_default_network()
+
+    feed_data = await chainlink_db.async_query_feed(network=network, **query)
+    if feed_data is None:
+        raise Exception('could not find data for feed: ' + str(feed))
+    return feed_data
+
+
 async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
     *,

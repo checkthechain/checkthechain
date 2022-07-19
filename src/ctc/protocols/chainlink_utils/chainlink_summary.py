@@ -5,15 +5,24 @@ import time
 import tooltime
 import toolstr
 
+from ctc import evm
 from ctc import rpc
+from ctc.cli import cli_run
 from ctc.protocols import chainlink_utils
 from . import chainlink_feed_metadata
 from . import chainlink_spec
 
 
-async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
+async def async_summarize_feed(
+    feed: str,
+    *,
+    n_recent: int = 20,
+    verbose: bool = False,
+) -> None:
 
     import asyncio
+
+    styles = cli_run.get_cli_styles()
 
     feed_address = await chainlink_feed_metadata.async_resolve_feed_address(
         feed,
@@ -47,10 +56,10 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
     updates = []
     for i, row in data.iterrows():
         timestamp = int(row['timestamp'])
-        age = tooltime.timelength_to_phrase(time.time() - timestamp)
+        age = tooltime.timelength_to_phrase(int(time.time() - timestamp))
         age = ' '.join(age.split(' ')[:2]).strip(',')
         update = [
-            row['answer'],
+            toolstr.format(row['answer'], decimals=3, trailing_zeros=3),
             age,
             str(i),
             str(timestamp),
@@ -63,16 +72,76 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
     aggregator = await aggregator_task
 
     title = 'Chainlink Feed Summary: ' + name
-    toolstr.print_text_box(title, double=False)
-    print('- name:', name)
-    print('- address:', feed_address)
-    print('- aggregator:', aggregator)
-    print('- decimals:', decimals)
-    # print('- deviation threshold:')
-    # print('- heartbeat:')
+    toolstr.print_text_box(title, double=False, style=styles['title'])
+    toolstr.print(
+        toolstr.add_style('- name:', styles['option']),
+        toolstr.add_style(name, styles['description']),
+    )
+    toolstr.print(
+        toolstr.add_style('- decimals:', styles['option']),
+        toolstr.add_style(str(decimals), styles['description']),
+    )
+
+    metadata = await chainlink_feed_metadata.async_get_feed_metadata(feed)
+    deviation = toolstr.format(
+        float(metadata['deviation']) / 100,
+        percentage=True,
+    )
+    toolstr.print(
+        toolstr.add_style('- deviation threshold:', styles['option']),
+        toolstr.add_style(deviation, styles['description']),
+    )
+    toolstr.print(
+        toolstr.add_style('- heartbeat:', styles['option']),
+        toolstr.add_style(metadata['heartbeat'], styles['description']),
+    )
+    toolstr.print(
+        toolstr.add_style('- address:', styles['option']),
+        toolstr.add_style(feed_address, styles['metavar']),
+    )
+    toolstr.print(
+        toolstr.add_style('- aggregator:', styles['option']),
+        toolstr.add_style(aggregator, styles['metavar']),
+    )
+
+    if verbose:
+        print()
+        print('fetching aggregator history...')
+        history = await chainlink_utils.async_get_feed_aggregator_history(
+            feed_address,
+            provider=None,
+        )
+        print()
+        toolstr.print_header('Aggregator History', style=styles['title'])
+        history_blocks = sorted(history.values())
+        raw_timestamps = await evm.async_get_block_timestamps(history_blocks)
+        history_timestamps = dict(zip(history.keys(), raw_timestamps))
+        history_rows = []
+        for old_aggregator, block in history.items():
+            age_seconds: str = tooltime.get_age(
+                history_timestamps[old_aggregator],
+                'TimelengthPhrase',
+            )
+            age = ' '.join(age_seconds.split(' ')[:2]).strip(',')
+            history_row = [
+                old_aggregator,
+                str(block),
+                age,
+            ]
+            history_rows.append(history_row)
+        labels = ['address', 'block', 'age']
+        toolstr.print_table(
+            history_rows,
+            labels=labels,
+            indent='    ',
+            label_style=styles['title'],
+            column_style={'address': styles['metavar']},
+            border=styles['comment'],
+        )
+
     print()
     print()
-    toolstr.print_header('Recent Updates')
+    toolstr.print_header('Recent Updates', style=styles['title'])
     print()
     labels = ['value', 'age', 'block', 'timestamp', 'time']
 
@@ -81,4 +150,9 @@ async def async_summarize_feed(feed: str, n_recent: int = 20) -> None:
         labels=labels,
         indent='    ',
         column_format={'value': {'decimals': 5}},
+        column_style={
+            'value': styles['description'] + ' bold',
+        },
+        label_style=styles['title'],
+        border=styles['comment'],
     )
