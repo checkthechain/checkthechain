@@ -106,7 +106,7 @@ def print_contract_abi_functions_human_readable(
     for i, function in enumerate(functions):
 
         if len(function['outputs']) == 0:
-            output_str = '[none]'
+            output_str = '-'
         else:
             output_str_list = [
                 (item['type'] + ' ' + item['name']).strip()
@@ -114,6 +114,9 @@ def print_contract_abi_functions_human_readable(
             ]
             output_str = ', '.join(output_str_list)
             output_str = output_str.strip()
+        output_str = output_str.strip()
+        if len(output_str) == 0:
+            output_str = '-'
 
         inputs = function.get('inputs', [])
         if len(inputs) == 0:
@@ -131,12 +134,14 @@ def print_contract_abi_functions_human_readable(
                 item_str = item_str.strip()
                 input_items.append(item_str)
             input_str = '\n'.join(input_items)
+            if input_str == '':
+                input_str = '-'
 
             row.append(input_str)
-            row.append(output_str.strip())
+            row.append(output_str)
         else:
             row.append(', '.join(item['type'] for item in inputs))
-            row.append(output_str.strip())
+            row.append(output_str)
         rows.append(row)
 
     labels = [
@@ -201,6 +206,8 @@ def print_contract_abi_events_human_readable(
     rows = []
     if len(events) == 0:
         print('[none]')
+        return
+
     for i, event_abi in enumerate(events):
 
         name = event_abi['name']
