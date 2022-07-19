@@ -104,6 +104,26 @@ async def async_summarize_feed(
         toolstr.add_style(aggregator, styles['metavar']),
     )
 
+    creation_block = await chainlink_feed_metadata.async_get_feed_first_block(
+        feed
+    )
+    creation_timestamp = await evm.async_get_block_timestamp(creation_block)
+    toolstr.print(
+        toolstr.add_style('- feed creation block:', styles['option']),
+        toolstr.add_style(str(creation_block), styles['description']),
+    )
+    toolstr.print(
+        toolstr.add_style('- feed creation timestamp:', styles['option']),
+        toolstr.add_style(str(creation_timestamp), styles['description']),
+    )
+    toolstr.print(
+        toolstr.add_style('- feed age:', styles['option']),
+        toolstr.add_style(
+            tooltime.get_age(creation_timestamp, 'TimelengthPhrase'),
+            styles['description'],
+        ),
+    )
+
     if verbose:
         print()
         print('fetching aggregator history...')
