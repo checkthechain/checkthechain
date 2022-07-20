@@ -59,7 +59,7 @@ async def async_summarize_feed(
         age = tooltime.timelength_to_phrase(int(time.time() - timestamp))
         age = ' '.join(age.split(' ')[:2]).strip(',')
         update = [
-            toolstr.format(row['answer'], decimals=3, trailing_zeros=3),
+            toolstr.format(row['answer'], decimals=4, trailing_zeros=True),
             age,
             str(i),
             str(timestamp),
