@@ -27,6 +27,7 @@ async def async_get_erc20_transfers(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    include_timestamps: bool = False,
     normalize: bool = True,
     convert_from_str: bool = True,
     verbose: bool = False,
@@ -46,6 +47,7 @@ async def async_get_erc20_transfers(
         end_block=end_block,
         verbose=verbose,
         provider=provider,
+        include_timestamps=include_timestamps,
         **event_kwargs,
     )
 

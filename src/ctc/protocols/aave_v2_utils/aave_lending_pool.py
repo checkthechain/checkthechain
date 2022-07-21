@@ -10,6 +10,7 @@ from . import aave_spec
 async def async_get_deposits(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    include_timestamps: bool = False,
     *,
     provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
@@ -36,6 +37,7 @@ async def async_get_deposits(
         event_name='Deposit',
         start_block=start_block,
         end_block=end_block,
+        include_timestamps=include_timestamps,
         verbose=False,
     )
     events['arg__amount'] = events['arg__amount'].map(int)
@@ -46,6 +48,7 @@ async def async_get_deposits(
 async def async_get_withdrawals(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    include_timestamps: bool = False,
     *,
     provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
@@ -71,6 +74,7 @@ async def async_get_withdrawals(
         contract_address=aave_lending_pool,
         event_name='Withdraw',
         start_block=start_block,
+        include_timestamps=include_timestamps,
         end_block=end_block,
         verbose=False,
     )

@@ -69,6 +69,7 @@ async def async_get_pool_swaps(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
 ) -> spec.DataFrame:
@@ -87,6 +88,7 @@ async def async_get_pool_swaps(
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
+        include_timestamps=include_timestamps,
     )
 
     if normalize or replace_symbols:
