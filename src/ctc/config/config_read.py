@@ -17,11 +17,6 @@ from . import config_spec
 from . import config_validate
 
 
-_config_cache: typing.MutableMapping[str, spec.PartialConfig] = {
-    'overrides': {},
-}
-
-
 class _ToolconfigKwargs(TypedDict):
     config_path_env_var: str
     default_config_path: str
@@ -111,11 +106,7 @@ def get_config(
             ].items()
         }
 
-    # load overrides
-    config_overrides = _config_cache['overrides']
-
-    # combine config data
-    config = dict(config_from_file, **config_overrides)
+    config = config_from_file
 
     # validate
     config_validate.validate_config(config)
@@ -124,31 +115,6 @@ def get_config(
         return typing.cast(spec.Config, config)
     else:
         return config
-
-
-#
-# # config overrides
-#
-
-
-def get_config_overrides() -> spec.PartialConfig:
-    return _config_cache['overrides']
-
-
-def set_config_override(key: str, value: typing.Any) -> None:
-    _config_cache['overrides'][key] = value  # type: ignore
-    get_config.cache.delete_all_entries()  # type: ignore
-
-
-def clear_config_override(key: str) -> None:
-    if key in _config_cache['overrides']:
-        del _config_cache['overrides'][key]  # type: ignore
-    get_config.cache.delete_all_entries()  # type: ignore
-
-
-def clear_config_overrides() -> None:
-    _config_cache['overrides'] = {}
-    get_config.cache.delete_all_entries()  # type: ignore
 
 
 def get_config_version_tuple(
