@@ -20,7 +20,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'block range of transfers',
             },
             {
-                'name': '--timestamps',
+                'name': '--include-timestamps',
                 'default': False,
                 'action': 'store_true',
                 'help': 'include timestamps',

@@ -28,7 +28,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '+',
             },
             {
-                'name': '--timestamps',
+                'name': '--include-timestamps',
                 'default': False,
                 'action': 'store_true',
                 'help': 'include timestamps',
