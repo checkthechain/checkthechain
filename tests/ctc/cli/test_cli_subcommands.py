@@ -69,7 +69,7 @@ def test_subcommand_examples(subcommand_spec):
                 ):
                     example_strs.append(example_str)
 
-    max_example_time = 10
+    max_example_time = 20
 
     for example_str in example_strs:
         command_pieces = ['python3', '-m', 'ctc'] + list(subcommand)
