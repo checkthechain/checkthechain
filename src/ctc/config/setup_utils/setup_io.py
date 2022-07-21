@@ -69,13 +69,22 @@ def write_new_config(
 
     version = upgrade_utils.omit_extra_version_data(ctc.__version__)
 
+    networks = {
+        str(key): value
+        for key, value in network_data['networks'].items()
+    }
+    default_providers = {
+        str(key): value
+        for key, value in network_data['default_providers'].items()
+    }
+
     config: spec.Config = {
         'config_spec_version': version,
         'data_dir': data_dir_data['data_dir'],
-        'networks': network_data['networks'],
+        'networks': networks,
         'providers': network_data['providers'],
         'default_network': network_data['default_network'],
-        'default_providers': network_data['default_providers'],
+        'default_providers': default_providers,
         'db_configs': db_data['db_configs'],
         'log_rpc_calls': data_dir_data['log_rpc_calls'],
         'log_sql_queries': data_dir_data['log_sql_queries'],
@@ -92,6 +101,7 @@ def write_new_config(
 
         # make sure file overwrite is confirmed
         if write_new and not overwrite:
+            raise Exception()
             print()
             if not toolcli.input_yes_or_no(
                 'Overwrite old config file? ',

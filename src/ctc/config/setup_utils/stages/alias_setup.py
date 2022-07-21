@@ -30,7 +30,7 @@ def add_cli_aliases(
         )
         print()
         toolstr.print(
-            'For example, you cna type '
+            'For example, you can type '
             + toolstr.add_style('4byte 0xa9059cbb', styles['command'])
             + ' instead of '
             + toolstr.add_style('ctc 4byte 0xa9059cbb', styles['command'])
