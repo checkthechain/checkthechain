@@ -127,7 +127,7 @@ def detect_shell_config_paths(verbose: bool = True) -> typing.Sequence[str]:
     """
 
     # gather paths
-    paths = [os.path.expanduser('~/.bashrc')]
+    paths = [os.path.expanduser('~/.bashrc'), os.path.expanduser('~/.profile')]
     zsh_path = os.path.expanduser('~/.zshrc')
     if os.path.isfile(zsh_path):
         paths.append(zsh_path)
@@ -160,7 +160,10 @@ def get_alias_status(paths: typing.Sequence[str] | None = None) -> AliasStatus:
 
     for path in paths:
         if path.endswith('.bashrc'):
-            shell = 'bash'
+            shell = 'bash interactive'
+        elif path.endswith('.profile'):
+            shell = 'bash login'
+
         elif path.endswith('.zshrc'):
             shell = 'zsh'
         else:
