@@ -70,7 +70,7 @@ def setup_dbs(
         network for network in used_networks if network is not None
     }
     print()
-    db.create_evm_tables(
+    db.create_missing_tables(
         networks=list(used_networks),
         db_config=db_configs['main'],
         confirm=True,

@@ -13,7 +13,7 @@ from .. import schema_utils
 from . import version_utils
 
 
-def create_evm_tables(
+def create_missing_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[schema_utils.SchemaName] | None = None,
     *,
