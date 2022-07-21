@@ -81,6 +81,7 @@ proposals = await evm.async_get_events(
 votes = await evm.async_get_events(
     contract_address=dao_address,
     event_name='VoteCast',
+    include_timestamps=True,
 )
 ```
 
