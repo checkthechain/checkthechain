@@ -78,7 +78,7 @@ def write_new_config(
         for key, value in network_data['default_providers'].items()
     }
 
-    config: spec.Config = {
+    config: spec.JsonConfig = {
         'config_spec_version': version,
         'data_dir': data_dir_data['data_dir'],
         'networks': networks,

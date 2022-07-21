@@ -43,3 +43,17 @@ class Config(TypedDict):
 
     log_rpc_calls: bool
     log_sql_queries: bool
+
+
+class JsonConfig(TypedDict):
+    config_spec_version: str
+    data_dir: str
+    providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
+    networks: typing.Mapping[str, network_types.NetworkMetadata]
+    default_network: network_types.ChainId | None
+    default_providers: typing.Mapping[str, rpc_types.ProviderName]
+
+    db_configs: typing.Mapping[str, toolsql.DBConfig]
+
+    log_rpc_calls: bool
+    log_sql_queries: bool
