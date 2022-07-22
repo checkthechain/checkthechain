@@ -71,7 +71,7 @@ def test_subcommand_examples(subcommand_spec):
                 ):
                     example_strs.append(example_str)
 
-    max_example_time = 20
+    max_example_time = 100
 
     for example_str in example_strs:
         command_pieces = [sys.executable, '-m', 'ctc'] + list(subcommand)
