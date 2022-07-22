@@ -4,6 +4,7 @@ import toolcli
 import toolstr
 
 from ctc import config
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -24,7 +25,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_chains_command(verbose: bool) -> None:
 
     default_network = config.get_default_network()
-    all_networks = list(config.get_networks().values())
+    all_networks = list(evm.get_networks().values())
     all_networks = sorted(all_networks, key=lambda network: network['chain_id'])
 
     # providers

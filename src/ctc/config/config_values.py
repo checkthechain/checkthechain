@@ -45,7 +45,7 @@ def get_default_network() -> spec.ChainId | None:
     return config_read.get_config().get('default_network')
 
 
-def get_networks() -> typing.Mapping[spec.ChainId, spec.NetworkMetadata]:
+def get_config_networks() -> typing.Mapping[spec.ChainId, spec.NetworkMetadata]:
     config = config_read.get_config()
     networks = config.get('networks')
     if networks is not None:
@@ -56,7 +56,7 @@ def get_networks() -> typing.Mapping[spec.ChainId, spec.NetworkMetadata]:
 
 def get_networks_that_have_providers() -> typing.Sequence[spec.ChainId]:
     providers = get_providers()
-    all_networks = get_networks()
+    all_networks = get_config_networks()
     network_set: set[spec.ChainId] = set()
     for provider in providers.values():
         network = provider.get('network')
@@ -145,7 +145,7 @@ def get_default_provider(
 
     if not isinstance(network, int):
         if isinstance(network, str):
-            for chain_id, network_metadata in get_networks().items():
+            for chain_id, network_metadata in get_config_networks().items():
                 if network == network_metadata['name']:
                     network = chain_id
                     break

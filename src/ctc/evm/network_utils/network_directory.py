@@ -65,9 +65,13 @@ def get_network_chain_id(network: spec.NetworkName | int) -> spec.ChainId:
 def get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
     return {
         network_metadata['name']: chain_id
-        for chain_id, network_metadata in config.get_networks().items()
+        for chain_id, network_metadata in get_networks().items()
         if network_metadata['name'] is not None
     }
+
+
+def get_networks() -> typing.Mapping[int, spec.NetworkMetadata]:
+    return config.get_config_networks()
 
 
 def get_network_names_by_chain_id() -> typing.Mapping[
@@ -75,7 +79,7 @@ def get_network_names_by_chain_id() -> typing.Mapping[
 ]:
     return {
         chain_id: network_metadata['name']
-        for chain_id, network_metadata in config.get_networks().items()
+        for chain_id, network_metadata in get_networks().items()
     }
 
 
@@ -86,7 +90,7 @@ def get_network_metadata(
     if isinstance(network, str):
         network = get_network_chain_id(network)
 
-    networks = config.get_networks()
+    networks = get_networks()
     if network in networks:
         return networks[network]
     else:
