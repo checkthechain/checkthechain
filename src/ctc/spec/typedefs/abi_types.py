@@ -70,5 +70,5 @@ FunctionSignature = str
 class DecodedCallData(TypedDict):
     function_abi: FunctionABI
     function_selector: str
-    parameters: list[typing.Any]
-    named_parameters: typing.Optional[dict[str, typing.Any]]
+    parameters: typing.List[typing.Any]
+    named_parameters: typing.Optional[typing.Mapping[str, typing.Any]]

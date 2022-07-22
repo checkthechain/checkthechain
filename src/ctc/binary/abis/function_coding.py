@@ -84,7 +84,7 @@ def decode_call_data(
         name is not None for name in parameter_names
     ):
         named_parameters = typing.cast(
-            dict[str, typing.Any],
+            typing.Mapping[str, typing.Any],
             dict(zip(parameter_names, decoded_parameters)),
         )
     else:
