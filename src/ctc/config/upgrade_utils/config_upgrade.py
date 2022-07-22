@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import typing
 
 import ctc
@@ -19,7 +20,8 @@ def upgrade_config(
 
     # perform upgrade
     if not isinstance(version, str):
-        raise spec.ConfigUpgradeError('old_config has unknown version')
+        print('old_config has unknown version, using default config', sys.stderr)
+        return dict(config_defaults.get_default_config())
     if version.startswith('0.2.'):
         return upgrade__0_2_0__to__0_3_0(old_config)
     elif version == '0.3.0':

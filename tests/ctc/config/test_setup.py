@@ -12,6 +12,8 @@ import pytest
 import ctc
 from ctc import spec
 from ctc.config import config_defaults
+from ctc.config import upgrade_utils
+
 
 #
 # # utility functions
@@ -250,15 +252,58 @@ def test_ctc_setup__overwrite(monkeypatch):
     )
 
 
+old_config__0_2_10 = {
+    'config_spec_version': '0.2.10',
+    'data_dir': '/home/storm/ctc_data',
+    'providers': {
+        'example_provider_1': {
+            'url': 'https://example_provider.com',
+            'name': 'example_provider_1',
+            'network': 1,
+            'protocol': 'http',
+            'session_kwargs': {},
+            'chunk_size': None,
+        },
+        'example_provider_2': {
+            'url': 'http://localhost',
+            'name': 'example_provider_2',
+            'network': 42161,
+            'protocol': 'http',
+            'session_kwargs': {},
+            'chunk_size': None,
+        },
+    },
+    'networks': {
+        'mainnet': {
+            'name': 'mainnet',
+            'chain_id': 1,
+            'block_explorer': 'etherscan.io',
+        },
+        'arbitrum': {
+            'name': 'arbitrum',
+            'chain_id': 42161,
+            'block_explorer': 'arbiscan.io',
+        },
+    },
+    'network_defaults': {
+        'default_network': 'mainnet',
+        'default_providers': {
+            'mainnet': 'example_provider_1',
+            'arbitrum': 'example_provider_2',
+        },
+    },
+}
+
 old_config_examples = [
+    #
     # 0.2.10 style config
-    {},
+    old_config__0_2_10,
+    #
     # blank old config
     {},
+    #
     # 0.3.0 style default config
     config_defaults.get_default_config(),
-    # malformed config
-    {},
 ]
 
 
@@ -284,6 +329,8 @@ def test_ctc_setup__use_old_config(monkeypatch, old_config):
         skip_db=True,
     )
 
+    old_config_upgraded = upgrade_utils.upgrade_config(old_config)
+
     # now, check that old_config values are preserved if they were valid
     new_config = get_ctc_config()
 
@@ -291,16 +338,23 @@ def test_ctc_setup__use_old_config(monkeypatch, old_config):
     assert new_config['config_spec_version'] == ctc.__version__
 
     # check that providers are preserved
-    pass
+    assert len(old_config_upgraded['providers']) == len(new_config['providers'])
 
     # check that default network is preserved
-    pass
+    assert (
+        old_config_upgraded.get('default_network')
+        == new_config['default_network']
+    )
 
     # check that default providers are preserved
-    pass
+    assert len(old_config_upgraded['default_providers']) == len(
+        new_config['default_providers']
+    )
+    for key, value in old_config_upgraded['default_providers'].items():
+        assert new_config['default_providers'].get(key) == value
 
     # check that custom networks are preserved
-    old_networks = old_config.get('networks')
+    old_networks = old_config_upgraded.get('networks')
     if old_networks is not None:
         for network_id, network_metadata in old_networks.items():
             assert network_id in new_config['networks']
@@ -308,6 +362,6 @@ def test_ctc_setup__use_old_config(monkeypatch, old_config):
                 assert new_config['networks'][network_id].get(key) == value
 
     # check that data dir is preserved
-    old_data_dir = old_config.get('data_dir')
+    old_data_dir = old_config_upgraded.get('data_dir')
     if old_data_dir is not None:
         assert new_config['data_dir'] == old_data_dir
