@@ -7,9 +7,9 @@ from ctc import spec
 
 from .. import abi_utils
 from .. import event_utils
-from . import erc20_abis
 from . import erc20_generic
 from . import erc20_metadata
+from . import erc20_spec
 
 
 def get_token_amount_column(df: spec.DataFrame) -> str:
@@ -47,7 +47,7 @@ async def async_get_erc20_transfers(
             contract_address=token, event_name='Transfer'
         )
     except Exception:
-        event_abi = erc20_abis.erc20_event_abis['Transfer']
+        event_abi = erc20_spec.erc20_event_abis['Transfer']
 
     transfers = await event_utils.async_get_events(
         contract_address=token_address,
