@@ -7,12 +7,11 @@ from ctc import spec
 
 from .. import abi_utils
 from .. import event_utils
-from . import erc20_generic
 from . import erc20_metadata
 from . import erc20_spec
 
 
-def get_token_amount_column(df: spec.DataFrame) -> str:
+def _get_token_amount_column(df: spec.DataFrame) -> str:
     if 'arg__amount' in df:
         return 'arg__amount'
     elif 'arg__value' in df:
@@ -36,7 +35,7 @@ async def async_get_erc20_transfers(
 ) -> spec.DataFrame:
 
     network = rpc.get_provider_network(provider)
-    token_address = await erc20_generic.async_get_erc20_address(
+    token_address = await erc20_metadata.async_get_erc20_address(
         token, network=network
     )
 
@@ -103,7 +102,7 @@ async def async_get_erc20_holdings_from_transfers(
         mask = blocks <= block
         transfers = transfers[mask]
 
-    amount_key = get_token_amount_column(transfers)
+    amount_key = _get_token_amount_column(transfers)
 
     # convert to float
     if dtype is not None:

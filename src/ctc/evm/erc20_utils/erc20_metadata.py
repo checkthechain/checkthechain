@@ -3,9 +3,37 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import config
 from ctc import rpc
 from ctc import spec
+from .. import address_utils
 from . import erc20_generic
+
+
+async def async_get_erc20_address(
+    token: spec.ERC20Reference,
+    network: spec.NetworkReference | None = None,
+) -> spec.ERC20Address:
+    """return address of input token, input as either symbol or address"""
+
+    if address_utils.is_address_str(token):
+        return token
+    elif isinstance(token, str):
+        from ctc import db
+
+        if network is None:
+            network = config.get_default_network()
+
+        metadata = await db.async_query_erc20_metadata(
+            symbol=token,
+            network=network,
+        )
+        if metadata is not None:
+            address = metadata['address']
+            if isinstance(address, str):
+                return address
+
+    raise Exception('could not get token address')
 
 
 async def async_get_default_erc20_tokens() -> typing.Sequence[
@@ -29,9 +57,7 @@ async def async_get_erc20_metadata(
 ) -> spec.ERC20Metadata:
 
     network = rpc.get_provider_network(provider)
-    address = await erc20_generic.async_get_erc20_address(
-        token, network=network
-    )
+    address = await async_get_erc20_address(token, network=network)
 
     symbol_coroutine = async_get_erc20_symbol(
         token=token, block=block, provider=provider, **rpc_kwargs
@@ -80,9 +106,7 @@ async def async_get_erc20_decimals(
         from ctc import db
 
         network = rpc.get_provider_network(provider)
-        token = await erc20_generic.async_get_erc20_address(
-            token, network=network
-        )
+        token = await async_get_erc20_address(token, network=network)
         result = await db.async_query_erc20_metadata(
             address=token, network=network
         )
@@ -162,9 +186,7 @@ async def async_get_erc20_name(
         from ctc import db
 
         network = rpc.get_provider_network(provider)
-        token = await erc20_generic.async_get_erc20_address(
-            token, network=network
-        )
+        token = await async_get_erc20_address(token, network=network)
         result: spec.ERC20Metadata | None = await db.async_query_erc20_metadata(
             address=token, network=network
         )
@@ -246,9 +268,7 @@ async def async_get_erc20_symbol(
         from ctc import db
 
         network = rpc.get_provider_network(provider)
-        token = await erc20_generic.async_get_erc20_address(
-            token, network=network
-        )
+        token = await async_get_erc20_address(token, network=network)
         result: spec.ERC20Metadata | None = await db.async_query_erc20_metadata(
             address=token, network=network
         )

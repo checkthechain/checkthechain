@@ -2,42 +2,10 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import rpc
 from ctc import spec
-from .. import address_utils
 from . import erc20_spec
-
-
-async def async_get_erc20_address(
-    token: spec.ERC20Reference,
-    network: spec.NetworkReference | None = None,
-) -> spec.ERC20Address:
-    """return address of input token, input as either symbol or address"""
-
-    if address_utils.is_address_str(token):
-        return token
-    elif isinstance(token, str):
-        from ctc import db
-
-        if network is None:
-            network = config.get_default_network()
-
-        metadata = await db.async_query_erc20_metadata(
-            symbol=token,
-            network=network,
-        )
-        if metadata is not None:
-            address = metadata['address']
-            if isinstance(address, str):
-                return address
-
-    raise Exception('could not get token address')
-
-
-#
-# # generic erc20 calls
-#
+from . import erc20_metadata
 
 
 async def async_erc20_eth_call(
@@ -48,7 +16,7 @@ async def async_erc20_eth_call(
     **rpc_kwargs: typing.Any,
 ) -> typing.Any:
     """perform eth_call for an erc20"""
-    address = await async_get_erc20_address(token)
+    address = await erc20_metadata.async_get_erc20_address(token)
     return await rpc.async_eth_call(
         to_address=address,
         function_abi=erc20_spec.erc20_function_abis[function_name],
@@ -68,7 +36,9 @@ async def async_erc20s_eth_calls(
 
     import asyncio
 
-    coroutines = [async_get_erc20_address(token) for token in tokens]
+    coroutines = [
+        erc20_metadata.async_get_erc20_address(token) for token in tokens
+    ]
     addresses = await asyncio.gather(*coroutines)
     return await rpc.async_batch_eth_call(
         to_addresses=addresses,
@@ -87,7 +57,7 @@ async def async_erc20_eth_call_by_block(
 ) -> list[typing.Any]:
     """perform eth_call for an erc20 across multiple blocks"""
 
-    address = await async_get_erc20_address(token)
+    address = await erc20_metadata.async_get_erc20_address(token)
     return await rpc.async_batch_eth_call(
         to_address=address,
         function_abi=erc20_spec.erc20_function_abis[function_name],
