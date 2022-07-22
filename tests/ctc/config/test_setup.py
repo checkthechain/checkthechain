@@ -49,7 +49,9 @@ def run_ctc_command(
 
     # run command
     print('running command: ' + ' '.join(command_pieces))
-    output = subprocess.check_output(command_pieces, timeout=max_time, env=os.environ.copy())
+    output = subprocess.check_output(
+        command_pieces, timeout=max_time, env=os.environ.copy()
+    )
     return output.decode().rstrip('\n')
 
 
@@ -101,6 +103,7 @@ def get_db_path():
 # # tests
 #
 
+
 def test_use_env_var_config_path(monkeypatch):
     # test that ctc reads from the CTC_CONFIG_PATH env var
     config_path = create_temp_config_path()
@@ -125,7 +128,7 @@ def test_ctc_setup__requires_rpc(monkeypatch):
     if 'ETH_RPC_URL' in os.environ:
         monkeypatch.delenv('ETH_RPC_URL')
     with pytest.raises(Exception):
-        run_ctc_headless()
+        run_ctc_headless(skip_db=True)
 
 
 def test_ctc_setup__with_env_eth_rpc_url(monkeypatch):
@@ -143,7 +146,7 @@ def test_ctc_setup__with_env_eth_rpc_url(monkeypatch):
     monkeypatch.setenv('ETH_RPC_CHAIN_ID', '3')
 
     # perform setup
-    run_ctc_headless()
+    run_ctc_headless(skip_db=True)
 
     # ensure that newly written config file has specified rpc
     default_provider = get_default_provider()
@@ -166,6 +169,7 @@ def test_ctc_setup__with_rpc_command(monkeypatch):
     run_ctc_headless(
         rpc_url=test_url,
         rpc_chain_id=test_chain_id,
+        skip_db=True,
     )
 
     # ensure that newly written config file has specified rpc
@@ -185,6 +189,7 @@ def test_ctc_setup__set_data_dir(monkeypatch):
         data_dir=data_dir,
         rpc_url='https://some/test/url',
         rpc_chain_id=1,
+        skip_db=True,
     )
     assert len(os.listdir(data_dir)) > 0
 
@@ -217,84 +222,92 @@ def test_ctc_setup__skip_db(monkeypatch):
     assert os.path.isfile(db_path)
 
 
-# def test_ctc_setup__overwrite(monkeypatch):
-#     # test that skipping or not skipping db setup works properly
+def test_ctc_setup__overwrite(monkeypatch):
+    # test that skipping or not skipping db setup works properly
 
-#     config_path = create_temp_config_path()
-#     monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
+    config_path = create_temp_config_path()
+    monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
 
-#     assert not os.path.isfile(config_path)
+    assert not os.path.isfile(config_path)
 
-#     default_config = config_defaults.get_default_config()
-#     with open(config_path, 'w') as f:
-#         json.dump(default_config, f)
+    default_config = config_defaults.get_default_config()
+    with open(config_path, 'w') as f:
+        json.dump(default_config, f)
 
-#     with pytest.raises(Exception):
-#         run_ctc_headless(
-#             overwrite=False,
-#             rpc_url='https://some/test/url',
-#             rpc_chain_id=1,
-#         )
+    with pytest.raises(Exception):
+        run_ctc_headless(
+            overwrite=False,
+            rpc_url='https://some/test/url',
+            rpc_chain_id=1,
+            skip_db=True,
+        )
 
-
-# old_config_examples = [
-#     # 0.2.10 style config
-#     {
-#     },
-#     # blank old config
-#     {},
-#     # 0.3.0 style default config
-#     config_defaults.get_default_config(),
-#     # malformed config
-#     {},
-# ]
+    run_ctc_headless(
+        overwrite=True,
+        rpc_url='https://some/test/url',
+        rpc_chain_id=1,
+        skip_db=True,
+    )
 
 
-# @pytest.mark.parametrize('old_config', old_config_examples)
-# def test_ctc_setup__use_old_config(monkeypatch, old_config):
-#     # test that
-#     # 1) values are preserved from old_configs
-#     # 2) old_configs do not crash the setup
+old_config_examples = [
+    # 0.2.10 style config
+    {},
+    # blank old config
+    {},
+    # 0.3.0 style default config
+    config_defaults.get_default_config(),
+    # malformed config
+    {},
+]
 
-#     config_path = create_temp_config_path()
-#     monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
 
-#     # write old config to config path
-#     assert not os.path.isfile(config_path)
-#     with open(config_path, 'w') as f:
-#         json.dump(old_config, f)
+@pytest.mark.parametrize('old_config', old_config_examples)
+def test_ctc_setup__use_old_config(monkeypatch, old_config):
+    # test that
+    # 1) values are preserved from old_configs
+    # 2) old_configs do not crash the setup
 
-#     # run setup
-#     run_ctc_headless(
-#         skip_networking=True,
-#         ignore_old_config=False,
-#         overwrite=True,
-#     )
+    config_path = create_temp_config_path()
+    monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
 
-#     # now, check that old_config values are preserved if they were valid
-#     new_config = get_ctc_config()
+    # write old config to config path
+    assert not os.path.isfile(config_path)
+    with open(config_path, 'w') as f:
+        json.dump(old_config, f)
 
-#     # check that current ctc value is used
-#     assert new_config['config_spec_version'] == ctc.__version__
+    # run setup
+    run_ctc_headless(
+        skip_networking=True,
+        ignore_old_config=False,
+        overwrite=True,
+        skip_db=True,
+    )
 
-#     # check that providers are preserved
-#     pass
+    # now, check that old_config values are preserved if they were valid
+    new_config = get_ctc_config()
 
-#     # check that default network is preserved
-#     pass
+    # check that current ctc value is used
+    assert new_config['config_spec_version'] == ctc.__version__
 
-#     # check that default providers are preserved
-#     pass
+    # check that providers are preserved
+    pass
 
-#     # check that custom networks are preserved
-#     old_networks = old_config.get('networks')
-#     if old_networks is not None:
-#         for network_id, network_metadata in old_networks.items():
-#             assert network_id in new_config['networks']
-#             for key, value in network_metadata.items():
-#                 assert new_config['networks'][network_id].get(key) == value
+    # check that default network is preserved
+    pass
 
-#     # check that data dir is preserved
-#     old_data_dir = old_config.get('data_dir')
-#     if old_data_dir is not None:
-#         assert new_config['data_dir'] == old_data_dir
+    # check that default providers are preserved
+    pass
+
+    # check that custom networks are preserved
+    old_networks = old_config.get('networks')
+    if old_networks is not None:
+        for network_id, network_metadata in old_networks.items():
+            assert network_id in new_config['networks']
+            for key, value in network_metadata.items():
+                assert new_config['networks'][network_id].get(key) == value
+
+    # check that data dir is preserved
+    old_data_dir = old_config.get('data_dir')
+    if old_data_dir is not None:
+        assert new_config['data_dir'] == old_data_dir
