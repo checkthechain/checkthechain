@@ -34,7 +34,7 @@ async def async_get_block_of_timestamp(
     if block_timestamps is not None or (
         block_timestamp_array is not None and block_number_array is not None
     ):
-        return get_block_of_timestamp_from_arrays(
+        return _get_block_of_timestamp_from_arrays(
             timestamp=timestamp,
             block_timestamp_array=block_timestamp_array,
             block_number_array=block_number_array,
@@ -57,7 +57,7 @@ async def async_get_block_of_timestamp(
                 return block
 
         # rpc node
-        return await block_time_search.async_get_block_of_timestamp_from_node(
+        return await block_time_search._async_get_block_of_timestamp_from_node(
             timestamp=timestamp,
             nary=nary,
             cache=cache,
@@ -68,7 +68,7 @@ async def async_get_block_of_timestamp(
         )
 
 
-def get_block_of_timestamp_from_arrays(
+def _get_block_of_timestamp_from_arrays(
     timestamp: tooltime.Timestamp,
     *,
     block_timestamp_array: spec.NumpyArray | None = None,

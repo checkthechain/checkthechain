@@ -6,9 +6,9 @@ from ctc import spec
 from ctc import rpc
 
 from .. import address_utils
-from .. import evm_spec
-from . import erc20_normalize
 from . import erc20_generic
+from . import erc20_normalize
+from . import erc20_spec
 
 
 #
@@ -171,7 +171,7 @@ async def async_get_erc20_balance_of_addresses(
     balances = await rpc.async_batch_eth_call(
         to_address=token,
         block_number=block,
-        function_abi=evm_spec.erc20_function_abis['balanceOf'],
+        function_abi=erc20_spec.erc20_function_abis['balanceOf'],
         function_parameter_list=[[wallet] for wallet in wallets],
         provider=provider,
         **rpc_kwargs,
@@ -396,7 +396,7 @@ async def async_get_erc20s_allowances_by_address(
     allowances = await rpc.async_batch_eth_call(
         to_address=token,
         block_number=block,
-        function_abi=evm_spec.erc20_function_abis['allowance'],
+        function_abi=erc20_spec.erc20_function_abis['allowance'],
         function_parameter_list=[[wallet] for wallet in wallets],
         provider=provider,
     )

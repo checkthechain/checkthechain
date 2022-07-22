@@ -35,7 +35,7 @@ async def async_get_contract_creation_block(
         if block is not None:
             return block
 
-    block = await async_get_contract_creation_block_from_node(
+    block = await _async_get_contract_creation_block_from_node(
         contract_address=contract_address,
         provider=provider,
         **search_kwargs,
@@ -51,7 +51,7 @@ async def async_get_contract_creation_block(
     return block
 
 
-async def async_get_contract_creation_block_from_node(
+async def _async_get_contract_creation_block_from_node(
     contract_address: spec.Address,
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,

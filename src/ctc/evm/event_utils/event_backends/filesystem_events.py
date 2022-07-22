@@ -18,7 +18,13 @@ from ctc.toolbox import filesystem_utils
 from ... import abi_utils
 from ... import block_utils
 from ... import network_utils
-from ... import evm_spec
+
+
+filesystem_layout = {
+    'evm_events_path': 'events/contract__{contract_address}/event__{event_hash}/{start_block}__to__{end_block}.csv',
+    'evm_contract_abis_path': 'contract_abis/contract__{contract_address}/{name}.json',
+    'evm_named_contract_abis_path': '{data_root}/{network}/evm/named_contract_abis',
+}
 
 
 #
@@ -84,7 +90,7 @@ def get_events_filepath(
     event_hash = event_hash.lower()
 
     # assemble items into subpath
-    subpath = evm_spec.filesystem_layout['evm_events_path'].format(
+    subpath = filesystem_layout['evm_events_path'].format(
         contract_address=contract_address,
         event_hash=event_hash,
         start_block=start_block,

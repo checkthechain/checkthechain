@@ -38,7 +38,7 @@ async def async_get_blocks_of_timestamps(
 
         blocks = []
         for timestamp in timestamps:
-            block = block_time_singular.get_block_of_timestamp_from_arrays(
+            block = block_time_singular._get_block_of_timestamp_from_arrays(
                 timestamp=timestamp,
                 block_timestamp_array=block_timestamp_array,
                 block_number_array=block_number_array,

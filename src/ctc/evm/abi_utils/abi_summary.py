@@ -14,6 +14,24 @@ from . import abi_io
 #
 
 
+def get_contract_abi_by_selectors(
+    contract_abi: spec.ContractABI,
+) -> typing.Mapping[str, spec.ContractABIEntry]:
+    by_selectors: typing.MutableMapping[str, spec.ContractABIEntry] = {}
+    for item in contract_abi:
+        if item['type'] == 'function':
+            function_selector = binary.get_function_selector(item)
+            by_selectors[function_selector] = item
+        elif item['type'] == 'event':
+            event_hash = binary.get_event_hash(item)
+            by_selectors[event_hash] = item
+        elif item['type'] in ['error', 'constructor']:
+            pass
+        else:
+            raise Exception('unknown item type in contract abi')
+    return by_selectors
+
+
 async def async_summarize_contract_abi(
     contract_abi: spec.ContractABI | None = None,
     contract_address: spec.Address | None = None,

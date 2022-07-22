@@ -6,7 +6,7 @@ from ctc import config
 from ctc import rpc
 from ctc import spec
 from .. import address_utils
-from .. import evm_spec
+from . import erc20_spec
 
 
 async def async_get_erc20_address(
@@ -51,7 +51,7 @@ async def async_erc20_eth_call(
     address = await async_get_erc20_address(token)
     return await rpc.async_eth_call(
         to_address=address,
-        function_abi=evm_spec.erc20_function_abis[function_name],
+        function_abi=erc20_spec.erc20_function_abis[function_name],
         block_number=block,
         **rpc_kwargs,
     )
@@ -72,7 +72,7 @@ async def async_erc20s_eth_calls(
     addresses = await asyncio.gather(*coroutines)
     return await rpc.async_batch_eth_call(
         to_addresses=addresses,
-        function_abi=evm_spec.erc20_function_abis[function_name],
+        function_abi=erc20_spec.erc20_function_abis[function_name],
         block_number=block,
         **rpc_kwargs,
     )
@@ -90,7 +90,7 @@ async def async_erc20_eth_call_by_block(
     address = await async_get_erc20_address(token)
     return await rpc.async_batch_eth_call(
         to_address=address,
-        function_abi=evm_spec.erc20_function_abis[function_name],
+        function_abi=erc20_spec.erc20_function_abis[function_name],
         block_numbers=blocks,
         **rpc_kwargs,
     )

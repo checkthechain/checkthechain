@@ -16,7 +16,7 @@ class BlockTimestampSearchCache(TypedDict):
     timestamps: dict[int, int]
 
 
-async def async_get_block_of_timestamp_from_node(
+async def _async_get_block_of_timestamp_from_node(
     timestamp: int,
     *,
     nary: typing.Optional[int] = None,

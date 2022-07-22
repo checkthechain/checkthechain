@@ -4,8 +4,8 @@ import typing
 
 from ctc import spec
 from .. import block_crud
-from . import block_time_crud
-from . import block_time_plural
+from . import block_to_timestamp
+from . import timestamp_to_block
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -29,11 +29,11 @@ async def async_sample_blocks(
     import tooltime
 
     if start_block is not None:
-        start_time = await block_time_crud.async_get_block_timestamp(
+        start_time = await block_to_timestamp.async_get_block_timestamp(
             start_block
         )
     if end_block is not None:
-        end_time = await block_time_crud.async_get_block_timestamp(end_block)
+        end_time = await block_to_timestamp.async_get_block_timestamp(end_block)
 
     float_timestamps = tooltime.sample_timestamps(
         start_time=start_time,
@@ -61,7 +61,7 @@ async def async_sample_blocks(
     trimmed = len(timestamps) != n_original_timestamps
 
     # get blocks of timestamps
-    blocks = await block_time_plural.async_get_blocks_of_timestamps(
+    blocks = await timestamp_to_block.async_get_blocks_of_timestamps(
         timestamps=timestamps,
     )
 
