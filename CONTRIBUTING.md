@@ -12,6 +12,13 @@ Relevant testing commands:
 
 The `pyproject.toml` file in the root directory contains the configuration for each of these tools.
 
+Useful arguments when running the tests:
+- `pytest -n 20` will run the tests in 20 parallel threads, which will greatly speed up the total time needed for testing.
+- `pytest --lf` will rerun only those tests that failed in the previous testing run, which is helpful for efficiently debugging a failing test.
+- `pytest --pdb` will drop into an interactive debugger each time a test fails.
+
+Running the tests will require an archive node RPC provider. Free third-party providers might have ratelimits that are too low to be able to run the tests in a reasonable amount of time.
+
 
 ## Development
 
