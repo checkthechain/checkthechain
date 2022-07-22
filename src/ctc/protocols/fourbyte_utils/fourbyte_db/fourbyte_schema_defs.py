@@ -18,6 +18,7 @@ fourbyte_schema: toolsql.DBSchema = {
                 {
                     'name': 'created_at',
                     'type': 'Text',
+                    'index': True,
                 },
                 {
                     'name': 'hex_signature',
@@ -32,6 +33,7 @@ fourbyte_schema: toolsql.DBSchema = {
                 {
                     'name': 'bytes_signature',
                     'type': 'Text',
+                    'index': True,
                 },
             ],
         },
@@ -45,6 +47,7 @@ fourbyte_schema: toolsql.DBSchema = {
                 {
                     'name': 'created_at',
                     'type': 'Text',
+                    'index': True,
                 },
                 {
                     'name': 'hex_signature',
@@ -59,6 +62,7 @@ fourbyte_schema: toolsql.DBSchema = {
                 {
                     'name': 'bytes_signature',
                     'type': 'Text',
+                    'index': True,
                 },
             ],
         },
