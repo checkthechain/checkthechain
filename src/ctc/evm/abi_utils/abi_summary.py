@@ -150,6 +150,31 @@ def summarize_contract_abi_functions(
             },
         )
 
+    print()
+    has_constructor = any(
+        item['type'] == 'constructor' for item in contract_abi
+    )
+    has_receive = any(item['type'] == 'receive' for item in contract_abi)
+    has_fallback = any(item['type'] == 'fallback' for item in contract_abi)
+
+    toolstr.print_text_box(
+        'Special Functions Present', style=styles['title'], indent=None
+    )
+    print()
+    rows = [
+        ('constructor', has_constructor),
+        ('receive', has_receive),
+        ('fallback', has_fallback),
+    ]
+    toolstr.print_table(
+        rows,
+        labels=['function', 'present'],
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_style={'function': styles['option'], 'present': None},
+        # indent=4,
+    )
+
 
 def summarize_contract_abi_events(
     contract_abi: spec.ContractABI,
