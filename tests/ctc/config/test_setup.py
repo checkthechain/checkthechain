@@ -191,7 +191,6 @@ def test_ctc_setup__set_data_dir(monkeypatch):
         data_dir=data_dir,
         rpc_url='https://some/test/url',
         rpc_chain_id=1,
-        skip_db=True,
     )
     assert len(os.listdir(data_dir)) > 0
 
@@ -294,6 +293,9 @@ old_config__0_2_10 = {
     },
 }
 
+
+default_config = config_defaults.get_default_config()
+
 old_config_examples = [
     #
     # 0.2.10 style config
@@ -303,7 +305,15 @@ old_config_examples = [
     {},
     #
     # 0.3.0 style default config
-    config_defaults.get_default_config(),
+    default_config,
+    #
+    # default config with small changes
+    dict(
+        default_config,
+        data_dir=tempfile.mkdtemp(),
+        providers={},
+        default_provider=None,
+    ),
 ]
 
 
