@@ -169,10 +169,12 @@ def delete_schema_version(
             if not answer:
                 raise Exception('aborting')
 
+    where_equals: typing.MutableMapping[str, typing.Any] = {}
     if schema_name is not None:
-        where_equals = {'schema_name': schema_name}
-    else:
-        where_equals = {}
+        where_equals['schema_name'] = schema_name
+    if network is not None:
+        where_equals['chain_id'] = evm.get_network_chain_id(network)
+
     toolsql.delete(
         conn=conn,
         table='schema_versions',
