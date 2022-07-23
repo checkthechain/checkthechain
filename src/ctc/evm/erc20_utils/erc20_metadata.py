@@ -6,8 +6,10 @@ from ctc import binary
 from ctc import config
 from ctc import rpc
 from ctc import spec
+from .. import abi_utils
 from .. import address_utils
 from . import erc20_generic
+from . import erc20_spec
 
 
 async def async_get_erc20_address(
@@ -34,6 +36,33 @@ async def async_get_erc20_address(
                 return address
 
     raise Exception('could not get token address')
+
+
+async def async_is_erc20(
+    address_or_abi: spec.Address | spec.ContractABI,
+) -> bool:
+    """return whether an address implements ERC20 spec in its abi"""
+
+    # get contract abi
+    if address_utils.is_address_str(address_or_abi):
+        contract_abi = await abi_utils.async_get_contract_abi(address_or_abi)
+    elif isinstance(address_or_abi, list):
+        contract_abi = address_or_abi
+    contract_abi_by_selectors = abi_utils.get_contract_abi_by_selectors(
+        contract_abi
+    )
+
+    # get erc20 abi
+    erc20_abi = list(erc20_spec.erc20_function_abis.values()) + list(
+        erc20_spec.erc20_event_abis.values()
+    )
+    erc20_abi_by_selectors = abi_utils.get_contract_abi_by_selectors(erc20_abi)
+
+    # compare abis
+    for selector in erc20_abi_by_selectors.keys():
+        if selector not in contract_abi_by_selectors:
+            return False
+    return True
 
 
 async def async_get_default_erc20_tokens() -> typing.Sequence[

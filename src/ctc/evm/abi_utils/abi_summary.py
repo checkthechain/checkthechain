@@ -17,6 +17,10 @@ from . import abi_io
 def get_contract_abi_by_selectors(
     contract_abi: spec.ContractABI,
 ) -> typing.Mapping[str, spec.ContractABIEntry]:
+    """return a mapping from function/event selectors to function/event abis
+
+    omits constructor, receive, and fallback functions
+    """
     by_selectors: typing.MutableMapping[str, spec.ContractABIEntry] = {}
     for item in contract_abi:
         if item['type'] == 'function':
@@ -25,7 +29,7 @@ def get_contract_abi_by_selectors(
         elif item['type'] == 'event':
             event_hash = binary.get_event_hash(item)
             by_selectors[event_hash] = item
-        elif item['type'] in ['error', 'constructor']:
+        elif item['type'] in ['error', 'constructor', 'receive', 'fallback']:
             pass
         else:
             raise Exception('unknown item type in contract abi')

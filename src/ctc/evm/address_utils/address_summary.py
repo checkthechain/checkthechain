@@ -68,8 +68,14 @@ async def async_print_address_summary(
             print('- age:', age)
 
     if is_contract:
-        print()
-        print()
+
+        is_erc20 = await evm.async_is_erc20(address)
+        print('- is ERC20:', is_erc20)
+
+        if is_erc20:
+            print()
+            print()
+            await evm.async_print_erc20_summary(address)
 
         provider = rpc.get_provider(provider)
         network = provider['network']
@@ -78,6 +84,8 @@ async def async_print_address_summary(
             network=network,
         )
 
+        print()
+        print()
         if raw:
             import json
             import toolstr
