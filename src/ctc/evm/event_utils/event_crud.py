@@ -50,12 +50,14 @@ async def async_get_events(
     end_block: spec.BlockNumberReference | None = None,
     backend_order: typing.Sequence[str] | None = None,
     keep_multiindex: bool = True,
+    verbose: bool = True,
     **query: typing.Any,
 ) -> spec.DataFrame:
 
     if start_block is None:
         start_block = await block_utils.async_get_contract_creation_block(
-            contract_address
+            contract_address,
+            verbose=verbose,
         )
     start_block = await block_utils.async_block_number_to_int(start_block)
     if end_block is None:
@@ -74,6 +76,7 @@ async def async_get_events(
         start_block=start_block,
         end_block=end_block,
         backend_order=backend_order,
+        verbose=verbose,
         **query,
     )
 
