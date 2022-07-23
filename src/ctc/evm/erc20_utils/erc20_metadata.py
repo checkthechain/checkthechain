@@ -53,9 +53,8 @@ async def async_is_erc20(
     )
 
     # get erc20 abi
-    erc20_abi = list(erc20_spec.erc20_function_abis.values()) + list(
-        erc20_spec.erc20_event_abis.values()
-    )
+    erc20_abi: spec.ContractABI = list(erc20_spec.erc20_function_abis.values())
+    erc20_abi += list(erc20_spec.erc20_event_abis.values())
     erc20_abi_by_selectors = abi_utils.get_contract_abi_by_selectors(erc20_abi)
 
     # compare abis

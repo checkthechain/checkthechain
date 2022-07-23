@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import typing
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypeGuard
+
 from ctc import binary
 from ctc import spec
 
 
-def is_address_str(some_str: str) -> bool:
+def is_address_str(some_str: typing.Any) -> TypeGuard[spec.Address]:
     return (
         isinstance(some_str, str)
         and some_str.startswith('0x')
