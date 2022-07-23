@@ -55,7 +55,7 @@ async def async_chains_command(verbose: bool) -> None:
         is_default = '✓' if default_network == network['chain_id'] else ''
 
         if not verbose:
-            has_provider = '✓' if network['name'] in providers_by_chain else ''
+            has_provider = '✓' if network['chain_id'] in providers_by_chain else ''
         else:
             if network['chain_id'] in providers_by_chain:
                 has_provider = providers_by_chain[network['chain_id']]['url']

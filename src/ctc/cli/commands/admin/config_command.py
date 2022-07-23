@@ -85,9 +85,7 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
         styled_path = toolstr.add_style(config_path, path_style)
         if env_var_value in (None, ''):
             toolstr.print(
-                toolstr.add_style(
-                    'using default config path: ', key_style
-                )
+                toolstr.add_style('using default config path: ', key_style)
                 + styled_path
             )
         else:
@@ -150,6 +148,10 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                     for label in labels:
                         if label == 'url' and not reveal:
                             cell = '*' * 8
+                        elif label == 'network':
+                            cell = config['networks'][provider['network']][
+                                'name'
+                            ]
                         else:
                             cell = str(provider[label])
                         row.append(cell)
@@ -174,7 +176,7 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                         + toolstr.add_style('--reveal', key_style)
                         + toolstr.add_style(
                             ' to reveal sensitive provider information)',
-                            chrome_style
+                            chrome_style,
                         )
                     )
 
