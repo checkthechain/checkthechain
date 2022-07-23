@@ -57,21 +57,21 @@ def print_contract_abi_diff(
 
     if functions_only or not events_only:
 
-        abi_summary.print_contract_abi_functions_human_readable(
+        abi_summary.summarize_contract_abi_functions(
             diff['mutual'],
             title='Mutual Functions',
         )
 
         print()
         print()
-        abi_summary.print_contract_abi_functions_human_readable(
+        abi_summary.summarize_contract_abi_functions(
             diff['first_only'],
             title=first_name + ' Functions',
         )
 
         print()
         print()
-        abi_summary.print_contract_abi_functions_human_readable(
+        abi_summary.summarize_contract_abi_functions(
             diff['second_only'],
             title=second_name + ' Functions',
         )
@@ -82,21 +82,21 @@ def print_contract_abi_diff(
             print()
             print()
 
-        abi_summary.print_contract_abi_events_human_readable(
+        abi_summary.summarize_contract_abi_events(
             diff['mutual'],
             title='Mutual Events',
         )
 
         print()
         print()
-        abi_summary.print_contract_abi_events_human_readable(
+        abi_summary.summarize_contract_abi_events(
             diff['first_only'],
             title=first_name + ' Events',
         )
 
         print()
         print()
-        abi_summary.print_contract_abi_events_human_readable(
+        abi_summary.summarize_contract_abi_events(
             diff['second_only'],
             title=second_name + ' Events',
         )

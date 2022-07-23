@@ -94,7 +94,7 @@ async def async_print_address_summary(
             as_str = json.dumps(contract_abi, sort_keys=True, indent=4)
             print(as_str)
         else:
-            abi_utils.print_contract_abi_human_readable(
+            abi_utils.summarize_contract_abi(
                 contract_abi=contract_abi,
                 max_width=max_width,
                 verbose=verbose,

@@ -205,7 +205,7 @@ deps =
     toolcli==0.6.5
     toolconf==0.1.2
     toolsql==0.3.6
-    toolstr==0.5.1
+    toolstr==0.5.2
     tooltime==0.2.4
     ;
     ; EVM dependencies

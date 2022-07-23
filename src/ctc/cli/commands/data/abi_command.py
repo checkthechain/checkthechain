@@ -119,7 +119,7 @@ async def async_abi_command(
             columns = os.get_terminal_size().columns
         except Exception:
             columns = 80
-        evm.print_contract_abi_human_readable(
+        evm.summarize_contract_abi(
             contract_abi,
             max_width=columns,
             verbose=verbose,
