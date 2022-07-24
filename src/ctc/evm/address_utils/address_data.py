@@ -28,8 +28,7 @@ def get_created_address(
     # see https://ethereum.stackexchange.com/a/761
     if nonce is not None:
         # create
-        sender_binary = binary.convert(sender, 'binary')
-        data = binary.rlp_encode([sender_binary, nonce])
+        data = binary.rlp_encode_address_nonce_tuple(sender, nonce)
     elif salt is not None and init_code is not None:
         # create2
         data = (

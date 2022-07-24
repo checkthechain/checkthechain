@@ -9,6 +9,44 @@ from ctc import spec
 from . import formats
 
 
+def rlp_encode_int(integer: int) -> spec.PrefixHexData:
+    if integer == 0:
+        return '0x80'
+    elif integer <= 127:
+        encoded = formats.convert(integer, 'raw_hex')
+        if len(encoded) == 1:
+            encoded = '0' + encoded
+        return '0x' + encoded
+    else:
+        integer_hex = formats.convert(integer, 'raw_hex')
+        if len(integer_hex) % 2 == 1:
+            integer_hex = '0' + integer_hex
+        integer_bytes = int(len(integer_hex) / 2)
+        return formats.convert(128 + integer_bytes, 'prefix_hex') + integer_hex
+
+
+def rlp_encode_address(address):
+    return '0x94' + formats.convert(address, 'raw_hex')
+
+
+def rlp_encode_address_nonce_tuple(address, nonce) -> spec.PrefixHexData:
+    rlp_address = rlp_encode_address(address)[2:]
+    rlp_integer = rlp_encode_int(nonce)[2:]
+    data_len = int(len(rlp_address) / 2 + len(rlp_integer) / 2)
+
+    if data_len <= 55:
+        pre_offset = 192
+    else:
+        pre_offset = 247
+
+    return (
+        '0x'
+        + formats.convert(pre_offset + data_len, 'raw_hex')
+        + rlp_address
+        + rlp_integer
+    )
+
+
 def rlp_encode(data: typing.Any) -> str:
     try:
         import rlp  # type: ignore
