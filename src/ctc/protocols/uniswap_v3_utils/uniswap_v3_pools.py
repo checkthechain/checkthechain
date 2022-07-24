@@ -4,7 +4,7 @@ import typing
 
 from ctc import evm
 from ctc import spec
-from . import uniswap_v2_spec
+from . import uniswap_v3_spec
 
 
 async def async_get_pools(
@@ -21,7 +21,7 @@ async def async_get_pools(
     from ctc import db
 
     if factory is None:
-        factory = uniswap_v2_spec.uniswap_v2_factory
+        factory = uniswap_v3_spec.factory
 
     return await db.async_get_pools(
         factory=factory,
@@ -58,19 +58,25 @@ async def _async_get_new_pools(
                 'type': 'address',
             },
             {
-                'indexed': False,
-                'internalType': 'address',
-                'name': 'pair',
-                'type': 'address',
+                'indexed': True,
+                'internalType': 'uint24',
+                'name': 'fee',
+                'type': 'uint24',
             },
             {
                 'indexed': False,
-                'internalType': 'uint256',
-                'name': '',
-                'type': 'uint256',
+                'internalType': 'int24',
+                'name': 'tickSpacing',
+                'type': 'int24',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'pool',
+                'type': 'address',
             },
         ],
-        'name': 'PairCreated',
+        'name': 'PoolCreated',
         'type': 'event',
     }
 
@@ -87,13 +93,13 @@ async def _async_get_new_pools(
     for index, row in df.iterrows():
         block = typing.cast(int, index)
         dex_pool: spec.DexPool = {
-            'address': row['arg__pair'],
+            'address': row['arg__pool'],
             'factory': factory,
             'asset0': row['arg__token0'],
             'asset1': row['arg__token1'],
             'asset2': None,
             'asset3': None,
-            'fee': int(0.003 * 1e8),
+            'fee': row['arg__fee'] * 100,
             'creation_block': block,
             'additional_data': {},
         }

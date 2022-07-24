@@ -11,6 +11,7 @@ from ctc import spec
 
 tick_lens = '0xbfd8137f7d1516d3ea5ca83523914859ec47f573'
 quoter = '0xb27308f9f90d607463bb33ea1bebb41c27ce5ab6'
+factory = '0x1f98431c8ad98523631ae4a59f267346ea31f984'
 
 
 #
