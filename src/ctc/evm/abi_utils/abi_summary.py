@@ -157,9 +157,7 @@ def summarize_contract_abi_functions(
     has_receive = any(item['type'] == 'receive' for item in contract_abi)
     has_fallback = any(item['type'] == 'fallback' for item in contract_abi)
 
-    toolstr.print_text_box(
-        'Special Functions Present', style=styles['title'], indent=None
-    )
+    toolstr.print_text_box('Special Functions Present', style=styles['title'])
     print()
     special_rows = [
         ('constructor', has_constructor),
