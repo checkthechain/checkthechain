@@ -6,6 +6,8 @@ from typing_extensions import TypedDict
 from ctc import spec
 
 
+uniswap_v2_factory = '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f'
+
 trade_fee = 0.003
 
 
