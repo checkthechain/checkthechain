@@ -10,6 +10,7 @@ from __future__ import annotations
 import typing
 
 from ctc import config
+from ctc import rpc
 from ctc import spec
 
 
@@ -100,3 +101,28 @@ def get_network_metadata(
 def get_network_block_explorer(network: spec.NetworkReference) -> str | None:
     network_metadata = get_network_metadata(network)
     return network_metadata['block_explorer']
+
+
+def get_network_and_provider(
+    network: spec.NetworkReference | None,
+    provider: spec.ProviderReference | None,
+) -> tuple[spec.NetworkReference, spec.Provider]:
+    pass
+    # if network is None:
+    #     network = 'mainnet'
+    if provider is None and network is None:
+        network = config.get_default_network()
+        if network is None:
+            raise Exception('no network or provider specified')
+        network_reference: spec.NetworkReference = network
+        full_provider = config.get_default_provider()
+    elif provider is not None and network is None:
+        full_provider = rpc.get_provider(provider)
+        network_reference = full_provider['network']
+    elif network is not None and provider is None:
+        network_reference = network
+        full_provider = rpc.get_provider({'network': network})
+    else:
+        raise Exception('internal logic error')
+
+    return network_reference, full_provider

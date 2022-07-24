@@ -258,7 +258,7 @@ async def async_collect_provider_metadata(
         try:
             temporary_provider: spec.Provider = {
                 'name': None,
-                'network': None,
+                'network': -2,
                 'protocol': 'http',
                 'session_kwargs': {},
                 'chunk_size': None,

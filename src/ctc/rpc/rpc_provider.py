@@ -21,9 +21,16 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
             if ctc.config.has_provider(url=provider):
                 return ctc.config.get_provider(url=provider)
             else:
+                from ctc.config import config_defaults
+
+                try:
+                    network = config_defaults._sync_get_chain_id(provider)
+                except Exception:
+                    raise Exception('could not determine chain_id of provider')
+
                 return {
                     'name': None,
-                    'network': None,
+                    'network': network,
                     'protocol': 'http',
                     'url': provider,
                     'session_kwargs': {},
@@ -57,11 +64,11 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
                 base_provider = ctc.config.get_default_provider()
 
             non_none_keys = typing.cast(
-                spec.PartialProvider,
+                spec.Provider,
                 {k: v for k, v in provider.items() if v is not None},
             )
-            full_provider = copy.copy(base_provider)
-            full_provider.update(non_none_keys)
+            full_provider: spec.Provider = copy.copy(base_provider)
+            full_provider.update(non_none_keys)  # type: ignore
 
             return full_provider
 
@@ -104,5 +111,5 @@ def add_provider_parameters(
     # TODO: decide whether parameters with value=None should be included
     provider = get_provider(provider)
     provider = copy.copy(provider)
-    provider.update(parameters)
+    provider.update(parameters)  # type: ignore
     return provider
