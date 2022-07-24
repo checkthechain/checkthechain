@@ -72,7 +72,6 @@ test = [
     'tox-asdf ==0.1.0',
     'tox ==3.8.0',
     'virtualenv >=20.6.0',
-    'rlp >= 3.0.0', # create address
 ]
 performance = [
     'pysha3 ==1.0.2',  # for keccak()
@@ -179,7 +178,6 @@ isolated_build = True
 deps =
     pytest >= 6
     pytest-asyncio
-    rlp
     matplotlib
 commands = pytest
 
@@ -188,7 +186,6 @@ commands = pytest
 deps =
     pytest >= 6
     pytest-asyncio
-    rlp
     matplotlib
     typing-extensions==4.2.0
     ;
