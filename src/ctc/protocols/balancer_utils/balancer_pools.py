@@ -121,6 +121,7 @@ async def _async_get_new_pools(
 
 async def _async_get_tokens_by_pool(
     factory: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
 ) -> typing.Mapping[str, typing.Sequence[str]]:

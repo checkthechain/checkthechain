@@ -89,7 +89,8 @@ async def async_get_events(
         )
 
     if include_timestamps:
-        events.insert(0, 'timestamp', await async_get_event_timestamps(events))
+        timestamps = await async_get_event_timestamps(events)
+        events.insert(0, 'timestamp', timestamps)  # type: ignore
 
     return events
 

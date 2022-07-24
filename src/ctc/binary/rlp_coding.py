@@ -25,11 +25,13 @@ def rlp_encode_int(integer: int) -> spec.PrefixHexData:
         return formats.convert(128 + integer_bytes, 'prefix_hex') + integer_hex
 
 
-def rlp_encode_address(address):
+def rlp_encode_address(address: spec.Address) -> spec.PrefixHexData:
     return '0x94' + formats.convert(address, 'raw_hex')
 
 
-def rlp_encode_address_nonce_tuple(address, nonce) -> spec.PrefixHexData:
+def rlp_encode_address_nonce_tuple(
+    address: spec.Address, nonce: int
+) -> spec.PrefixHexData:
     rlp_address = rlp_encode_address(address)[2:]
     rlp_integer = rlp_encode_int(nonce)[2:]
     data_len = int(len(rlp_address) / 2 + len(rlp_integer) / 2)
