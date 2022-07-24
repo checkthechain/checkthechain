@@ -28,7 +28,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '+',
             },
             {
-                'name': '--include-timestamps',
+                'name': '--include_timestamps',
                 'default': False,
                 'action': 'store_true',
                 'help': 'include timestamps',
@@ -53,8 +53,8 @@ def get_command_spec() -> toolcli.CommandSpec:
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer': {
                 'long': True
             },
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks [14000000, 14010000]': {},
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks [14000000, 14010000] --include-timestamps': {},
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks "[14000000, 14010000]"': {},
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer --blocks [14000000, 14010000] --include_timestamps': {},
         },
     }
 
@@ -64,7 +64,7 @@ async def async_events_command(
     contract: str,
     event: str,
     blocks: typing.Sequence[str],
-    timestamps: bool,
+    include_timestamps: bool,
     output: str,
     overwrite: bool,
     verbose: bool,
@@ -85,7 +85,7 @@ async def async_events_command(
             contract_address=contract,
             start_block=start_block,
             end_block=end_block,
-            include_timestamps=timestamps,
+            include_timestamps=include_timestamps,
             verbose=False,
             event_hash=event,
         )
@@ -94,7 +94,7 @@ async def async_events_command(
             contract_address=contract,
             start_block=start_block,
             end_block=end_block,
-            include_timestamps=timestamps,
+            include_timestamps=include_timestamps,
             verbose=False,
             event_name=event,
         )
@@ -119,9 +119,8 @@ async def async_events_command(
                 for column in events.columns
                 if column.startswith('arg__')
             ]
-            if timestamps:
+            if include_timestamps:
                 columns.insert(0, 'timestamp')
-                events = events.astype({'timestamp': 'str'})
 
             events = events[columns]
             new_column_names = {
@@ -130,4 +129,6 @@ async def async_events_command(
                 if old_column.startswith('arg__')
             }
             events = events.rename(columns=new_column_names)
+        if output == 'stdout' and include_timestamps:
+            events = events.astype({'timestamp': 'str'})
         cli_utils.output_data(events, output=output, overwrite=overwrite)
