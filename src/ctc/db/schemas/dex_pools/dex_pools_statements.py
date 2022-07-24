@@ -169,18 +169,10 @@ async def async_select_dex_pools_by_id(
 async def async_select_dex_pools(
     *,
     factory: spec.Address | None = None,
+    assets: typing.Sequence[spec.Address] | None = None,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
 ) -> typing.Sequence[spec.DexPool] | None:
-    """
-
-    wanted args:
-    - n_assets: specify number of assets in pool
-        - must specify that certain columns are None
-    - has_assets: specify assets that are contained in pool
-        - must specify that one of the asset columns equals the asset
-        - need an "or" query
-    """
 
     table = schema_utils.get_table_name('dex_pools', network=network)
 
@@ -188,6 +180,28 @@ async def async_select_dex_pools(
     if factory is not None:
         query.setdefault('where_equals', {})
         query['where_equals']['factory'] = factory
+    if assets is not None:
+        import sqlalchemy  # type: ignore
+
+        # get table object
+        try:
+            sqla_table = toolsql.create_table_object_from_db(
+                table_name=table,
+                conn=conn,
+            )
+        except toolsql.TableNotFound:
+            return None
+
+        query.setdefault('filters', [])
+        for asset in assets:
+            asset = asset.lower()
+            asset_filter = sqlalchemy.or_(
+                sqla_table.c['asset0'] == asset,
+                sqla_table.c['asset1'] == asset,
+                sqla_table.c['asset2'] == asset,
+                sqla_table.c['asset3'] == asset,
+            )
+            query['filters'].append(asset_filter)
 
     return toolsql.select(  # type: ignore
         conn=conn, table=table, raise_if_table_dne=False, **query
