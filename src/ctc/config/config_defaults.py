@@ -91,23 +91,19 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
 
 def _sync_get_chain_id(provider_url: str) -> int:
     import json
-    import urllib3  # type: ignore
+    import urllib.request
 
     from ctc import binary
 
     data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
-    encoded_body = json.dumps(data)
-
-    http = urllib3.PoolManager()
-
-    response = http.request(
-        'POST',
+    encoded_data = json.dumps(data).encode()
+    request = urllib.request.Request(
         provider_url,
-        headers={'Content-Type': 'application/json'},
-        body=encoded_body,
+        data=encoded_data,
+        headers={'User-Agent': 'python3'},
     )
-
-    response_data = json.loads(response.data.decode('utf-8'))
+    response = urllib.request.urlopen(request)
+    response_data = json.loads(response.read().decode())
     raw_chain_id = response_data['result']
     return binary.convert(raw_chain_id, 'integer')
 
