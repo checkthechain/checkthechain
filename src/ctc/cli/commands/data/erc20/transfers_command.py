@@ -20,6 +20,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'block range of transfers',
             },
             {
+                'name': '--include_timestamps',
+                'default': False,
+                'action': 'store_true',
+                'help': 'include timestamps',
+            },
+            {
                 'name': '--output',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
@@ -33,6 +39,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': {
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca': {'long': True},
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --blocks [14000000, 14001000]': {},
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --blocks [14000000, 14001000] --include_timestamps': {},
         },
     }
 
@@ -41,6 +48,7 @@ async def async_transfers_command(
     *,
     erc20: str,
     blocks: typing.Sequence[str],
+    include_timestamps: bool,
     output: str,
     overwrite: bool,
 ) -> None:
@@ -57,5 +65,9 @@ async def async_transfers_command(
         erc20,
         start_block=start_block,
         end_block=end_block,
+        include_timestamps=include_timestamps,
     )
+
+    if output == 'stdout' and include_timestamps:
+        transfers = transfers.astype({'timestamp': 'str'})
     cli_utils.output_data(transfers, output=output, overwrite=overwrite)

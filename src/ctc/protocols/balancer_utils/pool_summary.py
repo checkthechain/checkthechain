@@ -64,6 +64,7 @@ async def async_get_pool_swaps(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    include_timestamps: bool = False,
 ) -> spec.DataFrame:
 
     vault = balancer_spec.vault
@@ -76,6 +77,7 @@ async def async_get_pool_swaps(
         event_name='Swap',
         start_block=start_block,
         end_block=end_block,
+        include_timestamps=include_timestamps,
         verbose=False,
     )
 
