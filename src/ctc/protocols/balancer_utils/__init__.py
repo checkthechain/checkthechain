@@ -1,3 +1,4 @@
+from .balancer_pools import *
 from .pool_metadata import *
 from .pool_plots import *
 from .pool_state import *
