@@ -74,7 +74,6 @@ async def _async_get_new_pools(
         'type': 'event',
     }
 
-    print(start_block, end_block)
     df = await evm.async_get_events(
         factory,
         event_abi=event_abi,
