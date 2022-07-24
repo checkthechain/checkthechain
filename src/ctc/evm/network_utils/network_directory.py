@@ -122,6 +122,11 @@ def get_network_and_provider(
     elif network is not None and provider is None:
         network_reference = network
         full_provider = rpc.get_provider({'network': network})
+    elif provider is not None and network is not None:
+        full_provider = rpc.get_provider(provider)
+        network_reference = get_network_chain_id(network)
+        if full_provider['network'] != network_reference:
+            raise Exception('network and provider do not match')
     else:
         raise Exception('internal logic error')
 

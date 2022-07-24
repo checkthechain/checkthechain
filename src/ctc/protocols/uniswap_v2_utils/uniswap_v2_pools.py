@@ -8,110 +8,82 @@ from . import uniswap_v2_spec
 
 
 async def async_get_pools(
+    factory: spec.Address | None = None,
     *,
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    factory: spec.Address | None = None,
     update: bool = False,
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
 ) -> typing.Sequence[spec.DexPool]:
-    """return pools"""
-
-    network, provider = evm.get_network_and_provider(network, provider)
-
-    if start_block is not None:
-        start_block = await evm.async_block_number_to_int(
-            start_block,
-            provider=provider,
-        )
-    if end_block is not None:
-        end_block = await evm.async_block_number_to_int(
-            end_block,
-            provider=provider,
-        )
 
     from ctc import db
 
     if factory is None:
         factory = uniswap_v2_spec.uniswap_v2_factory
 
-    # get old pools
-    pools: typing.MutableSequence[
-        spec.DexPool
-    ] | None = await db.async_query_dex_pools(  # type: ignore
+    return await db.async_get_pools(
         factory=factory,
+        async_get_new_pools_of_factory=_async_get_new_pools,
         assets=assets,
-        network=network,
         start_block=start_block,
         end_block=end_block,
+        update=update,
+        network=network,
+        provider=provider,
     )
-    if pools is None:
-        pools = []
-
-    if update:
-
-        # get new pools
-        last_scanned_block = (
-            await db.async_query_dex_pool_factory_last_scanned_block(
-                factory=factory,
-                network=network,
-            )
-        )
-        if last_scanned_block is None:
-            last_scanned_block = None
-
-        # faster to obtain from event cache or from db?
-        latest_block = await evm.async_get_latest_block_number()
-        new_pools_df = await evm.async_get_events(
-            factory,
-            event_name='PairCreated',
-            verbose=False,
-            start_block=last_scanned_block,
-            end_block=latest_block,
-            keep_multiindex=False,
-        )
-        new_pools = _uniswap_v2_events_to_dex_pools(new_pools_df)
-        await db.async_intake_dex_pools(
-            new_pools, network=network, last_scanned_block=latest_block
-        )
-
-        # filter the new pools according to input arguments
-        for new_pool in new_pools:
-
-            # check asset filter
-            include = True
-            if assets is not None:
-                keys = ['asset0', 'asset1', 'asset2', 'asset3']
-                for asset in assets:
-                    asset = asset.lower()
-                    include = any(new_pool[key] == asset for key in keys)  # type: ignore
-                    if not include:
-                        break
-            if not include:
-                continue
-
-            # check block range
-            if start_block is not None and (
-                new_pool['creation_block'] is None
-                or new_pool['creation_block'] < start_block
-            ):
-                continue
-            if end_block is not None and (
-                new_pool['creation_block'] is None
-                or new_pool['creation_block'] > end_block
-            ):
-                continue
-
-            pools.append(new_pool)
-
-    return pools
 
 
-def _uniswap_v2_events_to_dex_pools(
-    df: spec.DataFrame,
-) -> typing.MutableSequence[spec.DexPool]:
+async def _async_get_new_pools(
+    *,
+    factory: spec.Address,
+    start_block: spec.BlockNumberReference,
+    end_block: spec.BlockNumberReference,
+) -> typing.Sequence[spec.DexPool]:
+
+    event_abi: spec.EventABI = {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'token0',
+                'type': 'address',
+            },
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'token1',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'pair',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': '',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'PairCreated',
+        'type': 'event',
+    }
+
+    print(start_block, end_block)
+    df = await evm.async_get_events(
+        factory,
+        event_abi=event_abi,
+        verbose=False,
+        start_block=start_block,
+        end_block=end_block,
+        keep_multiindex=False,
+    )
+
     dex_pools = []
     for index, row in df.iterrows():
         block = typing.cast(int, index)

@@ -8,9 +8,10 @@ from . import dex_pools_statements
 
 
 async def async_intake_dex_pools(
+    *,
+    factory: spec.Address,
     dex_pools: typing.Sequence[spec.DexPool],
     network: spec.NetworkReference,
-    *,
     last_scanned_block: int | None = None,
 ) -> None:
     """intake dex pools into database
@@ -20,17 +21,15 @@ async def async_intake_dex_pools(
     - all dex pools should have the same factory
     """
 
-    if len(dex_pools) == 0:
-        return
-
     # verify factories are identical
-    factory = dex_pools[0]['factory'].lower()
     for dex_pool in dex_pools:
         if dex_pool['factory'].lower() != factory:
             raise Exception('all dex pools should be produced by same factory')
 
     # obtain last scanned block if not provided
     if last_scanned_block is None:
+        if len(dex_pools) == 0:
+            return
         last_scanned_block = max(
             dex_pool['creation_block'] for dex_pool in dex_pools
         )

@@ -37,6 +37,8 @@ async def async_upsert_dex_pools(
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
 ) -> None:
+    if len(dex_pools) == 0:
+        return
     table = schema_utils.get_table_name('dex_pools', network=network)
     dex_pools = [_format_dex_pool(dex_pool) for dex_pool in dex_pools]
     toolsql.insert(
