@@ -76,6 +76,17 @@ schema_datas = [
         },
     },
     {
+        'schema_name': 'dex_pools',
+        'selector': db.async_select_dex_pool,
+        'queryer': db.async_query_dex_pool,
+        'query': {'address': '0x9928e4046d7c6513326ccea028cd3e7a91c7590a'},
+        'plural_selector': db.async_select_dex_pools,
+        'plural_queryer': db.async_query_dex_pools,
+        'plural_query': {
+            'factory': '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f',
+        },
+    },
+    {
         'schema_name': 'chainlink',
         'selector': chainlink_db.async_select_feed,
         'queryer': chainlink_db.async_query_feed,

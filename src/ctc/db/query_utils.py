@@ -30,6 +30,7 @@ def wrap_selector_with_connection(
         engine: toolsql.SAEngine | None = None,
         **kwargs: Any,
     ) -> R | None:
+        # TODO: allow this function to accept a conn that already exists
 
         if network is None and require_network:
             raise Exception('must specify network')

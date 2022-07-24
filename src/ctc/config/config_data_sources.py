@@ -72,6 +72,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         'contract_creation_blocks',
         'chainlink',
         '4byte',
+        'dex_pools',
     ]:
 
         db_config = config_values.get_db_config(schema_name=tags['datatype'])

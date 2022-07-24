@@ -161,13 +161,13 @@ def summarize_contract_abi_functions(
         'Special Functions Present', style=styles['title'], indent=None
     )
     print()
-    rows = [
+    special_rows = [
         ('constructor', has_constructor),
         ('receive', has_receive),
         ('fallback', has_fallback),
     ]
     toolstr.print_table(
-        rows,
+        special_rows,
         labels=['function', 'present'],
         border=styles['comment'],
         label_style=styles['title'],
