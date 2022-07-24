@@ -5,6 +5,7 @@ import typing
 
 import toolsql
 
+from ctc import evm
 from ctc import spec
 from ... import schema_utils
 
@@ -172,6 +173,8 @@ async def async_select_dex_pools(
     assets: typing.Sequence[spec.Address] | None = None,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[spec.DexPool] | None:
 
     table = schema_utils.get_table_name('dex_pools', network=network)
@@ -202,6 +205,18 @@ async def async_select_dex_pools(
                 sqla_table.c['asset3'] == asset,
             )
             query['filters'].append(asset_filter)
+    if start_block is not None:
+        start_block = await evm.async_block_number_to_int(
+            start_block, provider={'network': network}
+        )
+        query.setdefault('where_gte', {})
+        query['where_gte']['creation_block'] = start_block
+    if end_block is not None:
+        end_block = await evm.async_block_number_to_int(
+            end_block, provider={'network': network}
+        )
+        query.setdefault('where_lte', {})
+        query['where_lte']['creation_block'] = end_block
 
     return toolsql.select(  # type: ignore
         conn=conn, table=table, raise_if_table_dne=False, **query
