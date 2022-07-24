@@ -54,9 +54,9 @@ async def async_get_erc20_transfers(
         event_abi=event_abi,
         start_block=start_block,
         end_block=end_block,
+        include_timestamps=include_timestamps,
         verbose=verbose,
         provider=provider,
-        include_timestamps=include_timestamps,
         **event_kwargs,
     )
 
