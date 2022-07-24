@@ -451,7 +451,6 @@ mainnet_erc20s_csv = """address,decimals,name,symbol
 0xeef9f339514298c6a857efcfc1a762af84438dee,18,HermezNetworkToken,HEZ
 0xea319e87cf06203dae107dd8e5672175e3ee976c,18,SURF.Finance,SURF
 0x3383c5a8969dc413bfddc9656eb80a1408e4ba20,18,WrappedANATHA,wANATHA
-0x18aaa7115705e8be94bffebde57af9bfc265b998,18,Audius,AUDIO
 0xa665fed1b0c9da00e91ca582f77df36e325048c5,18,yfarm.finance,YFM
 0xdacd69347de42babfaecd09dc88958378780fb62,0,AtariToken,ATRI
 0x0954906da0bf32d5479e25f46056d22f08464cab,18,Index,INDEX

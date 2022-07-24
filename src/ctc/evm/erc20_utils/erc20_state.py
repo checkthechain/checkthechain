@@ -207,7 +207,7 @@ async def async_get_erc20s_balance_of(
 
     provider = rpc.get_provider(provider)
     provider = typing.cast(spec.Provider, dict(provider))
-    provider['chunk_size'] = 500
+    provider['chunk_size'] = 100
     balances = await erc20_generic.async_erc20s_eth_calls(
         tokens=tokens,
         function_name='balanceOf',
