@@ -14,7 +14,12 @@ if typing.TYPE_CHECKING:
 
     class ProxyAddressMetadata(TypedDict):
         address: spec.Address | None
-        proxy_type: Literal['eip897', 'eip1967', 'gnosis_safe'] | None
+        proxy_type: Literal[
+            'eip897',
+            'eip1967-logic',
+            'eip1967-beacon',
+            'gnosis_safe',
+        ] | None
 
 
 async def async_get_proxy_address(
@@ -52,16 +57,28 @@ async def async_get_proxy_metadata(
     except (spec.exceptions.rpc_exceptions.RpcException, Exception):
         pass
 
-    # try eip1967
-    eip1967_address = await _async_get_eip1967_proxy_logic_address(
+    # try eip1967 logic
+    eip1967_logic_address = await _async_get_eip1967_proxy_logic_address(
         contract_address=contract_address,
         provider=provider,
         block=block,
     )
-    if eip1967_address != '0x0000000000000000000000000000000000000000':
+    if eip1967_logic_address != '0x0000000000000000000000000000000000000000':
         return {
-            'address': eip1967_address,
-            'proxy_type': 'eip1967',
+            'address': eip1967_logic_address,
+            'proxy_type': 'eip1967-logic',
+        }
+
+    # try eip1967 beacon
+    eip1967_beacon_address = await _async_get_eip1967_proxy_beacon_address(
+        contract_address=contract_address,
+        provider=provider,
+        block=block,
+    )
+    if eip1967_beacon_address is not None:
+        return {
+            'address': eip1967_beacon_address,
+            'proxy_type': 'eip1967-beacon',
         }
 
     # try gnosis proxy
@@ -180,7 +197,8 @@ async def _async_get_eip1967_proxy_beacon_address(
     contract_address: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> spec.Address:
+    provider: spec.ProviderReference = None,
+) -> spec.Address | None:
     """get a contract's logic address
 
     storage position obtained as:
@@ -197,11 +215,34 @@ async def _async_get_eip1967_proxy_beacon_address(
         address=contract_address,
         position=position,
         block_number=block,
+        provider=provider,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
 
-    return '0x' + result[-40:]
+    beacon = '0x' + result[-40:]
+    if beacon == '0x0000000000000000000000000000000000000000':
+        return None
+
+    implementation_abi: spec.FunctionABI = {
+        'name': 'implementation',
+        'type': 'function',
+        'inputs': [],
+        'outputs': [{'type': 'address'}],
+    }
+
+    try:
+        proxy_in_beacon = await rpc.async_eth_call(
+            to_address=beacon,
+            function_abi=implementation_abi,
+            provider=provider,
+        )
+    except Exception:
+        proxy_in_beacon = None
+
+    if not isinstance(proxy_in_beacon, str):
+        raise Exception('bad rpc data')
+    return proxy_in_beacon
 
 
 async def _async_get_eip1967_proxy_admin_address(

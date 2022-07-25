@@ -52,18 +52,23 @@ async def async_proxy_command(
 
         toolstr.print_text_box('Proxy Summary for ' + str(contract_address))
         rows: typing.Sequence[typing.Sequence[typing.Any]] = [
+            ['contract_address', contract_address],
             ['block', block],
             ['uses EIP-897', proxy_metadata['proxy_type'] == 'eip897'],
-            ['uses EIP-1967', proxy_metadata['proxy_type'] == 'eip1967'],
+            ['uses EIP-1967 Logic', proxy_metadata['proxy_type'] == 'eip1967-logic'],
+            ['uses EIP-1967 Beacon', proxy_metadata['proxy_type'] == 'eip1967-beacon'],
             [
                 'uses gnosis-proxy',
                 proxy_metadata['proxy_type'] == 'gnosis_safe',
             ],
-            ['contract_address', contract_address],
-            ['proxy_address', proxy_address],
         ]
         toolstr.print_table(rows, column_justify=['right', 'left'], compact=2)
+        print()
+        print('proxy_address =', proxy_address)
 
     else:
         proxy_address = await evm.async_get_proxy_address(contract_address)
-        print(proxy_address)
+        if proxy_address is None:
+            print('[no proxy address detected]')
+        else:
+            print(proxy_address)
