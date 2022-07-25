@@ -23,7 +23,7 @@ async def async_get_pools(
     if factory is None:
         factory = uniswap_v3_spec.factory
 
-    return await db.async_get_pools(
+    return await db.async_get_dex_pools(
         factory=factory,
         async_get_new_pools_of_factory=_async_get_new_pools,
         assets=assets,
