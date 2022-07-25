@@ -19,7 +19,7 @@ class FourbyteRatelimit(TypedDict):
 _4byte_ratelimit: FourbyteRatelimit = {
     'lock': None,
     'last_request_time': 0,
-    'requests_per_second': 1.0,
+    'requests_per_second': 4.0,
 }
 
 
