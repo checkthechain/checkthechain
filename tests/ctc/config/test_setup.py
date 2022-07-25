@@ -223,34 +223,6 @@ def test_ctc_setup__skip_db(monkeypatch):
     assert os.path.isfile(db_path)
 
 
-def test_ctc_setup__overwrite(monkeypatch):
-    # test that skipping or not skipping db setup works properly
-
-    config_path = create_temp_config_path()
-    monkeypatch.setenv('CTC_CONFIG_PATH', config_path)
-
-    assert not os.path.isfile(config_path)
-
-    default_config = config_defaults.get_default_config()
-    with open(config_path, 'w') as f:
-        json.dump(default_config, f)
-
-    with pytest.raises(Exception):
-        run_ctc_headless(
-            overwrite=False,
-            rpc_url='https://some/test/url',
-            rpc_chain_id=1,
-            skip_db=True,
-        )
-
-    run_ctc_headless(
-        overwrite=True,
-        rpc_url='https://some/test/url',
-        rpc_chain_id=1,
-        skip_db=True,
-    )
-
-
 old_config__0_2_10 = {
     'config_spec_version': '0.2.10',
     'data_dir': '/home/storm/ctc_data',
@@ -262,6 +234,7 @@ old_config__0_2_10 = {
             'protocol': 'http',
             'session_kwargs': {},
             'chunk_size': None,
+            'convert_reverts_to_none': False,
         },
         'example_provider_2': {
             'url': 'http://localhost',
@@ -270,6 +243,7 @@ old_config__0_2_10 = {
             'protocol': 'http',
             'session_kwargs': {},
             'chunk_size': None,
+            'convert_reverts_to_none': False,
         },
     },
     'networks': {

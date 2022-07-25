@@ -37,12 +37,25 @@ def digest(
         digestor = rpc_registry.get_digestors()[request['method']]
         if digest_kwargs is None:
             digest_kwargs = {}
-        return digestor(response=response, **digest_kwargs)
+
+        if response is None:
+            return response
+        else:
+            return digestor(response=response, **digest_kwargs)
+
     elif isinstance(request, list) and isinstance(response, list):
-        return [
-            digest(subresponse, subrequest, digest_kwargs=digest_kwargs)
-            for subresponse, subrequest in zip(response, request)
-        ]
+        output = []
+        for subresponse, subrequest in zip(response, request):
+            if subresponse is None:
+                result = None
+            else:
+                result = digest(
+                    subresponse,
+                    subrequest,
+                    digest_kwargs=digest_kwargs,
+                )
+            output.append(result)
+        return output
     else:
         raise Exception()
 

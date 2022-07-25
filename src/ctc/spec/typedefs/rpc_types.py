@@ -61,6 +61,7 @@ class PartialProvider(TypedDict, total=False):
     protocol: Literal['http', 'wss', 'ipc']
     session_kwargs: typing.Optional[dict[str, typing.Any]]
     chunk_size: typing.Optional[int]
+    convert_reverts_to_none: bool
 
 
 class Provider(TypedDict, total=True):
@@ -70,6 +71,7 @@ class Provider(TypedDict, total=True):
     protocol: Literal['http', 'wss', 'ipc']
     session_kwargs: typing.Optional[dict[str, typing.Any]]
     chunk_size: typing.Optional[int]
+    convert_reverts_to_none: bool
 
 
 provider_keys = [
@@ -79,7 +81,20 @@ provider_keys = [
     'protocol',
     'session_kwargs',
     'chunk_size',
+    'convert_reverts_to_none',
 ]
+
+default_provider_settings = {
+    # these must be particularly specified
+    # 'url',
+    # 'network',
+    # 'protocol',
+    #
+    'name': '',
+    'session_kwargs': {},
+    'chunk_size': None,
+    'convert_reverts_to_none': False,
+}
 
 ProviderShortcut = str
 ProviderReference = typing.Union[

@@ -35,6 +35,7 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
                     'url': provider,
                     'session_kwargs': {},
                     'chunk_size': None,
+                    'convert_reverts_to_none': False,
                 }
 
         # case: provider specified as name in config

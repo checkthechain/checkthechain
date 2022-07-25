@@ -111,10 +111,15 @@ async def async_send(
     if isinstance(request, dict):
         response = await async_send_raw(request=request, provider=full_provider)
         if 'result' not in response and 'error' in response:
-            response = typing.cast(spec.RpcSingularResponseFailure, response)
-            raise spec.RpcException(
-                'RPC ERROR: ' + response['error']['message']
-            )
+            if full_provider['convert_reverts_to_none']:
+                output = None
+            else:
+                response = typing.cast(
+                    spec.RpcSingularResponseFailure, response
+                )
+                raise spec.RpcException(
+                    'RPC ERROR: ' + response['error']['message']
+                )
         else:
             response = typing.cast(spec.RpcSingularResponseSuccess, response)
             output = response['result']
@@ -151,7 +156,17 @@ async def async_send(
         # reorder chunks
         plural_response = reorder_response_chunks(response_chunks, request)
 
-        output = [subresponse['result'] for subresponse in plural_response]
+        if full_provider['convert_reverts_to_none']:
+            output = []
+            for subresponse in plural_response:
+                if 'result' in subresponse:
+                    output.append(subresponse['result'])
+                elif 'error' in subresponse:
+                    output.append(None)
+                else:
+                    raise Exception('could not process response')
+        else:
+            output = [subresponse['result'] for subresponse in plural_response]
 
     else:
 

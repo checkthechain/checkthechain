@@ -36,6 +36,7 @@ valid_values = {
                 'protocol': 'http',
                 'session_kwargs': {},
                 'chunk_size': None,
+                'convert_reverts_to_none': False,
             },
         },
         {
@@ -46,6 +47,7 @@ valid_values = {
                 'protocol': 'http',
                 'session_kwargs': {},
                 'chunk_size': None,
+                'convert_reverts_to_none': False,
             },
         },
     ],
@@ -85,6 +87,7 @@ invalid_values = {
                 'protocol': 'http',
                 'session_kwargs': {},
                 'chunk_size': None,
+                'convert_reverts_to_none': False,
             },
         },
         {
@@ -95,6 +98,7 @@ invalid_values = {
                 'protocol': 'http',
                 'session_kwargs': {},
                 'chunk_size': None,
+                'convert_reverts_to_none': False,
             },
         },
     ],

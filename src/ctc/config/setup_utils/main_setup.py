@@ -10,9 +10,6 @@ from .stages import data_dir_setup
 from .stages import db_setup
 from .stages import network_setup
 
-if typing.TYPE_CHECKING:
-    import toolsql
-
 
 styles = {
     'header': '#ce93f9 bold',

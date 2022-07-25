@@ -30,6 +30,20 @@ def load_old_config(
     else:
         old_config = {}
 
+    old_providers = old_config.get('providers')
+    if old_providers is not None:
+        for provider_name, provider in list(old_providers.items()):
+            for provider_key in spec.provider_keys:
+                if provider_key not in provider:
+                    if provider_key in spec.default_provider_settings:
+                        provider.setdefault(
+                            provider_key,
+                            spec.default_provider_settings[provider_key],
+                        )
+                    else:
+                        print('skipping provider, missing essential keys')
+                        del old_providers[provider_name]
+
     # upgrade config file if need be
     if (
         convert_to_latest
@@ -70,8 +84,7 @@ def write_new_config(
     version = upgrade_utils.omit_extra_version_data(ctc.__version__)
 
     networks = {
-        str(key): value
-        for key, value in network_data['networks'].items()
+        str(key): value for key, value in network_data['networks'].items()
     }
     default_providers = {
         str(key): value
@@ -101,7 +114,6 @@ def write_new_config(
 
         # make sure file overwrite is confirmed
         if write_new and not overwrite:
-            raise Exception()
             print()
             if not toolcli.input_yes_or_no(
                 'Overwrite old config file? ',

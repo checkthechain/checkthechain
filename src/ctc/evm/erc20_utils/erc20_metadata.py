@@ -272,9 +272,11 @@ async def async_get_erc20_name_by_block(
 #
 
 
-def _decode_raw_symbol(data: str) -> str:
+def _decode_raw_symbol(data: str | None) -> str:
     """special case decode of ancient non-compliant implementations of symbol"""
-    if len(data) == 66:
+    if data is None:
+        return ''
+    elif len(data) == 66:
         return binary.hex_to_ascii(data).strip('\x00')
     elif len(data) == 0 or data == '0x':
         return ''

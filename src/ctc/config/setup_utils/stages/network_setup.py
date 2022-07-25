@@ -263,6 +263,7 @@ async def async_collect_provider_metadata(
                 'session_kwargs': {},
                 'chunk_size': None,
                 'url': url,
+                'convert_reverts_to_none': False,
             }
             try:
                 chain_id = await rpc.async_eth_chain_id(
@@ -323,6 +324,7 @@ async def async_collect_provider_metadata(
         'protocol': protocol,
         'session_kwargs': {},
         'chunk_size': None,
+        'convert_reverts_to_none': False,
     }
     providers[name] = provider
 
