@@ -276,6 +276,8 @@ def _decode_raw_symbol(data: str) -> str:
     """special case decode of ancient non-compliant implementations of symbol"""
     if len(data) == 66:
         return binary.hex_to_ascii(data).strip('\x00')
+    elif len(data) == 0 or data == '0x':
+        return ''
     else:
         as_binary = binary.convert(data, 'binary')
         as_str: str = binary.decode_types(as_binary, '(string)')[0]
