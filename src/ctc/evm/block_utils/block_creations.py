@@ -51,6 +51,30 @@ async def async_get_contract_creation_block(
     return block
 
 
+async def async_get_contracts_creation_blocks(
+    contract_addresses: typing.Sequence[spec.Address],
+    *,
+    provider: spec.ProviderReference = None,
+    use_db: bool = True,
+    verbose: bool = False,
+    **search_kwargs: typing.Any,
+) -> typing.Sequence[int | None]:
+
+    import asyncio
+
+    coroutines = [
+        async_get_contract_creation_block(
+            contract_address=contract_address,
+            provider=provider,
+            use_db=use_db,
+            verbose=verbose,
+            **search_kwargs,
+        )
+        for contract_address in contract_addresses
+    ]
+    return await asyncio.gather(*coroutines)
+
+
 async def _async_get_contract_creation_block_from_node(
     contract_address: spec.Address,
     *,
