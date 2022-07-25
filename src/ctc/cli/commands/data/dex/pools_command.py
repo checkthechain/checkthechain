@@ -37,6 +37,15 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'dest': 'all_pools',
                 'action': 'store_true',
             },
+            {
+                'name': '--compact',
+                'help': 'use compact view for higher information density',
+                'action': 'store_true',
+            },
+        ],
+        'examples': [
+            'CRV',
+            'DAI --platform balancer',
         ],
     }
 
@@ -50,10 +59,16 @@ platforms = {
 }
 
 
+def simplify_name(name: str) -> str:
+    return name.lower().replace('-', '').replace(' ', '').replace('_', '')
+
+
 async def async_dex_pools_command(
+    *,
     token: spec.Address | str,
     platform: spec.Address | str,
     all_pools: bool,
+    compact: bool,
 ) -> None:
 
     if token is not None:
@@ -65,7 +80,19 @@ async def async_dex_pools_command(
     else:
         assets = None
 
-    dex_pools = await db.async_get_known_dex_pools(assets=assets)
+    if platform is not None:
+
+        simple_platform = simplify_name(platform)
+        for factory, factory_name in platforms.items():
+            factory_name = simplify_name(factory_name)
+            if simple_platform == factory_name:
+                break
+        else:
+            raise Exception('unknown platform: ' + str(platform))
+    else:
+        factory = None
+
+    dex_pools = await db.async_get_known_dex_pools(assets=assets, factory=factory)
 
     styles = cli_run.get_cli_styles()
 
@@ -101,14 +128,14 @@ async def async_dex_pools_command(
     ordered_assets = [asset for asset in all_assets if asset is not None]
     symbols = await evm.async_get_erc20s_symbols(
         ordered_assets,
-        provider={'chunk_size': 10},
-        fill_empty=True,
-        empty_token='-',
+        provider={'chunk_size': 10, 'convert_reverts_to_none': True},
     )
 
     symbols = [symbol.replace('\x00', '') for symbol in symbols]
 
-    assets_to_symbols: typing.Mapping[str | None, str] = dict(zip(ordered_assets, symbols))
+    assets_to_symbols: typing.Mapping[str | None, str] = dict(
+        zip(ordered_assets, symbols)
+    )
 
     rows = []
     for dex_pool in dex_pools:
@@ -123,8 +150,6 @@ async def async_dex_pools_command(
         if n_assets >= 4:
             row.append(assets_to_symbols.get(dex_pool['asset3'], ''))
 
-        # row.append(dex_pool['address'])
-
         rows.append(row)
 
     labels = [
@@ -137,7 +162,6 @@ async def async_dex_pools_command(
         labels.append('asset2')
     if n_assets >= 4:
         labels.append('asset3')
-    # labels.append('address')
 
     sort_indices = [
         labels.index('platform'),
@@ -151,7 +175,6 @@ async def async_dex_pools_command(
     toolstr.print_table(
         rows,
         labels=labels,
-        # compact=2,
         border=styles['comment'],
         label_style=styles['title'],
         column_style={
@@ -162,14 +185,18 @@ async def async_dex_pools_command(
             'asset3': styles['description'] + ' bold',
         },
         max_table_width=toolcli.get_n_terminal_cols(),
+        compact=compact,
     )
 
     if clipped:
         print()
-        print(
+        toolstr.print(
             'showing only first',
             max_pools,
-            'pools, use --all to display all',
+            'pools, use',
+            toolstr.add_style('--all', styles['option']),
+            'to display all',
             clipped + max_pools,
             'pools',
+            style=styles['comment'],
         )
