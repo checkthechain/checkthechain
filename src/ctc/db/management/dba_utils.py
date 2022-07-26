@@ -132,7 +132,6 @@ def create_missing_tables(
                 schema_name=schema_name,
                 network=schema_network,
                 conn=conn,
-                prepared_schema=(schema_name in network_schema_names),
             )
 
     print()
@@ -145,7 +144,6 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
         'schema_versions',
         network=None,
         conn=conn,
-        prepared_schema=False,
     )
 
 
@@ -154,9 +152,11 @@ def initialize_schema(
     *,
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
-    prepared_schema: bool = True,
 ) -> None:
     """initialize schema by creating its table and other objects"""
+
+    network_schema_names = schema_utils.get_network_schema_names()
+    prepared_schema = schema_name in network_schema_names
 
     # check that schema versions are being tracked
     if not version_utils.is_schema_versions_initialized(engine=conn.engine):
