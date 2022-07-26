@@ -16,13 +16,14 @@ if typing.TYPE_CHECKING:
         lock: asyncio.Lock | None
         last_request_time: float
         rps: float
+        enabled: bool
 
 
 _cg_ratelimit: CoinGeckoRatelimit = {
-    # 'lock': asyncio.Lock(),
     'lock': None,
-    'last_request_time': time.time(),
+    'last_request_time': 0,
     'rps': 50 / 60,
+    'enabled': False,
 }
 
 
@@ -35,6 +36,7 @@ urls = {
 
 
 async def _async_sleep_for_cg_ratelimit() -> None:
+
     sleep_time = (
         _cg_ratelimit['last_request_time']
         + 1 / _cg_ratelimit['rps']
@@ -44,6 +46,11 @@ async def _async_sleep_for_cg_ratelimit() -> None:
         print('sleeping for', sleep_time, 'seconds')
         await asyncio.sleep(sleep_time)
     _cg_ratelimit['last_request_time'] = time.time()
+
+
+#
+# # lists of tokens
+#
 
 
 async def async_get_token_list(
@@ -88,12 +95,48 @@ async def _async_get_token_list_from_server(
                 return await response.json()  # type: ignore
 
 
-async def async_get_token_ids_by_symbol() -> typing.Mapping[
+#
+# # token symbol --> token id
+#
+
+
+async def async_get_token_id(query: str, use_db: bool = True) -> str:
+    """given a token symbol query top token id"""
+    if use_db:
+        result = await coingecko_db.async_query_tokens(symbol_query=query, name_query=query)
+        if result is not None:
+            return result[0]['id']
+
+    return await async_get_token_id_from_server(query)
+
+
+async def async_get_token_id_from_server(symbol: str) -> str:
+    """return first result from server token list"""
+
+    token_ids = await async_get_token_ids_from_server(symbol)
+
+    if len(token_ids) == 0:
+        raise Exception('cannot find token_id')
+    elif len(token_ids) > 1:
+        raise Exception('too many token_ids for symbol')
+    else:
+        return token_ids[0]
+
+
+async def async_get_token_ids_from_server(
+    symbol: str,
+) -> typing.Sequence[str]:
+    token_ids_by_symbol = await _async_get_token_ids_by_symbol_from_server()
+    token_ids = token_ids_by_symbol.get(symbol.lower(), [])
+    return token_ids
+
+
+async def _async_get_token_ids_by_symbol_from_server() -> typing.Mapping[
     str, typing.Sequence[typing.Any]
 ]:
 
     # get token list
-    token_list = await async_get_token_list()
+    token_list = await _async_get_token_list_from_server()
 
     # process result
     tokens_by_symbol: typing.MutableMapping[
@@ -106,91 +149,89 @@ async def async_get_token_ids_by_symbol() -> typing.Mapping[
     return tokens_by_symbol
 
 
-async def async_get_token_ids(token_symbol: str) -> typing.Sequence[str]:
-    token_ids_by_symbol = await async_get_token_ids_by_symbol()
-    token_ids = token_ids_by_symbol.get(token_symbol.lower(), [])
-    return token_ids
-
-
-async def async_get_token_id(token_symbol: str) -> str:
-    token_ids = await async_get_token_ids(token_symbol)
-
-    if len(token_ids) == 0:
-        raise Exception('cannot find token_id')
-    elif len(token_ids) > 1:
-        raise Exception('too many token_ids for symbol')
-    else:
-        return token_ids[0]
+#
+# # token info
+#
 
 
 async def async_get_token_info(
     *,
-    token_symbol: str | None = None,
+    symbol: str | None = None,
     token_id: str | None = None,
 ) -> typing.Mapping[typing.Any, typing.Any]:
     url_template = urls['token_info']
 
     if token_id is None:
-        if token_symbol is None:
-            raise Exception('must specify token_id or token_symbol')
-        token_ids = await async_get_token_ids(token_symbol=token_symbol)
-        token_id = token_ids[0]
+        if symbol is None:
+            raise Exception('must specify token_id or symbol')
+        token_id = await async_get_token_id(symbol)
 
     url = url_template.format(token_id=token_id)
 
-    lock: asyncio.Lock | None = _cg_ratelimit['lock']
-    if lock is None:
-        lock = asyncio.Lock()
-        _cg_ratelimit['lock'] = lock
-    async with lock:
-        await _async_sleep_for_cg_ratelimit()
+    # lock: asyncio.Lock | None = _cg_ratelimit['lock']
+    # if lock is None:
+    #     lock = asyncio.Lock()
+    #     _cg_ratelimit['lock'] = lock
+    # async with lock:
+    # await _async_sleep_for_cg_ratelimit()
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                return await response.json()  # type: ignore
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.json()  # type: ignore
 
 
 async def async_get_market_chart(
-    token_symbol: str,
+    *,
+    symbol: str | None = None,
+    token_id: str | None = None,
 ) -> typing.Mapping[typing.Any, typing.Any]:
 
-    token_ids = await async_get_token_ids(token_symbol=token_symbol)
-    token_id = token_ids[0]
+    if token_id is None:
+        if symbol is None:
+            raise Exception('must specify token_id or symbol')
+        token_id = await async_get_token_id(symbol)
+
     url_template = urls['token_market_chart']
     url = url_template.format(token_id=token_id)
 
-    lock: asyncio.Lock | None = _cg_ratelimit['lock']
-    if lock is None:
-        lock = asyncio.Lock()
-        _cg_ratelimit['lock'] = lock
-    async with lock:
-        await _async_sleep_for_cg_ratelimit()
+    # lock: asyncio.Lock | None = _cg_ratelimit['lock']
+    # if lock is None:
+    #     lock = asyncio.Lock()
+    #     _cg_ratelimit['lock'] = lock
+    # async with lock:
+    # await _async_sleep_for_cg_ratelimit()
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                return await response.json()  # type: ignore
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.json()  # type: ignore
+
+
+#
+# # data summary
+#
 
 
 async def async_summarize_token_data(
     *,
-    token: str | None = None,
+    token_id: str | None = None,
+    query: str | None = None,
     verbose: bool = False,
     update: bool = False,
 ) -> None:
 
-    if token is None:
-        raise Exception('must specify token or token_info')
+    if token_id is None:
+        if query is None:
+            raise Exception('must specify token_id or query')
+        token_id = await async_get_token_id(query)
+
     token_info_coroutine = asyncio.create_task(
-        async_get_token_info(token_symbol=token)
+        async_get_token_info(token_id=token_id)
     )
-    market_chart_coroutine = asyncio.create_task(async_get_market_chart(token))
+    market_chart_coroutine = asyncio.create_task(
+        async_get_market_chart(token_id=token_id)
+    )
     token_info = await token_info_coroutine
     market_chart = await market_chart_coroutine
-    # found_token_info, market_chart = await asyncio.gather(
-    #     token_info_coroutine,
-    #     market_chart_coroutine,
-    # )
-    # token_info = found_token_info
 
     market_data = token_info['market_data']
     price = market_data['current_price'].get('usd')
@@ -243,7 +284,7 @@ async def async_summarize_token_data(
     ):
         print()
         print()
-        toolstr.print_header('Platforms')
+        toolstr.print_header('Platforms', style=styles['title'])
         rows = []
         for platform, address in token_info['platforms'].items():
             row: typing.Sequence[typing.Any] = (platform, address)
@@ -333,8 +374,3 @@ async def async_summarize_token_data(
     toolstr.print(
         'metadata updated:', token_info['last_updated'], style=styles['comment']
     )
-    # stats_updated = market_chart['prices'][-1][0]
-    # print(
-    #     'statistics updated:',
-    #     tooltime.timestamp_seconds_to_iso_pretty(stats_updated / 1000),
-    # )

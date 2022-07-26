@@ -122,7 +122,7 @@ schema_datas = [
     },
 ]
 
-non_network_schemas = ['4byte']
+non_network_schemas = db.get_generic_schema_names() + db.get_admin_schema_names()
 
 
 def get_test_db_config():
@@ -180,19 +180,20 @@ async def test_select_when_schema_not_initialized(schema_data):
     with engine.begin() as conn:
         db.initialize_schema_versions(conn=conn)
 
+    if schema_data['schema_name'] not in non_network_schemas:
+        network_kwargs = {'network': 1}
+    else:
+        network_kwargs = {}
+
     if schema_data.get('selector') is not None:
         with engine.begin() as conn:
             result = await schema_data['selector'](
-                network=1, conn=conn, **schema_data['query']
+                conn=conn, **schema_data['query'], **network_kwargs
             )
 
         assert result is None
 
     if 'plural_selector' in schema_data:
-        if schema_data['schema_name'] in non_network_schemas:
-            network_kwargs = {}
-        else:
-            network_kwargs = {'network': 1}
         with engine.begin() as conn:
             result = await schema_data['plural_selector'](
                 conn=conn,
@@ -211,9 +212,14 @@ async def test_query_when_schema_not_initialized(schema_data):
     with engine.begin() as conn:
         db.initialize_schema_versions(conn=conn)
 
+    if schema_data['schema_name'] not in non_network_schemas:
+        network_kwargs = {'network': 1}
+    else:
+        network_kwargs = {}
+
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
-            network=1, engine=engine, **schema_data['query']
+            engine=engine, **schema_data['query'], **network_kwargs
         )
 
         assert result is None
@@ -222,29 +228,36 @@ async def test_query_when_schema_not_initialized(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_row_does_not_exist(schema_data):
 
+
     db_config = get_test_db_config()
     engine = toolsql.create_engine(**db_config)
     with engine.begin() as conn:
+        if schema_data['schema_name'] not in non_network_schemas:
+            network_kwargs = {'network': 1}
+        else:
+            network_kwargs = {'network': None}
+
         db.initialize_schema(
             schema_name=schema_data['schema_name'],
-            network=1,
             conn=conn,
+            **network_kwargs
         )
+
+    if schema_data['schema_name'] not in non_network_schemas:
+        network_kwargs = {'network': 1}
+    else:
+        network_kwargs = {}
 
     if schema_data.get('selector') is not None:
         with engine.begin() as conn:
             result = await schema_data['selector'](
-                network=1, conn=conn, **schema_data['query']
+                conn=conn, **schema_data['query'], **network_kwargs
             )
 
         assert result is None
 
     if 'plural_selector' in schema_data:
         with engine.begin() as conn:
-            if schema_data['schema_name'] in non_network_schemas:
-                network_kwargs = {}
-            else:
-                network_kwargs = {'network': 1}
             result = await schema_data['plural_selector'](
                 conn=conn,
                 **schema_data['plural_query'],
@@ -260,15 +273,25 @@ async def test_query_when_row_does_not_exist(schema_data):
     db_config = get_test_db_config()
     engine = toolsql.create_engine(**db_config)
     with engine.begin() as conn:
+        if schema_data['schema_name'] not in non_network_schemas:
+            network_kwargs = {'network': 1}
+        else:
+            network_kwargs = {'network': None}
+
         db.initialize_schema(
             schema_name=schema_data['schema_name'],
-            network=1,
             conn=conn,
+            **network_kwargs
         )
 
     if schema_data.get('queryer') is not None:
+        if schema_data['schema_name'] not in non_network_schemas:
+            network_kwargs = {'network': 1}
+        else:
+            network_kwargs = {}
+
         result = await schema_data['queryer'](
-            network=1, engine=engine, **schema_data['query']
+            engine=engine, **schema_data['query'], **network_kwargs
         )
 
         assert result is None

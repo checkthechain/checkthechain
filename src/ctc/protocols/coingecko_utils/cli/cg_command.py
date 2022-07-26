@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import toolcli
+import toolstr
 
+from ctc.cli import cli_run
 from ctc.protocols import coingecko_utils
 
 
@@ -48,6 +50,7 @@ async def async_cg_command(
     width: str | int | None,
     update: bool,
 ) -> None:
+
     if height is None:
         height = 1
     height = int(height)
@@ -55,17 +58,22 @@ async def async_cg_command(
     if isinstance(width, str):
         width = int(width)
 
-    if n is None:
-        n = toolcli.get_n_terminal_rows() - 3
-        n = int(n / height)
-    else:
-        n = int(n)
-
     if token is None:
+
+        if n is None:
+            n = toolcli.get_n_terminal_rows() - 4
+            n = int(n / height)
+        else:
+            n = int(n)
+
         data = await coingecko_utils.async_get_market_data(n)
 
         if verbose is None:
             verbose = toolcli.get_n_terminal_cols() >= 96
+
+        styles = cli_run.get_cli_styles()
+        note = 'coingecko data @ ' + str(data[0]['last_updated'])
+        toolstr.print(note, style=styles['comment'])
 
         coingecko_utils.print_market_data(
             data=data,
@@ -76,7 +84,7 @@ async def async_cg_command(
 
     else:
         await coingecko_utils.async_summarize_token_data(
-            token=token,
+            query=token,
             verbose=verbose,
             update=update,
         )
