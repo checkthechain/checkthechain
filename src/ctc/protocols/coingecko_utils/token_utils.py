@@ -7,6 +7,8 @@ import typing
 import aiohttp
 import toolstr
 
+from . import coingecko_db
+
 if typing.TYPE_CHECKING:
     from typing_extensions import TypedDict
 
@@ -32,7 +34,7 @@ urls = {
 }
 
 
-async def _sleep_for_cg_ratelimit() -> None:
+async def _async_sleep_for_cg_ratelimit() -> None:
     sleep_time = (
         _cg_ratelimit['last_request_time']
         + 1 / _cg_ratelimit['rps']
@@ -45,6 +47,28 @@ async def _sleep_for_cg_ratelimit() -> None:
 
 
 async def async_get_token_list(
+    use_db: bool = True, update: bool | None = None
+) -> typing.Sequence[coingecko_db.CoingeckoToken]:
+
+    if use_db and not update:
+        result = await coingecko_db.async_query_tokens()
+        if isinstance(result, list) and len(result) > 0:
+            return result
+
+    token_list = await _async_get_token_list_from_server(include_platform=False)
+    for item in token_list:
+        item['market_cap_rank'] = None
+
+    # update db
+    if update is None:
+        update = True
+    if update:
+        await coingecko_db.async_intake_tokens(token_list)
+
+    return token_list
+
+
+async def _async_get_token_list_from_server(
     include_platform: bool = False,
 ) -> typing.Sequence[typing.Any]:
     if include_platform:
@@ -57,7 +81,7 @@ async def async_get_token_list(
         lock = asyncio.Lock()
         _cg_ratelimit['lock'] = lock
     async with lock:
-        await _sleep_for_cg_ratelimit()
+        await _async_sleep_for_cg_ratelimit()
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
@@ -119,7 +143,7 @@ async def async_get_token_info(
         lock = asyncio.Lock()
         _cg_ratelimit['lock'] = lock
     async with lock:
-        await _sleep_for_cg_ratelimit()
+        await _async_sleep_for_cg_ratelimit()
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
@@ -140,7 +164,7 @@ async def async_get_market_chart(
         lock = asyncio.Lock()
         _cg_ratelimit['lock'] = lock
     async with lock:
-        await _sleep_for_cg_ratelimit()
+        await _async_sleep_for_cg_ratelimit()
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
@@ -151,6 +175,7 @@ async def async_summarize_token_data(
     *,
     token: str | None = None,
     verbose: bool = False,
+    update: bool = False,
 ) -> None:
 
     if token is None:
@@ -257,17 +282,18 @@ async def async_summarize_token_data(
             n_rows=40,
             n_columns=120,
             line_style=styles['description'],
-            chrome_style=styles['title'],
-            tick_label_style=styles['comment'],
+            chrome_style=styles['comment'],
+            tick_label_style=styles['metavar'],
+            yaxis_kwargs={'label_prefix': '$'},
         )
-        print()
         print()
         toolstr.print(
             toolstr.hjustify(title, 'center', 70),
             indent=4,
-            style=styles['option'],
+            style=styles['title'],
         )
         toolstr.print(plot, indent=4)
+        print()
         print()
 
     if verbose:

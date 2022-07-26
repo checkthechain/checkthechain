@@ -18,6 +18,7 @@ AdminSchemaName = Literal['schema_versions']
 # generic schemas = those agnostic to network
 GenericSchemaName = Literal[
     '4byte',
+    'coingecko',
 ]
 
 # network schemas = those that have unique data on each network
@@ -81,6 +82,10 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
         from ctc.protocols.chainlink_utils import chainlink_db
 
         return chainlink_db.chainlink_schema
+    elif schema_name == 'coingecko':
+        from ctc.protocols.coingecko_utils import coingecko_db
+
+        return coingecko_db.coingecko_schema
     else:
         raise Exception('unknown schema: ' + str(schema_name))
 

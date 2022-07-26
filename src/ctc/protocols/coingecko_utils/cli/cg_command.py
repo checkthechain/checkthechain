@@ -25,10 +25,16 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--height', 'help': 'height, number of rows per asset'},
             {'name': '--width', 'help': 'width of sparklines'},
+            {
+                'name': '--update',
+                'help': 'update stored coingecko token db',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             '',
             'CRV',
+            '--update',
         ],
     }
 
@@ -40,6 +46,7 @@ async def async_cg_command(
     verbose: bool,
     height: int | None,
     width: str | int | None,
+    update: bool,
 ) -> None:
     if height is None:
         height = 1
@@ -69,5 +76,7 @@ async def async_cg_command(
 
     else:
         await coingecko_utils.async_summarize_token_data(
-            token=token, verbose=verbose
+            token=token,
+            verbose=verbose,
+            update=update,
         )

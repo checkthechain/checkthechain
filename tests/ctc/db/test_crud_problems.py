@@ -7,6 +7,7 @@ import toolsql
 from ctc import db
 from ctc.protocols.chainlink_utils import chainlink_db
 from ctc.protocols import fourbyte_utils
+from ctc.protocols.coingecko_utils import coingecko_db
 
 
 schema_datas = [
@@ -106,6 +107,17 @@ schema_datas = [
         'plural_queryer': fourbyte_utils.async_query_function_signatures,
         'plural_query': {
             'text_signature': 'transfer(address,uint256)',
+        },
+    },
+    {
+        'schema_name': 'coingecko',
+        'selector': coingecko_db.async_select_token,
+        'queryer': coingecko_db.async_query_token,
+        'query': {'id': '1244-s-avers'},
+        'plural_selector': coingecko_db.async_select_tokens,
+        'plural_queryer': coingecko_db.async_query_tokens,
+        'plural_query': {
+            'symbol_query': 'eth',
         },
     },
 ]

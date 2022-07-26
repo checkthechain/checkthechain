@@ -73,6 +73,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         'chainlink',
         '4byte',
         'dex_pools',
+        'coingecko',
     ]:
 
         db_config = config_values.get_db_config(schema_name=tags['datatype'])
