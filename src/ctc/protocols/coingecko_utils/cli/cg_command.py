@@ -10,6 +10,11 @@ def get_command_spec() -> toolcli.CommandSpec:
         'f': async_cg_command,
         'help': 'output coingecko market data',
         'args': [
+            {
+                'name': 'token',
+                'help': 'token to display information of',
+                'nargs': '?',
+            },
             {'name': '-n', 'help': 'number of entries to include in output'},
             {
                 'name': '--verbose',
@@ -23,13 +28,14 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '',
-            '-n 100',
+            'CRV',
         ],
     }
 
 
 async def async_cg_command(
     *,
+    token: str,
     n: int,
     verbose: bool,
     height: int | None,
@@ -48,14 +54,20 @@ async def async_cg_command(
     else:
         n = int(n)
 
-    data = await coingecko_utils.async_get_market_data(n)
+    if token is None:
+        data = await coingecko_utils.async_get_market_data(n)
 
-    if verbose is None:
-        verbose = toolcli.get_n_terminal_cols() >= 96
+        if verbose is None:
+            verbose = toolcli.get_n_terminal_cols() >= 96
 
-    coingecko_utils.print_market_data(
-        data=data,
-        verbose=verbose,
-        height=height,
-        width=width,
-    )
+        coingecko_utils.print_market_data(
+            data=data,
+            verbose=verbose,
+            height=height,
+            width=width,
+        )
+
+    else:
+        await coingecko_utils.async_summarize_token_data(
+            token=token, verbose=verbose
+        )

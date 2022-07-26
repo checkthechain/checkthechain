@@ -76,7 +76,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('tx',): 'ctc.cli.commands.data.tx_command',
     },
     'protocol': {
-        ('cg',): 'ctc.cli.commands.data.cg_command',
+        ('cg',): 'ctc.protocols.coingecko_utils.cli.cg_command',
         ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
         (
             'chainlink',
