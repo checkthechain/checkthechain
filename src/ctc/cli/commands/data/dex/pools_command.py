@@ -12,6 +12,7 @@ import toolcli
 import toolstr
 
 from ctc.cli import cli_run
+from ctc.cli import cli_utils
 from ctc import db
 from ctc import evm
 from ctc import spec
@@ -32,15 +33,40 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'name of platform (e.g. balancer, curve, uniswap-v2',
             },
             {
-                'name': '--all',
+                'name': '--all-pools',
                 'help': 'display all pools instead of just the first 1000',
-                'dest': 'all_pools',
                 'action': 'store_true',
             },
             {
                 'name': '--compact',
                 'help': 'use compact view for higher information density',
                 'action': 'store_true',
+            },
+            {
+                'name': ['--verbose', '-v'],
+                'help': 'show additional data',
+                'action': 'store_true',
+            },
+            {
+                'name': '--json',
+                'help': 'output data as json',
+                'dest': 'json_output',
+                'action': 'store_true',
+            },
+            {
+                'name': '--csv',
+                'help': 'output data as json',
+                'dest': 'csv_output',
+                'action': 'store_true',
+            },
+            {
+                'name': '--output',
+                'help': 'file path to save output to',
+            },
+            {
+                'name': '--overwrite',
+                'action': 'store_true',
+                'help': 'specify that output path can be overwritten',
             },
         ],
         'examples': [
@@ -69,6 +95,11 @@ async def async_dex_pools_command(
     platform: spec.Address | str,
     all_pools: bool,
     compact: bool,
+    verbose: bool,
+    json_output: bool,
+    csv_output: bool,
+    output: str | None,
+    overwrite: bool,
 ) -> None:
 
     if token is not None:
@@ -95,6 +126,28 @@ async def async_dex_pools_command(
     dex_pools = await db.async_get_known_dex_pools(
         assets=assets, factory=factory
     )
+
+    # alternative output formats
+    if json_output and output is None:
+        import json
+
+        as_str = json.dumps(dex_pools)
+        print(as_str)
+        return
+    if csv_output and output is None:
+        import pandas as pd
+
+        df = pd.DataFrame(dex_pools)
+        csv_str = df.to_csv()
+        print(csv_str)
+        return
+    if output:
+        import pandas as pd
+
+        df = pd.DataFrame(dex_pools)
+        cli_utils.output_data(df, output=output, overwrite=overwrite)
+        print('saved output to', output)
+        return
 
     styles = cli_run.get_cli_styles()
 
@@ -139,6 +192,16 @@ async def async_dex_pools_command(
         zip(ordered_assets, symbols)
     )
 
+    # get block times
+    if verbose:
+        import tooltime
+
+        all_blocks = list(
+            {dex_pool['creation_block'] for dex_pool in dex_pools}
+        )
+        block_timestamps = await evm.async_get_block_timestamps(all_blocks)
+        timestamps_of_blocks = dict(zip(all_blocks, block_timestamps))
+
     rows = []
     for dex_pool in dex_pools:
         row: list[str | None] = [
@@ -152,6 +215,15 @@ async def async_dex_pools_command(
         if n_assets >= 4:
             row.append(assets_to_symbols.get(dex_pool['asset3'], ''))
 
+        if verbose:
+            block = dex_pool['creation_block']
+            timestamp = timestamps_of_blocks[block]
+            age = tooltime.get_age(timestamp, 'TimelengthPhrase')
+            age = ' '.join(age.split(' ')[:2]).strip(',')
+
+            row.append(str(block))
+            row.append(age)
+
         rows.append(row)
 
     labels = [
@@ -164,6 +236,9 @@ async def async_dex_pools_command(
         labels.append('asset2')
     if n_assets >= 4:
         labels.append('asset3')
+    if verbose:
+        labels.append('creation\nblock')
+        labels.append('age')
 
     sort_indices = [
         labels.index('platform'),
