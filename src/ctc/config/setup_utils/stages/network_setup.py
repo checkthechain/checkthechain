@@ -245,7 +245,7 @@ async def async_collect_provider_metadata(
 
     if (
         chain_id is None
-        and url == os.environ['ETH_RPC_URL']
+        and url == os.environ.get('ETH_RPC_URL')
         and os.environ.get('ETH_RPC_CHAIN_ID') not in [None, '']
     ):
         try:

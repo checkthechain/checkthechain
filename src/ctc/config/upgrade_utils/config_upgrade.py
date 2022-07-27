@@ -20,7 +20,7 @@ def upgrade_config(
 
     # perform upgrade
     if not isinstance(version, str):
-        print('old_config has unknown version, using default config', sys.stderr)
+        print('old_config has unknown version, using default config', file=sys.stderr)
         return dict(config_defaults.get_default_config())
     if version.startswith('0.2.'):
         return upgrade__0_2_0__to__0_3_0(old_config)
