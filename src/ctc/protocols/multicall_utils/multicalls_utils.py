@@ -19,6 +19,29 @@ from . import call_utils
 from . import multicall_spec
 
 
+function_abis: typing.Mapping[str, spec.FunctionABI] = {
+    'aggregate': {
+        'inputs': [
+            {
+                'components': [
+                    {'name': 'target', 'type': 'address'},
+                    {'name': 'callData', 'type': 'bytes'},
+                ],
+                'name': 'calls',
+                'type': 'tuple[]',
+            }
+        ],
+        'name': 'aggregate',
+        'outputs': [
+            {'name': 'blockNumber', 'type': 'uint256'},
+            {'name': 'returnData', 'type': 'bytes[]'},
+        ],
+        'stateMutability': 'nonpayable',
+        'type': 'function',
+    }
+}
+
+
 def get_multicall_address(
     *,
     network: spec.NetworkReference = 'mainnet',
@@ -67,7 +90,7 @@ async def async_multicall(
     # make call
     results = await rpc.async_eth_call(
         to_address=multicall_address,
-        function_name='aggregate',
+        function_abi=function_abis['aggregate'],
         function_parameters=[encoded_calls],
         block_number=block,
         provider=provider,

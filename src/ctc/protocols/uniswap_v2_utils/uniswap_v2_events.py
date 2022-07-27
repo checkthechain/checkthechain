@@ -8,6 +8,109 @@ from ctc import spec
 from . import uniswap_v2_metadata
 
 
+pool_event_abis: typing.Mapping[str, spec.EventABI] = {
+    'Burn': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'sender',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount0',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount1',
+                'type': 'uint256',
+            },
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'to',
+                'type': 'address',
+            },
+        ],
+        'name': 'Burn',
+        'type': 'event',
+    },
+    'Mint': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'sender',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount0',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount1',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'Mint',
+        'type': 'event',
+    },
+    'Swap': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'sender',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount0In',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount1In',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount0Out',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amount1Out',
+                'type': 'uint256',
+            },
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'to',
+                'type': 'address',
+            },
+        ],
+        'name': 'Swap',
+        'type': 'event',
+    },
+}
+
+
 async def async_get_pool_swaps(
     pool_address: spec.Address,
     *,
@@ -35,7 +138,7 @@ async def async_get_pool_swaps(
         )
 
     swaps = await evm.async_get_events(
-        event_name='Swap',
+        event_abi=pool_event_abis['Swap'],
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
@@ -112,7 +215,7 @@ async def async_get_pool_mints(
         )
 
     mints = await evm.async_get_events(
-        event_name='Mint',
+        event_abi=pool_event_abis['Mint'],
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
@@ -174,7 +277,7 @@ async def async_get_pool_burns(
         )
 
     burns = await evm.async_get_events(
-        event_name='Burn',
+        event_abi=pool_event_abis['Burn'],
         contract_address=pool_address,
         start_block=start_block,
         include_timestamps=include_timestamps,

@@ -19,6 +19,22 @@ creation_blocks = {
     '0xb9fc157394af804a3578134a6585c0dc9cc990d4': 12903979,
 }
 
+function_abis: typing.Mapping[str, spec.FunctionABI] = {
+    'pool_count': {
+        'inputs': [],
+        'name': 'pool_count',
+        'outputs': [{'name': '', 'type': 'uint256'}],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'pool_list': {
+        'inputs': [{'name': 'arg0', 'type': 'uint256'}],
+        'name': 'pool_list',
+        'outputs': [{'name': '', 'type': 'address'}],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+}
 
 event_abis = {
     'BasePoolAdded__old': {
@@ -74,7 +90,7 @@ async def async_get_factory_pool_data(
 
     n_pools = await rpc.async_eth_call(
         to_address=factory,
-        function_name='pool_count',
+        function_abi=function_abis['pool_count'],
     )
 
     coroutines = [
@@ -100,13 +116,13 @@ async def _async_get_pool_data(
 ) -> CurvePoolData:
     pool = await rpc.async_eth_call(
         to_address=factory,
-        function_name='pool_list',
+        function_abi=function_abis['pool_list'],
         function_parameters=[p],
     )
 
     coins = await rpc.async_eth_call(
         to_address=factory,
-        function_name='get_coins',
+        function_name='get_coins',  # cannot inline because different new / old
         function_parameters=[pool],
     )
     coins = [coin for coin in coins if coin not in [eth_address]]
@@ -361,13 +377,13 @@ async def _async_get_new_pools(
 
     start_pool_count, end_pool_count = await rpc.async_batch_eth_call(
         to_address=factory,
-        function_name='pool_count',
+        function_abi=function_abis['pool_count'],
         block_numbers=[start_block, end_block],
     )
 
     pools = await rpc.async_batch_eth_call(
         to_address=factory,
-        function_name='pool_list',
+        function_abi=function_abis['pool_list'],
         function_parameter_list=[
             [index] for index in range(start_pool_count, end_pool_count)
         ],

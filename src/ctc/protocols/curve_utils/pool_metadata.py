@@ -115,9 +115,22 @@ async def async_get_pool_metadata(
 
     import asyncio
 
+    function_abi: spec.FunctionABI = {
+        'inputs': [],
+        'name': 'A',
+        'outputs': [
+            {
+                'name': '',
+                'type': 'uint256',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    }
+
     a_coroutine = rpc.async_eth_call(
         to_address=pool,
-        function_name='A',
+        function_abi=function_abi,
         function_parameters=[],
         provider=provider,
     )

@@ -67,6 +67,44 @@ async def async_get_pool_swaps(
     include_timestamps: bool = False,
 ) -> spec.DataFrame:
 
+    event_abi: spec.EventABI = {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'poolId',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': True,
+                'internalType': 'contract IERC20',
+                'name': 'tokenIn',
+                'type': 'address',
+            },
+            {
+                'indexed': True,
+                'internalType': 'contract IERC20',
+                'name': 'tokenOut',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amountIn',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amountOut',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'Swap',
+        'type': 'event',
+    }
+
     vault = balancer_spec.vault
 
     if start_block is None:
@@ -74,7 +112,7 @@ async def async_get_pool_swaps(
 
     swaps = await evm.async_get_events(
         contract_address=vault,
-        event_name='Swap',
+        event_abi=event_abi,
         start_block=start_block,
         end_block=end_block,
         include_timestamps=include_timestamps,

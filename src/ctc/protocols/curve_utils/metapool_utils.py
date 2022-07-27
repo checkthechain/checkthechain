@@ -49,9 +49,35 @@ async def async_get_metapool_trade(
         if input_normalized:
             amount_sold *= 10 ** metadata['token_decimals'][sold_index]
 
+        function_abi: spec.FunctionABI = {
+            'inputs': [
+                {
+                    'name': 'i',
+                    'type': 'int128',
+                },
+                {
+                    'name': 'j',
+                    'type': 'int128',
+                },
+                {
+                    'name': 'dx',
+                    'type': 'uint256',
+                },
+            ],
+            'name': 'get_dy',
+            'outputs': [
+                {
+                    'name': '',
+                    'type': 'uint256',
+                },
+            ],
+            'stateMutability': 'view',
+            'type': 'function',
+        }
+
         lp_bought = await rpc.async_eth_call(
             to_address=metapool,
-            function_name='get_dy',
+            function_abi=function_abi,
             function_parameters=[sold_index, bought_index, amount_sold],
             provider=provider,
         )

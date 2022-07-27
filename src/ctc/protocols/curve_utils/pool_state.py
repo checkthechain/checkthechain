@@ -10,6 +10,68 @@ from . import pool_metadata
 from . import pool_parameters
 
 
+pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
+    'calc_withdraw_one_coin': {
+        'inputs': [
+            {
+                'name': '_burn_amount',
+                'type': 'uint256',
+            },
+            {
+                'name': 'i',
+                'type': 'int128',
+            },
+        ],
+        'name': 'calc_withdraw_one_coin',
+        'outputs': [
+            {
+                'name': '',
+                'type': 'uint256',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'get_dy': {
+        'inputs': [
+            {
+                'name': 'i',
+                'type': 'int128',
+            },
+            {
+                'name': 'j',
+                'type': 'int128',
+            },
+            {
+                'name': 'dx',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'get_dy',
+        'outputs': [
+            {
+                'name': '',
+                'type': 'uint256',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'get_virtual_price': {
+        'inputs': [],
+        'name': 'get_virtual_price',
+        'outputs': [
+            {
+                'name': '',
+                'type': 'uint256',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+}
+
+
 async def async_get_virtual_price(
     pool: spec.Address,
     *,
@@ -18,7 +80,7 @@ async def async_get_virtual_price(
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_name='get_virtual_price',
+        function_abi=pool_function_abis['get_virtual_price'],
         function_parameters=[],
         provider=provider,
         block_number=block,
@@ -46,7 +108,7 @@ async def async_get_lp_withdrawal(
 
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_name='calc_withdraw_one_coin',
+        function_abi=pool_function_abis['calc_withdraw_one_coin'],
         function_parameters=[amount_lp, token_index],
         provider=provider,
     )
@@ -132,7 +194,7 @@ async def async_get_trade(
     # query data
     amount_out = await rpc.async_eth_call(
         to_address=pool,
-        function_name='get_dy',
+        function_abi=pool_function_abis['get_dy'],
         function_parameters=[
             in_index,
             out_index,

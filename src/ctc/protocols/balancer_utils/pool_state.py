@@ -11,6 +11,36 @@ from . import balancer_spec
 from . import pool_metadata
 
 
+pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
+    'getNormalizedWeights': {
+        'inputs': [],
+        'name': 'getNormalizedWeights',
+        'outputs': [
+            {
+                'internalType': 'uint256[]',
+                'name': '',
+                'type': 'uint256[]',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'getSwapFeePercentage': {
+        'inputs': [],
+        'name': 'getSwapFeePercentage',
+        'outputs': [
+            {
+                'internalType': 'uint256',
+                'name': '',
+                'type': 'uint256',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+}
+
+
 #
 # # weights
 #
@@ -23,7 +53,7 @@ async def async_get_pool_weights_raw(
 
     result = await rpc.async_eth_call(
         to_address=pool_address,
-        function_name='getNormalizedWeights',
+        function_abi=pool_function_abis['getNormalizedWeights'],
         block_number=block,
     )
     if not isinstance(result, (tuple, list)) or not all(
@@ -73,7 +103,7 @@ async def async_get_pool_weights_by_block(
 
     weights = await rpc.async_batch_eth_call(
         to_address=pool_address,
-        function_name='getNormalizedWeights',
+        function_abi=pool_function_abis['getNormalizedWeights'],
         block_numbers=blocks,
         provider={'chunk_size': 100},
     )
@@ -101,7 +131,7 @@ async def async_get_pool_fees(
 
     fees = await rpc.async_eth_call(
         to_address=pool_address,
-        function_name='getSwapFeePercentage',
+        function_abi=pool_function_abis['getSwapFeePercentage'],
         block_number=block,
     )
 
@@ -140,7 +170,7 @@ async def async_get_pool_balances(
 
     pool_tokens = await rpc.async_eth_call(
         to_address=vault,
-        function_name='getPoolTokens',
+        function_abi=balancer_spec.vault_function_abis['getPoolTokens'],
         function_parameters=[pool_id],
         block_number=block,
         package_named_outputs=True,
@@ -155,7 +185,7 @@ async def async_get_pool_balances(
             block=block,
         )
         for token, decimal in zip(tokens, decimals):
-            pool_balances[token] /= 10 ** decimal
+            pool_balances[token] /= 10**decimal
 
     return pool_balances
 

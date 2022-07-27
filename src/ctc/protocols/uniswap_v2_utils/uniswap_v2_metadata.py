@@ -1,10 +1,42 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import evm
 from ctc import rpc
 from ctc import spec
 
 from . import uniswap_v2_spec
+
+
+pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
+    'token0': {
+        'inputs': [],
+        'name': 'token0',
+        'outputs': [
+            {
+                'internalType': 'address',
+                'name': '',
+                'type': 'address',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'token1': {
+        'inputs': [],
+        'name': 'token1',
+        'outputs': [
+            {
+                'internalType': 'address',
+                'name': '',
+                'type': 'address',
+            },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+}
 
 
 async def async_get_pool_tokens(
@@ -14,10 +46,14 @@ async def async_get_pool_tokens(
     import asyncio
 
     token0 = rpc.async_eth_call(
-        function_name='token0', to_address=pool, provider=provider
+        function_abi=pool_function_abis['token0'],
+        to_address=pool,
+        provider=provider,
     )
     token1 = rpc.async_eth_call(
-        function_name='token1', to_address=pool, provider=provider
+        function_abi=pool_function_abis['token1'],
+        to_address=pool,
+        provider=provider,
     )
 
     return await asyncio.gather(token0, token1)

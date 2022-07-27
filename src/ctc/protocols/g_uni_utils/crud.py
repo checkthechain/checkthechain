@@ -8,6 +8,28 @@ from ctc import evm
 from ctc import spec
 
 
+guni_function_abis = {
+    'token0': {
+        'constant': True,
+        'inputs': [],
+        'name': 'token0',
+        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
+        'payable': False,
+        'stateMutability': 'view',
+        'type': 'function',
+    },
+    'token1': {
+        'constant': True,
+        'inputs': [],
+        'name': 'token1',
+        'outputs': [{'internalType': 'address', 'name': '', 'type': 'address'}],
+        'payable': False,
+        'stateMutability': 'view',
+        'type': 'function',
+    }
+}
+
+
 async def async_get_tokens(
     g_uni_pool: spec.Address,
 ) -> tuple[spec.Address, spec.Address]:

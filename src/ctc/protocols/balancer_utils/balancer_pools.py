@@ -125,9 +125,36 @@ async def _async_get_tokens_by_pool(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
 ) -> typing.Mapping[str, typing.Sequence[str]]:
+
+    event_abi: spec.EventABI = {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'poolId',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': False,
+                'internalType': 'contract IERC20[]',
+                'name': 'tokens',
+                'type': 'address[]',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address[]',
+                'name': 'assetManagers',
+                'type': 'address[]',
+            },
+        ],
+        'name': 'TokensRegistered',
+        'type': 'event',
+    }
+
     balancer_token_registrations = await evm.async_get_events(
         factory,
-        event_name='TokensRegistered',
+        event_abi=event_abi,
         verbose=False,
         start_block=start_block,
         end_block=end_block,
