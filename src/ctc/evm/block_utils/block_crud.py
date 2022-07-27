@@ -39,6 +39,7 @@ async def async_get_block(
             provider=provider,
             include_full_transactions=include_full_transactions,
         )
+        block_data.setdefault('base_fee_per_gas', None)
 
         await db.async_intake_block(
             block=block_data,
@@ -100,6 +101,8 @@ async def async_get_blocks(
             include_full_transactions=include_full_transactions,
             provider=provider,
         )
+        for block_data in blocks_data:
+            block_data.setdefault('base_fee_per_gas', None)
 
         from ctc import db
 

@@ -73,11 +73,14 @@ async def async_print_transaction_summary(
         '- gas price:', toolstr.format(transaction['gas_price'] / 1e9), 'gwei'
     )
     if 'max_priority_fee_per_gas' in transaction:
+        base_fee_per_gas = block.get('base_fee_per_gas')
+        if base_fee_per_gas is None:
+            base_fee_per_gas = 0
         print(
             '- priority + base:',
             toolstr.format(transaction['max_priority_fee_per_gas'] / 1e9),
             '+',
-            toolstr.format(int(block['base_fee_per_gas']) / 1e9),
+            toolstr.format(int(base_fee_per_gas) / 1e9),
         )
     fee = transaction_receipt['gas_used'] * transaction['gas_price'] / 1e18
     fee_usd = fee * eth_usd

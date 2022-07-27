@@ -78,7 +78,7 @@ class RawBlock(TypedDict):
 
 
 class Block(TypedDict):
-    base_fee_per_gas: NotRequired[int]
+    base_fee_per_gas: NotRequired[int | None]
     difficulty: int
     extra_data: binary_types.PrefixHexData
     gas_limit: int
