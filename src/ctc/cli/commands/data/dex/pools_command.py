@@ -92,7 +92,9 @@ async def async_dex_pools_command(
     else:
         factory = None
 
-    dex_pools = await db.async_get_known_dex_pools(assets=assets, factory=factory)
+    dex_pools = await db.async_get_known_dex_pools(
+        assets=assets, factory=factory
+    )
 
     styles = cli_run.get_cli_styles()
 
@@ -169,7 +171,10 @@ async def async_dex_pools_command(
         labels.index('asset1'),
     ]
     rows = sorted(
-        rows, key=lambda row: tuple(row[index] for index in sort_indices)
+        rows,
+        key=lambda row: tuple(
+            row[index] if row[index] else '' for index in sort_indices
+        ),
     )
 
     toolstr.print_table(
