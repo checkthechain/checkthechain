@@ -12,7 +12,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'list curve pools',
         'args': [
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'include extra data',
                 'action': 'store_true',
             },

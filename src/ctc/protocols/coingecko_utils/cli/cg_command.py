@@ -19,7 +19,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '-n', 'help': 'number of entries to include in output'},
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'action': 'store_const',
                 'const': True,
                 'default': None,

@@ -19,7 +19,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify block by timestamp',
             },
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'action': 'store_true',
                 'help': 'emit extra information',
             },

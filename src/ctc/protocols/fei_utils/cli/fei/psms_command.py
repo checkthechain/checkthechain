@@ -35,7 +35,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'default': 15,
             },
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'display additional information',
                 'action': 'store_true',
             },

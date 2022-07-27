@@ -45,7 +45,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'query of name of function or event abi',
             },
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'include extra abi data',
                 'action': 'store_true',
             },

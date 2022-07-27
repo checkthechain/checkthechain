@@ -12,7 +12,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'address', 'help': 'address of gnosis safe'},
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'display additional information',
                 'action': 'store_true',
             },

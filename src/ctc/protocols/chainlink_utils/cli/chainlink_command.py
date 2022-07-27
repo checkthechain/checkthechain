@@ -19,7 +19,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'feed', 'nargs': '+', 'help': 'name or address of feed'},
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'show additional information',
                 'action': 'store_true',
             },

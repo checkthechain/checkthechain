@@ -15,7 +15,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {'name': 'provider', 'help': 'url or configured name of RPC node'},
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'display additional information about provider chain',
                 'action': 'store_true',
             },

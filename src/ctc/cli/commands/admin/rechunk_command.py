@@ -56,7 +56,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'perform a dry run where no changes are made',
             },
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'action': 'store_true',
                 'help': 'increase verbosity',
             },

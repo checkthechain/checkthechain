@@ -18,7 +18,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': 'function-name', 'help': 'name of function to call'},
             {'name': 'args', 'nargs': '*', 'help': 'function arguments'},
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'action': 'store_true',
                 'help': 'show summary',
             },

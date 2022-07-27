@@ -34,7 +34,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {'name': '--block', 'help': 'block number'},
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'display additional information',
                 'action': 'store_true',
             },

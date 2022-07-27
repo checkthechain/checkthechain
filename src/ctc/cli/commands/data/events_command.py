@@ -44,7 +44,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify that output path can be overwritten',
             },
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'display more event data',
                 'action': 'store_true',
             },

@@ -13,7 +13,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'display information about configured chains',
         'args': [
             {
-                'name': '--verbose',
+                'name': ['--verbose', '-v'],
                 'help': 'display additional information including RPC urls',
                 'action': 'store_true',
             },
