@@ -31,6 +31,16 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': '--block',
                 'help': 'block number for call',
             },
+            {
+                'name': '--inputs',
+                'help': 'list of input types (used if ABI not available)',
+                'nargs': '+',
+            },
+            {
+                'name': '--outputs',
+                'help': 'list of output types (used if ABI not available)',
+                'nargs': '+',
+            },
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca totalSupply',
@@ -46,6 +56,8 @@ async def async_call_command(
     verbose: bool,
     from_address: spec.Address,
     block: str,
+    inputs: typing.Sequence[str],
+    outputs: typing.Sequence[str],
 ) -> None:
     import asyncio
 
@@ -72,10 +84,21 @@ async def async_call_command(
         print()
         print('result:')
 
-    function_abi = await evm.async_get_function_abi(
-        contract_address=address,
-        function_name=function_name,
-    )
+    if inputs is not None or outputs is not None:
+        if inputs is None:
+            inputs = []
+        if outputs is None:
+            outputs = []
+        function_abi: spec.FunctionABI = {
+            'name': function_name,
+            'inputs': [{'type': input_type} for input_type in inputs],
+            'outputs': [{'type': output_type} for output_type in outputs],
+        }
+    else:
+        function_abi = await evm.async_get_function_abi(
+            contract_address=address,
+            function_name=function_name,
+        )
 
     if len(args) != len(function_abi['inputs']):
         raise Exception('improper number of arguments for function')
