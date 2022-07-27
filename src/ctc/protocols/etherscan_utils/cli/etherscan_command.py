@@ -23,13 +23,13 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'help': 'open etherscan query in browser or fetch',
-        'examples': [
-            '0xd3181ddbb2cea7b4954b8d4a05dbf85d8fc36aef',
-            '0x146063226f2bc60ab02fff825393555672ff505afb352ff11b820355422ba31e',
-            '14000000',
-            'DAI',
-            'vitalik.eth',
-        ],
+        'examples': {
+            '0xd3181ddbb2cea7b4954b8d4a05dbf85d8fc36aef': {'skip': True},
+            '0x146063226f2bc60ab02fff825393555672ff505afb352ff11b820355422ba31e': {'skip': True},
+            '14000000': {'skip': True},
+            'DAI': {'skip': True},
+            'vitalik.eth': {'skip': True},
+        },
     }
 
 
