@@ -70,7 +70,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca Transfer Minting',
+            '0x2b79b3c3c7b35463a28a76e0d332aab3e20aa337 Mint Burn Swap Sync'
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --json',
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --map-names --python',
         ],
@@ -152,12 +152,15 @@ async def async_abi_command(
         else:
             as_str = json.dumps(json_data, indent=4, sort_keys=True)
 
+        # convert from json to python syntax
         if python:
             import re
 
             as_str = re.sub('(?<![\[{,])\n', ',\n', as_str)
+            as_str = as_str.replace('"', '\'')
             as_str = as_str.replace(': true,\n', ': True,\n')
             as_str = as_str.replace(': false,\n', ': False,\n')
+
         print(as_str)
     if not json_only and not human_only:
         print()
