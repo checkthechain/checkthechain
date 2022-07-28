@@ -3,6 +3,7 @@ from __future__ import annotations
 import toolcli
 import toolstr
 
+from ctc.cli import cli_run
 from ctc import config
 from ctc import evm
 
@@ -73,7 +74,9 @@ async def async_chains_command(verbose: bool) -> None:
 
     rows = sorted(rows, key=lambda row: (row[3], row[4], -row[1]), reverse=True)  # type: ignore
 
-    toolstr.print_text_box('EVM Chains')
+    styles = cli_run.get_cli_styles()
+
+    toolstr.print_text_box('EVM Chains', style=styles['title'])
     print()
     toolstr.print_table(
         rows,
@@ -81,5 +84,13 @@ async def async_chains_command(verbose: bool) -> None:
         column_justify={
             'default': 'center',
             'has rpc': 'center',
+        },
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_style={
+            'chain_id': styles['description'],
+            'block explorer': styles['metavar'],
+            'default': styles['title'],
+            'has rpc': styles['title'],
         },
     )

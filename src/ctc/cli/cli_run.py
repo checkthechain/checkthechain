@@ -284,6 +284,8 @@ def run_cli(
     #         except Exception:
     #             pass
 
+    styles = get_cli_styles()
+
     config: toolcli.CLIConfig = {
         #
         # metadata
@@ -297,7 +299,7 @@ def run_cli(
         'help_subcommand_categories': help_subcommand_categories,
         'async_context_manager': cli_utils.AsyncContextManager,
         #
-        'style_theme': get_cli_styles(),
+        'style_theme': styles,
         #
         # standard subcommands and standard args
         'include_standard_subcommands': True,
@@ -305,6 +307,9 @@ def run_cli(
         #
         # plugins
         'plugins': [toolsql_plugin.plugin],
+        'extra_data': {
+            'styles': styles,
+        },
         'extra_data_getters': {
             'db_config': _db_config_getter,
             'db_schema': ('ctc.db', 'get_complete_prepared_schema'),  # type: ignore
