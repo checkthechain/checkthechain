@@ -6,7 +6,7 @@ import toolcli
 import toolstr
 
 from ctc.protocols import uniswap_v2_utils
-from ctc.toolbox.defi_utils.amm_utils import cpmm
+from ctc.toolbox.defi_utils.dex_utils.amm_utils import cpmm
 from ctc import spec
 
 
