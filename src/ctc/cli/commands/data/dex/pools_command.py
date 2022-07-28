@@ -1,9 +1,3 @@
-"""
-TODO:
-- colors
-- filter by platform
-- implement TVLs
-"""
 from __future__ import annotations
 
 import typing
@@ -13,9 +7,9 @@ import toolstr
 
 from ctc.cli import cli_run
 from ctc.cli import cli_utils
-from ctc import db
 from ctc import evm
 from ctc import spec
+from ctc.toolbox.defi_utils import dex_utils
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -76,15 +70,6 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-platforms = {
-    '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f': 'Uniswap V2',
-    '0x1f98431c8ad98523631ae4a59f267346ea31f984': 'Uniswap V3',
-    '0xba12222222228d8ba445958a75a0704d566bf2c8': 'Balancer',
-    '0xb9fc157394af804a3578134a6585c0dc9cc990d4': 'Curve',
-    '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac': 'Sushi',
-}
-
-
 def simplify_name(name: str) -> str:
     return name.lower().replace('-', '').replace(' ', '').replace('_', '')
 
@@ -101,6 +86,8 @@ async def async_dex_pools_command(
     output: str | None,
     overwrite: bool,
 ) -> None:
+
+    platforms = dex_utils.get_dex_pool_factory_platforms(network='mainnet')
 
     if token is not None:
         if evm.is_address_str(token):
@@ -123,8 +110,9 @@ async def async_dex_pools_command(
     else:
         factory = None
 
-    dex_pools = await db.async_get_known_dex_pools(
-        assets=assets, factory=factory
+    dex_pools = await dex_utils.async_get_dex_pools(
+        assets=assets,
+        factory=factory,
     )
 
     # alternative output formats

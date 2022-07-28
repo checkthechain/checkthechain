@@ -4,6 +4,7 @@ import typing
 
 from ctc import evm
 from ctc import spec
+from ctc.toolbox.defi_utils import dex_utils
 from . import uniswap_v3_spec
 
 
@@ -18,15 +19,13 @@ async def async_get_pools(
     provider: spec.ProviderReference | None = None,
 ) -> typing.Sequence[spec.DexPool]:
 
-    from ctc import db
-
     if factory is None:
         # uniswap factory the same across all networks
         factory = uniswap_v3_spec.factory
 
-    return await db.async_get_dex_pools(
+    return await dex_utils.async_get_dex_pools(
         factory=factory,
-        async_get_new_pools_of_factory=_async_get_new_pools,
+        async_get_new_pools_of_factory=async_get_new_pools,
         assets=assets,
         start_block=start_block,
         end_block=end_block,
@@ -36,7 +35,7 @@ async def async_get_pools(
     )
 
 
-async def _async_get_new_pools(
+async def async_get_new_pools(
     *,
     factory: spec.Address,
     start_block: spec.BlockNumberReference,
