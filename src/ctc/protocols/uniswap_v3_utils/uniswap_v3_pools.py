@@ -21,6 +21,7 @@ async def async_get_pools(
     from ctc import db
 
     if factory is None:
+        # uniswap factory the same across all networks
         factory = uniswap_v3_spec.factory
 
     return await db.async_get_dex_pools(

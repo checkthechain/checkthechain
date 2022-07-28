@@ -22,6 +22,11 @@ async def async_get_pools(
     network, provider = evm.get_network_and_provider(network, provider)
 
     if factory is None:
+        network, provider = evm.get_network_and_provider(network, provider)
+        if network not in (1, 'mainnet'):
+            raise Exception(
+                'sushi factory unknown for network: ' + str(network)
+            )
         factory = sushi_spec.get_sushiswap_factory(network)
 
     return await uniswap_v2_utils.async_get_pools(

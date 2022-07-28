@@ -21,6 +21,11 @@ async def async_get_pools(
     from ctc import db
 
     if factory is None:
+        network, provider = evm.get_network_and_provider(network, provider)
+        if network not in (1, 'mainnet'):
+            raise Exception(
+                'uniswap v2 factory unknown for network: ' + str(network)
+            )
         factory = uniswap_v2_spec.uniswap_v2_factory
 
     return await db.async_get_dex_pools(

@@ -22,6 +22,12 @@ async def async_get_pools(
     from ctc import db
 
     if factory is None:
+        network, provider = evm.get_network_and_provider(network, provider)
+        if network not in (1, 'mainnet'):
+            raise Exception(
+                'balancer vault unknown for network: ' + str(network)
+            )
+
         factory = balancer_spec.vault
 
     return await db.async_get_dex_pools(
