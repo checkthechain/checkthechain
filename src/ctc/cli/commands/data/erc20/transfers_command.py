@@ -20,7 +20,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'block range of transfers',
             },
             {
-                'name': '--include_timestamps',
+                'name': '--include-timestamps',
                 'default': False,
                 'action': 'store_true',
                 'help': 'include timestamps',
@@ -39,7 +39,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': {
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca': {'long': True},
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --blocks [14000000, 14001000]': {},
-            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --blocks [14000000, 14001000] --include_timestamps': {},
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca --blocks [14000000, 14001000] --include-timestamps': {},
         },
     }
 

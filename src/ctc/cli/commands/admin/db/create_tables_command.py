@@ -11,7 +11,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'create tables for database',
         'args': [
             {
-                'name': '--schema_names',
+                'name': '--schema-names',
                 'nargs': '+',
                 'help': 'schemas to create tables for',
             },
