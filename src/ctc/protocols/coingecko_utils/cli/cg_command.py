@@ -17,6 +17,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'token to display information of',
                 'nargs': '?',
             },
+            {
+                'name': '--time',
+                'help': 'time of chart (e.g. 7d, 1y, max)',
+                'dest': 'timelength',
+            },
             {'name': '-n', 'help': 'number of entries to include in output'},
             {
                 'name': ['--verbose', '-v'],
@@ -49,6 +54,7 @@ async def async_cg_command(
     height: int | None,
     width: str | int | None,
     update: bool,
+    timelength: str | None,
 ) -> None:
 
     if height is None:
@@ -83,8 +89,19 @@ async def async_cg_command(
         )
 
     else:
+        if timelength is not None:
+            if timelength == 'max':
+                days = None
+            else:
+                import tooltime
+
+                days = round(tooltime.timelength_to_seconds(timelength) / 86400)
+        else:
+            days = 30
+
         await coingecko_utils.async_summarize_token_data(
             query=token,
             verbose=verbose,
             update=update,
+            days=days,
         )

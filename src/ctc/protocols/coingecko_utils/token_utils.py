@@ -31,7 +31,7 @@ urls = {
     'token_list': 'https://api.coingecko.com/api/v3/coins/list',
     'platform_list': 'https://api.coingecko.com/api/v3/coins/list?include_platform=true',
     'token_info': 'https://api.coingecko.com/api/v3/coins/{token_id}',
-    'token_market_chart': 'https://api.coingecko.com/api/v3/coins/{token_id}/market_chart?vs_currency=usd&days=max',
+    'token_market_chart': 'https://api.coingecko.com/api/v3/coins/{token_id}/market_chart?vs_currency=usd&days={days}',
 }
 
 
@@ -184,7 +184,11 @@ async def async_get_market_chart(
     *,
     symbol: str | None = None,
     token_id: str | None = None,
+    days: str | int | None = None,
 ) -> typing.Mapping[typing.Any, typing.Any]:
+
+    if days is None:
+        days = 'max'
 
     if token_id is None:
         if symbol is None:
@@ -192,7 +196,7 @@ async def async_get_market_chart(
         token_id = await async_get_token_id(symbol)
 
     url_template = urls['token_market_chart']
-    url = url_template.format(token_id=token_id)
+    url = url_template.format(token_id=token_id, days=str(days))
 
     # lock: asyncio.Lock | None = _cg_ratelimit['lock']
     # if lock is None:
@@ -217,6 +221,7 @@ async def async_summarize_token_data(
     query: str | None = None,
     verbose: bool = False,
     update: bool = False,
+    days: int | str | None = None,
 ) -> None:
 
     if token_id is None:
@@ -228,7 +233,7 @@ async def async_summarize_token_data(
         async_get_token_info(token_id=token_id)
     )
     market_chart_coroutine = asyncio.create_task(
-        async_get_market_chart(token_id=token_id)
+        async_get_market_chart(token_id=token_id, days=days)
     )
     token_info = await token_info_coroutine
     market_chart = await market_chart_coroutine
@@ -335,7 +340,9 @@ async def async_summarize_token_data(
         )
         toolstr.print(plot, indent=4)
         print()
-        print()
+
+        if title != plots[-1][0]:
+            print()
 
     if verbose:
         print()
@@ -369,8 +376,9 @@ async def async_summarize_token_data(
             column_style={'volume': styles['description']},
         )
 
-    print()
-    print()
-    toolstr.print(
-        'metadata updated:', token_info['last_updated'], style=styles['comment']
-    )
+    updated_time_str = 'metadata updated: ' + token_info['last_updated']
+    updated_time_str.replace('T', ' ')
+    timespan_str = 'timespan = ' + str(days) + ' days'
+    timespan_str = toolstr.hjustify(timespan_str, 'right', 73)
+    combined_str = updated_time_str + timespan_str[len(updated_time_str):]
+    toolstr.print(combined_str, style=styles['comment'])
