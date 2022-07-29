@@ -16,14 +16,15 @@ def add_cli_aliases(
     print()
     toolstr.print('## Installing CLI Aliases', style=styles['header'])
 
-    alias_status = cli_alias_utils.get_alias_status()
+    alias_status = cli_alias_utils.get_paths_alias_status()
+    current = all(status == 'current' for status in alias_status.values())
 
-    if len(alias_status['no_aliases']) == 0:
+    if current:
         print()
-        cli_alias_utils.print_alias_status(
-            alias_status=alias_status, styles=styles
-        )
+        cli_alias_utils.print_alias_status(include_title=False)
     else:
+        print()
+        cli_alias_utils.print_paths_alias_status()
         print()
         print(
             'ctc can install cli aliases to make many commands quicker to type'
@@ -37,15 +38,8 @@ def add_cli_aliases(
         )
         print()
         print('ctc has aliases prepared for the following commands:')
-        styled_aliases = [
-            toolstr.add_style(alias, styles['command'])
-            for alias in cli_alias_utils.get_alias_list()
-        ]
-        toolstr.print(', '.join(styled_aliases))
         print()
-        cli_alias_utils.print_alias_status(
-            alias_status=alias_status, styles=styles
-        )
+        cli_alias_utils.print_aliases()
         print()
 
         if skip_aliases:
@@ -59,8 +53,6 @@ def add_cli_aliases(
             default=default,
             headless=headless,
         ):
-            cli_alias_utils.append_aliases_to_shell_configs(
-                confirm=True, verbose=False
-            )
+            cli_alias_utils.install_aliases(confirm=True, headless=headless)
             print()
             print('Aliases installed')

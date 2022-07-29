@@ -29,34 +29,32 @@ depending on preference, can use all aliases or just a subset of them"""
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': aliases_command,
-        'help': 'output ctc shell aliases' + '\n\n' + aliases_help,
+        'help': 'view and manage ctc shell aliases' + '\n\n' + aliases_help,
         'args': [
             {
-                'name': '--status',
-                'help': 'display whether each shell config file has ctc aliases',
+                'name': '--raw',
+                'help': 'output aliases as raw script file',
                 'action': 'store_true',
             },
             {
-                'name': '--append',
-                'help': 'append aliases to shell config file (will ask for confirmation)',
-                'action': 'store_true',
-            },
-            {
-                'name': '--names',
-                'help': 'display list of alias names instead of actual alias commands',
+                'name': '--install',
+                'help': 'install/upgrade aliases in shell config (will ask for confirmation)',
                 'action': 'store_true',
             },
         ],
-        'examples': ['', '--status'],
+        'examples': {
+            '': {},
+            '--raw': {},
+            '--install': {'runnable': False},
+        },
     }
 
 
-def aliases_command(*, names: bool, append: bool, status: bool) -> None:
-    if names:
-        print('\n'.join(sorted(cli_alias_utils.get_alias_list())))
-    elif status:
-        cli_alias_utils.print_alias_status()
-    elif append:
-        cli_alias_utils.append_aliases_to_shell_configs()
+def aliases_command(*, raw: bool, install: bool) -> None:
+
+    if raw:
+        cli_alias_utils.print_raw_aliases()
+    elif install:
+        cli_alias_utils.install_aliases()
     else:
-        cli_alias_utils.print_aliases()
+        cli_alias_utils.print_alias_status()

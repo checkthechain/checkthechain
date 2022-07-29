@@ -4,6 +4,11 @@ import os
 import sys
 import typing
 
+import toolcli
+
+from ctc.cli import cli_run
+
+
 if typing.TYPE_CHECKING:
 
     from typing_extensions import TypedDict
@@ -56,6 +61,28 @@ alias uniswap="ctc uniswap"
 #
 """
 
+alias_header = """#
+# # ctc aliases
+#
+"""
+
+alias_footer = """
+#
+# # end of ctc aliases
+#"""
+
+
+default_shell_paths = {
+    '~/.bashrc': 'bash interactive',
+    '~/.profile': 'bash login',
+    '~/.zshrc': 'zsh',
+}
+
+
+#
+# # ctc root command
+#
+
 
 def is_ctc_on_path() -> bool:
     import subprocess
@@ -71,152 +98,278 @@ def create_root_ctc_alias() -> str:
     return 'alias ctc="' + sys.executable + '-m ctc"'
 
 
-def print_aliases() -> None:
+#
+# # alias data
+#
+
+
+def print_raw_aliases() -> None:
     print(aliases_content)
 
 
-def get_alias_list() -> typing.Sequence[str]:
-    aliases = []
+def get_aliases() -> typing.Mapping[str, str]:
+    aliases = {}
     for line in aliases_content.split('\n'):
         if line.startswith('alias'):
             index = line.index('=')
             alias = line[6:index]
-            aliases.append(alias)
+            command = line[index + 1 :]
+            aliases[alias] = command
     return aliases
 
 
-def append_aliases_to_shell_configs(
+#
+# # alias reads
+#
+
+
+def detect_existing_shell_paths() -> typing.Mapping[str, bool]:
+    return {
+        path: os.path.isfile(os.path.expanduser(path))
+        for path in default_shell_paths.keys()
+    }
+
+
+def does_file_contain_current_aliases(path: str) -> bool:
+
+    path = os.path.expanduser(path)
+
+    if not os.path.isfile(path):
+        return False
+
+    with open(path, 'r') as f:
+        return aliases_content in f.read()
+
+
+def does_file_contain_old_aliases(path: str) -> bool:
+
+    path = os.path.expanduser(path)
+
+    if not os.path.isfile(path):
+        return False
+
+    with open(path, 'r') as f:
+        content = f.read()
+        return (
+            alias_header in content
+            and alias_footer in content
+            and content.index(alias_header) < content.index(alias_footer)
+        )
+
+
+#
+# # alias writes
+#
+
+
+def install_aliases(
     paths: typing.Sequence[str] | None = None,
     *,
     confirm: bool = False,
     verbose: bool = True,
+    headless: bool = False,
 ) -> None:
 
     # autodetect path based on shell
     if paths is None:
-        paths = detect_shell_config_paths(verbose=verbose)
+        paths = [
+            path
+            for path, exists in detect_existing_shell_paths().items()
+            if exists
+        ]
 
     # check that aliases are not already on path
+    global_confirm = confirm
     for path in paths:
-        if does_file_contain_aliases(path):
+        if does_file_contain_current_aliases(path):
             if verbose:
-                print('file ' + path + ' already contains shell aliases')
+                print('File ' + path + ' already contains shell aliases')
             continue
+
+        elif does_file_contain_old_aliases(path):
+            if verbose:
+                print('File ' + path + ' contains old aliases')
+            if not confirm:
+                confirm = toolcli.input_yes_or_no(
+                    'Replace old aliases with new aliases? ',
+                    headless=headless,
+                )
+                if not confirm:
+                    continue
+                else:
+                    delete_aliases(path, confirm=confirm, headless=headless)
 
         # confirm
         if not confirm:
             print()
-            import toolcli
 
             answer = toolcli.input_yes_or_no(
-                'Appending ctc aliases to ' + path + '\nContinue? '
+                'Appending ctc aliases to ' + path + '\nContinue? ',
+                headless=headless,
             )
             if not answer:
                 continue
 
         # append to file
+        path = os.path.expanduser(path)
         with open(path, 'a') as f:
             f.write('\n' + aliases_content)
             if verbose:
-                print('aliases added to', path)
+                print('Aliases added to', path)
+
+        confirm = global_confirm
 
 
-def detect_shell_config_paths(verbose: bool = True) -> typing.Sequence[str]:
-    """by default, returns ~/.bashrc and if it exists, ~/.zshrc
+def delete_aliases(
+    path: str,
+    *,
+    confirm: bool = False,
+    headless: bool = False,
+) -> None:
+    path = os.path.expanduser(path)
 
-    see https://askubuntu.com/a/606882 for bash configuration summary
-    """
-
-    # gather paths
-    paths = [os.path.expanduser('~/.bashrc'), os.path.expanduser('~/.profile')]
-    zsh_path = os.path.expanduser('~/.zshrc')
-    if os.path.isfile(zsh_path):
-        paths.append(zsh_path)
-
-    # print summary
-    if verbose:
-        print('Detected the following shell config paths:')
-        for path in paths:
-            print('-', path)
-
-    return paths
-
-
-def does_file_contain_aliases(path: str) -> bool:
-    if not os.path.isfile(path):
-        return False
     with open(path, 'r') as f:
-        return aliases_content in f.read()
+        content = f.read()
+
+    if alias_header not in content or alias_footer not in content:
+        raise Exception('could not detect aliases in file ' + str(path))
+    header_index = content.index(alias_header)
+    footer_index = content.index(alias_footer)
+    end_clip_index = footer_index + len(alias_footer)
+    clipped_content = content[header_index:end_clip_index]
+    new_content = content[:header_index] + content[end_clip_index:]
+
+    # ensure not deleting anything but comments, blanks, and aliases
+    clipped_lines = clipped_content.split('\n')
+    for line in clipped_lines:
+        valid = line.startswith('#') or line.startswith('alias ') or line == ''
+        if not valid:
+            raise Exception(
+                'could not delete aliases, there has been addititional content placed in the ctc section of the file'
+            )
+
+    if not confirm:
+        answer = toolcli.input_yes_or_no(
+            'Delete aliases from file ' + path + '?',
+            headless=headless,
+        )
+        if not answer:
+            raise Exception('not deleting aliases')
+
+    with open(path, 'w') as f:
+        f.write(new_content)
 
 
-def get_alias_status(paths: typing.Sequence[str] | None = None) -> AliasStatus:
+#
+# # alias summary
+#
+
+
+def get_paths_alias_status(
+    paths: typing.Sequence[str] | None = None,
+) -> typing.Mapping[str, typing.Literal['old', 'current', 'missing']]:
 
     if paths is None:
-        paths = detect_shell_config_paths(verbose=False)
+        paths = list(default_shell_paths.keys())
 
-    yes_aliases = []
-    no_aliases = []
-    yes_shells = []
-    no_shells = []
-
+    statuses: typing.MutableMapping[
+        str, typing.Literal['old', 'current', 'missing']
+    ] = {}
     for path in paths:
-        if path.endswith('.bashrc'):
-            shell = 'bash interactive'
-        elif path.endswith('.profile'):
-            shell = 'bash login'
-
-        elif path.endswith('.zshrc'):
-            shell = 'zsh'
+        if does_file_contain_current_aliases(path):
+            statuses[path] = 'current'
+        elif does_file_contain_old_aliases(path):
+            statuses[path] = 'old'
         else:
-            shell = 'unknown shell'
-
-        if does_file_contain_aliases(path):
-            yes_aliases.append(path)
-            yes_shells.append(shell)
-        else:
-            no_aliases.append(path)
-            no_shells.append(shell)
-
-    return {
-        'yes_aliases': yes_aliases,
-        'no_aliases': no_aliases,
-        'yes_shells': yes_shells,
-        'no_shells': no_shells,
-    }
+            statuses[path] = 'missing'
+    return statuses
 
 
-def print_alias_status(
-    alias_status: AliasStatus | None = None,
-    styles: typing.Mapping[str, str] | None = None,
+def print_alias_status(include_title: bool = True) -> None:
+    import toolstr
+
+    styles = cli_run.get_cli_styles()
+    if include_title:
+        toolstr.print_text_box('ctc Aliases', style=styles['title'])
+    print()
+    print_paths_alias_status()
+    print()
+    print()
+    print_aliases()
+    print()
+    toolstr.print(
+        'typing each '
+        + toolstr.add_style('alias', styles['description'])
+        + ' is equivalent to typing each full '
+        + toolstr.add_style('command', styles['option']),
+        style=styles['comment'],
+    )
+
+
+def print_paths_alias_status(
+    paths: typing.Sequence[str] | None = None,
 ) -> None:
-    if styles is not None:
-        import toolstr
 
-    if alias_status is None:
-        alias_status = get_alias_status()
+    import toolstr
 
-    yes_aliases = alias_status['yes_aliases']
-    no_aliases = alias_status['no_aliases']
-    yes_shells = alias_status['yes_shells']
-    no_shells = alias_status['no_shells']
+    if paths is None:
+        paths = list(default_shell_paths.keys())
+    paths_status = get_paths_alias_status(paths)
 
-    if len(no_aliases) > 0:
-        print('These shells do not have ctc aliases installed:')
-        for shell, path in zip(no_shells, no_aliases):
-            if styles is not None:
-                styled_shell = toolstr.add_style(shell, style=styles['command'])
-                styled_path = toolstr.add_style(path, style=styles['path'])
-                toolstr.print('-', styled_shell, '(' + styled_path + ')')
-            else:
-                print('-', shell, '(' + path + ')')
-    if len(yes_aliases) > 0 and len(no_aliases) > 0:
+    rows = []
+    for path, status in paths_status.items():
+        shell = default_shell_paths.get(path, 'unknown shell')
+        row = [path, shell, status]
+        rows.append(row)
+    labels = ['path', 'shell', 'status']
+    styles = cli_run.get_cli_styles()
+    toolstr.print_header('Alias Configuration', style=styles['title'])
+    print()
+    toolstr.print_table(
+        rows,
+        labels=labels,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_style={
+            'path': styles['metavar'],
+            'shell': styles['description'],
+            'status': styles['description'],
+        },
+        indent=4,
+    )
+
+    not_current = any(status != 'current' for status in paths_status.values())
+    if not_current:
         print()
-    if len(yes_aliases) > 0:
-        print('These shells already have ctc aliases installed:')
-        for shell, path in zip(yes_shells, yes_aliases):
-            if styles is not None:
-                styled_shell = toolstr.add_style(shell, style=styles['command'])
-                styled_path = toolstr.add_style(path, style=styles['path'])
-                toolstr.print('-', styled_shell, '(' + styled_path + ')')
-            else:
-                print('-', shell, '(' + path + ')')
+        print()
+        toolstr.print(
+            '   install/update aliases using: '
+            + toolstr.add_style('ctc aliases --install', styles['option']),
+            style=styles['comment'],
+        )
+
+
+def print_aliases() -> None:
+    import toolstr
+
+    styles = cli_run.get_cli_styles()
+    toolstr.print_header('Aliases', style=styles['title'])
+    print()
+
+    aliases = get_aliases()
+    rows = []
+    for alias, command in aliases.items():
+        row = [alias, command.strip('"')]
+        rows.append(row)
+    labels = ['alias', 'command']
+    toolstr.print_table(
+        rows,
+        labels=labels,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_style={
+            'alias': styles['description'],
+            'command': styles['option'],
+        },
+        indent=4,
+    )
