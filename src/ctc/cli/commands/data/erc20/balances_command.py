@@ -179,7 +179,7 @@ async def async_balances_command(
                 end_block=block,
                 normalize=False,
             )
-            df = await evm.async_get_erc20_holdings_from_transfers(
+            df = await evm.async_get_erc20_balances_from_transfers(
                 transfers=transfers, dtype=None, normalize=(not raw)
             )
             output_data = df

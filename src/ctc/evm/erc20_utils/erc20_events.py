@@ -88,7 +88,7 @@ async def async_get_erc20_transfers(
     return transfers
 
 
-async def async_get_erc20_holdings_from_transfers(
+async def async_get_erc20_balances_from_transfers(
     transfers: spec.DataFrame,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
