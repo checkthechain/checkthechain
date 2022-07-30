@@ -6,6 +6,7 @@ import toolcli
 import tooltime
 
 from ctc import evm
+from ctc import spec
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -48,6 +49,7 @@ async def async_block_command(
     parse_spec: toolcli.ParseSpec,
 ) -> None:
 
+    block_data: spec.Block = None
     if block is None:
         if timestamp is not None:
 
@@ -79,7 +81,7 @@ async def async_block_command(
                 print('found block', block_number)
                 print()
         else:
-            raise Exception('must specify block or timestamp')
+            block_number = 'latest'
     else:
         block_number = await evm.async_block_number_to_int(block)
 
