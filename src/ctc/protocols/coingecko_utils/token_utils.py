@@ -102,9 +102,22 @@ async def _async_get_token_list_from_server(
 
 async def async_get_token_id(query: str, use_db: bool = True) -> str:
     """given a token symbol query top token id"""
+
     if use_db:
-        result = await coingecko_db.async_query_tokens(symbol_query=query, name_query=query)
-        if result is not None:
+        result = await coingecko_db.async_query_tokens(
+            symbol_query=query, name_query=query
+        )
+        if result is not None and len(result) > 0:
+
+            # check for direct symbol matches
+            query = query.lower()
+            symbol_matches = [
+                result
+                for result in result if result['symbol'].lower() == query
+            ]
+            if len(symbol_matches) >= 1:
+                return symbol_matches[0]['id']
+
             return result[0]['id']
 
     return await async_get_token_id_from_server(query)
@@ -380,5 +393,5 @@ async def async_summarize_token_data(
     updated_time_str.replace('T', ' ')
     timespan_str = 'timespan = ' + str(days) + ' days'
     timespan_str = toolstr.hjustify(timespan_str, 'right', 73)
-    combined_str = updated_time_str + timespan_str[len(updated_time_str):]
+    combined_str = updated_time_str + timespan_str[len(updated_time_str) :]
     toolstr.print(combined_str, style=styles['comment'])
