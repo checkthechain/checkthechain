@@ -7,6 +7,7 @@ import typing
 import aiohttp
 import toolstr
 
+from ctc import spec
 from . import coingecko_db
 
 if typing.TYPE_CHECKING:
@@ -100,6 +101,29 @@ async def _async_get_token_list_from_server(
 #
 
 
+async def async_get_token_name(query: str, use_db: bool = True) -> str:
+    """given a token symbol query top token id"""
+
+    if use_db:
+        result = await coingecko_db.async_query_tokens(
+            symbol_query=query, name_query=query
+        )
+        if result is not None and len(result) > 0:
+
+            # check for direct symbol matches
+            query = query.lower()
+            symbol_matches = [
+                result for result in result if result['symbol'].lower() == query
+            ]
+            if len(symbol_matches) >= 1:
+                return symbol_matches[0]['name']
+
+            return result[0]['name']
+
+    raise Exception()
+    # return await async_get_token_id_from_server(query)
+
+
 async def async_get_token_id(query: str, use_db: bool = True) -> str:
     """given a token symbol query top token id"""
 
@@ -112,8 +136,7 @@ async def async_get_token_id(query: str, use_db: bool = True) -> str:
             # check for direct symbol matches
             query = query.lower()
             symbol_matches = [
-                result
-                for result in result if result['symbol'].lower() == query
+                result for result in result if result['symbol'].lower() == query
             ]
             if len(symbol_matches) >= 1:
                 return symbol_matches[0]['id']
@@ -395,3 +418,91 @@ async def async_summarize_token_data(
     timespan_str = toolstr.hjustify(timespan_str, 'right', 73)
     combined_str = updated_time_str + timespan_str[len(updated_time_str) :]
     toolstr.print(combined_str, style=styles['comment'])
+
+
+async def async_summarize_coin_quotient(
+    coin1: str,
+    coin2: str,
+    *,
+    days: int | None = None,
+) -> None:
+    import numpy as np
+    from ctc.cli import cli_run
+
+    chart1 = await async_get_market_chart(symbol=coin1, days=days)
+    chart2 = await async_get_market_chart(symbol=coin2, days=days)
+
+    coin1_times, coin1_prices = np.array(chart1['prices']).T
+    coin2_times, coin2_prices = np.array(chart2['prices']).T
+
+    coin1_times /= 1000
+    coin2_times /= 1000
+
+    coin1_over_coin2_times, coin1_over_coin2_prices = _compute_token_quotient(
+        coin1_times=coin1_times,
+        coin2_times=coin2_times,
+        coin1_prices=coin1_prices,
+        coin2_prices=coin2_prices,
+    )
+    coin2_over_coin1_times, coin2_over_coin1_prices = _compute_token_quotient(
+        coin1_times=coin2_times,
+        coin2_times=coin1_times,
+        coin1_prices=coin2_prices,
+        coin2_prices=coin1_prices,
+    )
+
+    styles = cli_run.get_cli_styles()
+
+    toolstr.print(
+        toolstr.hjustify(coin1 + ' / ' + coin2, 'center', 70),
+        indent=4,
+        style=styles['title'],
+    )
+    plot = toolstr.render_line_plot(
+        xvals=coin1_over_coin2_times,  # type: ignore
+        yvals=coin1_over_coin2_prices,  # type: ignore
+        n_rows=40,
+        n_columns=120,
+        line_style=styles['description'],
+        chrome_style=styles['comment'],
+        tick_label_style=styles['metavar'],
+    )
+    toolstr.print(plot, indent=4)
+
+    print()
+    print()
+    print()
+    toolstr.print(
+        toolstr.hjustify(coin2 + ' / ' + coin1, 'center', 70),
+        indent=4,
+        style=styles['title'],
+    )
+    plot = toolstr.render_line_plot(
+        xvals=coin2_over_coin1_times,  # type: ignore
+        yvals=coin2_over_coin1_prices,  # type: ignore
+        n_rows=40,
+        n_columns=120,
+        line_style=styles['description'],
+        chrome_style=styles['comment'],
+        tick_label_style=styles['metavar'],
+    )
+    toolstr.print(plot, indent=4)
+
+
+def _compute_token_quotient(
+    *,
+    coin1_times: spec.NumpyArray,
+    coin2_times: spec.NumpyArray,
+    coin1_prices: spec.NumpyArray,
+    coin2_prices: spec.NumpyArray,
+) -> tuple[spec.NumpyArray, spec.NumpyArray]:
+    """returns coin1_prices / coin_prices using simple backlook interpolation"""
+
+    import numpy as np
+
+    indices = np.searchsorted(coin1_times, coin2_times)
+    nonzero_mask = (indices != 0) * (indices < len(coin1_times))
+    nonzero_indices = indices[nonzero_mask]
+    comparison_prices = coin1_prices[nonzero_indices]
+    coin1_over_coin2_prices = comparison_prices / coin2_prices[nonzero_mask]
+    return coin2_times[nonzero_mask], coin1_over_coin2_prices

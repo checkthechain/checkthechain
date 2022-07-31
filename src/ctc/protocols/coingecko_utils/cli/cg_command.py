@@ -13,9 +13,9 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'output coingecko market data',
         'args': [
             {
-                'name': 'token',
+                'name': 'tokens',
                 'help': 'token to display information of',
-                'nargs': '?',
+                'nargs': '*',
             },
             {
                 'name': '--time',
@@ -42,13 +42,15 @@ def get_command_spec() -> toolcli.CommandSpec:
             '',
             'CRV',
             '--update',
+            'ETH / BTC',
+            'ETH / LINK',
         ],
     }
 
 
 async def async_cg_command(
     *,
-    token: str,
+    tokens: str,
     n: int,
     verbose: bool,
     height: int | None,
@@ -64,7 +66,17 @@ async def async_cg_command(
     if isinstance(width, str):
         width = int(width)
 
-    if token is None:
+    if timelength is not None:
+        if timelength == 'max':
+            days = None
+        else:
+            import tooltime
+
+            days = round(tooltime.timelength_to_seconds(timelength) / 86400)
+    else:
+        days = 30
+
+    if len(tokens) == 0:
 
         if n is None:
             n = toolcli.get_n_terminal_rows() - 4
@@ -88,20 +100,21 @@ async def async_cg_command(
             width=width,
         )
 
-    else:
-        if timelength is not None:
-            if timelength == 'max':
-                days = None
-            else:
-                import tooltime
+    elif len(tokens) == 3 and tokens[1] == '/':
+        await coingecko_utils.async_summarize_coin_quotient(
+            tokens[0],
+            tokens[2],
+            days=days,
+        )
 
-                days = round(tooltime.timelength_to_seconds(timelength) / 86400)
-        else:
-            days = 30
+    elif len(tokens) == 1:
 
         await coingecko_utils.async_summarize_token_data(
-            query=token,
+            query=tokens[0],
             verbose=verbose,
             update=update,
             days=days,
         )
+
+    else:
+        raise Exception('could not parse inputs, use --help for details')
