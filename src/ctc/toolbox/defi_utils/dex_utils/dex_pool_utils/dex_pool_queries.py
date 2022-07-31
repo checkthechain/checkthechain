@@ -74,8 +74,9 @@ def get_new_pool_getter(
 
 
 async def async_get_dex_pools(
-    factory: spec.Address,
     *,
+    factory: spec.Address | None = None,
+    factories: typing.Sequence[spec.Address] | None = None,
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
@@ -85,6 +86,24 @@ async def async_get_dex_pools(
     async_get_new_pools_of_factory: NewPoolGetter | None = None,
 ) -> typing.Sequence[spec.DexPool]:
     """return pools"""
+
+    if factory is None:
+        # TODO: do this using native sql queries instead of in python
+        if factories is not None:
+            coroutines = [
+                async_get_dex_pools(
+                    factory=factory,
+                    assets=assets,
+                    start_block=start_block,
+                    end_block=end_block,
+                    update=update,
+                    network=network,
+                    provider=provider,
+                )
+                for factory in factories
+            ]
+            results = await asyncio.gather(*coroutines)
+            return [subresult for result in results for subresult in result]
 
     network, provider = evm.get_network_and_provider(network, provider)
 
