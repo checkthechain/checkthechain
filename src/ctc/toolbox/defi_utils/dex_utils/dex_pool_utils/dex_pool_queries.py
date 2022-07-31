@@ -29,6 +29,10 @@ def get_dex_pool_factory_platforms(
             '0xba12222222228d8ba445958a75a0704d566bf2c8': 'Balancer',
             '0xb9fc157394af804a3578134a6585c0dc9cc990d4': 'Curve',
             '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae': 'Curve',
+            '0xf18056bbd320e96a48e3fbf8bc061322531aac99': 'Curve',
+            '0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5': 'Curve',
+            '0x8f942c20d02befc377d41445793068908e2250d0': 'Curve',
+            '0xbabe61887f1de2713c6f97e567623453d3c79f67': 'Curve',
             '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac': 'Sushi',
         }
     else:
@@ -87,6 +91,9 @@ async def async_get_dex_pools(
 ) -> typing.Sequence[spec.DexPool]:
     """return pools"""
 
+    if assets is not None and len(assets) == 0:
+        assets = None
+
     if factory is None:
         # TODO: do this using native sql queries instead of in python
         if factories is not None:
@@ -136,7 +143,7 @@ async def async_get_dex_pools(
         )
 
         new_pools = _filter_pools(
-            pools=pools,
+            pools=new_pools,
             assets=assets,
             start_block=start_block,
             end_block=end_block,
@@ -233,10 +240,15 @@ async def async_update_latest_dex_pools_of_factory(
         )
     )
     if last_scanned_block is None:
-        creation_block = await evm.async_get_contract_creation_block(factory)
-        if creation_block is None:
-            raise Exception('could not determine factory creation block')
-        last_scanned_block = creation_block - 1
+        from ctc.toolbox import search_utils
+
+        try:
+            creation_block = await evm.async_get_contract_creation_block(factory)
+            if creation_block is None:
+                raise Exception('could not determine factory creation block')
+            last_scanned_block = creation_block - 1
+        except search_utils.NoMatchFound:
+            last_scanned_block = -1
 
     latest_block = await evm.async_get_latest_block_number()
 
@@ -259,6 +271,9 @@ async def async_update_latest_dex_pools_of_factory(
             network=network,
             last_scanned_block=latest_block,
         )
+
+    else:
+        new_pools = []
 
     return new_pools
 

@@ -98,24 +98,24 @@ async def async_dex_pools_command(
 
     coroutines = [evm.async_get_erc20_address(token) for token in tokens]
     assets = await asyncio.gather(*coroutines)
-    if len(assets) == 0:
-        assets = None
 
+    factories: typing.Sequence[spec.Address] | None
     if platform is not None:
 
         factory = None
-        factories = []
 
+        use_factories = []
         simple_platform = simplify_name(platform)
         for factory, factory_name in platforms.items():
             factory_name = simplify_name(factory_name)
             if simple_platform == factory_name:
-                factories.append(factory)
+                use_factories.append(factory)
 
-        if len(factories) > 1:
+        if len(use_factories) > 1:
+            factories = use_factories
             factory = None
-        elif len(factories) == 1:
-            factory = factories[0]
+        elif len(use_factories) == 1:
+            factory = use_factories[0]
             factories = None
         else:
             raise Exception('unknown platform: ' + str(platform))

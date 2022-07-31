@@ -17,14 +17,32 @@ async def async_get_pool_tokens(
 ) -> list[spec.Address]:
     import asyncio
 
-    if n_tokens is None:
-        token_addresses = []
-        t = 0
+    old_pools = {
+        '0x79a8c46dea5ada233abaffd40f3a0a2b1e5a4f27',
+        '0xa2b47e3d5c44877cca798226b7b8118f9bfb7a56',
+        '0x06364f10b501e868329afbc005b3492902d6c763',
+        '0x93054188d876f558f4a66b2ef1d97d16edf0895b',
+        '0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714',
+        '0xa5407eae9ba41422680e2e00537571bcc53efbfd',
+        '0x52ea46506b9cc5ef470c5bf89f17dc28bb35d85c',
+        '0x45f783cce6b7ff23b2ab2d70e416cdb7d6055f51',
+    }
+    if pool in old_pools:
         function_abi: spec.FunctionABI = {
+            'name': 'coins',
+            'inputs': [{'type': 'int128'}],
+            'outputs': [{'type': 'address'}],
+        }
+    else:
+        function_abi = {
             'name': 'coins',
             'inputs': [{'type': 'uint256'}],
             'outputs': [{'type': 'address'}],
         }
+
+    if n_tokens is None:
+        token_addresses = []
+        t = 0
         while True:
             try:
                 token_address = await rpc.async_eth_call(
@@ -38,11 +56,6 @@ async def async_get_pool_tokens(
             except spec.RpcException:
                 break
     else:
-        function_abi = {
-            'name': 'coins',
-            'inputs': [{'type': 'uint256'}],
-            'outputs': [{'type': 'address'}],
-        }
         address_coroutines = [
             rpc.async_eth_call(
                 to_address=pool,

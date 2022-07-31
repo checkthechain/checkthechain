@@ -49,7 +49,6 @@ async def async_block_command(
     parse_spec: toolcli.ParseSpec,
 ) -> None:
 
-    block_data: spec.Block = None
     if block is None:
         if timestamp is not None:
 
