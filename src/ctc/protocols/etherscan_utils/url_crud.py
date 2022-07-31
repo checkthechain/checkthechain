@@ -9,9 +9,15 @@ from ctc import spec
 url_templates: typing.Mapping[str, str] = {
     'abi': 'https://{api_subdomain}/api?module=contract&action=getabi&address={address}&format=raw',
     'address': 'https://{hostname}/address/{address}',
+    'address_erc20_transfers': 'https://{hostname}/tokentxns?a={address}',
+    'address_internal_txs': 'https://{hostname}/txsinternal?ps=100&zero=false&a={address}&valid=all&m=advanced',
+    'address_holdings': 'https://{hostname}/tokenholdings?a={address}',
     'block': 'https://{hostname}/block/{block}',
     'token': 'https://{hostname}/token/{token_address}',
+    'token_holders': 'https://{hostname}/token/{token_address}#balances',
     'transaction': 'https://{hostname}/tx/{transaction_hash}',
+    'transaction_logs': 'https://{hostname}/tx/{transaction_hash}#eventlog',
+    'transaction_state_changes': 'https://{hostname}/tx/{transaction_hash}#statechange',
 }
 
 
@@ -68,6 +74,33 @@ def create_address_url(
     return template.format(hostname=hostname, address=address)
 
 
+def create_address_erc20_transfers_url(
+    address: spec.Address,
+    network: spec.NetworkReference = 'mainnet',
+) -> str:
+    hostname = get_hostname(network)
+    template = url_templates['address_erc20_transfers']
+    return template.format(hostname=hostname, address=address)
+
+
+def create_address_internal_txs_url(
+    address: spec.Address,
+    network: spec.NetworkReference = 'mainnet',
+) -> str:
+    hostname = get_hostname(network)
+    template = url_templates['address_internal_txs']
+    return template.format(hostname=hostname, address=address)
+
+
+def create_address_holdings_url(
+    address: spec.Address,
+    network: spec.NetworkReference = 'mainnet',
+) -> str:
+    hostname = get_hostname(network)
+    template = url_templates['address_holdings']
+    return template.format(hostname=hostname, address=address)
+
+
 def create_block_url(
     block: int,
     network: spec.NetworkReference = 'mainnet',
@@ -86,10 +119,37 @@ def create_token_url(
     return template.format(hostname=hostname, token_address=token_address)
 
 
+def create_token_holders_url(
+    token_address: spec.Address,
+    network: spec.NetworkReference = 'mainnet',
+) -> str:
+    hostname = get_hostname(network)
+    template = url_templates['token_holders']
+    return template.format(hostname=hostname, token_address=token_address)
+
+
 def create_transaction_url(
     transaction_hash: str,
     network: spec.NetworkReference = 'mainnet',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['transaction']
+    return template.format(hostname=hostname, transaction_hash=transaction_hash)
+
+
+def create_transaction_logs_url(
+    transaction_hash: str,
+    network: spec.NetworkReference = 'mainnet',
+) -> str:
+    hostname = get_hostname(network)
+    template = url_templates['transaction_logs']
+    return template.format(hostname=hostname, transaction_hash=transaction_hash)
+
+
+def create_transaction_state_changes_url(
+    transaction_hash: str,
+    network: spec.NetworkReference = 'mainnet',
+) -> str:
+    hostname = get_hostname(network)
+    template = url_templates['transaction_state_changes']
     return template.format(hostname=hostname, transaction_hash=transaction_hash)
