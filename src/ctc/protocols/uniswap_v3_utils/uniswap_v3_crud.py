@@ -10,6 +10,9 @@ from ctc import spec
 from . import contracts
 from . import uniswap_v3_spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 class UniswapV3PoolMetadata(TypedDict):
     x_symbol: str
@@ -69,6 +72,8 @@ async def async_get_pool_swaps(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
@@ -88,6 +93,8 @@ async def async_get_pool_swaps(
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         include_timestamps=include_timestamps,
     )
 
@@ -114,9 +121,9 @@ async def async_get_pool_swaps(
         )
         swaps[columns['arg__amount0']] = swaps[columns['arg__amount0']].astype(
             float
-        ) / (10 ** x_decimals)
+        ) / (10**x_decimals)
         swaps[columns['arg__amount1']] = swaps[columns['arg__amount1']].astype(
             float
-        ) / (10 ** y_decimals)
+        ) / (10**y_decimals)
 
     return swaps

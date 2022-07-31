@@ -11,6 +11,9 @@ from . import balancer_spec
 from . import pool_metadata
 from . import pool_state
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 class BalancerPoolState(TypedDict):
     block: int
@@ -64,6 +67,8 @@ async def async_get_pool_swaps(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
 ) -> spec.DataFrame:
 
@@ -106,6 +111,14 @@ async def async_get_pool_swaps(
     }
 
     vault = balancer_spec.vault
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+    )
 
     if start_block is None:
         start_block = await evm.async_get_contract_creation_block(vault)

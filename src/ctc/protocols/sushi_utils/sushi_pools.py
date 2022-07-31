@@ -8,11 +8,17 @@ from ctc.protocols import uniswap_v2_utils
 from . import sushi_spec
 
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
+
 async def async_get_pools(
     *,
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     factory: spec.Address | None = None,
     update: bool = False,
     network: spec.NetworkReference | None = None,

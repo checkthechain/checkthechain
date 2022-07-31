@@ -6,6 +6,9 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
     'A': {
@@ -167,6 +170,8 @@ async def async_get_A_history(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[float]:
     """get history of pool's A parameter"""
@@ -174,6 +179,15 @@ async def async_get_A_history(
     import asyncio
     import numpy as np
     from ctc.toolbox import pd_utils
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     # get ramp events
     pool_start_block = await evm.async_get_contract_creation_block(

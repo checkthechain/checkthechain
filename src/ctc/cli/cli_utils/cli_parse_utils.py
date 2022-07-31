@@ -13,7 +13,7 @@ async def async_resolve_block_range(
     from ctc import evm
 
     if not isinstance(block_range, dict):
-        parsed_range = parse_block_range(block_range)
+        parsed_range = parse_str_block_range(block_range)
     else:
         parsed_range = block_range
 
@@ -63,7 +63,7 @@ async def async_resolve_block_sample(
 
 def is_block_range(block_spec: typing.Union[str, typing.Sequence[str]]) -> bool:
     try:
-        parse_block_range(block_spec)
+        parse_str_block_range(block_spec)
         return True
     except ValueError:
         return False
@@ -79,7 +79,7 @@ def is_block_sample(
         return False
 
 
-def parse_block_range(
+def parse_str_block_range(
     block_spec: typing.Union[str, typing.Sequence[str]]
 ) -> spec.BlockRange:
     """

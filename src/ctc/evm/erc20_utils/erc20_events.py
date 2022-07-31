@@ -10,6 +10,9 @@ from .. import event_utils
 from . import erc20_metadata
 from . import erc20_spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 def _get_token_amount_column(df: spec.DataFrame) -> str:
     if 'arg__amount' in df:
@@ -27,6 +30,8 @@ async def async_get_erc20_transfers(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     normalize: bool = True,
     convert_from_str: bool = True,
@@ -54,6 +59,8 @@ async def async_get_erc20_transfers(
         event_abi=event_abi,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         include_timestamps=include_timestamps,
         verbose=verbose,
         provider=provider,

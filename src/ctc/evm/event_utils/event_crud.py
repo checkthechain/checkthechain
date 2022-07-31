@@ -10,6 +10,9 @@ from ctc.toolbox import backend_utils
 from .. import block_utils
 from .. import abi_utils
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 def is_event_hash(data: spec.BinaryData) -> bool:
     try:
@@ -48,13 +51,24 @@ async def async_get_events(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     backend_order: typing.Sequence[str] | None = None,
     keep_multiindex: bool = True,
     verbose: bool = True,
+    provider: spec.ProviderReference = None,
     **query: typing.Any,
 ) -> spec.DataFrame:
 
+    start_block, end_block = await block_utils.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
     if start_block is None:
         start_block = await block_utils.async_get_contract_creation_block(
             contract_address,
@@ -77,6 +91,7 @@ async def async_get_events(
         end_block=end_block,
         backend_order=backend_order,
         verbose=verbose,
+        provider=provider,
         **query,
     )
 

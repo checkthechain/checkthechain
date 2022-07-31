@@ -11,12 +11,17 @@ from .. import chainlink_feed_metadata
 from .. import chainlink_spec
 from . import feed_datum
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 async def async_get_full_feed_event_data(
     feed: chainlink_spec._FeedReference,
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     normalize: bool = True,
     interpolate: bool = False,
     provider: spec.ProviderReference = None,
@@ -35,6 +40,14 @@ async def async_get_full_feed_event_data(
     )
 
     # get aggregator
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
     if start_block is None:
         start_block = await chainlink_feed_metadata.async_get_feed_first_block(
             feed=feed,
@@ -170,6 +183,8 @@ async def async_get_answer_feed_event_data(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     normalize: bool = True,
     interpolate: bool = False,
     provider: spec.ProviderReference = None,
@@ -181,6 +196,8 @@ async def async_get_answer_feed_event_data(
         feed=feed,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         normalize=normalize,
         interpolate=interpolate,
         provider=provider,

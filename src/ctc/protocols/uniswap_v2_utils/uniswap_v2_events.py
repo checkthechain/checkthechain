@@ -7,6 +7,9 @@ from ctc import spec
 
 from . import uniswap_v2_metadata
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 pool_event_abis: typing.Mapping[str, spec.EventABI] = {
     'Burn': {
@@ -116,6 +119,8 @@ async def async_get_pool_swaps(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
@@ -142,6 +147,8 @@ async def async_get_pool_swaps(
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         include_timestamps=include_timestamps,
         provider=provider,
         verbose=verbose,
@@ -193,6 +200,8 @@ async def async_get_pool_mints(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
@@ -219,6 +228,8 @@ async def async_get_pool_mints(
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         include_timestamps=include_timestamps,
         provider=provider,
         verbose=verbose,
@@ -255,6 +266,8 @@ async def async_get_pool_burns(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
@@ -280,8 +293,10 @@ async def async_get_pool_burns(
         event_abi=pool_event_abis['Burn'],
         contract_address=pool_address,
         start_block=start_block,
-        include_timestamps=include_timestamps,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        include_timestamps=include_timestamps,
         provider=provider,
         verbose=verbose,
     )

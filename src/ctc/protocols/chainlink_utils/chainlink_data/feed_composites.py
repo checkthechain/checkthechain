@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import typing
 
+from ctc import evm
 from ctc import spec
 from .. import chainlink_spec
 from .. import chainlink_feed_metadata
 from . import feed_data
+
+if typing.TYPE_CHECKING:
+    import tooltime
 
 
 async def async_get_composite_feed_data(
@@ -13,11 +17,22 @@ async def async_get_composite_feed_data(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     invert: bool = False,
     provider: spec.ProviderReference = None,
 ) -> spec.Series:
     # TODO: other ways of specifying composites
     import asyncio
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     # queue requests
     coroutines = []

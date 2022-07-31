@@ -1,21 +1,38 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import evm
 from ctc import rpc
 from ctc import spec
 
 from . import aave_spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 async def async_get_deposits(
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    *,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
 
     provider = rpc.get_provider(provider)
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
+
     network = provider['network']
     if network is None:
         raise Exception('could not determine network')
@@ -46,14 +63,26 @@ async def async_get_deposits(
 
 
 async def async_get_withdrawals(
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    *,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
 
     provider = rpc.get_provider(provider)
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
+
     network = provider['network']
     if network is None:
         raise Exception('could not determine network')

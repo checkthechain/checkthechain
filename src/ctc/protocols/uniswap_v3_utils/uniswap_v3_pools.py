@@ -7,6 +7,9 @@ from ctc import spec
 from ctc.toolbox.defi_utils import dex_utils
 from . import uniswap_v3_spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 async def async_get_pools(
     factory: spec.Address | None = None,
@@ -14,6 +17,8 @@ async def async_get_pools(
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     update: bool = False,
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
@@ -29,6 +34,8 @@ async def async_get_pools(
         assets=assets,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         update=update,
         network=network,
         provider=provider,
@@ -38,8 +45,10 @@ async def async_get_pools(
 async def async_get_new_pools(
     *,
     factory: spec.Address,
-    start_block: spec.BlockNumberReference,
-    end_block: spec.BlockNumberReference,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
 ) -> typing.Sequence[spec.DexPool]:
 
     event_abi: spec.EventABI = {
@@ -79,6 +88,14 @@ async def async_get_new_pools(
         'name': 'PoolCreated',
         'type': 'event',
     }
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=False,
+    )
 
     df = await evm.async_get_events(
         factory,

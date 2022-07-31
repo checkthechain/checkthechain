@@ -11,6 +11,9 @@ from ctc.toolbox.defi_utils import dex_utils
 
 from . import pool_metadata
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 # factories
 curve_deployer_eoa = '0xbabe61887f1de2713c6f97e567623453d3c79f67'
@@ -249,12 +252,23 @@ async def async_get_base_pools(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     factory: spec.Address | None = None,
     provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio
     import pandas as pd
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     if start_block is None:
         start_block = 12903979
@@ -303,6 +317,8 @@ async def async_get_plain_pools(
     factory: spec.Address | None = None,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
@@ -318,6 +334,8 @@ async def async_get_plain_pools(
         event_name='PlainPoolDeployed',
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         provider=provider,
         verbose=verbose,
     )
@@ -347,6 +365,8 @@ async def async_get_meta_pools(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     factory: spec.Address | None = None,
     provider: spec.ProviderReference = None,
     verbose: bool = False,
@@ -360,6 +380,15 @@ async def async_get_meta_pools(
         factories = [old_pool_factory, pool_factory]
     else:
         factories = [factory]
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     # gather data
     coroutines = []
@@ -420,6 +449,8 @@ async def async_get_pools(
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     update: bool = False,
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
@@ -439,6 +470,8 @@ async def async_get_pools(
         assets=assets,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         update=update,
         network=network,
         provider=provider,
@@ -448,9 +481,19 @@ async def async_get_pools(
 async def async_get_new_pools(
     *,
     factory: spec.Address,
-    start_block: spec.BlockNumberReference,
-    end_block: spec.BlockNumberReference,
+    start_block: spec.BlockNumberReference | None,
+    end_block: spec.BlockNumberReference | None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
 ) -> typing.Sequence[spec.DexPool]:
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=False,
+    )
 
     start_block, end_block = await evm.async_block_numbers_to_int(
         [start_block, end_block]

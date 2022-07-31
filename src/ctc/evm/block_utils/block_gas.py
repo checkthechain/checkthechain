@@ -5,7 +5,11 @@ from typing_extensions import TypedDict
 
 from . import block_crud
 from . import block_normalize
+from . import block_times
 from ctc import spec
+
+if typing.TYPE_CHECKING:
+    import tooltime
 
 
 if typing.TYPE_CHECKING:
@@ -154,10 +158,21 @@ async def async_get_blocks_gas_stats(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> BlocksGasStats:
     """get gas statistics aggregated over multiple blocks"""
+
+    start_block, end_block = await block_times.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     if blocks is None:
         if start_block is None or end_block is None:

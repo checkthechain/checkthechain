@@ -7,6 +7,9 @@ from ctc import spec
 from ctc.toolbox.defi_utils import dex_utils
 from . import uniswap_v2_spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 async def async_get_pools(
     factory: spec.Address | None = None,
@@ -14,6 +17,8 @@ async def async_get_pools(
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     update: bool = False,
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
@@ -33,6 +38,8 @@ async def async_get_pools(
         assets=assets,
         start_block=start_block,
         end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
         update=update,
         network=network,
         provider=provider,
@@ -84,6 +91,8 @@ async def async_get_new_pools(
         verbose=False,
         start_block=start_block,
         end_block=end_block,
+        start_time=None,
+        end_time=None,
         keep_multiindex=False,
     )
 

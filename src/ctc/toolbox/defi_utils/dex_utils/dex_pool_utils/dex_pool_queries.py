@@ -8,6 +8,8 @@ from ctc import spec
 
 
 if typing.TYPE_CHECKING:
+    import tooltime
+
     NewPoolGetter = typing.Callable[
         ...,
         typing.Coroutine[
@@ -84,6 +86,8 @@ async def async_get_dex_pools(
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     update: bool = False,
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
@@ -93,6 +97,15 @@ async def async_get_dex_pools(
 
     if assets is not None and len(assets) == 0:
         assets = None
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     if factory is None:
         # TODO: do this using native sql queries instead of in python

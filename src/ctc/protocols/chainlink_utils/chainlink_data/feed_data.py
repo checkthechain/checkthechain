@@ -2,12 +2,17 @@ from __future__ import annotations
 
 import typing
 
+from ctc import evm
 from ctc import spec
 
 from .. import chainlink_feed_metadata
 from .. import chainlink_spec
 from . import feed_datum_by_block
 from . import feed_events
+
+
+if typing.TYPE_CHECKING:
+    import tooltime
 
 
 @typing.overload
@@ -49,11 +54,22 @@ async def async_get_feed_data(
     blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[spec.DataFrame, spec.Series]:
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+        provider=provider,
+    )
 
     # determine blocks
     if (blocks is not None) and [start_block, end_block].count(None) < 2:

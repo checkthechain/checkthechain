@@ -7,12 +7,17 @@ from ctc import spec
 from . import uniswap_v2_events
 from . import uniswap_v2_state
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 async def async_get_pool_log_deltas(
     pool: spec.Address,
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
     normalize: bool = True,
     include_initial_state: bool = True,
 ) -> spec.DataFrame:
@@ -20,6 +25,13 @@ async def async_get_pool_log_deltas(
     import pandas as pd
 
     # get start_block and initial conditions
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+    )
     if start_block is None:
         start_block = await evm.async_get_contract_creation_block(pool)
         initial_point_task = None
