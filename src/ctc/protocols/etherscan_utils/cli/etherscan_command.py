@@ -110,13 +110,13 @@ async def async_etherscan_command(
 
     if is_address:
         if holdings:
-            url = etherscan_utils.create_address_holdings_url(query)
+            url = etherscan_utils.create_address_holdings_url(address)
         elif erc20_transfers:
-            url = etherscan_utils.create_address_erc20_transfers_url(query)
+            url = etherscan_utils.create_address_erc20_transfers_url(address)
         elif internal:
-            url = etherscan_utils.create_address_internal_txs_url(query)
+            url = etherscan_utils.create_address_internal_txs_url(address)
         elif holders:
-            url = etherscan_utils.create_token_holders_url(query)
+            url = etherscan_utils.create_token_holders_url(address)
 
     if abi:
         if is_address:
