@@ -9,7 +9,7 @@ from .. import analytics_spec
 
 
 async def async_compute_buybacks(
-    blocks: list[int], verbose: bool = False
+    blocks: typing.Sequence[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
 
     return {
@@ -21,7 +21,7 @@ async def async_compute_buybacks(
 
 
 async def async_compute_tribe_buybacks_usd(
-    blocks: list[int], swaps: typing.Optional[spec.DataFrame] = None
+    blocks: typing.Sequence[int], swaps: typing.Optional[spec.DataFrame] = None
 ) -> analytics_spec.MetricData:
     from ctc.toolbox import pd_utils
 

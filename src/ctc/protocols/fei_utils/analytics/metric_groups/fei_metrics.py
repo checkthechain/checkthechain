@@ -12,7 +12,7 @@ from .. import analytics_spec
 
 
 async def async_compute_prices(
-    blocks: list[int], verbose: bool = False
+    blocks: typing.Sequence[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
     from ctc.toolbox import pd_utils
 
@@ -42,7 +42,7 @@ async def async_compute_prices(
 
 
 async def async_compute_pfei_by_platform(
-    blocks: list[int], verbose: bool = False
+    blocks: typing.Sequence[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
 
     deposit_balances = await fei_utils.async_get_fei_deposit_balances_by_block(
@@ -87,7 +87,7 @@ async def async_compute_pfei_by_platform(
 
 
 async def async_compute_dex_tvls(
-    blocks: list[int],
+    blocks: typing.Sequence[int],
     verbose: bool = False,
 ) -> analytics_spec.MetricGroup:
     import asyncio

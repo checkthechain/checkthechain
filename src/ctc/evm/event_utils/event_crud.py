@@ -60,13 +60,12 @@ async def async_get_events(
             contract_address,
             verbose=verbose,
         )
-    start_block = await block_utils.async_block_number_to_int(start_block)
+    if start_block is not None:
+        start_block = await block_utils.async_block_number_to_int(start_block)
     if end_block is None:
         end_block = 'latest'
-
-    start_block, end_block = await block_utils.async_block_numbers_to_int(
-        blocks=[start_block, end_block],
-    )
+    if end_block is not None:
+        end_block = await block_utils.async_block_number_to_int(end_block)
 
     if backend_order is None:
         backend_order = ['filesystem', 'download']

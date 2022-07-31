@@ -29,7 +29,7 @@ MetricSeries = typing.List[float]
 
 class TimeData(TypedDict):
     timestamps: list[int]
-    block_numbers: list[int]
+    block_numbers: typing.Sequence[int]
     n_samples: int
     window_size: str
     interval_size: str
@@ -63,23 +63,23 @@ class AnalyticsPayload(TypedDict):
     interval_size: str
     window_size: str
     timestamps: list[Timestamp]
-    block_numbers: list[int]
+    block_numbers: typing.Sequence[int]
 
     # metrics
     data: dict[str, MetricGroup]
 
 
-MetricGroupCreator = typing.Callable[[typing.List[int], bool], MetricGroup]
+MetricGroupCreator = typing.Callable[[typing.Sequence[int], bool], MetricGroup]
 MetricGroupCreatorCoroutine = typing.Callable[
-    [typing.List[int], bool],
+    [typing.Sequence[int], bool],
     typing.Coroutine[typing.Any, typing.Any, MetricGroup],
 ]
 MultiMetricGroupCreator = typing.Callable[
-    [typing.List[int], bool],
+    [typing.Sequence[int], bool],
     typing.Dict[str, MetricGroup],
 ]
 MultiMetricGroupCreatorCoroutine = typing.Callable[
-    [typing.List[int], bool],
+    [typing.Sequence[int], bool],
     typing.Coroutine[typing.Any, typing.Any, typing.Dict[str, MetricGroup]],
 ]
 

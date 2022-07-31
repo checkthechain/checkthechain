@@ -57,7 +57,7 @@ async def async_get_block_timestamps(
         if db_timestamps is None:
             db_timestamps = [None for block in blocks]
         results: dict[int, int | None] = dict(zip(blocks, db_timestamps))
-        remaining_blocks = [
+        remaining_blocks: typing.Sequence[int] = [
             block
             for block, timestamp in zip(blocks, db_timestamps)
             if timestamp is None

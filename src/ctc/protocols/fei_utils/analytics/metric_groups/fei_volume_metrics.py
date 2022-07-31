@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import evm
 from ctc import spec
 from .. import analytics_spec
 
 
 async def async_compute_dex_volume(
-    blocks: list[int], verbose: bool = False
+    blocks: typing.Sequence[int], verbose: bool = False
 ) -> analytics_spec.MetricGroup:
     import asyncio
 
@@ -66,7 +68,7 @@ async def async_compute_dex_volume(
 
 
 async def async_compute_uniswap_v2_volume(
-    pool_address: spec.ContractAddress, blocks: list[int]
+    pool_address: spec.ContractAddress, blocks: typing.Sequence[int]
 ) -> analytics_spec.MetricData:
     from ctc.protocols import uniswap_v2_utils
 
@@ -84,7 +86,7 @@ async def async_compute_uniswap_v2_volume(
 
 
 async def async_compute_uniswap_v3_volume(
-    pool_address: spec.ContractAddress, blocks: list[int]
+    pool_address: spec.ContractAddress, blocks: typing.Sequence[int]
 ) -> analytics_spec.MetricData:
     import numpy as np
     from ctc.protocols import uniswap_v3_utils
@@ -102,14 +104,14 @@ async def async_compute_uniswap_v3_volume(
 
 
 async def async_compute_sushiswap_volume(
-    pool_address: spec.ContractAddress, blocks: list[int]
+    pool_address: spec.ContractAddress, blocks: typing.Sequence[int]
 ) -> analytics_spec.MetricData:
     return await async_compute_uniswap_v2_volume(pool_address, blocks)
 
 
 async def async_compute_curve_volume(
     pool_address: spec.ContractAddress,
-    blocks: list[int],
+    blocks: typing.Sequence[int],
     *,
     fei_index: int,
     event_name: str,
@@ -142,7 +144,7 @@ async def async_compute_curve_volume(
 
 
 async def async_compute_saddle_volume(
-    pool_address: spec.ContractAddress, *, blocks: list[int], fei_index: int
+    pool_address: spec.ContractAddress, *, blocks: typing.Sequence[int], fei_index: int
 ) -> analytics_spec.MetricData:
 
     swaps = await evm.async_get_events(

@@ -153,7 +153,12 @@ async def async_get_token_balance(
     usd: bool = False,
 ) -> typing.Union[int, float]:
 
-    block = await evm.async_block_number_to_int(block=block, provider=provider)
+    if block is None:
+        block = 'latest'
+    if block is not None:
+        block = await evm.async_block_number_to_int(
+            block=block, provider=provider
+        )
     deposits = await coracle_deposits.async_get_token_deposits(
         token=token, block=block, provider=provider
     )
@@ -221,6 +226,8 @@ async def async_get_tokens_balances(
     exclude_fei: bool = True,
 ) -> typing.Union[dict[spec.Address, int], dict[spec.Address, float]]:
 
+    if block is None:
+        block = 'latest'
     block = await evm.async_block_number_to_int(block=block, provider=provider)
 
     # use all tokens in pcv by default

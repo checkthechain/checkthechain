@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from . import analytics_spec
 from . import metric_groups
 
@@ -20,7 +22,7 @@ f_multi_metric_group: dict[
 
 
 async def async_get_metrics(
-    blocks: list[int],
+    blocks: typing.Sequence[int],
     verbose: bool = False,
 ) -> dict[str, analytics_spec.MetricGroup]:
     import asyncio

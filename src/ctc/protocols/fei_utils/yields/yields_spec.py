@@ -21,7 +21,7 @@ class FeiYieldPayload(TypedDict):
     interval_size: str
     window_size: str
     timestamps: list[int]
-    block_numbers: list[int]
+    block_numbers: typing.Sequence[int]
     created_at_timestamp: int
 
     # farms

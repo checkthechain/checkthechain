@@ -10,7 +10,7 @@ from .. import analytics_spec
 
 
 async def async_compute_pcv_stats(
-    blocks: list[int],
+    blocks: typing.Sequence[int],
     verbose: bool = False,
 ) -> dict[str, analytics_spec.MetricGroup]:
 
@@ -66,7 +66,7 @@ async def async_compute_pcv_stats(
 
 
 async def async_compute_pcv_by_asset(
-    blocks: list[int],
+    blocks: typing.Sequence[int],
     verbose: bool = False,
     *,
     provider: spec.ProviderReference = None,
