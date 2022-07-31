@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import typing
 
 import toolcli
@@ -18,9 +19,9 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'list dex pools',
         'args': [
             {
-                'name': 'token',
-                'help': 'token symbol or address',
-                'nargs': '?',
+                'name': 'tokens',
+                'help': 'token symbols or addresses (separate using spaces)',
+                'nargs': '*',
             },
             {
                 'name': '--platform',
@@ -62,6 +63,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
                 'help': 'specify that output path can be overwritten',
             },
+            {
+                'name': '--sort',
+                'help': 'column to sort pools by',
+                'nargs': '+',
+            },
         ],
         'examples': [
             'CRV',
@@ -76,7 +82,7 @@ def simplify_name(name: str) -> str:
 
 async def async_dex_pools_command(
     *,
-    token: spec.Address | str,
+    tokens: typing.Sequence[spec.Address | str],
     platform: spec.Address | str,
     all_pools: bool,
     compact: bool,
@@ -85,34 +91,42 @@ async def async_dex_pools_command(
     csv_output: bool,
     output: str | None,
     overwrite: bool,
+    sort: typing.Sequence[str] | None,
 ) -> None:
 
     platforms = dex_utils.get_dex_pool_factory_platforms(network='mainnet')
 
-    if token is not None:
-        if evm.is_address_str(token):
-            address = token
-        else:
-            address = await evm.async_get_erc20_address(token)
-        assets = [address]
-    else:
+    coroutines = [evm.async_get_erc20_address(token) for token in tokens]
+    assets = await asyncio.gather(*coroutines)
+    if len(assets) == 0:
         assets = None
 
     if platform is not None:
+
+        factory = None
+        factories = []
 
         simple_platform = simplify_name(platform)
         for factory, factory_name in platforms.items():
             factory_name = simplify_name(factory_name)
             if simple_platform == factory_name:
-                break
+                factories.append(factory)
+
+        if len(factories) > 1:
+            factory = None
+        elif len(factories) == 1:
+            factory = factories[0]
+            factories = None
         else:
             raise Exception('unknown platform: ' + str(platform))
     else:
         factory = None
+        factories = None
 
     dex_pools = await dex_utils.async_get_dex_pools(
         assets=assets,
         factory=factory,
+        factories=factories,
     )
 
     # alternative output formats
@@ -228,11 +242,17 @@ async def async_dex_pools_command(
         labels.append('creation\nblock')
         labels.append('age')
 
-    sort_indices = [
-        labels.index('platform'),
-        labels.index('asset0'),
-        labels.index('asset1'),
-    ]
+    if sort is not None:
+        sort_indices = [
+            labels.index(column)
+            for column in sort
+        ]
+    else:
+        sort_indices = [
+            labels.index('platform'),
+            labels.index('asset0'),
+            labels.index('asset1'),
+        ]
     rows = sorted(
         rows,
         key=lambda row: tuple(
