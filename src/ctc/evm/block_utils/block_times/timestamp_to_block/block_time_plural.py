@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from typing_extensions import Literal
+
 from ctc import spec
 from ctc import rpc
 
@@ -19,6 +21,7 @@ async def async_get_blocks_of_timestamps(
     cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
     provider: spec.ProviderReference = None,
     use_db: bool = True,
+    mode: Literal['<=', '>=', '=='] = '>=',
 ) -> list[int]:
     """once parallel node search created, use that"""
 
@@ -26,6 +29,9 @@ async def async_get_blocks_of_timestamps(
         block_number_array is not None and block_timestamp_array is not None
     ):
         import numpy as np
+
+        if mode != '>=':
+            raise NotImplementedError()
 
         if block_timestamp_array is None:
             if block_timestamps is None:
@@ -58,6 +64,7 @@ async def async_get_blocks_of_timestamps(
             db_blocks = await db.async_query_timestamps_blocks(
                 network=network,
                 timestamps=timestamps,
+                mode=mode,
             )
             if db_blocks is None:
                 db_blocks = [None for timestamp in timestamps]
@@ -85,6 +92,7 @@ async def async_get_blocks_of_timestamps(
                     nary=nary,
                     provider=provider,
                     use_db=False,
+                    mode=mode,
                 )
                 coroutines.append(coroutine)
             import asyncio
