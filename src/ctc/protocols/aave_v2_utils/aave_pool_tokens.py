@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import typing
+
+from ctc import binary
 from ctc import rpc
 from ctc import spec
+
+from . import aave_spec
 
 
 async def async_get_underlying_asset(
@@ -21,3 +26,25 @@ async def async_get_underlying_asset(
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
     return result
+
+
+async def async_get_reserves_list(
+    *,
+    block: spec.BlockNumberReference | None = None,
+    provider: spec.ProviderReference = None,
+) -> typing.Sequence[spec.Address]:
+
+    network = rpc.get_provider_network(provider)
+    address = aave_spec.get_aave_address('LendingPool', network=network)
+
+    if block is not None:
+        block = binary.standardize_block_number(block)
+
+    reserves: typing.Sequence[spec.Address] = await rpc.async_eth_call(
+        to_address=address,
+        function_name='getReservesList',
+        provider=provider,
+        block_number=block,
+    )
+
+    return reserves

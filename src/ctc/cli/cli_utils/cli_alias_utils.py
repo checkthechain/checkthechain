@@ -47,6 +47,7 @@ alias tx="ctc tx"
 
 # protocol commands
 alias 4byte="ctc 4byte"
+alias aave="ctc aave"
 alias cg="ctc cg"
 alias chainlink="ctc chainlink"
 alias curve="ctc curve"

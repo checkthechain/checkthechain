@@ -8,7 +8,7 @@ def get_aave_address(
     network: spec.NetworkReference | None = None,
 ) -> spec.Address:
     # TODO: move to directory
-    if network == 'mainnet':
+    if network in ('mainnet', 1):
         if name == 'PriceOracle':
             return '0xa50ba011c48153de246e5192c8f9258a2ba79ca9'
         elif name == 'LendingPoolProvider':
@@ -17,6 +17,8 @@ def get_aave_address(
             return '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
         elif name == 'IncentivesController':
             return '0xd784927ff2f95ba542bfc824c8a8a98f3495f6b5'
+        elif name == 'Collector':
+            return '0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c'
         else:
             raise Exception('unknown contract: ' + str(name))
     else:

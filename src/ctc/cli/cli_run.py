@@ -77,6 +77,8 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('tx',): 'ctc.cli.commands.data.tx_command',
     },
     'protocol': {
+        ('aave',): 'ctc.protocols.aave_v2_utils.cli.aave_command',
+        ('aave', 'addresses'): 'ctc.protocols.aave_v2_utils.cli.aave_addresses_command',
         ('cg',): 'ctc.protocols.coingecko_utils.cli.cg_command',
         ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
         (
