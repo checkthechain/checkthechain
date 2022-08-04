@@ -11,7 +11,7 @@ from .. import llama_yields
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_llama_pools_command,
-        'help': 'output a filtered list of pools tracked by Defi Llama',
+        'help': 'output data about pools tracked by Defi Llama',
         'args': [
             {
                 'name': '--chain',

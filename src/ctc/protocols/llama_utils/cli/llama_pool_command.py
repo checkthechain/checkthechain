@@ -8,7 +8,7 @@ from .. import llama_yields
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_llama_pool_command,
-        'help': 'display information related to a pool',
+        'help': 'output data about a pool tracked by Defi Llama',
         'args': [
             {
                 'name': 'pool',

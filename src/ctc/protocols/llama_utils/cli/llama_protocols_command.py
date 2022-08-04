@@ -8,7 +8,7 @@ from .. import llama_tvls
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_llama_protocols_command,
-        'help': 'output defi usage statistics by protocol',
+        'help': 'output data about protocols tracked by Defi Llama',
         'args': [
             {
                 'name': ['-v', '--verbose'],
