@@ -139,6 +139,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'swaps',
         ): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
         ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.pool_command',
+        ('yearn',): 'ctc.protocols.yearn_utils.cli.yearn_pools_command',
         ('4byte',): 'ctc.protocols.fourbyte_utils.cli.fourbyte_command',
         (
             '4byte',

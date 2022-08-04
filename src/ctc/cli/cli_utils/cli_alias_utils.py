@@ -58,6 +58,7 @@ alias gnosis="ctc gnosis"
 alias llama="ctc llama"
 alias rari="ctc rari"
 alias uniswap="ctc uniswap"
+alias yearn="ctc yearn"
 
 #
 # # end of ctc aliases
