@@ -17,6 +17,9 @@ def digest_eth_call(
     empty_token: typing.Any = None,
 ) -> spec.RpcSingularResponse:
 
+    if response is None:
+        return response
+
     if decode_response:
 
         if (fill_empty or empty_token is not None) and response == '0x':
