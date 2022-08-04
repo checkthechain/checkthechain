@@ -59,6 +59,8 @@ async def async_call_all_command(
 
     results = await asyncio.gather(*coroutines)
 
+    styles = cli_run.get_cli_styles()
+
     multiline = False
     rows = []
     for r in range(len(results)):
@@ -68,15 +70,17 @@ async def async_call_all_command(
 
         # modify specific result values
         if result is None:
-            result = '[red]\[REVERT][/red]'
+            result = toolstr.add_style('\[REVERT]', styles['title'])
         if isinstance(result, int):
             result = str(result)
 
         # add result to row
-        if isinstance(result, tuple):
+        if isinstance(result, (tuple, list)):
             import json
 
+            footnote = 'length = ' + str(len(result))
             if len(result) > max_results:
+                footnote += ', clipped to ' + str(max_results)
                 result = result[:max_results]
                 clipped = True
             else:
@@ -85,6 +89,9 @@ async def async_call_all_command(
             if clipped:
                 str_result = str_result[: str_result.rindex('\n')]
                 str_result = str_result + ',\n...'
+
+            footnote = toolstr.add_style('(' + footnote + ')', styles['comment'])
+            str_result += '\n\n' + footnote
             row.append(str_result)
             multiline = True
         else:
@@ -97,7 +104,6 @@ async def async_call_all_command(
         'output',
     ]
 
-    styles = cli_run.get_cli_styles()
     toolstr.print_text_box(
         'Function Outputs for ' + contract_address, style=styles['title']
     )
