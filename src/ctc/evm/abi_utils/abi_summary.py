@@ -162,7 +162,7 @@ def summarize_contract_abi_functions(
             max_table_width=max_width,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'selector': styles['metavar'],
                 'inputs': styles['option'],
                 'outputs': styles['option'],
@@ -177,7 +177,7 @@ def summarize_contract_abi_functions(
             max_table_width=max_width,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'selector': styles['metavar'],
                 'inputs': styles['option'],
                 'outputs': styles['option'],
@@ -204,7 +204,7 @@ def summarize_contract_abi_functions(
         labels=['function', 'present'],
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'function': styles['option'],
             'present': styles['description'],
         },
@@ -272,7 +272,7 @@ def summarize_contract_abi_events(
         max_table_width=max_width,
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'event_hash': styles['metavar'],
             'inputs': styles['option'],
         },

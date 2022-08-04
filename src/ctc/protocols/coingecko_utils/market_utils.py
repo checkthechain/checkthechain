@@ -129,7 +129,7 @@ def print_market_data(
         separate_all_rows=False,
         # max_table_width=os.get_terminal_size().columns,
         vertical_justify='center',
-        column_style={
+        column_styles={
             'Δ 1H': lambda context: 'bold ' + color_polarity(context['cell']),
             'Δ 24H': lambda context: 'bold ' + color_polarity(context['cell']),
             'Δ 7D': lambda context: 'bold ' + color_polarity(context['cell']),

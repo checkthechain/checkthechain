@@ -124,7 +124,7 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                     labels=labels,
                     indent=4,
                     label_style=title_style,
-                    column_style={
+                    column_styles={
                         'name': content_style,
                         'chain_id': content_style,
                         'block_explorer': path_style,
@@ -161,7 +161,7 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                     labels=labels,
                     indent=4,
                     label_style=title_style,
-                    column_style={
+                    column_styles={
                         'name': content_style,
                         'network': content_style,
                         'url': path_style,

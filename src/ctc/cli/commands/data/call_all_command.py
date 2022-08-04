@@ -109,7 +109,7 @@ async def async_call_all_command(
             indent=4,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'function': styles['option'],
                 'output': styles['description'],
             },
@@ -122,7 +122,7 @@ async def async_call_all_command(
             indent=4,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'function': styles['option'],
                 'output': styles['description'],
             },

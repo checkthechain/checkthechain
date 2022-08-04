@@ -333,7 +333,7 @@ def print_paths_alias_status(
         labels=labels,
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'path': styles['metavar'],
             'shell': styles['description'],
             'status': styles['description'],
@@ -370,7 +370,7 @@ def print_aliases() -> None:
         labels=labels,
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'alias': styles['description'],
             'command': styles['option'],
         },

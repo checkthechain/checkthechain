@@ -265,7 +265,7 @@ async def async_dex_pools_command(
         labels=labels,
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'address': styles['metavar'],
             'asset0': styles['description'] + ' bold',
             'asset1': styles['description'] + ' bold',

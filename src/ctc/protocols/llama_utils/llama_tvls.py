@@ -61,7 +61,7 @@ async def async_summarize_protocols_tvls(
         },
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'tvl': styles['description'],
         },
     )
@@ -104,7 +104,7 @@ async def async_summarize_chains_tvls(n: int = 50) -> None:
         },
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'tvl': styles['description'],
         },
     )

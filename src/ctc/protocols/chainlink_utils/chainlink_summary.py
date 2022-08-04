@@ -155,7 +155,7 @@ async def async_summarize_feed(
             labels=labels,
             indent='    ',
             label_style=styles['title'],
-            column_style={'address': styles['metavar']},
+            column_styles={'address': styles['metavar']},
             border=styles['comment'],
         )
 
@@ -170,7 +170,7 @@ async def async_summarize_feed(
         labels=labels,
         indent='    ',
         column_format={'value': {'decimals': 5}},
-        column_style={
+        column_styles={
             'value': styles['description'] + ' bold',
         },
         label_style=styles['title'],

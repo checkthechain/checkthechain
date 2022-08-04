@@ -87,7 +87,7 @@ async def async_chains_command(verbose: bool) -> None:
         },
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'chain_id': styles['description'],
             'block explorer': styles['metavar'],
             'default': styles['title'],

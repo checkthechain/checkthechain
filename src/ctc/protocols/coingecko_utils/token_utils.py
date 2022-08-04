@@ -314,7 +314,7 @@ async def async_summarize_token_data(
         rows,
         indent=4,
         border=styles['comment'],
-        column_style=[styles['option'], styles['description']],
+        column_styles=[styles['option'], styles['description']],
     )
 
     platforms = token_info['platforms']
@@ -334,7 +334,7 @@ async def async_summarize_token_data(
             rows,
             indent=4,
             border=styles['comment'],
-            column_style=[styles['option'], styles['description']],
+            column_styles=[styles['option'], styles['description']],
         )
 
     print()
@@ -409,7 +409,7 @@ async def async_summarize_token_data(
             indent=4,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={'volume': styles['description']},
+            column_styles={'volume': styles['description']},
         )
 
     updated_time_str = 'metadata updated: ' + token_info['last_updated']

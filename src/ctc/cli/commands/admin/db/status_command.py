@@ -113,7 +113,7 @@ def status_command() -> None:
             indent=4,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'network': styles['description'] + ' bold',
                 'version': styles['description'] + ' bold',
             },

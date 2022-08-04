@@ -53,7 +53,7 @@ async def async_print_aave_addresses(
         rows,
         indent=indent,
         border=styles['comment'],
-        column_style=[styles['option'], styles['metavar']],
+        column_styles=[styles['option'], styles['metavar']],
         max_table_width=max_table_width,
     )
 
@@ -106,7 +106,7 @@ async def async_print_aave_addresses(
             labels=labels,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'symbol': styles['option'],
             },
             max_table_width=max_table_width,
@@ -133,7 +133,7 @@ async def async_print_aave_addresses(
             labels=labels,
             border=styles['comment'],
             label_style=styles['title'],
-            column_style={
+            column_styles={
                 'symbol': styles['option'],
                 'atoken': styles['metavar'],
             },
@@ -321,7 +321,7 @@ async def async_summarize_token_markets(
         },
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'token': styles['metavar'],
             'supply APY': styles['description'],
             'borrow APY': styles['description'],

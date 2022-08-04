@@ -195,7 +195,7 @@ def print_pools_table(
         indent=4,
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'symbol': styles['option'],
             'chain': styles['option'],
             'project': styles['option'],
@@ -290,7 +290,7 @@ def summarize_pool_counts(
         },
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'project': styles['option'],
             'pools': styles['description'],
             'tvl': styles['description'],
@@ -316,7 +316,7 @@ def summarize_pool_counts(
         },
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={
+        column_styles={
             'chain': styles['option'],
             'pools': styles['description'],
             'tvl': styles['description'],
