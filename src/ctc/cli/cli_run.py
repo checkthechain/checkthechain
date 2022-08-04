@@ -57,6 +57,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('block',): 'ctc.cli.commands.data.block_command',
         ('blocks',): 'ctc.cli.commands.data.blocks_command',
         ('call',): 'ctc.cli.commands.data.call_command',
+        ('call', 'all'): 'ctc.cli.commands.data.call_all_command',
         ('calls',): 'ctc.cli.commands.data.calls_command',
         ('chain',): 'ctc.cli.commands.data.chain_command',
         ('decompile',): 'ctc.cli.commands.data.decompile_command',

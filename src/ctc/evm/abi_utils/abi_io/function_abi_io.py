@@ -58,9 +58,10 @@ async def async_get_function_abi(
 
 
 def is_function_read_only(function_abi: spec.FunctionABI) -> bool:
-    return function_abi.get('constant') or function_abi.get(
-        'stateMutability'
-    ) in (
-        'view',
-        'pure',
+    return bool(function_abi.get('constant')) or (
+        function_abi.get('stateMutability')
+        in (
+            'view',
+            'pure',
+        )
     )
