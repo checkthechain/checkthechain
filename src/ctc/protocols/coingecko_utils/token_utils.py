@@ -369,8 +369,13 @@ async def async_summarize_token_data(
             yaxis_kwargs={'label_prefix': '$'},
         )
         print()
+
+        delta = yvals[-1] / yvals[0] - 1
+        formatted_delta = toolstr.format(delta, percentage=True, signed=True)
+        formatted_delta = '(' + formatted_delta + ')'
+        formatted_delta = toolstr.add_style(formatted_delta, styles['comment'])
         toolstr.print(
-            toolstr.hjustify(title, 'center', 70),
+            toolstr.hjustify(title + ' ' + formatted_delta, 'center', 84)[:80],
             indent=4,
             style=styles['title'],
         )
