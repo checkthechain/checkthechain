@@ -55,6 +55,7 @@ alias es="ctc etherscan"
 alias ens="ctc ens"
 alias fei="ctc fei"
 alias gnosis="ctc gnosis"
+alias llama="ctc llama"
 alias rari="ctc rari"
 alias uniswap="ctc uniswap"
 
