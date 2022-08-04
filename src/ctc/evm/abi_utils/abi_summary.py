@@ -5,6 +5,7 @@ import typing
 
 from ctc import binary
 from ctc import spec
+from . import abi_io
 
 
 def get_contract_abi_by_selectors(
@@ -34,11 +35,13 @@ def summarize_contract_abi(
     *,
     max_width: int = 80,
     verbose: bool | int = False,
+    read_write: bool = False,
 ) -> None:
     summarize_contract_abi_functions(
         contract_abi=contract_abi,
         max_width=max_width,
         verbose=verbose,
+        read_write=read_write,
     )
     print()
     print()
@@ -55,13 +58,25 @@ def summarize_contract_abi_functions(
     max_width: int | None = None,
     verbose: bool | int = False,
     title: str = 'Contract ABI Functions',
+    read_write: bool = False,
 ) -> None:
     import toolstr
     from ctc.cli import cli_run
 
     styles = cli_run.get_cli_styles()
 
+    if read_write:
+        read_color = 'white'
+        write_color = styles['description']
+
     functions = binary.get_function_abis(contract_abi)
+
+    if read_write:
+        functions = sorted(
+            functions,
+            key=abi_io.is_function_read_only,
+            reverse=True,
+        )
 
     toolstr.print_text_box(title, style=styles['title'])
     print()
@@ -85,9 +100,18 @@ def summarize_contract_abi_functions(
         if len(inputs) == 0:
             inputs = [{'name': '-', 'type': '-'}]
 
+        name = function['name']
+        if read_write:
+            if abi_io.is_function_read_only(function):
+                # read
+                name = toolstr.add_style(name, read_color)
+            else:
+                # write
+                name = toolstr.add_style(name, write_color)
+
         row = [
             binary.get_function_selector(function),
-            function['name'],
+            name,
         ]
 
         if verbose:
@@ -107,9 +131,19 @@ def summarize_contract_abi_functions(
             row.append(output_str)
         rows.append(row)
 
+    name_column = 'name'
+    if read_write:
+        name_column += (
+            ' ('
+            + toolstr.add_style('r', read_color)
+            + '/'
+            + toolstr.add_style('w', write_color)
+            + ')'
+        )
+
     labels = [
         'selector',
-        'name',
+        name_column,
         'inputs',
         'outputs',
     ]
@@ -125,7 +159,7 @@ def summarize_contract_abi_functions(
             labels=labels,
             max_column_widths=max_column_widths,
             compact=4,
-            # max_table_width=max_width,
+            max_table_width=max_width,
             border=styles['comment'],
             label_style=styles['title'],
             column_style={
@@ -140,7 +174,7 @@ def summarize_contract_abi_functions(
             add_row_index=True,
             labels=labels,
             max_column_widths=max_column_widths,
-            # max_table_width=max_width,
+            max_table_width=max_width,
             border=styles['comment'],
             label_style=styles['title'],
             column_style={
@@ -157,6 +191,7 @@ def summarize_contract_abi_functions(
     has_receive = any(item['type'] == 'receive' for item in contract_abi)
     has_fallback = any(item['type'] == 'fallback' for item in contract_abi)
 
+    print()
     toolstr.print_text_box('Special Functions Present', style=styles['title'])
     print()
     special_rows = [
@@ -169,7 +204,10 @@ def summarize_contract_abi_functions(
         labels=['function', 'present'],
         border=styles['comment'],
         label_style=styles['title'],
-        column_style={'function': styles['option'], 'present': None},
+        column_style={
+            'function': styles['option'],
+            'present': styles['description'],
+        },
         # indent=4,
     )
 
@@ -231,7 +269,7 @@ def summarize_contract_abi_events(
         vertical_justify='top',
         compact=4,
         column_justify={'indexed': 'center'},
-        # max_table_width=max_width,
+        max_table_width=max_width,
         border=styles['comment'],
         label_style=styles['title'],
         column_style={

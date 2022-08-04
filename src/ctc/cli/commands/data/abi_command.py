@@ -22,6 +22,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'name of function or event',
                 'nargs': '*',
             },
+            # {
+            #     'name': '--rw',
+            #     'help': 'sort function entries by read vs write functions',
+            #     'action': 'store_true',
+            #     'dest': 'read_write',
+            # },
             {
                 'name': '--json',
                 'dest': 'json_pretty',
@@ -70,7 +76,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
-            '0x2b79b3c3c7b35463a28a76e0d332aab3e20aa337 Mint Burn Swap Sync'
+            '0x2b79b3c3c7b35463a28a76e0d332aab3e20aa337 Mint Burn Swap Sync',
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --json',
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --map-names --python',
         ],
@@ -81,6 +87,7 @@ async def async_abi_command(
     *,
     address: spec.Address,
     names: typing.Sequence[str],
+    # read_write: bool,
     json_pretty: bool,
     json_raw: bool,
     functions: bool,
@@ -174,4 +181,6 @@ async def async_abi_command(
             contract_abi,
             max_width=columns,
             verbose=verbose,
+            # read_write=read_write,
+            read_write=True,
         )
