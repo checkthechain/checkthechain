@@ -4,6 +4,7 @@ import typing
 
 import toolstr
 
+import ctc
 from . import setup_io
 from .stages import alias_setup
 from .stages import data_dir_setup
@@ -37,6 +38,11 @@ async def async_setup_ctc(
     # print intro
     toolstr.print('# Setting up ctc...', style=styles['header'])
     # toolstr.print_text_box('Setting up ctc', style=styles['header'])
+    print()
+    toolstr.print(
+        'Running setup process for ctc '
+        + toolstr.add_style(ctc.__version__, styles['path'] + ' bold')
+    )
     print()
     print('Each step is optional')
     print('- by default, setup process will leave existing settings unchanged')
