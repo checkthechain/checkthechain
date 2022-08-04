@@ -28,6 +28,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'type': int,
                 'help': 'for functions that output lists, limit display length',
             },
+            {
+                'name': '--block',
+                'help': 'block number for call',
+            },
         ],
         'examples': [
             '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490',
@@ -37,8 +41,17 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_call_all_command(
-    *, contract_address: spec.Address, max_results: int
+    *,
+    contract_address: spec.Address,
+    max_results: int,
+    block: str,
 ) -> None:
+
+    if block is not None:
+        block_number = await evm.async_block_number_to_int(block)
+    else:
+        block_number = 'latest'
+
     contract_abi = await evm.async_get_contract_abi(contract_address)
 
     function_abis = []
@@ -54,6 +67,7 @@ async def async_call_all_command(
                         to_address=contract_address,
                         function_abi=function_abi,
                         provider={'convert_reverts_to_none': True},
+                        block_number=block_number,
                     )
                     coroutines.append(coroutine)
 
@@ -90,7 +104,9 @@ async def async_call_all_command(
                 str_result = str_result[: str_result.rindex('\n')]
                 str_result = str_result + ',\n...'
 
-            footnote = toolstr.add_style('(' + footnote + ')', styles['comment'])
+            footnote = toolstr.add_style(
+                '(' + footnote + ')', styles['comment']
+            )
             str_result += '\n\n' + footnote
             row.append(str_result)
             multiline = True

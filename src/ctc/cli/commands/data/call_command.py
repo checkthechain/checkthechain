@@ -61,14 +61,14 @@ async def async_call_command(
 ) -> None:
     import asyncio
 
-    address_task = asyncio.create_task(
-        evm.async_resolve_address(address, block=block)
-    )
-
     if block is not None:
         block_number = await evm.async_block_number_to_int(block)
     else:
         block_number = 'latest'
+
+    address_task = asyncio.create_task(
+        evm.async_resolve_address(address, block=block)
+    )
 
     address = await address_task
 
