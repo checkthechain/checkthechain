@@ -112,7 +112,10 @@ async def async_gas_command(
                 '-', key + ':', toolstr.format(value, order_of_magnitude=True)
             )
         else:
-            print('-', key + ':', toolstr.format(value))
+            if value is None:
+                print('-', key + ': -')
+            else:
+                print('-', key + ':', toolstr.format(value))
     print()
     print()
     toolstr.print_header('Previous Blocks')
