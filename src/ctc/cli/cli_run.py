@@ -61,7 +61,10 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('calls',): 'ctc.cli.commands.data.calls_command',
         ('chain',): 'ctc.cli.commands.data.chain_command',
         ('decompile',): 'ctc.cli.commands.data.decompile_command',
-        ('dex', 'pools',): 'ctc.cli.commands.data.dex.pools_command',
+        (
+            'dex',
+            'pools',
+        ): 'ctc.cli.commands.data.dex.pools_command',
         ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
         ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
         ('erc20',): 'ctc.cli.commands.data.erc20_command',
@@ -78,7 +81,10 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     },
     'protocol': {
         ('aave',): 'ctc.protocols.aave_v2_utils.cli.aave_command',
-        ('aave', 'addresses'): 'ctc.protocols.aave_v2_utils.cli.aave_addresses_command',
+        (
+            'aave',
+            'addresses',
+        ): 'ctc.protocols.aave_v2_utils.cli.aave_addresses_command',
         ('cg',): 'ctc.protocols.coingecko_utils.cli.cg_command',
         ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
         (
@@ -115,9 +121,18 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('gnosis',): 'ctc.protocols.gnosis_utils.cli.gnosis_command',
         ('llama',): 'ctc.protocols.llama_utils.cli.llama_command',
         ('llama', 'chain'): 'ctc.protocols.llama_utils.cli.llama_chain_command',
-        ('llama', 'chains'): 'ctc.protocols.llama_utils.cli.llama_chains_command',
-        ('llama', 'protocol'): 'ctc.protocols.llama_utils.cli.llama_protocol_command',
-        ('llama', 'protocols'): 'ctc.protocols.llama_utils.cli.llama_protocols_command',
+        (
+            'llama',
+            'chains',
+        ): 'ctc.protocols.llama_utils.cli.llama_chains_command',
+        (
+            'llama',
+            'protocol',
+        ): 'ctc.protocols.llama_utils.cli.llama_protocol_command',
+        (
+            'llama',
+            'protocols',
+        ): 'ctc.protocols.llama_utils.cli.llama_protocols_command',
         ('llama', 'pool'): 'ctc.protocols.llama_utils.cli.llama_pool_command',
         ('llama', 'pools'): 'ctc.protocols.llama_utils.cli.llama_pools_command',
         ('rari',): 'ctc.protocols.rari_utils.cli.rari.fuse_command',
@@ -139,7 +154,11 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'swaps',
         ): 'ctc.protocols.uniswap_v2_utils.cli.swaps_command',
         ('uniswap', 'pool'): 'ctc.protocols.uniswap_v2_utils.cli.pool_command',
-        ('yearn',): 'ctc.protocols.yearn_utils.cli.yearn_pools_command',
+        ('yearn',): 'ctc.protocols.yearn_utils.cli.yearn_command',
+        (
+            'yearn',
+            'addresses',
+        ): 'ctc.protocols.yearn_utils.cli.yearn_addresses_command',
         ('4byte',): 'ctc.protocols.fourbyte_utils.cli.fourbyte_command',
         (
             '4byte',
