@@ -114,7 +114,7 @@ async def async_summarize_pools(
             'gross APR': styles['description'],
         },
         indent=4,
-        column_format={
+        column_formats={
             'TVL': {
                 'order_of_magnitude': True,
                 'trailing_zeros': True,

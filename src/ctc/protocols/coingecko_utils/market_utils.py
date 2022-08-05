@@ -135,7 +135,7 @@ def print_market_data(
             'Δ 7D': lambda context: 'bold ' + color_polarity(context['cell']),
             '7D chart': lambda context: 'bold ' + get_row_color(context['r']),
         },
-        column_format={
+        column_formats={
             'price': {'decimals': 2, 'trailing_zeros': True, 'prefix': '$'},
             'Δ 1H': {
                 'scientific': False,

@@ -71,5 +71,5 @@ async def async_pcv_command(
             rows,
             labels=['', 'amount'],
             format=format_kwargs,
-            column_format={'CR': {'percentage': True}},
+            column_formats={'CR': {'percentage': True}},
         )

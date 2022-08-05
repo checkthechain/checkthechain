@@ -183,7 +183,7 @@ def print_pools_table(
         rows,
         labels=labels,
         max_column_widths={'pool': 45},
-        column_format={
+        column_formats={
             'apy': {'postfix': '%', 'decimals': 2, 'trailing_zeros': True},
             'tvl': {
                 'order_of_magnitude': True,
@@ -285,7 +285,7 @@ def summarize_pool_counts(
         rows,
         labels=['project', 'pools', 'tvl'],
         indent=4,
-        column_format={
+        column_formats={
             'tvl': money_format,
         },
         border=styles['comment'],
@@ -311,7 +311,7 @@ def summarize_pool_counts(
         rows,
         labels=['chain', 'pools', 'tvl'],
         indent=4,
-        column_format={
+        column_formats={
             'tvl': money_format,
         },
         border=styles['comment'],

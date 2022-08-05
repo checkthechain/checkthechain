@@ -285,7 +285,7 @@ async def async_summarize_token_markets(
     toolstr.print_table(
         rows,
         labels=labels,
-        column_format={
+        column_formats={
             'supply APY': {
                 'percentage': True,
                 'trailing_zeros': True,

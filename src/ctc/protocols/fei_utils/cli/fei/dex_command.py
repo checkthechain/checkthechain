@@ -89,5 +89,5 @@ def print_dex_table(
         rows,
         labels=labels,
         format=format,
-        column_format={'Total TVL': dict(format, prefix='$')},
+        column_formats={'Total TVL': dict(format, prefix='$')},
     )

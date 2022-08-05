@@ -169,7 +169,7 @@ async def async_summarize_feed(
         updates[-n_recent:][::-1],
         labels=labels,
         indent='    ',
-        column_format={'value': {'decimals': 5}},
+        column_formats={'value': {'decimals': 5}},
         column_styles={
             'value': styles['description'] + ' bold',
         },

@@ -51,7 +51,7 @@ async def async_summarize_protocols_tvls(
     toolstr.print_table(
         rows,
         labels=keys,
-        column_format={
+        column_formats={
             'tvl': {
                 'order_of_magnitude': True,
                 'decimals': 2,
@@ -94,7 +94,7 @@ async def async_summarize_chains_tvls(n: int = 50) -> None:
     toolstr.print_table(
         rows,
         labels=keys,
-        column_format={
+        column_formats={
             'tvl': {
                 'order_of_magnitude': True,
                 'decimals': 2,
