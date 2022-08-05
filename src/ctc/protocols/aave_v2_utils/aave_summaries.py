@@ -157,13 +157,14 @@ async def async_summarize_token_markets(
         block=block
     )
 
-    total_supplies = await evm.async_get_erc20s_total_supplies(
+    total_supplies_coroutine = evm.async_get_erc20s_total_supplies(
         [
             token_market['reserve_data']['atoken_address']
             for token_market in token_markets
         ],
         block=block,
     )
+    total_supplies_task = asyncio.create_task(total_supplies_coroutine)
 
     coroutines = [
         aave_interest_rates.async_get_interest_rates(
@@ -172,14 +173,15 @@ async def async_summarize_token_markets(
         )
         for token_market in token_markets
     ]
-    interest_rates = await asyncio.gather(*coroutines)
+    interest_rates_task = asyncio.gather(*coroutines)
 
     reserves_list = [
         token_market['underlying'] for token_market in token_markets
     ]
-    prices = await aave_oracle.async_get_asset_prices(
+    prices_coroutine = aave_oracle.async_get_asset_prices(
         reserves_list, block=block
     )
+    prices_task = asyncio.create_task(prices_coroutine)
 
     reserve_balances_coroutines = [
         evm.async_get_erc20_balance_of(
@@ -190,6 +192,10 @@ async def async_summarize_token_markets(
         for token_market in token_markets
     ]
     reserve_balances = await asyncio.gather(*reserve_balances_coroutines)
+
+    interest_rates = await interest_rates_task
+    prices = await prices_task
+    total_supplies = await total_supplies_task
 
     rows = []
     tvls = []
