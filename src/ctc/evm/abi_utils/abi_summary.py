@@ -228,9 +228,6 @@ def summarize_contract_abi_events(
     toolstr.print_text_box(title, style=styles['title'])
     print()
     rows = []
-    if len(events) == 0:
-        print('[none]')
-        return
 
     for i, event_abi in enumerate(events):
 

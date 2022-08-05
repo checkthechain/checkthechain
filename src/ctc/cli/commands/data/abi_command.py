@@ -50,12 +50,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
             {
-                'name': '--functions',
+                'name': ['-f', '--functions'],
                 'help': 'display function abi\'s only',
                 'action': 'store_true',
             },
             {
-                'name': '--events',
+                'name': ['-e', '--events'],
                 'help': 'display event abi\'s only',
                 'action': 'store_true',
             },
@@ -77,6 +77,8 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
             '0x2b79b3c3c7b35463a28a76e0d332aab3e20aa337 Mint Burn Swap Sync',
+            '0x2b79b3c3c7b35463a28a76e0d332aab3e20aa337 -f',
+            '0x2b79b3c3c7b35463a28a76e0d332aab3e20aa337 -e',
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --json',
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca --map-names --python',
         ],
@@ -177,10 +179,26 @@ async def async_abi_command(
             columns = os.get_terminal_size().columns
         except Exception:
             columns = 80
-        evm.summarize_contract_abi(
-            contract_abi,
-            max_width=columns,
-            verbose=verbose,
-            # read_write=read_write,
-            read_write=True,
-        )
+
+        if functions:
+            evm.summarize_contract_abi_functions(
+                contract_abi,
+                max_width=columns,
+                verbose=verbose,
+                read_write=True,
+            )
+
+        elif events:
+            evm.summarize_contract_abi_events(
+                contract_abi,
+                max_width=columns,
+                verbose=verbose,
+            )
+
+        else:
+            evm.summarize_contract_abi(
+                contract_abi,
+                max_width=columns,
+                verbose=verbose,
+                read_write=True,
+            )
