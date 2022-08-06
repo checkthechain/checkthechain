@@ -370,7 +370,10 @@ async def async_summarize_token_data(
         )
         print()
 
-        delta = yvals[-1] / yvals[0] - 1
+        if yvals[0] != 0:
+            delta = yvals[-1] / yvals[0] - 1
+        else:
+            delta = float('inf')
         formatted_delta = toolstr.format(delta, percentage=True, signed=True)
         formatted_delta = '(' + formatted_delta + ')'
         formatted_delta = toolstr.add_style(formatted_delta, styles['comment'])
