@@ -50,13 +50,17 @@ def test_every_module_has_init_file():
     assert len(missing) == 0
 
 
-def test_async_function_names():
+def test_function_names():
     import importlib
     import inspect
     import pkgutil
 
     should_have_async_in_name = []
     should_not_have_async_in_name = []
+    async_exceptions = [
+        '__aenter__',
+        '__aexit__',
+    ]
 
     should_use_by_block = []
     by_block_exceptions = [
@@ -77,44 +81,83 @@ def test_async_function_names():
         for attr_name in dir(module):
             module_attr = getattr(module, attr_name)
             if hasattr(module_attr, '__call__'):
+                check_function_name(
+                    module_attr=module_attr,
+                    attr_name=attr_name,
+                    modname=modname,
+                    should_have_async_in_name=should_have_async_in_name,
+                    should_not_have_async_in_name=should_not_have_async_in_name,
+                    should_use_by_block=should_use_by_block,
+                    async_exceptions=async_exceptions,
+                    by_block_exceptions=by_block_exceptions,
+                )
 
-                if 'per_block' in attr_name or 'by_blocks' in attr_name:
-                    if attr_name not in by_block_exceptions:
-                        should_use_by_block.append(modname + '.' + attr_name)
-
-                named_as_async = attr_name.startswith(
-                    'async'
-                ) or attr_name.startswith('_async')
-                if inspect.iscoroutinefunction(module_attr):
-                    if not named_as_async:
-                        should_have_async_in_name.append(
-                            modname + '.' + attr_name
-                        )
-                else:
-                    if named_as_async:
-                        should_not_have_async_in_name.append(
-                            modname + '.' + attr_name
-                        )
+            # check methods of classes
+            if (
+                isinstance(module_attr, type)
+                and module_attr.__module__ == modname
+            ):
+                methods = inspect.getmembers(
+                    module_attr, predicate=inspect.ismethod
+                )
+                for method_name, method in methods:
+                    check_function_name(
+                        module_attr=method,
+                        attr_name=method_name,
+                        modname=modname + '.' + attr_name,
+                        should_have_async_in_name=should_have_async_in_name,
+                        should_not_have_async_in_name=should_not_have_async_in_name,
+                        should_use_by_block=should_use_by_block,
+                        async_exceptions=async_exceptions,
+                        by_block_exceptions=by_block_exceptions,
+                    )
 
     if len(should_have_async_in_name) > 0:
         message = 'names of these items should start with async_ or _async_:'
-        for attr in should_have_async_in_name:
+        for attr in sorted(should_have_async_in_name):
             message += '\n    - ' + attr
         raise Exception(message)
     if len(should_not_have_async_in_name) > 0:
         message = (
             'names of these items should not start with async_ or _async_:'
         )
-        for attr in should_not_have_async_in_name:
+        for attr in sorted(should_not_have_async_in_name):
             message += '\n    - ' + attr
         raise Exception(message)
     if len(should_use_by_block) > 0:
         message = (
             'functions should use by_block instead of per_block or by_blocks'
         )
-        for attr in should_use_by_block:
+        for attr in sorted(should_use_by_block):
             message += '\n    - ' + attr
         raise Exception(message)
+
+
+def check_function_name(
+    module_attr,
+    attr_name,
+    modname,
+    should_have_async_in_name,
+    should_not_have_async_in_name,
+    should_use_by_block,
+    async_exceptions,
+    by_block_exceptions,
+):
+    import inspect
+
+    named_as_async = attr_name.startswith('async') or attr_name.startswith(
+        '_async'
+    )
+    if inspect.iscoroutinefunction(module_attr):
+        if not named_as_async and attr_name not in async_exceptions:
+            should_have_async_in_name.append(modname + '.' + attr_name)
+    else:
+        if named_as_async and attr_name not in async_exceptions:
+            should_not_have_async_in_name.append(modname + '.' + attr_name)
+
+    if 'per_block' in attr_name or 'by_blocks' in attr_name:
+        if attr_name not in by_block_exceptions:
+            should_use_by_block.append(modname + '.' + attr_name)
 
 
 def iterate_package_functions(prefix):
@@ -174,6 +217,12 @@ def test_max_positional_args():
         if len(argspec.args) > max_positional_args:
             too_many.append(function_name)
 
+    for class_name, class_data in iterate_package_classes('ctc.').items():
+        for method_name, method in class_data['methods']:
+            argspec = inspect.getfullargspec(method)
+            if len(argspec.args) > max_positional_args + 1:
+                too_many.append(class_name + '.' + method_name)
+
     if len(too_many) > 0:
         message = (
             'functions should take no more than '
@@ -185,3 +234,57 @@ def test_max_positional_args():
         message += '\n' + str(len(too_many)) + ' violations'
         message += '\n\nuse `*` to convert to keyword-only arguments'
         raise Exception(message)
+
+
+def iterate_package_classes(prefix, include_methods=True):
+    import importlib
+    import inspect
+    import pkgutil
+
+    classes = {}
+    classes_to_name = {}
+
+    for importer, modname, ispkg in pkgutil.walk_packages(
+        path=ctc.__path__,
+        prefix=prefix,
+        onerror=lambda x: None,
+    ):
+
+        # skip files that run a lot of code
+        if modname.endswith('__main__'):
+            continue
+
+        module = importlib.import_module(modname)
+        for attr_name in dir(module):
+            module_attr = getattr(module, attr_name)
+            if (
+                isinstance(module_attr, type)
+                and module_attr.__module__ == module.__name__
+            ):
+
+                class_data = {
+                    'module_name': modname,
+                    'class_name': attr_name,
+                    'class': module_attr,
+                    'module': module,
+                }
+
+                if include_methods:
+                    class_data['methods'] = inspect.getmembers(
+                        module_attr,
+                        predicate=inspect.ismethod,
+                    )
+
+                name = modname + '.' + attr_name
+                if module_attr not in classes_to_name:
+                    classes[name] = class_data
+                    classes_to_name[module_attr] = name
+                else:
+                    # use longest valid name for function
+                    other_name = classes_to_name[module_attr]
+                    if len(name) > len(other_name):
+                        del classes[other_name]
+                        classes[name] = class_data
+                        classes_to_name[module_attr] = name
+
+    return classes
