@@ -59,6 +59,10 @@ async def async_cg_command(
     timelength: str | None,
 ) -> None:
 
+    if update:
+        await coingecko_utils.async_get_token_list(use_db=False, update=True)
+        return
+
     if height is None:
         height = 1
     height = int(height)
@@ -90,8 +94,6 @@ async def async_cg_command(
             verbose = toolcli.get_n_terminal_cols() >= 96
 
         styles = cli_run.get_cli_styles()
-        note = 'coingecko data @ ' + str(data[0]['last_updated'])
-        toolstr.print(note, style=styles['comment'])
 
         coingecko_utils.print_market_data(
             data=data,
@@ -99,6 +101,9 @@ async def async_cg_command(
             height=height,
             width=width,
         )
+
+        note = 'coingecko data @ ' + str(data[0]['last_updated'])
+        toolstr.print(note, style=styles['comment'])
 
     elif len(tokens) == 3 and tokens[1] == '/':
         await coingecko_utils.async_summarize_coin_quotient(

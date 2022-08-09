@@ -71,6 +71,7 @@ async def async_get_token_list(
     if update is None:
         update = True
     if update:
+        print('intaking ' + str(len(token_list)) + ' coingecko tokens')
         await coingecko_db.async_intake_tokens(token_list)
 
     return token_list
