@@ -116,7 +116,7 @@ async def async_get_pool_assets(
 
 async def async_get_pool_balance(
     pool: spec.Address,
-    token: spec.Address,
+    asset: spec.Address,
     *,
     dex: typing.Type[dexes.DEX] | str | None = None,
     factory: spec.Address | None = None,
@@ -131,7 +131,7 @@ async def async_get_pool_balance(
     dex = dexes.get_dex(dex=dex, factory=factory, network=network)
     return await dex.async_get_pool_balance(
         pool=pool,
-        token=token,
+        asset=asset,
         block=block,
         normalize=normalize,
         network=network,
@@ -164,7 +164,7 @@ async def async_get_pool_balances(
 
 async def async_get_pool_balance_by_block(
     pool: spec.Address,
-    token: spec.Address,
+    asset: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     dex: typing.Type[dexes.DEX] | str | None = None,
@@ -179,7 +179,7 @@ async def async_get_pool_balance_by_block(
     dex = dexes.get_dex(dex=dex, factory=factory, network=network)
     return await dex.async_get_pool_balance_by_block(
         pool=pool,
-        token=token,
+        asset=asset,
         blocks=blocks,
         normalize=normalize,
         network=network,

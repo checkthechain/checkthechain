@@ -300,7 +300,7 @@ class DEX:
     async def async_get_pool_balance(
         cls,
         pool: spec.Address,
-        token: spec.Address,
+        asset: spec.Address,
         *,
         factory: spec.Address | None = None,
         normalize: bool = True,
@@ -313,7 +313,7 @@ class DEX:
 
         return await evm.async_get_erc20_balance_of(
             wallet=pool,
-            token=token,
+            token=asset,
             normalize=normalize,
             block=block,
         )
@@ -346,7 +346,7 @@ class DEX:
     async def async_get_pool_balance_by_block(
         cls,
         pool: spec.Address,
-        token: spec.Address,
+        asset: spec.Address,
         *,
         blocks: typing.Sequence[spec.BlockNumberReference],
         factory: spec.Address | None = None,
@@ -359,7 +359,7 @@ class DEX:
 
         return await evm.async_get_erc20_balance_of_by_block(
             wallet=pool,
-            token=token,
+            token=asset,
             normalize=normalize,
             blocks=blocks,
         )

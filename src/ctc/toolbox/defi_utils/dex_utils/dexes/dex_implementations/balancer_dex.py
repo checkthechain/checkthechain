@@ -37,7 +37,7 @@ class BalancerDEX(dex_class.DEX):
     async def async_get_pool_balance(
         cls,
         pool: spec.Address,
-        token: spec.Address,
+        asset: spec.Address,
         *,
         factory: spec.Address | None = None,
         normalize: bool = True,
@@ -53,7 +53,7 @@ class BalancerDEX(dex_class.DEX):
             block=block,
             normalize=normalize,
         )
-        return pool_balances[token]
+        return pool_balances[asset]
 
     @classmethod
     async def async_get_new_pools(
