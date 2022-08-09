@@ -103,7 +103,7 @@ async def async_get_events(
         )
 
     if include_timestamps:
-        timestamps = await async_get_event_timestamps(events)
+        timestamps = await async_get_event_timestamps(events, provider=provider)
         events.insert(0, 'timestamp', timestamps)  # type: ignore
 
     return events
@@ -247,6 +247,7 @@ async def async_download_events(
 
 async def async_get_event_timestamps(
     events: spec.DataFrame,
+    provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int]:
 
     # get block_numbers
@@ -257,4 +258,7 @@ async def async_get_event_timestamps(
         block_numbers = events.index.values
 
     # get timestamps
-    return await block_utils.async_get_block_timestamps(block_numbers)
+    return await block_utils.async_get_block_timestamps(
+        block_numbers,
+        provider=provider,
+    )
