@@ -24,8 +24,12 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '*',
             },
             {
-                'name': '--platform',
-                'help': 'name of platform (e.g. balancer, curve, uniswap-v2',
+                'name': '--dex',
+                'help': 'name of dex (e.g. balancer, curve, uniswap-v2)',
+            },
+            {
+                'name': '--factory',
+                'help': 'address of pool factory',
             },
             {
                 'name': '--all-pools',
@@ -71,7 +75,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             'CRV',
-            'DAI --platform balancer',
+            'DAI --dex balancer',
         ],
     }
 
@@ -83,7 +87,8 @@ def simplify_name(name: str) -> str:
 async def async_dex_pools_command(
     *,
     tokens: typing.Sequence[spec.Address | str],
-    platform: spec.Address | str,
+    dex: spec.Address | str | None,
+    factory: spec.Address | None,
     all_pools: bool,
     compact: bool,
     verbose: bool,
@@ -94,39 +99,15 @@ async def async_dex_pools_command(
     sort: typing.Sequence[str] | None,
 ) -> None:
 
-    platforms = dex_utils.get_dex_pool_factory_platforms(network='mainnet')
+    factory_dexes = dex_utils.get_dex_names_of_factories(network='mainnet')
 
     coroutines = [evm.async_get_erc20_address(token) for token in tokens]
     assets = await asyncio.gather(*coroutines)
 
-    factories: typing.Sequence[spec.Address] | None
-    if platform is not None:
-
-        factory = None
-
-        use_factories = []
-        simple_platform = simplify_name(platform)
-        for factory, factory_name in platforms.items():
-            factory_name = simplify_name(factory_name)
-            if simple_platform == factory_name:
-                use_factories.append(factory)
-
-        if len(use_factories) > 1:
-            factories = use_factories
-            factory = None
-        elif len(use_factories) == 1:
-            factory = use_factories[0]
-            factories = None
-        else:
-            raise Exception('unknown platform: ' + str(platform))
-    else:
-        factory = None
-        factories = None
-
-    dex_pools = await dex_utils.async_get_dex_pools(
+    dex_pools = await dex_utils.async_get_pools(
         assets=assets,
         factory=factory,
-        factories=factories,
+        dex=dex,
     )
 
     # alternative output formats
@@ -208,7 +189,7 @@ async def async_dex_pools_command(
     for dex_pool in dex_pools:
         row: list[str | None] = [
             dex_pool['address'],
-            platforms.get(dex_pool['factory']),
+            factory_dexes.get(dex_pool['factory']),
             assets_to_symbols.get(dex_pool['asset0']),
             assets_to_symbols.get(dex_pool['asset1']),
         ]
@@ -230,7 +211,7 @@ async def async_dex_pools_command(
 
     labels = [
         'address',
-        'platform',
+        'dex',
         'asset0',
         'asset1',
     ]
@@ -249,7 +230,7 @@ async def async_dex_pools_command(
         ]
     else:
         sort_indices = [
-            labels.index('platform'),
+            labels.index('dex'),
             labels.index('asset0'),
             labels.index('asset1'),
         ]

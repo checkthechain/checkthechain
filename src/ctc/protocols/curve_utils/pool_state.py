@@ -212,3 +212,12 @@ async def async_get_trade(
         raise Exception('invalid rpc result')
 
     return amount_out
+
+
+# async def async_get_swaps():
+#     """
+#     Events
+#     - TokenExchange 0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140
+#     - TokenExchangeUnderlying 0xd013ca23e77a65003c2c659c5442c00c805371b7fc1ebd4c206c41d1536bd90b
+#     """
+#     pass

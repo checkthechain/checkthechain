@@ -1,3 +1,4 @@
+# TODO: all functions should accept `pool` as a positional argument
 from __future__ import annotations
 
 import typing
@@ -154,10 +155,14 @@ async def async_get_pool_balances(
     *,
     pool_address: typing.Optional[spec.ContractAddress] = None,
     pool_id: typing.Optional[spec.HexData] = None,
-    block: spec.BlockNumberReference = 'latest',
+    block: spec.BlockNumberReference | None = None,
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
-) -> typing.Union[dict[spec.Address, int], dict[spec.Address, float],]:
+    provider: spec.ProviderReference | None = None,
+) -> typing.Union[dict[spec.Address, int], dict[spec.Address, float]]:
+
+    if block is None:
+        block = 'latest'
 
     if vault is None:
         vault = balancer_spec.vault
@@ -165,7 +170,9 @@ async def async_get_pool_balances(
         if pool_address is None:
             raise Exception('must specify pool_id or pool_address')
         pool_id = await pool_metadata.async_get_pool_id(
-            pool_address, block=block
+            pool_address,
+            block=block,
+            provider=provider,
         )
 
     pool_tokens = await rpc.async_eth_call(
@@ -174,6 +181,7 @@ async def async_get_pool_balances(
         function_parameters=[pool_id],
         block_number=block,
         package_named_outputs=True,
+        provider=provider,
     )
 
     pool_balances = dict(zip(pool_tokens['tokens'], pool_tokens['balances']))
@@ -183,6 +191,7 @@ async def async_get_pool_balances(
         decimals = await evm.async_get_erc20s_decimals(
             tokens=tokens,
             block=block,
+            provider=provider,
         )
         for token, decimal in zip(tokens, decimals):
             pool_balances[token] /= 10**decimal

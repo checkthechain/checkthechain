@@ -25,11 +25,11 @@ async def async_curve_pools_command(verbose: bool) -> None:
     import asyncio
 
     factories = [
-        '0xB9fC157394Af804a3578134A6585C0dc9cc990d4',
-        '0x90E00ACe148ca3b23Ac1bC8C240C2a7Dd9c2d7f5',
+        '0xb9fc157394af804a3578134a6585c0dc9cc990d4',
+        '0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5',
         '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae',
-        '0x8F942C20D02bEfc377D41445793068908E2250D0',
-        '0xF18056Bbd320E96A48e3Fbf8bC061322531aac99',
+        '0x8f942c20d02befc377d41445793068908e2250d0',
+        '0xf18056bbd320e96a48e3fbf8bc061322531aac99',
     ]
 
     # get data from each factory

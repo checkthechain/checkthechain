@@ -1,14 +1,23 @@
 from __future__ import annotations
 
+import ast
+import typing
+
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
 from . import balancer_spec
 
+if typing.TYPE_CHECKING:
+    import tooltime
+
 
 async def async_get_pool_id(
     pool_address: spec.Address,
     block: spec.BlockNumberReference | None = None,
+    *,
+    provider: spec.ProviderReference | None = None,
 ) -> str:
 
     function_abi: spec.FunctionABI = {
@@ -29,6 +38,7 @@ async def async_get_pool_id(
         to_address=pool_address,
         function_abi=function_abi,
         block_number=block,
+        provider=provider,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -75,3 +85,67 @@ async def async_get_pool_tokens(
         package_named_outputs=True,
     )
     return list(pool_tokens['tokens'])
+
+
+async def async_get_token_registrations(
+    factory: spec.Address,
+    *,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
+) -> typing.Mapping[str, typing.Sequence[str]]:
+
+    event_abi: spec.EventABI = {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'poolId',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': False,
+                'internalType': 'contract IERC20[]',
+                'name': 'tokens',
+                'type': 'address[]',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address[]',
+                'name': 'assetManagers',
+                'type': 'address[]',
+            },
+        ],
+        'name': 'TokensRegistered',
+        'type': 'event',
+    }
+
+    start_block, end_block = await evm.async_parse_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        allow_none=True,
+    )
+
+    balancer_token_registrations = await evm.async_get_events(
+        factory,
+        event_abi=event_abi,
+        verbose=False,
+        start_block=start_block,
+        end_block=end_block,
+    )
+    balancer_token_registrations['arg__tokens'] = balancer_token_registrations[
+        'arg__tokens'
+    ].map(ast.literal_eval)
+
+    token_registrations_by_pool: typing.MutableMapping[str, typing.MutableSequence[str]] = {}
+    for index, row in balancer_token_registrations.iterrows():
+        pool = row['arg__poolId']
+
+        token_registrations_by_pool.setdefault(pool, [])
+        token_registrations_by_pool[pool].extend(row['arg__tokens'])
+
+    return token_registrations_by_pool

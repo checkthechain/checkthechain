@@ -171,6 +171,7 @@ async def async_select_dex_pools_by_id(
 async def async_select_dex_pools(
     *,
     factory: spec.Address | None = None,
+    factories: typing.Sequence[spec.Address] | None = None,
     assets: typing.Sequence[spec.Address] | None = None,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference | None = None,
@@ -184,6 +185,8 @@ async def async_select_dex_pools(
     if factory is not None:
         query.setdefault('where_equals', {})
         query['where_equals']['factory'] = factory
+    if factories is not None:
+        query['where_in']['factory'] = factories
     if assets is not None:
         import sqlalchemy  # type: ignore
 
