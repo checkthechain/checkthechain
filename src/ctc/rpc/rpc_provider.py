@@ -88,7 +88,11 @@ def get_provider_key(provider: spec.Provider) -> spec.ProviderKey:
 
 
 def get_provider_network(provider: spec.ProviderReference) -> spec.ChainId:
-    if provider is None or isinstance(provider, str):
+    if (
+        provider is None
+        or isinstance(provider, str)
+        or 'network' not in provider
+    ):
         provider = get_provider(provider)
 
     network = provider.get('network')
