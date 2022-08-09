@@ -22,6 +22,7 @@ class CurveDEX(dex_class.DEX):
             '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae',
             '0x8f942c20d02befc377d41445793068908e2250d0',
             '0xf18056bbd320e96a48e3fbf8bc061322531aac99',
+            '0xbabe61887f1de2713c6f97e567623453d3c79f67',
         ],
     }
 
