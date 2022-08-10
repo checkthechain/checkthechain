@@ -53,7 +53,7 @@ dependencies = [
     'toolcache >=0.5.0, <0.6',
     'toolcli >=0.6.5, <0.7',
     'toolconf >=0.1.2, <0.2',
-    'toolsql >=0.3.8, <0.4',
+    'toolsql >=0.3.9, <0.4',
     'toolstr >=0.6.1, <0.7',
     'tooltime >=0.2.4, <0.3',
     #
@@ -202,7 +202,7 @@ deps =
     toolcache==0.5.0
     toolcli==0.6.5
     toolconf==0.1.2
-    toolsql==0.3.8
+    toolsql==0.3.9
     toolstr==0.6.1
     tooltime==0.2.4
     ;

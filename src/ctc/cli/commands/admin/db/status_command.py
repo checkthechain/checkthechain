@@ -16,11 +16,18 @@ def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': status_command,
         'help': 'display database status',
+        'args': [
+            {
+                'name': ['-v', '--verbose'],
+                'help': 'display additional information',
+                'action': 'store_true',
+            },
+        ],
         'examples': [''],
     }
 
 
-def status_command() -> None:
+def status_command(verbose: bool) -> None:
     styles = cli_run.get_cli_styles()
 
     toolstr.print_text_box('Database Status', style=styles['title'])
@@ -38,7 +45,7 @@ def status_command() -> None:
     if db_config['dbms'] == 'sqlite':
         toolstr.print(
             toolstr.add_style('- path:', styles['option']),
-            toolstr.add_style(db_config['path'], styles['metavar']),
+            toolstr.add_style(db_config['path'], styles['metavar'] + ' bold'),
         )
     else:
         raise NotImplementedError()
@@ -74,50 +81,62 @@ def status_command() -> None:
     if db_exists:
 
         db_schema = db.get_complete_prepared_schema()
-        toolsql.print_schema(
-            db_config=db_config,
-            db_schema=db_schema,
-            styles=styles,
-        )
+        if verbose:
+            toolsql.print_schema(
+                db_config=db_config,
+                db_schema=db_schema,
+                styles=styles,
+            )
 
-        print()
-        toolstr.print_header('Schema Versions', style=styles['title'])
-        rows = []
-        for schema_name in active_schemas:
-            if schema_name in network_schemas:
-                schema_networks: typing.Sequence[
-                    spec.NetworkReference
-                ] | typing.Sequence[
-                    None
-                ] = config.get_networks_that_have_providers()
-            else:
-                schema_networks = [None]
-
-            for schema_network in schema_networks:
-                version = db.get_schema_version(
-                    schema_name, network=schema_network
-                )
-                if version is None:
-                    version = '[DNE]'
-
-                if schema_network is None:
-                    network_str = ''
+            print()
+            toolstr.print_header('Schema Versions', style=styles['title'])
+            rows = []
+            for schema_name in active_schemas:
+                if schema_name in network_schemas:
+                    schema_networks: typing.Sequence[
+                        spec.NetworkReference
+                    ] | typing.Sequence[
+                        None
+                    ] = config.get_networks_that_have_providers()
                 else:
-                    network_str = str(schema_network)
-                row = [schema_name, network_str, version]
-                rows.append(row)
-            rows = sorted(rows, key=lambda row: tuple(row))
-        toolstr.print_table(
-            rows,
-            labels=['schema', 'network', 'version'],
-            indent=4,
-            border=styles['comment'],
-            label_style=styles['title'],
-            column_styles={
-                'network': styles['description'] + ' bold',
-                'version': styles['description'] + ' bold',
-            },
-        )
+                    schema_networks = [None]
+
+                for schema_network in schema_networks:
+                    version = db.get_schema_version(
+                        schema_name, network=schema_network
+                    )
+                    if version is None:
+                        version = '[DNE]'
+
+                    if schema_network is None:
+                        network_str = ''
+                    else:
+                        network_str = str(schema_network)
+                    row = [schema_name, network_str, version]
+                    rows.append(row)
+                rows = sorted(rows, key=lambda row: tuple(row))
+            toolstr.print_table(
+                rows,
+                labels=['schema', 'network', 'version'],
+                indent=4,
+                border=styles['comment'],
+                label_style=styles['title'],
+                column_styles={
+                    'schema': styles['description'],
+                    'network': 'bold',
+                    'version': 'bold',
+                },
+            )
+
+            print()
+            print()
+            toolsql.print_db_usage(
+                db_config=db_config,
+                db_schema=db_schema,
+                full=False,
+                styles=styles,
+            )
+
     else:
         toolstr.print_text_box('Schema Summary', style=styles['title'])
         print('- db does not exist')

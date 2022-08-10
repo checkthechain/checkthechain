@@ -9,7 +9,7 @@ command_index: toolcli.CommandIndex = {
     # ('db', 'config'): 'toolsql.cli.commands.sql.config_command',
     ('db', 'login'): 'toolsql.cli.commands.sql.login_command',
     # ('db', 'schema'): 'toolsql.cli.commands.sql.schema_command',
-    ('db', 'usage'): 'toolsql.cli.commands.sql.usage_command',
+    # ('db', 'usage'): 'toolsql.cli.commands.sql.usage_command',
     # ('db', 'migrate', 'all'): 'toolsql.cli.commands.sql.migrate.all_command',
     # (
     #     'db',
