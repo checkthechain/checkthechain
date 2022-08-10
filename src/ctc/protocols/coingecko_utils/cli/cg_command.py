@@ -3,7 +3,6 @@ from __future__ import annotations
 import toolcli
 import toolstr
 
-from ctc.cli import cli_run
 from ctc.protocols import coingecko_utils
 
 
@@ -93,8 +92,6 @@ async def async_cg_command(
         if verbose is None:
             verbose = toolcli.get_n_terminal_cols() >= 96
 
-        styles = cli_run.get_cli_styles()
-
         coingecko_utils.print_market_data(
             data=data,
             verbose=verbose,
@@ -103,7 +100,7 @@ async def async_cg_command(
         )
 
         note = 'coingecko data @ ' + str(data[0]['last_updated'])
-        toolstr.print(note, style=styles['comment'])
+        toolstr.print(note, style='#555555')
 
     elif len(tokens) == 3 and tokens[1] == '/':
         await coingecko_utils.async_summarize_coin_quotient(

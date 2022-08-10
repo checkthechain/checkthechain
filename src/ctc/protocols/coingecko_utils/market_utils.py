@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 import typing
 
 if typing.TYPE_CHECKING:
@@ -47,7 +48,7 @@ def color_polarity(value: int | float | None) -> str:
         return ''
 
     if value > 0:
-        return '#4eaf0a'
+        return '#8dc647'
     elif value < 0:
         return '#e15241'
     else:
@@ -120,6 +121,7 @@ def print_market_data(
         return color_polarity(diff)
 
     # print table
+    grey = '#BBBBBB'
     toolstr.print_multiline_table(
         rows,
         labels=labels,
@@ -127,9 +129,15 @@ def print_market_data(
         # compact=True,
         add_row_index=True,
         separate_all_rows=False,
-        # max_table_width=os.get_terminal_size().columns,
+        max_table_width=os.get_terminal_size().columns,
         vertical_justify='center',
+        border='#555555',
+        label_style='#DDDDDD' + ' bold',
         column_styles={
+            '': '#555555' + ' bold',
+            'price': grey,
+            'volume': grey,
+            'mkt cap': grey,
             'Δ 1H': lambda context: 'bold ' + color_polarity(context['cell']),
             'Δ 24H': lambda context: 'bold ' + color_polarity(context['cell']),
             'Δ 7D': lambda context: 'bold ' + color_polarity(context['cell']),
