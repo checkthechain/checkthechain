@@ -129,17 +129,6 @@ async def async_send(
         # chunk request
         request_chunks = chunk_request(request=request, provider=full_provider)
 
-        import logging
-
-        logger = logging.getLogger()
-        logger.info(
-            'chunking batch of '
-            + str(len(request))
-            + ' calls into '
-            + str(len(request_chunks))
-            + ' chunks'
-        )
-
         # send request chunks
         coroutines = []
         for request_chunk in request_chunks:
@@ -208,8 +197,6 @@ async def async_send_raw(
     provider: spec.Provider,
 ) -> spec.RpcResponseRaw:
 
-    _log_request(request=request, provider=provider)
-
     if provider['protocol'] == 'http':
         from .rpc_protocols import rpc_http_async
 
@@ -230,24 +217,6 @@ async def async_send_raw(
         raise Exception(
             'unknown provider protocol: ' + str(provider['protocol'])
         )
-
-
-def _log_request(request: spec.RpcRequest, provider: spec.Provider) -> None:
-    import logging
-
-    logger = logging.getLogger()
-    if isinstance(request, dict):
-        logger.info('singular request: ' + request['method'])
-    elif isinstance(request, list):
-        methods = [subrequest['method'] for subrequest in request]
-        logger.info(
-            'plural request: '
-            + str(len(request))
-            + ' calls, '
-            + str(set(methods))
-        )
-    else:
-        raise Exception('unknown request type: ' + str(type(request)))
 
 
 def reorder_response_chunks(
