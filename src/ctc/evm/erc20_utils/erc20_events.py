@@ -92,6 +92,14 @@ async def async_get_erc20_transfers(
         dtype = float
         transfers[column] = transfers[column] / dtype('1e' + str(decimals))
 
+    else:
+
+        # prevent implicit conversion to int64
+        # - this happens to ERC20's that use small number of decimals
+        # - keep all quantities as native python ints for consistency
+        if transfers[column].dtype.name != 'object':
+            transfers[column] = transfers[column].astype(object)
+
     return transfers
 
 
