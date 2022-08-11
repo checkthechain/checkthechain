@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 import toolcli
 
 from ctc import evm
@@ -39,10 +37,8 @@ for contracts, will display ABI""",
 async def async_address_command(
     *, address: spec.Address, verbose: bool | int, network: str, raw: bool
 ) -> None:
-    try:
-        max_width = os.get_terminal_size().columns
-    except OSError:
-        max_width = 80
+
+    max_width = toolcli.get_n_terminal_cols()
 
     address = await evm.async_resolve_address(address)
 

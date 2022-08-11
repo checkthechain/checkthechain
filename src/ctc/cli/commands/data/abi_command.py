@@ -175,10 +175,7 @@ async def async_abi_command(
         print()
         print()
     if not json_only:
-        try:
-            columns = os.get_terminal_size().columns
-        except Exception:
-            columns = 80
+        columns = toolcli.get_n_terminal_cols()
 
         if functions:
             evm.summarize_contract_abi_functions(

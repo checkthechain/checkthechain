@@ -86,10 +86,8 @@ async def async_decompile_command(
     if verbose:
         width = None
     else:
-        try:
-            width = os.get_terminal_size().columns
-        except Exception:
-            width = 80
+        width = toolcli.get_n_terminal_cols()
+
     toolstr.print_table(
         rows,
         column_justify=['right', 'right', 'left'],

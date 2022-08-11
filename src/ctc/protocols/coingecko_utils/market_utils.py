@@ -64,6 +64,8 @@ def print_market_data(
     width: int | None = None,
 ) -> None:
 
+    import toolcli
+
     if width is None:
         width = 8
 
@@ -129,7 +131,7 @@ def print_market_data(
         # compact=True,
         add_row_index=True,
         separate_all_rows=False,
-        max_table_width=os.get_terminal_size().columns,
+        max_table_width=toolcli.get_n_terminal_cols(),
         vertical_justify='center',
         border='#555555',
         label_style='#DDDDDD' + ' bold',

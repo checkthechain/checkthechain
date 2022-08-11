@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import functools
-import os
 import math
 
 import rich.console
@@ -57,10 +56,7 @@ async def async_chart_command(
         uniswap_v2_utils.async_get_pool_tokens_metadata(pool)
     )
 
-    try:
-        columns = os.get_terminal_size().columns
-    except Exception:
-        columns = 80
+    columns = toolcli.get_n_terminal_cols()
     n_candles = math.floor((columns - 10) / 2)
     if timescale is None:
         candle_timescale = '1d'
