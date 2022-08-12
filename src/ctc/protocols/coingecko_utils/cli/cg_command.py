@@ -81,11 +81,27 @@ async def async_cg_command(
 
     if len(tokens) == 0:
 
+        terminal_rows = toolcli.get_n_terminal_rows()
+        terminal_columns = toolcli.get_n_terminal_cols()
         if n is None:
-            n = toolcli.get_n_terminal_rows() - 4
-            n = int(n / height)
+            if terminal_columns > 172:
+                n_columns = 2
+                gap = 4
+                n = (terminal_rows - 4) * 2
+
+            else:
+                n_columns = None
+                gap = None
+
+                n = terminal_rows - 4
+                n = int(n / height)
+
         else:
             n = int(n)
+
+            if n > terminal_rows - 4 and terminal_columns > 172:
+                n_columns = 2
+                gap = 4
 
         data = await coingecko_utils.async_get_market_data(n)
 
@@ -97,6 +113,8 @@ async def async_cg_command(
             verbose=verbose,
             height=height,
             width=width,
+            n_columns=n_columns,
+            gap=gap,
         )
 
         note = 'coingecko data @ ' + str(data[0]['last_updated'])

@@ -62,6 +62,8 @@ def print_market_data(
     include_links: bool = False,
     height: int | None = None,
     width: int | None = None,
+    n_columns: int | None = None,
+    gap: int | str | None = None,
 ) -> None:
 
     import toolcli
@@ -124,7 +126,7 @@ def print_market_data(
 
     # print table
     grey = '#BBBBBB'
-    toolstr.print_multiline_table(
+    table_str = toolstr.print_multiline_table(
         rows,
         labels=labels,
         column_gap=1,
@@ -178,4 +180,18 @@ def print_market_data(
                 'order_of_magnitude': True,
             },
         },
+        return_str=True,
     )
+
+    if n_columns is not None:
+        if table_str is None:
+            raise Exception('table_str not generated')
+        columnized = toolstr.columnize(
+            table_str,
+            n_columns=n_columns,
+            gap=gap,
+            header_height=2,
+        )
+        toolstr.print(columnized)
+    else:
+        toolstr.print(table_str)
