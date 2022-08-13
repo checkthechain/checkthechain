@@ -9,7 +9,7 @@ from ctc import binary
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': encode_command,
-        'help': """encode data
+        'help': """encode data as EVM datatypes
 
 for simple datatypes, no quotes required
 

@@ -431,7 +431,7 @@ async def async_summarize_token_market(
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
-            **plot_kwargs,
+            **plot_kwargs,  # type: ignore
         )
         toolstr.print(
             toolstr.hjustify(title, 'center', 70),

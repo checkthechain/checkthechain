@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import typing
 
 from ctc import spec
 from . import erc20_metadata
@@ -33,9 +34,27 @@ async def async_print_erc20_summary(
 
     styles = cli_run.get_cli_styles()
 
-    toolstr.print_text_box('ERC20 Summary', style=styles['title'])
-    print('- address:', address)
-    print('- name:', name)
-    print('- symbol:', symbol)
-    print('- decimals:', decimals)
-    print('- total_supply:', toolstr.format(total_supply))
+    toolstr.print_text_box('ERC20 Summary for ' + symbol, style=styles['title'])
+
+    rows: typing.MutableSequence[typing.Tuple[str, typing.Any]] = []
+    rows.append(('name', name))
+    rows.append(('symbol', symbol))
+    rows.append(('decimals', decimals))
+    rows.append(
+        (
+            'total_supply',
+            toolstr.format(
+                total_supply, order_of_magnitude=True, trailing_zeros=True
+            ),
+        )
+    )
+    print()
+    toolstr.print_table(
+        rows,
+        # indent=4,
+        border=styles['comment'],
+        column_styles=[styles['option'], styles['description']],
+    )
+
+    print()
+    toolstr.print(address, style=styles['metavar'])

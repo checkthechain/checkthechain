@@ -22,6 +22,7 @@ import tooltime
 
 from ctc import evm
 from ctc import rpc
+from ctc.cli import cli_run
 from ctc.cli import cli_utils
 
 
@@ -64,6 +65,8 @@ async def async_gas_command(
     import numpy as np
     import pandas as pd
 
+    styles = cli_run.get_cli_styles()
+
     if last is None:
         last_as_int = [1, 10, 100]
     else:
@@ -100,26 +103,39 @@ async def async_gas_command(
                 break
         last_blocks.append(i)
 
-    toolstr.print_text_box('Gas Price Summary')
+    toolstr.print_text_box('Gas Price Summary', style=styles['title'])
     print()
-    print('all prices reported in gwei')
+    toolstr.print('all prices reported in gwei', style=styles['comment'])
     print()
-    print()
-    toolstr.print_header('Latest block = ' + str(latest))
+    toolstr.print_header(
+        'Latest block = ' + toolstr.add_style(str(latest), styles['metavar']),
+        style=styles['title'],
+    )
+    block_rows = []
     for key, value in blocks_gas_stats[-1].items():
         if key in ['gas_limit', 'gas_used']:
-            print(
-                '-', key + ':', toolstr.format(value, order_of_magnitude=True)
-            )
+            block_row = (key, toolstr.format(value, order_of_magnitude=True))
         else:
             if value is None:
-                print('-', key + ': -')
+                block_row = (key, '')
             else:
-                print('-', key + ':', toolstr.format(value))
+                block_row = (key, toolstr.format(value))
+        block_rows.append(block_row)
+    print()
+    toolstr.print_table(
+        block_rows,
+        border=styles['comment'],
+        column_styles=[styles['option'], styles['description']],
+        indent=4,
+    )
     print()
     print()
-    toolstr.print_header('Previous Blocks')
-    print('aggregated using median price of transactions in each block')
+    toolstr.print_header('Previous Blocks', style=styles['title'])
+    print()
+    toolstr.print(
+        'aggregated by median transactoin price of each block',
+        style=styles['comment'],
+    )
     print()
     labels = ['blocks', 'time', 'min', 'median', 'mean', 'max']
     rows = []
@@ -160,4 +176,41 @@ async def async_gas_command(
     final_df = final_df.sort_values(by='time')
     final_df = final_df.set_index('blocks')
 
-    cli_utils.output_data(final_df, output, overwrite=overwrite)
+    if output != 'stdout':
+        cli_utils.output_data(final_df, output, overwrite=overwrite)
+    else:
+        toolstr.print_dataframe_as_table(
+            final_df,
+            border=styles['comment'],
+            label_style=styles['title'],
+            column_styles={
+                'blocks': styles['metavar'],
+                'time': styles['description'],
+                'min': styles['description'],
+                'median': styles['description'],
+                'mean': styles['description'],
+                'max': styles['description'],
+            },
+        )
+
+        xvals = [block['timestamp'] for block in blocks]
+        yvals = gas_stats_df['median_gas_price'].values
+        plot = toolstr.render_line_plot(
+            xvals=xvals,
+            yvals=yvals,  # type: ignore
+            n_rows=40,
+            n_columns=120,
+            line_style=styles['description'],
+            chrome_style=styles['comment'],
+            tick_label_style=styles['metavar'],
+            xtick_format='age',
+        )
+        print()
+        print()
+        print()
+        toolstr.print(
+            toolstr.hjustify('median fee', 'center', 70),
+            indent=4,
+            style=styles['title'],
+        )
+        toolstr.print(plot, indent=4)

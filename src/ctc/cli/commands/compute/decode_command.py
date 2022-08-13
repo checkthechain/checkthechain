@@ -8,7 +8,11 @@ from ctc import binary
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': decode_command,
-        'help': 'decode encoded data',
+        'help': """decode encoded EVM datatypes
+
+for simple datatypes, no quotes required
+
+for nested datatypes, enclose in quotes and quote contained addresses""",
         'args': [
             {'name': 'type', 'help': 'type of data to decode'},
             {'name': 'data', 'help': 'data to decode'},

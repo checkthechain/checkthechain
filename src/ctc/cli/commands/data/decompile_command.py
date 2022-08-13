@@ -10,11 +10,12 @@ TODO:
 """
 from __future__ import annotations
 
-import os
+import typing
 
 import toolcli
 import toolstr
 
+from ctc.cli import cli_run
 from ctc import evm
 from ctc import rpc
 
@@ -64,36 +65,70 @@ async def async_decompile_command(
         sort='hex_signature',
     )
 
-    print(
-        'Found',
-        len(function_selectors),
-        'function selectors matching',
-        len(decompiled_function_abis),
-        'total 4byte entries',
+    styles = cli_run.get_cli_styles()
+    toolstr.print(
+        'Found '
+        + toolstr.add_style(
+            str(len(function_selectors)),
+            styles['description'] + ' bold',
+        )
+        + ' function selectors matching '
+        + toolstr.add_style(
+            str(len(decompiled_function_abis)),
+            styles['description'] + ' bold',
+        )
+        + ' total 4byte entries',
     )
 
     if len(decompiled_function_abis) > 0:
         print()
-        toolstr.print_header('Known selectors')
-    rows = []
-    for entry in decompiled_function_abis:
-        row = [
-            function_selector_indices[entry['hex_signature']],
-            entry['hex_signature'],
-            entry['text_signature'],
-        ]
-        rows.append(row)
+        toolstr.print_header('Known selectors', style=styles['title'])
+    rows: typing.MutableSequence[typing.MutableSequence[typing.Any]] = []
+    row = None
+    for e, entry in enumerate(decompiled_function_abis):
+
+        duplicate = (
+            e > 0
+            and entry['hex_signature']
+            == decompiled_function_abis[e - 1]['hex_signature']
+        )
+
+        if duplicate and row is not None:
+            row[2] = row[2] + '\n' + entry['text_signature']
+            # row = [
+            #     '',
+            #     '',
+            #     entry['text_signature'],
+            # ]
+        else:
+            if row is not None:
+                rows.append(row)
+            row = [
+                function_selector_indices[entry['hex_signature']],
+                entry['hex_signature'],
+                entry['text_signature'],
+            ]
     if verbose:
         width = None
     else:
         width = toolcli.get_n_terminal_cols()
 
-    toolstr.print_table(
+    print()
+    toolstr.print_multiline_table(
         rows,
         column_justify=['right', 'right', 'left'],
         # add_row_index=True,
-        compact=2,
+        labels=['', 'selector', '4byte matches'],
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_styles=[
+            styles['title'] + ' bold',
+            styles['metavar'],
+            styles['description'],
+        ],
+        # compact=2,
         max_table_width=width,
+        # indent=4,
     )
 
     decompiled_selectors = set(
@@ -102,7 +137,7 @@ async def async_decompile_command(
     unknown_selectors = set(function_selectors) - decompiled_selectors
     if len(unknown_selectors) > 0:
         print()
-        toolstr.print_header('Unknown selectors')
+        toolstr.print_header('Unknown selectors', style=styles['title'])
         for unknown_selector in unknown_selectors:
             print(unknown_selector)
 

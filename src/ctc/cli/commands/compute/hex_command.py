@@ -8,9 +8,9 @@ from ctc import binary
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': hex_command,
-        'help': 'convert ascii to hex',
+        'help': 'convert text data to hex representation',
         'args': [
-            {'name': 'data', 'help': 'ascii data to convert'},
+            {'name': 'text', 'help': 'ascii or other text data to convert'},
             {
                 'name': '--raw',
                 'action': 'store_true',
@@ -24,9 +24,9 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-def hex_command(data: str, raw: bool) -> None:
+def hex_command(text: str, raw: bool) -> None:
     if raw:
-        output = binary.ascii_to_raw_hex(data)
+        output = binary.ascii_to_raw_hex(text)
     else:
-        output = binary.ascii_to_prefix_hex(data)
+        output = binary.ascii_to_prefix_hex(text)
     print(output)

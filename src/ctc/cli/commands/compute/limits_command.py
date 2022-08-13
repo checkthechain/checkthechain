@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import math
 import typing
 
 import toolcli
 import toolstr
+
+from ctc.cli import cli_run
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -53,11 +56,12 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
             256,
         ]
 
-    toolstr.print_text_box('int')
+    styles = cli_run.get_cli_styles()
+
+    toolstr.print_text_box('int Limits', style=styles['title'])
     rows: typing.List[typing.Sequence[typing.Any]] = [
         [
             'int' + str(bit_value),
-            'min\nmax',
             str(-(1 << (bit_value - 1)))
             + '\n '
             + str((1 << (bit_value - 1)) - 1),
@@ -66,18 +70,58 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
     ]
     toolstr.print_multiline_table(
         rows,
-        column_justify=['right', 'right', 'left'],
-        compact=2,
+        column_justify=['right', 'left'],
+        column_styles=[
+            styles['option'] + ' bold',
+            styles['description'],
+        ],
+        compact=1,
         separate_all_rows=False,
     )
 
     # uint
     print()
-    toolstr.print_text_box('uint')
-    rows = [
-        ['uint' + str(bit_value), 'max', str(1 << bit_value)]
-        for bit_value in bit_values
+    toolstr.print_text_box('uint Limits', style=styles['title'])
+    rows = []
+    for bit_value in bit_values:
+        row = ['uint' + str(bit_value), str(1 << bit_value)]
+        rows.append(row)
+    toolstr.print_multiline_table(
+        rows,
+        column_justify=['right', 'left'],
+        column_styles=[
+            styles['option'] + ' bold',
+            styles['description'],
+        ],
+        compact=1,
+        separate_all_rows=False,
+    )
+
+    print()
+    floats = [
+        ['float16', 1, 5, 10, 3.31, '65500'],
+        ['float32', 1, 8, 23, 7.22, '3.40e+38'],
+        ['float64', 1, 11, 52, 15.95, '1.80e+308'],
+        ['float128', 1, 15, 113, 34.32, '1.19e+4932'],
     ]
+    labels = [
+        'type',
+        'sign\nbits',
+        'exp\nbits',
+        'mantissa\nbits',
+        'decimal\ndigits',
+        'max value',
+    ]
+    column_styles = {
+        label: styles['description']
+        for label in labels
+    }
+    column_styles['type'] = styles['option'] + ' bold'
+    toolstr.print_text_box('float Limits', style=styles['title'])
     toolstr.print_table(
-        rows, column_justify=['right', 'center', 'left'], compact=2
+        floats,
+        labels=labels,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_styles=column_styles,  # type: ignore
     )
