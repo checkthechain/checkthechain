@@ -120,9 +120,20 @@ schema_datas = [
             'symbol_query': 'eth',
         },
     },
+    {
+        'schema_name': 'block_gas',
+        'selector': db.async_select_median_block_gas_fee,
+        'queryer': db.async_query_median_block_gas_fee,
+        'query': {'block_number': 14000000},
+        'plural_selector': db.async_select_median_blocks_gas_fees,
+        'plural_queryer': db.async_query_median_blocks_gas_fees,
+        'plural_query': {'block_numbers': [14000000, 14000001, 14000002]},
+    },
 ]
 
-non_network_schemas = db.get_generic_schema_names() + db.get_admin_schema_names()
+non_network_schemas = (
+    db.get_generic_schema_names() + db.get_admin_schema_names()
+)
 
 
 def get_test_db_config():
@@ -228,7 +239,6 @@ async def test_query_when_schema_not_initialized(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_row_does_not_exist(schema_data):
 
-
     db_config = get_test_db_config()
     engine = toolsql.create_engine(**db_config)
     with engine.begin() as conn:
@@ -238,9 +248,7 @@ async def test_select_when_row_does_not_exist(schema_data):
             network_kwargs = {'network': None}
 
         db.initialize_schema(
-            schema_name=schema_data['schema_name'],
-            conn=conn,
-            **network_kwargs
+            schema_name=schema_data['schema_name'], conn=conn, **network_kwargs
         )
 
     if schema_data['schema_name'] not in non_network_schemas:
@@ -279,9 +287,7 @@ async def test_query_when_row_does_not_exist(schema_data):
             network_kwargs = {'network': None}
 
         db.initialize_schema(
-            schema_name=schema_data['schema_name'],
-            conn=conn,
-            **network_kwargs
+            schema_name=schema_data['schema_name'], conn=conn, **network_kwargs
         )
 
     if schema_data.get('queryer') is not None:
