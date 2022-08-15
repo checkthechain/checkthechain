@@ -11,7 +11,9 @@ def construct_eth_block_number() -> spec.RpcRequest:
 
 
 def construct_eth_get_block_by_hash(
-    block_hash: spec.BinaryData, *, include_full_transactions: bool = False
+    block_hash: spec.BinaryData,
+    *,
+    include_full_transactions: bool = False,
 ) -> spec.RpcRequest:
     encoded_block_hash = binary.convert(block_hash, 'prefix_hex')
     parameters = [encoded_block_hash, include_full_transactions]
@@ -21,7 +23,7 @@ def construct_eth_get_block_by_hash(
 def construct_eth_get_block_by_number(
     block_number: spec.BlockNumberReference,
     *,
-    include_full_transactions: bool = True,
+    include_full_transactions: bool = False,
 ) -> spec.RpcRequest:
 
     encoded_block_number = binary.encode_block_number(block_number)

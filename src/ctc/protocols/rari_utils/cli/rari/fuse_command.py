@@ -65,7 +65,8 @@ async def async_summarize_fuse_pool(
     comptroller = pool[2]
     standard_block = binary.standardize_block_number(block)
     block_data = await rpc.async_eth_get_block_by_number(
-        block_number=standard_block
+        block_number=standard_block,
+        include_full_transactions=False,
     )
 
     tokens_data = await rari_utils.async_get_pool_summary(

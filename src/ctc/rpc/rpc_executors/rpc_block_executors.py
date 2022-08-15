@@ -41,7 +41,7 @@ async def async_eth_get_block_by_hash(
 async def async_eth_get_block_by_number(
     block_number: spec.StandardBlockNumber,
     *,
-    include_full_transactions: bool = True,
+    include_full_transactions: bool = False,
     decode_response: bool = True,
     provider: spec.ProviderReference = None,
     snake_case_response: bool = True,

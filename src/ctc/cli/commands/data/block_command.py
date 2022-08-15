@@ -88,7 +88,10 @@ async def async_block_command(
         import rich
         import json
 
-        block_data = await evm.async_get_block(block_number)
+        block_data = await evm.async_get_block(
+            block_number,
+            include_full_transactions=False,
+        )
         rich.print_json(json.dumps(block_data))
     else:
         await evm.async_print_block_summary(block=block_number)
