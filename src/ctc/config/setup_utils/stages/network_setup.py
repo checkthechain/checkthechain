@@ -9,6 +9,7 @@ import toolstr
 
 from ctc import rpc
 from ctc import spec
+from ctc.cli import cli_run
 from ... import config_defaults
 
 
@@ -152,9 +153,7 @@ async def async_specify_providers(
         print()
         print('Most ctc operations require an RPC provider')
         print()
-        prompt = (
-            'Would you like to specify an RPC provider? '
-        )
+        prompt = 'Would you like to specify an RPC provider? '
         if toolcli.input_yes_or_no(
             prompt=prompt,
             style=styles['question'],
@@ -250,7 +249,9 @@ async def async_collect_provider_metadata(
     ):
         try:
             chain_id = int(os.environ['ETH_RPC_CHAIN_ID'])
-            print('could not use value of ETH_RPC_CHAIN_ID, not a valid integer')
+            print(
+                'could not use value of ETH_RPC_CHAIN_ID, not a valid integer'
+            )
         except Exception:
             pass
 
@@ -391,7 +392,17 @@ def specify_networks(
         [networks[chain_id]['name'], chain_id]
         for chain_id in sorted(networks.keys())
     ]
-    toolstr.print_table(rows, labels=['name', 'chain_id'], add_row_index=True)
+    toolstr.print_table(
+        rows,
+        labels=['name', 'chain_id'],
+        border=styles['comment'],
+        label_style=styles['header'],
+        column_styles={
+            'name': styles['question'],
+            'chain_id': styles['path'],
+        },
+        add_row_index=True,
+    )
 
     # add new networks
     while toolcli.input_yes_or_no(

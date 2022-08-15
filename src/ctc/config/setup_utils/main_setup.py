@@ -18,6 +18,7 @@ styles = {
     'question': '#8be9fd',
     'quote': '#f1fa8c',
     'command': '#64aaaa',
+    'comment': '#6272a4',
 }
 
 
