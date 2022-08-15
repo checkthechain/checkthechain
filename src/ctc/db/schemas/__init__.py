@@ -1,3 +1,4 @@
+from .block_gas import *
 from .block_timestamps import *
 from .blocks import *
 from .contract_abis import *

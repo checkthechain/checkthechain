@@ -68,9 +68,11 @@ async def async_get_blocks(
     chunk_size: int = 500,
     provider: spec.ProviderReference = None,
     use_db: bool = True,
+    latest_block_number: int | None = None,
 ) -> list[spec.Block]:
 
-    provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
+    if isinstance(provider, dict) and provider.get('chunk_size') is None:
+        provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
 
     if all(spec.is_block_number_reference(block) for block in blocks):
 
@@ -110,6 +112,7 @@ async def async_get_blocks(
         await db.async_intake_blocks(
             blocks=blocks_data,
             network=rpc.get_provider_network(provider),
+            latest_block_number=latest_block_number,
         )
 
         if use_db:

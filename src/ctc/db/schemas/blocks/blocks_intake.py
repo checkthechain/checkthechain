@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import typing
 
+from ctc import evm
 from ctc import spec
 
 from ... import management
@@ -10,6 +11,16 @@ from ... import connect_utils
 from ... import intake_utils
 from . import blocks_statements
 from ..block_timestamps import block_timestamps_statements
+from ..block_gas import block_gas_statements
+from .. import block_gas
+
+if typing.TYPE_CHECKING:
+    import toolsql
+
+
+#
+# # singular
+#
 
 
 async def async_intake_block(
@@ -20,358 +31,241 @@ async def async_intake_block(
 
     under normal operation should store raw block or block timestamp, noth both
     """
-    block_coroutine = async_intake_raw_block(
-        block=block,
-        network=network,
-    )
-    timestamp_coroutine = async_intake_block_timestamp(
-        block=block,
-        network=network,
-    )
-    await asyncio.gather(
-        block_coroutine,
-        timestamp_coroutine,
-    )
-
-
-async def async_intake_raw_block(
-    block: spec.Block,
-    network: spec.NetworkReference,
-) -> None:
 
     # check whether to intake
-    if not management.get_active_schemas().get('blocks'):
-        return
-    if not await intake_utils.async_is_block_fully_confirmed(
-        block=block, network=network
-    ):
-        return
+    active_schemas = management.get_active_schemas()
+    intake_block_object = active_schemas.get('blocks')
+    intake_block_timestamp = active_schemas.get('block_timestamps')
+    intake_block_gas = active_schemas.get('block_gas')
 
-    # store in db
-    engine = connect_utils.create_engine(
-        schema_name='block_timestamps',
-        network=network,
-    )
-    if engine is None:
-        return
-    with engine.begin() as conn:
-        await blocks_statements.async_upsert_block(
-            conn=conn,
-            block=block,
+    # check that block is confirmed
+    if intake_block_object or intake_block_timestamp:
+        if not await intake_utils.async_is_block_fully_confirmed(
+            block=block, network=network
+        ):
+            intake_block_object = False
+            intake_block_timestamp = False
+
+    # insert into databases
+    if intake_block_object or intake_block_timestamp or intake_block_gas:
+        engine = connect_utils.create_engine(
+            schema_name='block_timestamps',
             network=network,
         )
+        if engine is None:
+            return
+
+        with engine.begin() as conn:
+            block_coroutine = _async_intake_block_object(
+                block=block,
+                conn=conn,
+                network=network,
+            )
+            timestamp_coroutine = _async_intake_block_timestamp(
+                block=block,
+                conn=conn,
+                network=network,
+            )
+            block_gas_coroutine = _async_intake_block_gas(
+                block=block,
+                conn=conn,
+                network=network,
+            )
+            await asyncio.gather(
+                block_coroutine,
+                timestamp_coroutine,
+                block_gas_coroutine,
+            )
 
 
-async def async_intake_block_timestamp(
-    block: spec.Block | None,
+async def _async_intake_block_object(
+    block: spec.Block,
     *,
-    block_number: int | None = None,
-    timestamp: int | None = None,
     network: spec.NetworkReference,
+    conn: toolsql.SAConnection,
 ) -> None:
 
+    await blocks_statements.async_upsert_block(
+        block=block,
+        conn=conn,
+        network=network,
+    )
+
+
+async def _async_intake_block_timestamp(
+    block: spec.Block | None,
+    *,
+    network: spec.NetworkReference,
+    conn: toolsql.SAConnection,
+    block_number: int | None = None,
+    timestamp: int | None = None,
+) -> None:
+
+    # get block_number and timestamp
     if block_number is None or timestamp is None:
         if block is None:
             raise Exception('must specify block or block_number and timestamp')
         block_number = block['number']
         timestamp = block['timestamp']
 
-    # check whether to intake
-    if not management.get_active_schemas().get('block_timestamps'):
-        return
-    if not await intake_utils.async_is_block_fully_confirmed(
-        block=block_number, network=network
-    ):
-        return
-
     # store in db
-    engine = connect_utils.create_engine(
-        schema_name='block_timestamps',
+    await block_timestamps_statements.async_upsert_block_timestamp(
+        conn=conn,
+        block_number=block_number,
+        timestamp=timestamp,
         network=network,
     )
-    if engine is None:
-        return
-    with engine.begin() as conn:
-        await block_timestamps_statements.async_upsert_block_timestamp(
+
+
+async def _async_intake_block_gas(
+    block: spec.Block,
+    *,
+    conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
+) -> None:
+
+    if len(block['transactions']) == 0 or isinstance(
+        block['transactions'][0], dict
+    ):
+        await block_gas_statements.async_upsert_median_block_gas_fee(
+            block_number=block['number'],
+            median_gas_fee=evm.compute_median_block_gas_fee(
+                block,
+                normalize=False,
+            ),
+            timestamp=block['timestamp'],
             conn=conn,
-            block_number=block_number,
-            timestamp=timestamp,
+            network=network,
         )
+
+
+#
+# # plural
+#
 
 
 async def async_intake_blocks(
     blocks: typing.Sequence[spec.Block],
     network: spec.NetworkReference,
+    *,
+    latest_block_number: int | None = None,
 ) -> None:
 
     if len(blocks) == 0:
         return
 
-    blocks_coroutine = async_intake_raw_blocks(blocks=blocks, network=network)
-    timestamps_coroutine = async_intake_block_timestamps(
-        blocks=blocks, network=network
-    )
-    await asyncio.gather(blocks_coroutine, timestamps_coroutine)
+    # check whether schemas are active
+    active_schemas = management.get_active_schemas()
+    intake_block_objects = active_schemas.get('blocks')
+    intake_block_timestamps = active_schemas.get('block_timestamps')
+    intake_block_gases = active_schemas.get('block_gas')
 
-
-async def async_intake_raw_blocks(
-    blocks: typing.Sequence[spec.Block],
-    network: spec.NetworkReference,
-) -> None:
-
-    if len(blocks) == 0:
-        return
-
-    if not management.get_active_schemas().get('blocks'):
-        return
-    confirmed = await intake_utils.async_filter_fully_confirmed_blocks(
+    # check which blocks are confirmed
+    confirmed_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
         blocks=blocks,
         network=network,
+        latest_block_number=latest_block_number,
     )
-    if len(confirmed) > 0:
+
+    if intake_block_objects or intake_block_timestamps or intake_block_gases:
         engine = connect_utils.create_engine(
-            schema_name='blocks', network=network
+            schema_name='block_timestamps',
+            network=network,
         )
         if engine is None:
             return
+
         with engine.begin() as conn:
-            await blocks_statements.async_upsert_blocks(
-                conn=conn,
-                blocks=confirmed,
+            blocks_coroutine = _async_intake_block_objects(
+                confirmed_blocks=confirmed_blocks,
                 network=network,
+                conn=conn,
+            )
+            timestamps_coroutine = _async_intake_block_timestamps(
+                confirmed_blocks=confirmed_blocks,
+                network=network,
+                conn=conn,
+            )
+            gas_coroutine = _async_intake_blocks_gas(
+                blocks=blocks,
+                conn=conn,
+                network=network,
+            )
+            await asyncio.gather(
+                blocks_coroutine, timestamps_coroutine, gas_coroutine
             )
 
 
-async def async_intake_block_timestamps(
-    blocks: typing.Sequence[spec.Block] | None = None,
+async def _async_intake_block_objects(
+    confirmed_blocks: typing.Sequence[spec.Block],
     *,
-    block_timestamps: typing.Mapping[int, int] | None = None,
     network: spec.NetworkReference,
+    conn: toolsql.SAConnection,
 ) -> None:
 
-    if blocks is not None and block_timestamps is not None:
+    if len(confirmed_blocks) > 0:
+        await blocks_statements.async_upsert_blocks(
+            conn=conn,
+            blocks=confirmed_blocks,
+            network=network,
+        )
+
+
+async def _async_intake_block_timestamps(
+    confirmed_blocks: typing.Sequence[spec.Block] | None = None,
+    *,
+    confirmed_block_timestamps: typing.Mapping[int, int] | None = None,
+    network: spec.NetworkReference,
+    conn: toolsql.SAConnection,
+) -> None:
+
+    if confirmed_blocks is not None and confirmed_block_timestamps is not None:
         raise Exception('cannot specify both blocks and block_timestamps')
 
-    if not management.get_active_schemas().get('block_timestamps'):
-        return
-
-    # determine which blocks have enough confirmations
-    if blocks is not None:
-        if len(blocks) == 0:
-            return
-        confirmed_blocks = (
-            await intake_utils.async_filter_fully_confirmed_blocks(
-                blocks=blocks,
-                network=network,
-            )
-        )
-        if len(confirmed_blocks) == 0:
-            return
-        confirmed_block_timestamps = None
-    elif block_timestamps is not None:
-        if len(block_timestamps) == 0:
-            return
-        confirmed_numbers = (
-            await intake_utils.async_filter_fully_confirmed_blocks(
-                blocks=list(block_timestamps.keys()),
-                network=network,
-            )
-        )
-        if len(confirmed_numbers) == 0:
-            return
+    # determine timestamps
+    if confirmed_blocks is not None:
         confirmed_block_timestamps = {
-            number: block_timestamps[number] for number in confirmed_numbers
+            block['number']: block['timestamp'] for block in confirmed_blocks
         }
-        confirmed_blocks = None
     else:
         raise Exception('specify either blocks or block_timestamps')
 
     # store in database
-    engine = connect_utils.create_engine(
-        schema_name='block_timestamps',
-        network=network,
-    )
-    if engine is None:
-        return
-    with engine.begin() as conn:
+    if len(confirmed_block_timestamps) > 0:
         await block_timestamps_statements.async_upsert_block_timestamps(
             conn=conn,
-            blocks=confirmed_blocks,
             block_timestamps=confirmed_block_timestamps,
         )
 
 
-#
-# # second draft
-#
+async def _async_intake_blocks_gas(
+    blocks: typing.Sequence[spec.Block],
+    *,
+    conn: toolsql.SAConnection,
+    network: spec.NetworkReference,
+) -> None:
 
+    # only perform on blocks that have full transactions included
+    blocks_gas_data: typing.MutableSequence[block_gas.BlockGasRow] = []
+    for block in blocks:
+        if len(block['transactions']) == 0 or isinstance(
+            block['transactions'][0], dict
+        ):
+            fee = evm.compute_median_block_gas_fee(
+                block,
+                normalize=False,
+            )
+            block_gas_data: block_gas.BlockGasRow = {
+                'block_number': block['number'],
+                'timestamp': block['timestamp'],
+                'median_gas_fee': fee,
+            }
+            blocks_gas_data.append(block_gas_data)
 
-# async def async_intake_blocks(
-#     blocks: typing.Sequence[spec.Block],
-#     provider: spec.ProviderReference = None,
-# ) -> None:
-#     """intake block and extract relevant information to db tables"""
-
-#     active_block_schemas = get_active_schemas('block')
-#     if len(active_block_schemas) == 0:
-#         return
-
-#     intake_blocks = await async_should_intake_blocks(
-#         blocks=blocks, provider=provider
-#     )
-#     if len(intake_blocks) > 0:
-#         with engine.begin() as conn:
-#             coroutines = []
-#             for schema in active_block_schemas:
-#                 if schema == 'blocks':
-#                     coroutine = db_statements.async_upsert_blocks(
-#                         conn=conn,
-#                         blocks=intake_blocks,
-#                     )
-#                     coroutines.append(coroutine)
-#                 elif schema == 'block_timestamps':
-#                     coroutine = db_statements.async_upsert_blocks_timestamp(
-#                         conn=conn,
-#                         blocks=should_upsert_block_timestamps,
-#                     )
-#                     coroutines.append(coroutine)
-#                 elif schema == 'block_gas_stats':
-#                     coroutine = db_statements.async_upsert_blocks_gas_stats(
-#                         conn=conn,
-#                         blocks=should_upsert_blocks_gas_stats,
-#                     )
-#                     coroutines.append(coroutine)
-#                 else:
-#                     raise Exception('unknown schema: ' + str(schema))
-#             await asyncio.gather(*coroutines)
-
-
-# async def async_should_intake_raw_block(block, network):
-
-#     # check whether already stored
-#     db_statements.does_block_exist()
-
-
-# async def async_should_intake_blocks(blocks, provider):
-#     required_confirmations = management.get_required_confirmations(
-#         provider=provider
-#     )
-#     latest_block = None
-#     latest_block = await rpc.async_eth_block_number(provider=provider)
-
-#     intake_blocks = []
-#     for block in blocks:
-#         pass
-
-#     if block['number'] <= max_block - required_confirmations:
-#         return True
-#     else:
-#         latest_block = await rpc.async_eth_block_number(provider=provider)
-#         return block['number'] <= latest_block - min_confirmations
-
-
-##
-## # old
-##
-
-
-# async def async_intake_block(
-#    block: spec.Block,
-#    provider: spec.ProviderReference = None,
-# ) -> None:
-#    """intake block and extract relevant information to db tables"""
-
-#    # determine whether to store block
-#    network = rpc.get_provider_network(provider=provider)
-#    min_confirmations = management.get_min_confirmations(
-#        schema='block_timestamps',
-#        network=network,
-#    )
-#    engine = connect_utils.create_engine(
-#        schema='block_timestamps',
-#        network=network,
-#    )
-#    if engine is None:
-#        return
-
-#    check_if_exists = False
-#    with engine.connect() as conn:
-#        if (
-#            check_if_exists
-#            and db_statements.get_block_timestamp(
-#                conn=conn, block_number=block['number']
-#            )
-#            is not None
-#        ):
-#            store = False
-#        else:
-#            max_block = db_statements.get_max_block_number(conn=conn, network=network)
-#            if block['number'] <= max_block - min_confirmations:
-#                store = True
-#            else:
-#                latest_block = await rpc.async_eth_block_number(
-#                    provider=provider,
-#                )
-#                store = block['number'] <= latest_block - min_confirmations
-
-#    # store data in db
-#    if store:
-#        with engine.begin() as conn:
-#            db_statements.set_block_timestamp(
-#                conn=conn,
-#                block_number=block['number'],
-#                timestamp=block['timestamp'],
-#            )
-
-
-# async def async_intake_blocks(
-#    blocks: typing.Sequence[spec.Block],
-#    provider: spec.ProviderReference = None,
-# ) -> None:
-#    """
-
-#    TODO: database should store a max_complete_block number
-#    - indicates that ALL blocks below this height are stored
-#    - enables not re-storing anything below this height upon intake
-#    """
-
-#    # determine whether to store block
-#    network = rpc.get_provider_network(provider=provider)
-#    min_confirmations = management.get_min_confirmations(
-#        schema='block_timestamps',
-#        network=network,
-#    )
-#    engine = connect_utils.create_engine(
-#        schema='block_timestamps',
-#        network=network,
-#    )
-#    if engine is None:
-#        return
-
-#    with engine.connect() as conn:
-#        max_intake_block = max(block['number'] for block in blocks)
-#        max_stored_block = db_statements.get_max_block_number(
-#            conn=conn, network=network
-#        )
-#        if max_intake_block <= max_stored_block - min_confirmations:
-#            store_blocks = blocks
-#        else:
-#            latest_block = await rpc.async_eth_block_number(
-#                provider=provider,
-#            )
-#            store_blocks = [
-#                block
-#                for block in blocks
-#                if block['number'] <= latest_block - min_confirmations
-#            ]
-
-#    # store data in db
-#    if len(store_blocks) > 0:
-#        block_timestamps = {
-#            block['number']: block['timestamp'] for block in store_blocks
-#        }
-#        with engine.begin() as conn:
-#            db_statements.set_block_timestamps(
-#                conn=conn,
-#                block_timestamps=block_timestamps,
-#            )
+    # insert into db
+    if len(blocks_gas_data) > 0:
+        await block_gas_statements.async_upsert_median_blocks_gas_fees(
+            block_gas_data=blocks_gas_data,
+            conn=conn,
+            network=network,
+        )

@@ -3,13 +3,19 @@ from __future__ import annotations
 import typing
 from typing_extensions import TypedDict
 
+import toolstr
+
 from . import block_crud
 from . import block_normalize
 from . import block_times
+from ctc import evm
+from ctc import rpc
 from ctc import spec
 
 if typing.TYPE_CHECKING:
     import tooltime
+
+    from ctc import db
 
 
 if typing.TYPE_CHECKING:
@@ -66,6 +72,196 @@ if typing.TYPE_CHECKING:
         max_n_transactions: int | float | None
 
         n_blocks: int
+
+
+#
+# # basic functions
+#
+
+
+def compute_median_block_gas_fee(
+    block: spec.Block,
+    *,
+    normalize: bool,
+) -> int | float | None:
+    import numpy as np
+
+    # get transactions
+    transactions = block['transactions']
+    if len(transactions) == 0:
+        return None
+
+    # gather gas fees
+    gas_fees = []
+    for transaction in transactions:
+        if isinstance(transaction, str):
+            raise Exception(
+                'must use a block with include_full_transactions=True'
+            )
+        gas_fees.append(transaction['gas_price'])
+
+    # compute median
+    median = float(np.median(gas_fees))
+
+    # normalize
+    if normalize:
+        median = median / 1e9
+
+    return median
+
+
+def compute_median_blocks_gas_fees(
+    blocks: typing.Sequence[spec.Block],
+    *,
+    normalize: bool = True,
+) -> typing.Sequence[int | float | None]:
+
+    return [
+        compute_median_block_gas_fee(block, normalize=normalize)
+        for block in blocks
+    ]
+
+
+async def async_get_median_block_gas_fee(
+    block: spec.BlockNumberReference,
+    *,
+    normalize: bool = True,
+    use_db: bool = True,
+    network: spec.NetworkReference | None = None,
+    provider: spec.ProviderReference = None,
+) -> db.BlockGasRow:
+
+    network, provider = evm.get_network_and_provider(network, provider)
+    block = await evm.async_block_number_to_int(block, provider=provider)
+
+    if use_db:
+        from ctc import db
+
+        try:
+            result = await db.async_query_median_block_gas_fee(
+                block, network=network
+            )
+
+            if result is not None:
+                if normalize and result['median_gas_fee'] is not None:
+                    result['median_gas_fee'] /= 1e9
+
+                return result
+
+        except Exception:
+            pass
+
+    block_data = await rpc.async_eth_get_block_by_number(
+        block,
+        provider=provider,
+        include_full_transactions=True,
+    )
+    return {
+        'block_number': block,
+        'timestamp': block_data['timestamp'],
+        'median_gas_fee': compute_median_block_gas_fee(
+            block_data,
+            normalize=normalize,
+        ),
+    }
+
+
+async def async_get_median_blocks_gas_fees(
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
+    use_db: bool = True,
+    normalize: bool = True,
+    network: spec.NetworkReference | None = None,
+    provider: spec.ProviderReference = None,
+    verbose: bool = True,
+    latest_block_number: int | None = None,
+) -> typing.Sequence[db.BlockGasRow]:
+
+    import time
+
+    network, provider = evm.get_network_and_provider(network, provider)
+    blocks = await evm.async_block_numbers_to_int(blocks)
+
+    # get data from db
+    if use_db:
+        from ctc import db
+
+        start = time.time()
+        new_time = time.time()
+
+        result = await db.async_query_median_blocks_gas_fees(
+            blocks, network=network
+        )
+
+        interval = time.time() - new_time
+        new_time = interval + new_time
+        print(
+            'query fees db',
+            'took=' + str(interval) + ', total=' + str(new_time - start),
+        )
+
+        if result is None:
+            fee_map: typing.MutableMapping[int, db.BlockGasRow] = {}
+            missing = blocks
+        else:
+            fee_map = dict(result)
+            missing = []
+            for block in blocks:
+                if block not in fee_map:
+                    missing.append(block)
+    else:
+        fee_map = {}
+
+    # get data from rpc
+    if len(missing) > 0:
+        if verbose:
+            from ctc.cli import cli_run
+
+            styles = cli_run.get_cli_styles()
+            toolstr.print(
+                'fetching tx gas data for '
+                + toolstr.add_style(
+                    str(len(missing)), styles['description'] + ' bold'
+                )
+                + ' blocks',
+            )
+            print()
+        blocks_data = await evm.async_get_blocks(
+            blocks=missing,
+            include_full_transactions=True,
+            provider={'chunk_size': 1},
+            latest_block_number=latest_block_number,
+        )
+
+        interval = time.time() - new_time
+        new_time = interval + new_time
+        print(
+            'query rpc',
+            'took=' + str(interval) + ', total=' + str(new_time - start),
+        )
+
+        missing_fees = compute_median_blocks_gas_fees(
+            blocks_data,
+            normalize=False,
+        )
+        for block, block_data, fee in zip(missing, blocks_data, missing_fees):
+            fee_map[block] = {
+                'block_number': block,
+                'median_gas_fee': fee,
+                'timestamp': block_data['timestamp'],
+            }
+
+    if normalize:
+        for block, fee_data in fee_map.items():
+            if fee_data is not None and fee_data['median_gas_fee'] is not None:
+                fee_data['median_gas_fee'] /= 1e9
+
+    return [fee_map[block] for block in blocks]
+
+
+#
+# # detailed functions
+#
 
 
 async def async_get_block_gas_stats(

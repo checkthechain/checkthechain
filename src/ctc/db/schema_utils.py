@@ -25,6 +25,7 @@ GenericSchemaName = Literal[
 NetworkSchemaName = Literal[
     # 'block_gas_stats',
     'block_timestamps',
+    'block_gas',
     'blocks',
     'contract_abis',
     'contract_creation_blocks',
@@ -53,10 +54,10 @@ def get_network_schema_names() -> tuple[NetworkSchemaName]:
 
 
 def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
-    # if schema_name == 'block_gas_stats':
-    #     return schemas.block_gas_stats_schema
     if schema_name == 'block_timestamps':
         return schemas.block_timestamps_schema
+    elif schema_name == 'block_gas':
+        return schemas.block_gas_schema
     elif schema_name == 'blocks':
         return schemas.blocks_schema
     elif schema_name == 'contract_abis':

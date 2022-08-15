@@ -26,7 +26,7 @@ async def async_is_block_fully_confirmed(
         block_number = block['number']
 
     # check whether block is older than newest block in db
-    max_db_block = await _async_get_max_block_number(network=network)
+    max_db_block = await _async_get_max_block_number_in_db(network=network)
     if max_db_block is not None and block_number < max_db_block:
         return True
 
@@ -45,6 +45,8 @@ async def async_is_block_fully_confirmed(
 async def async_filter_fully_confirmed_blocks(
     blocks: typing.Sequence[T],
     network: spec.NetworkReference,
+    *,
+    latest_block_number: int | None = None,
 ) -> typing.Sequence[T]:
 
     block_numbers = []
@@ -58,7 +60,10 @@ async def async_filter_fully_confirmed_blocks(
 
     # check whether all blocks older than newest block in db
     max_block_number = max(block_numbers)
-    max_db_block = await _async_get_max_block_number(network=network)
+    if latest_block_number is not None:
+        max_db_block: int | None = latest_block_number
+    else:
+        max_db_block = await _async_get_max_block_number_in_db(network=network)
     if max_db_block is not None and max_db_block > max_block_number:
         return blocks
 
@@ -67,7 +72,10 @@ async def async_filter_fully_confirmed_blocks(
         network = config.get_default_network()
     network_name = evm.get_network_name(network)
     provider: spec.ProviderReference = {'network': network_name}
-    rpc_latest_block = await rpc.async_eth_block_number(provider=provider)
+    if latest_block_number is not None:
+        rpc_latest_block = latest_block_number
+    else:
+        rpc_latest_block = await rpc.async_eth_block_number(provider=provider)
     required_confirmations = management.get_required_confirmations(
         network=network,
     )
@@ -79,7 +87,7 @@ async def async_filter_fully_confirmed_blocks(
     ]
 
 
-async def _async_get_max_block_number(
+async def _async_get_max_block_number_in_db(
     network: spec.NetworkReference,
 ) -> int | None:
     engine = connect_utils.create_engine(
