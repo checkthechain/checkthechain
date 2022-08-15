@@ -98,9 +98,9 @@ def print_market_data(
 
         # add sparkline
         if verbose:
-            from toolstr.charts import braille
+            from toolstr.charts import braille_utils
 
-            sparkline = braille.create_braille_sparkline(
+            sparkline = braille_utils.create_braille_sparkline(
                 data=item['sparkline_in_7d']['price'],
                 # width=20,
                 width=width,

@@ -129,7 +129,7 @@ async def async_summarize_historical_defi_tvl() -> None:
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
-        yaxis_kwargs={'label_prefix': '$'},
+        yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
     )
 
     toolstr.print_text_box('Historical Defi TVL', style=styles['title'])
@@ -151,7 +151,7 @@ async def async_summarize_historical_chain_tvl(chain: str) -> None:
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
-        yaxis_kwargs={'label_prefix': '$'},
+        yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
     )
 
     toolstr.print_text_box(
@@ -183,7 +183,7 @@ async def async_summarize_historical_protocol_tvl(
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
-        yaxis_kwargs={'label_prefix': '$'},
+        yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
     )
 
     toolstr.print_text_box(
@@ -223,7 +223,7 @@ async def async_summarize_historical_protocol_tvl(
                 line_style=styles['description'],
                 chrome_style=styles['comment'],
                 tick_label_style=styles['metavar'],
-                yaxis_kwargs={'label_prefix': '$'},
+                yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
             )
             print()
             toolstr.print(

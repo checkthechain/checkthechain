@@ -61,6 +61,8 @@ class AaveV2TokenMarket(TypedDict):
 async def async_get_reserve_data(
     asset: spec.Address,
     block: spec.BlockNumberReference | None = None,
+    *,
+    provider: spec.ProviderReference = None,
 ) -> AaveV2ReserveData:
 
     result = await rpc.async_eth_call(
@@ -68,6 +70,7 @@ async def async_get_reserve_data(
         function_name='getReserveData',
         function_parameters=[asset],
         block_number=block,
+        provider=provider,
     )
 
     return {
@@ -87,11 +90,15 @@ async def async_get_reserve_data(
 
 
 async def async_get_reserve_data_by_block(
-    asset: spec.Address, blocks: typing.Sequence[spec.BlockNumberReference]
+    asset: spec.Address,
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
+    provider: spec.ProviderReference = None,
 ) -> AaveV2ReserveListData:
 
     coroutines = [
-        async_get_reserve_data(asset, block=block) for block in blocks
+        async_get_reserve_data(asset, block=block, provider=provider)
+        for block in blocks
     ]
 
     results = await asyncio.gather(*coroutines)

@@ -51,10 +51,10 @@ dependencies = [
     #
     # tool suite
     'toolcache >=0.5.0, <0.6',
-    'toolcli >=0.6.5, <0.7',
+    'toolcli >=0.6.6, <0.7',
     'toolconf >=0.1.2, <0.2',
-    'toolsql >=0.3.9, <0.4',
-    'toolstr >=0.6.3, <0.7',
+    'toolsql >=0.3.10, <0.4',
+    'toolstr >=0.7.0, <0.8',
     'tooltime >=0.2.4, <0.3',
     #
     # EVM dependencies
@@ -200,9 +200,9 @@ deps =
     ;
     ; tool suite
     toolcache==0.5.0
-    toolcli==0.6.5
+    toolcli==0.6.6
     toolconf==0.1.2
-    toolsql==0.3.9
+    toolsql==0.3.10
     toolstr==0.6.3
     tooltime==0.2.4
     ;

@@ -356,12 +356,15 @@ async def async_summarize_token_market(
     else:
         token_address = token
 
-    timestamps = await evm.async_get_block_timestamps(blocks)
+    timestamps_task = asyncio.create_task(
+        evm.async_get_block_timestamps(blocks)
+    )
 
     reserve_data_by_block = (
         await aave_interest_rates.async_get_reserve_data_by_block(
             asset=token_address,
             blocks=blocks,
+            provider={'chunk_size': 1},
         )
     )
 
@@ -376,24 +379,36 @@ async def async_summarize_token_market(
     )
 
     # compute tvls
-    total_supplies = await evm.async_get_erc20_total_supply_by_block(
-        atoken_address,
-        blocks=blocks,
+    total_supplies_task = asyncio.create_task(
+        evm.async_get_erc20_total_supply_by_block(
+            atoken_address,
+            blocks=blocks,
+        )
     )
+
+    # compute tvbs
+    balances_task = asyncio.create_task(
+        evm.async_get_erc20_balance_of_by_block(
+            wallet=atoken_address,
+            token=token,
+            blocks=blocks,
+        )
+    )
+
+    total_supplies = await total_supplies_task
     total_supplies_array = np.array(total_supplies)
-    prices = await aave_oracle.async_get_asset_price_by_block(
-        token_address,
-        blocks=blocks,
+    prices_task = asyncio.create_task(
+        aave_oracle.async_get_asset_price_by_block(
+            token_address,
+            blocks=blocks,
+        )
     )
+
+    prices = await prices_task
     prices_array = np.array(prices)
     tvls = total_supplies_array * prices_array
 
-    # compute tvbs
-    balances = await evm.async_get_erc20_balance_of_by_block(
-        wallet=atoken_address,
-        token=token,
-        blocks=blocks,
-    )
+    balances = await balances_task
     balances_array = np.array(balances)
     tvbs = (total_supplies_array - balances_array) * prices_array
 
@@ -410,8 +425,16 @@ async def async_summarize_token_market(
         'Summary of ' + token + ' on Aave v2', style=styles['title']
     )
 
-    percentage_kwargs = {'yaxis_kwargs': {'label_postfix': '%'}}
-    dollar_kwargs = {'yaxis_kwargs': {'label_prefix': '$'}}
+    percentage_kwargs = {
+        'yaxis_kwargs': {
+            'tick_label_format': {
+                'postfix': '%',
+                'decimals': 2,
+                'trailing_zeros': True,
+            }
+        }
+    }
+    dollar_kwargs = {'yaxis_kwargs': {'tick_label_format': {'prefix': '$'}}}
     plots = [
         ('Supply APY', supply_apy, percentage_kwargs),
         ('Borrow APY', borrow_apy, percentage_kwargs),
@@ -421,6 +444,7 @@ async def async_summarize_token_market(
     if verbose:
         plots.append(('Utilization', utilization * 100, percentage_kwargs))
         plots.append(('Price', prices_array, dollar_kwargs))
+    timestamps = await timestamps_task
     for title, data, plot_kwargs in plots:
         print()
         plot = toolstr.render_line_plot(

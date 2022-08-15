@@ -349,7 +349,7 @@ async def async_summarize_pool_yield(pool: typing.Any) -> None:
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
-        yaxis_kwargs={'label_postfix': '%'},
+        yaxis_kwargs={'tick_label_format': {'postfix': '%'}},
     )
     toolstr.print(
         toolstr.hjustify('APY', 'center', 70),
@@ -367,7 +367,7 @@ async def async_summarize_pool_yield(pool: typing.Any) -> None:
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
-        yaxis_kwargs={'label_prefix': '$'},
+        yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
     )
     toolstr.print(
         toolstr.hjustify('TVL', 'center', 70),

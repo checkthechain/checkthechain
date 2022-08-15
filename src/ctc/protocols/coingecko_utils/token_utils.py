@@ -244,7 +244,12 @@ async def async_get_market_chart(
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            return await response.json()  # type: ignore
+            data: typing.Mapping[typing.Any, typing.Any] = await response.json()
+
+    if data.get('status', {}).get('error_code') == 429:
+        raise Exception('coingecko ratelimit reached, wait a bit or obtain an API key')
+
+    return data
 
 
 #
@@ -367,7 +372,7 @@ async def async_summarize_token_data(
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
-            yaxis_kwargs={'label_prefix': '$'},
+            yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
         )
         print()
 

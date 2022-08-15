@@ -117,7 +117,7 @@ async def async_chart_command(
 
     as_str = toolstr.render_supergrid(
         raster,
-        sample_mode='quadrants',
+        char_dict='quadrants',
         color_grid=color_grid,
         color_map=toolstr.candlestick_color_map,
     )
@@ -190,7 +190,7 @@ async def async_chart_command(
 
     if not no_volume:
         volume_bars_str = toolstr.render_supergrid(
-            volume_raster, sample_mode='quadrants'
+            volume_raster, char_dict='quadrants'
         )
         volume_graph = toolstr.concatenate_blocks(
             [volume_y_axis, volume_bars_str]
