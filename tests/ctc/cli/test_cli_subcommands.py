@@ -41,49 +41,59 @@ def test_subcommands_have_examples(spec_reference):
     ), 'missing examples for command for ' + str(spec_reference)
 
 
-@pytest.mark.parametrize('subcommand_spec', list(cli_run.command_index.items()))
-def test_subcommand_examples(subcommand_spec):
+def collect_cli_examples():
 
-    # TODO: make a toolcli function to extract the examples
+    cli_examples = []
+    for subcommand, spec_reference in cli_run.command_index.items():
+        command_spec = toolcli.resolve_command_spec(spec_reference)
+        if command_spec.get('hidden', False):
+            continue
 
-    subcommand, spec_reference = subcommand_spec
-    command_spec = toolcli.resolve_command_spec(spec_reference)
-
-    if command_spec.get('hidden', False):
-        return
-
-    # collect examples
-    example_strs = []
-    examples = command_spec.get('examples', [])
-    if isinstance(examples, list):
-        example_strs = examples
-    elif isinstance(examples, dict):
-        for example_str, example_data in examples.items():
-            if isinstance(example_data, str):
-                example_strs.append(example_str)
-
-            elif isinstance(example_data, dict):
-
-                if (
-                    example_data.get('runnable', True)
-                    and not example_data.get('long', False)
-                    and not example_data.get('skip', False)
-                ):
+        # collect non-hidden examples
+        example_strs = []
+        examples = command_spec.get('examples', [])
+        if isinstance(examples, list):
+            example_strs = examples
+        elif isinstance(examples, dict):
+            for example_str, example_data in examples.items():
+                if isinstance(example_data, str):
                     example_strs.append(example_str)
 
-    max_example_time = 100
+                elif isinstance(example_data, dict):
 
-    for example_str in example_strs:
-        command_pieces = [sys.executable, '-m', 'ctc'] + list(subcommand)
-        command_pieces.extend(example_str.split(' '))
-        command_pieces = [
-            piece.strip('"') for piece in command_pieces if piece != ''
-        ]
-        exit_code = subprocess.call(command_pieces, timeout=max_example_time)
-        if exit_code != 0:
-            raise Exception(
-                'command failed with exit code '
-                + str(exit_code)
-                + ': '
-                + ' '.join(command_pieces)
-            )
+                    if (
+                        example_data.get('runnable', True)
+                        and not example_data.get('long', False)
+                        and not example_data.get('skip', False)
+                    ):
+                        example_strs.append(example_str)
+
+        # convert examples into raw commands
+        for example_str in example_strs:
+            command_pieces = [sys.executable, '-m', 'ctc'] + list(subcommand)
+            command_pieces.extend(example_str.split(' '))
+            command_pieces = [
+                piece.strip('"') for piece in command_pieces if piece != ''
+            ]
+
+            cli_examples.append(command_pieces)
+
+    return cli_examples
+
+
+cli_examples = collect_cli_examples()
+
+
+@pytest.mark.parametrize('cli_example', cli_examples)
+def test_subcommand_examples(cli_example):
+
+    max_example_time = 20
+
+    exit_code = subprocess.call(cli_example, timeout=max_example_time)
+    if exit_code != 0:
+        raise Exception(
+            'command failed with exit code '
+            + str(exit_code)
+            + ': '
+            + ' '.join(cli_examples)
+        )
