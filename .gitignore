@@ -19,3 +19,4 @@ build/*
 dist/*
 notebooks
 notebooks/*
+tuna.log
