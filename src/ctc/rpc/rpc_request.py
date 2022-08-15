@@ -105,10 +105,12 @@ async def async_send(
         logging_rpc_calls = config.get_log_rpc_calls()
     except Exception:
         logging_rpc_calls = False
-    if logging_rpc_calls:
-        log_rpc_request(request=request, provider=full_provider)
 
     if isinstance(request, dict):
+
+        if logging_rpc_calls:
+            log_rpc_request(request=request, provider=full_provider)
+
         response = await async_send_raw(request=request, provider=full_provider)
         if 'result' not in response and 'error' in response:
             if full_provider['convert_reverts_to_none']:
@@ -124,10 +126,21 @@ async def async_send(
             response = typing.cast(spec.RpcSingularResponseSuccess, response)
             output = response['result']
 
+        if logging_rpc_calls:
+            log_rpc_response(
+                response=response,
+                request=request,
+                provider=provider,
+            )
+
     elif isinstance(request, list):
 
         # chunk request
         request_chunks = chunk_request(request=request, provider=full_provider)
+
+        if logging_rpc_calls:
+            for request_chunk in request_chunks:
+                log_rpc_request(request=request_chunk, provider=full_provider)
 
         # send request chunks
         coroutines = []
@@ -141,6 +154,14 @@ async def async_send(
         import asyncio
 
         response_chunks = await asyncio.gather(*coroutines)
+
+        if logging_rpc_calls:
+            for request_chunk, response_chunk in zip(request_chunks, response_chunks):
+                log_rpc_response(
+                    response=response_chunk,
+                    request=request_chunk,
+                    provider=provider,
+                )
 
         # reorder chunks
         plural_response = reorder_response_chunks(response_chunks, request)
@@ -158,22 +179,7 @@ async def async_send(
             output = [subresponse['result'] for subresponse in plural_response]
 
     else:
-
         raise Exception('unknown request type: ' + str(type(request)))
-
-    if logging_rpc_calls:
-        if isinstance(request, dict):
-            log_rpc_response(
-                response=response,
-                request=request,
-                provider=provider,
-            )
-        elif isinstance(request, list):
-            log_rpc_response(
-                response=plural_response,
-                request=request,
-                provider=provider,
-            )
 
     return output
 
