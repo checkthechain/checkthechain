@@ -177,8 +177,6 @@ async def async_get_median_blocks_gas_fees(
     latest_block_number: int | None = None,
 ) -> typing.Sequence[db.BlockGasRow]:
 
-    import time
-
     network, provider = evm.get_network_and_provider(network, provider)
     blocks = await evm.async_block_numbers_to_int(blocks)
 
@@ -186,18 +184,8 @@ async def async_get_median_blocks_gas_fees(
     if use_db:
         from ctc import db
 
-        start = time.time()
-        new_time = time.time()
-
         result = await db.async_query_median_blocks_gas_fees(
             blocks, network=network
-        )
-
-        interval = time.time() - new_time
-        new_time = interval + new_time
-        print(
-            'query fees db',
-            'took=' + str(interval) + ', total=' + str(new_time - start),
         )
 
         if result is None:
@@ -231,13 +219,6 @@ async def async_get_median_blocks_gas_fees(
             include_full_transactions=True,
             provider={'chunk_size': 1},
             latest_block_number=latest_block_number,
-        )
-
-        interval = time.time() - new_time
-        new_time = interval + new_time
-        print(
-            'query rpc',
-            'took=' + str(interval) + ', total=' + str(new_time - start),
         )
 
         missing_fees = compute_median_blocks_gas_fees(

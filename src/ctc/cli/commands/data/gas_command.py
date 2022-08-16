@@ -76,16 +76,7 @@ async def async_gas_command(
     verbose: bool,
 ) -> None:
 
-    start = time.time()
-    new_time = start
-
     import numpy as np
-
-    interval = time.time() - new_time
-    new_time = interval + new_time
-    print(
-        'imports', 'took=' + str(interval) + ', total=' + str(new_time - start)
-    )
 
     styles = cli_run.get_cli_styles()
 
@@ -102,24 +93,10 @@ async def async_gas_command(
     latest = await rpc.async_eth_block_number()
     block_numbers = list(range(latest - n_blocks + 1, latest + 1))
 
-    interval = time.time() - new_time
-    new_time = interval + new_time
-    print(
-        'get latest',
-        'took=' + str(interval) + ', total=' + str(new_time - start),
-    )
-
     # get block transaction data
     raw_median_gas_fees = await evm.async_get_median_blocks_gas_fees(
         block_numbers,
         latest_block_number=latest,
-    )
-
-    interval = time.time() - new_time
-    new_time = interval + new_time
-    print(
-        'median gas fees',
-        'took=' + str(interval) + ', total=' + str(new_time - start),
     )
 
     median_gas_fees = np.array(
@@ -128,13 +105,6 @@ async def async_gas_command(
     )
     # block_timestamps = await evm.async_get_block_timestamps(block_numbers)
     block_timestamps = [item['timestamp'] for item in raw_median_gas_fees]
-
-    interval = time.time() - new_time
-    new_time = interval + new_time
-    print(
-        'get timestamps',
-        'took=' + str(interval) + ', total=' + str(new_time - start),
-    )
 
     now = time.time()
     last_times = ['5 minutes', '10 minutes']
@@ -206,15 +176,16 @@ async def async_gas_command(
             row.append(last_n)
             timelength_seconds = round(now - block_timestamps[-last_n])
             timelength_clock = tooltime.timelength_to_clock(timelength_seconds)
+            timelength_clock = timelength_clock.lstrip('0').lstrip(':')
             row.append(timelength_clock)
         else:
             row.append('last ' + last_times[index - len(last_as_int)])
             row.append(last_n)
-            row.append(
-                tooltime.timelength_to_clock(
-                    last_times[index - len(last_as_int)]
-                )
+            timelength_clock = tooltime.timelength_to_clock(
+                last_times[index - len(last_as_int)]
             )
+            timelength_clock = timelength_clock.lstrip('0').lstrip(':')
+            row.append(timelength_clock)
 
         # add gas fee columns
         interval_median_gas_fees = median_gas_fees[-last_n:]
@@ -227,13 +198,6 @@ async def async_gas_command(
             row.extend([None] * 4)
 
         rows.append(row)
-
-    interval = time.time() - new_time
-    new_time = interval + new_time
-    print(
-        'right before printing table',
-        'took=' + str(interval) + ', total=' + str(new_time - start),
-    )
 
     if output != 'stdout':
         import pandas as pd
@@ -289,10 +253,3 @@ async def async_gas_command(
             style=styles['title'],
         )
         toolstr.print(plot, indent=4)
-
-    interval = time.time() - new_time
-    new_time = interval + new_time
-    print(
-        'after printing table',
-        'took=' + str(interval) + ', total=' + str(new_time - start),
-    )

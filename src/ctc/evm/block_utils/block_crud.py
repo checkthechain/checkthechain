@@ -81,7 +81,7 @@ async def async_get_blocks(
         ]
         pending = standardized
 
-        if use_db:
+        if use_db and not include_full_transactions:
             from ctc import db
 
             network = rpc.get_provider_network(provider)
@@ -97,6 +97,8 @@ async def async_get_blocks(
                     for block, db_block_data in block_data_map.items()
                     if db_block_data is None
                 ]
+        else:
+            block_data_map = {}
 
         blocks_data = await rpc.async_batch_eth_get_block_by_number(
             block_numbers=pending,
