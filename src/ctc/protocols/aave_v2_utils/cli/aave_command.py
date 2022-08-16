@@ -38,6 +38,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': '-n',
                 'help': 'number of blocks to sample',
+                'default': 40,
                 'type': int,
             },
         ],
@@ -120,7 +121,6 @@ async def _async_sample_blocks(
     if not isinstance(end_block, int):
         raise Exception('invalid type for end_block')
 
-    n_samples = 100
     samples = np.linspace(start_block, end_block, n_samples).astype(int)
 
     return samples  # type: ignore
