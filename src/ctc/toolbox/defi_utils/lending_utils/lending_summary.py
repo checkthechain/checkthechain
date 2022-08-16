@@ -68,7 +68,7 @@ async def async_get_lending_flows(
     )
     timestamps_task = asyncio.create_task(timestamps_coroutine)
     pool_token_balances_before_coroutine = (
-        evm.async_get_erc20_balance_of_by_block(
+        evm.async_get_erc20_balance_by_block(
             token=pool_token,
             wallet=wallet,
             blocks=blocks_before,
@@ -79,7 +79,7 @@ async def async_get_lending_flows(
         pool_token_balances_before_coroutine
     )
     pool_token_balances_after_coroutine = (
-        evm.async_get_erc20_balance_of_by_block(
+        evm.async_get_erc20_balance_by_block(
             token=pool_token,
             wallet=wallet,
             blocks=blocks,

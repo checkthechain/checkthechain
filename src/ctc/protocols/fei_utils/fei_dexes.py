@@ -79,7 +79,7 @@ async def async_get_stable_dex_balances_by_block(
     for pool_name in pool_tokens.keys():
         for token in pool_tokens[pool_name]:
             label = pool_name + '__' + token
-            coroutines[label] = evm.async_get_erc20_balance_of_by_block(
+            coroutines[label] = evm.async_get_erc20_balance_by_block(
                 wallet=pools[pool_name],
                 token=token_map[token],
                 blocks=blocks,

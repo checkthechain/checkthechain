@@ -72,7 +72,7 @@ async def async_compute_wallet_rewards(
         blocks=blocks,
         provider=provider,
     )
-    reward_in_wallet_coroutine = evm.async_get_erc20_balance_of_by_block(
+    reward_in_wallet_coroutine = evm.async_get_erc20_balance_by_block(
         wallet=wallet,
         token=reward_token,
         blocks=blocks,

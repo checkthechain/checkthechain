@@ -110,7 +110,7 @@ async def async_get_erc20_total_supply_by_block(
 #
 
 
-async def async_get_erc20_balance_of(
+async def async_get_erc20_balance(
     wallet: spec.Address,
     token: spec.ERC20Address,
     *,
@@ -149,7 +149,7 @@ async def async_get_erc20_balance_of(
     return balance
 
 
-async def async_get_erc20_balance_of_addresses(
+async def async_get_erc20_balances_of_addresses(
     wallets: typing.Sequence[spec.Address],
     token: spec.ERC20Address,
     *,
@@ -185,7 +185,7 @@ async def async_get_erc20_balance_of_addresses(
     return balances
 
 
-async def async_get_erc20s_balance_of(
+async def async_get_erc20s_balances(
     wallet: spec.Address,
     tokens: typing.Sequence[spec.ERC20Address],
     *,
@@ -228,7 +228,7 @@ async def async_get_erc20s_balance_of(
     return balances
 
 
-async def async_get_erc20_balance_of_by_block(
+async def async_get_erc20_balance_by_block(
     wallet: spec.Address,
     token: spec.ERC20Reference,
     *,
@@ -378,7 +378,7 @@ async def async_get_erc20s_allowances(
     return allowances
 
 
-async def async_get_erc20s_allowances_by_address(
+async def async_get_erc20s_allowances_of_addresses(
     token: spec.ERC20Reference,
     wallets: typing.Sequence[spec.Address],
     *,

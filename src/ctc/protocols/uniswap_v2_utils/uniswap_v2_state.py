@@ -55,7 +55,7 @@ async def async_get_pool_state(
     token_x, token_y = await uniswap_v2_metadata.async_get_pool_tokens(
         pool=pool, provider=provider
     )
-    reserves_coroutine = evm.async_get_erc20s_balance_of(
+    reserves_coroutine = evm.async_get_erc20s_balances(
         wallet=pool,
         tokens=[token_x, token_y],
         block=block,

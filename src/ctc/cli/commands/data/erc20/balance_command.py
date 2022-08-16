@@ -41,7 +41,7 @@ async def async_balance_command(
         wallet_address,
         block=block,
     )
-    balance = await evm.async_get_erc20_balance_of(
+    balance = await evm.async_get_erc20_balance(
         wallet=wallet_address,
         token=erc20_address,
         block=block,

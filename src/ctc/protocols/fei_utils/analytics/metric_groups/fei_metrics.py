@@ -101,7 +101,7 @@ async def async_compute_dex_tvls(
     if _chunk_by_blocks:
         tasks: list[asyncio.Task[typing.Union[list[int], list[float]]]] = []
         for block in blocks:
-            task = evm.async_get_erc20_balance_of_addresses(
+            task = evm.async_get_erc20_balances_of_addresses(
                 wallets=addresses,
                 token='FEI',
                 block=block,
@@ -113,7 +113,7 @@ async def async_compute_dex_tvls(
     else:
         tasks = []
         for address in addresses:
-            task = evm.async_get_erc20_balance_of_by_block(
+            task = evm.async_get_erc20_balance_by_block(
                 wallet=address,
                 token='FEI',
                 blocks=blocks,

@@ -17,7 +17,7 @@ async def test_fetch_token_total_supply():
 @pytest.mark.asyncio
 async def test_fetch_token_balance_of():
     address = '0x94b0a3d511b6ecdb17ebf877278ab030acb0a878'
-    balance = await evm.async_get_erc20_balance_of(
+    balance = await evm.async_get_erc20_balance(
         wallet=address, token=token_address, block=13436621, normalize=False
     )
     assert balance == 137680097380114452997476874

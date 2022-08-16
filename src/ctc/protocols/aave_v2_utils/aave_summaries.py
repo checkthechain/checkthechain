@@ -184,7 +184,7 @@ async def async_summarize_token_markets(
     prices_task = asyncio.create_task(prices_coroutine)
 
     reserve_balances_coroutines = [
-        evm.async_get_erc20_balance_of(
+        evm.async_get_erc20_balance(
             wallet=token_market['reserve_data']['atoken_address'],
             token=token_market['underlying'],
             block=block,
@@ -388,7 +388,7 @@ async def async_summarize_token_market(
 
     # compute tvbs
     balances_task = asyncio.create_task(
-        evm.async_get_erc20_balance_of_by_block(
+        evm.async_get_erc20_balance_by_block(
             wallet=atoken_address,
             token=token,
             blocks=blocks,

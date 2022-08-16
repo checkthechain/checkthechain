@@ -311,7 +311,7 @@ class DEX:
 
         network, provider = evm.get_network_and_provider(network, provider)
 
-        return await evm.async_get_erc20_balance_of(
+        return await evm.async_get_erc20_balance(
             wallet=pool,
             token=asset,
             normalize=normalize,
@@ -333,7 +333,7 @@ class DEX:
         network, provider = evm.get_network_and_provider(network, provider)
 
         pool_tokens = await cls.async_get_pool_assets(pool=pool)
-        balances = await evm.async_get_erc20s_balance_of(
+        balances = await evm.async_get_erc20s_balances(
             wallet=pool,
             tokens=pool_tokens,
             normalize=normalize,
@@ -357,7 +357,7 @@ class DEX:
 
         network, provider = evm.get_network_and_provider(network, provider)
 
-        return await evm.async_get_erc20_balance_of_by_block(
+        return await evm.async_get_erc20_balance_by_block(
             wallet=pool,
             token=asset,
             normalize=normalize,
