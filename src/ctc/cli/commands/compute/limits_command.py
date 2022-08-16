@@ -59,15 +59,21 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
     styles = cli_run.get_cli_styles()
 
     toolstr.print_text_box('int Limits', style=styles['title'])
-    rows: typing.List[typing.Sequence[typing.Any]] = [
-        [
+    rows: typing.List[typing.Sequence[typing.Any]] = []
+    for bit_value in bit_values:
+        int_min = -(1 << (bit_value - 1))
+        int_max = (1 << (bit_value - 1)) - 1
+        row = [
             'int' + str(bit_value),
-            str(-(1 << (bit_value - 1)))
-            + '\n '
-            + str((1 << (bit_value - 1)) - 1),
+            str(int_min) + '\n ' + str(int_max),
         ]
-        for bit_value in bit_values
-    ]
+        row[1] += (
+            '\n-10^'
+            + toolstr.format(round(math.log10(-int_min)))
+            + ' --> 10^'
+            + toolstr.format(round(math.log10(int_max)))
+        )
+        rows.append(row)
     toolstr.print_multiline_table(
         rows,
         column_justify=['right', 'left'],
@@ -77,6 +83,7 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
         ],
         compact=1,
         separate_all_rows=False,
+        vertical_justify='top',
     )
 
     # uint
@@ -84,7 +91,9 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
     toolstr.print_text_box('uint Limits', style=styles['title'])
     rows = []
     for bit_value in bit_values:
-        row = ['uint' + str(bit_value), str(1 << bit_value)]
+        uint_max = 1 << bit_value
+        row = ['uint' + str(bit_value), str(uint_max)]
+        row[1] += '\n0 --> 10^' + str(round(math.log10(uint_max)))
         rows.append(row)
     toolstr.print_multiline_table(
         rows,
@@ -112,10 +121,7 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
         'decimal\ndigits',
         'max value',
     ]
-    column_styles = {
-        label: styles['description']
-        for label in labels
-    }
+    column_styles = {label: styles['description'] for label in labels}
     column_styles['type'] = styles['option'] + ' bold'
     toolstr.print_text_box('float Limits', style=styles['title'])
     toolstr.print_table(
@@ -124,4 +130,24 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
         border=styles['comment'],
         label_style=styles['title'],
         column_styles=column_styles,  # type: ignore
+    )
+
+    rows = [
+        ['contract size', '0 bytes', '24576 bytes'],
+        ['transaction size', '21000 gas', '30M gas'],
+        ['block size', '0 gas', '30M gas'],
+    ]
+    print()
+    print()
+    toolstr.print_text_box('EVM Limits', style=styles['title'])
+    toolstr.print_table(
+        rows,
+        labels=['', 'min', 'max'],
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_styles={
+            '': styles['metavar'],
+            'min': styles['description'],
+            'max': styles['description'],
+        },
     )
