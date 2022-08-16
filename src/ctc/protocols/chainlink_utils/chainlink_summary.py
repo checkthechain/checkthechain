@@ -176,3 +176,25 @@ async def async_summarize_feed(
         label_style=styles['title'],
         border=styles['comment'],
     )
+
+    xvals = data['timestamp'].values.astype(float)
+    yvals = data['answer'].values.astype(float)
+    plot = toolstr.render_line_plot(
+        xvals=xvals,  # type: ignore
+        yvals=yvals,  # type: ignore
+        n_rows=40,
+        n_columns=120,
+        line_style=styles['description'],
+        chrome_style=styles['comment'],
+        tick_label_style=styles['metavar'],
+        xaxis_kwargs={'tick_label_format': 'age'},
+    )
+    print()
+    print()
+    print()
+    toolstr.print(
+        toolstr.hjustify(name + ' feed over time', 'center', 70),
+        indent=4,
+        style=styles['title'],
+    )
+    toolstr.print(plot, indent=4)
