@@ -95,5 +95,5 @@ def test_subcommand_examples(cli_example):
             'command failed with exit code '
             + str(exit_code)
             + ': '
-            + ' '.join(cli_examples)
+            + ' '.join(cli_example)
         )
