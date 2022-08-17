@@ -40,6 +40,11 @@ def get_command_spec() -> toolcli.CommandSpec:
             #     'nargs': '?',
             # },
             {
+                'name': '--block',
+                'help': 'historical block to use',
+                'type': int,
+            },
+            {
                 'name': '--last',
                 'metavar': 'N',
                 'nargs': '+',
@@ -70,6 +75,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 async def async_gas_command(
     *,
+    block: int | None,
     last: typing.Optional[typing.Sequence[str]],
     output: str,
     overwrite: bool,
@@ -90,13 +96,17 @@ async def async_gas_command(
         ]
 
     n_blocks = max(last_as_int)
-    latest = await rpc.async_eth_block_number()
-    block_numbers = list(range(latest - n_blocks + 1, latest + 1))
+    if block is None:
+        block = await rpc.async_eth_block_number()
+        using_latest = True
+    else:
+        using_latest = False
+    block_numbers = list(range(block - n_blocks + 1, block + 1))
 
     # get block transaction data
     raw_median_gas_fees = await evm.async_get_median_blocks_gas_fees(
         block_numbers,
-        latest_block_number=latest,
+        latest_block_number=block,
     )
 
     median_gas_fees = np.array(
@@ -106,7 +116,10 @@ async def async_gas_command(
     # block_timestamps = await evm.async_get_block_timestamps(block_numbers)
     block_timestamps = [item['timestamp'] for item in raw_median_gas_fees]
 
-    now = time.time()
+    if using_latest:
+        now = time.time()
+    else:
+        now = block_timestamps[-1]
     last_times = ['5 minutes', '10 minutes']
     last_blocks = []
     for last_as_int_time in last_times:
@@ -124,10 +137,11 @@ async def async_gas_command(
 
     if verbose:
         print()
-        toolstr.print_header(
-            'Latest block = '
-            + toolstr.add_style(str(latest), styles['metavar']),
-            style=styles['title'],
+        toolstr.print_header('Block Summary', style=styles['title'])
+        print()
+        toolstr.print(
+            'using block ' + toolstr.add_style(str(block), styles['metavar']),
+            style=styles['comment'],
         )
         block_rows = []
         block_gas_stats = await evm.async_get_block_gas_stats(
@@ -141,7 +155,10 @@ async def async_gas_command(
                 )
             else:
                 if value is None:
-                    block_row = (key, '')
+                    if key == 'base_fee':
+                        block_row = (key, '-')
+                    else:
+                        block_row = (key, '\[no txs]')
                 else:
                     block_row = (key, toolstr.format(value))
             block_rows.append(block_row)
@@ -149,8 +166,40 @@ async def async_gas_command(
         toolstr.print_table(
             block_rows,
             border=styles['comment'],
-            column_styles=[styles['option'], styles['description']],
+            column_styles=[styles['option'], styles['description'] + ' bold'],
             indent=4,
+        )
+
+        print()
+        print()
+        toolstr.print_header(
+            'Costs of Common Operations', style=styles['title']
+        )
+        from ctc.protocols import chainlink_utils
+
+        recent_median_gas_fee = median_gas_fees[~np.isnan(median_gas_fees)][-1]
+
+        try:
+            eth_usd: float | None = await chainlink_utils.async_get_eth_price(
+                block=block
+            )
+        except Exception:
+            eth_usd = None
+        print()
+        message = 'using gas price = ' + toolstr.add_style(
+            toolstr.format(recent_median_gas_fee) + ' gwei',
+            styles['description'] + ' bold',
+        )
+        if eth_usd is not None:
+            message += ' and ETH price = ' + toolstr.add_style(
+                toolstr.format(eth_usd, prefix='$'),
+                styles['description'] + ' bold',
+            )
+        toolstr.print(message, style=styles['comment'])
+        print()
+        await async_print_gas_costs(
+            eth_usd=eth_usd,
+            gas_fee=recent_median_gas_fee,
         )
 
     print()
@@ -174,7 +223,12 @@ async def async_gas_command(
             else:
                 row.append('last ' + str(last_n) + ' blocks')
             row.append(last_n)
-            timelength_seconds = round(now - block_timestamps[-last_n])
+            if using_latest:
+                timelength_seconds = round(now - block_timestamps[-last_n])
+            else:
+                timelength_seconds = (
+                    block_timestamps[-1] - block_timestamps[-last_n]
+                )
             timelength_clock = tooltime.timelength_to_clock(timelength_seconds)
             timelength_clock = timelength_clock.lstrip('0').lstrip(':')
             row.append(timelength_clock)
@@ -224,15 +278,21 @@ async def async_gas_command(
                 '': styles['metavar'],
                 'blocks': styles['metavar'],
                 'time': styles['metavar'],
-                'min': styles['description'],
-                'median': styles['description'],
-                'mean': styles['description'],
-                'max': styles['description'],
+                'min': styles['description'] + ' bold',
+                'median': styles['description'] + ' bold',
+                'mean': styles['description'] + ' bold',
+                'max': styles['description'] + ' bold',
             },
         )
 
         xvals = block_timestamps
         yvals = median_gas_fees
+        if using_latest:
+            xtick_format = 'age'
+            n_ticks = 3
+        else:
+            xtick_format = 'iso'
+            n_ticks = 2
         plot = toolstr.render_line_plot(
             xvals=xvals,
             yvals=yvals,  # type: ignore
@@ -241,10 +301,12 @@ async def async_gas_command(
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
-            xaxis_kwargs={'tick_label_format': 'age'},
+            xaxis_kwargs={
+                'tick_label_format': xtick_format,
+                'n_ticks': n_ticks,
+            },
             # char_dict='sextants',
         )
-        print()
         print()
         print()
         toolstr.print(
@@ -253,3 +315,69 @@ async def async_gas_command(
             style=styles['title'],
         )
         toolstr.print(plot, indent=4)
+
+
+async def async_print_gas_costs(
+    *, gas_fee: float, eth_usd: float | None
+) -> None:
+
+    styles = cli_run.get_cli_styles()
+
+    # see appendices G+H https://ethereum.github.io/yellowpaper/paper.pdf
+    rows: typing.Sequence[typing.MutableSequence[typing.Any]] = [
+        ['tx execution', 21000, 'gas per tx'],
+        ['call data  (0)', 4, 'gas per byte'],
+        ['call data (!0)', 16, 'gas per byte'],
+        ['contract creation', 32000, 'gas per contract'],
+        ['contract bytecode', 200, 'gas per byte'],
+        ['contract destruct', -24000, 'gas per contract'],
+        ['storage  0 --> !0', 20000, 'gas per byte'],
+        ['storage  0 -->  0', 2900, 'gas per byte'],
+        ['storage !0 -->  0', -15000, 'gas per byte'],
+        ['log creation', 375, 'gas per log'],
+        ['log topic', 375, 'gas per topic'],
+        ['log data', 8, 'gas per byte'],
+    ]
+    labels = ['', 'gas cost', 'gas units']
+    column_styles = [
+        styles['metavar'],
+        styles['description'] + ' bold',
+        styles['option'],
+    ]
+
+    if eth_usd is not None:
+        for row in rows:
+            raw_gas_amount: int = row[1]
+            gas_amount = float(raw_gas_amount)
+            usd_cost = eth_usd * gas_fee * gas_amount / 1e9
+            row.append(abs(usd_cost))
+            row.append(row[2].replace('gas', '$'))
+        labels.append('$ cost')
+        labels.append('$ units')
+        column_styles.append(styles['description'] + ' bold')
+        column_styles.append(styles['option'])
+
+    toolstr.print_table(
+        rows,
+        labels=labels,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_styles=column_styles,
+        column_formats={
+            '$ cost': {
+                'decimals': 5,
+                'trailing_zeros': True,
+                # 'scientific': False,
+                'prefix': '$',
+            },
+        },
+        column_gap=1,
+        # compact=2,
+        # indent=4,
+    )
+    print()
+    toolstr.print(
+        'for complete gas accounting see yellowpaper:\n    https://ethereum.github.io/yellowpaper/paper.pdf',
+        style=styles['comment'],
+        indent=4,
+    )
