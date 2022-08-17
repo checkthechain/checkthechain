@@ -26,7 +26,7 @@ async def async_get_block(
 
         network = rpc.get_provider_network(provider)
 
-        if use_db:
+        if use_db and not include_full_transactions:
             db_block_data = await db.async_query_block(
                 block_number=block,
                 network=network,
