@@ -132,14 +132,30 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
         column_styles=column_styles,  # type: ignore
     )
 
+    print()
+    print()
+    toolstr.print_text_box('EVM Data', style=styles['title'])
+
+    parameters = [
+        ['address', '20 bytes'],
+        ['transaction hash', '32 bytes'],
+        ['word size', '32 bytes'],
+        ['instruction size', '1 byte'],
+    ]
+    print()
+    toolstr.print_table(
+        rows=parameters,
+        border=styles['comment'],
+        column_styles=[styles['metavar'], styles['description']],
+    )
+    print()
+    print()
+
     rows = [
         ['contract size', '0 bytes', '24576 bytes'],
         ['transaction size', '21000 gas', '30M gas'],
         ['block size', '0 gas', '30M gas'],
     ]
-    print()
-    print()
-    toolstr.print_text_box('EVM Limits', style=styles['title'])
     toolstr.print_table(
         rows,
         labels=['', 'min', 'max'],
@@ -150,4 +166,12 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
             'min': styles['description'],
             'max': styles['description'],
         },
+    )
+
+    print()
+    toolstr.print(
+        'see '
+        + toolstr.add_style('ctc gas -v', styles['option'] + ' bold')
+        + ' for EVM gas cost summary',
+        style=styles['comment'],
     )
