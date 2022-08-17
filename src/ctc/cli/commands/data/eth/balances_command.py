@@ -165,8 +165,8 @@ async def async_balances_command(
         xvals = resolved_blocks
         yvals = balances
         plot = toolstr.render_line_plot(
-            xvals=xvals,  # type: ignore
-            yvals=yvals,  # type: ignore
+            xvals=xvals,
+            yvals=yvals,
             n_rows=40,
             n_columns=120,
             line_style=styles['description'],
@@ -187,8 +187,8 @@ async def async_balances_command(
             xvals = resolved_blocks
             yvals = usd_balances
             plot = toolstr.render_line_plot(
-                xvals=xvals,  # type: ignore
-                yvals=yvals,  # type: ignore
+                xvals=xvals,
+                yvals=yvals,
                 n_rows=40,
                 n_columns=120,
                 line_style=styles['description'],
