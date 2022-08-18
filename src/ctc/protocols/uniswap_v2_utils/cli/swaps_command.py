@@ -28,6 +28,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'examples': [
+            '0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5 --blocks 14000000:14001000',
             '0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5 --blocks "[14000000, 14001000]"',
         ],
     }

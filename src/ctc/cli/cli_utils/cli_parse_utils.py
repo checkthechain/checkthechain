@@ -97,6 +97,7 @@ def parse_str_block_range(
     - "[ 123, 456]"
     - "[ 123 , 456]"
     - "[ 123 ,456]"
+    - "123:456"
     """
 
     from ctc import binary
@@ -221,6 +222,11 @@ def tokenize(data: typing.Union[str, typing.Sequence[str]]) -> list[str]:
     - "(" or "[" at beginning
     - ")" or "]" at end
     """
+
+    if isinstance(data, str) and ':' in data:
+        return ['['] + data.split(':') + [']']
+    elif len(data) == 1 and isinstance(data[0], str) and ':' in data[0]:
+        return ['['] + data[0].split(':') + [']']
 
     # break into tokens
     if isinstance(data, str):

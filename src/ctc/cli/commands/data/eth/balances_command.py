@@ -59,8 +59,8 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': {
             '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 0xea674fdde714fd979de3edf0f56aa9716b898ec8 0xbe0eb53f46cd790cd13851d5eff43d12404d33e8': 'multiple wallets',
-            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 --blocks [14000000, 14000100]': 'multiple blocks',
-            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 -v --blocks [14000000, 14100000, 1000]': 'multiple blocks with USD values',
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 --blocks 14000000:14000100': 'multiple blocks',
+            '0xd8da6bf26964af9d7eed9e03e53415d37aa96045 -v --blocks 14000000:14100000:1000': 'multiple blocks with USD values',
         },
     }
 
