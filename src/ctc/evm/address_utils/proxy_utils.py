@@ -18,6 +18,7 @@ if typing.TYPE_CHECKING:
             'eip897',
             'eip1967-logic',
             'eip1967-beacon',
+            'openzeppelin',
             'gnosis_safe',
         ] | None
 
@@ -81,8 +82,20 @@ async def async_get_proxy_metadata(
             'proxy_type': 'eip1967-beacon',
         }
 
+    # try openzeppelin
+    openzeppelin_address = await _async_get_oz_proxy_address(
+        contract_address=contract_address,
+        provider=provider,
+        block=block,
+    )
+    if openzeppelin_address is not None:
+        return {
+            'address': openzeppelin_address,
+            'proxy_type': 'openzeppelin',
+        }
+
     # try gnosis proxy
-    gnosis_proxy_address = await async_get_gnosis_safe_proxy_address(
+    gnosis_proxy_address = await _async_get_gnosis_safe_proxy_address(
         contract_address,
         provider=provider,
         block=block,
@@ -282,11 +295,39 @@ async def async_get_eip1967_history() -> None:
 
 
 #
-# # gnosisc
+# # openzeppelin os
 #
 
 
-async def async_get_gnosis_safe_proxy_address(
+async def _async_get_oz_proxy_address(
+    contract_address: spec.Address,
+    *,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    provider: spec.ProviderReference = None,
+) -> spec.Address | None:
+
+    position = (
+        '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3'
+    )
+
+    result = await rpc.async_eth_get_storage_at(
+        address=contract_address,
+        position=position,
+        block_number=block,
+        provider=provider,
+    )
+    if not isinstance(result, str):
+        raise Exception('invalid rpc result')
+
+    return '0x' + result[-40:]
+
+
+#
+# # gnosis
+#
+
+
+async def _async_get_gnosis_safe_proxy_address(
     contract_address: spec.Address,
     *,
     block: spec.BlockNumberReference | None = None,
