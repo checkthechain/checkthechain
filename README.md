@@ -50,7 +50,7 @@ transfers = await evm.async_get_erc20_transfers(
 )
 
 # get holdings of each address for a given block
-holdings = await evm.async_get_erc20_holdings_from_transfers(transfers=transfers, block=12345789)
+holdings = await evm.async_get_erc20_balances_from_transfers(transfers=transfers, block=12345789)
 ```
 
 ```bash
@@ -90,8 +90,8 @@ votes = await evm.async_get_events(
 
 DAO="0x0bef27feb58e857046d630b2c03dfb7bae567494"
 
-ctc events 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 ProposalCreated --output proposals.csv
-ctc events 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 VoteCast --output votes.csv
+ctc events $DAO ProposalCreated --output proposals.csv
+ctc events $DAO VoteCast --output votes.csv
 ```
 
 #### Get historical data for a Chainlink feed
