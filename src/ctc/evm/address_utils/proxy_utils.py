@@ -319,7 +319,12 @@ async def _async_get_oz_proxy_address(
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
 
-    return '0x' + result[-40:]
+    address = '0x' + result[-40:]
+
+    if address == '0x0000000000000000000000000000000000000000':
+        return None
+    else:
+        return address
 
 
 #
