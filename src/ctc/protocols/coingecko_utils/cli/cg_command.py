@@ -17,7 +17,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '*',
             },
             {
-                'name': '--time',
+                'name': ['-t', '--time'],
                 'help': 'time of chart (e.g. 7d, 1y, max)',
                 'dest': 'timelength',
             },
@@ -39,10 +39,10 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '',
-            'CRV',
-            '--update',
+            'CRV -t 100d',
             'ETH / BTC',
-            'ETH / LINK',
+            'LINK / ETH -t 24h',
+            '--update',
         ],
     }
 
