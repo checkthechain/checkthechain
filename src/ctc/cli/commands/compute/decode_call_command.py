@@ -163,7 +163,15 @@ async def async_decode_command(
         named_parameters = decoded.get('named_parameters')
 
         if len(function_abi['inputs']) == 1:
-            nested_calls = decoded['parameters'][0]
+            nested_calls = [
+                {
+                    'address': address,
+                    'call_data': call_data,
+                    'value': None,
+                    'signature': None,
+                }
+                for address, call_data in decoded['parameters'][0]
+            ]
             non_nested_parameters = []
         elif (
             named_parameters is not None
