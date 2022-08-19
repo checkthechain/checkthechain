@@ -74,6 +74,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('events',): 'ctc.cli.commands.data.events_command',
         ('gas',): 'ctc.cli.commands.data.gas_command',
         ('proxy',): 'ctc.cli.commands.data.proxy_command',
+        ('proxy', 'register'): 'ctc.cli.commands.data.proxy_register_command',
         ('storage',): 'ctc.cli.commands.data.storage_command',
         ('symbol',): 'ctc.cli.commands.data.symbol_command',
         ('timestamp',): 'ctc.cli.commands.data.timestamp_command',
