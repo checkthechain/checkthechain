@@ -66,8 +66,8 @@ def summarize_contract_abi_functions(
     styles = cli_run.get_cli_styles()
 
     if read_write:
-        read_color = 'white'
-        write_color = styles['description']
+        read_color = styles['description']
+        write_color = 'white'
 
     functions = binary.get_function_abis(contract_abi)
 
@@ -272,6 +272,8 @@ def summarize_contract_abi_events(
         column_styles={
             'event_hash': styles['metavar'],
             'inputs': styles['option'],
+            'name': styles['description'],
+            'indexed': styles['description'],
         },
     )
 
