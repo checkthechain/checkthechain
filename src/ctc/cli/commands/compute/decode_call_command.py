@@ -47,6 +47,8 @@ async def async_decode_command(
     title: str | None = None,
     indent: str | None = None,
     mention_nested: bool = True,
+    send_value: int | None = None,
+    explicit_signature: str | None = None,
 ) -> None:
 
     styles = cli_run.get_cli_styles()
@@ -71,13 +73,22 @@ async def async_decode_command(
             contract_abi = await evm.async_get_contract_abi(
                 contract_address=contract_address
             )
+            if explicit_signature is not None:
+                function_selector = binary.get_function_selector(
+                    function_signature=explicit_signature
+                )
+                call_data = (
+                    '0x'
+                    + function_selector
+                    + binary.convert(call_data, 'raw_hex')
+                )
+
             decoded = binary.decode_call_data(
                 contract_abi=contract_abi, call_data=call_data
             )
             function_abi = decoded['function_abi']
         except Exception:
-            print('[abi unavailable, cannot decode]')
-            return
+            function_abi = None
     else:
         raise Exception('wrong syntax, see `ctc decode -h`')
 
@@ -90,26 +101,40 @@ async def async_decode_command(
     ) -> None:
         if key_style is None:
             key_style = styles['option']
-        toolstr.print(
-            indent
-            + toolstr.add_style(bullet + ' ', styles['title'])
-            + toolstr.add_style(str(key), key_style)
-            + toolstr.add_style(': ', styles['comment'])
-            + toolstr.add_style(str(value), styles['description'] + ' bold')
-        )
+
+        as_str = (indent + toolstr.add_style(bullet + ' ', styles['title']))
+        if key != '':
+            as_str += (
+                toolstr.add_style(str(key), key_style)
+                + toolstr.add_style(': ', styles['comment'])
+            )
+        as_str += toolstr.add_style(str(value), styles['description'] + ' bold')
+        toolstr.print(as_str)
 
     print_bullet('to', contract_address, indent)
     print_bullet('n_bytes', len(binary.convert(call_data, 'binary')), indent)
-    print()
+    if send_value is not None:
+        print_bullet('value', send_value, indent)
+
+    if function_abi is None:
+        if explicit_signature is not None:
+            print_bullet('signature', explicit_signature)
+        print()
+        print('[abi for ' + contract_address + ' unavailable, cannot decode]')
+        return
 
     # print funciton info
+    print()
     print()
     toolstr.print_header('Function Info', style=styles['title'])
     print_bullet('name', function_abi['name'], indent)
     print_bullet('selector', decoded['function_selector'], indent)
-    print_bullet(
-        'signature', binary.get_function_signature(function_abi), indent
-    )
+    if explicit_signature is not None:
+        print_bullet('signature', explicit_signature)
+    else:
+        print_bullet(
+            'signature', binary.get_function_signature(function_abi), indent
+        )
     print_bullet('inputs', indent=indent)
     for p, parameter in enumerate(function_abi['inputs']):
         print_bullet(
@@ -153,16 +178,20 @@ async def async_decode_command(
                     'address': named_parameters['targets'][i],
                     'call_data': named_parameters['calldatas'][i],
                     'value': None,
+                    'signature': None,
                 }
                 if 'values' in named_parameters:
                     nested_call['value'] = named_parameters['values'][i]
+                if 'signatures' in named_parameters:
+                    if named_parameters['signatures'][i] != '':
+                        nested_call['signature'] = named_parameters['signatures'][i]
                 nested_calls.append(nested_call)
 
             # gather non-nested parameters
             non_nested_parameters = [
                 n
                 for n, name in enumerate(named_parameters)
-                if name not in ['targets', 'calldatas', 'values']
+                if name not in ['targets', 'calldatas', 'values', 'signatures']
             ]
 
         else:
@@ -216,6 +245,8 @@ async def async_decode_command(
                 title=title,
                 indent='',
                 mention_nested=False,
+                send_value=nested_call['value'],
+                explicit_signature=nested_call['signature'],
             )
             if nc + 1 != len(nested_calls):
                 print()
