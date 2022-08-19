@@ -73,6 +73,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'output data as pep8-formatted python syntax',
                 'action': 'store_true',
             },
+            {
+                'name': '--update',
+                'help': 're-import ABI from etherscan (e.g. if proxy has changed)',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
@@ -99,6 +104,7 @@ async def async_abi_command(
     map_names: bool,
     map_selectors: bool,
     python: bool,
+    update: bool,
 ) -> None:
 
     if map_names and map_selectors:
@@ -108,7 +114,9 @@ async def async_abi_command(
             json_pretty = True
 
     address = await evm.async_resolve_address(address)
-    contract_abi = await evm.async_get_contract_abi(contract_address=address)
+    contract_abi = await evm.async_get_contract_abi(
+        contract_address=address, db_query=(not update),
+    )
 
     # filter by name
     if len(names) > 0:
