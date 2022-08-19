@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
     from typing_extensions import TypedDict, Literal
 
     class ProxyAddressMetadata(TypedDict):
-        address: spec.Address | None
+        implementation: spec.Address | None
         proxy_type: Literal[
             'eip897',
             'eip1967-logic',
@@ -23,7 +23,7 @@ if typing.TYPE_CHECKING:
         ] | None
 
 
-async def async_get_proxy_address(
+async def async_get_proxy_implementation(
     contract_address: spec.Address,
     *,
     provider: spec.ProviderReference = None,
@@ -34,7 +34,7 @@ async def async_get_proxy_address(
         contract_address=contract_address, provider=provider, block=block
     )
 
-    return proxy_metadata['address']
+    return proxy_metadata['implementation']
 
 
 async def async_get_proxy_metadata(
@@ -52,7 +52,7 @@ async def async_get_proxy_metadata(
         )
         if eip897_address is not None:
             return {
-                'address': eip897_address,
+                'implementation': eip897_address,
                 'proxy_type': 'eip897',
             }
     except (spec.exceptions.rpc_exceptions.RpcException, Exception):
@@ -66,7 +66,7 @@ async def async_get_proxy_metadata(
     )
     if eip1967_logic_address != '0x0000000000000000000000000000000000000000':
         return {
-            'address': eip1967_logic_address,
+            'implementation': eip1967_logic_address,
             'proxy_type': 'eip1967-logic',
         }
 
@@ -78,7 +78,7 @@ async def async_get_proxy_metadata(
     )
     if eip1967_beacon_address is not None:
         return {
-            'address': eip1967_beacon_address,
+            'implementation': eip1967_beacon_address,
             'proxy_type': 'eip1967-beacon',
         }
 
@@ -90,7 +90,7 @@ async def async_get_proxy_metadata(
     )
     if openzeppelin_address is not None:
         return {
-            'address': openzeppelin_address,
+            'implementation': openzeppelin_address,
             'proxy_type': 'openzeppelin',
         }
 
@@ -102,12 +102,12 @@ async def async_get_proxy_metadata(
     )
     if gnosis_proxy_address is not None:
         return {
-            'address': gnosis_proxy_address,
+            'implementation': gnosis_proxy_address,
             'proxy_type': 'gnosis_safe',
         }
 
     return {
-        'address': None,
+        'implementation': None,
         'proxy_type': None,
     }
 

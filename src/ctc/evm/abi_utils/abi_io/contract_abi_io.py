@@ -16,6 +16,7 @@ async def async_get_contract_abi(
     db_query: bool | None = None,
     db_intake: bool | None = None,
     block: spec.BlockNumberReference | None = None,
+    proxy_implementation: spec.Address | None = None,
     verbose: bool = True,
 ) -> spec.ContractABI:
     """for addresses that change ABI's over time, use db_query=False to skip cache"""
@@ -48,18 +49,21 @@ async def async_get_contract_abi(
         verbose=verbose,
     )
 
-    # get proxy abi
+    # get proxy implementation
     if provider is None:
         provider = {'network': network}
-    proxy_address = await address_utils.async_get_proxy_address(
-        contract_address=contract_address,
-        provider=provider,
-        block=block,
-    )
+    if proxy_implementation is None:
+        proxy_implementation = await address_utils.async_get_proxy_implementation(
+            contract_address=contract_address,
+            provider=provider,
+            block=block,
+        )
+
+    # get proxy abi
     includes_proxy = False
-    if proxy_address is not None:
+    if proxy_implementation is not None:
         proxy_abi = await etherscan_utils.async_get_contract_abi(
-            contract_address=proxy_address,
+            contract_address=proxy_implementation,
             network=network,
             verbose=verbose,
         )

@@ -46,7 +46,7 @@ async def async_proxy_command(
             contract_address=contract_address,
             block=block,
         )
-        proxy_address = proxy_metadata['address']
+        proxy_address = proxy_metadata['implementation']
         if proxy_address is None:
             proxy_address = 'none'
 
@@ -57,6 +57,7 @@ async def async_proxy_command(
             ['uses EIP-897', proxy_metadata['proxy_type'] == 'eip897'],
             ['uses EIP-1967 Logic', proxy_metadata['proxy_type'] == 'eip1967-logic'],
             ['uses EIP-1967 Beacon', proxy_metadata['proxy_type'] == 'eip1967-beacon'],
+            ['uses Openzeppelin', proxy_metadata['proxy_type'] == 'openzeppelin'],
             [
                 'uses gnosis-proxy',
                 proxy_metadata['proxy_type'] == 'gnosis_safe',
@@ -67,7 +68,7 @@ async def async_proxy_command(
         print('proxy_address =', proxy_address)
 
     else:
-        proxy_address = await evm.async_get_proxy_address(contract_address)
+        proxy_address = await evm.async_get_proxy_implementation(contract_address)
         if proxy_address is None:
             print('[no proxy address detected]')
         else:
