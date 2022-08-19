@@ -10,6 +10,7 @@ from . import erc20_state
 
 async def async_print_erc20_summary(
     erc20: spec.Address,
+    include_address: bool = True,
 ) -> None:
     import toolstr
     from ctc.cli import cli_run
@@ -56,5 +57,6 @@ async def async_print_erc20_summary(
         column_styles=[styles['option'], styles['description']],
     )
 
-    print()
-    toolstr.print(address, style=styles['metavar'])
+    if include_address:
+        print()
+        toolstr.print(address, style=styles['metavar'])

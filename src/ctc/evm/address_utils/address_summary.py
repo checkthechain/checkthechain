@@ -54,15 +54,26 @@ async def async_print_address_summary(
 
     title = 'Address ' + address.lower()
     toolstr.print_text_box(title, style=styles['title'])
-    print('- checksum:', address_data.get_address_checksum(address))
-    print('- address type:', address_type)
-    print('- ETH balance:', eth_balance)
-    print('- transaction count:', transaction_count)
+    rows = [
+        ('checksum', toolstr.add_style(address_data.get_address_checksum(address), styles['metavar'])),
+        ('address type', address_type),
+        ('ETH balance', eth_balance),
+        ('transaction count', transaction_count),
+    ]
+    print()
+    toolstr.print_table(
+        rows,
+        border=styles['comment'],
+        column_justify=['right', 'left'],
+        column_styles=[styles['option'], styles['description']],
+    )
 
     if verbose:
         creation_block = await evm.async_get_contract_creation_block(address)
         if creation_block is not None:
-            block_timestamp = await evm.async_get_block_timestamp(creation_block)
+            block_timestamp = await evm.async_get_block_timestamp(
+                creation_block
+            )
             age = tooltime.get_age(block_timestamp, 'TimelengthPhrase')
             print('- creation block:', creation_block)
             print('- age:', age)
@@ -70,12 +81,11 @@ async def async_print_address_summary(
     if is_contract:
 
         is_erc20 = await evm.async_is_erc20(address)
-        print('- is ERC20:', is_erc20)
 
         if is_erc20:
             print()
             print()
-            await evm.async_print_erc20_summary(address)
+            await evm.async_print_erc20_summary(address, include_address=False)
 
         provider = rpc.get_provider(provider)
         network = provider['network']
