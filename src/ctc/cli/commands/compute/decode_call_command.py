@@ -43,13 +43,19 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_decode_command(
     *,
     args: typing.Sequence[str],
-    nested: bool,
+    nested: bool = False,
     title: str | None = None,
     indent: str | None = None,
     mention_nested: bool = True,
 ) -> None:
 
     styles = cli_run.get_cli_styles()
+    # print header
+    if indent is None:
+        indent = ''
+    if title is None:
+        title = 'Decoding Call Data'
+    toolstr.print_text_box(title, style=styles['title'])
 
     if len(args) == 1:
         from ctc.protocols import fourbyte_utils
@@ -61,13 +67,17 @@ async def async_decode_command(
         return
     elif len(args) == 2:
         contract_address, call_data = args
-        contract_abi = await evm.async_get_contract_abi(
-            contract_address=contract_address
-        )
-        decoded = binary.decode_call_data(
-            contract_abi=contract_abi, call_data=call_data
-        )
-        function_abi = decoded['function_abi']
+        try:
+            contract_abi = await evm.async_get_contract_abi(
+                contract_address=contract_address
+            )
+            decoded = binary.decode_call_data(
+                contract_abi=contract_abi, call_data=call_data
+            )
+            function_abi = decoded['function_abi']
+        except Exception:
+            print('[abi unavailable, cannot decode]')
+            return
     else:
         raise Exception('wrong syntax, see `ctc decode -h`')
 
@@ -88,12 +98,6 @@ async def async_decode_command(
             + toolstr.add_style(str(value), styles['description'] + ' bold')
         )
 
-    # print header
-    if indent is None:
-        indent = ''
-    if title is None:
-        title = 'Decoding Call Data'
-    toolstr.print_text_box(title, style=styles['title'])
     print_bullet('to', contract_address, indent)
     print_bullet('n_bytes', len(binary.convert(call_data, 'binary')), indent)
     print()
@@ -126,37 +130,52 @@ async def async_decode_command(
         toolstr.print(indent + '    \[no outputs]', style=styles['comment'])
     print()
 
-    # print function parameters
+    # detect nested calls
+    nested_calls = []
+    non_nested_parameters = list(range(len(decoded['parameters'])))
     if nested:
-        if len(function_abi['inputs']) != 1:
-            raise NotImplementedError(
-                'only implemented for simple lists of calls'
-            )
-        nested_calls = decoded['parameters'][0]
-        for nc, nested_call in enumerate(nested_calls):
-            nested_address, nested_call_data = nested_call
-            title = (
-                'Nested Call Data '
-                + str(nc + 1)
-                + ' / '
-                + str(len(nested_calls))
-            )
-            print()
-            await async_decode_command(
-                args=nested_call,
-                nested=False,
-                title=title,
-                indent='',
-                mention_nested=False,
-            )
-            if nc + 1 != len(nested_calls):
-                print()
 
-    else:
+        named_parameters = decoded.get('named_parameters')
+
+        if len(function_abi['inputs']) == 1:
+            nested_calls = decoded['parameters'][0]
+            non_nested_parameters = []
+        elif (
+            named_parameters is not None
+            and 'targets' in named_parameters
+            and 'calldatas' in named_parameters
+        ):
+
+            # gather nested calls
+            nested_calls = []
+            for i in range(len(named_parameters['calldatas'])):
+                nested_call = {
+                    'address': named_parameters['targets'][i],
+                    'call_data': named_parameters['calldatas'][i],
+                    'value': None,
+                }
+                if 'values' in named_parameters:
+                    nested_call['value'] = named_parameters['values'][i]
+                nested_calls.append(nested_call)
+
+            # gather non-nested parameters
+            non_nested_parameters = [
+                n
+                for n, name in enumerate(named_parameters)
+                if name not in ['targets', 'calldatas', 'values']
+            ]
+
+        else:
+            raise Exception('could not detect nested calls')
+
+    # print non nested parameters
+    if len(non_nested_parameters) > 0:
         print()
         toolstr.print_header('Call Parameters', style=styles['title'])
         input_names = binary.get_function_parameter_names(function_abi)
         for p, parameter in enumerate(decoded['parameters']):
+            if p not in non_nested_parameters:
+                parameter = '\[nested parameter, see below]'  # type: ignore
             if isinstance(parameter, tuple):
                 print_bullet(
                     str(input_names[p]),
@@ -179,6 +198,27 @@ async def async_decode_command(
                     indent=indent,
                     bullet=str(p + 1) + '.',
                 )
+
+    # print nested calls
+    if nested:
+        for nc, nested_call in enumerate(nested_calls):
+            # nested_address, nested_call_data = nested_call
+            title = (
+                'Nested Call Data '
+                + str(nc + 1)
+                + ' / '
+                + str(len(nested_calls))
+            )
+            print()
+            await async_decode_command(
+                args=[nested_call['address'], nested_call['call_data']],
+                nested=False,
+                title=title,
+                indent='',
+                mention_nested=False,
+            )
+            if nc + 1 != len(nested_calls):
+                print()
 
     if mention_nested and not nested:
         toolstr.print(
