@@ -4,8 +4,6 @@ import os
 import sys
 import typing
 
-import toolcli
-
 from ctc.cli import cli_run
 
 
@@ -174,6 +172,8 @@ def install_aliases(
     headless: bool = False,
 ) -> None:
 
+    import toolcli
+
     # autodetect path based on shell
     if paths is None:
         paths = [
@@ -230,6 +230,9 @@ def delete_aliases(
     confirm: bool = False,
     headless: bool = False,
 ) -> None:
+
+    import toolcli
+
     path = os.path.expanduser(path)
 
     with open(path, 'r') as f:

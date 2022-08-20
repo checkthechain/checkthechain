@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import spec
+if typing.TYPE_CHECKING:
+    from ctc import spec
 
 
 async def async_resolve_block_range(

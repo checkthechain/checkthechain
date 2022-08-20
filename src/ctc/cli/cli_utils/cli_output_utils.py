@@ -2,11 +2,32 @@ from __future__ import annotations
 
 import os
 import typing
-
-import toolcli
+from .. import cli_run
 
 if typing.TYPE_CHECKING:
     from ctc import spec
+
+
+def print_bullet(
+    value: str,
+    *,
+    key: str | None = None,
+    number: int | None = None,
+) -> None:
+
+    import toolstr
+
+    styles = cli_run.get_cli_styles()
+
+    toolstr.print_bullet(
+        key=key,
+        value=value,
+        number=number,
+        bullet_style=styles['title'],
+        colon_style=styles['comment'],
+        key_style=styles['option'],
+        value_style=styles['description'],
+    )
 
 
 def output_data(
@@ -62,6 +83,8 @@ def output_data(
         toolstr.print_table(rows=rows, labels=columns, indent=indent)
 
     else:
+
+        import toolcli
 
         # check whether file exists
         if os.path.isfile(output):
