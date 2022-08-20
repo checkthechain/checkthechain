@@ -35,7 +35,7 @@ def summarize_contract_abi(
     *,
     max_width: int = 80,
     verbose: bool | int = False,
-    read_write: bool = False,
+    read_write: bool = True,
 ) -> None:
     summarize_contract_abi_functions(
         contract_abi=contract_abi,
