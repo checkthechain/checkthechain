@@ -9,9 +9,9 @@ if typing.TYPE_CHECKING:
 
 
 def print_bullet(
-    value: str,
+    value: typing.Any,
     *,
-    key: str | None = None,
+    key: typing.Any | None = None,
     number: int | None = None,
 ) -> None:
 

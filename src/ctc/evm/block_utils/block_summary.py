@@ -17,6 +17,8 @@ async def async_print_block_summary(
     import toolstr
     import tooltime
 
+    from ctc import cli
+
     if not isinstance(block, dict):
         block = await block_crud.async_get_block(block=block, provider=provider)
 
@@ -44,20 +46,25 @@ async def async_print_block_summary(
         )
 
     title = 'Block ' + str(block['number'])
-    toolstr.print_text_box(title)
-    print('- timestamp:', block['timestamp'])
-    print('- time:', tooltime.timestamp_to_iso(block['timestamp']))
-    print(
-        '- age:',
-        tooltime.timelength_to_phrase(round(time.time()) - block['timestamp']),
+    styles = cli.get_cli_styles()
+    toolstr.print_text_box(title, style=styles['title'])
+    cli.print_bullet(key='timestamp', value=block['timestamp'])
+    cli.print_bullet(key='time', value=tooltime.timestamp_to_iso(block['timestamp']))
+    cli.print_bullet(
+        key='age',
+        value=tooltime.timelength_to_phrase(
+            round(time.time()) - block['timestamp']
+        ),
     )
-    print('- block_hash:', block['hash'])
-    print('- n_transactions:', len(block['transactions']))
-    print(
-        '- gas used:',
-        toolstr.format(block['gas_used']),
-        '/',
-        toolstr.format(block['gas_limit']),
+    cli.print_bullet(key='block_hash', value=block['hash'])
+    cli.print_bullet(key='n_transactions:', value=len(block['transactions']))
+    cli.print_bullet(
+        key='gas used',
+        value=(
+            toolstr.format(block['gas_used'])
+            + '/'
+            + toolstr.format(block['gas_limit'])
+        ),
     )
     if full_transactions:
         percentile_label = (
@@ -82,4 +89,4 @@ async def async_print_block_summary(
             message = message[:77] + '...'
         else:
             message = message
-    print('- message:', message)
+    cli.print_bullet(key='message', value=message)
