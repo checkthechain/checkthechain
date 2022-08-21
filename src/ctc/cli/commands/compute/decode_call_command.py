@@ -13,8 +13,9 @@ from ctc.cli import cli_run
 help_message = """decode EVM call data
 
 syntax is one of
-    1. [option]ctc CALL_DATA[/option]
-    2. [option]ctc CONTRACT_ADDRESS CALL_DATA[/option]"""
+    1. [option]ctc decode call CALL_DATA[/option]
+    2. [option]ctc decode call CONTRACT_ADDRESS CALL_DATA[/option]
+    3. [option]ctc decode call TX_HASH --tx[/option]"""
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -24,8 +25,13 @@ def get_command_spec() -> toolcli.CommandSpec:
         'args': [
             {
                 'name': 'args',
-                'help': 'either `CALL_DATA` or `CONTRACT_ADDRESS CALL_DATA`',
+                'help': '`CALL_DATA` or `CONTRACT_ADDRESS CALL_DATA` or `TX_HASH`',
                 'nargs': '+',
+            },
+            {
+                'name': '--tx',
+                'help': 'decode call data trasnaction, use tx hash as args',
+                'action': 'store_true',
             },
             {
                 'name': '--nested',
@@ -36,6 +42,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': [
             '0xdac17f958d2ee523a2206206994597c13d831ec7 0xa9059cbb00000000000000000000000021dd5c13925407e5bcec3f27ab11a355a9dafbe3000000000000000000000000000000000000000000000000000000003fd629c0',
             '0xeefba1e63905ef1d7acba5a8513c70307c1ce441 0x252dba420000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000100000000000000000000000000a65803ad604668e26a81be92c9f1c90354255eae00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000044bba06f270000000000000000000000000a01960ddf19c59e43cbdf0b5ab9278d7459e76e000000000000000000000000e9822f18f2654e606a8dff9d75edd98367e7c0ae00000000000000000000000000000000000000000000000000000000000000000000000000000000a65803ad604668e26a81be92c9f1c90354255eae0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002451cff8d90000000000000000000000000a01960ddf19c59e43cbdf0b5ab9278d7459e76e00000000000000000000000000000000000000000000000000000000 --nested',
+            '0xcb2931bd1c078f70106017f2e0c378fa9f648aa7d17c1d87240764b65e4626c9 --tx',
         ],
     }
 
@@ -44,6 +51,7 @@ async def async_decode_command(
     *,
     args: typing.Sequence[str],
     nested: bool = False,
+    tx: bool = False,
     title: str | None = None,
     indent: str | None = None,
     mention_nested: bool = True,
@@ -59,7 +67,13 @@ async def async_decode_command(
         title = 'Decoding Call Data'
     toolstr.print_text_box(title, style=styles['title'])
 
-    if len(args) == 1:
+    if tx:
+        if len(args) != 1:
+            raise Exception('syntax is `ctc decode call TX_HASH --tx`')
+        transaction = await evm.async_get_transaction(args[0])
+        call_data = transaction['input']
+        contract_address = transaction['to']
+    elif len(args) == 1:
         from ctc.protocols import fourbyte_utils
 
         call_data = args[0]
@@ -69,28 +83,29 @@ async def async_decode_command(
         return
     elif len(args) == 2:
         contract_address, call_data = args
-        try:
-            contract_abi = await evm.async_get_contract_abi(
-                contract_address=contract_address
-            )
-            if explicit_signature is not None:
-                function_selector = binary.get_function_selector(
-                    function_signature=explicit_signature
-                )
-                call_data = (
-                    '0x'
-                    + function_selector
-                    + binary.convert(call_data, 'raw_hex')
-                )
-
-            decoded = binary.decode_call_data(
-                contract_abi=contract_abi, call_data=call_data
-            )
-            function_abi = decoded['function_abi']
-        except Exception:
-            function_abi = None
     else:
         raise Exception('wrong syntax, see `ctc decode -h`')
+
+    try:
+        contract_abi = await evm.async_get_contract_abi(
+            contract_address=contract_address
+        )
+        if explicit_signature is not None:
+            function_selector = binary.get_function_selector(
+                function_signature=explicit_signature
+            )
+            call_data = (
+                '0x'
+                + function_selector
+                + binary.convert(call_data, 'raw_hex')
+            )
+
+        decoded = binary.decode_call_data(
+            contract_abi=contract_abi, call_data=call_data
+        )
+        function_abi = decoded['function_abi']
+    except Exception:
+        function_abi = None
 
     def print_bullet(
         key: typing.Any,
