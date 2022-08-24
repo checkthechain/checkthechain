@@ -55,7 +55,7 @@ dependencies = [
     'toolconf >=0.1.2, <0.2',
     'toolsql >=0.3.10, <0.4',
     'toolstr >=0.7.4, <0.8',
-    'tooltime >=0.2.4, <0.3',
+    'tooltime >=0.2.5, <0.3',
     #
     # EVM dependencies
     'pycryptodome >=3.9.1, <4',  # for keccak()
@@ -204,7 +204,7 @@ deps =
     toolconf==0.1.2
     toolsql==0.3.10
     toolstr==0.7.4
-    tooltime==0.2.4
+    tooltime==0.2.5
     ;
     ; EVM dependencies
     pycryptodome==3.9.1
