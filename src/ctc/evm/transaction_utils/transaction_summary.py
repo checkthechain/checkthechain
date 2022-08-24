@@ -4,6 +4,7 @@ import time
 
 
 from ctc import binary
+from ctc import cli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -37,64 +38,67 @@ async def async_print_transaction_summary(
         chainlink_utils.async_get_eth_price(block=transaction['block_number'])
     )
 
-    toolstr.print_text_box('Transaction Summary')
-    print('- hash:', transaction['hash'])
-    print('- from:', transaction['from'])
-    print('- to:', transaction['to'])
-    print('- block number:', transaction['block_number'])
-    print('- transaction index:', transaction['transaction_index'])
-    print('- nonce:', transaction['nonce'])
-    print('- call data length:', len(transaction['input']))
+    styles = cli.get_cli_styles()
+    toolstr.print_text_box('Transaction Summary', style=styles['title'])
+    cli.print_bullet(key='hash', value=transaction['hash'])
+    cli.print_bullet(key='from', value=transaction['from'])
+    cli.print_bullet(key='to', value=transaction['to'])
+    cli.print_bullet(key='block number', value=transaction['block_number'])
+    cli.print_bullet(
+        key='transaction index', value=transaction['transaction_index']
+    )
+    cli.print_bullet(key='nonce', value=transaction['nonce'])
+    cli.print_bullet(key='call data length', value=len(transaction['input']))
 
     block, eth_usd = await asyncio.gather(block_task, eth_usd_task)
     timestamp = block['timestamp']
-    print('- timestamp:', timestamp)
-    print('- time:', tooltime.timestamp_to_iso(timestamp))
+    cli.print_bullet(key='timestamp', value=timestamp)
+    cli.print_bullet(key='time', value=tooltime.timestamp_to_iso(timestamp))
     age = int(time.time()) - timestamp
-    print('- age:', tooltime.timelength_to_phrase(age))
+    cli.print_bullet(key='age', value=tooltime.timelength_to_phrase(age))
     print()
     print()
     transaction_receipt = await transaction_receipt_task
-    toolstr.print_text_box('Transaction Receipt')
-    print('- success:', bool(transaction_receipt['status']))
-    print(
-        '- transaction index:',
-        transaction_receipt['transaction_index'],
-        '/',
-        len(block['transactions']),
+    toolstr.print_text_box('Transaction Receipt', style=styles['title'])
+    cli.print_bullet(key='success', value=bool(transaction_receipt['status']))
+    cli.print_bullet(
+        key='transaction index',
+        value=str(transaction_receipt['transaction_index'])
+        + ' / '
+        + str(len(block['transactions'])),
     )
-    print(
-        '- gas used:',
-        toolstr.format(transaction_receipt['gas_used']),
-        '/',
-        toolstr.format(transaction['gas']),
+    cli.print_bullet(
+        key='gas used',
+        value=toolstr.format(transaction_receipt['gas_used'])
+        + ' / '
+        + toolstr.format(transaction['gas']),
     )
-    print(
-        '- gas price:', toolstr.format(transaction['gas_price'] / 1e9), 'gwei'
+    cli.print_bullet(
+        key='gas price',
+        value=toolstr.format(transaction['gas_price'] / 1e9) + ' gwei',
     )
     if 'max_priority_fee_per_gas' in transaction:
         base_fee_per_gas = block.get('base_fee_per_gas')
         if base_fee_per_gas is None:
             base_fee_per_gas = 0
-        print(
-            '- priority + base:',
-            toolstr.format(transaction['max_priority_fee_per_gas'] / 1e9),
-            '+',
-            toolstr.format(int(base_fee_per_gas) / 1e9),
+        cli.print_bullet(
+            key='priority + base',
+            value=toolstr.format(transaction['max_priority_fee_per_gas'] / 1e9)
+            + ' + '
+            + toolstr.format(int(base_fee_per_gas) / 1e9)
+            + ' gwei',
         )
     fee = transaction_receipt['gas_used'] * transaction['gas_price'] / 1e18
     fee_usd = fee * eth_usd
-    print(
-        '- total fee:',
-        toolstr.format(fee),
-        'ETH',
-        '($' + toolstr.format(fee_usd) + ')',
+    cli.print_bullet(
+        key='total fee',
+        value=toolstr.format(fee) + ' ETH ($' + toolstr.format(fee_usd) + ')',
     )
 
     if transaction['input'] == '0x':
         print()
         print()
-        toolstr.print_text_box('Call Data')
+        toolstr.print_text_box('Call Data', style=styles['title'])
         print('[none]')
     else:
         try:
@@ -121,25 +125,18 @@ async def async_print_transaction_summary(
         )
         print()
         print()
-        toolstr.print_text_box('Call Data')
-        print(
-            call_data['function_selector'],
-            '-->',
-            binary.get_function_signature(function_abi=function_abi),
+
+        from ctc.cli.commands.compute import decode_call_command
+
+        await decode_call_command.async_decode_call_command(
+            args=[transaction_hash],
+            tx=True,
+            title='Call Data',
         )
-        named_parameters = call_data['named_parameters']
-        if named_parameters is not None:
-            for p, (name, value) in enumerate(named_parameters.items()):
-                if (
-                    value
-                    == 115792089237316195423570985008687907853269984665640564039457584007913129639935
-                ):
-                    value = 'INT_MAX'
-                print('    ' + str(p + 1) + '.', name, '=', value)
 
     print()
     print()
-    toolstr.print_text_box('Logs')
+    toolstr.print_text_box('Logs', style=styles['title'])
     logs = transaction_receipt['logs']
     if len(logs) == 0:
         print('[none]')
@@ -153,8 +150,8 @@ async def async_print_transaction_summary(
         #             event_hash=log['topics'][0],
         #         ),
         #     )
-        for l, log in enumerate(logs):
-            if l != 0:
+        for li, log in enumerate(logs):
+            if li != 0:
                 print()
 
             event_abi = await evm.async_get_event_abi(
@@ -166,8 +163,22 @@ async def async_print_transaction_summary(
                 arg_prefix=None,
                 event_abi=event_abi,
             )
-            event_signature = binary.get_event_signature(event_abi=event_abi)
-            print(event_signature, '-->', log['address'])
+            # event_signature = binary.get_event_signature(event_abi=event_abi)
+            stylized_event_signature = (
+                toolstr.add_style(event_abi['name'], styles['option'])
+                + toolstr.add_style('(', styles['title'])
+                + toolstr.add_style(',', styles['title']).join(
+                    toolstr.add_style(item['type'], styles['option'])
+                    for item in event_abi['inputs']
+                )
+                + toolstr.add_style(')', styles['title'])
+            )
+            toolstr.print(
+                stylized_event_signature,
+                toolstr.add_style('-->', styles['comment']),
+                toolstr.add_style(log['address'], styles['metavar']),
+                style=styles['description'] + ' bold',
+            )
             for e, (name, value) in enumerate(normalized_event['args'].items()):
                 if (
                     value
@@ -179,4 +190,10 @@ async def async_print_transaction_summary(
                 if isinstance(value, bytes):
                     value = binary.convert(value, 'prefix_hex')
 
-                print('    ' + str(e + 1) + '.', name, '=', value)
+                cli.print_bullet(
+                    key=name,
+                    value=value,
+                    colon_str=' = ',
+                    number=e + 1,
+                    indent=4,
+                )

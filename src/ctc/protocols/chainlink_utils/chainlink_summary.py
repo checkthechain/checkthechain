@@ -5,8 +5,10 @@ import time
 import tooltime
 import toolstr
 
+from ctc import cli
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 from ctc.cli import cli_run
 from ctc.protocols import chainlink_utils
 from . import chainlink_feed_metadata
@@ -16,7 +18,8 @@ from . import chainlink_spec
 async def async_summarize_feed(
     feed: str,
     *,
-    n_recent: int = 20,
+    start_block: spec.BlockNumberReference | None = None,
+    n_recent: int | None = None,
     verbose: bool = False,
 ) -> None:
 
@@ -44,11 +47,17 @@ async def async_summarize_feed(
     decimals_task = asyncio.create_task(decimals_coroutine)
     aggregator_task = asyncio.create_task(aggregator_coroutine)
 
-    latest_block = await rpc.async_eth_block_number()
+    if start_block is None:
+        if n_recent is None:
+            n_recent = 20
+        latest_block = await rpc.async_eth_block_number()
+        start_block = latest_block - 6000 * n_recent
+    else:
+        n_recent = 999999999999
     data = await chainlink_utils.async_get_feed_data(
         feed_address,
         fields='full',
-        start_block=latest_block - 5000,
+        start_block=start_block,
     )
     most_recent = data.iloc[-1]
     timestamp = most_recent['timestamp']
@@ -73,55 +82,31 @@ async def async_summarize_feed(
 
     title = 'Chainlink Feed Summary: ' + name
     toolstr.print_text_box(title, double=False, style=styles['title'])
-    toolstr.print(
-        toolstr.add_style('- name:', styles['option']),
-        toolstr.add_style(name, styles['description']),
-    )
-    toolstr.print(
-        toolstr.add_style('- decimals:', styles['option']),
-        toolstr.add_style(str(decimals), styles['description']),
-    )
+    cli.print_bullet(key='name', value=name)
+    cli.print_bullet(key='decimals', value=str(decimals))
 
     metadata = await chainlink_feed_metadata.async_get_feed_metadata(feed)
     deviation = toolstr.format(
         float(metadata['deviation']) / 100,
         percentage=True,
     )
-    toolstr.print(
-        toolstr.add_style('- deviation threshold:', styles['option']),
-        toolstr.add_style(deviation, styles['description']),
-    )
-    toolstr.print(
-        toolstr.add_style('- heartbeat:', styles['option']),
-        toolstr.add_style(metadata['heartbeat'], styles['description']),
-    )
-    toolstr.print(
-        toolstr.add_style('- address:', styles['option']),
-        toolstr.add_style(feed_address, styles['metavar']),
-    )
-    toolstr.print(
-        toolstr.add_style('- aggregator:', styles['option']),
-        toolstr.add_style(aggregator, styles['metavar']),
-    )
+    cli.print_bullet(key='deviation threshold', value=deviation)
+    cli.print_bullet(key='heartbeat', value=metadata['heartbeat'])
+    cli.print_bullet(key='address', value=feed_address)
+    cli.print_bullet(key='aggregator', value=aggregator)
 
     creation_block = await chainlink_feed_metadata.async_get_feed_first_block(
         feed
     )
     creation_timestamp = await evm.async_get_block_timestamp(creation_block)
-    toolstr.print(
-        toolstr.add_style('- feed creation block:', styles['option']),
-        toolstr.add_style(str(creation_block), styles['description']),
+    cli.print_bullet(key='feed creation block', value=str(creation_block))
+    cli.print_bullet(
+        key='feed creation timestamp',
+        value=str(creation_timestamp),
     )
-    toolstr.print(
-        toolstr.add_style('- feed creation timestamp:', styles['option']),
-        toolstr.add_style(str(creation_timestamp), styles['description']),
-    )
-    toolstr.print(
-        toolstr.add_style('- feed age:', styles['option']),
-        toolstr.add_style(
-            tooltime.get_age(creation_timestamp, 'TimelengthPhrase'),
-            styles['description'],
-        ),
+    cli.print_bullet(
+        key='feed age:',
+        value=tooltime.get_age(creation_timestamp, 'TimelengthPhrase'),
     )
 
     if verbose:
@@ -175,6 +160,7 @@ async def async_summarize_feed(
         },
         label_style=styles['title'],
         border=styles['comment'],
+        limit_rows=21,
     )
 
     xvals = data['timestamp'].values.astype(float)

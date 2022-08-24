@@ -20,7 +20,7 @@ syntax is one of
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': async_decode_command,
+        'f': async_decode_call_command,
         'help': help_message,
         'args': [
             {
@@ -47,7 +47,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_decode_command(
+async def async_decode_call_command(
     *,
     args: typing.Sequence[str],
     nested: bool = False,
@@ -262,7 +262,7 @@ async def async_decode_command(
                 + str(len(nested_calls))
             )
             print()
-            await async_decode_command(
+            await async_decode_call_command(
                 args=[nested_call['address'], nested_call['call_data']],
                 nested=False,
                 title=title,

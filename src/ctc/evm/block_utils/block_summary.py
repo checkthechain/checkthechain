@@ -57,12 +57,12 @@ async def async_print_block_summary(
         ),
     )
     cli.print_bullet(key='block_hash', value=block['hash'])
-    cli.print_bullet(key='n_transactions:', value=len(block['transactions']))
+    cli.print_bullet(key='n_transactions', value=len(block['transactions']))
     cli.print_bullet(
         key='gas used',
         value=(
             toolstr.format(block['gas_used'])
-            + '/'
+            + ' / '
             + toolstr.format(block['gas_limit'])
         ),
     )
@@ -84,7 +84,7 @@ async def async_print_block_summary(
     message = block['extra_data']
     try:
         message = binary.convert(message, 'binary').decode()
-    except Exception as e:
+    except Exception:
         if len(message) > 80:
             message = message[:77] + '...'
         else:

@@ -13,6 +13,8 @@ def print_bullet(
     *,
     key: typing.Any | None = None,
     number: int | None = None,
+    colon_str: str | None = None,
+    indent: int | str | None = None,
 ) -> None:
 
     import toolstr
@@ -23,6 +25,8 @@ def print_bullet(
         key=key,
         value=value,
         number=number,
+        colon_str=colon_str,
+        indent=indent,
         bullet_style=styles['title'],
         colon_style=styles['comment'],
         key_style=styles['option'],
