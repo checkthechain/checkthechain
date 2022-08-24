@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import time
 import typing
 
 import toolcli
 import toolstr
+import tooltime
 
 from ctc import evm
 from ctc import rpc
@@ -27,6 +29,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': '--blocks',
                 'nargs': '+',
                 'help': 'block range of datapoints',
+            },
+            {
+                'name': '--time',
+                'dest': 'timelength',
+                'help': 'historical duration to show feed data',
             },
             {
                 'name': '--output',
@@ -70,6 +77,7 @@ async def async_chainlink_command(
     feed: typing.Sequence[str],
     verbose: bool,
     blocks: typing.Optional[typing.Sequence[str]],
+    timelength: str,
     output: str,
     overwrite: bool,
     provider: typing.Optional[str],
@@ -83,6 +91,15 @@ async def async_chainlink_command(
 
     feed_str = await evm.async_resolve_address(feed_str)
 
+    if timelength is not None:
+        timelength_seconds = tooltime.timelength_to_seconds(timelength)
+        start_block = await evm.async_get_block_of_timestamp(
+            time.time() - timelength_seconds,
+            mode='<=',
+        )
+    else:
+        start_block = None
+
     if all_fields:
         fields: typing.Literal['full', 'answer'] = 'full'
     else:
@@ -92,6 +109,7 @@ async def async_chainlink_command(
         await chainlink_utils.async_summarize_feed(
             feed=feed_str,
             verbose=verbose,
+            start_block=start_block,
         )
     else:
         feed_address = await chainlink_utils.async_resolve_feed_address(
