@@ -5,6 +5,7 @@ import typing
 import toolcli
 import toolstr
 
+from ctc import cli
 from ctc import evm
 from ctc import spec
 
@@ -42,33 +43,48 @@ async def async_proxy_command(
 
     if verbose:
 
+        styles = cli.get_cli_styles()
+
         proxy_metadata = await evm.async_get_proxy_metadata(
             contract_address=contract_address,
             block=block,
         )
-        proxy_address = proxy_metadata['implementation']
-        if proxy_address is None:
-            proxy_address = 'none'
 
-        toolstr.print_text_box('Proxy Summary for ' + str(contract_address))
+        if proxy_metadata['implementation'] is None:
+            toolstr.print(
+                'no proxy detected for '
+                + toolstr.add_style(contract_address, styles['metavar']),
+            )
+            return
+
+        toolstr.print_text_box(
+            'Proxy Summary for ' + str(contract_address),
+            style=styles['title'],
+        )
         rows: typing.Sequence[typing.Sequence[typing.Any]] = [
-            ['contract_address', contract_address],
-            ['block', block],
-            ['uses EIP-897', proxy_metadata['proxy_type'] == 'eip897'],
-            ['uses EIP-1967 Logic', proxy_metadata['proxy_type'] == 'eip1967-logic'],
-            ['uses EIP-1967 Beacon', proxy_metadata['proxy_type'] == 'eip1967-beacon'],
-            ['uses Openzeppelin', proxy_metadata['proxy_type'] == 'openzeppelin'],
+            ['proxy', toolstr.add_style(contract_address, styles['metavar'])],
             [
-                'uses gnosis-proxy',
-                proxy_metadata['proxy_type'] == 'gnosis_safe',
+                'implementation',
+                toolstr.add_style(
+                    proxy_metadata['implementation'], styles['metavar']
+                ),
             ],
+            ['block', block],
+            ['proxy_type', proxy_metadata['proxy_type']],
         ]
-        toolstr.print_table(rows, column_justify=['right', 'left'], compact=2)
-        print()
-        print('proxy_address =', proxy_address)
+        toolstr.print_table(
+            rows,
+            column_justify=['right', 'left'],
+            compact=2,
+            border=styles['comment'],
+            column_styles=[styles['option'], styles['description'] + ' bold'],
+            indent=4,
+        )
 
     else:
-        proxy_address = await evm.async_get_proxy_implementation(contract_address)
+        proxy_address = await evm.async_get_proxy_implementation(
+            contract_address
+        )
         if proxy_address is None:
             print('[no proxy address detected]')
         else:
