@@ -186,6 +186,7 @@ async def async_select_dex_pools(
         query.setdefault('where_equals', {})
         query['where_equals']['factory'] = factory
     if factories is not None:
+        query.setdefault('where_in', {})
         query['where_in']['factory'] = factories
     if assets is not None:
         import sqlalchemy  # type: ignore
