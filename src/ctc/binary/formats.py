@@ -48,6 +48,8 @@ def get_binary_n_bytes(data: spec.BinaryInteger) -> int:
 def convert(
     data: spec.BinaryInteger,
     output_format: typing.Literal['binary'],
+    *,
+    n_bytes: int | None = None,
 ) -> bytes:
     ...
 
@@ -56,6 +58,8 @@ def convert(
 def convert(
     data: spec.BinaryInteger,
     output_format: typing.Literal['integer'],
+    *,
+    n_bytes: int | None = None,
 ) -> int:
     ...
 
@@ -64,6 +68,8 @@ def convert(
 def convert(
     data: spec.BinaryInteger,
     output_format: typing.Optional[typing.Literal['prefix_hex', 'raw_hex']],
+    *,
+    n_bytes: int | None = None,
 ) -> str:
     ...
 
@@ -71,6 +77,8 @@ def convert(
 def convert(
     data: spec.BinaryInteger,
     output_format: typing.Optional[spec.BinaryFormat] = None,
+    *,
+    n_bytes: int | None = None,
 ) -> spec.BinaryInteger:
     """convert {hex str or bytes} into {hex str or bytes}
 
@@ -94,6 +102,9 @@ def convert(
         else:
             raw_data = data
 
+        if n_bytes is not None and len(raw_data) / 2 != n_bytes:
+            raise Exception('data does not have target length')
+
         if output_format == 'prefix_hex':
             return '0x' + raw_data
         elif output_format == 'raw_hex':
@@ -106,6 +117,9 @@ def convert(
             raise Exception('invalid output_format: ' + str(output_format))
 
     elif isinstance(data, bytes):
+
+        if n_bytes is not None and len(data) != n_bytes:
+            raise Exception('data does not have target length')
 
         if output_format == 'binary':
             return data
@@ -123,18 +137,33 @@ def convert(
         if data < 0:
             raise Exception('only positive integers allowed')
 
-        n_bytes = get_binary_n_bytes(data)
+        if output_format == 'integer':
 
-        if output_format == 'binary':
-            return data.to_bytes(n_bytes, 'big')
-        elif output_format == 'prefix_hex':
-            return hex(data)
-        elif output_format == 'raw_hex':
-            return hex(data)[2:]
-        elif output_format == 'integer':
             return data
+
         else:
-            raise Exception('invalid output_format: ' + str(output_format))
+
+            if n_bytes is None:
+                n_bytes = get_binary_n_bytes(data)
+                keep_leading_0 = False
+            else:
+                keep_leading_0 = True
+            as_bytes = data.to_bytes(n_bytes, 'big')
+
+            if output_format == 'binary':
+                return as_bytes
+            elif output_format in ['prefix_hex', 'raw_hex']:
+                as_hex = as_bytes.hex()
+                if not keep_leading_0:
+                    as_hex = as_hex.lstrip('0')
+                    if data == 0:
+                        as_hex = '0'
+                if output_format == 'prefix_hex':
+                    return '0x' + as_hex
+                else:
+                    return as_hex
+            else:
+                raise Exception('invalid output_format: ' + str(output_format))
 
     else:
 
