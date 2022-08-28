@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
 
 def rlp_decode(data: spec.BinaryData) -> typing.Any:
     try:
-        import rlp
+        import rlp  # type: ignore
     except ImportError:
         raise Exception(
             'the rlp package is required for this feature, try `pip install rlp`'
@@ -103,7 +103,7 @@ def rlp_encode_bytes(data: bytes) -> bytes:
 
 def rlp_encode_list(
     items: typing.Sequence[typing.Any],
-    str_mode: Literal['text', 'hex'] | None = None,
+    str_mode: Literal['auto', 'text', 'hex'] | None = None,
 ) -> bytes:
 
     encoded_items = [

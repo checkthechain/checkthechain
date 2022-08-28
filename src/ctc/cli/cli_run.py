@@ -47,6 +47,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('keccak',): 'ctc.cli.commands.compute.keccak_command',
         ('limits',): 'ctc.cli.commands.compute.limits_command',
         ('lower',): 'ctc.cli.commands.compute.lower_command',
+        ('rlp', 'encode'): 'ctc.cli.commands.compute.rlp_encode',
         ('selector',): 'ctc.cli.commands.compute.selector_command',
     },
     'data': {

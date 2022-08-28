@@ -41,6 +41,8 @@ alias dex="ctc dex"
 alias erc20="ctc erc20"
 alias eth="ctc eth"
 alias gas="ctc gas"
+alias int="ctc int"
+alias rlp="ctc rlp"
 alias tx="ctc tx"
 
 # protocol commands
