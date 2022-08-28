@@ -32,7 +32,7 @@ def rlp_encode(
     item: typing.Any,
     output_format: typing.Literal['binary'],
     *,
-    str_mode: Literal['text', 'hex'] | None = None,
+    str_mode: Literal['auto', 'text', 'hex'] | None = None,
 ) -> bytes:
     ...
 
@@ -42,7 +42,7 @@ def rlp_encode(
     item: typing.Any,
     output_format: typing.Literal['integer'],
     *,
-    str_mode: Literal['text', 'hex'] | None = None,
+    str_mode: Literal['auto', 'text', 'hex'] | None = None,
 ) -> int:
     ...
 
@@ -52,7 +52,7 @@ def rlp_encode(
     item: typing.Any,
     output_format: typing.Literal['prefix_hex', 'raw_hex'] = 'prefix_hex',
     *,
-    str_mode: Literal['text', 'hex'] | None = None,
+    str_mode: Literal['auto', 'text', 'hex'] | None = None,
 ) -> str:
     ...
 
@@ -61,7 +61,7 @@ def rlp_encode(
     item: typing.Any,
     output_format: spec.BinaryFormat = 'prefix_hex',
     *,
-    str_mode: Literal['text', 'hex'] | None = None,
+    str_mode: Literal['auto', 'text', 'hex'] | None = 'auto',
 ) -> spec.BinaryInteger:
     """str_mode specifies how str values should be interpreted"""
 
@@ -131,8 +131,14 @@ def rlp_encode_list(
 
 def rlp_encode_str(
     item: str,
-    str_mode: Literal['text', 'hex'] | None,
+    str_mode: Literal['auto', 'text', 'hex'] | None,
 ) -> bytes:
+
+    if str_mode == 'auto':
+        if item.startswith('0x'):
+            str_mode = 'hex'
+        else:
+            str_mode = 'text'
 
     if str_mode == 'text':
         as_bytes = item.encode()
