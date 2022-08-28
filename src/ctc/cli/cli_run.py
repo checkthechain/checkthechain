@@ -43,6 +43,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('decode',): 'ctc.cli.commands.compute.decode_command',
         ('encode',): 'ctc.cli.commands.compute.encode_command',
         ('hex',): 'ctc.cli.commands.compute.hex_command',
+        ('int',): 'ctc.cli.commands.compute.integer_command',
         ('keccak',): 'ctc.cli.commands.compute.keccak_command',
         ('limits',): 'ctc.cli.commands.compute.limits_command',
         ('lower',): 'ctc.cli.commands.compute.lower_command',
