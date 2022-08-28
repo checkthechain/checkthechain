@@ -1,5 +1,7 @@
 """
-see https://eth.wiki/en/fundamentals/rlp
+see
+- https://eth.wiki/en/fundamentals/rlp
+- https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/
 """
 from __future__ import annotations
 
@@ -8,57 +10,8 @@ import typing
 from ctc import spec
 from . import formats
 
-
-def rlp_encode_int(integer: int) -> spec.PrefixHexData:
-    if integer == 0:
-        return '0x80'
-    elif integer <= 127:
-        encoded = formats.convert(integer, 'raw_hex')
-        if len(encoded) == 1:
-            encoded = '0' + encoded
-        return '0x' + encoded
-    else:
-        integer_hex = formats.convert(integer, 'raw_hex')
-        if len(integer_hex) % 2 == 1:
-            integer_hex = '0' + integer_hex
-        integer_bytes = int(len(integer_hex) / 2)
-        return formats.convert(128 + integer_bytes, 'prefix_hex') + integer_hex
-
-
-def rlp_encode_address(address: spec.Address) -> spec.PrefixHexData:
-    return '0x94' + formats.convert(address, 'raw_hex')
-
-
-def rlp_encode_address_nonce_tuple(
-    address: spec.Address, nonce: int
-) -> spec.PrefixHexData:
-    rlp_address = rlp_encode_address(address)[2:]
-    rlp_integer = rlp_encode_int(nonce)[2:]
-    data_len = int(len(rlp_address) / 2 + len(rlp_integer) / 2)
-
-    if data_len <= 55:
-        pre_offset = 192
-    else:
-        pre_offset = 247
-
-    return (
-        '0x'
-        + formats.convert(pre_offset + data_len, 'raw_hex')
-        + rlp_address
-        + rlp_integer
-    )
-
-
-def rlp_encode(data: typing.Any) -> str:
-    try:
-        import rlp  # type: ignore
-    except ImportError:
-        raise Exception(
-            'the rlp package is required for this feature, try `pip install rlp`'
-        )
-
-    rlp_data = rlp.encode(data)
-    return formats.convert(rlp_data, 'prefix_hex')
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 
 def rlp_decode(data: spec.BinaryData) -> typing.Any:
@@ -74,97 +27,118 @@ def rlp_decode(data: spec.BinaryData) -> typing.Any:
     return rlp.decode(binary_data)
 
 
-# def rlp_encode(input):
-#    if isinstance(input, str):
-#        if len(input) == 1 and ord(input) < 0x80:
-#            return input
-#        else:
-#            return encode_length(len(input), 0x80) + input
-#    elif isinstance(input, list):
-#        output = ''
-#        for item in input:
-#            output += rlp_encode(item)
-#        return encode_length(len(output), 0xC0) + output
+@typing.overload
+def rlp_encode(
+    item: typing.Any,
+    output_format: typing.Literal['binary'],
+    *,
+    str_mode: Literal['text', 'hex'] | None = None,
+) -> bytes:
+    ...
 
 
-# def encode_length(L, offset):
-#    if L < 56:
-#        return chr(L + offset)
-#    elif L < 256 ** 8:
-#        BL = to_binary(L)
-#        return chr(len(BL) + offset + 55) + BL
-#    else:
-#        raise Exception("input too long")
+@typing.overload
+def rlp_encode(
+    item: typing.Any,
+    output_format: typing.Literal['integer'],
+    *,
+    str_mode: Literal['text', 'hex'] | None = None,
+) -> int:
+    ...
 
 
-# def to_binary(x):
-#    if x == 0:
-#        return ''
-#    else:
-#        return to_binary(int(x / 256)) + chr(x % 256)
+@typing.overload
+def rlp_encode(
+    item: typing.Any,
+    output_format: typing.Literal['prefix_hex', 'raw_hex'] = 'prefix_hex',
+    *,
+    str_mode: Literal['text', 'hex'] | None = None,
+) -> str:
+    ...
 
 
-##
-## # decode
-##
-# def rlp_decode(input):
-#    if len(input) == 0:
-#        return
-#    output = ''
-#    (offset, dataLen, type) = decode_length(input)
-#    if type is str:
-#        output = str(substr(input, offset, dataLen))
-#    elif type is list:
-#        output = list(substr(input, offset, dataLen))
-#    output + rlp_decode(substr(input, offset + dataLen))
-#    return output
+def rlp_encode(
+    item: typing.Any,
+    output_format: spec.BinaryFormat = 'prefix_hex',
+    *,
+    str_mode: Literal['text', 'hex'] | None = None,
+) -> spec.BinaryInteger:
+    """str_mode specifies how str values should be interpreted"""
+
+    if isinstance(item, int):
+        if item == 0:
+            item = bytes()
+        else:
+            item = formats.convert(item, 'binary')
+
+    if isinstance(item, (tuple, list)):
+        output = rlp_encode_list(item, str_mode=str_mode)
+    elif isinstance(item, bytes):
+        output = rlp_encode_bytes(item)
+    elif isinstance(item, str):
+        output = rlp_encode_str(item, str_mode=str_mode)
+    else:
+        raise Exception('cannot rlp encode items of type ' + str(type(item)))
+
+    return formats.convert(output, output_format)
 
 
-# def decode_length(input):
-#    length = len(input)
-#    if length == 0:
-#        raise Exception("input is null")
-#    prefix = ord(input[0])
-#    if prefix <= 0x7F:
-#        return (0, 1, str)
-#    elif prefix <= 0xB7 and length > prefix - 0x80:
-#        strLen = prefix - 0x80
-#        return (1, strLen, str)
-#    elif (
-#        prefix <= 0xBF
-#        and length > prefix - 0xB7
-#        and length > prefix - 0xB7 + to_integer(substr(input, 1, prefix - 0xB7))
-#    ):
-#        lenOfStrLen = prefix - 0xB7
-#        strLen = to_integer(substr(input, 1, lenOfStrLen))
-#        return (1 + lenOfStrLen, strLen, str)
-#    elif prefix <= 0xF7 and length > prefix - 0xC0:
-#        listLen = prefix - 0xC0
-#        return (1, listLen, list)
-#    elif (
-#        prefix <= 0xFF
-#        and length > prefix - 0xF7
-#        and length > prefix - 0xF7 + to_integer(substr(input, 1, prefix - 0xF7))
-#    ):
-#        lenOfListLen = prefix - 0xF7
-#        listLen = to_integer(substr(input, 1, lenOfListLen))
-#        return (1 + lenOfListLen, listLen, list)
-#    else:
-#        raise Exception("input don't conform RLP encoding form")
+def rlp_encode_bytes(data: bytes) -> bytes:
+
+    data = formats.convert(data, 'binary')
+
+    length = len(data)
+    if length == 0:
+        return bytes.fromhex('80')
+    elif length == 1 and data <= bytes.fromhex('7f'):
+        return data
+    elif length <= 55:
+        prefix = 128 + length
+        return formats.convert(prefix, 'binary') + data
+    else:
+        length_as_bytes = formats.convert(length, 'binary')
+        prefix = 183 + len(length_as_bytes)
+        return formats.convert(prefix, 'binary') + length_as_bytes + data
 
 
-# def to_integer(b):
-#    length = len(b)
-#    if length == 0:
-#        raise Exception("input is null")
-#    elif length == 1:
-#        return ord(b[0])
-#    else:
-#        return ord(substr(b, -1)) + to_integer(substr(b, 0, -1)) * 256
+def rlp_encode_list(
+    items: typing.Sequence[typing.Any],
+    str_mode: Literal['text', 'hex'] | None = None,
+) -> bytes:
+
+    encoded_items = [
+        rlp_encode(item, str_mode=str_mode, output_format='binary')
+        for item in items
+    ]
+    item_lengths = [len(encoded_item) for encoded_item in encoded_items]
+    total_payload_length = sum(item_lengths)
+
+    if total_payload_length <= 55:
+        prefix = formats.convert(192 + total_payload_length, 'binary')
+        output = prefix
+        for item in encoded_items:
+            output = output + item
+        return output
+
+    else:
+        bytes_of_length = formats.convert(total_payload_length, 'binary')
+        prefix_int = 248 + len(bytes_of_length)
+        output = formats.convert(prefix_int, 'binary') + bytes_of_length
+        for item in encoded_items:
+            output = output + item
+        return output
 
 
-# def substr(s, beginning, length=None):
-#    if length is None:
-#        return s[beginning:]
-#    else:
-#        return s[beginning: length + 1]
+def rlp_encode_str(
+    item: str,
+    str_mode: Literal['text', 'hex'] | None,
+) -> bytes:
+
+    if str_mode == 'text':
+        as_bytes = item.encode()
+    elif str_mode == 'hex':
+        as_bytes = formats.convert(item, 'binary')
+    else:
+        raise Exception('unknown str mode: ' + str(str_mode))
+
+    return rlp_encode_bytes(as_bytes)

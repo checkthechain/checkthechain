@@ -1,6 +1,49 @@
 import pytest
 from ctc import binary
 
+rlp_examples = [
+    #
+    # integers
+    [0, '0x80'],
+    [15, '0x0f'],
+    [1024, '0x820400'],
+    #
+    # str
+    [
+        'dog',
+        binary.convert(bytes.fromhex('83') + 'dog'.encode(), 'prefix_hex'),
+    ],
+    [
+        ['cat', 'dog'],
+        binary.convert(
+            bytes.fromhex('c883')
+            + 'cat'.encode()
+            + bytes.fromhex('83')
+            + 'dog'.encode(),
+            'prefix_hex',
+        )
+    ],
+    #
+    # lists
+    [[], '0xc0'],
+    [
+        [[], [[]], [[], [[]]]],
+        '0xc7c0c1c0c3c0c1c0',
+    ],
+]
+
+
+@pytest.mark.parametrize('test', rlp_examples)
+def test_rlp_encoding(test):
+    data, target_encoding = test
+    actual_encoding = binary.rlp_encode(data, str_mode='text')
+    assert actual_encoding == target_encoding
+
+
+#
+# # address nonce tuples
+#
+
 nonces = [
     0,
     1,
@@ -71,15 +114,17 @@ encoded_address_nonce_tuples = [
 @pytest.mark.parametrize('test', zip(nonces, encoded_ints))
 def test_rlp_encode_integer(test):
     integer, target_encoding = test
-    assert binary.rlp_encode_int(integer) == target_encoding
+    assert binary.rlp_encode(integer) == target_encoding
 
 
 def test_rlp_encode_address():
-    assert binary.rlp_encode_address(address) == encoded_address
+    assert binary.rlp_encode(address, str_mode='hex') == encoded_address
 
 
 @pytest.mark.parametrize('test', zip(nonces, encoded_address_nonce_tuples))
 def test_rlp_encode_address_integer_tuples(test):
     nonce, target_encoding = test
 
-    assert binary.rlp_encode_address_nonce_tuple(address, nonce) == target_encoding
+    assert (
+        binary.rlp_encode([address, nonce], str_mode='hex') == target_encoding
+    )
