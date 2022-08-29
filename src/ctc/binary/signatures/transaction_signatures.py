@@ -30,6 +30,20 @@ legacy_transaction_keys = (
     's',
 )
 
+eip_2930_transaction_keys = [
+    'chain_id',
+    'nonce',
+    'gas_price',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'access_list',
+    'v',
+    'r',
+    's',
+]
+
 eip1559_transaction_keys = [
     'chain_id',
     'nonce',
@@ -69,6 +83,9 @@ def serialize_signed_transaction(
     # get serialized key list
     if transaction['type'] == '0x0':
         keys = legacy_transaction_keys
+        prefix = '0x'
+    elif transaction['type'] == '0x1':
+        keys = eip_2930_transaction_keys
         prefix = '0x'
     elif transaction['type'] == '0x2':
         keys = eip1559_transaction_keys
