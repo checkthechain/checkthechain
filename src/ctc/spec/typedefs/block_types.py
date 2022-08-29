@@ -73,6 +73,27 @@ Transaction = TypedDict(
 )
 
 
+class UnsignedTransaction(TypedDict):
+    nonce: int
+    gas_price: int
+    gas_limit: int
+    to: address_types.Address
+    value: int
+    data: binary_types.Data
+
+
+class SignedTransaction(TypedDict):
+    nonce: int
+    gas_price: int
+    gas_limit: int
+    to: address_types.Address
+    value: int
+    data: binary_types.Data
+    v: binary_types.Data
+    r: binary_types.Data
+    s: binary_types.Data
+
+
 class RawBlock(TypedDict):
     pass
 

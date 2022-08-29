@@ -15,7 +15,7 @@ def sign_text_message(
     *,
     message: str,
     private_key: spec.Data,
-    mode: Literal['eth_sign', 'personal_sign'] = 'personal_sign',
+    mode: Literal['eth_sign', 'personal_sign'],
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
 
@@ -35,7 +35,7 @@ def sign_data_message(
     *,
     message: spec.Data,
     private_key: spec.Data,
-    mode: Literal['eth_sign', 'personal_sign'] = 'personal_sign',
+    mode: Literal['eth_sign', 'personal_sign'],
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
 
@@ -53,7 +53,7 @@ def sign_data_message(
 
 def create_text_message_hash(
     message: str,
-    mode: Literal['eth_sign', 'personal_sign'] = 'personal_sign',
+    mode: Literal['eth_sign', 'personal_sign'],
 ) -> bytes:
 
     # add prefix
@@ -74,7 +74,7 @@ def create_text_message_hash(
 
 def create_data_message_hash(
     message: spec.Data,
-    mode: Literal['eth_sign', 'personal_sign'] = 'personal_sign',
+    mode: Literal['eth_sign', 'personal_sign'],
 ) -> bytes:
 
     message = formats.convert(message, 'binary')
@@ -115,7 +115,3 @@ def sign_message_hash(
         v = v - 27 + chain_id * 2 + 35
 
     return v, r, s
-
-
-def sign_transaction(transaction: spec.Transaction, private_key: str) -> None:
-    raise NotImplementedError()

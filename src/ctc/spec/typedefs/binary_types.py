@@ -11,6 +11,7 @@ BinaryInteger = typing.Union[int, BinaryData]
 # ]
 
 BinaryFormat = Literal['binary', 'prefix_hex', 'raw_hex', 'integer']
+ExtendedBinaryFormat = typing.Union[BinaryFormat, Literal['ascii']]
 
 IntegerData = int
 

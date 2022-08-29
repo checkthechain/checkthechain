@@ -32,7 +32,19 @@ def pack_vrs(
     return formats.convert(signature, 'prefix_hex')
 
 
-def unpack_vrs(signature: spec.Data) -> tuple[int, int, int]:
+def unpack_vrs(
+    signature: spec.Data | tuple[int, int, int]
+) -> tuple[int, int, int]:
+
+    if isinstance(signature, tuple):
+        if (len(signature) == 3
+            and isinstance(signature[0], int)
+            and isinstance(signature[1], int)
+            and isinstance(signature[2], int)
+        ):
+            return signature
+        else:
+            raise Exception('unknown signature format')
 
     bytes_signature = formats.convert(signature, 'binary')
 
