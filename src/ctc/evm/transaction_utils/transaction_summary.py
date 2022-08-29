@@ -4,7 +4,6 @@ import time
 
 
 from ctc import binary
-from ctc import cli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -19,6 +18,7 @@ async def async_print_transaction_summary(
     import asyncio
     import toolstr
     import tooltime
+    from ctc import cli
     from ctc.protocols import chainlink_utils
 
     transaction_coroutine = rpc.async_eth_get_transaction_by_hash(

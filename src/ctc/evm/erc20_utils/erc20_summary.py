@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import spec
@@ -12,6 +11,8 @@ async def async_print_erc20_summary(
     erc20: spec.Address,
     include_address: bool = True,
 ) -> None:
+
+    import asyncio
     import toolstr
     from ctc.cli import cli_run
 

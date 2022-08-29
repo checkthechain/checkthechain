@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import evm
@@ -45,6 +44,8 @@ async def async_parse_block_range(
     allow_none: bool,
     provider: spec.ProviderReference = None,
 ) -> tuple[spec.BlockNumberReference | None, spec.BlockNumberReference | None]:
+
+    import asyncio
 
     tasks = {}
     if start_block is not None:

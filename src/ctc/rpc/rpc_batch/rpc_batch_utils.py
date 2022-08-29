@@ -4,7 +4,6 @@ digestors are simpler than constructors and so they do not have batch versions
 
 from __future__ import annotations
 
-import inspect
 import typing
 
 from ctc import spec
@@ -98,6 +97,8 @@ def _separate_execution_kwargs(
     kwargs: typing.Mapping[str, typing.Any],
 ) -> tuple[typing.Mapping[str, typing.Any], typing.Mapping[str, typing.Any]]:
     """separate constructor kwargs from digestor kwargs"""
+
+    import inspect
 
     # compile digestor kwargs
     digestor = rpc_registry.get_digestor(method)

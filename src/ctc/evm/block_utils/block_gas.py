@@ -3,8 +3,6 @@ from __future__ import annotations
 import typing
 from typing_extensions import TypedDict
 
-import toolstr
-
 from . import block_crud
 from . import block_normalize
 from . import block_times
@@ -203,6 +201,7 @@ async def async_get_median_blocks_gas_fees(
     # get data from rpc
     if len(missing) > 0:
         if verbose:
+            import toolstr
             from ctc.cli import cli_run
 
             styles = cli_run.get_cli_styles()
