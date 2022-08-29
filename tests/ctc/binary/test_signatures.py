@@ -117,5 +117,5 @@ async def test_get_tx_hash(test):
 
     target_hash = test
     transaction = await evm.async_get_transaction(target_hash)
-    actual_hash = binary.get_transaction_hash(transaction)
+    actual_hash = binary.get_signed_transaction_hash(transaction)
     assert actual_hash == target_hash

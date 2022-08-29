@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import spec
+from .. import formats
 from .. import hashes
 from .. import rlp_coding
 from . import secp256k1_utils
@@ -30,7 +33,7 @@ legacy_transaction_keys = (
     's',
 )
 
-eip_2930_transaction_keys = [
+eip_2930_transaction_keys = (
     'chain_id',
     'nonce',
     'gas_price',
@@ -42,9 +45,9 @@ eip_2930_transaction_keys = [
     'v',
     'r',
     's',
-]
+)
 
-eip1559_transaction_keys = [
+eip1559_transaction_keys = (
     'chain_id',
     'nonce',
     'max_priority_fee_per_gas',
@@ -57,7 +60,8 @@ eip1559_transaction_keys = [
     'v',
     'r',
     's',
-]
+)
+
 
 #
 # # tranaction serialization
@@ -78,20 +82,30 @@ def serialize_unsigned_transaction(
 
 def serialize_signed_transaction(
     transaction: spec.SignedTransaction,
+    *,
+    type: spec.Data | None = None,
 ) -> spec.PrefixHexData:
 
+    if type is None:
+        if 'type' in transaction:
+            type = transaction['type']
+    if type is None:
+        raise Exception('must specify transaction type (e.g. 0, 1, or 2)')
+    else:
+        type = formats.convert(type, 'integer')
+
     # get serialized key list
-    if transaction['type'] == '0x0':
-        keys = legacy_transaction_keys
+    if type == 0:
+        keys: tuple[str, ...] = legacy_transaction_keys
         prefix = '0x'
-    elif transaction['type'] == '0x1':
+    elif type == 1:
         keys = eip_2930_transaction_keys
         prefix = '0x'
-    elif transaction['type'] == '0x2':
+    elif type == 2:
         keys = eip1559_transaction_keys
         prefix = '0x02'
     else:
-        raise Exception('unknown transaction type: ' + transaction['type'])
+        raise Exception('unknown transaction type: ' + str(type))
 
     # get list of fields
     as_list = [transaction[key] for key in keys]  # type: ignore
@@ -103,6 +117,7 @@ def serialize_signed_transaction(
 #
 # # transaction signing
 #
+
 
 def sign_transaction(
     transaction: spec.UnsignedTransaction,
@@ -171,7 +186,8 @@ def get_transaction_sender(
 # # transaction hashing
 #
 
-def is_transaction_signed(transaction) -> bool:
+
+def is_transaction_signed(transaction: typing.Mapping[str, typing.Any]) -> bool:
     return (
         transaction.get('v') is not None
         and transaction.get('r') is not None
@@ -179,9 +195,17 @@ def is_transaction_signed(transaction) -> bool:
     )
 
 
-def get_transaction_hash(transaction):
-    if is_transaction_signed(transaction):
-        serialized = serialize_signed_transaction(transaction)
-    else:
-        serialized = serialize_unsigned_transaction(transaction)
+def get_unsigned_transaction_hash(
+    transaction: spec.UnsignedTransaction,
+    chain_id: int,
+) -> spec.Data:
+    serialized = serialize_unsigned_transaction(transaction, chain_id=chain_id)
+    return hashes.keccak(serialized)
+
+
+def get_signed_transaction_hash(
+    transaction: spec.SignedTransaction,
+    type: int | None = None,
+) -> spec.Data:
+    serialized = serialize_signed_transaction(transaction, type=type)
     return hashes.keccak(serialized)

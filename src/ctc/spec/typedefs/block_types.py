@@ -79,7 +79,7 @@ class UnsignedTransaction(TypedDict):
     gas_limit: int
     to: address_types.Address
     value: int
-    data: binary_types.Data
+    input: binary_types.Data
 
 
 class SignedTransaction(TypedDict):
@@ -88,10 +88,11 @@ class SignedTransaction(TypedDict):
     gas_limit: int
     to: address_types.Address
     value: int
-    data: binary_types.Data
+    input: binary_types.Data
     v: binary_types.Data
     r: binary_types.Data
     s: binary_types.Data
+    type: NotRequired[binary_types.Data]
 
 
 class RawBlock(TypedDict):
