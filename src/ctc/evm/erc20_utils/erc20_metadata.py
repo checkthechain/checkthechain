@@ -210,27 +210,28 @@ async def async_get_erc20_name(
 ) -> str:
     """get name of an erc20"""
 
+    result: spec.ERC20Metadata | None = None
     if use_db:
         from ctc import db
 
         network = rpc.get_provider_network(provider)
         token = await async_get_erc20_address(token, network=network)
-        result: spec.ERC20Metadata | None = await db.async_query_erc20_metadata(
+        result = await db.async_query_erc20_metadata(
             address=token, network=network
         )
         if result is not None and result['name'] is not None:
             return result['name']
 
-    result = await erc20_generic.async_erc20_eth_call(
+    rpc_result = await erc20_generic.async_erc20_eth_call(
         function_name='name',
         token=token,
         block=block,
         provider=provider,
         **rpc_kwargs,
     )
-    if not isinstance(result, str):
+    if not isinstance(rpc_result, str):
         raise Exception('invalid rpc result')
-    name = result
+    name = rpc_result
 
     if use_db:
         if result is not None:
