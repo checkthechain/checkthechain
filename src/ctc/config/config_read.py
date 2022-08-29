@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
+import functools
 import sys
 import typing
 from typing_extensions import TypedDict
-
-import toolcache
 
 if typing.TYPE_CHECKING:
     import toolconfig
@@ -56,7 +55,7 @@ def get_config(
     ...
 
 
-@toolcache.cache('memory')
+@functools.lru_cache()
 def get_config(
     validate: toolconfig.ValidationOption = False,
     warn_if_dne: bool = True,

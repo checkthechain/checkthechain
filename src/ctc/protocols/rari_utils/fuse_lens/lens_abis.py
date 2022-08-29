@@ -3,10 +3,9 @@ TODO: move this data to directory
 """
 from __future__ import annotations
 
+import functools
 import json
 import typing
-
-import toolcache
 
 from ctc import binary
 from ctc import spec
@@ -24,7 +23,7 @@ def get_secondary_lens_abi() -> dict[str, spec.FunctionABI | spec.EventABI]:
     return {item['name']: item for item in json.loads(raw_secondary_abi)}
 
 
-@toolcache.cache('memory')
+@functools.lru_cache()
 def get_lens_abi() -> dict[str, spec.FunctionABI | spec.EventABI]:
     return dict(
         get_primary_lens_abi(),
