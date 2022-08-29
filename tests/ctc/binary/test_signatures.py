@@ -1,6 +1,7 @@
 import pytest
 
 from ctc import binary
+from ctc import evm
 
 
 def test_pack_vrs_transaction():
@@ -38,7 +39,9 @@ private_key_to_public_key_examples = [
 def test_private_key_to_public_key(test):
     private_key, target_public_key = test
     actual_public_key = binary.private_key_to_public_key(private_key)
-    assert binary.public_key_tuple_to_hex(target_public_key) == actual_public_key
+    assert (
+        binary.public_key_tuple_to_hex(target_public_key) == actual_public_key
+    )
 
 
 private_key_to_address_examples = [
@@ -100,3 +103,19 @@ def test_recover_address():
         signature=signature,
     )
     assert actual_public_key == target_public_key
+
+
+example_txs = [
+    '0xccb0a942a36db42ccc5ee226e4f0599c761d4c0a884f3ac2f7a56fef7aef85df',
+    '0xfd74b4443e147687326e76886417a5a81c07ba26568c87e928546ef5b8dacd0d',
+    '0x0bf99b11e4f4963d34b5b9d24a542ff045d8e436740dcda698ec29deff84c959',
+]
+
+
+@pytest.mark.parametrize('test', example_txs)
+async def test_get_tx_hash(test):
+
+    target_hash = test
+    transaction = await evm.async_get_transaction(target_hash)
+    actual_hash = binary.get_transaction_hash(transaction)
+    assert actual_hash == target_hash

@@ -114,7 +114,7 @@ def _rlp_encode_list(
 
     else:
         bytes_of_length = formats.convert(total_payload_length, 'binary')
-        prefix_int = 248 + len(bytes_of_length)
+        prefix_int = 247 + len(bytes_of_length)
         output = formats.convert(prefix_int, 'binary') + bytes_of_length
         for item in encoded_items:
             output = output + item

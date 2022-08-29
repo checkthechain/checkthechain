@@ -18,6 +18,37 @@ unsigned_transaction_keys = (
     'data',
 )
 
+legacy_transaction_keys = (
+    'nonce',
+    'gas_price',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'v',
+    'r',
+    's',
+)
+
+eip1559_transaction_keys = [
+    'chain_id',
+    'nonce',
+    'max_priority_fee_per_gas',
+    'max_fee_per_gas',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'access_list',
+    'v',
+    'r',
+    's',
+]
+
+#
+# # tranaction serialization
+#
+
 
 def serialize_unsigned_transaction(
     unsigned_transaction: spec.UnsignedTransaction,
@@ -30,6 +61,31 @@ def serialize_unsigned_transaction(
         as_list.append(0)
     return rlp_coding.rlp_encode(as_list)
 
+
+def serialize_signed_transaction(
+    transaction: spec.SignedTransaction,
+) -> spec.PrefixHexData:
+
+    # get serialized key list
+    if transaction['type'] == '0x0':
+        keys = legacy_transaction_keys
+        prefix = '0x'
+    elif transaction['type'] == '0x2':
+        keys = eip1559_transaction_keys
+        prefix = '0x02'
+    else:
+        raise Exception('unknown transaction type: ' + transaction['type'])
+
+    # get list of fields
+    as_list = [transaction[key] for key in keys]  # type: ignore
+
+    # encode as rlp
+    return prefix + rlp_coding.rlp_encode(as_list, 'raw_hex')
+
+
+#
+# # transaction signing
+#
 
 def sign_transaction(
     transaction: spec.UnsignedTransaction,
@@ -92,3 +148,23 @@ def get_transaction_sender(
     # convert public key to address
     sender = '0x' + hashes.keccak(public_key)[-40:]
     return sender
+
+
+#
+# # transaction hashing
+#
+
+def is_transaction_signed(transaction) -> bool:
+    return (
+        transaction.get('v') is not None
+        and transaction.get('r') is not None
+        and transaction.get('s') is not None
+    )
+
+
+def get_transaction_hash(transaction):
+    if is_transaction_signed(transaction):
+        serialized = serialize_signed_transaction(transaction)
+    else:
+        serialized = serialize_unsigned_transaction(transaction)
+    return hashes.keccak(serialized)

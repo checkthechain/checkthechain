@@ -110,6 +110,8 @@ def convert(
         elif output_format == 'raw_hex':
             return raw_data
         elif output_format == 'binary':
+            if len(raw_data) % 2 == 1:
+                raw_data = '0' + raw_data
             return bytes.fromhex(raw_data)
         elif output_format == 'integer':
             return int(data, 16)
