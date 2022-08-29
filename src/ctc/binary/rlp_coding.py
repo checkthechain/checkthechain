@@ -14,17 +14,9 @@ if typing.TYPE_CHECKING:
     from typing_extensions import Literal
 
 
-def rlp_decode(data: spec.BinaryData) -> typing.Any:
-    try:
-        import rlp  # type: ignore
-    except ImportError:
-        raise Exception(
-            'the rlp package is required for this feature, try `pip install rlp`'
-        )
-
-    binary_data = formats.convert(data, 'binary')
-
-    return rlp.decode(binary_data)
+#
+# # encoder
+#
 
 
 @typing.overload
@@ -72,18 +64,18 @@ def rlp_encode(
             item = formats.convert(item, 'binary')
 
     if isinstance(item, (tuple, list)):
-        output = rlp_encode_list(item, str_mode=str_mode)
+        output = _rlp_encode_list(item, str_mode=str_mode)
     elif isinstance(item, bytes):
-        output = rlp_encode_bytes(item)
+        output = _rlp_encode_bytes(item)
     elif isinstance(item, str):
-        output = rlp_encode_str(item, str_mode=str_mode)
+        output = _rlp_encode_str(item, str_mode=str_mode)
     else:
         raise Exception('cannot rlp encode items of type ' + str(type(item)))
 
     return formats.convert(output, output_format)
 
 
-def rlp_encode_bytes(data: bytes) -> bytes:
+def _rlp_encode_bytes(data: bytes) -> bytes:
 
     data = formats.convert(data, 'binary')
 
@@ -101,7 +93,7 @@ def rlp_encode_bytes(data: bytes) -> bytes:
         return formats.convert(prefix, 'binary') + length_as_bytes + data
 
 
-def rlp_encode_list(
+def _rlp_encode_list(
     items: typing.Sequence[typing.Any],
     str_mode: Literal['auto', 'text', 'hex'] | None = None,
 ) -> bytes:
@@ -129,7 +121,7 @@ def rlp_encode_list(
         return output
 
 
-def rlp_encode_str(
+def _rlp_encode_str(
     item: str,
     str_mode: Literal['auto', 'text', 'hex'] | None,
 ) -> bytes:
@@ -147,4 +139,182 @@ def rlp_encode_str(
     else:
         raise Exception('unknown str mode: ' + str(str_mode))
 
-    return rlp_encode_bytes(as_bytes)
+    return _rlp_encode_bytes(as_bytes)
+
+
+#
+# # decoder
+#
+
+# use recursive type once mypy#731 gets released
+# https://github.com/python/mypy/issues/731
+
+# RLPDecodeTypes = typing.Sequence[typing.Any] | typing.ExtendedBinaryFormat | None
+RLPDecodeTypes = typing.Any
+
+
+def rlp_decode(
+    data: spec.Data,
+    types: RLPDecodeTypes = None,
+) -> typing.Any:
+    """decode rlp data
+
+    the types parameter determines how raw data will be decoded in python
+    - types is one of:
+        1. binary format name: prefix_hex, raw_hex, binary, integer, ascii
+        2. list/tuple of binary format names, corresponding to items in rlp list
+    """
+
+    data = formats.convert(data, 'binary')
+    decoded, remaining = _rlp_decode_chunk(data=data, types=types)
+    if len(remaining) > 0:
+        raise Exception('data contains extra bytes')
+    return decoded
+
+
+def _rlp_decode_chunk(
+    data: bytes,
+    types: RLPDecodeTypes,
+) -> tuple[typing.Any, bytes]:
+    """decode next item chunk in rlp encoded data"""
+
+    if len(data) == 0:
+        raise Exception()
+
+    first_byte = data[0]
+    if first_byte <= 0xbf:
+        return _rlp_decode_primitive_chunk(data, types=types)
+    else:
+        result = _rlp_decode_list_chunk(data, types=types)
+        return result
+
+
+def _rlp_decode_primitive_chunk(
+    data: bytes,
+    types: RLPDecodeTypes,
+) -> tuple[typing.Any, bytes]:
+
+    first_byte = data[0]
+
+    if first_byte <= 0x7f:
+        # data that is single byte less than or equal to 127
+
+        decoded: typing.Any = first_byte.to_bytes(1, 'big')
+        remaining = data[1:]
+
+    elif first_byte <= 0xb7:
+        # data with length between 0 and 55 bytes
+
+        # get length
+        length = first_byte - 0x80
+
+        # get data
+        start = 1
+        end = 1 + length
+        decoded = data[start:end]
+        remaining = data[end:]
+
+    elif first_byte <= 0xbf:
+        # data longer than 55 bytes
+
+        # get length length
+        length_length = first_byte - 0xb7
+
+        # get length
+        start = 1
+        end = 1 + length_length
+        length = int.from_bytes(data[start:end], 'big')
+
+        # get data
+        start = 1 + length_length
+        end = 1 + length_length + length
+        decoded = data[start:end]
+        remaining = data[end:]
+
+    else:
+        raise Exception('next item in data is not a primitive chunk')
+
+    # convert
+    if types is not None:
+        if types == 'ascii':
+            decoded = decoded.decode()
+        else:
+            decoded = formats.convert(decoded, types)
+
+    return decoded, remaining
+
+
+def _rlp_decode_list_chunk(
+    data: bytes,
+    types: RLPDecodeTypes,
+) -> tuple[list[typing.Any], bytes]:
+
+    first_byte = data[0]
+
+    if first_byte <= 0xbf:
+        raise Exception('next item in data is not a list chunk')
+
+    elif first_byte <= 0xf7:
+        # list with total payload length between 0 and 55 bytes
+
+        # get length
+        length = first_byte - 0xc0
+
+        # decode list
+        start = 1
+        end = 1 + length
+        list_payload = data[start:end]
+
+        if len(list_payload) != length:
+            raise Exception('data is shorted than specified by header')
+
+        remaining = data[end:]
+
+    else:
+        # list with payload longer than 55 bytes
+
+        # get length length
+        length_length = first_byte - 0xf7
+
+        # get length
+        start = 1
+        end = 1 + length_length
+        length = int.from_bytes(data[start:end], 'big')
+
+        # decode list
+        start = 1 + length_length
+        end = 1 + length_length + length
+        list_payload = data[start:end]
+
+        if len(list_payload) != length:
+            raise Exception('data is shorted than specified by header')
+
+        remaining = data[end:]
+
+    # decode each item of list payload
+    output = []
+    remaining_payload = list_payload
+    index = 0
+    while len(remaining_payload) > 0:
+
+        # get type of item
+        if isinstance(types, (list, tuple)):
+            if index >= len(types):
+                raise Exception(
+                    'number of types does not match number of list items'
+                )
+            item_types = types[index]
+        elif isinstance(types, str):
+            item_types = types
+        else:
+            item_types = None
+
+        # decode next item in list
+        item, remaining_payload = _rlp_decode_chunk(
+            remaining_payload,
+            types=item_types,
+        )
+        output.append(item)
+        index += 1
+
+    return output, remaining

@@ -21,7 +21,7 @@ rlp_examples = [
             + bytes.fromhex('83')
             + 'dog'.encode(),
             'prefix_hex',
-        )
+        ),
     ],
     #
     # lists
@@ -38,6 +38,58 @@ def test_rlp_encoding(test):
     data, target_encoding = test
     actual_encoding = binary.rlp_encode(data, str_mode='text')
     assert actual_encoding == target_encoding
+
+
+#
+# # test decoding
+#
+
+ascii_examples = [
+    'cat',
+    'dog',
+    'a',
+    'hello',
+    'world',
+    ['hello', 'world'],
+    ['nested', ['list', ['structure']]],
+    [],
+    [[], [[], []]],
+]
+
+raw_hex_examples = [
+    '636174',
+    ['636174'],
+    [],
+    [[], [[], []]],
+]
+
+prefix_hex_examples = [
+    '0x636174',
+    ['0x636174'],
+    [],
+    [[], [[], []]],
+]
+
+
+@pytest.mark.parametrize('test', ascii_examples)
+def test_rlp_decoding_ascii(test):
+    encoded = binary.rlp_encode(test)
+    decoded = binary.rlp_decode(encoded, types='ascii')
+    assert decoded == test
+
+
+@pytest.mark.parametrize('test', raw_hex_examples)
+def test_rlp_decoding_raw_hex(test):
+    encoded = binary.rlp_encode(test, str_mode='hex')
+    decoded = binary.rlp_decode(encoded, types='raw_hex')
+    assert decoded == test
+
+
+@pytest.mark.parametrize('test', prefix_hex_examples)
+def test_rlp_decoding_prefix_hex(test):
+    encoded = binary.rlp_encode(test)
+    decoded = binary.rlp_decode(encoded, types='prefix_hex')
+    assert decoded == test
 
 
 #
