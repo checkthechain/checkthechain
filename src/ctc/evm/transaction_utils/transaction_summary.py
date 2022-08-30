@@ -115,10 +115,17 @@ async def async_print_transaction_summary(
             print('[no contract ABI available]')
             return
 
-        function_abi = await evm.async_get_function_abi(
-            contract_address=transaction['to'],
-            function_selector=transaction['input'][:10],
-        )
+        try:
+            function_abi = await evm.async_get_function_abi(
+                contract_address=transaction['to'],
+                function_selector=transaction['input'][:10],
+            )
+        except Exception:
+            print()
+            print()
+            print('could not find function ABI. custom proxy being used?')
+            return
+
         call_data = binary.decode_call_data(
             call_data=transaction['input'],
             function_abi=function_abi,
