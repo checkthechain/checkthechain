@@ -72,7 +72,11 @@ async def async_get_function_abi(
     abi_entry = _abi_cache[contract]
     if abi_entry is None:
         raise Exception('must load abi into cache')
-    return typing.cast(spec.FunctionABI, abi_entry[function_name])
+
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.FunctionABI, abi_entry[function_name])
+    else:
+        return abi_entry[function_name]
 
 
 async def async_get_event_abi(event_name: str, contract: str) -> spec.EventABI:
@@ -80,4 +84,8 @@ async def async_get_event_abi(event_name: str, contract: str) -> spec.EventABI:
     abi_entry = _abi_cache[contract]
     if abi_entry is None:
         raise Exception('must load abi into cache')
-    return typing.cast(spec.EventABI, abi_entry[event_name])
+
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.EventABI, abi_entry[event_name])
+    else:
+        return abi_entry[event_name]

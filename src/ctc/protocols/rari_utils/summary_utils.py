@@ -14,8 +14,9 @@ from ctc import spec
 from . import fuse_queries
 
 
-K = typing.TypeVar('K')
-V = typing.TypeVar('V', bound=typing.Mapping[str, typing.Any])
+if typing.TYPE_CHECKING:
+    K = typing.TypeVar('K')
+    V = typing.TypeVar('V', bound=typing.Mapping[str, typing.Any])
 
 
 display_names = {

@@ -2,18 +2,21 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
+from .. import typedata
+from . import binary_typeguards
+
 if typing.TYPE_CHECKING:
+
     from typing_extensions import TypeGuard
 
-from ctc import binary
-from ..typedefs import block_types
-from . import binary_typeguards
+    from ..typedefs import block_types
 
 
 def is_block_number_name(
     block: typing.Any,
 ) -> TypeGuard[block_types.BlockNumberName]:
-    return block in block_types.block_number_names
+    return block in typedata.block_number_names
 
 
 def is_raw_block_number(

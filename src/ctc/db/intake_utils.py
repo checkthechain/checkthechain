@@ -12,7 +12,8 @@ from . import management
 from . import schemas
 
 
-T = typing.TypeVar('T', int, spec.Block)
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T', int, spec.Block)
 
 
 async def async_is_block_fully_confirmed(

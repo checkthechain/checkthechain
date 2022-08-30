@@ -64,10 +64,11 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
             else:
                 base_provider = ctc.config.get_default_provider()
 
-            non_none_keys = typing.cast(
-                spec.Provider,
-                {k: v for k, v in provider.items() if v is not None},
-            )
+            data = {k: v for k, v in provider.items() if v is not None}
+            if typing.TYPE_CHECKING:
+                non_none_keys = typing.cast(spec.Provider, data)
+            else:
+                non_none_keys = data
             full_provider: spec.Provider = copy.copy(base_provider)
             full_provider.update(non_none_keys)  # type: ignore
 

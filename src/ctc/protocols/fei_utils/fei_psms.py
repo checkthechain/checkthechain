@@ -71,7 +71,10 @@ async def async_get_fei_psm_mints(
         )
         psm_mints[psm]['token'] = psm[:-4]
 
-    mints = typing.cast(spec.DataFrame, pd.concat(list(psm_mints.values())))
+    if typing.TYPE_CHECKING:
+        mints = typing.cast(spec.DataFrame, pd.concat(list(psm_mints.values())))
+    else:
+        mints = pd.concat(list(psm_mints.values()))
     mints = mints.sort_index()
 
     # add extra fields
@@ -129,9 +132,11 @@ async def async_get_fei_psm_redemptions(
         )
         psm_redeems[psm]['token'] = psm[:-4]
 
-    redemptions = typing.cast(
-        spec.DataFrame, pd.concat(list(psm_redeems.values()))
-    )
+    data = pd.concat(list(psm_redeems.values()))
+    if typing.TYPE_CHECKING:
+        redemptions = typing.cast(spec.DataFrame, data)
+    else:
+        redemptions = data
     redemptions = redemptions.sort_index()
 
     # add extra fields

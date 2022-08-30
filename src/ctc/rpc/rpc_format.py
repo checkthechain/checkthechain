@@ -6,7 +6,8 @@ import typing
 from ctc import binary
 
 
-T = typing.TypeVar('T')
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T')
 
 
 def decode_response(

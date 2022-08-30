@@ -59,7 +59,10 @@ async def async_get_transactions_from_address(
     for block, block_count in zip(blocks, count_data['diffs']):
         n_block_transactions = 0
         for transaction_data in block['transactions']:
-            transaction = typing.cast(spec.Transaction, transaction_data)
+            if typing.TYPE_CHECKING:
+                transaction = typing.cast(spec.Transaction, transaction_data)
+            else:
+                transaction = transaction_data
             if transaction['from'] == address:
                 transactions.append(transaction)
                 n_block_transactions += 1

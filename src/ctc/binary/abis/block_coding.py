@@ -36,7 +36,10 @@ def standardize_block_number(
         block = 'latest'
 
     if block in spec.block_number_names:
-        return typing.cast(spec.BlockNumberName, block)
+        if typing.TYPE_CHECKING:
+            return typing.cast(spec.BlockNumberName, block)
+        else:
+            return block
     else:
         return raw_block_number_to_int(block)
 

@@ -10,7 +10,6 @@ from . import binary_types
 BlockHash = binary_types.PrefixHexData
 TransactionHash = binary_types.PrefixHexData
 
-block_number_names = ['latest', 'earliest', 'pending']
 BlockNumberName = typing.Union[
     Literal['latest'],
     Literal['earliest'],

@@ -58,7 +58,10 @@ async def async_call_all_command(
     coroutines = []
     for item in contract_abi:
         if item.get('type') == 'function':
-            function_abi = typing.cast(spec.FunctionABI, item)
+            if typing.TYPE_CHECKING:
+                function_abi = typing.cast(spec.FunctionABI, item)
+            else:
+                function_abi = item
             if evm.is_function_read_only(function_abi):
                 inputs = function_abi.get('inputs')
                 if inputs is not None and len(inputs) == 0:

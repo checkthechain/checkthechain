@@ -18,7 +18,12 @@ def create_timestamp_column(
     if isinstance(index, pd.MultiIndex):
         # keep only first level of multiindex
         n_levels = len(df.index.names)
-        df = typing.cast(spec.DataFrame, df.droplevel(list(range(1, n_levels))))
+
+        dropped_level = df.droplevel(list(range(1, n_levels)))
+        if typing.TYPE_CHECKING:
+            df = typing.cast(spec.DataFrame, dropped_level)
+        else:
+            df = dropped_level
 
     merged = pd.merge(
         df,

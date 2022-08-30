@@ -3,7 +3,8 @@ from __future__ import annotations
 import typing
 import math
 
-T = typing.TypeVar('T')
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T')
 
 
 def _ensure_exactly_one(*args: T) -> T:

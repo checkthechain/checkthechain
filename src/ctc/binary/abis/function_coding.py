@@ -9,10 +9,11 @@ from . import contract_parsing
 from . import function_parsing
 
 
-_Parameters = typing.Union[
-    typing.Sequence[typing.Any],
-    typing.Mapping[str, typing.Any],
-]
+if typing.TYPE_CHECKING:
+    _Parameters = typing.Union[
+        typing.Sequence[typing.Any],
+        typing.Mapping[str, typing.Any],
+    ]
 
 
 #

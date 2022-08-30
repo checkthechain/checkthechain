@@ -65,7 +65,7 @@ def get_config(
     # load from file
     try:
         config_from_file = toolconfig.get_config(
-            config_spec=spec.Config, validate=validate, **_kwargs
+            config_spec=None, validate=validate, **_kwargs
         )
     except toolconfig.ConfigDoesNotExist:
         from . import config_defaults
@@ -111,7 +111,10 @@ def get_config(
     config_validate.validate_config(config)
 
     if validate == 'raise':
-        return typing.cast(spec.Config, config)
+        if typing.TYPE_CHECKING:
+            return typing.cast(spec.Config, config)
+        else:
+            return config
     else:
         return config
 

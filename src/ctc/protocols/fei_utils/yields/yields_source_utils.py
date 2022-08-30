@@ -28,14 +28,15 @@ async def async_get_fei_yield_data(
     }
 
 
-YieldGetter = typing.Callable[
-    [typing.Sequence[spec.BlockNumberReference]],
-    typing.Coroutine[
-        typing.Any,
-        typing.Any,
-        typing.Mapping[str, yields_spec.YieldSourceData],
-    ],
-]
+if typing.TYPE_CHECKING:
+    YieldGetter = typing.Callable[
+        [typing.Sequence[spec.BlockNumberReference]],
+        typing.Coroutine[
+            typing.Any,
+            typing.Any,
+            typing.Mapping[str, yields_spec.YieldSourceData],
+        ],
+    ]
 
 
 def get_yields_sources() -> typing.Sequence[YieldGetter]:

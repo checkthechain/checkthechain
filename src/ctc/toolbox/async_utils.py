@@ -13,8 +13,9 @@ import typing
 from ctc import spec
 
 
-T = typing.TypeVar('T')
-R = typing.TypeVar('R')
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T')
+    R = typing.TypeVar('R')
 
 #
 # # gathering
@@ -200,7 +201,11 @@ async def async_read_csv_dask(path: str) -> spec.DataFrame:
     client = await dask.distributed.Client(asynchronous=True)
     g = dd.read_csv(path, dtype='object')
     result = await client.compute(g)
-    return typing.cast(spec.DataFrame, result)
+
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.DataFrame, result)
+    else:
+        return result
 
 
 async def async_read_csv_aiofiles(path: str) -> spec.DataFrame:

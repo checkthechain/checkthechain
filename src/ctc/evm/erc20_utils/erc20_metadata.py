@@ -156,13 +156,11 @@ async def async_get_erc20_decimals(
         if result is not None:
             result['decimals'] = decimals
         else:
-            result = typing.cast(
-                spec.ERC20Metadata,
-                {
-                    'address': token,
-                    'decimals': decimals,
-                },
-            )
+            data = {'address': token, 'decimals': decimals}
+            if typing.TYPE_CHECKING:
+                result = typing.cast(spec.ERC20Metadata, data)
+            else:
+                result = data
         await db.async_intake_erc20_metadata(network=network, **result)
 
     return decimals
@@ -237,10 +235,12 @@ async def async_get_erc20_name(
         if result is not None:
             result['name'] = name
         else:
-            result = typing.cast(
-                spec.ERC20Metadata,
-                {'address': token, 'name': name},
-            )
+            data = {'address': token, 'name': name}
+            if typing.TYPE_CHECKING:
+                result = typing.cast(spec.ERC20Metadata, data)
+            else:
+                result = data
+
         await db.async_intake_erc20_metadata(network=network, **result)
 
     return name
@@ -322,10 +322,12 @@ async def async_get_erc20_symbol(
         if result is not None:
             result['symbol'] = symbol
         else:
-            result = typing.cast(
-                spec.ERC20Metadata,
-                {'address': token, 'symbol': symbol},
-            )
+            data = {'address': token, 'symbol': symbol}
+            if typing.TYPE_CHECKING:
+                result = typing.cast(spec.ERC20Metadata, data)
+            else:
+                result = data
+
         await db.async_intake_erc20_metadata(network=network, **result)
 
     return symbol

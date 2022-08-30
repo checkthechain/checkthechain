@@ -34,10 +34,11 @@ async def async_print_block_summary(
     ]
 
     if full_transactions:
-        gas_prices = [
-            typing.cast(spec.Transaction, transaction)['gas_price'] / 1e9
-            for transaction in block['transactions']
-        ]
+        gas_prices = []
+        for transaction in block['transactions']:
+            if typing.TYPE_CHECKING:
+                transaction = typing.cast(spec.Transaction, transaction)
+            gas_prices.append(transaction['gas_price'] / 1e9)
         import numpy as np
 
         gas_percentiles = np.percentile(

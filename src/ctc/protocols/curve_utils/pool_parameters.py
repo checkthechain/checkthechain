@@ -322,4 +322,7 @@ def _compute_A(
     mask = timestamps > future_A_time
     result[mask] = future_A
 
-    return typing.cast(spec.NumpyArray, result)
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.NumpyArray, result)
+    else:
+        return result

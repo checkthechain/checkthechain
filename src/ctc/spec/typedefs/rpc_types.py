@@ -74,28 +74,6 @@ class Provider(TypedDict, total=True):
     convert_reverts_to_none: bool
 
 
-provider_keys = [
-    'url',
-    'name',
-    'network',
-    'protocol',
-    'session_kwargs',
-    'chunk_size',
-    'convert_reverts_to_none',
-]
-
-default_provider_settings = {
-    # these must be particularly specified
-    # 'url',
-    # 'network',
-    # 'protocol',
-    #
-    'name': '',
-    'session_kwargs': {},
-    'chunk_size': None,
-    'convert_reverts_to_none': False,
-}
-
 ProviderShortcut = str
 ProviderReference = typing.Union[
     ProviderShortcut, PartialProvider, Provider, None

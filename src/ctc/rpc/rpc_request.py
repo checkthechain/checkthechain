@@ -116,14 +116,16 @@ async def async_send(
             if full_provider['convert_reverts_to_none']:
                 output = None
             else:
-                response = typing.cast(
-                    spec.RpcSingularResponseFailure, response
-                )
+                if typing.TYPE_CHECKING:
+                    response = typing.cast(
+                        spec.RpcSingularResponseFailure, response
+                    )
                 raise spec.RpcException(
                     'RPC ERROR: ' + response['error']['message']
                 )
         else:
-            response = typing.cast(spec.RpcSingularResponseSuccess, response)
+            if typing.TYPE_CHECKING:
+                response = typing.cast(spec.RpcSingularResponseSuccess, response)
             output = response['result']
 
         if logging_rpc_calls:

@@ -5,7 +5,8 @@ import typing
 
 from . import backend_exceptions
 
-T = typing.TypeVar('T')
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T')
 
 
 def get_backend_order(

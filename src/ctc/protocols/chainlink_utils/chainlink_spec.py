@@ -6,14 +6,13 @@ from typing_extensions import TypedDict
 
 from ctc import spec
 
+if typing.TYPE_CHECKING:
+    _FeedReference = typing.Union[spec.Address, str]
 
-_FeedReference = typing.Union[spec.Address, str]
-
-
-class FeedRoundData(TypedDict):
-    answer: typing.Union[int, float]
-    round_id: int
-    timestamp: int
+    class FeedRoundData(TypedDict):
+        answer: typing.Union[int, float]
+        round_id: int
+        timestamp: int
 
 
 path_templates = {

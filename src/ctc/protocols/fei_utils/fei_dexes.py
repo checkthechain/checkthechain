@@ -126,10 +126,12 @@ async def async_get_fei_stable_dex_metrics_by_block(
             pool_balances[pool_name + '__' + token]
             for token in pool_tokens[pool_name]
         ]
-        pool_tvls[pool_name] = typing.cast(
-            spec.NumpyArray, sum(pool_token_balances)
-        )
 
+        value = sum(pool_token_balances)
+        if typing.TYPE_CHECKING:
+            pool_tvls[pool_name] = typing.cast(spec.NumpyArray, value)
+        else:
+            pool_tvls[pool_name] = value
         # pool targets
         n_tokens = len(pool_tokens[pool_name])
         pool_targets[pool_name] = pool_tvls[pool_name] / n_tokens
@@ -140,13 +142,18 @@ async def async_get_fei_stable_dex_metrics_by_block(
             pool_fei_tvls[pool_name] - pool_targets[pool_name]
         )
 
-    total_pool_tvls = typing.cast(spec.NumpyArray, sum(pool_tvls.values()))
-    total_pool_fei_tvl = typing.cast(
-        spec.NumpyArray, sum(pool_fei_tvls.values())
-    )
-    total_pool_fei_imbalance = typing.cast(
-        spec.NumpyArray, sum(pool_fei_imbalances.values())
-    )
+    if typing.TYPE_CHECKING:
+        total_pool_tvls = typing.cast(spec.NumpyArray, sum(pool_tvls.values()))
+        total_pool_fei_tvl = typing.cast(
+            spec.NumpyArray, sum(pool_fei_tvls.values())
+        )
+        total_pool_fei_imbalance = typing.cast(
+            spec.NumpyArray, sum(pool_fei_imbalances.values())
+        )
+    else:
+        total_pool_tvls = sum(pool_tvls.values())
+        total_pool_fei_tvl = sum(pool_fei_tvls.values())
+        total_pool_fei_imbalance = sum(pool_fei_imbalances.values())
 
     return {
         'pool_balances': pool_balances,

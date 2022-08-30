@@ -297,7 +297,11 @@ async def async_get_base_pools(
         )
         coroutines.append(coroutine)
     dfs = await asyncio.gather(*coroutines)
-    events = typing.cast(spec.DataFrame, pd.concat(dfs))
+
+    if typing.TYPE_CHECKING:
+        events = typing.cast(spec.DataFrame, pd.concat(dfs))
+    else:
+        events = pd.concat(dfs)
 
     # format data
     events = events.sort_index()
@@ -409,7 +413,11 @@ async def async_get_meta_pools(
         )
         coroutines.append(coroutine)
     dfs = await asyncio.gather(*coroutines)
-    events = typing.cast(spec.DataFrame, pd.concat(dfs))
+
+    if typing.TYPE_CHECKING:
+        events = typing.cast(spec.DataFrame, pd.concat(dfs))
+    else:
+        events = pd.concat(dfs)
 
     # format data
     events = events.sort_index()

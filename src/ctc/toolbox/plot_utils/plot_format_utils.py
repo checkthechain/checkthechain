@@ -12,7 +12,8 @@ from ctc import evm
 from ctc import spec
 
 
-T = typing.TypeVar('T')
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T')
 
 
 async def async_xtick_block_dates(

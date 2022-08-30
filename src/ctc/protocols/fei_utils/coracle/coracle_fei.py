@@ -95,7 +95,8 @@ async def async_get_fei_deposit_balances_by_block(
 # # fei platforms
 #
 
-T = typing.TypeVar('T', int, float)
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T', int, float)
 
 
 def fei_deposits_to_deployments(deposit_balances: dict[str, T]) -> dict[str, T]:

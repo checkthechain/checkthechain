@@ -5,7 +5,8 @@ import typing
 from ctc import spec
 
 
-T = typing.TypeVar('T', spec.DataFrame, spec.Series)
+if typing.TYPE_CHECKING:
+    T = typing.TypeVar('T', spec.DataFrame, spec.Series)
 
 
 def bin_by_blocks(

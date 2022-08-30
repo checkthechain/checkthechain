@@ -15,7 +15,8 @@ class MultipleMatchesFound(LookupError):
     pass
 
 
-M = typing.TypeVar('M', bound=typing.Mapping[typing.Any, typing.Any])
+if typing.TYPE_CHECKING:
+    M = typing.TypeVar('M', bound=typing.Mapping[typing.Any, typing.Any])
 
 
 def get_matching_entries(

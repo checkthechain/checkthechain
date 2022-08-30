@@ -3,9 +3,10 @@ from __future__ import annotations
 import typing
 
 if typing.TYPE_CHECKING:
+
     from typing_extensions import TypeGuard
 
-from ..typedefs import binary_types
+    from ..typedefs import binary_types
 
 
 def is_data(data: typing.Any) -> TypeGuard[binary_types.Data]:

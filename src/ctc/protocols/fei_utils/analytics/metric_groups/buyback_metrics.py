@@ -30,10 +30,12 @@ async def async_compute_tribe_buybacks_usd(
         swaps = await balancer_utils.async_get_pool_swaps(
             pool_address='0xc1382fe6e17bcdbc3d35f73f5317fbf261ebeecd'
         )
-    swaps = typing.cast(
-        spec.DataFrame,
-        swaps.droplevel('transaction_index').droplevel('log_index'),
-    )
+
+    dropped_level = swaps.droplevel('transaction_index').droplevel('log_index')
+    if typing.TYPE_CHECKING:
+        swaps = typing.cast(spec.DataFrame, dropped_level)
+    else:
+        swaps = dropped_level
 
     # filter tribe buys
     fei = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'

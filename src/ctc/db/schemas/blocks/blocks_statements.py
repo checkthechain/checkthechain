@@ -11,7 +11,10 @@ from ... import schema_utils
 def _remove_block_transactions(block: spec.Block) -> spec.Block:
     txs = block['transactions']
     if len(txs) > 0 and isinstance(txs[0], dict):
-        full_txs = typing.cast(list[spec.Transaction], txs)
+        if typing.TYPE_CHECKING:
+            full_txs = typing.cast(list[spec.Transaction], txs)
+        else:
+            full_txs = txs
         tx_hashes = [tx['hash'] for tx in full_txs]
         return dict(block, transactions=tx_hashes)  # type: ignore
     else:

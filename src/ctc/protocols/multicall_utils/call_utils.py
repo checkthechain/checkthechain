@@ -111,7 +111,10 @@ async def async_get_call_function_abi(
             raise Exception('unknown call format')
     elif isinstance(call, (list, tuple)):
         if isinstance(call[1], dict):
-            return typing.cast(spec.FunctionABI, call[1])
+            if typing.TYPE_CHECKING:
+                return typing.cast(spec.FunctionABI, call[1])
+            else:
+                return call[1]
         elif isinstance(call[1], str) and not call[1].startswith('0x'):
             function = call[1]
         else:

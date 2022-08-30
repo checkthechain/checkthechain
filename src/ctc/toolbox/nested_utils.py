@@ -3,8 +3,9 @@ from __future__ import annotations
 import typing
 
 
-K = typing.TypeVar('K')
-V = typing.TypeVar('V')
+if typing.TYPE_CHECKING:
+    K = typing.TypeVar('K')
+    V = typing.TypeVar('V')
 
 
 def list_of_dicts_to_dict_of_lists(

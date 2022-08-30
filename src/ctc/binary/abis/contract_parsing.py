@@ -26,7 +26,11 @@ def get_function_abi(
         if item.get('type') != 'function':
             continue
         else:
-            function_abi = typing.cast(spec.FunctionABI, item)
+
+            if typing.TYPE_CHECKING:
+                function_abi = typing.cast(spec.FunctionABI, item)
+            else:
+                function_abi = item
 
         if (
             function_name is not None

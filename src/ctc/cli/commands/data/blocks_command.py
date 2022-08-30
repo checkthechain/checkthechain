@@ -65,7 +65,7 @@ async def async_block_command(
             'max_gas_price',
         ]
     elif attributes == ['all']:
-        attributes = list(spec.Block.__annotations__.keys())
+        attributes = list(spec.block_keys)
     else:
         attributes = [
             attribute for token in attributes for attribute in token.split(',')

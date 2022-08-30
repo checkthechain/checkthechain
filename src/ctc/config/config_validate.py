@@ -41,12 +41,11 @@ def get_config_base_types() -> typing.Mapping[
 def validate_config(config: typing.Mapping[typing.Any, typing.Any]) -> None:
     """raise spec.ConfigInvalid if config is not valid"""
 
-    config_keys = list(spec.Config.__annotations__.keys())
     config_validators = get_config_validators()
     config_base_types = get_config_base_types()
 
     # check that all required keys are present
-    for key in config_keys:
+    for key in spec.config_keys:
         if key not in config:
             raise spec.ConfigInvalid('config does not specify key: ' + str(key))
 
@@ -54,7 +53,7 @@ def validate_config(config: typing.Mapping[typing.Any, typing.Any]) -> None:
     for key, value in config.items():
 
         # check that key is allowed
-        if key not in config_keys:
+        if key not in spec.config_keys:
             raise spec.ConfigInvalid('key not allowed in config:')
 
         # check value type

@@ -110,4 +110,7 @@ async def async_get_contract_abi(
 
         _etherscan_ratelimit['recent_results'][contract_address] = abi
 
-    return typing.cast(spec.ContractABI, abi)
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.ContractABI, abi)
+    else:
+        return abi

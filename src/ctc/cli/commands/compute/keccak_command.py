@@ -46,9 +46,13 @@ def keccack_command(*, data: str, text: bool, hex: bool, raw: bool) -> None:
         hex = data.startswith('0x')
 
     if hex:
-        keccak = binary.keccak(
-            typing.cast(spec.BinaryInteger, data), output_format='prefix_hex'
-        )
+
+        if typing.TYPE_CHECKING:
+            casted = typing.cast(spec.BinaryInteger, data)
+        else:
+            casted = data
+
+        keccak = binary.keccak(casted, output_format='prefix_hex')
     else:
         keccak = binary.keccak_text(data)
 

@@ -1,6 +1,7 @@
 import pytest
 
 from ctc import spec
+from ctc.spec import typedefs
 from ctc.config import config_defaults
 from ctc.config import config_validate
 
@@ -114,7 +115,7 @@ invalid_values = {
 
 
 def test_every_config_key_has_validator_entry():
-    config_spec = list(spec.Config.__annotations__.keys())
+    config_spec = list(typedefs.Config.__annotations__.keys())
     config_validators = config_validate.get_config_validators()
     for key in config_spec:
         assert key in config_validators

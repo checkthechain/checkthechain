@@ -277,7 +277,7 @@ def get_block_gas_stats(
             )
 
         gas_prices: list[int | float] = [
-            typing.cast(spec.Transaction, transaction)['gas_price']
+            transaction['gas_price']  # type: ignore
             for transaction in block['transactions']
         ]
 
