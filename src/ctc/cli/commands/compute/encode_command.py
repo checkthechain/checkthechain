@@ -34,7 +34,7 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
     }
 
 
-def encode_command(type: str, data: str, packed: bool) -> None:
+def encode_command(*, type: str, data: str, packed: bool) -> None:
 
     if ',' in type:
         if not type.startswith('('):
