@@ -15,7 +15,7 @@ from ctc.cli import cli_run
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': async_call_all_command,
-        'help': 'call and display outputs of a contract\'s read-only functions'
+        'help': 'display outputs of all contract\'s read-only functions'
         + '\n\ncurrently only displays output of zero-parameter functions',
         'args': [
             {
