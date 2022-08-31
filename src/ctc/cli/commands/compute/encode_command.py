@@ -21,6 +21,11 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
                 # 'dest': 'datatype',
             },
             {'name': 'data', 'help': 'data to be encoded'},
+            {
+                'name': '--packed',
+                'help': 'encode like solidity\'s abi.encodePacked()',
+                'action': 'store_true',
+            },
         ],
         'examples': [
             'address 0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -29,11 +34,19 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
     }
 
 
-def encode_command(type: str, data: str) -> None:
+def encode_command(type: str, data: str, packed: bool) -> None:
     if data.startswith('0x'):
         literal_data = data
     else:
-        literal_data = ast.literal_eval(data)
-    encoded = binary.encode_types(literal_data, type)
+        try:
+            literal_data = ast.literal_eval(data)
+        except Exception:
+            literal_data = ast.literal_eval('"' + data + '"')
+
+    if packed:
+        encoded = binary.abi_encode_packed(literal_data, type)
+    else:
+        encoded = binary.encode_types(literal_data, type)
+
     as_hex = binary.convert(encoded, 'prefix_hex')
     print(as_hex)
