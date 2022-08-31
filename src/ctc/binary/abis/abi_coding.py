@@ -17,3 +17,9 @@ def encode_types(data: typing.Any, types: spec.ABIDatatypeStr) -> bytes:
     import eth_abi_lite
 
     return eth_abi_lite.encode_single(types, data)
+
+
+def abi_encode_packed(data: typing.Any, types: spec.ABIDatatypeStr) -> bytes:
+    from eth_abi_lite import packed
+
+    return packed.encode_single_packed(types, data)
