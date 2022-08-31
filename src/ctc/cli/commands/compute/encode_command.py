@@ -35,6 +35,11 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
 
 
 def encode_command(type: str, data: str, packed: bool) -> None:
+
+    if ',' in type:
+        if not type.startswith('('):
+            type = '(' + type + ')'
+
     if data.startswith('0x'):
         literal_data = data
     else:
