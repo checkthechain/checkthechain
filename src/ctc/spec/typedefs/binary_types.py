@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import Literal
+from typing_extensions import Literal, TypedDict
+from . import abi_types
 
 
 BinaryData = typing.Union[bytes, str]
@@ -20,3 +21,8 @@ RawHexData = str
 HexData = typing.Union[PrefixHexData, RawHexData]
 
 Data = typing.Union[IntegerData, BinaryData, HexData]
+
+
+class Eip712StructType(TypedDict):
+    name: str
+    fields: typing.Mapping[str, abi_types.ABIDatatypeStr]
