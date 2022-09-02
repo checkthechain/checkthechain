@@ -136,7 +136,7 @@ def sign_transaction(
 
 def get_transaction_sender(
     transaction: spec.Transaction,
-    signature: spec.Data,
+    signature: spec.Signature,
 ) -> spec.Address:
     """
     adapted from https://github.com/ethereum/pyethereum/blob/ecb14c937a0b6cb0a0dc4f06be3a88e6d53dcce3/ethereum/transactions.py#L68
@@ -172,9 +172,7 @@ def get_transaction_sender(
     message_hash = hashes.keccak(rlp_transaction)
     public_key = signature_recovery.get_signer_public_key(
         message_hash=message_hash,
-        v=v,
-        r=r,
-        s=s,
+        signature=(v, r, s),
     )
 
     # convert public key to address

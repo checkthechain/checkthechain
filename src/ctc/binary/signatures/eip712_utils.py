@@ -12,6 +12,8 @@ from ctc import spec
 from .. import formats
 from .. import abis
 from .. import hashes
+from . import signature_creation
+from . import signature_recovery
 
 
 def eip712_hash(
@@ -28,6 +30,58 @@ def eip712_hash(
         + _hash_struct(struct_data=struct_data, struct_type=struct_type)
     )
     return formats.convert(as_bytes, output_format)
+
+
+def eip712_sign(
+    struct_data: typing.Mapping[str, typing.Any],
+    *,
+    private_key: spec.Data,
+    struct_type: spec.Eip712StructType,
+    domain: typing.Mapping[str, typing.Any],
+) -> tuple[int, int, int]:
+
+    message_hash = eip712_hash(
+        struct_data=struct_data,
+        struct_type=struct_type,
+        domain=domain,
+    )
+
+    if domain.get('chain_id') is not None:
+        chain_id = domain.get('chain_id')
+    elif domain.get('chainId') is not None:
+        chain_id = domain.get('chainId')
+    else:
+        chain_id = None
+
+    return signature_creation.sign_message_hash(
+        message_hash=message_hash,
+        private_key=private_key,
+        chain_id=chain_id,
+    )
+
+
+def eip712_verify(
+    signature: spec.Signature,
+    *,
+    struct_data: typing.Mapping[str, typing.Any],
+    struct_type: spec.Eip712StructType,
+    domain: typing.Mapping[str, typing.Any],
+    public_key: spec.Data | None = None,
+    address: spec.Data | None = None,
+) -> bool:
+
+    message_hash = eip712_hash(
+        struct_data=struct_data,
+        struct_type=struct_type,
+        domain=domain,
+    )
+
+    return signature_recovery.verify_signature(
+        signature=signature,
+        message_hash=message_hash,
+        public_key=public_key,
+        address=address,
+    )
 
 
 def _hash_struct(
@@ -139,9 +193,16 @@ def get_domain_separator(
         'name': 'string',
         'version': 'string',
         'chainId': 'uint256',
+        'chain_id': 'uint256',
         'verifyingContract': 'address',
+        'verifying_contract': 'address',
         'salt': 'bytes32',
     }
+
+    if 'chain_id' in domain and 'chainId' in domain:
+        raise Exception('should only specify one of chain_id or chainId')
+    if 'verifying_contract' in domain and 'verifyingContract' in domain:
+        raise Exception('should only specify one of verifying_contract or verifyingContract')
 
     # add in custom fields if present
     if custom_fields is not None:

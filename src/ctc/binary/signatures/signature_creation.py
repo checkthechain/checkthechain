@@ -51,6 +51,29 @@ def sign_data_message(
     )
 
 
+def sign_message_hash(
+    *,
+    message_hash: spec.Data,
+    private_key: spec.Data,
+    chain_id: int | None = None,
+) -> tuple[int, int, int]:
+
+    message_hash = formats.convert(message_hash, 'binary')
+
+    # compute signature
+    private_binary = formats.convert(private_key, 'binary')
+    v, r, s = secp256k1_utils.ecdsa_raw_sign(
+        message_hash,
+        priv=private_binary,
+    )
+
+    # alter v with chain_id
+    if chain_id is not None:
+        v = v - 27 + chain_id * 2 + 35
+
+    return v, r, s
+
+
 def create_text_message_hash(
     message: str,
     mode: Literal['eth_sign', 'personal_sign'],
@@ -92,26 +115,3 @@ def create_data_message_hash(
     message_hash = hashes.keccak(full_message, output_format='binary')
 
     return message_hash
-
-
-def sign_message_hash(
-    *,
-    message_hash: spec.Data,
-    private_key: spec.Data,
-    chain_id: int | None = None,
-) -> tuple[int, int, int]:
-
-    message_hash = formats.convert(message_hash, 'binary')
-
-    # compute signature
-    private_binary = formats.convert(private_key, 'binary')
-    v, r, s = secp256k1_utils.ecdsa_raw_sign(
-        message_hash,
-        priv=private_binary,
-    )
-
-    # alter v with chain_id
-    if chain_id is not None:
-        v = v - 27 + chain_id * 2 + 35
-
-    return v, r, s

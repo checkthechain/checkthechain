@@ -18,7 +18,9 @@ def private_key_to_address(private_key: spec.Data) -> spec.Address:
     return public_key_to_address(public_key)
 
 
-def public_key_to_address(public_key: tuple[int, int] | spec.Data) -> spec.Address:
+def public_key_to_address(
+    public_key: tuple[int, int] | spec.Data
+) -> spec.Address:
     as_hex = public_key_tuple_to_hex(public_key)
     hash = hashes.keccak(as_hex, 'binary')
     address = hash[-20:]
@@ -36,4 +38,6 @@ def public_key_tuple_to_hex(public_key: tuple[int, int] | spec.Data) -> str:
             raise Exception('unknown pubilc key format')
 
     else:
-        return formats.convert(public_key, output_format='prefix_hex', n_bytes=64)
+        return formats.convert(
+            public_key, output_format='prefix_hex', n_bytes=64
+        )

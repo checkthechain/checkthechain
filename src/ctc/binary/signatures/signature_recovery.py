@@ -7,18 +7,41 @@ from . import secp256k1_utils
 from . import vrs_utils
 
 
-def get_signature_network_id(signature: spec.Data) -> int | None:
+def verify_signature(
+    signature: spec.Signature,
+    *,
+    message_hash: spec.Data,
+    public_key: spec.Data | None = None,
+    address: spec.Data | None = None,
+) -> bool:
+
+    # recover public key from signature
+    recovered_public_key = get_signer_public_key(
+        message_hash=message_hash,
+        signature=signature,
+    )
+
+    # varify a match against provided public_key and/or address
+    if public_key is None and address is None:
+        raise Exception('must provider public_key or address to verify')
+    if public_key is not None and public_key != recovered_public_key:
+        return False
+    if address is not None:
+        recovered_address = key_crud.public_key_to_address(recovered_public_key)
+        if recovered_address != address:
+            return False
+    return True
+
+
+def get_signature_network_id(signature: spec.Signature) -> int | None:
     v, r, s = vrs_utils.unpack_vrs(signature)
     return vrs_utils.vrs_to_network_id(v=v, r=r, s=s)
 
 
 def get_signer_public_key(
-    message_hash: spec.Data,
     *,
-    signature: spec.Data | None = None,
-    v: spec.Data | None = None,
-    r: spec.Data | None = None,
-    s: spec.Data | None = None,
+    message_hash: spec.Data,
+    signature: spec.Signature,
 ) -> str:
     """
 
@@ -28,13 +51,7 @@ def get_signer_public_key(
     """
 
     # ger vrs
-    if isinstance(signature, tuple):
-        v, r, s = signature
-    if v is None or r is None or s is None:
-        if signature is None:
-            raise Exception('must provide more arguments')
-        v, r, s = vrs_utils.unpack_vrs(signature)
-
+    v, r, s = vrs_utils.unpack_vrs(signature)
     v = formats.convert(v, 'integer')
     r = formats.convert(r, 'integer')
     s = formats.convert(s, 'integer')
@@ -54,18 +71,10 @@ def get_signer_public_key(
 
 
 def get_signer_address(
-    message_hash: spec.Data,
-    signature: spec.Data | None = None,
-    *,
-    v: spec.Data | None = None,
-    r: spec.Data | None = None,
-    s: spec.Data | None = None,
+    message_hash: spec.Data, signature: spec.Signature
 ) -> spec.Address:
     public_key = get_signer_public_key(
         message_hash=message_hash,
         signature=signature,
-        v=v,
-        r=r,
-        s=s,
     )
     return key_crud.public_key_to_address(public_key)

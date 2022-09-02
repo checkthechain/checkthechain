@@ -104,6 +104,12 @@ def test_recover_address():
     )
     assert actual_public_key == target_public_key
 
+    assert binary.verify_signature(
+        signature=signature,
+        message_hash=test['message_hash'],
+        public_key=target_public_key,
+    )
+
 
 example_txs = [
     '0xccb0a942a36db42ccc5ee226e4f0599c761d4c0a884f3ac2f7a56fef7aef85df',
