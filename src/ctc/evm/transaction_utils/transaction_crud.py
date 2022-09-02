@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
 from ctc import rpc
 from ctc import spec
 
@@ -27,3 +28,15 @@ async def async_get_transactions(
         for transaction_hash in transaction_hashes
     ]
     return await asyncio.gather(*coroutines)
+
+
+def get_transaction_type_name(transaction_type: spec.Data) -> str:
+
+    transaction_type = binary.convert(transaction_type, 'integer')
+
+    if transaction_type == 0:
+        return 'legacy'
+    elif transaction_type == 1:
+        return 'eip2930'
+    elif transaction_type == 2:
+        return 'eip1559'

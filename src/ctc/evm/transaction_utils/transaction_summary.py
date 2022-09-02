@@ -8,6 +8,7 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 from .. import block_utils
+from . import transaction_crud
 
 
 async def async_print_transaction_summary(
@@ -48,6 +49,11 @@ async def async_print_transaction_summary(
         key='transaction index', value=transaction['transaction_index']
     )
     cli.print_bullet(key='nonce', value=transaction['nonce'])
+
+    type_name = transaction_crud.get_transaction_type_name(transaction['type'])
+    type_str = type_name + ' (' + transaction['type'] + ')'
+    cli.print_bullet(key='type', value=type_str)
+
     cli.print_bullet(key='call data length', value=len(transaction['input']))
 
     block, eth_usd = await asyncio.gather(block_task, eth_usd_task)
