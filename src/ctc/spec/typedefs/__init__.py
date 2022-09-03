@@ -8,3 +8,4 @@ from .network_types import *
 from .number_types import *
 from .rpc_types import *
 from .storage_types import *
+from .transaction_types import *

@@ -5,10 +5,10 @@ from typing_extensions import TypedDict, Literal, NotRequired
 
 from . import address_types
 from . import binary_types
+from . import transaction_types
 
 
 BlockHash = binary_types.PrefixHexData
-TransactionHash = binary_types.PrefixHexData
 
 BlockNumberName = typing.Union[
     Literal['latest'],
@@ -18,6 +18,10 @@ BlockNumberName = typing.Union[
 
 # anything that can be converted to an int without node querying
 RawBlockNumber = typing.Union[typing.SupportsRound, binary_types.HexData, str]
+
+
+class RawBlock(TypedDict):
+    pass
 
 # an int or block number name
 StandardBlockNumber = typing.Union[int, BlockNumberName]
@@ -44,60 +48,6 @@ class BlockSample(TypedDict):
     open_end: bool
 
 
-class RawTransaction(TypedDict):
-    pass
-
-
-# use literal definition because 'from' is a python keyword
-Transaction = TypedDict(
-    'Transaction',
-    {
-        'hash': TransactionHash,
-        'block_hash': BlockHash,
-        'block_number': int,
-        'chain_id': binary_types.PrefixHexData,
-        'from': address_types.Address,
-        'gas': int,
-        'gas_price': int,
-        'input': binary_types.PrefixHexData,
-        'nonce': int,
-        'r': binary_types.PrefixHexData,
-        's': binary_types.PrefixHexData,
-        'to': address_types.Address,
-        'transaction_index': int,
-        'type': binary_types.PrefixHexData,
-        'v': int,
-        'value': int,
-    },
-)
-
-
-class UnsignedTransaction(TypedDict):
-    nonce: int
-    gas_price: int
-    gas_limit: int
-    to: address_types.Address
-    value: int
-    input: binary_types.Data
-
-
-class SignedTransaction(TypedDict):
-    nonce: int
-    gas_price: int
-    gas_limit: int
-    to: address_types.Address
-    value: int
-    input: binary_types.Data
-    v: binary_types.Data
-    r: binary_types.Data
-    s: binary_types.Data
-    type: NotRequired[binary_types.Data]
-
-
-class RawBlock(TypedDict):
-    pass
-
-
 class Block(TypedDict):
     base_fee_per_gas: NotRequired[int | None]
     difficulty: int
@@ -118,7 +68,8 @@ class Block(TypedDict):
     timestamp: int
     total_difficulty: str
     transactions: typing.Union[
-        typing.List[TransactionHash], typing.List[Transaction]
+        typing.List[transaction_types.TransactionHash],
+        typing.List[transaction_types.Transaction],
     ]
     transactions_root: binary_types.PrefixHexData
     uncles: typing.List[BlockHash]
@@ -128,7 +79,7 @@ class RawLog(TypedDict):
     removed: bool
     logIndex: int
     transactionIndex: int
-    transactionHash: TransactionHash
+    transactionHash: transaction_types.TransactionHash
     blockHash: BlockHash
     blockNumber: int
     address: address_types.Address
@@ -141,7 +92,7 @@ class PendingRawLog(TypedDict):
     removed: bool
     logIndex: typing.Union[None, int]
     transactionIndex: typing.Union[None, int]
-    transactionHash: typing.Union[None, TransactionHash]
+    transactionHash: typing.Union[None, transaction_types.TransactionHash]
     blockHash: typing.Union[None, BlockHash]
     blockNumber: typing.Union[None, int]
     address: address_types.Address

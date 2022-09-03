@@ -44,6 +44,72 @@ block_keys = (
 
 block_number_names = ['latest', 'earliest', 'pending']
 
+
+#
+# # transactions
+#
+
+transaction_keys_legacy = (
+    'nonce',
+    'gas_price',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'v',
+    'r',
+    's',
+)
+
+transaction_keys_eip2930 = (
+    'chain_id',
+    'nonce',
+    'gas_price',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'access_list',
+    'v',
+    'r',
+    's',
+)
+
+transaction_keys_eip1559 = (
+    'chain_id',
+    'nonce',
+    'max_priority_fee_per_gas',
+    'max_fee_per_gas',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'access_list',
+    'v',
+    'r',
+    's',
+)
+
+transaction_keys_standardized = {
+    'chainId': 'chain_id',
+    'start_gas': 'gas',
+    'maxPriorityFeePerGas': 'max_priority_fee_per_gas',
+    'maxFeePerGas': 'max_fee_per_gas',
+    'gas_limit': 'gas',
+    'destination': 'to',
+    'amount': 'value',
+    'data': 'input',
+    'accessList': 'access_list',
+    'signature_y_parity': 'v',
+    'signature_r': 'r',
+    'signature_s': 's',
+}
+
+
+#
+# # providers
+#
+
 provider_keys = [
     'url',
     'name',
