@@ -48,7 +48,11 @@ private_key_to_address_examples = [
     [
         '0x080a12470a639f95139e5e2d9fc7ca597869a42de9bfab4969a3a57a89b0c84a',
         '0x774246187e1e2205c5920898eede0945016080df',
-    ]
+    ],
+    [
+        b"\xb2\\}\xb3\x1f\xee\xd9\x12''\xbf\t9\xdcv\x9a\x96VK-\xe4\xc4rm\x03[6\xec\xf1\xe5\xb3d",
+        '0x5ce9454909639d2d17a3f753ce7d93fa0b9ab12e',
+    ],
 ]
 
 
@@ -57,6 +61,36 @@ def test_private_key_to_address(test):
     private_key, target_address = test
     actual_address = binary.private_key_to_address(private_key)
     assert target_address == actual_address
+
+
+sign_text_message_examples = [
+    {
+        # from https://github.com/ethereum/web3.py/blob/master/docs/web3.eth.account.rst#sign-a-message
+        'message': "I♥SF",
+        'private_key': b"\xb2\\}\xb3\x1f\xee\xd9\x12''\xbf\t9\xdcv\x9a\x96VK-\xe4\xc4rm\x03[6\xec\xf1\xe5\xb3d",
+        'target_signature': (
+            28,
+            104389933075820307925104709181714897380569894203213074526835978196648170704563,
+            28205917190874851400050446352651915501321657673772411533993420917949420456142,
+        ),
+        'mode': 'personal_sign',
+    },
+]
+
+
+@pytest.mark.parametrize('test', sign_text_message_examples)
+def test_sign_text_message(test):
+    message = test['message']
+    private_key = test['private_key']
+    target_signature = test['target_signature']
+    mode = test['mode']
+
+    actual_signature = binary.sign_text_message(
+        message=message,
+        private_key=private_key,
+        mode=mode,
+    )
+    assert target_signature == actual_signature
 
 
 sign_message_hash_examples = [
@@ -88,7 +122,8 @@ def test_sign_message_hash(test):
     assert target_signature == actual_signature
 
 
-def test_recover_address():
+@pytest.mark.parametrize('test', sign_message_hash_examples)
+def test_recover_address(test):
     test = sign_message_hash_examples[0]
 
     signature = binary.sign_message_hash(
@@ -98,7 +133,7 @@ def test_recover_address():
     )
 
     target_public_key = binary.private_key_to_public_key(test['private_key'])
-    actual_public_key = binary.get_signer_public_key(
+    actual_public_key = binary.recover_signer_public_key(
         message_hash=test['message_hash'],
         signature=signature,
     )
@@ -109,19 +144,3 @@ def test_recover_address():
         message_hash=test['message_hash'],
         public_key=target_public_key,
     )
-
-
-example_txs = [
-    '0xccb0a942a36db42ccc5ee226e4f0599c761d4c0a884f3ac2f7a56fef7aef85df',
-    '0xfd74b4443e147687326e76886417a5a81c07ba26568c87e928546ef5b8dacd0d',
-    '0x0bf99b11e4f4963d34b5b9d24a542ff045d8e436740dcda698ec29deff84c959',
-]
-
-
-@pytest.mark.parametrize('test', example_txs)
-async def test_get_tx_hash(test):
-
-    target_hash = test
-    transaction = await evm.async_get_transaction(target_hash)
-    actual_hash = binary.get_signed_transaction_hash(transaction)
-    assert actual_hash == target_hash

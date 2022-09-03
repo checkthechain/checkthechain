@@ -12,8 +12,8 @@ if typing.TYPE_CHECKING:
 
 
 def sign_text_message(
-    *,
     message: str,
+    *,
     private_key: spec.Data,
     mode: Literal['eth_sign', 'personal_sign'],
     chain_id: int | None = None,
@@ -32,8 +32,8 @@ def sign_text_message(
 
 
 def sign_data_message(
-    *,
     message: spec.Data,
+    *,
     private_key: spec.Data,
     mode: Literal['eth_sign', 'personal_sign'],
     chain_id: int | None = None,
@@ -52,8 +52,8 @@ def sign_data_message(
 
 
 def sign_message_hash(
-    *,
     message_hash: spec.Data,
+    *,
     private_key: spec.Data,
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
@@ -84,7 +84,9 @@ def create_text_message_hash(
         full_message = message
     elif mode == 'personal_sign':
         full_message = (
-            '\x19Ethereum Signed Message:\n' + str(len(message)) + message
+            '\x19Ethereum Signed Message:\n'
+            + str(len(message.encode()))
+            + message
         )
     else:
         raise Exception('unrecognized signing mode: ' + str(mode))

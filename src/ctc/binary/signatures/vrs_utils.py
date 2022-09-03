@@ -9,17 +9,35 @@ if typing.TYPE_CHECKING:
     from typing_extensions import Literal
 
 
+def convert_vrs_tuple_type(
+    vrs: tuple[spec.Data, spec.Data, spec.Data],
+    output_format: spec.BinaryFormat,
+) -> tuple[spec.Data, spec.Data, spec.Data]:
+    v, r, s = vrs
+    return (
+        formats.convert(v, output_format),
+        formats.convert(r, output_format),
+        formats.convert(s, output_format),
+    )
+
+
 def pack_vrs(
-    *,
-    v: spec.Data,
-    r: spec.Data,
-    s: spec.Data,
+    *vrs: spec.Data,
     mode: Literal['transaction', 'ecdsa'],
+    v: spec.Data | None = None,
+    r: spec.Data | None = None,
+    s: spec.Data | None = None,
 ) -> str:
 
-    v_bytes = formats.convert(v, 'binary', n_bytes=1)
-    r_bytes = formats.convert(r, 'binary', n_bytes=32)
-    s_bytes = formats.convert(s, 'binary', n_bytes=32)
+    if len(vrs) == 3:
+        v, r, s = vrs
+
+    if v is not None and r is not None and s is not None:
+        v_bytes = formats.convert(v, 'binary', n_bytes=1)
+        r_bytes = formats.convert(r, 'binary', n_bytes=32)
+        s_bytes = formats.convert(s, 'binary', n_bytes=32)
+    else:
+        raise Exception('must specify v, r, and s')
 
     if mode == 'ecdsa':
         signature = r_bytes + s_bytes + v_bytes

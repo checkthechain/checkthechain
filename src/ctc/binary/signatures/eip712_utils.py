@@ -1,4 +1,6 @@
-"""https://eips.ethereum.org/EIPS/eip-712
+"""
+https://eips.ethereum.org/EIPS/eip-712
+https://eips.ethereum.org/EIPS/eip-191
 
 TODO:
 - handle nested struct types
