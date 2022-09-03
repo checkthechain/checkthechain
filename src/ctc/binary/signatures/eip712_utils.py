@@ -31,7 +31,7 @@ def eip712_hash(
         + get_domain_separator(domain, 'binary')
         + _hash_struct(struct_data=struct_data, struct_type=struct_type)
     )
-    return formats.convert(as_bytes, output_format)
+    return hashes.keccak(as_bytes, output_format)
 
 
 def eip712_sign(
@@ -105,7 +105,6 @@ def _hash_struct_type(struct_type: spec.Eip712StructType) -> bytes:
         type + ' ' + name for name, type in struct_type['fields'].items()
     )
     struct_type_str = struct_type['name'] + '(' + struct_fields_str + ')'
-    print(struct_type_str)
     return hashes.keccak_text(struct_type_str, 'binary')
 
 
@@ -195,16 +194,26 @@ def get_domain_separator(
         'name': 'string',
         'version': 'string',
         'chainId': 'uint256',
-        'chain_id': 'uint256',
         'verifyingContract': 'address',
-        'verifying_contract': 'address',
         'salt': 'bytes32',
     }
 
+    # convert snake case to camel case
     if 'chain_id' in domain and 'chainId' in domain:
         raise Exception('should only specify one of chain_id or chainId')
     if 'verifying_contract' in domain and 'verifyingContract' in domain:
-        raise Exception('should only specify one of verifying_contract or verifyingContract')
+        raise Exception(
+            'should only specify one of verifying_contract or verifyingContract'
+        )
+    if 'chain_id' in domain:
+        domain = {
+            (k if k != 'chain_id' else 'chainId'): v for k, v in domain.items()
+        }
+    if 'verifying_contract' in domain:
+        domain = {
+            (k if k != 'verifying_contract' else 'verifyingContract'): v
+            for k, v in domain.items()
+        }
 
     # add in custom fields if present
     if custom_fields is not None:

@@ -8,33 +8,7 @@ import toolstr
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-
-
-function_abis: typing.Mapping[str, spec.FunctionABI] = {
-    'getOwners': {
-        'inputs': [],
-        'name': 'getOwners',
-        'outputs': [
-            {'internalType': 'address[]', 'name': '', 'type': 'address[]'}
-        ],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-    'getThreshold': {
-        'inputs': [],
-        'name': 'getThreshold',
-        'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-    'nonce': {
-        'inputs': [],
-        'name': 'nonce',
-        'outputs': [{'internalType': 'uint256', 'name': '', 'type': 'uint256'}],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-}
+from . import gnosis_safe_spec
 
 
 async def async_get_safe_owners(
@@ -42,7 +16,7 @@ async def async_get_safe_owners(
 ) -> typing.Sequence[spec.Address]:
     result = await rpc.async_eth_call(
         to_address=address,
-        function_abi=function_abis['getOwners'],
+        function_abi=gnosis_safe_spec.function_abis['getOwners'],
     )
     if not isinstance(result, (tuple, list)) or not all(
         isinstance(item, str) for item in result
@@ -54,7 +28,7 @@ async def async_get_safe_owners(
 async def async_get_safe_threshold(address: spec.Address) -> int:
     result = await rpc.async_eth_call(
         to_address=address,
-        function_abi=function_abis['getThreshold'],
+        function_abi=gnosis_safe_spec.function_abis['getThreshold'],
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -64,7 +38,7 @@ async def async_get_safe_threshold(address: spec.Address) -> int:
 async def async_get_safe_nonce(address: spec.Address) -> int:
     result = await rpc.async_eth_call(
         to_address=address,
-        function_abi=function_abis['nonce'],
+        function_abi=gnosis_safe_spec.function_abis['nonce'],
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
