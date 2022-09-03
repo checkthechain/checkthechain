@@ -1,0 +1,40 @@
+from __future__ import annotations
+
+from ctc import binary
+from ctc import spec
+
+
+def serialize_block(block: spec.Block) -> spec.PrefixHexData:
+
+    if block.get('base_fee_per_gas') is not None:
+        block_type = 'eip1559'
+    else:
+        block_type = 'legacy'
+
+    as_list = [
+        block['parent_hash'],
+        block['sha3_uncles'],
+        block['miner'],
+        block['state_root'],
+        block['transactions_root'],
+        block['receipts_root'],
+        block['logs_bloom'],
+        block['difficulty'],
+        block['number'],
+        block['gas_limit'],
+        block['gas_used'],
+        block['timestamp'],
+        block['extra_data'],
+        block['mix_hash'],
+        block['nonce'],
+    ]
+
+    if block_type == 'eip1559':
+        as_list.append(block['base_fee_per_gas'])
+
+    return binary.rlp_encode(as_list)
+
+
+def get_block_hash(block: spec.Block) -> spec.PrefixHexData:
+    serialized = serialize_block(block)
+    return binary.keccak(serialized)

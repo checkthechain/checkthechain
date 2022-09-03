@@ -44,6 +44,17 @@ block_keys = (
 
 block_number_names = ['latest', 'earliest', 'pending']
 
+block_keys_standardized = {
+    'uncle_hashes': 'sha3_uncles',
+    'coinbase': 'miner',
+    'author': 'miner',
+    'beneficiary': 'miner',
+    'transaction_root': 'transactions_root',
+    'bloom': 'logs_bloom',
+    'block_number': 'number',
+    'proof_of_work': 'mix_hash',
+}
+
 
 #
 # # transactions

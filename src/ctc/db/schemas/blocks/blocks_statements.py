@@ -74,6 +74,9 @@ async def async_select_block(
 
     if block is not None and block['base_fee_per_gas'] is None:
         del block['base_fee_per_gas']
+    else:
+        if block is not None and block['base_fee_per_gas'] is not None:
+            block['base_fee_per_gas'] = int(block['base_fee_per_gas'])
 
     return block
 
@@ -118,6 +121,8 @@ async def async_select_blocks(
     for block in blocks:
         if block is not None and block['base_fee_per_gas'] is None:
             del block['base_fee_per_gas']
+        else:
+            block['base_fee_per_gas'] = int(block['base_fee_per_gas'])
 
     blocks_by_number = {
         block['number']: block for block in blocks if block is not None
