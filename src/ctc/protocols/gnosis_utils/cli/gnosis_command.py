@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import toolcli
+import toolstr
 
-from .. import gnosis_safe_data
+from ctc import cli
+from .. import safe_summary
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -25,4 +27,10 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_gnosis_command(address: str, verbose: bool) -> None:
-    await gnosis_safe_data.async_print_safe_summary(address, verbose=verbose)
+    await safe_summary.async_print_safe_summary(address, verbose=verbose)
+    if not verbose:
+        styles = cli.get_cli_styles()
+        toolstr.print(
+            'use --verbose to display detailed information',
+            style=styles['comment'],
+        )
