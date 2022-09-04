@@ -4,7 +4,7 @@ import typing
 
 from ctc import binary
 from ctc import spec
-from . import gnosis_safe_spec
+from . import safe_spec
 
 
 def parse_safe_signatures(
@@ -77,7 +77,7 @@ def get_safe_transaction_signers(
     signatures: spec.BinaryData
     | typing.Sequence[typing.Mapping[str, typing.Any]],
     safe_transaction_hash: spec.Data,
-    safe_transaction: gnosis_safe_spec.SafeTransaction,
+    safe_transaction: safe_spec.SafeTransaction,
     chain_id: int,
     safe_address: spec.Address,
     call_data: spec.Data,
@@ -151,7 +151,8 @@ def _get_safe_transaction_signers(
 
 
 def hash_safe_transaction(
-    safe_transaction: gnosis_safe_spec.SafeTransaction,
+    safe_transaction: safe_spec.SafeTransaction,
+    *,
     chain_id: int,
     safe_address: spec.Address,
 ) -> spec.Data:
@@ -163,7 +164,7 @@ def hash_safe_transaction(
     }
     return binary.eip712_hash(
         struct_data=safe_transaction,
-        struct_type=gnosis_safe_spec.safe_transaction_type,
+        struct_type=safe_spec.safe_transaction_type,
         domain=domain,
     )
 
@@ -176,21 +177,21 @@ def hash_safe_transaction(
 def get_safe_transaction_from_call_data(
     call_data: spec.BinaryData,
     nonce: int,
-) -> gnosis_safe_spec.SafeTransaction:
+) -> safe_spec.SafeTransaction:
 
     # decode transaction parameters
     decoded = binary.decode_call_data(
         call_data=call_data,
-        function_abi=gnosis_safe_spec.function_abis['execTransaction'],
+        function_abi=safe_spec.function_abis['execTransaction'],
     )
     parameters = typing.cast(
         typing.Mapping[str, typing.Any], decoded['named_parameters']
     )
 
     # create safe transaction from decoded transaction parameters
-    safe_transaction: gnosis_safe_spec.SafeTransaction = {  # type: ignore
+    safe_transaction: safe_spec.SafeTransaction = {  # type: ignore
         key: parameters[key]
-        for key in gnosis_safe_spec.safe_transaction_keys
+        for key in safe_spec.safe_transaction_keys
         if key != 'nonce'
     }
     safe_transaction['nonce'] = nonce
@@ -203,7 +204,7 @@ def get_safe_signatures_from_call_data(
     # decode transaction parameters
     decoded = binary.decode_call_data(
         call_data=call_data,
-        function_abi=gnosis_safe_spec.function_abis['execTransaction'],
+        function_abi=safe_spec.function_abis['execTransaction'],
     )
 
     # return signatures

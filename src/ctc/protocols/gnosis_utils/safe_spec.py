@@ -44,7 +44,7 @@ safe_transaction_type: spec.Eip712StructType = {
         'gasToken': 'address',
         'refundReceiver': 'address',
         'nonce': 'uint256',
-    }
+    },
 }
 
 safe_message_type = {
@@ -141,5 +141,116 @@ function_abis: typing.Mapping[str, spec.FunctionABI] = {
         ],
         'stateMutability': 'payable',
         'type': 'function',
+    },
+}
+
+event_abis = {
+    'AddedOwner': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'owner',
+                'type': 'address',
+            },
+        ],
+        'name': 'AddedOwner',
+        'type': 'event',
+    },
+    'ChangedGuard': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'guard',
+                'type': 'address',
+            },
+        ],
+        'name': 'ChangedGuard',
+        'type': 'event',
+    },
+    'ChangedThreshold': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'threshold',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'ChangedThreshold',
+        'type': 'event',
+    },
+    'ExecutionSuccess': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': False,
+                'internalType': 'bytes32',
+                'name': 'txHash',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'payment',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'ExecutionSuccess',
+        'type': 'event',
+    },
+    'RemovedOwner': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'owner',
+                'type': 'address',
+            },
+        ],
+        'name': 'RemovedOwner',
+        'type': 'event',
+    },
+    'SafeSetup': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'initiator',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address[]',
+                'name': 'owners',
+                'type': 'address[]',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'threshold',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'initializer',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'fallbackHandler',
+                'type': 'address',
+            },
+        ],
+        'name': 'SafeSetup',
+        'type': 'event',
     },
 }
