@@ -2,21 +2,45 @@ from __future__ import annotations
 
 import typing
 from ctc import spec
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, Literal
 
 
-class SafeTransaction(TypedDict):
-    to: spec.Address
-    value: int
-    data: bytes
-    operation: int
-    safeTxGas: int
-    baseGas: int
-    gasPrice: int
-    gasToken: spec.Address
-    refundReceiver: spec.Address
-    nonce: int
+if typing.TYPE_CHECKING:
 
+    class GnosisSafeCreation(TypedDict):
+        creation_block: int
+        creation_transaction: spec.PrefixHexData
+        factory: spec.Address
+        implementation: spec.Address
+        address: spec.Address
+        version: Literal['1.1', '1.3']
+
+    class SafeTransaction(TypedDict):
+        to: spec.Address
+        value: int
+        data: bytes
+        operation: int
+        safeTxGas: int
+        baseGas: int
+        gasPrice: int
+        gasToken: spec.Address
+        refundReceiver: spec.Address
+        nonce: int
+
+
+safe_deployments_repository = 'https://github.com/safe-global/safe-deployments'
+
+deployments = {
+    1: {
+        'factory__1.1.1': '0x76e2cfc1f5fa8f6a5b3fc4c8f4788f0116861f9b',
+        'factory__1.3.0': '0xa6b71e26c5e0845f74c812102ca7114b6a896ab2',
+        'safe__1.0.0': '0xb6029ea3b2c51d09a50b53ca8012feeb05bda35a',
+        'safe__1.1.1': '0x34cfac646f301356faa8b21e94227e3583fe3f5f',
+        'safe__1.2.0': '0x6851d6fdfafd08c0295c392436245e5bc78b0185',
+        'safe__1.3.0': '0xd9db270c1b5e3bd161e8c8503c55ceabee709552',
+        'safe_l2__1.3.0': '0x3e5c63644e683549055b9be8653de26e0b4cd36e',
+    }
+}
 
 safe_transaction_keys = [
     'to',
