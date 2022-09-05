@@ -217,6 +217,12 @@ async def async_decode_call_command(
                 if name not in ['targets', 'calldatas', 'values', 'signatures']
             ]
 
+        # elif (
+        #     named_parameters is not None
+        #     and 'targets' in named_parameters
+        #     and 'calldatas' in named_parameters
+        # ):
+
         else:
             raise Exception('could not detect nested calls')
 
@@ -235,6 +241,8 @@ async def async_decode_call_command(
                     bullet=str(p + 1) + '.',
                 )
                 for subparameter in parameter:
+                    if isinstance(subparameter, bytes):
+                        subparameter = binary.convert(subparameter, 'prefix_hex')
                     toolstr.print(
                         indent + '    ' + stringify(subparameter),
                         style=styles['description'],
@@ -244,6 +252,8 @@ async def async_decode_call_command(
                         indent + '    \[none]', style=styles['comment']
                     )
             else:
+                if isinstance(parameter, bytes):
+                    parameter = binary.convert(parameter, 'prefix_hex')
                 print_bullet(
                     input_names[p],
                     parameter,
