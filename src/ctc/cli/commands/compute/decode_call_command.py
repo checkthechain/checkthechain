@@ -217,12 +217,32 @@ async def async_decode_call_command(
                 if name not in ['targets', 'calldatas', 'values', 'signatures']
             ]
 
-        # elif (
-        #     named_parameters is not None
-        #     and 'targets' in named_parameters
-        #     and 'calldatas' in named_parameters
-        # ):
+        elif (
+            named_parameters is not None
+            and 'targets' in named_parameters
+            and 'payloads' in named_parameters
+            and 'values' in named_parameters
+        ):
+            nested_calls = [
+                {
+                    'address': target,
+                    'call_data': payload,
+                    'value': value,
+                    'signature': None,
+                }
+                for target, payload, value in zip(
+                    named_parameters['targets'],
+                    named_parameters['payloads'],
+                    named_parameters['values'],
+                )
+            ]
 
+            # gather non-nested parameters
+            non_nested_parameters = [
+                n
+                for n, name in enumerate(named_parameters)
+                if name not in ['targets', 'payloads', 'values']
+            ]
         else:
             raise Exception('could not detect nested calls')
 
