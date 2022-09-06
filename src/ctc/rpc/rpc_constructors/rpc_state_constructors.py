@@ -103,7 +103,7 @@ def construct_eth_get_storage_at(
     block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
-    position = binary.convert(position, 'prefix_hex')
+    position = binary.convert(position, 'prefix_hex', keep_leading_0=False)
     encoded_block_number = binary.encode_block_number(block_number)
     return rpc_request.create(
         'eth_getStorageAt', [address, position, encoded_block_number]

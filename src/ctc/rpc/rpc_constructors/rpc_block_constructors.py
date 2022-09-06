@@ -60,7 +60,9 @@ def construct_eth_get_uncle_by_block_hash_and_index(
 ) -> spec.RpcRequest:
 
     encoded_block_hash = binary.convert(block_hash, 'prefix_hex')
-    encoded_uncle_index = binary.convert(uncle_index, 'prefix_hex')
+    encoded_uncle_index = binary.convert(
+        uncle_index, 'prefix_hex', keep_leading_0=False
+    )
 
     return rpc_request.create(
         method='eth_getUncleByBlockHashAndIndex',
@@ -73,7 +75,9 @@ def construct_eth_get_uncle_by_block_number_and_index(
 ) -> spec.RpcRequest:
 
     encoded_block_number = binary.encode_block_number(block_number)
-    encoded_uncle_index = binary.convert(uncle_index, 'prefix_hex')
+    encoded_uncle_index = binary.convert(
+        uncle_index, 'prefix_hex', keep_leading_0=False
+    )
 
     return rpc_request.create(
         method='eth_getUncleByBlockNumberAndIndex',

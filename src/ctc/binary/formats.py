@@ -50,6 +50,7 @@ def convert(
     output_format: typing.Literal['binary'],
     *,
     n_bytes: int | None = None,
+    keep_leading_0: bool | None = None,
 ) -> bytes:
     ...
 
@@ -60,6 +61,7 @@ def convert(
     output_format: typing.Literal['integer'],
     *,
     n_bytes: int | None = None,
+    keep_leading_0: bool | None = None,
 ) -> int:
     ...
 
@@ -70,6 +72,7 @@ def convert(
     output_format: typing.Optional[typing.Literal['prefix_hex', 'raw_hex']],
     *,
     n_bytes: int | None = None,
+    keep_leading_0: bool | None = None,
 ) -> str:
     ...
 
@@ -79,6 +82,7 @@ def convert(
     output_format: typing.Optional[spec.BinaryFormat] = None,
     *,
     n_bytes: int | None = None,
+    keep_leading_0: bool | None = None,
 ) -> spec.BinaryInteger:
     """convert {hex str or bytes} into {hex str or bytes}
 
@@ -145,11 +149,10 @@ def convert(
 
         else:
 
+            if keep_leading_0 is None:
+                keep_leading_0 = True
             if n_bytes is None:
                 n_bytes = get_binary_n_bytes(data)
-                keep_leading_0 = False
-            else:
-                keep_leading_0 = True
             as_bytes = data.to_bytes(n_bytes, 'big')
 
             if output_format == 'binary':
