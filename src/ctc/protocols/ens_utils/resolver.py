@@ -28,7 +28,7 @@ async def async_resolve_name(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> spec.Address:
+) -> spec.Address | None:
     name_hash = hash_name(name)
 
     function_abi: spec.FunctionABI = {
@@ -51,6 +51,8 @@ async def async_resolve_name(
         resolver = await registrar.async_get_resolver(
             name=name, provider=provider, block=block
         )
+        if resolver == '0x0000000000000000000000000000000000000000':
+            return None
         result = await rpc.async_eth_call(
             to_address=resolver,
             block_number=block,
@@ -73,7 +75,7 @@ async def async_resolve_names(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> typing.Sequence[spec.Address]:
+) -> typing.Sequence[spec.Address | None]:
 
     import asyncio
 

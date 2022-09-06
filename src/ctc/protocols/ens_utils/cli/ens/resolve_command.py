@@ -28,4 +28,7 @@ async def async_resolve_command(
     if block is not None:
         block = binary.standardize_block_number(block)
     address = await ens_utils.async_resolve_name(name, block=block)
-    print(address)
+    if address is not None:
+        print(address)
+    else:
+        print('[name does not resolve to address]')

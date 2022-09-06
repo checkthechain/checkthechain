@@ -97,9 +97,13 @@ async def async_etherscan_command(
     elif query.endswith('.eth'):
         from ctc.protocols import ens_utils
 
-        address = await ens_utils.async_resolve_name(query)
-        url = etherscan_utils.create_address_url(address)
-        is_address = True
+        resolved_address = await ens_utils.async_resolve_name(query)
+        if resolved_address is None:
+            print('[name does not resolve to an address]')
+        else:
+            address = resolved_address
+            url = etherscan_utils.create_address_url(address)
+            is_address = True
     else:
         try:
             address = await evm.async_get_erc20_address(query)

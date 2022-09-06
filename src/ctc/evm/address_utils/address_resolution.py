@@ -6,7 +6,7 @@ import typing
 if typing.TYPE_CHECKING:
     from ctc import spec
 
-    N = typing.TypeVar('N')
+#     N = typing.TypeVar('N')
 
 
 # def is_ens_name(name: typing.Any) -> bool:
@@ -18,11 +18,11 @@ if typing.TYPE_CHECKING:
 
 
 async def async_resolve_address(
-    name_or_address: N,
+    name_or_address: str,
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> N:
+) -> str:
 
     if not (
         isinstance(name_or_address, str)
@@ -33,24 +33,28 @@ async def async_resolve_address(
 
     from ctc.protocols import ens_utils
 
-    return await ens_utils.async_resolve_name(  # type: ignore
+    result = await ens_utils.async_resolve_name(
         name=name_or_address,
         provider=provider,
         block=block,
     )
+    if result is not None:
+        return result
+    else:
+        return name_or_address
 
 
 async def async_resolve_addresses(
-    names_or_addresses: typing.Sequence[N],
+    names_or_addresses: typing.Sequence[str],
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> typing.Sequence[N]:
+) -> typing.Sequence[str]:
 
-    to_resolve = {}
-    for i, item in enumerate(names_or_addresses):
+    to_resolve: typing.Sequence[str] = []
+    for item in enumerate(names_or_addresses):
         if isinstance(item, str) and len(item) > 4 and item.endswith('.eth'):
-            to_resolve[i] = item
+            to_resolve.append(item)
 
     if len(to_resolve) == 0:
         return names_or_addresses
@@ -60,24 +64,31 @@ async def async_resolve_addresses(
         from ctc.protocols import ens_utils
 
         results = await ens_utils.async_resolve_names(
-            names=list(to_resolve.values()),
+            names=to_resolve,
             provider=provider,
             block=block,
         )
-        resolved = dict(zip(to_resolve.keys(), results))
+        resolved: typing.Mapping[str, str | None] = dict(
+            zip(to_resolve, results)
+        )
 
-        return [
-            resolved.get(i, item)  # type: ignore
-            for i, item in enumerate(names_or_addresses)
-        ]
+        output: list[str] = []
+        for name_or_address in names_or_addresses:
+            resolved_name_or_address = resolved.get(name_or_address)
+            if resolved_name_or_address is not None:
+                output.append(resolved_name_or_address)
+            else:
+                output.append(name_or_address)
+
+        return output
 
 
 async def async_resolve_address_by_block(
-    name_or_address: N,
+    name_or_address: str,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
-) -> typing.Sequence[N]:
+) -> typing.Sequence[str]:
     import asyncio
 
     coroutines = [
@@ -89,4 +100,9 @@ async def async_resolve_address_by_block(
         for block in blocks
     ]
 
-    return await asyncio.gather(*coroutines)
+    results = await asyncio.gather(*coroutines)
+
+    return [
+        (result if result is not None else name_or_address)
+        for result in results
+    ]

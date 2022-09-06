@@ -71,9 +71,10 @@ async def async_ens_command(
             toolstr.print_text_box(result['address'])
             print('[no ENS records]')
             continue
-        elif result['address'] is None:
+        elif result['address'] is None and result['owner'] is None:
             toolstr.print_text_box(result['name'])
             print('[no ENS records]')
+            raise Exception()
             continue
 
         toolstr.print_text_box(result['name'])
