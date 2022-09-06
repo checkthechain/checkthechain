@@ -95,9 +95,7 @@ async def async_decode_call_command(
                 function_signature=explicit_signature
             )
             call_data = (
-                '0x'
-                + function_selector
-                + binary.convert(call_data, 'raw_hex')
+                '0x' + function_selector + binary.convert(call_data, 'raw_hex')
             )
 
         decoded = binary.decode_call_data(
@@ -117,12 +115,11 @@ async def async_decode_call_command(
         if key_style is None:
             key_style = styles['option']
 
-        as_str = (indent + toolstr.add_style(bullet + ' ', styles['title']))
+        as_str = indent + toolstr.add_style(bullet + ' ', styles['title'])
         if key != '':
-            as_str += (
-                toolstr.add_style(str(key), key_style)
-                + toolstr.add_style(': ', styles['comment'])
-            )
+            as_str += toolstr.add_style(
+                str(key), key_style
+            ) + toolstr.add_style(': ', styles['comment'])
         as_str += toolstr.add_style(str(value), styles['description'] + ' bold')
         toolstr.print(as_str)
 
@@ -173,9 +170,17 @@ async def async_decode_call_command(
     # detect nested calls
     nested_calls = []
     non_nested_parameters = list(range(len(decoded['parameters'])))
-    if nested:
+    named_parameters = decoded.get('named_parameters')
 
-        named_parameters = decoded.get('named_parameters')
+    function_selector = binary.get_function_selector(function_abi)
+    if not nested:
+        nested = function_selector in [
+            '252dba42',  # aggregate((address,bytes)[])
+            '7d5e81e2',  # propose(address[],uint256[],bytes[],string)
+            '40a4f325',  # executeBatch(address,address[],uint256[],bytes[],bytes32,bytes32)
+        ]
+
+    if nested:
 
         if len(function_abi['inputs']) == 1:
             nested_calls = [
@@ -207,7 +212,9 @@ async def async_decode_call_command(
                     nested_call['value'] = named_parameters['values'][i]
                 if 'signatures' in named_parameters:
                     if named_parameters['signatures'][i] != '':
-                        nested_call['signature'] = named_parameters['signatures'][i]
+                        nested_call['signature'] = named_parameters[
+                            'signatures'
+                        ][i]
                 nested_calls.append(nested_call)
 
             # gather non-nested parameters
@@ -243,6 +250,7 @@ async def async_decode_call_command(
                 for n, name in enumerate(named_parameters)
                 if name not in ['targets', 'payloads', 'values']
             ]
+
         else:
             raise Exception('could not detect nested calls')
 
@@ -262,7 +270,9 @@ async def async_decode_call_command(
                 )
                 for subparameter in parameter:
                     if isinstance(subparameter, bytes):
-                        subparameter = binary.convert(subparameter, 'prefix_hex')
+                        subparameter = binary.convert(
+                            subparameter, 'prefix_hex'
+                        )
                     toolstr.print(
                         indent + '    ' + stringify(subparameter),
                         style=styles['description'],
