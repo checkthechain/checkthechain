@@ -56,25 +56,21 @@ async def async_intake_block(
             return
 
         with engine.begin() as conn:
-            block_coroutine = _async_intake_block_object(
+            # do not perform these concurrently to prevent deadlocks
+            await _async_intake_block_object(
                 block=block,
                 conn=conn,
                 network=network,
             )
-            timestamp_coroutine = _async_intake_block_timestamp(
+            await _async_intake_block_timestamp(
                 block=block,
                 conn=conn,
                 network=network,
             )
-            block_gas_coroutine = _async_intake_block_gas(
+            await _async_intake_block_gas(
                 block=block,
                 conn=conn,
                 network=network,
-            )
-            await asyncio.gather(
-                block_coroutine,
-                timestamp_coroutine,
-                block_gas_coroutine,
             )
 
 
@@ -176,23 +172,21 @@ async def async_intake_blocks(
             return
 
         with engine.begin() as conn:
-            blocks_coroutine = _async_intake_block_objects(
+            # do not perform these concurrently to prevent deadlocks
+            await _async_intake_block_objects(
                 confirmed_blocks=confirmed_blocks,
                 network=network,
                 conn=conn,
             )
-            timestamps_coroutine = _async_intake_block_timestamps(
+            await _async_intake_block_timestamps(
                 confirmed_blocks=confirmed_blocks,
                 network=network,
                 conn=conn,
             )
-            gas_coroutine = _async_intake_blocks_gas(
+            await _async_intake_blocks_gas(
                 blocks=blocks,
                 conn=conn,
                 network=network,
-            )
-            await asyncio.gather(
-                blocks_coroutine, timestamps_coroutine, gas_coroutine
             )
 
 
