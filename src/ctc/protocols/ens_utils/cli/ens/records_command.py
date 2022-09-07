@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
+from ctc import cli
 from ctc.protocols import ens_utils
 
 
@@ -22,4 +23,4 @@ async def async_records_command(name: str) -> None:
     text_records = await ens_utils.async_get_text_records(name=name)
 
     for key, value in sorted(text_records.items()):
-        print('-', key + ':', value)
+        cli.print_bullet(key=key, value=value)

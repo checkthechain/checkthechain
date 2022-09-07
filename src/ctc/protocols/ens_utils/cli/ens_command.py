@@ -8,6 +8,7 @@ import tooltime
 from typing_extensions import TypedDict
 
 from ctc import binary
+from ctc import cli
 from ctc import evm
 from ctc import spec
 
@@ -77,15 +78,20 @@ async def async_ens_command(
             raise Exception()
             continue
 
-        toolstr.print_text_box(result['name'])
-        print('- address:', result['address'])
-        print('- owner:', result['owner'])
-        print('- resolver:', result['resolver'])
-        print('- namehash:', ens_utils.hash_name(result['name']))
+        styles = cli.get_cli_styles()
+        toolstr.print_text_box(result['name'], style=styles['title'])
+        cli.print_bullet(key='address', value=result['address'])
+        cli.print_bullet(key='owner', value=result['owner'])
+        cli.print_bullet(key='resolver', value=result['resolver'])
+        cli.print_bullet(
+            key='namehash', value=ens_utils.hash_name(result['name'])
+        )
         # print('- registered:', )
-        print(
-            '- expiration:',
-            tooltime.timestamp_to_iso(result['expiration']).replace('T', ' '),
+        cli.print_bullet(
+            key='expiration',
+            value=tooltime.timestamp_to_iso(result['expiration']).replace(
+                'T', ' '
+            ),
         )
 
         if verbose:
@@ -95,11 +101,11 @@ async def async_ens_command(
             if len(text_records) > 0:
                 print()
                 print()
-                toolstr.print_header('Text Records')
+                toolstr.print_header('Text Records', style=styles['title'])
                 for key, value in sorted(text_records.items()):
-                    print('-', key + ':', value)
+                    cli.print_bullet(key=key, value=value)
             else:
-                print('- no text records')
+                cli.print_bullet(value='no text records')
 
 
 async def async_process_ens_arg(
