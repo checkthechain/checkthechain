@@ -71,7 +71,16 @@ def collect_cli_examples():
         # convert examples into raw commands
         for example_str in example_strs:
             command_pieces = [sys.executable, '-m', 'ctc'] + list(subcommand)
-            command_pieces.extend(example_str.split(' '))
+
+            # handle internal quotes
+            if '\'' in example_str:
+                pieces = example_str.split('\'')
+                for head, tail in zip(pieces[::2], pieces[1::2]):
+                    command_pieces.extend(head.split(' '))
+                    command_pieces.append(tail)
+            else:
+                command_pieces.extend(example_str.split(' '))
+
             command_pieces = [
                 piece.strip('"') for piece in command_pieces if piece != ''
             ]
