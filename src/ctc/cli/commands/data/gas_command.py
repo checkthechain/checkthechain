@@ -135,41 +135,41 @@ async def async_gas_command(
     print()
     toolstr.print('all prices reported in gwei', style=styles['comment'])
 
-    if verbose:
-        print()
-        toolstr.print_header('Block Summary', style=styles['title'])
-        print()
-        toolstr.print(
-            'using block ' + toolstr.add_style(str(block), styles['metavar']),
-            style=styles['comment'],
-        )
-        block_rows = []
-        block_gas_stats = await evm.async_get_block_gas_stats(
-            block_numbers[-1],
-        )
-        for key, value in block_gas_stats.items():
-            if key in ['gas_limit', 'gas_used']:
-                block_row = (
-                    key,
-                    toolstr.format(value, order_of_magnitude=True),
-                )
-            else:
-                if value is None:
-                    if key == 'base_fee':
-                        block_row = (key, '-')
-                    else:
-                        block_row = (key, '\[no txs]')
+    print()
+    toolstr.print_header('Latest Block Summary', style=styles['title'])
+    print()
+    toolstr.print(
+        'using block ' + toolstr.add_style(str(block), styles['metavar']),
+        style=styles['comment'],
+    )
+    block_rows = []
+    block_gas_stats = await evm.async_get_block_gas_stats(
+        block_numbers[-1],
+    )
+    for key, value in block_gas_stats.items():
+        if key in ['gas_limit', 'gas_used']:
+            block_row = (
+                key,
+                toolstr.format(value, order_of_magnitude=True),
+            )
+        else:
+            if value is None:
+                if key == 'base_fee':
+                    block_row = (key, '-')
                 else:
-                    block_row = (key, toolstr.format(value))
-            block_rows.append(block_row)
-        print()
-        toolstr.print_table(
-            block_rows,
-            border=styles['comment'],
-            column_styles=[styles['option'], styles['description'] + ' bold'],
-            indent=4,
-        )
+                    block_row = (key, '\[no txs]')
+            else:
+                block_row = (key, toolstr.format(value))
+        block_rows.append(block_row)
+    print()
+    toolstr.print_table(
+        block_rows,
+        border=styles['comment'],
+        column_styles=[styles['option'], styles['description'] + ' bold'],
+        indent=4,
+    )
 
+    if verbose:
         print()
         print()
         toolstr.print_header(
