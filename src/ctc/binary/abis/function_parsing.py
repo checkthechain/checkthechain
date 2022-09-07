@@ -7,6 +7,25 @@ from ctc import spec
 from .. import hashes
 
 
+def function_signature_to_abi(function_signature: str) -> spec.FunctionABI:
+    """return a partial ABI of function from just a signature
+
+    will be missing input parameter names and information about outputs
+    """
+    function_name, tail = function_signature.split('(')
+    parameters, _ = tail.split(')')
+    parameter_types = parameters.split(',')
+
+    return {
+        'type': 'function',
+        'name': function_name,
+        'inputs': [
+            {'type': parameter_type} for parameter_type in parameter_types
+        ],
+        'outputs': [],
+    }
+
+
 def get_function_parameter_types(
     function_abi: spec.FunctionABI | None = None,
     function_signature: typing.Optional[str] = None,

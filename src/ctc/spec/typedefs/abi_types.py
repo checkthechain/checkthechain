@@ -14,8 +14,8 @@ class FunctionABI(TypedDict, total=False):
     name: NotRequired[str]
     inputs: NotRequired[list['ABIFunctionArg']]
     outputs: NotRequired[list['ABIFunctionArg']]
-    stateMutability: typing.Literal['pure', 'view', 'nonpayable', 'payable']
-    anonymous: bool
+    stateMutability: NotRequired[typing.Literal['pure', 'view', 'nonpayable', 'payable']]
+    anonymous: NotRequired[bool]
 
 
 class ABIFunctionArg(TypedDict, total=False):
