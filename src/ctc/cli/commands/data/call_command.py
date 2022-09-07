@@ -6,6 +6,7 @@ import toolcli
 import toolstr
 
 from ctc import cli
+from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -17,7 +18,10 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'output result of a call',
         'args': [
             {'name': 'address', 'help': 'address to point call toward'},
-            {'name': 'function-name', 'help': 'name of function to call'},
+            {
+                'name': 'function',
+                'help': 'function name, 4byte selector, or ABI',
+            },
             {'name': 'args', 'nargs': '*', 'help': 'function arguments'},
             {
                 'name': ['--verbose', '-v'],
@@ -36,6 +40,8 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca totalSupply',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca 0x18160ddd',
+            '0x956f47f50a910163d8bf957cf5846d573e7f87ca \'{"name": "totalSupply", "inputs": [], "outputs": [{"type": "uint256"}]}\'',
         ],
     }
 
@@ -43,7 +49,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_call_command(
     *,
     address: spec.Address,
-    function_name: str,
+    function: str,
     args: typing.Sequence[str],
     verbose: bool,
     from_address: spec.Address,
@@ -73,15 +79,33 @@ async def async_call_command(
             cli.print_bullet(key='block', value=block)
         if from_address is not None:
             cli.print_bullet(key='from address', value=from_address)
-        cli.print_bullet(key='function', value=function_name)
+        cli.print_bullet(key='function', value=function)
         cli.print_bullet(key='arguments', value=args)
         print()
         toolstr.print('result =', style=styles['option'])
 
-    function_abi = await evm.async_get_function_abi(
-        contract_address=address,
-        function_name=function_name,
-    )
+    if binary.is_function_selector(function):
+        function_name = None
+        function_selector = function
+        function_abi = None
+    else:
+        try:
+            import ast
+
+            function_name = None
+            function_selector = None
+            function_abi = ast.literal_eval(function)
+        except Exception:
+            function_name = function
+            function_selector = None
+            function_abi = None
+
+    if function_abi is None:
+        function_abi = await evm.async_get_function_abi(
+            contract_address=address,
+            function_name=function_name,
+            function_selector=function_selector,
+        )
 
     if len(args) != len(function_abi['inputs']):
         raise Exception('improper number of arguments for function')

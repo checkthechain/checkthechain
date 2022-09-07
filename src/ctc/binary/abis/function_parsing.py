@@ -136,6 +136,13 @@ def get_function_selector(
     return full_hash[:8]
 
 
+def is_function_selector(selector: typing.Any) -> bool:
+    return isinstance(selector, str) and (
+        (spec.is_prefix_hex_data(selector) and len(selector) == 10)
+        or (spec.is_raw_hex_data(selector) and len(selector) == 8)
+    )
+
+
 def get_function_output_types(
     function_abi: spec.FunctionABI,
 ) -> list[spec.ABIDatumType]:
