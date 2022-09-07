@@ -24,12 +24,13 @@ from ctc.cli import cli_run
 command_help = """output the result of multiple contract eth_call's
 
 This command can be used in two ways:
-[title]1) **Multi-contract Calls**[/title]: same call across multiple contracts
+[title]1) [option]**Multi-contract Calls**[/option][/title][comment]:[/comment] same call across multiple contracts
     - This is indicated by the `--addresses` parameter
-    - Example: `call <function-name> --addresses <addr1> <addr2> <addr3>`
-[title]2) **Multi-block Calls**[/title]: same call across multiple blocks
+    - Example: `call <function> --addresses <addr1> <addr2> <addr3>`
+[title]2) [option]**Multi-block Calls**[/option][/title][comment]:[/comment] same call across multiple blocks
     - This is indicated by either of the `--blocks` or `--time` parameters
-    - Example: `call <addr1> <function-name> --time 30d`
+    - Example: `call <addr1> <function> --time 30d`
+[comment]in each case, `<function>` can be a name, a 4byte selector, or an ABI[/comment]
 
 ## Multi-contract Calls
 
@@ -274,11 +275,11 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'examples': {
-            '<function_name> [<function_parameters>] --addresses <addresses>': {
+            '<function> [<function_parameters>] --addresses <addresses>': {
                 'description': '1) multi-contract template: same call across multiple addresses',
                 'runnable': False,
             },
-            '<address> <function_name> [<function_parameters>] --blocks <blocks>': {
+            '<address> <function> [<function_parameters>] --blocks <blocks>': {
                 'description': '2) multi-block template: same call across multiple blocks',
                 'runnable': False,
             },
@@ -287,7 +288,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'runnable': True,
             },
             '0x6b175474e89094c44da98b954eedeac495271d0f balanceOf 0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7 --times 2021:2022:1w --normalize': {
-                'description': 'Weekly balance of DAI in Curve 3pool over year 2021',
+                'description': 'Weekly balance of DAI in Curve 3pool throughout year 2021',
                 'runnable': True,
             },
         },
@@ -380,21 +381,23 @@ async def async_perform_multi_contract_call(
     if block is None:
         block = 'latest'
 
-    function_name, *function_parameters = address_and_or_function
+    function, *function_parameters = address_and_or_function
 
     # assert that all address functions have the same number of outputs
-    function_abi = await evm.async_get_function_abi(
+    function_abi = await evm.async_parse_function_str_abi(
+        function,
         contract_address=addresses[0],
-        function_name=function_name,
     )
     n_outputs = len(function_abi['outputs'])
     for to_address in addresses[1:]:
         other_function_abi = await evm.async_get_function_abi(
             contract_address=to_address,
-            function_name=function_name,
+            function_name=function_abi['name'],
         )
+        if len(other_function_abi['inputs']) != len(function_abi['inputs']):
+            print('not all addresses have same number of function inputs')
         if len(other_function_abi['outputs']) != n_outputs:
-            print('toaddresses do not all have same number of function outputs')
+            print('not all addresses have same number of function outputs')
 
     # fetch data
     if unique_abis:
@@ -403,7 +406,7 @@ async def async_perform_multi_contract_call(
         coroutines = [
             rpc.async_batch_eth_call(
                 to_address=address,
-                function_name=function_name,
+                function_abi=function_abi,
                 function_parameters=function_parameters,
                 block_number=block,
                 from_address=from_address,
@@ -414,7 +417,7 @@ async def async_perform_multi_contract_call(
     else:
         results = await rpc.async_batch_eth_call(
             to_addresses=addresses,
-            function_name=function_name,
+            function_abi=function_abi,
             function_parameters=function_parameters,
             block_number=block,
             from_address=from_address,
@@ -449,7 +452,7 @@ async def async_perform_multi_contract_call(
     if block is None:
         block = 'latest'
     cli.print_bullet(key='block', value=block)
-    cli.print_bullet(key='function', value=function_name)
+    cli.print_bullet(key='function', value=function_abi.get('name', '\[none]'))
     cli.print_bullet(key='function_args', value='')
     for fp, function_parameter in enumerate(function_parameters):
         cli.print_bullet(value=function_parameter, number=fp + 1, indent=4)
@@ -521,10 +524,14 @@ async def async_perform_multi_block_call(
     # parse address, function, and function parameters
     (
         to_address,
-        function_name,
+        function,
         *function_parameters,
     ) = address_and_or_function
     to_address = await evm.async_resolve_address(to_address, block=block)
+    function_abi = await evm.async_parse_function_str_abi(
+        function,
+        contract_address=to_address,
+    )
 
     # parse blocks or times
     if blocks is not None:
@@ -558,21 +565,15 @@ async def async_perform_multi_block_call(
     # fetch data
     results = await rpc.async_batch_eth_call(
         to_address=to_address,
-        function_name=function_name,
+        function_abi=function_abi,
         function_parameters=function_parameters,
         block_numbers=block_numbers,
         from_address=from_address,
     )
 
-    # name based on first contract's abi
-    function_abi = await evm.async_get_function_abi(
-        contract_address=to_address,
-        function_name=function_name,
-    )
     output_names = binary.get_function_output_names(
         function_abi, human_readable=True
     )
-
     if normalize is not None:
         if len(normalize) == 0:
             if len(output_names) != 1:
@@ -592,21 +593,12 @@ async def async_perform_multi_block_call(
         else:
             raise Exception('--normalize should have at most 1 argument')
 
-    # get output names
-    function_abi = await evm.async_get_function_abi(
-        contract_address=to_address,
-        function_name=function_name,
-    )
-    output_names = binary.get_function_output_names(
-        function_abi, human_readable=True
-    )
-
     styles = cli.get_cli_styles()
     toolstr.print_text_box('Multi-block calls', style=styles['title'])
     cli.print_bullet(
         key='address', value=toolstr.add_style(to_address, styles['metavar'])
     )
-    cli.print_bullet(key='function', value=function_name)
+    cli.print_bullet(key='function', value=function_abi.get('name', '\[none]'))
     cli.print_bullet(key='function_args', value='')
     for fp, function_parameter in enumerate(function_parameters):
         cli.print_bullet(value=function_parameter, number=fp + 1, indent=4)

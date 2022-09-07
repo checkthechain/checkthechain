@@ -84,28 +84,10 @@ async def async_call_command(
         print()
         toolstr.print('result =', style=styles['option'])
 
-    if binary.is_function_selector(function):
-        function_name = None
-        function_selector = function
-        function_abi = None
-    else:
-        try:
-            import ast
-
-            function_name = None
-            function_selector = None
-            function_abi = ast.literal_eval(function)
-        except Exception:
-            function_name = function
-            function_selector = None
-            function_abi = None
-
-    if function_abi is None:
-        function_abi = await evm.async_get_function_abi(
-            contract_address=address,
-            function_name=function_name,
-            function_selector=function_selector,
-        )
+    function_abi = await evm.async_parse_function_str_abi(
+        function,
+        contract_address=address,
+    )
 
     if len(args) != len(function_abi['inputs']):
         raise Exception('improper number of arguments for function')
