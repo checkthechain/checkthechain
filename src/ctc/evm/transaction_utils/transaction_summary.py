@@ -144,7 +144,6 @@ async def async_print_transaction_summary(
 
         await decode_call_command.async_decode_call_command(
             args=[transaction_hash],
-            tx=True,
             title='Call Data',
         )
 
