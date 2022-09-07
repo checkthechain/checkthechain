@@ -4,7 +4,9 @@ import typing
 
 import toolcli
 import tooltime
+import toolstr
 
+from ctc import cli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -58,11 +60,8 @@ async def async_block_command(
         attributes = [
             'number',
             'timestamp',
-            'time',
-            'min_gas_price',
-            'median_gas_price',
-            'mean_gas_price',
-            'max_gas_price',
+            'age',
+            'median_gas',
         ]
     elif attributes == ['all']:
         attributes = list(spec.block_keys)
@@ -75,53 +74,80 @@ async def async_block_command(
     export_blocks = await cli_utils.async_resolve_block_range(blocks)
 
     # print summary
-    print('exporting from', len(export_blocks), 'blocks')
-    print('- min:', min(export_blocks))
-    print('- max:', max(export_blocks))
-    print('- attributes:', attributes)
-    print()
+    styles = cli.get_cli_styles()
+    toolstr.print_text_box('Blocks Data', style=styles['title'])
+    cli.print_bullet(key='n_blocks', value=len(export_blocks))
+    cli.print_bullet(key='min block', value=min(export_blocks))
+    cli.print_bullet(key='max block', value=max(export_blocks))
 
-    # obtain data
-    gas_attrs = [
-        'min_gas_price',
-        'median_gas_price',
-        'mean_gas_price',
-        'max_gas_price',
-    ]
-    compute_gas = any(attr in attributes for attr in gas_attrs)
     blocks_data = await rpc.async_batch_eth_get_block_by_number(
         block_numbers=export_blocks,
-        include_full_transactions=compute_gas,
+        include_full_transactions=True,
         provider=provider,
     )
 
-    # format as dataframe
-    df = pd.DataFrame(blocks_data)
+    if output == 'stdout':
+        cli.print_bullet(key='attributes', value='')
+        for attribute in attributes:
+            cli.print_bullet(value=attribute, indent=4)
+        print()
 
-    # special attribute: gas stats
-    if compute_gas:
-        gas_stats = pd.DataFrame(
-            evm.get_block_gas_stats(block_data) for block_data in blocks_data
+        aliases = {
+            'number': 'block',
+            'median_gas': 'median gas',
+        }
+        rows = []
+        for block in blocks_data:
+            row: list[typing.Any] = []
+            for attribute in attributes:
+                if attribute == 'timestamp':
+                    row.append(
+                        tooltime.timestamp_to_iso_pretty(block['timestamp'])
+                    )
+                elif attribute == 'age':
+                    age = tooltime.get_age(
+                        block['timestamp'], 'TimelengthPhrase'
+                    )
+                    age = ', '.join(age.split(', ')[:2])
+                    row.append(age)
+                elif attribute == 'median_gas':
+                    median_gas = evm.compute_median_block_gas_fee(
+                        block, normalize=True
+                    )
+                    row.append(median_gas)
+                else:
+                    row.append(block[attribute])
+            rows.append(row)
+        labels = [aliases.get(attribute, attribute) for attribute in attributes]
+        print()
+        toolstr.print_table(
+            rows,
+            labels=labels,
+            border=styles['comment'],
+            label_style=styles['title'],
+            column_styles={
+                'block': styles['description'],
+            },
+            column_formats={
+                'block': {'commas': False},
+                'median gas': {'postfix': ' gwei', 'trailing_zeros': True},
+            },
+            compact=4,
         )
-        for gas_attr in gas_attrs:
-            if gas_attr in attributes:
-                df[gas_attr] = gas_stats[gas_attr]
+    else:
 
-    # special attribute: base_fee_per_gas
-    if 'base_fee_per_gas' in attributes and 'base_fee_per_gas' not in df:
-        df['base_fee_per_gas'] = np.nan
-    if 'base_fee_per_gas' in df:
-        df['base_fee_per_gas'] /= 1e9
+        # format as dataframe
+        df = pd.DataFrame(blocks_data)
 
-    # special attribute: time
-    if 'time' in attributes:
-        df['time'] = df['timestamp'].map(tooltime.timestamp_to_iso)
+        # # special attribute: time
+        # if 'time' in attributes:
+        #     df['time'] = df['timestamp'].map(tooltime.timestamp_to_iso)
 
-    # trim attributes
-    if len(attributes) > 0:
-        df = df[attributes]
+        # # trim attributes
+        # if len(attributes) > 0:
+        #     df = df[attributes]
 
-    # output data
-    if 'number' in df:
-        df = df.set_index('number')
-    cli_utils.output_data(df, output=output, overwrite=overwrite)
+        # # output data
+        # if 'number' in df:
+        #     df = df.set_index('number')
+        cli_utils.output_data(df, output=output, overwrite=overwrite)
