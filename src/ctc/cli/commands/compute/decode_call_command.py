@@ -6,7 +6,9 @@ import toolcli
 import toolstr
 
 from ctc import binary
+from ctc import cli
 from ctc import evm
+from ctc import spec
 from ctc.cli import cli_run
 
 
@@ -72,37 +74,60 @@ async def async_decode_call_command(
         transaction = await evm.async_get_transaction(args[0])
         call_data = transaction['input']
         contract_address = transaction['to']
+        contract_known = True
     elif len(args) == 1:
         from ctc.protocols import fourbyte_utils
 
+        contract_known = False
         call_data = args[0]
         signature = call_data[:10]
         result = await fourbyte_utils.async_query_function_signatures(signature)
-        print(result)
-        return
+
+        for subresult in result:
+            try:
+                function_abi: spec.FunctionABI | None = binary.function_signature_to_abi(
+                    subresult['text_signature']
+                )
+                decoded = binary.decode_call_data(
+                    call_data=call_data,
+                    function_abi=function_abi,
+                )
+                break
+            except Exception as e:
+                raise e
+                continue
+        else:
+            raise Exception(
+                'could not identify suitable abi for decoding function'
+            )
+
     elif len(args) == 2:
         contract_address, call_data = args
+        contract_known = True
     else:
         raise Exception('wrong syntax, see `ctc decode -h`')
 
-    try:
-        contract_abi = await evm.async_get_contract_abi(
-            contract_address=contract_address
-        )
-        if explicit_signature is not None:
-            function_selector = binary.get_function_selector(
-                function_signature=explicit_signature
+    if contract_known:
+        try:
+            contract_abi = await evm.async_get_contract_abi(
+                contract_address=contract_address
             )
-            call_data = (
-                '0x' + function_selector + binary.convert(call_data, 'raw_hex')
-            )
+            if explicit_signature is not None:
+                function_selector = binary.get_function_selector(
+                    function_signature=explicit_signature
+                )
+                call_data = (
+                    '0x'
+                    + function_selector
+                    + binary.convert(call_data, 'raw_hex')
+                )
 
-        decoded = binary.decode_call_data(
-            contract_abi=contract_abi, call_data=call_data
-        )
-        function_abi = decoded['function_abi']
-    except Exception:
-        function_abi = None
+            decoded = binary.decode_call_data(
+                contract_abi=contract_abi, call_data=call_data
+            )
+            function_abi = decoded['function_abi']
+        except Exception:
+            function_abi = None
 
     def print_bullet(
         key: typing.Any,
@@ -122,7 +147,8 @@ async def async_decode_call_command(
         as_str += toolstr.add_style(str(value), styles['description'] + ' bold')
         toolstr.print(as_str)
 
-    print_bullet('to', contract_address, indent)
+    if contract_known:
+        print_bullet('to', contract_address, indent)
     print_bullet('n_bytes', len(binary.convert(call_data, 'binary')), indent)
     if send_value is not None:
         print_bullet('value', send_value, indent)
@@ -131,7 +157,12 @@ async def async_decode_call_command(
         if explicit_signature is not None:
             print_bullet('signature', explicit_signature)
         print()
-        print('[abi for ' + contract_address + ' unavailable, cannot decode]')
+        if contract_known:
+            print(
+                '[abi for ' + contract_address + ' unavailable, cannot decode]'
+            )
+        else:
+            print('[abi unavailable, cannot decode]')
         return
 
     # print funciton info
@@ -148,20 +179,36 @@ async def async_decode_call_command(
         )
     print_bullet('inputs', indent=indent)
     for p, parameter in enumerate(function_abi['inputs']):
-        print_bullet(
-            parameter['name'],
-            parameter['type'],
-            indent=indent + '    ',
-            bullet=str(p + 1) + '.',
-        )
+        if 'name' in parameter:
+            cli.print_bullet(
+                key=parameter['name'],
+                value=parameter['type'],
+                indent=indent + '    ',
+                number=p + 1,
+            )
+        else:
+            cli.print_bullet(
+                value=parameter['type'],
+                colon_str='',
+                indent=indent + '    ',
+                number=p + 1,
+            )
     print_bullet('outputs', indent=indent)
     for p, parameter in enumerate(function_abi['outputs']):
-        print_bullet(
-            parameter['name'],
-            parameter['type'],
-            indent=indent + '    ',
-            bullet=str(p + 1) + '.',
-        )
+        if 'name' in parameter:
+            cli.print_bullet(
+                key=parameter['name'],
+                value=parameter['type'],
+                indent=indent + '    ',
+                number=(p + 1),
+            )
+        else:
+            cli.print_bullet(
+                key=parameter['name'],
+                value=parameter['type'],
+                indent=indent + '    ',
+                number=(p + 1),
+            )
     if len(function_abi['outputs']) == 0:
         toolstr.print(indent + '    \[no outputs]', style=styles['comment'])
     print()
@@ -261,9 +308,12 @@ async def async_decode_call_command(
         for p, parameter in enumerate(decoded['parameters']):
             if p not in non_nested_parameters:
                 parameter = '\[nested parameter, see below]'  # type: ignore
+            input_name = input_names[p]
+            if input_name is None:
+                input_name = function_abi['inputs'][p]['type']
             if isinstance(parameter, tuple):
                 print_bullet(
-                    str(input_names[p]),
+                    str(input_name),
                     indent=indent,
                     bullet=str(p + 1) + '.',
                 )
@@ -284,7 +334,7 @@ async def async_decode_call_command(
                 if isinstance(parameter, bytes):
                     parameter = binary.convert(parameter, 'prefix_hex')
                 print_bullet(
-                    input_names[p],
+                    input_name,
                     parameter,
                     indent=indent,
                     bullet=str(p + 1) + '.',
