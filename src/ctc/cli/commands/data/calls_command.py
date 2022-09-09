@@ -53,11 +53,12 @@ Ranges are inclusive of start and end boundaries
 
 Example block specifications:
     `--blocks 16000 16010 16020 16030`
-    `--blocks 16000,16010,16020,16030`
-    `--blocks 16000, 16010, 16020, 16030`
     `--blocks 16010:16030:10`
     `--blocks 16010:16030 -n 4`
-    (each of these examples specifies the same set of 4 blocks)
+    `--blocks 16030:-20:10`
+    `--blocks latest:-20:10`
+    [comment](each of these examples would specify the same set of 4 blocks,
+     if the latest block were 16030)[/comment]
 
 Can also specify a block range sampled over a regular time interval:
     `--blocks 15000000:16000000:1d` --> samples block range once per day
@@ -537,7 +538,7 @@ async def async_perform_multi_block_call(
     if blocks is not None:
 
         # parse blocks
-        block_numbers = await cli_utils.async_resolve_block_range(blocks)
+        block_numbers = await cli_utils.async_parse_block_slice(blocks)
 
     elif times is not None:
 
