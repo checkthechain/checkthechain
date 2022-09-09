@@ -292,6 +292,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'description': 'Weekly balance of DAI in Curve 3pool throughout year 2021',
                 'runnable': True,
             },
+            '0x6b175474e89094c44da98b954eedeac495271d0f balanceOf 0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7 --blocks latest:-1000000 -n 20 --normalize': {
+                'description': 'Balance of DAI in Curve 3pool over the past 1 million blocks',
+                'runnable': True,
+            },
         },
     }
 
@@ -538,7 +542,7 @@ async def async_perform_multi_block_call(
     if blocks is not None:
 
         # parse blocks
-        block_numbers = await cli_utils.async_parse_block_slice(blocks)
+        block_numbers = await cli_utils.async_parse_block_slice(blocks, n=n)
 
     elif times is not None:
 
@@ -627,8 +631,13 @@ async def async_perform_multi_block_call(
             column_styles = {
                 'block': styles['option'],
             }
+            column_formats = {
+                'block': {'commas': False},
+            }
             for output_name in output_names:
                 column_styles[output_name] = styles['description']
+                if normalize is not None:
+                    column_formats[output_name] = {'trailing_zeros': True}
             print()
             toolstr.print_table(
                 rows,
@@ -636,7 +645,7 @@ async def async_perform_multi_block_call(
                 border=styles['comment'],
                 label_style=styles['title'],
                 column_styles=column_styles,
-                column_formats={'block': {'commas': False}},
+                column_formats=column_formats,
                 indent=4,
             )
 

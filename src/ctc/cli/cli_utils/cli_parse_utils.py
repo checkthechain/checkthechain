@@ -8,6 +8,7 @@ from ctc import spec
 
 async def async_parse_block_slice(
     text: str | typing.Sequence[str],
+    n: int | None = None,
 ) -> typing.Sequence[int]:
     """convert a cli block slice to a list of integer block numbers
 
@@ -27,7 +28,7 @@ async def async_parse_block_slice(
 
         blocks: list[int] = []
         for subtext in text:
-            subblocks = await async_parse_block_slice(subtext)
+            subblocks = await async_parse_block_slice(subtext, n=n)
             blocks.extend(subblocks)
         return blocks
 
@@ -45,7 +46,7 @@ async def async_parse_block_slice(
             pieces = text.split(' ')
             blocks = []
             for piece in pieces:
-                block = await _resolve_single_block(piece)
+                block = await _async_resolve_single_block(piece)
                 blocks.append(block)
             return blocks
 
@@ -56,7 +57,7 @@ async def async_parse_block_slice(
             if len(pieces) == 2:
                 raw_start_block = pieces[0]
                 raw_end_block = pieces[1]
-                interval = 1
+                interval: int | None = None
             elif len(pieces) == 3:
                 raw_start_block = pieces[0]
                 raw_end_block = pieces[1]
@@ -65,13 +66,23 @@ async def async_parse_block_slice(
                 raise Exception('invalid block slice specification')
 
             if raw_end_block[0] in ['+', '-']:
-                start_block = await _resolve_single_block(raw_start_block)
-                end_block = start_block + int(raw_end_block)
+                start_block = await _async_resolve_single_block(raw_start_block)
+                diff = await _async_resolve_single_block(raw_end_block)
+                end_block = start_block + diff
                 if raw_end_block[0] == '-':
                     start_block, end_block = end_block, start_block
             else:
-                start_block = await _resolve_single_block(raw_start_block)
-                end_block = await _resolve_single_block(raw_end_block)
+                start_block = await _async_resolve_single_block(raw_start_block)
+                end_block = await _async_resolve_single_block(raw_end_block)
+
+            if end_block < start_block:
+                raise Exception('invalid block slice specification')
+
+            if interval is None:
+                if n is None:
+                    interval = 1
+                else:
+                    interval = int((end_block - start_block) / n)
 
             blocks = list(range(start_block, end_block + 1, interval))
             if blocks[-1] != end_block:
@@ -88,7 +99,14 @@ async def _async_resolve_single_block(text: str) -> int:
     elif text == 'latest':
         return await evm.async_get_latest_block_number()
     else:
-        raise Exception('could not parse block: ' + str(text))
+        try:
+            as_float = float(text)
+            as_int = int(as_float)
+            if abs(as_float - as_int) > 0.00000001:
+                raise Exception('must specify integer block values')
+            return as_int
+        except ValueError:
+            raise Exception('could not parse block: ' + str(text))
 
 
 async def async_resolve_block_range(
