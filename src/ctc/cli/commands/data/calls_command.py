@@ -8,6 +8,7 @@ TODO:
 
 from __future__ import annotations
 
+import asyncio
 import typing
 
 import toolcli
@@ -567,6 +568,12 @@ async def async_perform_multi_block_call(
     else:
         raise Exception('must specify --blocks or --times')
 
+    if not no_table:
+        block_timestamps_coroutine = evm.async_get_block_timestamps(
+            block_numbers
+        )
+        block_timestamps_task = asyncio.create_task(block_timestamps_coroutine)
+
     # fetch data
     results = await rpc.async_batch_eth_call(
         to_address=to_address,
@@ -612,11 +619,19 @@ async def async_perform_multi_block_call(
 
     if output == 'stdout':
 
+        import tooltime
+
         if not no_table:
+
+            block_timestamps = await block_timestamps_task
+
             rows = []
             for r, result in enumerate(results):
                 row = []
                 row.append(block_numbers[r])
+                age = tooltime.get_age(block_timestamps[r], 'TimelengthPhrase')
+                age = ', '.join(age.split(', ')[:2])
+                row.append(age)
                 if len(output_names) == 1:
                     row.append(result)
                 else:
@@ -626,10 +641,12 @@ async def async_perform_multi_block_call(
                 rows.append(row)
             labels = [
                 'block',
+                'block age',
             ]
             labels += output_names
             column_styles = {
                 'block': styles['option'],
+                'block age': styles['option'],
             }
             column_formats = {
                 'block': {'commas': False},
