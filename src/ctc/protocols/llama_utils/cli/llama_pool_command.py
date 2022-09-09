@@ -16,7 +16,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'examples': [
-            '0x39aa39c021dfbae8fac545936693ac917d5e7563',
+            '747c1d2a-c668-4682-b9f9-296708a3dd90',
         ],
     }
 
