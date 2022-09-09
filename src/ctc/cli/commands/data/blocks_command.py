@@ -16,10 +16,15 @@ from ctc.cli import cli_utils
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': async_block_command,
+        'f': async_blocks_command,
         'help': 'output information about blocks',
         'args': [
             {'name': 'blocks', 'nargs': '+', 'help': 'block range to fetch'},
+            {
+                'name': '-n',
+                'help': 'number of blocks in block slice',
+                'type': int,
+            },
             {
                 'name': '--attributes',
                 'nargs': '+',
@@ -38,21 +43,23 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': '--provider', 'help': 'rpc provider to use'},
         ],
         'examples': {
-            '[14000000, 14000100]': 'get blocks 14000000 through 14000100',
-            '[14000000, 14000100] --attributes timestamp,number': 'get blocks 14000000 through 14000100',
+            '14000000:14000010': 'get blocks 14000000 through 14000010',
+            '14000000:15000000:100000': 'get blocks 14000000 through 15000000, every 100000 blocks',
+            '14000000:15000000 -n 10': 'get blocks 14000000 through 15000000, every 100000 blocks',
+            '14000000:14000100 --attributes timestamp,number': 'get blocks 14000000 through 14000100, with specific attributes',
         },
     }
 
 
-async def async_block_command(
+async def async_blocks_command(
     *,
     blocks: typing.Sequence[str],
+    n: int | None,
     attributes: typing.Optional[typing.Sequence[str]],
     output: str,
     overwrite: bool,
     provider: typing.Optional[str],
 ) -> None:
-    import numpy as np
     import pandas as pd
 
     if attributes is None:
@@ -71,7 +78,8 @@ async def async_block_command(
         ]
 
     # determine blocks
-    export_blocks = await cli_utils.async_resolve_block_range(blocks)
+    # export_blocks = await cli_utils.async_resolve_block_range(blocks)
+    export_blocks = await cli_utils.async_parse_block_slice(blocks, n=n)
 
     # print summary
     styles = cli.get_cli_styles()

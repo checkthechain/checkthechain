@@ -206,7 +206,7 @@ async def async_balances_command(
                 'can only specify one of --erc20s --wallets, --blocks'
             )
         erc20, wallet = args
-        resolved_blocks = await cli_utils.async_resolve_block_sample(blocks)
+        resolved_blocks = await cli_utils.async_parse_block_slice(blocks, n=n)
 
         timestamps = await evm.async_get_block_timestamps(resolved_blocks)
 

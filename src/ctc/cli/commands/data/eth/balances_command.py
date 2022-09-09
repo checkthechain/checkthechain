@@ -89,7 +89,7 @@ async def async_balances_command(
                 'cannot specify multiple wallets and multiple blocks'
             )
 
-        resolved_blocks = await cli_utils.async_resolve_block_sample(blocks)
+        resolved_blocks = await cli_utils.async_parse_block_slice(blocks)
         if verbose:
             import asyncio
             from ctc.protocols import chainlink_utils
