@@ -6,6 +6,38 @@ from ctc import evm
 from ctc import spec
 
 
+async def async_parse_block_range(
+    text: str,
+    default_start: int | None = None,
+    default_end: int | None = None,
+) -> tuple[int | None, int | None]:
+    """convert a cli block range to its start and end bounds
+
+    Example block slices
+        16000:        -->   (16000, None)
+        :16010        -->   (None, 16010)
+        16000:16010   -->   (16000, 16010)
+        14e6:15e6     -->   (14000000, 15000000)
+    """
+
+    if text.count(':') != 1:
+        raise Exception('range must have format: [start_block]:[end_block]')
+
+    raw_start_block, raw_end_block = text.split(':')
+
+    if raw_start_block == '':
+        start_block = default_start
+    else:
+        start_block = await _async_resolve_single_block(raw_start_block)
+
+    if raw_end_block == '':
+        end_block = default_end
+    else:
+        end_block = await _async_resolve_single_block(raw_end_block)
+
+    return start_block, end_block
+
+
 async def async_parse_block_slice(
     text: str | typing.Sequence[str],
     n: int | None = None,
@@ -21,6 +53,8 @@ async def async_parse_block_slice(
         16010:+20
         16030:-20
         latest:-20:2
+        14e6:15e6
+        14e6:15e6:1e5
     """
 
     # list of blocks

@@ -24,6 +24,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '*',
             },
             {
+                'name': '--created',
+                'help': 'specify start and/or end of when pool was created',
+            },
+            {
                 'name': '--dex',
                 'help': 'name of dex (e.g. balancer, curve, uniswap-v2)',
             },
@@ -76,6 +80,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'examples': [
             'CRV',
             'DAI --dex balancer',
+            'DAI --created 14000000:15000000',
         ],
     }
 
@@ -88,6 +93,7 @@ async def async_dex_pools_command(
     *,
     tokens: typing.Sequence[spec.Address | str],
     dex: spec.Address | str | None,
+    created: str | None,
     factory: spec.Address | None,
     all_pools: bool,
     compact: bool,
@@ -104,10 +110,17 @@ async def async_dex_pools_command(
     coroutines = [evm.async_get_erc20_address(token) for token in tokens]
     assets = await asyncio.gather(*coroutines)
 
+    if created is not None:
+        start_block, end_block = await cli_utils.async_parse_block_range(created)
+    else:
+        start_block = None
+        end_block = None
     dex_pools = await dex_utils.async_get_pools(
         assets=assets,
         factory=factory,
         dex=dex,
+        start_block=start_block,
+        end_block=end_block,
     )
 
     # alternative output formats
