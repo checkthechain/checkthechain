@@ -8,6 +8,7 @@ from ctc import spec
 def get_dex_names_of_factories(
     network: spec.NetworkReference,
 ) -> typing.Mapping[spec.Address, str]:
+    """get mapping of factory_address -> dex_name"""
 
     if network in (1, 'mainnet'):
         return {
@@ -32,6 +33,7 @@ def get_dex_name_of_factory(
     factory: spec.Address,
     network: spec.NetworkReference,
 ) -> str:
+    """get dex_name of factory address"""
 
     names_of_factories = get_dex_names_of_factories(network=network)
     return names_of_factories[factory]

@@ -1,3 +1,5 @@
+"""functions for getting dex classes"""
+
 from __future__ import annotations
 
 import typing
@@ -7,28 +9,31 @@ from . import dex_directory
 from . import dex_class
 
 
-def get_dex(
+def get_dex_class(
     dex: typing.Type[dex_class.DEX] | str | None = None,
     *,
     factory: spec.Address | None = None,
+    # pool: spec.Address | None = None,
     network: spec.NetworkReference | None = None,
 ) -> typing.Type[dex_class.DEX]:
     """return DEX object corresponding to dex name or dex factory"""
 
     if dex is not None:
         if isinstance(dex, str):
-            return get_dex_by_name(dex)
+            return _get_dex_class_from_name(dex)
         elif issubclass(dex, dex_class.DEX):
             return dex
         else:
             raise Exception('unknown dex type: ' + str(type(dex)))
     elif factory is not None:
-        return get_dex_by_factory(factory=factory, network=network)
+        return _get_dex_class_from_factory(factory=factory, network=network)
+    # elif pool is not None:
+    #     return _get_dex_class_from_pool(pool=pool, network=network)
     else:
         raise Exception('not enough inputs specified')
 
 
-def get_dex_by_factory(
+def _get_dex_class_from_factory(
     factory: spec.Address,
     network: spec.NetworkReference | None,
 ) -> typing.Type[dex_class.DEX]:
@@ -37,10 +42,10 @@ def get_dex_by_factory(
     if network is None:
         raise Exception('must specify network of factory')
     dex_name = dex_directory.get_dex_name_of_factory(factory, network=network)
-    return get_dex_by_name(dex_name)
+    return _get_dex_class_from_name(dex_name)
 
 
-def get_dex_by_name(dex: str) -> typing.Type[dex_class.DEX]:
+def _get_dex_class_from_name(dex: str) -> typing.Type[dex_class.DEX]:
     """return DEX class using given DEX name"""
 
     dex = dex.lower().replace(' ', '').replace('-', '').replace('_', '')
@@ -67,3 +72,16 @@ def get_dex_by_name(dex: str) -> typing.Type[dex_class.DEX]:
         return uniswap_v3_dex.UniswapV3DEX
     else:
         raise Exception('unknown DEX: ' + str(dex))
+
+
+async def async_get_dex_class_of_pool(
+    pool: spec.Address,
+    network: spec.NetworkReference | None,
+) -> typing.Type[dex_class.DEX]:
+
+    from ctc import db
+
+    dex_pool = await db.async_query_dex_pool(address=pool, network=network)
+    if dex_pool is None:
+        raise Exception('could not determine dex class of pool')
+    return _get_dex_class_from_factory(dex_pool['factory'], network=network)

@@ -50,12 +50,6 @@ example_pool_queries = [
             '0xb065c77afc6e1a03b6166ac0fb2f4e84ff6a24d4',
         ],
     },
-    {
-        'query': {
-            'assets': ['0x6b175474e89094c44da98b954eedeac495271d0f'],
-        },
-        'results': [],
-    },
 ]
 
 
