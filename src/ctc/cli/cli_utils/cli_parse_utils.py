@@ -8,6 +8,7 @@ from ctc import spec
 
 async def async_parse_block_range(
     text: str,
+    *,
     default_start: int | None = None,
     default_end: int | None = None,
 ) -> tuple[int | None, int | None]:
