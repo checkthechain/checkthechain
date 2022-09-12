@@ -7,9 +7,6 @@ from typing_extensions import TypedDict
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc.toolbox.defi_utils import dex_utils
-
-from . import pool_metadata
 
 if typing.TYPE_CHECKING:
     import tooltime

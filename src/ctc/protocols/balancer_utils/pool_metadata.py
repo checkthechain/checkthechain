@@ -94,54 +94,26 @@ async def async_get_token_registrations(
     end_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
+    provider: spec.ProviderReference = None,
 ) -> typing.Mapping[str, typing.Sequence[str]]:
 
-    event_abi: spec.EventABI = {
-        'anonymous': False,
-        'inputs': [
-            {
-                'indexed': True,
-                'internalType': 'bytes32',
-                'name': 'poolId',
-                'type': 'bytes32',
-            },
-            {
-                'indexed': False,
-                'internalType': 'contract IERC20[]',
-                'name': 'tokens',
-                'type': 'address[]',
-            },
-            {
-                'indexed': False,
-                'internalType': 'address[]',
-                'name': 'assetManagers',
-                'type': 'address[]',
-            },
-        ],
-        'name': 'TokensRegistered',
-        'type': 'event',
-    }
-
-    start_block, end_block = await evm.async_parse_block_range(
+    balancer_token_registrations = await evm.async_get_events(
+        factory,
+        event_abi=balancer_spec.vault_event_abis['TokensRegistered'],
+        verbose=False,
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,
         end_time=end_time,
-        allow_none=True,
-    )
-
-    balancer_token_registrations = await evm.async_get_events(
-        factory,
-        event_abi=event_abi,
-        verbose=False,
-        start_block=start_block,
-        end_block=end_block,
+        provider=provider,
     )
     balancer_token_registrations['arg__tokens'] = balancer_token_registrations[
         'arg__tokens'
     ].map(ast.literal_eval)
 
-    token_registrations_by_pool: typing.MutableMapping[str, typing.MutableSequence[str]] = {}
+    token_registrations_by_pool: typing.MutableMapping[
+        str, typing.MutableSequence[str]
+    ] = {}
     for index, row in balancer_token_registrations.iterrows():
         pool = row['arg__poolId']
 

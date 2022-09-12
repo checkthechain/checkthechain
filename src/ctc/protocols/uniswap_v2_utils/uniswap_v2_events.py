@@ -6,193 +6,46 @@ from ctc import evm
 from ctc import spec
 
 from . import uniswap_v2_metadata
+from . import uniswap_v2_spec
 
 if typing.TYPE_CHECKING:
     import tooltime
 
-
-pool_event_abis: typing.Mapping[str, spec.EventABI] = {
-    'Burn': {
-        'anonymous': False,
-        'inputs': [
-            {
-                'indexed': True,
-                'internalType': 'address',
-                'name': 'sender',
-                'type': 'address',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount0',
-                'type': 'uint256',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount1',
-                'type': 'uint256',
-            },
-            {
-                'indexed': True,
-                'internalType': 'address',
-                'name': 'to',
-                'type': 'address',
-            },
-        ],
-        'name': 'Burn',
-        'type': 'event',
-    },
-    'Mint': {
-        'anonymous': False,
-        'inputs': [
-            {
-                'indexed': True,
-                'internalType': 'address',
-                'name': 'sender',
-                'type': 'address',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount0',
-                'type': 'uint256',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount1',
-                'type': 'uint256',
-            },
-        ],
-        'name': 'Mint',
-        'type': 'event',
-    },
-    'Swap': {
-        'anonymous': False,
-        'inputs': [
-            {
-                'indexed': True,
-                'internalType': 'address',
-                'name': 'sender',
-                'type': 'address',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount0In',
-                'type': 'uint256',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount1In',
-                'type': 'uint256',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount0Out',
-                'type': 'uint256',
-            },
-            {
-                'indexed': False,
-                'internalType': 'uint256',
-                'name': 'amount1Out',
-                'type': 'uint256',
-            },
-            {
-                'indexed': True,
-                'internalType': 'address',
-                'name': 'to',
-                'type': 'address',
-            },
-        ],
-        'name': 'Swap',
-        'type': 'event',
-    },
-}
+    from typing_extensions import Literal
 
 
 async def async_get_pool_swaps(
-    pool_address: spec.Address,
+    pool: spec.Address,
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
-    replace_symbols: bool = False,
+    include_prices: bool = False,
+    include_volumes: bool = False,
+    label: Literal['index', 'symbol', 'address'] = 'index',
     normalize: bool = True,
     provider: spec.ProviderReference = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
-    import asyncio
 
-    if replace_symbols:
-        symbols_task = asyncio.create_task(
-            uniswap_v2_metadata.async_get_pool_symbols(
-                pool_address, provider=provider
-            )
-        )
-    if normalize:
-        decimals_task = asyncio.create_task(
-            uniswap_v2_metadata.async_get_pool_decimals(
-                pool_address, provider=provider
-            )
-        )
+    from ctc.toolbox.defi_utils import dex_utils
 
-    swaps = await evm.async_get_events(
-        event_abi=pool_event_abis['Swap'],
-        contract_address=pool_address,
+    return await dex_utils.UniswapV2DEX.async_get_pool_trades(
+        pool=pool,
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,
         end_time=end_time,
         include_timestamps=include_timestamps,
+        include_prices=include_prices,
+        include_volumes=include_volumes,
+        label=label,
+        normalize=normalize,
         provider=provider,
         verbose=verbose,
     )
-    swaps['arg__amount0In'] = swaps['arg__amount0In'].map(int)
-    swaps['arg__amount0Out'] = swaps['arg__amount0Out'].map(int)
-    swaps['arg__amount1In'] = swaps['arg__amount1In'].map(int)
-    swaps['arg__amount1Out'] = swaps['arg__amount1Out'].map(int)
-
-    # normalize columns
-    if normalize:
-        x_decimals, y_decimals = await decimals_task
-        swaps['arg__amount0In'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount0In'].astype(float),
-            decimals=x_decimals,
-        )
-        swaps['arg__amount0Out'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount0Out'].astype(float),
-            decimals=x_decimals,
-        )
-        swaps['arg__amount1In'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount1In'].astype(float),
-            decimals=y_decimals,
-        )
-        swaps['arg__amount1Out'] = await evm.async_normalize_erc20_quantities(
-            quantities=swaps['arg__amount1Out'].astype(float),
-            decimals=y_decimals,
-        )
-
-    # rename columns
-    if replace_symbols:
-        x_symbol, y_symbol = await symbols_task
-    else:
-        x_symbol = 'x'
-        y_symbol = 'y'
-    columns = {
-        'arg__amount0In': x_symbol + '_sold',
-        'arg__amount0Out': x_symbol + '_bought',
-        'arg__amount1In': y_symbol + '_sold',
-        'arg__amount1Out': y_symbol + '_bought',
-    }
-    swaps = swaps.rename(columns=columns)
-
-    return swaps
 
 
 async def async_get_pool_mints(
@@ -224,7 +77,7 @@ async def async_get_pool_mints(
         )
 
     mints = await evm.async_get_events(
-        event_abi=pool_event_abis['Mint'],
+        event_abi=uniswap_v2_spec.pool_event_abis['Mint'],
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,
@@ -290,7 +143,7 @@ async def async_get_pool_burns(
         )
 
     burns = await evm.async_get_events(
-        event_abi=pool_event_abis['Burn'],
+        event_abi=uniswap_v2_spec.pool_event_abis['Burn'],
         contract_address=pool_address,
         start_block=start_block,
         end_block=end_block,

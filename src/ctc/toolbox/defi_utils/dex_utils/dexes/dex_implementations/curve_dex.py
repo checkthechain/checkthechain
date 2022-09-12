@@ -121,3 +121,91 @@ class CurveDEX(dex_class.DEX):
             dex_pools.append(dex_pool)
 
         return dex_pools
+
+    @classmethod
+    async def _async_get_pool_assets_from_node(
+        cls,
+        pool: spec.Address,
+        *,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+        block: spec.BlockNumberReference | None = None,
+    ) -> typing.Sequence[spec.Address]:
+        network, provider = evm.get_network_and_provider(network, provider)
+        return await curve_utils.async_get_pool_tokens(
+            pool=pool,
+            provider=provider,
+        )
+
+    @classmethod
+    async def _async_get_pool_raw_trades(
+        cls,
+        pool: spec.Address,
+        *,
+        start_block: spec.BlockNumberReference | None = None,
+        end_block: spec.BlockNumberReference | None = None,
+        start_time: tooltime.Timestamp | None = None,
+        end_time: tooltime.Timestamp | None = None,
+        include_timestamps: bool = False,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+        verbose: bool = False,
+    ) -> spec.RawDexTrades:
+
+        import pandas as pd
+
+        network, provider = evm.get_network_and_provider(network, provider)
+
+        # get data
+        trades = await evm.async_get_events(
+            contract_address=pool,
+            event_abi=curve_utils.pool_event_abis['TokenExchange'],
+            start_block=start_block,
+            end_block=end_block,
+            start_time=start_time,
+            end_time=end_time,
+            verbose=verbose,
+            include_timestamps=include_timestamps,
+        )
+
+        # check factory for whether TokenExchangeUnderlying is present
+        contract_abi = await evm.async_get_contract_abi(pool, network=network)
+        try:
+            await evm.async_get_event_abi(
+                contract_abi=contract_abi,
+                event_name='TokenExchangeUnderlying',
+            )
+            has_token_exchange_underlying = True
+        except LookupError:
+            has_token_exchange_underlying = False
+
+        if has_token_exchange_underlying:
+            token_exchange_underlyings = await evm.async_get_events(
+                pool,
+                event_abi=curve_utils.pool_event_abis[
+                    'TokenExchangeUnderlying'
+                ],
+                start_block=start_block,
+                end_block=end_block,
+                start_time=start_time,
+                end_time=end_time,
+                verbose=verbose,
+                include_timestamps=include_timestamps,
+            )
+            trades = pd.concat([trades, token_exchange_underlyings])
+            trades = trades.sort_index()
+
+        # gather relevatn subset of data
+        output: spec.RawDexTrades = {
+            'transaction_hash': trades['transaction_hash'],
+            'recipient': trades['arg__buyer'],
+            'sold_id': trades['arg__sold_id'],
+            'bought_id': trades['arg__bought_id'],
+            'sold_amount': trades['arg__tokens_sold'],
+            'bought_amount': trades['arg__tokens_bought'],
+        }
+
+        if include_timestamps:
+            output['timestamp'] = trades['timestamp']
+
+        return output

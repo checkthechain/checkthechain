@@ -63,3 +63,93 @@ vault_function_abis: typing.Mapping[str, spec.FunctionABI] = {
         'type': 'function',
     },
 }
+
+vault_event_abis = {
+    'PoolRegistered': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'poolId',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'poolAddress',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'enum IVault.PoolSpecialization',
+                'name': 'specialization',
+                'type': 'uint8',
+            },
+        ],
+        'name': 'PoolRegistered',
+        'type': 'event',
+    },
+    'TokensRegistered': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'poolId',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': False,
+                'internalType': 'contract IERC20[]',
+                'name': 'tokens',
+                'type': 'address[]',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address[]',
+                'name': 'assetManagers',
+                'type': 'address[]',
+            },
+        ],
+        'name': 'TokensRegistered',
+        'type': 'event',
+    },
+    'Swap': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'bytes32',
+                'name': 'poolId',
+                'type': 'bytes32',
+            },
+            {
+                'indexed': True,
+                'internalType': 'contract IERC20',
+                'name': 'tokenIn',
+                'type': 'address',
+            },
+            {
+                'indexed': True,
+                'internalType': 'contract IERC20',
+                'name': 'tokenOut',
+                'type': 'address',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amountIn',
+                'type': 'uint256',
+            },
+            {
+                'indexed': False,
+                'internalType': 'uint256',
+                'name': 'amountOut',
+                'type': 'uint256',
+            },
+        ],
+        'name': 'Swap',
+        'type': 'event',
+    },
+}

@@ -52,7 +52,7 @@ async def async_swaps_command(
 
     swaps = await uniswap_v2_utils.async_get_pool_swaps(
         pool,
-        replace_symbols=True,
+        label='symbol',
         start_block=start_block,
         end_block=end_block,
     )

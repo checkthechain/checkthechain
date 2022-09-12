@@ -50,7 +50,6 @@ async def async_chart_command(
     no_volume: bool,
 ) -> None:
     import asyncio
-    import numpy as np
 
     metadata_task = asyncio.create_task(
         uniswap_v2_utils.async_get_pool_tokens_metadata(pool)
@@ -78,23 +77,24 @@ async def async_chart_command(
         pool,
         start_block=start_block,
         end_block=end_block,
+        normalize=True,
+        include_volumes=True,
+        include_prices=True,
     )
 
     # compute candlesticks
-    prices = np.nan_to_num(swaps['x_sold'] / swaps['y_bought']) + np.nan_to_num(
-        swaps['x_bought'] / swaps['y_sold']
-    )
-    x_volumes = swaps['x_bought'].values + swaps['x_sold'].values
+    prices = swaps['price__0__per__1'].values
+    x_volumes = swaps['volume__0'].values
     if invert:
         prices = 1 / prices
     block_timestamps = await evm.async_get_block_timestamps(
         swaps.index.get_level_values('block_number')
     )
     ohlc = ohlc_utils.compute_ohlc(
-        values=prices,
+        values=prices,   # type: ignore
         indices=block_timestamps,
         bin_size=candle_seconds,
-        volumes=x_volumes,
+        volumes=x_volumes,  # type: ignore
     )
     ohlc = ohlc.iloc[-n_candles:]
 

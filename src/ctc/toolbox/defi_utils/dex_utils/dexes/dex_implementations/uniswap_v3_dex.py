@@ -6,6 +6,7 @@ from ctc import evm
 from ctc import spec
 
 from .. import dex_class
+from . import uniswap_v2_dex
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -26,58 +27,16 @@ class UniswapV3DEX(dex_class.DEX):
         end_time: tooltime.Timestamp | None = None,
     ) -> typing.Sequence[spec.DexPool]:
 
-        event_abi: spec.EventABI = {
-            'anonymous': False,
-            'inputs': [
-                {
-                    'indexed': True,
-                    'internalType': 'address',
-                    'name': 'token0',
-                    'type': 'address',
-                },
-                {
-                    'indexed': True,
-                    'internalType': 'address',
-                    'name': 'token1',
-                    'type': 'address',
-                },
-                {
-                    'indexed': True,
-                    'internalType': 'uint24',
-                    'name': 'fee',
-                    'type': 'uint24',
-                },
-                {
-                    'indexed': False,
-                    'internalType': 'int24',
-                    'name': 'tickSpacing',
-                    'type': 'int24',
-                },
-                {
-                    'indexed': False,
-                    'internalType': 'address',
-                    'name': 'pool',
-                    'type': 'address',
-                },
-            ],
-            'name': 'PoolCreated',
-            'type': 'event',
-        }
+        from ctc.protocols import uniswap_v3_utils
 
-        start_block, end_block = await evm.async_parse_block_range(
+        df = await evm.async_get_events(
+            factory,
+            event_abi=uniswap_v3_utils.factory_event_abis['PoolCreated'],
+            verbose=False,
             start_block=start_block,
             end_block=end_block,
             start_time=start_time,
             end_time=end_time,
-            allow_none=False,
-        )
-
-        df = await evm.async_get_events(
-            factory,
-            event_abi=event_abi,
-            verbose=False,
-            start_block=start_block,
-            end_block=end_block,
             keep_multiindex=False,
         )
 
@@ -96,4 +55,77 @@ class UniswapV3DEX(dex_class.DEX):
                 'additional_data': {},
             }
             dex_pools.append(dex_pool)
+
         return dex_pools
+
+    @classmethod
+    async def _async_get_pool_assets_from_node(
+        cls,
+        pool: spec.Address,
+        *,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+        block: spec.BlockNumberReference | None = None,
+    ) -> tuple[str, str]:
+        output = uniswap_v2_dex.UniswapV2DEX._async_get_pool_assets_from_node(
+            pool=pool,
+            network=network,
+            provider=provider,
+            block=block,
+        )
+        return await output
+
+    @classmethod
+    async def _async_get_pool_raw_trades(
+        cls,
+        pool: spec.Address,
+        *,
+        start_block: spec.BlockNumberReference | None = None,
+        end_block: spec.BlockNumberReference | None = None,
+        start_time: tooltime.Timestamp | None = None,
+        end_time: tooltime.Timestamp | None = None,
+        include_timestamps: bool = False,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+        verbose: bool = False,
+    ) -> spec.RawDexTrades:
+
+        from ctc.protocols import uniswap_v3_utils
+
+        network, provider = evm.get_network_and_provider(network, provider)
+
+        event_abi = await uniswap_v3_utils.async_get_event_abi('Swap', 'pool')
+
+        trades = await evm.async_get_events(
+            event_abi=event_abi,
+            contract_address=pool,
+            start_block=start_block,
+            end_block=end_block,
+            start_time=start_time,
+            end_time=end_time,
+            include_timestamps=include_timestamps,
+            verbose=verbose,
+            keep_multiindex=False,
+        )
+
+        bool_bought_id = trades['arg__amount0'].map(int) > 0
+        bought_id = bool_bought_id.map(int)
+        sold_id = (bought_id == 0).map(int)
+        sold_amount = sold_id * trades['arg__amount1'].map(
+            int
+        ) + bought_id * trades['arg__amount0'].map(int)
+        bought_amount = -(
+            bought_id * trades['arg__amount1'].map(int)
+            + sold_id * trades['arg__amount0'].map(int)
+        )
+
+        output: spec.RawDexTrades = {
+            'transaction_hash': trades['transaction_hash'],
+            'recipient': trades['arg__recipient'],
+            'sold_id': sold_id,
+            'bought_id': bought_id,
+            'sold_amount': sold_amount,
+            'bought_amount': bought_amount,
+        }
+
+        return output

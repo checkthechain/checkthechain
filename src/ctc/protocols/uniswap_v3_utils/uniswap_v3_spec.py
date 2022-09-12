@@ -89,3 +89,44 @@ async def async_get_event_abi(event_name: str, contract: str) -> spec.EventABI:
         return typing.cast(spec.EventABI, abi_entry[event_name])
     else:
         return abi_entry[event_name]
+
+
+factory_event_abis = {
+    'PoolCreated': {
+        'anonymous': False,
+        'inputs': [
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'token0',
+                'type': 'address',
+            },
+            {
+                'indexed': True,
+                'internalType': 'address',
+                'name': 'token1',
+                'type': 'address',
+            },
+            {
+                'indexed': True,
+                'internalType': 'uint24',
+                'name': 'fee',
+                'type': 'uint24',
+            },
+            {
+                'indexed': False,
+                'internalType': 'int24',
+                'name': 'tickSpacing',
+                'type': 'int24',
+            },
+            {
+                'indexed': False,
+                'internalType': 'address',
+                'name': 'pool',
+                'type': 'address',
+            },
+        ],
+        'name': 'PoolCreated',
+        'type': 'event',
+    },
+}

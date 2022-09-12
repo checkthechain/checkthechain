@@ -5,73 +5,10 @@ import typing
 from ctc import evm
 from ctc import rpc
 from ctc import spec
+from . import curve_spec
 
 if typing.TYPE_CHECKING:
     import tooltime
-
-
-pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
-    'A': {
-        'inputs': [],
-        'name': 'A',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'uint256',
-            },
-        ],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-    'future_A': {
-        'inputs': [],
-        'name': 'future_A',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'uint256',
-            },
-        ],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-    'future_A_time': {
-        'inputs': [],
-        'name': 'future_A_time',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'uint256',
-            },
-        ],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-    'initial_A': {
-        'inputs': [],
-        'name': 'initial_A',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'uint256',
-            },
-        ],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-    'initial_A_time': {
-        'inputs': [],
-        'name': 'initial_A_time',
-        'outputs': [
-            {
-                'name': '',
-                'type': 'uint256',
-            },
-        ],
-        'stateMutability': 'view',
-        'type': 'function',
-    },
-}
 
 
 async def async_get_pool_A(
@@ -83,7 +20,7 @@ async def async_get_pool_A(
 
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_abi=pool_function_abis['A'],
+        function_abi=curve_spec.pool_function_abis['A'],
         block_number=block,
         provider=provider,
     )
@@ -100,7 +37,7 @@ async def async_get_pool_future_A_time(
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_abi=pool_function_abis['future_A_time'],
+        function_abi=curve_spec.pool_function_abis['future_A_time'],
         block_number=block,
         provider=provider,
     )
@@ -117,7 +54,7 @@ async def async_get_pool_initial_A(
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_abi=pool_function_abis['initial_A'],
+        function_abi=curve_spec.pool_function_abis['initial_A'],
         block_number=block,
         provider=provider,
     )
@@ -134,7 +71,7 @@ async def async_get_pool_initial_A_time(
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_abi=pool_function_abis['initial_A_time'],
+        function_abi=curve_spec.pool_function_abis['initial_A_time'],
         block_number=block,
         provider=provider,
     )
@@ -151,7 +88,7 @@ async def async_get_pool_future_A(
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
-        function_abi=pool_function_abis['future_A'],
+        function_abi=curve_spec.pool_function_abis['future_A'],
         block_number=block,
         provider=provider,
     )

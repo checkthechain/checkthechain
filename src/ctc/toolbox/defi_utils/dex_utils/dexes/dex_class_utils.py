@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import evm
 from ctc import spec
 from . import dex_directory
 from . import dex_class
@@ -13,7 +14,6 @@ def get_dex_class(
     dex: typing.Type[dex_class.DEX] | str | None = None,
     *,
     factory: spec.Address | None = None,
-    # pool: spec.Address | None = None,
     network: spec.NetworkReference | None = None,
 ) -> typing.Type[dex_class.DEX]:
     """return DEX object corresponding to dex name or dex factory"""
@@ -27,10 +27,32 @@ def get_dex_class(
             raise Exception('unknown dex type: ' + str(type(dex)))
     elif factory is not None:
         return _get_dex_class_from_factory(factory=factory, network=network)
-    # elif pool is not None:
-    #     return _get_dex_class_from_pool(pool=pool, network=network)
     else:
         raise Exception('not enough inputs specified')
+
+
+async def async_get_dex_class(
+    dex: typing.Type[dex_class.DEX] | str | None = None,
+    *,
+    factory: spec.Address | None = None,
+    pool: spec.Address | None = None,
+    network: spec.NetworkReference | None = None,
+    provider: spec.ProviderReference = None,
+) -> typing.Type[dex_class.DEX]:
+
+    network, provider = evm.get_network_and_provider(network, provider)
+    if factory is not None or dex is not None:
+        return get_dex_class(
+            dex=dex,
+            factory=factory,
+            network=network,
+        )
+    else:
+        if pool is None:
+            raise Exception(
+                'must specify dex, factory or pool to get dex class'
+            )
+        return await _async_get_dex_class_of_pool(pool, network=network)
 
 
 def _get_dex_class_from_factory(
@@ -74,7 +96,7 @@ def _get_dex_class_from_name(dex: str) -> typing.Type[dex_class.DEX]:
         raise Exception('unknown DEX: ' + str(dex))
 
 
-async def async_get_dex_class_of_pool(
+async def _async_get_dex_class_of_pool(
     pool: spec.Address,
     network: spec.NetworkReference | None,
 ) -> typing.Type[dex_class.DEX]:

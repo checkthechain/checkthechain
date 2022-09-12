@@ -73,9 +73,9 @@ async def async_compute_uniswap_v2_volume(
     from ctc.protocols import uniswap_v2_utils
 
     swaps = await uniswap_v2_utils.async_get_pool_swaps(
-        pool_address=pool_address,
+        pool=pool_address,
         start_block=blocks[0],
-        replace_symbols=True,
+        label='symbol',
     )
     fei_sold = evm.bin_by_blocks(swaps['FEI_sold'], blocks)
     fei_bought = evm.bin_by_blocks(swaps['FEI_sold'], blocks)

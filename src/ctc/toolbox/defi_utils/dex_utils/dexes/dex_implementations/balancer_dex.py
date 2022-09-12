@@ -16,46 +16,6 @@ class BalancerDEX(dex_class.DEX):
     _pool_factories = {1: ['0xba12222222228d8ba445958a75a0704d566bf2c8']}
 
     @classmethod
-    async def async_get_pool_assets(
-        cls,
-        pool: spec.Address,
-        *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
-        block: spec.BlockNumberReference | None = None,
-    ) -> typing.Sequence[spec.Address]:
-
-        network, provider = evm.get_network_and_provider(network, provider)
-
-        result = await balancer_utils.async_get_pool_balances(
-            pool_address=pool, provider=provider, block=block
-        )
-
-        return list(result.keys())
-
-    @classmethod
-    async def async_get_pool_balance(
-        cls,
-        pool: spec.Address,
-        asset: spec.Address,
-        *,
-        factory: spec.Address | None = None,
-        normalize: bool = True,
-        block: spec.BlockNumberReference | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
-    ) -> int | float:
-
-        from ctc.protocols import balancer_utils
-
-        pool_balances = await balancer_utils.async_get_pool_balances(
-            pool_address=pool,
-            block=block,
-            normalize=normalize,
-        )
-        return pool_balances[asset]
-
-    @classmethod
     async def async_get_new_pools(
         cls,
         *,
@@ -64,54 +24,29 @@ class BalancerDEX(dex_class.DEX):
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
     ) -> typing.Sequence[spec.DexPool]:
 
-        event_abi: spec.EventABI = {
-            'anonymous': False,
-            'inputs': [
-                {
-                    'indexed': True,
-                    'internalType': 'bytes32',
-                    'name': 'poolId',
-                    'type': 'bytes32',
-                },
-                {
-                    'indexed': True,
-                    'internalType': 'address',
-                    'name': 'poolAddress',
-                    'type': 'address',
-                },
-                {
-                    'indexed': False,
-                    'internalType': 'enum IVault.PoolSpecialization',
-                    'name': 'specialization',
-                    'type': 'uint8',
-                },
-            ],
-            'name': 'PoolRegistered',
-            'type': 'event',
-        }
+        network, provider = evm.get_network_and_provider(network, provider)
 
-        start_block, end_block = await evm.async_parse_block_range(
+        balancer_pools = await evm.async_get_events(
+            factory,
+            event_abi=balancer_utils.vault_event_abis['PoolRegistered'],
+            verbose=False,
             start_block=start_block,
             end_block=end_block,
             start_time=start_time,
             end_time=end_time,
-            allow_none=False,
-        )
-
-        balancer_pools = await evm.async_get_events(
-            factory,
-            event_abi=event_abi,
-            verbose=False,
-            start_block=start_block,
-            end_block=end_block,
             keep_multiindex=False,
         )
-        token_registrations = await balancer_utils.async_get_token_registrations(
-            factory=factory,
-            start_block=start_block,
-            end_block=end_block,
+        token_registrations = (
+            await balancer_utils.async_get_token_registrations(
+                factory=factory,
+                start_block=start_block,
+                end_block=end_block,
+                provider=provider,
+            )
         )
 
         dex_pools = []
@@ -148,3 +83,106 @@ class BalancerDEX(dex_class.DEX):
             dex_pools.append(dex_pool)
 
         return dex_pools
+
+    @classmethod
+    async def _async_get_pool_assets_from_node(
+        cls,
+        pool: spec.Address,
+        *,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+        block: spec.BlockNumberReference | None = None,
+    ) -> typing.Sequence[spec.Address]:
+
+        network, provider = evm.get_network_and_provider(network, provider)
+
+        result = await balancer_utils.async_get_pool_balances(
+            pool_address=pool, provider=provider, block=block
+        )
+
+        return list(result.keys())
+
+    @classmethod
+    async def _async_get_pool_raw_trades(
+        cls,
+        pool: spec.Address,
+        *,
+        start_block: spec.BlockNumberReference | None = None,
+        end_block: spec.BlockNumberReference | None = None,
+        start_time: tooltime.Timestamp | None = None,
+        end_time: tooltime.Timestamp | None = None,
+        include_timestamps: bool = False,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+        verbose: bool = False,
+    ) -> spec.RawDexTrades:
+
+        network, provider = evm.get_network_and_provider(network, provider)
+
+        network = evm.get_network_chain_id(network)
+        vault = cls._pool_factories[network][0]
+        if start_block is None:
+            start_block = await evm.async_get_contract_creation_block(
+                pool,
+                provider=provider,
+            )
+
+        trades = await evm.async_get_events(
+            vault,
+            event_abi=balancer_utils.vault_event_abis['Swap'],
+            start_block=start_block,
+            end_block=end_block,
+            start_time=start_time,
+            end_time=end_time,
+            verbose=verbose,
+            keep_multiindex=False,
+        )
+
+        # filter by pool
+        pool_id = await balancer_utils.async_get_pool_id(
+            pool_address=pool, provider=provider
+        )
+        mask = trades['arg__poolId'] == pool_id
+        trades = trades[mask]
+
+        output: spec.RawDexTrades = {
+            'transaction_hash': trades['transaction_hash'],
+            'recipient': None,
+            'sold_id': trades['arg__tokenIn'],
+            'bought_id': trades['arg__tokenOut'],
+            'sold_amount': trades['arg__amountIn'],
+            'bought_amount': trades['arg__amountOut'],
+        }
+
+        if include_timestamps:
+            output['timestamp'] = await evm.async_get_block_timestamps(
+                blocks=trades.index.values,
+                provider=provider,
+            )
+
+        return output
+
+    @classmethod
+    async def async_get_pool_balance(
+        cls,
+        pool: spec.Address,
+        asset: spec.Address,
+        *,
+        factory: spec.Address | None = None,
+        normalize: bool = True,
+        block: spec.BlockNumberReference | None = None,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
+    ) -> int | float:
+
+        from ctc.protocols import balancer_utils
+
+        network, provider = evm.get_network_and_provider(network, provider)
+
+        pool_balances = await balancer_utils.async_get_pool_balances(
+            pool_address=pool,
+            block=block,
+            normalize=normalize,
+            provider=provider,
+        )
+        return pool_balances[asset]

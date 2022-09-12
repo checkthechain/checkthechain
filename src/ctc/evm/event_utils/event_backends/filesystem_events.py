@@ -431,7 +431,7 @@ async def async_get_events_from_filesystem(
     # load paths
     dfs = []
     for path in paths_to_load:
-        df = pd.read_csv(path)
+        df = pd.read_csv(path, low_memory=False)
         df = df.set_index(['block_number', 'transaction_index', 'log_index'])
         dfs.append(df)
     df = pd.concat(dfs, axis=0)
