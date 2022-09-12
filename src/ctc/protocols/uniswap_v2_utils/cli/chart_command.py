@@ -8,6 +8,7 @@ import toolcli
 import toolstr
 import tooltime
 
+from ctc import cli
 from ctc import evm
 from ctc import spec
 from ctc.toolbox.defi_utils import ohlc_utils
@@ -91,7 +92,7 @@ async def async_chart_command(
         swaps.index.get_level_values('block_number')
     )
     ohlc = ohlc_utils.compute_ohlc(
-        values=prices,   # type: ignore
+        values=prices,  # type: ignore
         indices=block_timestamps,
         bin_size=candle_seconds,
         volumes=x_volumes,  # type: ignore
@@ -124,10 +125,17 @@ async def async_chart_command(
 
     console = rich.console.Console(theme=rich.theme.Theme(inherit=False))
 
+    styles = cli.get_cli_styles()
+    plot_styles = {
+        'tick_label_style': 'bold',
+        'chrome_style': '#888888',
+    }
+
     y_axis = toolstr.render_y_axis(
         grid=render_grid,
+        **plot_styles,  # type: ignore
     )
-    y_axis_width = len(y_axis.split('\n')[0])
+    y_axis_width = rich.text.Text.from_markup(y_axis.split('\n')[0]).cell_len
     graph = toolstr.concatenate_blocks([y_axis, as_str])
 
     formatter = functools.partial(
@@ -137,6 +145,7 @@ async def async_chart_command(
     x_axis = toolstr.render_x_axis(
         grid=render_grid,
         formatter=formatter,
+        **plot_styles,  # type: ignore
     )
     x_axis = toolstr.indent_block(x_axis, indent=y_axis_width)
 
@@ -165,6 +174,7 @@ async def async_chart_command(
         volume_y_axis = toolstr.render_y_axis(
             grid=volume_render_grid,
             n_ticks=1,
+            **plot_styles,  # type: ignore
         )
 
     # wait for metadata
@@ -174,17 +184,18 @@ async def async_chart_command(
     token0 = metadata['x_symbol']
     token1 = metadata['y_symbol']
     toolstr.print_text_box(
-        metadata['x_symbol'] + '-' + metadata['y_symbol'] + ' Uniswap V2 Pool'
+        metadata['x_symbol'] + '-' + metadata['y_symbol'] + ' Uniswap V2 Pool',
+        style=styles['title'],
     )
-    print('- pool address =', pool)
-    print('- each candle =', candle_timescale)
-    print('- n_candles =', n_candles)
+    cli.print_bullet(key='pool address', value=pool)
+    cli.print_bullet(key='each candle', value=candle_timescale)
+    cli.print_bullet(key='n_candles', value=n_candles)
     if invert:
-        print('- price units =', token1, 'per', token0)
+        cli.print_bullet(key='price units', value=str(token1) + ' per ' + str(token0))
     else:
-        print('- price units =', token0, 'per', token1)
+        cli.print_bullet(key='price units', value=str(token0) + ' per ' + str(token1))
     if not no_volume:
-        print('- volume units =', token0)
+        cli.print_bullet(key='volume units', value=token0)
     print()
     console.print(graph)
 
@@ -195,7 +206,7 @@ async def async_chart_command(
         volume_graph = toolstr.concatenate_blocks(
             [volume_y_axis, volume_bars_str]
         )
-        print(volume_graph)
+        toolstr.print(volume_graph)
 
     # print x axis
     console.print(x_axis)
