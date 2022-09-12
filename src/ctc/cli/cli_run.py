@@ -67,6 +67,10 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'dex',
             'pools',
         ): 'ctc.cli.commands.data.dex.pools_command',
+        (
+            'dex',
+            'trades',
+        ): 'ctc.cli.commands.data.dex.trades_command',
         ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
         ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
         ('erc20',): 'ctc.cli.commands.data.erc20_command',
