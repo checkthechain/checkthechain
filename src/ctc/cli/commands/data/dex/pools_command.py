@@ -24,6 +24,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'nargs': '*',
             },
             {
+                'name': '--update',
+                'help': 'run update to index all recently created pools',
+                'action': 'store_true',
+            },
+            {
                 'name': '--created',
                 'help': 'specify start and/or end of when pool was created',
             },
@@ -93,6 +98,7 @@ async def async_dex_pools_command(
     *,
     tokens: typing.Sequence[spec.Address | str],
     dex: spec.Address | str | None,
+    update: bool,
     created: str | None,
     factory: spec.Address | None,
     all_pools: bool,
@@ -121,6 +127,7 @@ async def async_dex_pools_command(
         dex=dex,
         start_block=start_block,
         end_block=end_block,
+        update=update,
     )
 
     # alternative output formats
