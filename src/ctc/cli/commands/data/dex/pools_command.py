@@ -191,6 +191,9 @@ async def async_dex_pools_command(
 
     symbols = [symbol.replace('\x00', '') for symbol in symbols]
 
+    for i in range(len(ordered_assets)):
+        if ordered_assets[i] == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee':
+            symbols[i] = 'ETH'
     assets_to_symbols: typing.Mapping[str | None, str] = dict(
         zip(ordered_assets, symbols)
     )
