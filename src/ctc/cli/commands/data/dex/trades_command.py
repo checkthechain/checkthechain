@@ -43,7 +43,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
         ],
         'examples': [
-            '0xc5be99a02c6857f9eac67bbce58df5572498f40c --blocks 14000000:14001000',
+            '0xc5be99a02c6857f9eac67bbce58df5572498f40c --blocks 14000000:14010000',
         ],
     }
 
@@ -77,7 +77,12 @@ async def async_trades_command(
     if export is not None:
         if not overwrite and os.path.isfile(export):
             raise Exception('file already exists, use --overwrite')
-        trades.to_csv(export)
+        if export.endswith('.csv'):
+            trades.to_csv(export)
+        elif export.endswith('.json'):
+            trades.to_json(export, orient='records')
+        else:
+            raise Exception('unknown export format')
     else:
 
         trades = trades.iloc[-100:]
