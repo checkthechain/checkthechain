@@ -21,6 +21,8 @@ def print_pool_summary(
 ) -> None:
     # add in +/- 2% depth
 
+    from ctc import cli
+
     if x_name is None:
         x_name = 'X'
     if y_name is None:
@@ -28,36 +30,33 @@ def print_pool_summary(
 
     indent = toolstr.indent_to_str(indent)
 
-    print(
-        indent + '- ' + x_name + ' reserves:',
-        toolstr.format(x_reserves, order_of_magnitude=True),
+    cli.print_bullet(
+        key=x_name + ' reserves',
+        value=toolstr.format(x_reserves, order_of_magnitude=True),
+        indent=indent,
     )
-    print(
-        indent + '- ' + y_name + ' reserves:',
-        toolstr.format(y_reserves, order_of_magnitude=True),
+    cli.print_bullet(
+        key=y_name + ' reserves',
+        value=toolstr.format(y_reserves, order_of_magnitude=True),
+        indent=indent,
     )
     if lp_total_supply is not None:
-        print(
-            indent + '- total lp tokens:',
-            toolstr.format(lp_total_supply, order_of_magnitude=True),
+        cli.print_bullet(
+            key='total lp tokens',
+            value=toolstr.format(lp_total_supply, order_of_magnitude=True),
+            indent=indent,
         )
-    print(
-        indent + '-',
-        x_name,
-        '/',
-        y_name + ' price:',
-        # '%.6f' % (x_reserves / y_reserves),
-        toolstr.format(x_reserves / y_reserves),
+    cli.print_bullet(
+        key=x_name + ' / ' + y_name + ' price',
+        value=toolstr.format(x_reserves / y_reserves),
+        indent=indent,
     )
-    print(
-        indent + '-',
-        y_name,
-        '/',
-        x_name + ' price:',
-        # '%.6f' % (y_reserves / x_reserves),
-        toolstr.format(y_reserves / x_reserves),
+    cli.print_bullet(
+        key=y_name + ' / ' + x_name + ' price',
+        value=toolstr.format(y_reserves / x_reserves),
+        indent=indent,
     )
-    print(indent + '-', x_name + ' / ' + y_name, 'liquidity depth:')
+    cli.print_bullet(key=x_name + ' / ' + y_name + ' liquidity depth', value='')
     print()
     print_liquidity_depth(
         x_reserves=x_reserves,
@@ -69,7 +68,7 @@ def print_pool_summary(
         depths=depths,
     )
     print()
-    print(indent + '-', y_name + ' / ' + x_name, 'liquidity depth:')
+    cli.print_bullet(key=y_name + ' / ' + x_name + ' liquidity depth', value='')
     print()
     print_liquidity_depth(
         x_reserves=y_reserves,
@@ -93,6 +92,8 @@ def print_liquidity_depth(
     fee_rate: float | None = None,
     indent: int | str | None = None,
 ) -> None:
+
+    from ctc import cli
 
     if x_name is None:
         x_name = 'X'
@@ -154,7 +155,20 @@ def print_liquidity_depth(
         trades.append(trade)
 
     indent = ' ' * 4 + toolstr.indent_to_str(indent)
-    toolstr.print_table(rows=trades, labels=labels, indent=indent)
+    styles = cli.get_cli_styles()
+    toolstr.print_table(
+        rows=trades,
+        labels=labels,
+        indent=indent,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_styles=[
+            styles['option'],
+            styles['description'],
+            styles['description'],
+            styles['description'],
+        ],
+    )
 
 
 def print_trade_summary(

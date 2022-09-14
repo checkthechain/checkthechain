@@ -37,12 +37,15 @@ async def async_replace_pool_state_symbols(
 async def async_get_pool_state(
     pool: spec.Address,
     *,
-    block: spec.BlockNumberReference = 'latest',
+    block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
     normalize: bool = True,
     fill_empty: bool = True,
 ) -> uniswap_v2_spec.PoolState:
     import asyncio
+
+    if block is None:
+        block = 'latest'
 
     block = await evm.async_block_number_to_int(block, provider=provider)
 

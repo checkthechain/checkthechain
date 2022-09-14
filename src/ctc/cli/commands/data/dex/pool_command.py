@@ -31,6 +31,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'name': '--network',
                 'help': 'network to query',
             },
+            {
+                'name': '--block',
+                'help': 'block number',
+            },
         ],
     }
 
@@ -38,6 +42,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def dex_pool_command(
     pool: spec.Address,
     network: str | int | None,
+    block: str | None,
 ) -> None:
     from ctc import db
 
@@ -45,6 +50,11 @@ async def dex_pool_command(
         network = cli_utils.parse_network(typing.cast(str, network))
     if network is None:
         network = config.get_default_network()
+
+    if block is not None:
+        block_number = await cli_utils.async_parse_block(block)
+    else:
+        block_number = None
 
     dex_pool = await db.async_query_dex_pool(address=pool, network=network)
     if dex_pool is None:
@@ -75,7 +85,11 @@ async def dex_pool_command(
     )
 
     # queue balances task
-    balances_coroutine = dex.async_get_pool_balances(pool, network=network)
+    balances_coroutine = dex.async_get_pool_balances(
+        pool,
+        network=network,
+        block=block_number,
+    )
     balances_task = asyncio.create_task(balances_coroutine)
 
     # await all tasks
@@ -94,7 +108,8 @@ async def dex_pool_command(
         key='factory',
         value=toolstr.add_style(dex_pool['factory'], styles['metavar']),
     )
-    cli.print_bullet(key='DEX', value=dex.get_dex_name())
+    dex_name = dex.get_dex_name()
+    cli.print_bullet(key='DEX', value=dex_name)
     cli.print_bullet(key='creation block', value=dex_pool['creation_block'])
     cli.print_bullet(
         key='creation timestamp',
@@ -127,3 +142,24 @@ async def dex_pool_command(
             'balance': {'trailing_zeros': True},
         },
     )
+
+    if dex_name == 'UniswapV2':
+        from ctc.protocols import uniswap_v2_utils
+        from ctc.toolbox.defi_utils.dex_utils.amm_utils import cpmm
+
+        print()
+        toolstr.print_header('Pool State', style=styles['title'])
+        tokens_metadata = await uniswap_v2_utils.async_get_pool_tokens_metadata(
+            pool
+        )
+        x_symbol = tokens_metadata['x_symbol']
+        y_symbol = tokens_metadata['y_symbol']
+        pool_state = await uniswap_v2_utils.async_get_pool_state(
+            pool,
+            block=block_number,
+        )
+        cpmm.print_pool_summary(
+            x_name=x_symbol,
+            y_name=y_symbol,
+            **pool_state,
+        )

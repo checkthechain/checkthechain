@@ -13,6 +13,15 @@ def parse_network(network: str) -> spec.NetworkReference:
         return network
 
 
+async def async_parse_block(block: str) -> spec.BlockNumberReference:
+    if block.isnumeric():
+        return int(block)
+    elif block == 'latest':
+        return block
+    else:
+        raise Exception('unknown block format: ' + str(block))
+
+
 async def async_parse_block_range(
     text: str,
     *,
