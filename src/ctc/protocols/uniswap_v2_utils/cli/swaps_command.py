@@ -17,7 +17,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': 'pool', 'help': 'pool address'},
             {'name': '--blocks', 'nargs': '+', 'help': 'block number range'},
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -38,7 +38,7 @@ async def async_swaps_command(
     *,
     pool: spec.Address,
     blocks: typing.Sequence[str],
-    output: str,
+    export: str,
     overwrite: bool,
 ) -> None:
 
@@ -56,4 +56,4 @@ async def async_swaps_command(
         start_block=start_block,
         end_block=end_block,
     )
-    cli_utils.output_data(swaps, output, overwrite=overwrite)
+    cli_utils.output_data(swaps, export, overwrite=overwrite)

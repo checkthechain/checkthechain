@@ -43,7 +43,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'whether to skip normalizing by ERC20 decimals',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -79,7 +79,7 @@ async def async_balances_command(
     blocks: typing.Optional[typing.Sequence[str]],
     erc20s: typing.Optional[typing.Sequence[str]],
     raw: bool,
-    output: str,
+    export: str,
     overwrite: bool,
     n: int | None,
 ) -> None:
@@ -224,7 +224,7 @@ async def async_balances_command(
             empty_token=0,
         )
 
-        if output == 'stdout':
+        if export == 'stdout':
             styles = cli_run.get_cli_styles()
 
             # print header
@@ -304,7 +304,7 @@ async def async_balances_command(
 
     cli_utils.output_data(
         output_data,
-        output=output,
+        output=export,
         overwrite=overwrite,
         top=n,
         indent=indent,

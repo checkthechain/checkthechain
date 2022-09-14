@@ -96,7 +96,7 @@ A table of outputs is displayed by default, omit with `--no-table`
 
 Numerical outputs of multi-block calls are charted, omit with `--no-chart`
 
-Use `--output` to output data to a json or csv file
+Use `--export` to output data to a json or csv file
 More data is included when exporting to a file
 """
 
@@ -239,7 +239,7 @@ def get_command_spec() -> toolcli.CommandSpec:
             #
             # output parameters
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -310,7 +310,7 @@ async def async_calls_command(
     addresses: typing.Sequence[str] | None,
     unique_abis: bool,
     block: str,
-    output: str,
+    export: str,
     overwrite: bool,
     no_table: bool,
     no_chart: bool,
@@ -339,7 +339,7 @@ async def async_calls_command(
             unique_abis=unique_abis,
             from_address=from_address,
             normalize=normalize,
-            output=output,
+            export=export,
         )
 
     elif multi_block_query:
@@ -350,7 +350,7 @@ async def async_calls_command(
             n=n,
             addresses=addresses,
             block=block,
-            output=output,
+            export=export,
             no_table=no_table,
             no_chart=no_chart,
             from_address=from_address,
@@ -361,10 +361,10 @@ async def async_calls_command(
     else:
         raise Exception('must specify either --blocks or --addresses')
 
-    if output != 'stdout':
+    if export != 'stdout':
         if df is None:
             raise Exception('did not obtain dataframe of data')
-        cli_utils.output_data(data=df, output=output, overwrite=overwrite)
+        cli_utils.output_data(data=df, output=export, overwrite=overwrite)
 
 
 async def async_perform_multi_contract_call(
@@ -375,7 +375,7 @@ async def async_perform_multi_contract_call(
     unique_abis: bool,
     from_address: spec.Address | None,
     normalize: typing.Sequence[str],
-    output: str,
+    export: str,
 ) -> spec.DataFrame | None:
 
     if addresses is not None:
@@ -464,7 +464,7 @@ async def async_perform_multi_contract_call(
         cli.print_bullet(value=function_parameter, number=fp + 1, indent=4)
     print()
 
-    if output == 'stdout':
+    if export == 'stdout':
         rows = []
         for r, result in enumerate(results):
             row: list[typing.Any] = [addresses[r]]
@@ -511,7 +511,7 @@ async def async_perform_multi_block_call(
     n: int | None,
     addresses: typing.Sequence[str] | None,
     block: str,
-    output: str,
+    export: str,
     no_table: bool,
     no_chart: bool,
     from_address: spec.Address | None,
@@ -617,7 +617,7 @@ async def async_perform_multi_block_call(
     cli.print_bullet(key='# blocks', value=str(len(block_numbers)))
     print()
 
-    if output == 'stdout':
+    if export == 'stdout':
 
         import tooltime
 

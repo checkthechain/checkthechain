@@ -42,7 +42,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'skip normalizing by 1e18 decimals',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -71,7 +71,7 @@ async def async_balances_command(
     block: typing.Optional[spec.BlockNumberReference],
     blocks: typing.Optional[typing.Sequence[str]],
     raw: bool,
-    output: str,
+    export: str,
     overwrite: bool,
     verbose: bool,
 ) -> None:
@@ -206,13 +206,13 @@ async def async_balances_command(
             )
             toolstr.print(plot, indent=4)
 
-        if output != 'stdout':
+        if export != 'stdout':
             df = pd.DataFrame(balances, index=resolved_blocks)
             df.index.name = 'block'
             df.columns = ['balance']
             output_data: typing.Union[spec.DataFrame, spec.Series] = df
             cli_utils.output_data(
-                output_data, output, overwrite=overwrite, indent=indent, raw=raw
+                output_data, export, overwrite=overwrite, indent=indent, raw=raw
             )
     else:
         # multiple wallets, single block
@@ -239,5 +239,5 @@ async def async_balances_command(
             output_data = series
 
         cli_utils.output_data(
-            output_data, output, overwrite=overwrite, indent=indent, raw=raw
+            output_data, export, overwrite=overwrite, indent=indent, raw=raw
         )

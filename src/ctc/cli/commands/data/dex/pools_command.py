@@ -68,7 +68,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'help': 'file path to save output to',
             },
             {
@@ -106,7 +106,7 @@ async def async_dex_pools_command(
     verbose: bool,
     json_output: bool,
     csv_output: bool,
-    output: str | None,
+    export: str | None,
     overwrite: bool,
     sort: typing.Sequence[str] | None,
 ) -> None:
@@ -131,25 +131,25 @@ async def async_dex_pools_command(
     )
 
     # alternative output formats
-    if json_output and output is None:
+    if json_output and export is None:
         import json
 
         as_str = json.dumps(dex_pools)
         print(as_str)
         return
-    if csv_output and output is None:
+    if csv_output and export is None:
         import pandas as pd
 
         df = pd.DataFrame(dex_pools)
         csv_str = df.to_csv()
         print(csv_str)
         return
-    if output:
+    if export:
         import pandas as pd
 
         df = pd.DataFrame(dex_pools)
-        cli_utils.output_data(df, output=output, overwrite=overwrite)
-        print('saved output to', output)
+        cli_utils.output_data(df, output=export, overwrite=overwrite)
+        print('saved output to', export)
         return
 
     styles = cli_run.get_cli_styles()

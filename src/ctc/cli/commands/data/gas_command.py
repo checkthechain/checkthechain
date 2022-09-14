@@ -51,7 +51,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'number of blocks to include',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -77,7 +77,7 @@ async def async_gas_command(
     *,
     block: int | None,
     last: typing.Optional[typing.Sequence[str]],
-    output: str,
+    export: str,
     overwrite: bool,
     verbose: bool,
 ) -> None:
@@ -253,7 +253,7 @@ async def async_gas_command(
 
         rows.append(row)
 
-    if output != 'stdout':
+    if export != 'stdout':
         import pandas as pd
 
         final_df = pd.DataFrame(rows)
@@ -261,7 +261,7 @@ async def async_gas_command(
         final_df = final_df.sort_values(by='time')
         final_df = final_df.set_index('blocks')
 
-        cli_utils.output_data(final_df, output, overwrite=overwrite)
+        cli_utils.output_data(final_df, export, overwrite=overwrite)
     else:
         toolstr.print_table(
             rows=rows,

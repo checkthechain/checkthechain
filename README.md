@@ -57,10 +57,10 @@ holdings = await evm.async_get_erc20_balances_from_transfers(transfers=transfers
 # bash
 
 ctc erc20 transfers 0x956f47f50a910163d8bf957cf5846d573e7f87ca \
-    --output transfers.csv
+    --export transfers.csv
 
 ctc erc20 balances 0x956f47f50a910163d8bf957cf5846d573e7f87ca \
-    --output balances.csv \
+    --export balances.csv \
     --block 12345789
 ```
 
@@ -90,8 +90,8 @@ votes = await evm.async_get_events(
 
 DAO="0x0bef27feb58e857046d630b2c03dfb7bae567494"
 
-ctc events $DAO ProposalCreated --output proposals.csv
-ctc events $DAO VoteCast --output votes.csv
+ctc events $DAO ProposalCreated --export proposals.csv
+ctc events $DAO VoteCast --export votes.csv
 ```
 
 #### Get historical data for a Chainlink feed
@@ -108,7 +108,7 @@ data = await chainlink_utils.async_get_feed_data(feed)
 ```bash
 # bash
 
-ctc chainlink 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 --output data.csv
+ctc chainlink 0x31e0a88fecb6ec0a411dbe0e9e76391498296ee9 --export data.csv
 ```
 
 #### Get swaps, mints, and burns of a Uniswap pool
@@ -130,9 +130,9 @@ burns = await uniswap_v2_utils.async_get_pool_burns(pool)
 
 POOL="0x94b0a3d511b6ecdb17ebf877278ab030acb0a878"
 
-ctc uniswap swaps $POOL --output swaps.csv
-ctc uniswap mints $POOL --output mints.csv
-ctc uniswap burns $POOL --output burns.csv
+ctc uniswap swaps $POOL --export swaps.csv
+ctc uniswap mints $POOL --export mints.csv
+ctc uniswap burns $POOL --export burns.csv
 ```
 
 

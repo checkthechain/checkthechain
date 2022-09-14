@@ -33,3 +33,15 @@ def test_subcommand_options_use_dashes_not_underscores(spec_reference):
                     + spec_reference
                     + ' cli args should use dashes not underscores'
                 )
+
+
+@pytest.mark.parametrize('spec_reference', list(cli_run.command_index.values()))
+def test_subcommands_use_export_instead_of_output(spec_reference):
+    command_spec = toolcli.resolve_command_spec(spec_reference)
+    problem_commands = []
+    for arg in command_spec.get('args', []):
+        if arg.get('name') == '--output':
+            raise Exception(
+                'these commands should use the name --export instead of --output: '
+                + str(problem_commands)
+            )

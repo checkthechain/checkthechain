@@ -34,7 +34,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'include timestamps',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -65,7 +65,7 @@ async def async_events_command(
     event: str,
     blocks: typing.Sequence[str],
     include_timestamps: bool,
-    output: str,
+    export: str,
     overwrite: bool,
     verbose: bool,
 ) -> None:
@@ -130,6 +130,6 @@ async def async_events_command(
                 if old_column.startswith('arg__')
             }
             events = events.rename(columns=new_column_names)
-        if output == 'stdout' and include_timestamps:
+        if export == 'stdout' and include_timestamps:
             events = events.astype({'timestamp': 'str'})
-        cli_utils.output_data(events, output=output, overwrite=overwrite)
+        cli_utils.output_data(events, output=export, overwrite=overwrite)

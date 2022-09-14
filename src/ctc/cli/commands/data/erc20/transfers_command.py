@@ -26,7 +26,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'include timestamps',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -49,7 +49,7 @@ async def async_transfers_command(
     erc20: str,
     blocks: typing.Sequence[str],
     include_timestamps: bool,
-    output: str,
+    export: str,
     overwrite: bool,
 ) -> None:
 
@@ -68,6 +68,6 @@ async def async_transfers_command(
         include_timestamps=include_timestamps,
     )
 
-    if output == 'stdout' and include_timestamps:
+    if export == 'stdout' and include_timestamps:
         transfers = transfers.astype({'timestamp': 'str'})
-    cli_utils.output_data(transfers, output=output, overwrite=overwrite)
+    cli_utils.output_data(transfers, output=export, overwrite=overwrite)

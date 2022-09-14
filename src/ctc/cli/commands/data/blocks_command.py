@@ -31,7 +31,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'attributes to fetch from each block',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -56,7 +56,7 @@ async def async_blocks_command(
     blocks: typing.Sequence[str],
     n: int | None,
     attributes: typing.Optional[typing.Sequence[str]],
-    output: str,
+    export: str,
     overwrite: bool,
     provider: typing.Optional[str],
 ) -> None:
@@ -94,7 +94,7 @@ async def async_blocks_command(
         provider=provider,
     )
 
-    if output == 'stdout':
+    if export == 'stdout':
         cli.print_bullet(key='attributes', value='')
         for attribute in attributes:
             cli.print_bullet(value=attribute, indent=4)
@@ -158,4 +158,4 @@ async def async_blocks_command(
         # # output data
         # if 'number' in df:
         #     df = df.set_index('number')
-        cli_utils.output_data(df, output=output, overwrite=overwrite)
+        cli_utils.output_data(df, output=export, overwrite=overwrite)

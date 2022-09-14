@@ -36,7 +36,7 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'historical duration to show feed data',
             },
             {
-                'name': '--output',
+                'name': '--export',
                 'default': 'stdout',
                 'help': 'file path for output (.json or .csv)',
             },
@@ -78,7 +78,7 @@ async def async_chainlink_command(
     verbose: bool,
     blocks: typing.Optional[typing.Sequence[str]],
     timelength: str,
-    output: str,
+    export: str,
     overwrite: bool,
     provider: typing.Optional[str],
     network: spec.NetworkReference | None,
@@ -125,7 +125,7 @@ async def async_chainlink_command(
         print('- feed address')
         print('- feed:', feed_str)
         print('- fields:', fields)
-        print('- output:', output)
+        print('- output:', export)
 
         # if cli_utils.is_block_range(blocks):
         #     start_block, end_block = await cli_utils.async_resolve_block_range(blocks)
@@ -171,4 +171,4 @@ async def async_chainlink_command(
             return
 
         print()
-        cli_utils.output_data(df, output=output, overwrite=overwrite, raw=True)
+        cli_utils.output_data(df, output=export, overwrite=overwrite, raw=True)
