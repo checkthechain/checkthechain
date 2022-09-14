@@ -15,7 +15,7 @@ from ctc.toolbox.defi_utils import dex_utils
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': trades_command,
+        'f': async_trades_command,
         'help': 'get DEX swaps',
         'args': [
             {'name': 'pool', 'help': 'pool to retrieve swaps from'},
@@ -37,15 +37,19 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'specify that output path can be overwritten',
             },
             {
-                'name': '--verbose',
+                'name': ['-v', '--verbose'],
                 'action': 'store_true',
                 'help': 'output extra data',
             },
         ],
+        'examples': [
+            '0xc5be99a02c6857f9eac67bbce58df5572498f40c --blocks 14000000:14001000',
+        ],
     }
 
 
-async def trades_command(
+async def async_trades_command(
+    *,
     pool: spec.Address,
     blocks: str,
     no_normalize: bool,

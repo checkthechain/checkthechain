@@ -20,7 +20,7 @@ help_message = """show information about a pool"""
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': dex_pool_command,
+        'f': async_dex_pool_command,
         'help': help_message,
         'args': [
             {
@@ -36,10 +36,15 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'block number',
             },
         ],
+        'examples': [
+            '0xc5be99a02c6857f9eac67bbce58df5572498f40c',
+            '0xc5be99a02c6857f9eac67bbce58df5572498f40c --block 14000000',
+        ],
     }
 
 
-async def dex_pool_command(
+async def async_dex_pool_command(
+    *,
     pool: spec.Address,
     network: str | int | None,
     block: str | None,
