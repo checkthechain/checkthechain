@@ -89,6 +89,10 @@ class DEX:
     #
 
     @classmethod
+    def get_dex_name(cls) -> str:
+        return cls.__name__.rstrip('DEX')
+
+    @classmethod
     def get_pool_factories(
         cls,
         network: spec.NetworkReference,

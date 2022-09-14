@@ -63,14 +63,9 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('calls',): 'ctc.cli.commands.data.calls_command',
         ('chain',): 'ctc.cli.commands.data.chain_command',
         ('decompile',): 'ctc.cli.commands.data.decompile_command',
-        (
-            'dex',
-            'pools',
-        ): 'ctc.cli.commands.data.dex.pools_command',
-        (
-            'dex',
-            'trades',
-        ): 'ctc.cli.commands.data.dex.trades_command',
+        ('dex', 'pool'): 'ctc.cli.commands.data.dex.pool_command',
+        ('dex', 'pools'): 'ctc.cli.commands.data.dex.pools_command',
+        ('dex', 'trades'): 'ctc.cli.commands.data.dex.trades_command',
         ('eth', 'balance'): 'ctc.cli.commands.data.eth.balance_command',
         ('eth', 'balances'): 'ctc.cli.commands.data.eth.balances_command',
         ('erc20',): 'ctc.cli.commands.data.erc20_command',

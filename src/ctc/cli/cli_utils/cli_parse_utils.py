@@ -6,6 +6,13 @@ from ctc import evm
 from ctc import spec
 
 
+def parse_network(network: str) -> spec.NetworkReference:
+    if network.isnumeric():
+        return int(network)
+    else:
+        return network
+
+
 async def async_parse_block_range(
     text: str,
     *,
