@@ -264,6 +264,16 @@ async def async_dex_pools_command(
         ),
     )
 
+    if not verbose:
+        max_column_widths: typing.Mapping[str | int, int] | None = {
+            'asset0': 10,
+            'asset1': 10,
+            'asset2': 10,
+            'asset3': 10,
+        }
+    else:
+        max_column_widths = None
+
     toolstr.print_table(
         rows,
         labels=labels,
@@ -277,6 +287,7 @@ async def async_dex_pools_command(
             'asset3': styles['description'] + ' bold',
         },
         max_table_width=toolcli.get_n_terminal_cols(),
+        max_column_widths=max_column_widths,
         compact=compact,
     )
 
