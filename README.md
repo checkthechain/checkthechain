@@ -138,6 +138,8 @@ ctc uniswap burns $POOL --output burns.csv
 
 ## Installation
 
+**note: the 0.2.10 version of ctc on pypi is very old. the upcoming 0.3.0 version will come out soon. installing the latest commit from the main branch fixes many bugs and adds many features. stay tuned for the upcoming 0.3.0 release on pypi**
+
 Two steps:
 1. `pip install checkthechain`
 2. run `ctc setup` in terminal to specify data provider and data storage path
