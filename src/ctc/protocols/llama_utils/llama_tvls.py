@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolstr
 
-from ctc.cli import cli_run
+from ctc import cli
 from . import llama_requests
 
 
@@ -19,7 +19,7 @@ async def async_summarize_protocols_tvls(
     filter_chain: str | None = None,
 ) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     data = await llama_requests.async_get_protocols_tvls(
         category=filter_category,
@@ -69,7 +69,7 @@ async def async_summarize_protocols_tvls(
 
 async def async_summarize_chains_tvls(n: int = 50) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     data = await llama_requests.async_get_chains_tvls()
 
@@ -117,7 +117,7 @@ async def async_summarize_chains_tvls(n: int = 50) -> None:
 
 async def async_summarize_historical_defi_tvl() -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     data = await llama_requests.async_get_historical_defi_tvl()
 
@@ -139,7 +139,7 @@ async def async_summarize_historical_defi_tvl() -> None:
 
 async def async_summarize_historical_chain_tvl(chain: str) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     data = await llama_requests.async_get_historical_chain_tvl(chain)
 
@@ -165,7 +165,7 @@ async def async_summarize_historical_protocol_tvl(
     protocol: str, verbose: bool = False
 ) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     uniswap = await llama_requests.async_get_historical_protocol_tvl(protocol)
 

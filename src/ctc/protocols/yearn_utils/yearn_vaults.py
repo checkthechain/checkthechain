@@ -8,7 +8,7 @@ import tooltime
 
 from ctc import evm
 from ctc import spec
-from ctc.cli import cli_run
+from ctc import cli
 from . import yearn_web_api
 from . import yearn_strategies
 
@@ -41,7 +41,7 @@ async def async_summarize_vault(
         query, network=network
     )
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box(
         'Yearn Vault ' + vault['name'], style=styles['title']
@@ -343,7 +343,7 @@ async def async_summarize_vaults(
     rows.append(total_row)
 
     # print outputs
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_text_box('Yearn Pool Summary', style=styles['title'])
     toolstr.print(
         'data obtained from https://api.yearn.finance', style=styles['comment']

@@ -6,7 +6,7 @@ import typing
 import toolcli
 import toolstr
 
-from ctc.cli import cli_run
+from ctc import cli
 from ctc.cli import cli_utils
 from ctc import evm
 from ctc import spec
@@ -152,7 +152,7 @@ async def async_dex_pools_command(
         print('saved output to', export)
         return
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print(
         toolstr.add_style(str(len(dex_pools)), styles['description'] + ' bold'),

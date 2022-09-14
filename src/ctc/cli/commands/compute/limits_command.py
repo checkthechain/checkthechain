@@ -6,7 +6,7 @@ import typing
 import toolcli
 import toolstr
 
-from ctc.cli import cli_run
+from ctc import cli
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -56,7 +56,7 @@ def limits_command(verbose: bool, bits: list[str]) -> None:
             256,
         ]
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box('int Limits', style=styles['title'])
     rows: typing.List[typing.Sequence[typing.Any]] = []

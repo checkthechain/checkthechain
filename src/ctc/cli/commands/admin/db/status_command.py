@@ -6,10 +6,10 @@ import toolcli
 import toolstr
 import toolsql
 
+from ctc import cli
 from ctc import config
 from ctc import db
 from ctc import spec
-from ctc.cli import cli_run
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -28,7 +28,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def status_command(verbose: bool) -> None:
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box('Database Status', style=styles['title'])
     print()

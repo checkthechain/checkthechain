@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 import toolstr
 
-from ctc.cli import cli_run
+from ctc import cli
 from . import llama_requests
 
 
@@ -44,7 +44,7 @@ async def async_summarize_llama_pools(
         max_tvl=max_tvl,
     )
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box('Defi Llama Tracked Pools', style=styles['title'])
 
@@ -151,7 +151,7 @@ def print_pools_table(
     show_id: bool = False,
 ) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     labels = [
         'symbol',
@@ -256,7 +256,7 @@ def summarize_pool_counts(
         'prefix': '$',
     }
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print(
         '- stablecoin pools: '
@@ -331,7 +331,7 @@ def summarize_pool_counts(
 
 async def async_summarize_pool_yield(pool: typing.Any) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     data = await llama_requests.async_get_pool_yield(pool)
 

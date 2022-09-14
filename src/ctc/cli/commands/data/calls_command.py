@@ -20,7 +20,7 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 from ctc.cli import cli_utils
-from ctc.cli import cli_run
+
 
 command_help = """output the result of multiple contract eth_call's
 
@@ -102,7 +102,7 @@ More data is included when exporting to a file
 
 
 def get_command_help(parse_spec: toolcli.ParseSpec) -> str:
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     stylized = stylize_markdown(command_help, styles=styles)
     stylized = stylized.replace(
         '[timestamp table]', get_timestamp_format_table()
@@ -142,7 +142,7 @@ def get_timestamp_format_table() -> str:
         'examples',
     ]
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     as_str = toolstr.print_multiline_table(
         rows,

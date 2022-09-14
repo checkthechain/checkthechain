@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import typing
-from .. import cli_run
+from ctc import cli
 
 if typing.TYPE_CHECKING:
     from ctc import spec
@@ -19,7 +19,7 @@ def print_bullet(
 
     import toolstr
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_bullet(
         key=key,

@@ -5,9 +5,9 @@ import typing
 import toolcli
 import toolstr
 
+from ctc import cli
 from ctc import evm
 from ctc import spec
-from ctc.cli import cli_run
 from ctc.cli import cli_utils
 
 
@@ -225,7 +225,7 @@ async def async_balances_command(
         )
 
         if export == 'stdout':
-            styles = cli_run.get_cli_styles()
+            styles = cli.get_cli_styles()
 
             # print header
             toolstr.print_text_box(

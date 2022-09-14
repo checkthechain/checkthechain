@@ -20,11 +20,11 @@ async def async_print_aave_addresses(
     max_width: int | None = None,
 ) -> None:
 
-    from ctc.cli import cli_run
+    from ctc import cli
 
     indent = 4
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box('Aave V2 Addresses', style=styles['title'])
 
@@ -148,7 +148,7 @@ async def async_summarize_token_markets(
     max_width: int | None = None,
 ) -> None:
 
-    from ctc.cli import cli_run
+    from ctc import cli
 
     if block is None:
         block = 'latest'
@@ -285,7 +285,7 @@ async def async_summarize_token_markets(
     total_row = [toolstr.add_style(cell, 'bold') for cell in total_row]
     rows.append(total_row)
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_text_box('Aave V2 Markets', style=styles['title'])
     print()
     toolstr.print_table(
@@ -349,7 +349,7 @@ async def async_summarize_token_market(
     verbose: bool = False,
 ) -> None:
 
-    from ctc.cli import cli_run
+    from ctc import cli
 
     if not evm.is_address_str(token):
         token_address = await evm.async_get_erc20_address(token)
@@ -420,7 +420,7 @@ async def async_summarize_token_market(
     supply_apy = np.array(interest_rates['supply_apy']) * 100
     borrow_apy = np.array(interest_rates['borrow_apy']) * 100
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_text_box(
         'Summary of ' + token + ' on Aave v2', style=styles['title']
     )

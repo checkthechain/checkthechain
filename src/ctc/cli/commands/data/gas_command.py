@@ -23,9 +23,9 @@ import toolcli
 import toolstr
 import tooltime
 
+from ctc import cli
 from ctc import evm
 from ctc import rpc
-from ctc.cli import cli_run
 from ctc.cli import cli_utils
 
 
@@ -84,7 +84,7 @@ async def async_gas_command(
 
     import numpy as np
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     if last is None:
         last_as_int = [10, 100]
@@ -321,7 +321,7 @@ async def async_print_gas_costs(
     *, gas_fee: float, eth_usd: float | None
 ) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     # see appendices G+H https://ethereum.github.io/yellowpaper/paper.pdf
     rows: typing.Sequence[typing.MutableSequence[typing.Any]] = [

@@ -9,7 +9,6 @@ from ctc import binary
 from ctc import cli
 from ctc import evm
 from ctc import spec
-from ctc.cli import cli_run
 
 
 help_message = """decode EVM call data
@@ -60,7 +59,7 @@ async def async_decode_call_command(
         or (len(args[0]) == 64)
     )
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     # print header
     if indent is None:
         indent = ''

@@ -202,9 +202,9 @@ async def async_get_median_blocks_gas_fees(
     if len(missing) > 0:
         if verbose:
             import toolstr
-            from ctc.cli import cli_run
+            from ctc import cli
 
-            styles = cli_run.get_cli_styles()
+            styles = cli.get_cli_styles()
             toolstr.print(
                 'fetching tx gas data for '
                 + toolstr.add_style(

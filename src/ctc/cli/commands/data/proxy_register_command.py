@@ -3,10 +3,10 @@ from __future__ import annotations
 import toolcli
 import toolstr
 
+from ctc import cli
 from ctc import evm
 from ctc import spec
 from ctc import rpc
-from ctc.cli import cli_run
 
 
 help_message = """register custom proxy implementation of a contract
@@ -50,7 +50,7 @@ async def async_proxy_add_command(
     confirm: bool,
 ) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     provider = rpc.get_provider()
     network = evm.get_network_name(provider['network'])

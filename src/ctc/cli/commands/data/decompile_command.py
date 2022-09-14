@@ -15,7 +15,7 @@ import typing
 import toolcli
 import toolstr
 
-from ctc.cli import cli_run
+from ctc import cli
 from ctc import evm
 from ctc import rpc
 
@@ -65,7 +65,7 @@ async def async_decompile_command(
         sort='hex_signature',
     )
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print(
         'Found '
         + toolstr.add_style(

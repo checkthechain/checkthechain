@@ -6,10 +6,10 @@ import typing
 import toolcli
 import toolstr
 
+from ctc import cli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc.cli import cli_run
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -76,7 +76,7 @@ async def async_call_all_command(
 
     results = await asyncio.gather(*coroutines)
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     multiline = False
     rows = []

@@ -5,7 +5,7 @@ import typing
 import toolstr
 
 from ctc import spec
-from ctc.cli import cli_run
+from ctc import cli
 from . import yearn_spec
 
 
@@ -89,7 +89,7 @@ def print_lens_addresses(network: spec.NetworkReference) -> None:
         'name',
         'address',
     ]
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_table(
         rows,
         labels=labels,
@@ -130,7 +130,7 @@ def _print_vault_addresses_nonverbose(
     sort_index = labels.index('vault')
     rows = sorted(rows, key=lambda row: row[sort_index])
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_table(
         rows,
         labels=labels,
@@ -148,7 +148,7 @@ def _print_vault_addresses_verbose(
     api_vaults: typing.Sequence[yearn_spec.ApiVault],
 ) -> None:
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     rows = []
     for datum in api_vaults:

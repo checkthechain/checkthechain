@@ -14,7 +14,7 @@ async def async_print_erc20_summary(
 
     import asyncio
     import toolstr
-    from ctc.cli import cli_run
+    from ctc import cli
 
     name_coroutine = erc20_metadata.async_get_erc20_name(
         erc20,
@@ -34,7 +34,7 @@ async def async_print_erc20_summary(
         total_supply_coroutine,
     )
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box('ERC20 Summary for ' + symbol, style=styles['title'])
 

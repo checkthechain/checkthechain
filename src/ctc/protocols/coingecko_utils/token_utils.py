@@ -247,7 +247,9 @@ async def async_get_market_chart(
             data: typing.Mapping[typing.Any, typing.Any] = await response.json()
 
     if data.get('status', {}).get('error_code') == 429:
-        raise Exception('coingecko ratelimit reached, wait a bit or obtain an API key')
+        raise Exception(
+            'coingecko ratelimit reached, wait a bit or obtain an API key'
+        )
 
     return data
 
@@ -306,9 +308,9 @@ async def async_summarize_token_data(
     rows.append(['circulating supply', market_data['circulating_supply']])
     rows.append(['total supply', market_data['total_supply']])
 
-    from ctc.cli import cli_run
+    from ctc import cli
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print_text_box(
         token_info['name'] + ' Coingecko data', style=styles['title']
@@ -441,7 +443,7 @@ async def async_summarize_coin_quotient(
     days: int | None = None,
 ) -> None:
     import numpy as np
-    from ctc.cli import cli_run
+    from ctc import cli
 
     chart1 = await async_get_market_chart(symbol=coin1, days=days)
     chart2 = await async_get_market_chart(symbol=coin2, days=days)
@@ -465,7 +467,7 @@ async def async_summarize_coin_quotient(
         coin2_prices=coin1_prices,
     )
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     toolstr.print(
         toolstr.hjustify(coin1 + ' / ' + coin2, 'center', 70),

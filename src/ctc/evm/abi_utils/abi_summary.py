@@ -61,9 +61,9 @@ def summarize_contract_abi_functions(
     read_write: bool = False,
 ) -> None:
     import toolstr
-    from ctc.cli import cli_run
+    from ctc import cli
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     if read_write:
         read_color = styles['description']
@@ -220,9 +220,9 @@ def summarize_contract_abi_events(
     title: str = 'Contract ABI Events',
 ) -> None:
     import toolstr
-    from ctc.cli import cli_run
+    from ctc import cli
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     events = binary.get_event_abis(contract_abi)
     toolstr.print_text_box(title, style=styles['title'])

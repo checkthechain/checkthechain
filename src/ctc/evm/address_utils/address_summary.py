@@ -26,9 +26,9 @@ async def async_print_address_summary(
 
     import toolstr
     import tooltime
-    from ctc.cli import cli_run
+    from ctc import cli
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     eth_balance_coroutine = evm.async_get_eth_balance(
         address, provider=provider

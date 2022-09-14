@@ -6,8 +6,8 @@ import typing
 import toolcli
 import toolstr
 
+from ctc import cli
 import ctc.config
-from ctc.cli import cli_run
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -67,7 +67,7 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
             key_style = None
 
         else:
-            styles = cli_run.get_cli_styles()
+            styles = cli.get_cli_styles()
             title_style = styles['title']
             chrome_style = styles['comment']
             key_style = styles['option']

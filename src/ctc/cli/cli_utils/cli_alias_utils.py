@@ -4,7 +4,7 @@ import os
 import sys
 import typing
 
-from ctc.cli import cli_run
+from ctc import cli
 
 
 if typing.TYPE_CHECKING:
@@ -297,7 +297,7 @@ def get_paths_alias_status(
 def print_alias_status(include_title: bool = True) -> None:
     import toolstr
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     if include_title:
         toolstr.print_text_box('ctc Aliases', style=styles['title'])
     print()
@@ -331,7 +331,7 @@ def print_paths_alias_status(
         row = [path, shell, status]
         rows.append(row)
     labels = ['path', 'shell', 'status']
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_header('Alias Configuration', style=styles['title'])
     print()
     toolstr.print_table(
@@ -361,7 +361,7 @@ def print_paths_alias_status(
 def print_aliases() -> None:
     import toolstr
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
     toolstr.print_header('Aliases', style=styles['title'])
     print()
 

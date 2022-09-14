@@ -9,7 +9,6 @@ from ctc import cli
 from ctc import evm
 from ctc import rpc
 from ctc import spec
-from ctc.cli import cli_run
 from ctc.protocols import chainlink_utils
 from . import chainlink_feed_metadata
 from . import chainlink_spec
@@ -25,7 +24,7 @@ async def async_summarize_feed(
 
     import asyncio
 
-    styles = cli_run.get_cli_styles()
+    styles = cli.get_cli_styles()
 
     feed_address = await chainlink_feed_metadata.async_resolve_feed_address(
         feed,
