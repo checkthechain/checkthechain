@@ -5,7 +5,7 @@ from ctc import spec
 from . import transaction_serialize
 
 
-def get_unsigned_transaction_hash(
+def hash_unsigned_transaction(
     transaction: spec.TransactionData,
     *,
     chain_id: int | None = None,
@@ -18,6 +18,6 @@ def get_unsigned_transaction_hash(
     return binary.keccak(serialized)
 
 
-def get_signed_transaction_hash(transaction: spec.TransactionData) -> spec.Data:
+def hash_signed_transaction(transaction: spec.TransactionData) -> spec.Data:
     serialized = transaction_serialize.serialize_signed_transaction(transaction)
     return binary.keccak(serialized)

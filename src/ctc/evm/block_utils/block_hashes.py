@@ -35,6 +35,6 @@ def serialize_block(block: spec.Block) -> spec.PrefixHexData:
     return binary.rlp_encode(as_list)
 
 
-def get_block_hash(block: spec.Block) -> spec.PrefixHexData:
+def hash_block(block: spec.Block) -> spec.PrefixHexData:
     serialized = serialize_block(block)
     return binary.keccak(serialized)

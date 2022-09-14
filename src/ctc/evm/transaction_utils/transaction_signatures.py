@@ -51,7 +51,7 @@ def verify_transaction_signature(
             raise Exception('must provide signature for transaction')
 
     # get transaction hash
-    transaction_hash = transaction_hashes.get_unsigned_transaction_hash(
+    transaction_hash = transaction_hashes.hash_unsigned_transaction(
         transaction
     )
 
