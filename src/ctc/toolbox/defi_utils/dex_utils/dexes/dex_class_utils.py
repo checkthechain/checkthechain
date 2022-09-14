@@ -10,6 +10,17 @@ from . import dex_directory
 from . import dex_class
 
 
+def get_all_dex_classes() -> typing.Mapping[str, typing.Type[dex_class.DEX]]:
+    dex_names = [
+        'balancer',
+        'curve',
+        'sushi',
+        'uniswapv2',
+        'uniswapv3',
+    ]
+    return {dex_name: get_dex_class(dex_name) for dex_name in dex_names}
+
+
 def get_dex_class(
     dex: typing.Type[dex_class.DEX] | str | None = None,
     *,

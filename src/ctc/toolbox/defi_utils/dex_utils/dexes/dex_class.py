@@ -52,6 +52,8 @@ class DEX:
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
     ) -> typing.Sequence[spec.DexPool]:
         raise NotImplementedError(cls.__name__ + '.async_get_new_pools')
 
@@ -167,33 +169,12 @@ class DEX:
         )
 
         if update:
-
-            if factories is not None:
-                coroutines = [
-                    cls.async_update_factory_pools(
-                        factory=factory,
-                        network=network,
-                        provider=provider,
-                    )
-                    for factory in factories
-                ]
-                results = await asyncio.gather(*coroutines)
-                unique_new_pools = {
-                    pool['address']: pool
-                    for result in results
-                    for pool in result
-                }
-                new_pools: typing.Sequence[spec.DexPool] = list(
-                    unique_new_pools.values()
-                )
-            elif factory is not None:
-                new_pools = await cls.async_update_factory_pools(
-                    factory=factory,
-                    network=network,
-                    provider=provider,
-                )
-            else:
-                new_pools = []
+            new_pools = await cls.async_update_pools(
+                factory=factory,
+                factories=factories,
+                network=network,
+                provider=provider,
+            )
 
             # filter pools according to function inputs
             new_pools = _filter_pools(
@@ -240,10 +221,11 @@ class DEX:
     #
 
     @classmethod
-    async def async_update_factory_pools(
+    async def async_update_pools(
         cls,
-        factory: spec.Address,
         *,
+        factory: spec.Address | None = None,
+        factories: typing.Sequence[spec.Address] | None = None,
         network: spec.NetworkReference | None = None,
         provider: spec.ProviderReference = None,
     ) -> typing.Sequence[spec.DexPool]:
@@ -252,6 +234,30 @@ class DEX:
         from ctc import db
 
         network, provider = evm.get_network_and_provider(network, provider)
+
+        # if not factory or factories specified, use all
+        if factories is None and factory is None:
+            factories = cls.get_pool_factories(network=network)
+
+        # if using multiple factories, call function separately for each
+        if factories is not None:
+            coroutines = []
+            for factory in factories:
+                coroutine = cls.async_update_pools(
+                    factory=factory,
+                    network=network,
+                    provider=provider,
+                )
+                coroutines.append(coroutine)
+            results = await asyncio.gather(*coroutines)
+            return [
+                dex_pool
+                for result in results
+                for dex_pool in result
+            ]
+
+        if factory is None:
+            raise Exception('factory should be specified')
 
         # get new pools
         last_scanned_block = (
@@ -295,29 +301,6 @@ class DEX:
             new_pools = []
 
         return new_pools
-
-    @classmethod
-    async def async_update_all_dex_factory_pools(
-        cls,
-        *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference = None,
-    ) -> typing.Sequence[spec.DexPool]:
-        """update latest pools from all factories of dex"""
-
-        network, provider = evm.get_network_and_provider(network, provider)
-
-        coroutines = []
-        for factory in cls.get_pool_factories(network=network):
-            coroutine = cls.async_update_factory_pools(
-                factory=factory,
-                network=network,
-                provider=provider,
-            )
-            coroutines.append(coroutine)
-        results = await asyncio.gather(*coroutines)
-
-        return [dex_pool for result in results for dex_pool in result]
 
     #
     # # single pool metadata

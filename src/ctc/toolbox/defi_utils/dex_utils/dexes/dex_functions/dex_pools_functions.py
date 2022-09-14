@@ -29,6 +29,14 @@ async def async_get_pools(
     all_dex_factories = dex is not None and factory is None
     if factory is None and dex is None:
         dex = dex_class.DEX
+
+        if update:
+            await async_update_all_dexes(
+                network=network,
+                provider=provider,
+            )
+            update = False
+
     else:
         dex = dex_class_utils.get_dex_class(
             dex=dex,
@@ -47,3 +55,26 @@ async def async_get_pools(
         update=update,
         provider=provider,
     )
+
+
+async def async_update_all_dexes(
+    network: spec.NetworkReference | None = None,
+    provider: spec.ProviderReference | None = None,
+) -> typing.Mapping[str, typing.Mapping[str, typing.Any]]:
+
+    import asyncio
+
+    all_dexes = dex_class_utils.get_all_dex_classes()
+
+    coroutines = []
+    for dex in all_dexes.values():
+        coroutine = dex.async_update_pools(network=network, provider=provider)
+        coroutines.append(coroutine)
+
+    results = await asyncio.gather(*coroutines)
+
+    updates = {}
+    for dex_name, result in zip(all_dexes.keys(), results):
+        updates[dex_name] = {'new_pools': result}
+
+    return updates

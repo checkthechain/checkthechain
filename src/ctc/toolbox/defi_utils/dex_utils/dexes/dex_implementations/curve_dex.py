@@ -35,7 +35,11 @@ class CurveDEX(dex_class.DEX):
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
     ) -> typing.Sequence[spec.DexPool]:
+
+        network, provider = evm.get_network_and_provider(network, provider)
 
         start_block, end_block = await evm.async_parse_block_range(
             start_block=start_block,
@@ -43,6 +47,7 @@ class CurveDEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             allow_none=False,
+            provider=provider,
         )
 
         start_block, end_block = await evm.async_block_numbers_to_int(
@@ -64,6 +69,7 @@ class CurveDEX(dex_class.DEX):
                 to_address=factory,
                 function_abi=curve_utils.function_abis['pool_count'],
                 block_numbers=[start_block, end_block],
+                provider=provider,
             )
 
             pools = await rpc.async_batch_eth_call(
@@ -72,13 +78,19 @@ class CurveDEX(dex_class.DEX):
                 function_parameter_list=[
                     [index] for index in range(start_pool_count, end_pool_count)
                 ],
+                provider=provider,
             )
 
             creation_blocks_coroutine = asyncio.create_task(
-                evm.async_get_contracts_creation_blocks(pools)
+                evm.async_get_contracts_creation_blocks(
+                    pools, provider=provider
+                )
             )
 
-        coroutines = [curve_utils.async_get_pool_tokens(pool) for pool in pools]
+        coroutines = [
+            curve_utils.async_get_pool_tokens(pool, provider=provider)
+            for pool in pools
+        ]
         pools_tokens = await asyncio.gather(*coroutines)
 
         if factory == curve_utils.curve_deployer_eoa:

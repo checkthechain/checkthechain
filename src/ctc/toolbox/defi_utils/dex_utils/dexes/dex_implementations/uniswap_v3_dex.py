@@ -25,9 +25,13 @@ class UniswapV3DEX(dex_class.DEX):
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
+        network: spec.NetworkReference | None = None,
+        provider: spec.ProviderReference | None = None,
     ) -> typing.Sequence[spec.DexPool]:
 
         from ctc.protocols import uniswap_v3_utils
+
+        network, provider = evm.get_network_and_provider(network, provider)
 
         df = await evm.async_get_events(
             factory,
@@ -38,6 +42,7 @@ class UniswapV3DEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             keep_multiindex=False,
+            provider=provider,
         )
 
         dex_pools = []
