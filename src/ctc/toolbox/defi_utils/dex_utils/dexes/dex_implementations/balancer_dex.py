@@ -138,6 +138,8 @@ class BalancerDEX(dex_class.DEX):
             keep_multiindex=False,
         )
 
+        assets = await cls.async_get_pool_assets(pool)
+
         # filter by pool
         pool_id = await balancer_utils.async_get_pool_id(
             pool_address=pool, provider=provider
@@ -145,13 +147,27 @@ class BalancerDEX(dex_class.DEX):
         mask = trades['arg__poolId'] == pool_id
         trades = trades[mask]
 
+        import pandas as pd
+
         output: spec.RawDexTrades = {
             'transaction_hash': trades['transaction_hash'],
             'recipient': None,
-            'sold_id': trades['arg__tokenIn'],
-            'bought_id': trades['arg__tokenOut'],
-            'sold_amount': trades['arg__amountIn'],
-            'bought_amount': trades['arg__amountOut'],
+            'sold_id': pd.Series(
+                [
+                    assets.index(address)
+                    for address in trades['arg__tokenIn'].values
+                ],
+                index=trades.index,
+            ),
+            'bought_id': pd.Series(
+                [
+                    assets.index(address)
+                    for address in trades['arg__tokenOut'].values
+                ],
+                index=trades.index,
+            ),
+            'sold_amount': trades['arg__amountIn'].map(int),
+            'bought_amount': trades['arg__amountOut'].map(int),
         }
 
         if include_timestamps:

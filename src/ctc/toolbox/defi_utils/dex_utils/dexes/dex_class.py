@@ -254,11 +254,7 @@ class DEX:
                 )
                 coroutines.append(coroutine)
             results = await asyncio.gather(*coroutines)
-            return [
-                dex_pool
-                for result in results
-                for dex_pool in result
-            ]
+            return [dex_pool for result in results for dex_pool in result]
 
         if factory is None:
             raise Exception('factory should be specified')
@@ -338,7 +334,7 @@ class DEX:
         cls,
         pool: spec.Address,
         *,
-        provider: spec.ProviderReference,
+        provider: spec.ProviderReference = None,
         network: spec.NetworkReference | None = None,
     ) -> typing.Sequence[str]:
         network, provider = evm.get_network_and_provider(network, provider)
@@ -525,9 +521,19 @@ class DEX:
 
         # normalize
         if normalize:
+
+            # test for metapools
+            if max(output['sold_id']) >= len(assets) or max(
+                output['bought_id']
+            ) >= len(assets):
+                raise NotImplementedError(
+                    'normalize not implemented for metapools'
+                )
+
             decimals = await evm.async_get_erc20s_decimals(
                 assets, provider=provider
             )
+
             sold_decimals = output['sold_id'].map(lambda i: decimals[i])
             bought_decimals = output['bought_id'].map(lambda i: decimals[i])
             output['sold_amount'] /= 10**sold_decimals  # type: ignore

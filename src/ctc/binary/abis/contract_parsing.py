@@ -104,7 +104,7 @@ def get_event_abi(
         candidates.append(item)
 
     if len(candidates) == 0:
-        raise Exception('could not find event abi')
+        raise LookupError('could not find event abi')
     elif len(candidates) == 1:
         return candidates[0]
     else:

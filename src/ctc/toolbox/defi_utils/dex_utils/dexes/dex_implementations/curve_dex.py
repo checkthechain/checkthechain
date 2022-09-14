@@ -213,8 +213,8 @@ class CurveDEX(dex_class.DEX):
             'recipient': trades['arg__buyer'],
             'sold_id': trades['arg__sold_id'],
             'bought_id': trades['arg__bought_id'],
-            'sold_amount': trades['arg__tokens_sold'],
-            'bought_amount': trades['arg__tokens_bought'],
+            'sold_amount': trades['arg__tokens_sold'].map(int),
+            'bought_amount': trades['arg__tokens_bought'].map(int),
         }
 
         if include_timestamps:
