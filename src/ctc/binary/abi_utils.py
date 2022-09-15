@@ -5,7 +5,7 @@ import typing
 from ctc import spec
 
 
-def decode_types(
+def abi_decode(
     data: bytes,
     types: spec.ABIDatatypeStr | typing.Sequence[spec.ABIDatatypeStr],
 ) -> typing.Any:
@@ -18,7 +18,7 @@ def decode_types(
         return eth_abi_lite.decode_abi(types, data)
 
 
-def encode_types(
+def abi_encode(
     data: typing.Any,
     types: spec.ABIDatatypeStr | typing.Sequence[spec.ABIDatatypeStr],
 ) -> bytes:

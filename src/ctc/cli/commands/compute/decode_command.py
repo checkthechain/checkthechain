@@ -25,5 +25,5 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
 
 
 def decode_command(type: str, data: str) -> None:
-    decoded = binary.decode_types(binary.convert(data, 'binary'), type)
+    decoded = binary.abi_decode(binary.convert(data, 'binary'), type)
     print(decoded)

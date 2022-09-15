@@ -51,7 +51,7 @@ def encode_command(*, type: str, data: str, packed: bool) -> None:
     if packed:
         encoded = binary.abi_encode_packed(literal_data, type)
     else:
-        encoded = binary.encode_types(literal_data, type)
+        encoded = binary.abi_encode(literal_data, type)
 
     as_hex = binary.convert(encoded, 'prefix_hex')
     print(as_hex)

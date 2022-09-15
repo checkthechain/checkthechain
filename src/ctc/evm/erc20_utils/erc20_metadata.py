@@ -283,7 +283,7 @@ def _decode_raw_symbol(data: str | None) -> str:
         return ''
     else:
         as_binary = binary.convert(data, 'binary')
-        as_str: str = binary.decode_types(as_binary, '(string)')[0]
+        as_str: str = binary.abi_decode(as_binary, '(string)')[0]
         return as_str
 
 

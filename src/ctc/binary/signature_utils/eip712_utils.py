@@ -132,13 +132,13 @@ def _encode_datum(value: typing.Any, type: spec.ABIDatatypeStr) -> bytes:
             encoded += _encode_datum(subvalue, scalar_type)
         return hash_utils.keccak(encoded, 'binary')
     elif type == 'bool':
-        return abi_utils.encode_types(int(value), 'uint256')
+        return abi_utils.abi_encode(int(value), 'uint256')
     elif type == 'address':
-        return abi_utils.encode_types(format_utils.convert(value, 'integer'), 'uint160')
+        return abi_utils.abi_encode(format_utils.convert(value, 'integer'), 'uint160')
     elif type.startswith('int'):
-        return abi_utils.encode_types(value, 'int256')
+        return abi_utils.abi_encode(value, 'int256')
     elif type.startswith('uint'):
-        return abi_utils.encode_types(value, 'uint256')
+        return abi_utils.abi_encode(value, 'uint256')
     elif type.startswith('bytes') and type[5:].isdecimal():
         return typing.cast(bytes, value) + b'\x00' * (32 - len(value))
     elif type == 'bytes':

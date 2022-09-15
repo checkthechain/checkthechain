@@ -52,5 +52,5 @@ async def async_storage_command(
         print(result)
     else:
         as_bytes = binary.convert(result, 'binary')
-        decoded = binary.decode_types(as_bytes, datatype)
+        decoded = binary.abi_decode(as_bytes, datatype)
         print(decoded)
