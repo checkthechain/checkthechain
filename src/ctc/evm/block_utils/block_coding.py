@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
 from ctc import spec
-from .. import formats
 
 
 def encode_block_number(block: spec.BlockNumberReference) -> str:
@@ -14,7 +14,7 @@ def encode_block_number(block: spec.BlockNumberReference) -> str:
     if isinstance(standard_block, str):
         return standard_block
     elif isinstance(standard_block, int):
-        return formats.convert(
+        return binary.convert(
             standard_block,
             'prefix_hex',
             keep_leading_0=False,

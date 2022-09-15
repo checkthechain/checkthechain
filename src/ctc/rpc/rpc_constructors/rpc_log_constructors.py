@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import spec
 from .. import rpc_request
 
@@ -16,9 +17,9 @@ def construct_eth_new_filter(
 ) -> spec.RpcRequest:
 
     if start_block is not None:
-        start_block = binary.encode_block_number(start_block)
+        start_block = evm.encode_block_number(start_block)
     if end_block is not None:
-        end_block = binary.encode_block_number(end_block)
+        end_block = evm.encode_block_number(end_block)
 
     parameters = {
         'address': address,
@@ -67,9 +68,9 @@ def construct_eth_get_logs(
 ) -> spec.RpcRequest:
 
     if start_block is not None:
-        start_block = binary.encode_block_number(start_block)
+        start_block = evm.encode_block_number(start_block)
     if end_block is not None:
-        end_block = binary.encode_block_number(end_block)
+        end_block = evm.encode_block_number(end_block)
 
     parameters = {
         'address': address,

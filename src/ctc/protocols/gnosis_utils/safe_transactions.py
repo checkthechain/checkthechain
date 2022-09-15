@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import spec
 from . import safe_spec
 
@@ -180,7 +181,7 @@ def get_safe_transaction_from_call_data(
 ) -> safe_spec.SafeTransaction:
 
     # decode transaction parameters
-    decoded = binary.decode_call_data(
+    decoded = evm.decode_call_data(
         call_data=call_data,
         function_abi=safe_spec.function_abis['execTransaction'],
     )
@@ -202,7 +203,7 @@ def get_safe_signatures_from_call_data(
     call_data: spec.BinaryData,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
     # decode transaction parameters
-    decoded = binary.decode_call_data(
+    decoded = evm.decode_call_data(
         call_data=call_data,
         function_abi=safe_spec.function_abis['execTransaction'],
     )

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
-from . import abi_summary
+from . import contract_abi_summary
 
 
 def get_contract_abi_diff(
@@ -11,10 +11,10 @@ def get_contract_abi_diff(
     second_contract_abi: spec.ContractABI,
 ) -> typing.Mapping[str, spec.ContractABI]:
 
-    first_by_selectors = abi_summary.get_contract_abi_by_selectors(
+    first_by_selectors = contract_abi_summary.get_contract_abi_by_selectors(
         first_contract_abi
     )
-    second_by_selectors = abi_summary.get_contract_abi_by_selectors(
+    second_by_selectors = contract_abi_summary.get_contract_abi_by_selectors(
         second_contract_abi
     )
 
@@ -57,21 +57,21 @@ def print_contract_abi_diff(
 
     if functions_only or not events_only:
 
-        abi_summary.summarize_contract_abi_functions(
+        contract_abi_summary.summarize_contract_abi_functions(
             diff['mutual'],
             title='Mutual Functions',
         )
 
         print()
         print()
-        abi_summary.summarize_contract_abi_functions(
+        contract_abi_summary.summarize_contract_abi_functions(
             diff['first_only'],
             title=first_name + ' Functions',
         )
 
         print()
         print()
-        abi_summary.summarize_contract_abi_functions(
+        contract_abi_summary.summarize_contract_abi_functions(
             diff['second_only'],
             title=second_name + ' Functions',
         )
@@ -82,21 +82,21 @@ def print_contract_abi_diff(
             print()
             print()
 
-        abi_summary.summarize_contract_abi_events(
+        contract_abi_summary.summarize_contract_abi_events(
             diff['mutual'],
             title='Mutual Events',
         )
 
         print()
         print()
-        abi_summary.summarize_contract_abi_events(
+        contract_abi_summary.summarize_contract_abi_events(
             diff['first_only'],
             title=first_name + ' Events',
         )
 
         print()
         print()
-        abi_summary.summarize_contract_abi_events(
+        contract_abi_summary.summarize_contract_abi_events(
             diff['second_only'],
             title=second_name + ' Events',
         )

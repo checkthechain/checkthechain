@@ -430,7 +430,7 @@ async def async_perform_multi_contract_call(
         )
 
     # name based on first contract's abi
-    output_names = binary.get_function_output_names(
+    output_names = evm.get_function_output_names(
         function_abi, human_readable=True
     )
 
@@ -583,7 +583,7 @@ async def async_perform_multi_block_call(
         from_address=from_address,
     )
 
-    output_names = binary.get_function_output_names(
+    output_names = evm.get_function_output_names(
         function_abi, human_readable=True
     )
     if normalize is not None:

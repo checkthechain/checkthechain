@@ -71,7 +71,7 @@ async def async_encode_call_data(
         raise Exception('could not determine function_abi')
 
     # encode
-    encoded_data = binary.encode_call_data(
+    encoded_data = evm.encode_call_data(
         function_abi=function_abi,
         parameters=function_parameters,
     )
@@ -85,7 +85,7 @@ async def async_decode_call_output(
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> typing.Any:
     function_abi = await async_get_call_function_abi(call)
-    return binary.decode_function_output(
+    return evm.decode_function_output(
         encoded_output=encoded_output,
         function_abi=function_abi,
     )

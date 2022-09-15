@@ -84,10 +84,10 @@ async def async_decode_call_command(
 
         for subresult in result:
             try:
-                function_abi: spec.FunctionABI | None = binary.function_signature_to_abi(
-                    subresult['text_signature']
+                function_abi: spec.FunctionABI | None = (
+                    evm.function_signature_to_abi(subresult['text_signature'])
                 )
-                decoded = binary.decode_call_data(
+                decoded = evm.decode_call_data(
                     call_data=call_data,
                     function_abi=function_abi,
                 )
@@ -112,7 +112,7 @@ async def async_decode_call_command(
                 contract_address=contract_address
             )
             if explicit_signature is not None:
-                function_selector = binary.get_function_selector(
+                function_selector = evm.get_function_selector(
                     function_signature=explicit_signature
                 )
                 call_data = (
@@ -121,7 +121,7 @@ async def async_decode_call_command(
                     + binary.convert(call_data, 'raw_hex')
                 )
 
-            decoded = binary.decode_call_data(
+            decoded = evm.decode_call_data(
                 contract_abi=contract_abi, call_data=call_data
             )
             function_abi = decoded['function_abi']
@@ -174,7 +174,7 @@ async def async_decode_call_command(
         print_bullet('signature', explicit_signature)
     else:
         print_bullet(
-            'signature', binary.get_function_signature(function_abi), indent
+            'signature', evm.get_function_signature(function_abi), indent
         )
     print_bullet('inputs', indent=indent)
     for p, parameter in enumerate(function_abi['inputs']):
@@ -217,7 +217,7 @@ async def async_decode_call_command(
     non_nested_parameters = list(range(len(decoded['parameters'])))
     named_parameters = decoded.get('named_parameters')
 
-    function_selector = binary.get_function_selector(function_abi)
+    function_selector = evm.get_function_selector(function_abi)
     if not nested:
         nested = function_selector in [
             '252dba42',  # aggregate((address,bytes)[])
@@ -303,7 +303,7 @@ async def async_decode_call_command(
     if len(non_nested_parameters) > 0:
         print()
         toolstr.print_header('Call Parameters', style=styles['title'])
-        input_names = binary.get_function_parameter_names(function_abi)
+        input_names = evm.get_function_parameter_names(function_abi)
         for p, parameter in enumerate(decoded['parameters']):
             if p not in non_nested_parameters:
                 parameter = '\[nested parameter, see below]'  # type: ignore

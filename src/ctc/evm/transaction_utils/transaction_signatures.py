@@ -98,8 +98,8 @@ def recover_transaction_sender(
     else:
         raise Exception('invalid v value')
     if (
-        r >= binary.signatures.secp256k1_utils.N
-        or s >= binary.signatures.secp256k1_utils.N
+        r >= binary.signature_utils.secp256k1_utils.N
+        or s >= binary.signature_utils.secp256k1_utils.N
         or r == 0
         or s == 0
     ):

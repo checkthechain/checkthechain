@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from ctc import spec
-from .. import formats
+from .. import format_utils
 from . import key_utils
 from . import secp256k1_utils
 from . import vrs_utils
@@ -52,9 +52,9 @@ def recover_signer_public_key(
 
     # ger vrs
     v, r, s = vrs_utils.unpack_vrs(signature)
-    v = formats.convert(v, 'integer')
-    r = formats.convert(r, 'integer')
-    s = formats.convert(s, 'integer')
+    v = format_utils.convert(v, 'integer')
+    r = format_utils.convert(r, 'integer')
+    s = format_utils.convert(s, 'integer')
 
     if v >= 37:
         network_id = vrs_utils.vrs_to_network_id(v=v, r=r, s=s)
@@ -63,11 +63,11 @@ def recover_signer_public_key(
         v = v - network_id * 2 - 8
 
     # get signer
-    message_hash = formats.convert(message_hash, 'binary')
+    message_hash = format_utils.convert(message_hash, 'binary')
     x, y = secp256k1_utils.ecdsa_raw_recover(message_hash, (v, r, s))
     signer = x.to_bytes(32, byteorder='big') + y.to_bytes(32, byteorder='big')
 
-    return formats.convert(signer, 'prefix_hex')
+    return format_utils.convert(signer, 'prefix_hex')
 
 
 def recover_signer_address(

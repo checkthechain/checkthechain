@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import spec
 from .. import rpc_request
 
@@ -25,11 +26,11 @@ def construct_eth_call(
     if block_number is None:
         block_number = 'latest'
     else:
-        block_number = binary.encode_block_number(block_number)
+        block_number = evm.encode_block_number(block_number)
 
     # encode call data
     if call_data is None:
-        call_data = binary.encode_call_data(
+        call_data = evm.encode_call_data(
             parameters=function_parameters,
             function_abi=function_abi,
         )
@@ -64,7 +65,7 @@ def construct_eth_estimate_gas(
 
     # encode call data
     if call_data is None:
-        call_data = binary.encode_call_data(
+        call_data = evm.encode_call_data(
             parameters=function_parameters,
             function_abi=function_abi,
         )
@@ -92,7 +93,7 @@ def construct_eth_get_balance(
     if block_number is None:
         block_number = 'latest'
 
-    encoded_block_number = binary.encode_block_number(block_number)
+    encoded_block_number = evm.encode_block_number(block_number)
     return rpc_request.create('eth_getBalance', [address, encoded_block_number])
 
 
@@ -104,7 +105,7 @@ def construct_eth_get_storage_at(
 ) -> spec.RpcRequest:
 
     position = binary.convert(position, 'prefix_hex', keep_leading_0=False)
-    encoded_block_number = binary.encode_block_number(block_number)
+    encoded_block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
         'eth_getStorageAt', [address, position, encoded_block_number]
     )
@@ -116,5 +117,5 @@ def construct_eth_get_code(
     block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
-    block_number = binary.encode_block_number(block_number)
+    block_number = evm.encode_block_number(block_number)
     return rpc_request.create('eth_getCode', [address, block_number])

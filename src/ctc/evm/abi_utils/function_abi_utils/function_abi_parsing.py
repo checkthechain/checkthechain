@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
 from ctc import spec
-
-from .. import hashes
 
 
 def function_signature_to_abi(function_signature: str) -> spec.FunctionABI:
@@ -149,7 +148,7 @@ def get_function_selector(
             raise Exception('must specify function_abi or function_signature')
         function_signature = get_function_signature(function_abi)
 
-    full_hash = hashes.keccak(
+    full_hash = binary.keccak(
         function_signature.encode(), output_format='raw_hex'
     )
     return full_hash[:8]
@@ -194,3 +193,13 @@ def get_function_output_names(
                     output_names[on] == 'output_' + str(on)
 
     return output_names
+
+
+def is_function_read_only(function_abi: spec.FunctionABI) -> bool:
+    return bool(function_abi.get('constant')) or (
+        function_abi.get('stateMutability')
+        in (
+            'view',
+            'pure',
+        )
+    )

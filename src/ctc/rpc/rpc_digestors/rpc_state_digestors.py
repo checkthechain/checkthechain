@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import evm
 from ctc import spec
 from ctc import binary
 
@@ -30,7 +31,7 @@ def digest_eth_call(
             if function_abi is None:
                 raise Exception('could not find function_abi for decoding')
 
-            response = binary.decode_function_output(
+            response = evm.decode_function_output(
                 encoded_output=response,
                 delist_single_outputs=delist_single_outputs,
                 package_named_outputs=package_named_outputs,

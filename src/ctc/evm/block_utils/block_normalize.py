@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import spec
 from . import block_crud
 
@@ -20,7 +21,7 @@ async def async_block_number_to_int(
     if block in spec.block_number_names:
         return await block_crud.async_get_latest_block_number(provider=provider)
     else:
-        return binary.raw_block_number_to_int(block)
+        return evm.raw_block_number_to_int(block)
 
 
 async def async_block_numbers_to_int(

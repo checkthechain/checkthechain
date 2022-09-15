@@ -66,7 +66,7 @@ def get_events_event_dir(
     if event_hash is None:
         if event_abi is None:
             raise Exception('must specify more event data')
-        event_hash = binary.get_event_hash(event_abi)
+        event_hash = abi_utils.get_event_hash(event_abi)
     contract_dir = get_events_contract_dir(contract_address, network=network)
     return os.path.join(contract_dir, 'event__' + event_hash)
 
@@ -86,7 +86,7 @@ def get_events_filepath(
     if event_hash is None:
         if event_abi is None:
             raise Exception('must specify more event data')
-        event_hash = binary.get_event_hash(event_abi)
+        event_hash = abi_utils.get_event_hash(event_abi)
     event_hash = event_hash.lower()
 
     # assemble items into subpath
@@ -148,7 +148,7 @@ def list_contract_events(
     if event_hash is not None:
         query_event_hash = event_hash
     elif event_abi is not None:
-        query_event_hash = binary.get_event_hash(event_abi)
+        query_event_hash = abi_utils.get_event_hash(event_abi)
     else:
         query_event_hash = None
 
@@ -386,7 +386,7 @@ async def async_get_events_from_filesystem(
                 network=network,
             )
 
-        event_hash = binary.get_event_hash(event_abi)
+        event_hash = abi_utils.get_event_hash(event_abi)
 
     events = list_contract_events(
         contract_address=contract_address,

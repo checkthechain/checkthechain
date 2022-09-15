@@ -11,9 +11,9 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
-from .. import formats
-from .. import abis
-from .. import hashes
+from .. import abi_utils
+from .. import format_utils
+from .. import hash_utils
 from . import signature_creation
 from . import signature_recovery
 
@@ -31,7 +31,7 @@ def eip712_hash(
         + get_domain_separator(domain, 'binary')
         + _hash_struct(struct_data=struct_data, struct_type=struct_type)
     )
-    return hashes.keccak(as_bytes, output_format)
+    return hash_utils.keccak(as_bytes, output_format)
 
 
 def eip712_sign(
@@ -91,7 +91,7 @@ def _hash_struct(
     struct_type: spec.Eip712StructType,
 ) -> bytes:
     """compute struct hash for use with EIP-712"""
-    return hashes.keccak(
+    return hash_utils.keccak(
         _hash_struct_type(struct_type)
         + _encode_struct_data(struct_data=struct_data, struct_type=struct_type),
         'binary',
@@ -105,7 +105,7 @@ def _hash_struct_type(struct_type: spec.Eip712StructType) -> bytes:
         type + ' ' + name for name, type in struct_type['fields'].items()
     )
     struct_type_str = struct_type['name'] + '(' + struct_fields_str + ')'
-    return hashes.keccak_text(struct_type_str, 'binary')
+    return hash_utils.keccak_text(struct_type_str, 'binary')
 
 
 def _encode_struct_data(
@@ -130,21 +130,21 @@ def _encode_datum(value: typing.Any, type: spec.ABIDatatypeStr) -> bytes:
         encoded = bytes()
         for subvalue in value:
             encoded += _encode_datum(subvalue, scalar_type)
-        return hashes.keccak(encoded, 'binary')
+        return hash_utils.keccak(encoded, 'binary')
     elif type == 'bool':
-        return abis.encode_types(int(value), 'uint256')
+        return abi_utils.encode_types(int(value), 'uint256')
     elif type == 'address':
-        return abis.encode_types(formats.convert(value, 'integer'), 'uint160')
+        return abi_utils.encode_types(format_utils.convert(value, 'integer'), 'uint160')
     elif type.startswith('int'):
-        return abis.encode_types(value, 'int256')
+        return abi_utils.encode_types(value, 'int256')
     elif type.startswith('uint'):
-        return abis.encode_types(value, 'uint256')
+        return abi_utils.encode_types(value, 'uint256')
     elif type.startswith('bytes') and type[5:].isdecimal():
         return typing.cast(bytes, value) + b'\x00' * (32 - len(value))
     elif type == 'bytes':
-        return hashes.keccak(value, 'binary')
+        return hash_utils.keccak(value, 'binary')
     elif type == 'string':
-        return hashes.keccak_text(value, 'binary')
+        return hash_utils.keccak_text(value, 'binary')
     elif type == 'struct':
         raise NotImplementedError('nested struct encoding')
     else:
@@ -240,4 +240,4 @@ def get_domain_separator(
         struct_data=domain,
         struct_type=domain_separator_type,
     )
-    return formats.convert(as_bytes, output_format)
+    return format_utils.convert(as_bytes, output_format)

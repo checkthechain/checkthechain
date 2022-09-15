@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
-from .. import formats
+from .. import format_utils
 
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
@@ -15,9 +15,9 @@ def convert_vrs_tuple_type(
 ) -> tuple[spec.Data, spec.Data, spec.Data]:
     v, r, s = vrs
     return (
-        formats.convert(v, output_format),
-        formats.convert(r, output_format),
-        formats.convert(s, output_format),
+        format_utils.convert(v, output_format),
+        format_utils.convert(r, output_format),
+        format_utils.convert(s, output_format),
     )
 
 
@@ -33,9 +33,9 @@ def pack_vrs(
         v, r, s = vrs
 
     if v is not None and r is not None and s is not None:
-        v_bytes = formats.convert(v, 'binary', n_bytes=1)
-        r_bytes = formats.convert(r, 'binary', n_bytes=32)
-        s_bytes = formats.convert(s, 'binary', n_bytes=32)
+        v_bytes = format_utils.convert(v, 'binary', n_bytes=1)
+        r_bytes = format_utils.convert(r, 'binary', n_bytes=32)
+        s_bytes = format_utils.convert(s, 'binary', n_bytes=32)
     else:
         raise Exception('must specify v, r, and s')
 
@@ -47,7 +47,7 @@ def pack_vrs(
     else:
         raise Exception('unknown vrs packing mode: ' + str(mode))
 
-    return formats.convert(signature, 'prefix_hex')
+    return format_utils.convert(signature, 'prefix_hex')
 
 
 def unpack_vrs(signature: spec.Signature) -> tuple[int, int, int]:
@@ -56,7 +56,7 @@ def unpack_vrs(signature: spec.Signature) -> tuple[int, int, int]:
         v, r, s = signature
 
     else:
-        bytes_signature = formats.convert(signature, 'binary')
+        bytes_signature = format_utils.convert(signature, 'binary')
 
         if len(bytes_signature) == 65:
             r = bytes_signature[:32]
@@ -70,9 +70,9 @@ def unpack_vrs(signature: spec.Signature) -> tuple[int, int, int]:
             raise Exception('signature format unrecognized')
 
     return (
-        formats.convert(v, 'integer'),
-        formats.convert(r, 'integer'),
-        formats.convert(s, 'integer'),
+        format_utils.convert(v, 'integer'),
+        format_utils.convert(r, 'integer'),
+        format_utils.convert(s, 'integer'),
     )
 
 

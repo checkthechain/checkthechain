@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -38,7 +38,7 @@ async def async_get_reserves_list(
     address = aave_spec.get_aave_address('LendingPool', network=network)
 
     if block is not None:
-        block = binary.standardize_block_number(block)
+        block = evm.standardize_block_number(block)
 
     reserves: typing.Sequence[spec.Address] = await rpc.async_eth_call(
         to_address=address,

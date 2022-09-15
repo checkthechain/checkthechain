@@ -8,6 +8,7 @@ if typing.TYPE_CHECKING:
     import asyncio
 
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -35,7 +36,7 @@ async def async_get_block(
                 return db_block_data
 
         block_data: spec.Block = await rpc.async_eth_get_block_by_number(
-            block_number=binary.standardize_block_number(block),
+            block_number=evm.standardize_block_number(block),
             provider=provider,
             include_full_transactions=include_full_transactions,
         )
@@ -77,7 +78,7 @@ async def async_get_blocks(
     if all(spec.is_block_number_reference(block) for block in blocks):
 
         standardized = [
-            binary.standardize_block_number(block) for block in blocks
+            evm.standardize_block_number(block) for block in blocks
         ]
         pending = standardized
 

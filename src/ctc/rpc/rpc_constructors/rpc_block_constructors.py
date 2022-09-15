@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ctc import binary
+from ctc import evm
 from ctc import spec
 
 from .. import rpc_request
@@ -26,7 +27,7 @@ def construct_eth_get_block_by_number(
     include_full_transactions: bool = False,
 ) -> spec.RpcRequest:
 
-    encoded_block_number = binary.encode_block_number(block_number)
+    encoded_block_number = evm.encode_block_number(block_number)
 
     parameters = [encoded_block_number, include_full_transactions]
     return rpc_request.create(
@@ -48,7 +49,7 @@ def construct_eth_get_uncle_count_by_block_hash(
 def construct_eth_get_uncle_count_by_block_number(
     block_number: spec.BlockNumberReference,
 ) -> spec.RpcRequest:
-    encoded_block_number = binary.encode_block_number(block_number)
+    encoded_block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
         method='eth_getUncleCountByBlockNumber',
         parameters=[encoded_block_number],
@@ -74,7 +75,7 @@ def construct_eth_get_uncle_by_block_number_and_index(
     block_number: spec.BlockNumberReference, uncle_index: spec.BinaryData
 ) -> spec.RpcRequest:
 
-    encoded_block_number = binary.encode_block_number(block_number)
+    encoded_block_number = evm.encode_block_number(block_number)
     encoded_uncle_index = binary.convert(
         uncle_index, 'prefix_hex', keep_leading_0=False
     )

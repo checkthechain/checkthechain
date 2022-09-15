@@ -3,10 +3,9 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import spec
-
-from . import contract_parsing
-from . import function_parsing
+from . import function_abi_parsing
 
 
 if typing.TYPE_CHECKING:
@@ -32,7 +31,7 @@ def encode_call_data(
 
     # encode function selector
     if function_selector is None:
-        function_selector = function_parsing.get_function_selector(function_abi)
+        function_selector = function_abi_parsing.get_function_selector(function_abi)
     function_selector = binary.convert(function_selector, 'prefix_hex')
 
     # encode parameters
@@ -63,14 +62,14 @@ def decode_call_data(
     if function_abi is None:
         if contract_abi is None:
             raise Exception('must specify function_abi or contract_abi')
-        function_abi = contract_parsing.get_function_abi(
+        function_abi = evm.get_function_abi(
             contract_abi=contract_abi,
             function_selector=function_selector,
         )
 
     # decode parameters
     encoded_parameters = call_data_bytes[4:]
-    parameter_types = function_parsing.get_function_parameter_types(
+    parameter_types = function_abi_parsing.get_function_parameter_types(
         function_abi
     )
     decoded_parameters = decode_function_parameters(
@@ -78,7 +77,7 @@ def decode_call_data(
     )
 
     # compute named parameters
-    parameter_names = function_parsing.get_function_parameter_names(
+    parameter_names = function_abi_parsing.get_function_parameter_names(
         function_abi
     )
     if len(parameter_names) == len(decoded_parameters) and all(
@@ -117,7 +116,7 @@ def encode_function_parameters(
 
     # get parameter types
     if parameter_types is None:
-        parameter_types = function_parsing.get_function_parameter_types(
+        parameter_types = function_abi_parsing.get_function_parameter_types(
             function_signature=function_signature,
             function_abi=function_abi,
         )
@@ -126,7 +125,7 @@ def encode_function_parameters(
     if isinstance(parameters, typing.Mapping):
         if function_abi is None:
             raise Exception('must specify function_abi')
-        parameter_names = function_parsing.get_function_parameter_names(
+        parameter_names = function_abi_parsing.get_function_parameter_names(
             function_abi=function_abi,
             require_names=True,
         )
@@ -174,7 +173,7 @@ def decode_function_named_parameters(
 ) -> dict[str, typing.Any]:
 
     if parameter_types is None:
-        parameter_types = function_parsing.get_function_parameter_types(
+        parameter_types = function_abi_parsing.get_function_parameter_types(
             function_abi=function_abi,
         )
 
@@ -184,7 +183,7 @@ def decode_function_named_parameters(
     )
 
     # get parameter names
-    parameter_names = function_parsing.get_function_parameter_names(
+    parameter_names = function_abi_parsing.get_function_parameter_names(
         function_abi
     )
 
@@ -211,7 +210,7 @@ def decode_function_output(
     if output_types is None:
         if function_abi is None:
             raise Exception('must specify function_abi')
-        output_types = function_parsing.get_function_output_types(function_abi)
+        output_types = function_abi_parsing.get_function_output_types(function_abi)
     output_types_str = '(' + ','.join(output_types) + ')'
 
     # decode
@@ -237,7 +236,7 @@ def decode_function_output(
     elif package_named_outputs and len(output_types) > 1:
         if function_abi is None:
             raise Exception('must specify function_abi')
-        names = function_parsing.get_function_output_names(function_abi)
+        names = function_abi_parsing.get_function_output_names(function_abi)
         if all(name is not None for name in names):
             decoded_output = dict(zip(names, decoded_output))
 

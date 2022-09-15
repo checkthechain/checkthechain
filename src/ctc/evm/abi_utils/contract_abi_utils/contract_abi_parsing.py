@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
+from .. import function_abi_utils
 
 
 async def async_parse_function_str_abi(
@@ -16,7 +16,7 @@ async def async_parse_function_str_abi(
     used for cli commands
     """
 
-    if binary.is_function_selector(function):
+    if function_abi_utils.is_function_selector(function):
         function_name = None
         function_selector = function
         function_abi = None

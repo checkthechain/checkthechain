@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 from ctc.toolbox import backend_utils
@@ -189,7 +190,7 @@ async def async_download_events(
                 network=network,
             )
 
-        event_hash = binary.get_event_hash(event_abi)
+        event_hash = evm.get_event_hash(event_abi)
 
     # determine what needs to be downloaded
     listed_events = filesystem_events.list_events(

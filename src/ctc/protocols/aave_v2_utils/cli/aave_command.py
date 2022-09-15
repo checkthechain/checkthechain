@@ -6,7 +6,6 @@ import typing
 import toolcli
 import tooltime
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
 from ctc.protocols import aave_v2_utils
@@ -64,7 +63,7 @@ async def async_aave_command(
 
     if block is None:
         block = 'latest'
-    block_reference = binary.standardize_block_number(block)
+    block_reference = evm.standardize_block_number(block)
 
     if token is not None:
 

@@ -3,8 +3,8 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
-from .. import hashes
-from .. import formats
+from .. import format_utils
+from .. import hash_utils
 from . import secp256k1_utils
 
 if typing.TYPE_CHECKING:
@@ -58,10 +58,10 @@ def sign_message_hash(
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
 
-    message_hash = formats.convert(message_hash, 'binary')
+    message_hash = format_utils.convert(message_hash, 'binary')
 
     # compute signature
-    private_binary = formats.convert(private_key, 'binary')
+    private_binary = format_utils.convert(private_key, 'binary')
     v, r, s = secp256k1_utils.ecdsa_raw_sign(
         message_hash,
         priv=private_binary,
@@ -92,7 +92,7 @@ def create_text_message_hash(
         raise Exception('unrecognized signing mode: ' + str(mode))
 
     # compute message hash
-    message_hash = hashes.keccak_text(full_message, output_format='binary')
+    message_hash = hash_utils.keccak_text(full_message, output_format='binary')
 
     return message_hash
 
@@ -102,7 +102,7 @@ def create_data_message_hash(
     mode: Literal['eth_sign', 'personal_sign'],
 ) -> bytes:
 
-    message = formats.convert(message, 'binary')
+    message = format_utils.convert(message, 'binary')
 
     # add prefix
     if mode == 'eth_sign':
@@ -114,6 +114,6 @@ def create_data_message_hash(
         raise Exception('unrecognized signing mode: ' + str(mode))
 
     # compute message hash
-    message_hash = hashes.keccak(full_message, output_format='binary')
+    message_hash = hash_utils.keccak(full_message, output_format='binary')
 
     return message_hash

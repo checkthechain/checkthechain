@@ -87,7 +87,7 @@ async def _async_add_trace_call_data(df: spec.DataFrame) -> None:
 
             try:
 
-                decoded = binary.decode_call_data(
+                decoded = evm.decode_call_data(
                     contract_abi=contract_abis[action_to],
                     call_data=action_input,
                 )
@@ -98,11 +98,11 @@ async def _async_add_trace_call_data(df: spec.DataFrame) -> None:
                     decoded['parameters']
                 )
 
-                function_abi = binary.get_function_abi(
+                function_abi = evm.get_function_abi(
                     contract_abi=contract_abis[action_to],
                     function_selector=action_input[:10],
                 )
-                result__outputs = binary.decode_function_output(
+                result__outputs = evm.decode_function_output(
                     encoded_output=result__output,
                     function_abi=function_abi,
                 )

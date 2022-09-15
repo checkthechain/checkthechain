@@ -4,7 +4,7 @@ from ctc import spec
 from ctc import rpc
 
 from ... import address_utils
-from .. import abi_modify
+from . import contract_abi_modification
 
 
 async def async_get_contract_abi(
@@ -53,10 +53,12 @@ async def async_get_contract_abi(
     if provider is None:
         provider = {'network': network}
     if proxy_implementation is None:
-        proxy_implementation = await address_utils.async_get_proxy_implementation(
-            contract_address=contract_address,
-            provider=provider,
-            block=block,
+        proxy_implementation = (
+            await address_utils.async_get_proxy_implementation(
+                contract_address=contract_address,
+                provider=provider,
+                block=block,
+            )
         )
 
     # get proxy abi
@@ -67,7 +69,7 @@ async def async_get_contract_abi(
             network=network,
             verbose=verbose,
         )
-        abi = abi_modify.combine_contract_abis([abi, proxy_abi])
+        abi = contract_abi_modification.combine_contract_abis([abi, proxy_abi])
         includes_proxy = True
 
     # save to db

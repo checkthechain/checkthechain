@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import typing
 
+from ctc import binary
 from ctc import spec
-from .. import formats
-from . import abi_coding
-from . import event_parsing
+from . import event_abi_parsing
 
 
 @typing.overload
@@ -57,7 +56,7 @@ def decode_event_topics(
     if indexed_types is None:
         if event_abi is None:
             raise Exception('must specify event_abi')
-        indexed_types = event_parsing.get_event_indexed_types(event_abi)
+        indexed_types = event_abi_parsing.get_event_indexed_types(event_abi)
 
     # decode
     decoded_topics: list[str] = []
@@ -70,8 +69,8 @@ def decode_event_topics(
         ):
             decoded_topics.append(topic)  # type: ignore
         else:
-            topic = formats.convert(topic, 'binary')
-            decoded_topic = abi_coding.decode_types(topic, indexed_type)
+            topic = binary.convert(topic, 'binary')
+            decoded_topic = binary.decode_types(topic, indexed_type)
             decoded_topics.append(decoded_topic)
 
     # package output
@@ -81,7 +80,7 @@ def decode_event_topics(
         if indexed_names is None:
             if event_abi is None:
                 raise Exception('must specify event_abi')
-            indexed_names = event_parsing.get_event_indexed_names(event_abi)
+            indexed_names = event_abi_parsing.get_event_indexed_names(event_abi)
         return dict(zip(indexed_names, decoded_topics))
 
 
@@ -135,11 +134,11 @@ def decode_event_unindexed_data(
     if unindexed_types is None:
         if event_abi is None:
             raise Exception('must specify event_abi')
-        unindexed_types = event_parsing.get_event_unindexed_types(event_abi)
+        unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
 
     # decode data
-    data = formats.convert(data, 'binary')
-    decoded = abi_coding.decode_types(
+    data = binary.convert(data, 'binary')
+    decoded = binary.decode_types(
         data, '(' + ','.join(unindexed_types) + ')'
     )
 
@@ -150,7 +149,7 @@ def decode_event_unindexed_data(
         if unindexed_names is None:
             if event_abi is None:
                 raise Exception('must specify event_abi')
-            unindexed_names = event_parsing.get_event_unindexed_names(event_abi)
+            unindexed_names = event_abi_parsing.get_event_unindexed_names(event_abi)
         return dict(zip(unindexed_names, decoded))
 
 
@@ -235,15 +234,15 @@ def decode_events_dataframe(
         assert len(set(df['topic0'])) == 1
 
         # assert event hash matches event_abi
-        assert df['topic0'].iloc[0] == event_parsing.get_event_hash(
+        assert df['topic0'].iloc[0] == event_abi_parsing.get_event_hash(
             event_abi=event_abi
         )
 
     # decode data items
-    unindexed_types = event_parsing.get_event_unindexed_types(
+    unindexed_types = event_abi_parsing.get_event_unindexed_types(
         event_abi=event_abi
     )
-    unindexed_names = event_parsing.get_event_unindexed_names(
+    unindexed_names = event_abi_parsing.get_event_unindexed_names(
         event_abi=event_abi
     )
     for name in unindexed_names:
@@ -274,14 +273,14 @@ def decode_events_dataframe(
 
     # decode other topics
     # need to double check this section
-    indexed_types = event_parsing.get_event_indexed_types(event_abi=event_abi)
+    indexed_types = event_abi_parsing.get_event_indexed_types(event_abi=event_abi)
     for t, indexed_type in enumerate(indexed_types):
         if indexed_type == 'address':
             topic = 'topic' + str(t + 1)
             new_df[topic] = '0x' + new_df[topic].str[26:]
 
     # rename topicX to indexed variable names
-    indexed_names = event_parsing.get_event_indexed_names(event_abi=event_abi)
+    indexed_names = event_abi_parsing.get_event_indexed_names(event_abi=event_abi)
     indexed_rename = {
         'topic' + str(i + 1): name for i, name in enumerate(indexed_names)
     }

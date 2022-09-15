@@ -144,7 +144,7 @@ async def async_print_all_pool_summary(
         row.append(tvb)
         rows.append(row)
 
-    standard_block = binary.standardize_block_number(block)
+    standard_block = evm.standardize_block_number(block)
     block_data = await rpc.async_eth_get_block_by_number(
         standard_block, include_full_transactions=False
     )
@@ -346,7 +346,7 @@ async def async_print_fuse_token_summary(
     else:
         symbol = await evm.async_get_erc20_symbol(token)
 
-    standard_block = binary.standardize_block_number(block)
+    standard_block = evm.standardize_block_number(block)
     block_data = await rpc.async_eth_get_block_by_number(
         standard_block, include_full_transactions=False
     )

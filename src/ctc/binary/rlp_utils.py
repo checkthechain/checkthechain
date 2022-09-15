@@ -8,7 +8,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
-from . import formats
+from . import format_utils
 
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
@@ -61,7 +61,7 @@ def rlp_encode(
         if item == 0:
             item = bytes()
         else:
-            item = formats.convert(item, 'binary')
+            item = format_utils.convert(item, 'binary')
 
     if isinstance(item, (tuple, list)):
         output = _rlp_encode_list(item, str_mode=str_mode)
@@ -72,12 +72,12 @@ def rlp_encode(
     else:
         raise Exception('cannot rlp encode items of type ' + str(type(item)))
 
-    return formats.convert(output, output_format)
+    return format_utils.convert(output, output_format)
 
 
 def _rlp_encode_bytes(data: bytes) -> bytes:
 
-    data = formats.convert(data, 'binary')
+    data = format_utils.convert(data, 'binary')
 
     length = len(data)
     if length == 0:
@@ -86,11 +86,11 @@ def _rlp_encode_bytes(data: bytes) -> bytes:
         return data
     elif length <= 55:
         prefix = 128 + length
-        return formats.convert(prefix, 'binary') + data
+        return format_utils.convert(prefix, 'binary') + data
     else:
-        length_as_bytes = formats.convert(length, 'binary')
+        length_as_bytes = format_utils.convert(length, 'binary')
         prefix = 183 + len(length_as_bytes)
-        return formats.convert(prefix, 'binary') + length_as_bytes + data
+        return format_utils.convert(prefix, 'binary') + length_as_bytes + data
 
 
 def _rlp_encode_list(
@@ -106,16 +106,16 @@ def _rlp_encode_list(
     total_payload_length = sum(item_lengths)
 
     if total_payload_length <= 55:
-        prefix = formats.convert(192 + total_payload_length, 'binary')
+        prefix = format_utils.convert(192 + total_payload_length, 'binary')
         output = prefix
         for item in encoded_items:
             output = output + item
         return output
 
     else:
-        bytes_of_length = formats.convert(total_payload_length, 'binary')
+        bytes_of_length = format_utils.convert(total_payload_length, 'binary')
         prefix_int = 247 + len(bytes_of_length)
-        output = formats.convert(prefix_int, 'binary') + bytes_of_length
+        output = format_utils.convert(prefix_int, 'binary') + bytes_of_length
         for item in encoded_items:
             output = output + item
         return output
@@ -135,7 +135,7 @@ def _rlp_encode_str(
     if str_mode == 'text':
         as_bytes = item.encode()
     elif str_mode == 'hex':
-        as_bytes = formats.convert(item, 'binary')
+        as_bytes = format_utils.convert(item, 'binary')
     else:
         raise Exception('unknown str mode: ' + str(str_mode))
 
@@ -165,7 +165,7 @@ def rlp_decode(
         2. list/tuple of binary format names, corresponding to items in rlp list
     """
 
-    data = formats.convert(data, 'binary')
+    data = format_utils.convert(data, 'binary')
     decoded, remaining = _rlp_decode_chunk(data=data, types=types)
     if len(remaining) > 0:
         raise Exception('data contains extra bytes')
@@ -182,7 +182,7 @@ def _rlp_decode_chunk(
         raise Exception()
 
     first_byte = data[0]
-    if first_byte <= 0xbf:
+    if first_byte <= 0xBF:
         return _rlp_decode_primitive_chunk(data, types=types)
     else:
         result = _rlp_decode_list_chunk(data, types=types)
@@ -196,13 +196,13 @@ def _rlp_decode_primitive_chunk(
 
     first_byte = data[0]
 
-    if first_byte <= 0x7f:
+    if first_byte <= 0x7F:
         # data that is single byte less than or equal to 127
 
         decoded: typing.Any = first_byte.to_bytes(1, 'big')
         remaining = data[1:]
 
-    elif first_byte <= 0xb7:
+    elif first_byte <= 0xB7:
         # data with length between 0 and 55 bytes
 
         # get length
@@ -214,11 +214,11 @@ def _rlp_decode_primitive_chunk(
         decoded = data[start:end]
         remaining = data[end:]
 
-    elif first_byte <= 0xbf:
+    elif first_byte <= 0xBF:
         # data longer than 55 bytes
 
         # get length length
-        length_length = first_byte - 0xb7
+        length_length = first_byte - 0xB7
 
         # get length
         start = 1
@@ -239,7 +239,7 @@ def _rlp_decode_primitive_chunk(
         if types == 'ascii':
             decoded = decoded.decode()
         else:
-            decoded = formats.convert(decoded, types)
+            decoded = format_utils.convert(decoded, types)
 
     return decoded, remaining
 
@@ -251,14 +251,14 @@ def _rlp_decode_list_chunk(
 
     first_byte = data[0]
 
-    if first_byte <= 0xbf:
+    if first_byte <= 0xBF:
         raise Exception('next item in data is not a list chunk')
 
-    elif first_byte <= 0xf7:
+    elif first_byte <= 0xF7:
         # list with total payload length between 0 and 55 bytes
 
         # get length
-        length = first_byte - 0xc0
+        length = first_byte - 0xC0
 
         # decode list
         start = 1
@@ -274,7 +274,7 @@ def _rlp_decode_list_chunk(
         # list with payload longer than 55 bytes
 
         # get length length
-        length_length = first_byte - 0xf7
+        length_length = first_byte - 0xF7
 
         # get length
         start = 1

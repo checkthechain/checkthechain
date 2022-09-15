@@ -34,7 +34,7 @@ async def async_rechunk_events(
         event_abi = await abi_utils.async_get_event_abi(
             contract_address=contract_address, event_name=event_name
         )
-        event_name = binary.get_event_hash(event_abi)
+        event_name = abi_utils.get_event_hash(event_abi)
 
     # make sure no leftover files from previous rechunks
     event_list = filesystem_events.list_events(

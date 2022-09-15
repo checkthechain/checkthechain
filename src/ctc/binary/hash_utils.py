@@ -4,7 +4,7 @@ import typing
 from typing_extensions import Literal
 
 from ctc import spec
-from . import formats
+from . import format_utils
 
 
 @typing.overload
@@ -56,7 +56,7 @@ def keccak(
             library = 'pycryptodome'
 
     # convert data to binary
-    data = formats.convert(data, 'binary')
+    data = format_utils.convert(data, 'binary')
 
     if library == 'pysha3':
         import sha3
@@ -71,7 +71,7 @@ def keccak(
             'must choose valid library, either \'pysha3\' or \'pycryptodome\''
         )
 
-    return formats.convert(binary, output_format)
+    return format_utils.convert(binary, output_format)
 
 
 @typing.overload

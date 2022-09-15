@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import typing
 
-
-from ctc import binary
+from ctc import evm
 from ctc import spec
-from . import abi_io
+from .. import function_abi_utils
+from .. import event_abi_utils
 
 
 def get_contract_abi_by_selectors(
@@ -18,10 +18,10 @@ def get_contract_abi_by_selectors(
     by_selectors: typing.MutableMapping[str, spec.ContractABIEntry] = {}
     for item in contract_abi:
         if item['type'] == 'function':
-            function_selector = binary.get_function_selector(item)
+            function_selector = function_abi_utils.get_function_selector(item)
             by_selectors[function_selector] = item
         elif item['type'] == 'event':
-            event_hash = binary.get_event_hash(item)
+            event_hash = event_abi_utils.get_event_hash(item)
             by_selectors[event_hash] = item
         elif item['type'] in ['error', 'constructor', 'receive', 'fallback']:
             pass
@@ -69,12 +69,12 @@ def summarize_contract_abi_functions(
         read_color = styles['description']
         write_color = 'white'
 
-    functions = binary.get_function_abis(contract_abi)
+    functions = evm.get_function_abis(contract_abi)
 
     if read_write:
         functions = sorted(
             functions,
-            key=abi_io.is_function_read_only,
+            key=function_abi_utils.is_function_read_only,
             reverse=True,
         )
 
@@ -102,7 +102,7 @@ def summarize_contract_abi_functions(
 
         name = function['name']
         if read_write:
-            if abi_io.is_function_read_only(function):
+            if function_abi_utils.is_function_read_only(function):
                 # read
                 name = toolstr.add_style(name, read_color)
             else:
@@ -110,7 +110,7 @@ def summarize_contract_abi_functions(
                 name = toolstr.add_style(name, write_color)
 
         row = [
-            binary.get_function_selector(function),
+            function_abi_utils.get_function_selector(function),
             name,
         ]
 
@@ -224,7 +224,7 @@ def summarize_contract_abi_events(
 
     styles = cli.get_cli_styles()
 
-    events = binary.get_event_abis(contract_abi)
+    events = evm.get_event_abis(contract_abi)
     toolstr.print_text_box(title, style=styles['title'])
     print()
     rows = []
@@ -249,7 +249,7 @@ def summarize_contract_abi_events(
         row.append('\n'.join(input_cell))
         row.append('\n'.join(indexed_cell))
 
-        event_hash = binary.get_event_hash(event_abi)
+        event_hash = event_abi_utils.get_event_hash(event_abi)
         if verbose:
             row.append(event_hash)
         else:

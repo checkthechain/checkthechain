@@ -133,7 +133,7 @@ async def async_print_transaction_summary(
             print('could not find function ABI. custom proxy being used?')
             return
 
-        call_data = binary.decode_call_data(
+        call_data = evm.decode_call_data(
             call_data=transaction['input'],
             function_abi=function_abi,
         )
@@ -171,7 +171,7 @@ async def async_print_transaction_summary(
                 contract_address=log['address'],
                 event_hash=log['topics'][0],
             )
-            normalized_event = binary.normalize_event(
+            normalized_event = evm.normalize_event(
                 event=log,
                 arg_prefix=None,
                 event_abi=event_abi,

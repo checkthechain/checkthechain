@@ -7,7 +7,6 @@ import toolstr
 import tooltime
 from typing_extensions import TypedDict
 
-from ctc import binary
 from ctc import cli
 from ctc import evm
 from ctc import spec
@@ -56,7 +55,7 @@ async def async_ens_command(
 ) -> None:
 
     if block is not None:
-        block = binary.standardize_block_number(block)
+        block = evm.standardize_block_number(block)
 
     coroutines = [
         async_process_ens_arg(arg=arg, block=block) for arg in name_or_address

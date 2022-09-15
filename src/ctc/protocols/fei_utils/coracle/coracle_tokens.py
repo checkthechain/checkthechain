@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -17,7 +16,7 @@ async def async_get_tokens_in_pcv(
 ) -> typing.Sequence[spec.Address]:
     """get list of all tokens in pcv"""
 
-    block = binary.standardize_block_number(block)
+    block = evm.standardize_block_number(block)
     coracle = coracle_spec.get_coracle_address(wrapper=wrapper, block=block)
 
     result = await rpc.async_eth_call(

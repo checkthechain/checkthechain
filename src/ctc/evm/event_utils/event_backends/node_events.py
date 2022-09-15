@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import binary
+from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -107,7 +108,7 @@ async def async_get_events_from_node(
                 network=network,
             )
         if event_name is not None:
-            event_hash = binary.get_event_hash(event_abi=event_abi)
+            event_hash = abi_utils.get_event_hash(event_abi=event_abi)
         elif event_abi is not None:
             event_hash = contract_address.get_event_hash(event_abi=event_abi)
 
@@ -156,8 +157,8 @@ async def _async_get_chunk_of_events_from_node(
 
     # fetch entries
     start_block, end_block = block_range
-    start_block = binary.standardize_block_number(start_block)
-    end_block = binary.standardize_block_number(end_block)
+    start_block = evm.standardize_block_number(start_block)
+    end_block = evm.standardize_block_number(end_block)
     entries: typing.Sequence[spec.RawLog] = await rpc.async_eth_get_logs(
         address=contract_address,
         topics=[event_hash],
@@ -195,7 +196,7 @@ async def _async_package_exported_events(
 
     formatted_entries = []
     for entry in entries:
-        formatted_entry = binary.normalize_event(
+        formatted_entry = abi_utils.normalize_event(
             event=entry,
             event_abi=event_abi,
         )

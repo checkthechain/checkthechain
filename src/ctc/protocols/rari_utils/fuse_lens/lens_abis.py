@@ -7,7 +7,7 @@ import functools
 import json
 import typing
 
-from ctc import binary
+from ctc import evm
 from ctc import spec
 
 
@@ -34,7 +34,7 @@ def get_lens_abi() -> dict[str, spec.FunctionABI | spec.EventABI]:
 def get_function_abi(
     function_name: str, **abi_query: typing.Any
 ) -> spec.FunctionABI:
-    return binary.get_function_abi(
+    return evm.get_function_abi(
         function_name=function_name,
         contract_abi=list(get_lens_abi().values()),
         **abi_query,
