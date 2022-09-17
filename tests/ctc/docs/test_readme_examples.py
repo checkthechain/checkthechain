@@ -11,13 +11,19 @@ import ctc
 
 def get_readme_examples():
 
-    with open(get_readme_path(), 'r') as f:
-        content = f.read()
+    path = get_readme_path()
+    if not os.path.exists(path):
+        return {'python': [], 'bash': []}
 
-    return {
-        'python': re.findall('```python\n(.+?)```\n', content, re.DOTALL),
-        'bash': re.findall('```bash\n(.+?)```\n', content, re.DOTALL),
-    }
+    else:
+
+        with open(get_readme_path(), 'r') as f:
+            content = f.read()
+
+        return {
+            'python': re.findall('```python\n(.+?)```\n', content, re.DOTALL),
+            'bash': re.findall('```bash\n(.+?)```\n', content, re.DOTALL),
+        }
 
 
 def get_readme_path():
