@@ -117,7 +117,7 @@ async def async_get_A_history(
     import numpy as np
     from ctc.toolbox import pd_utils
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

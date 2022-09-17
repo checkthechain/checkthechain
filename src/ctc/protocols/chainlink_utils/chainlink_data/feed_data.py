@@ -62,7 +62,7 @@ async def async_get_feed_data(
     provider: spec.ProviderReference = None,
 ) -> typing.Union[spec.DataFrame, spec.Series]:
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

@@ -258,7 +258,7 @@ async def async_get_base_pools(
     import asyncio
     import pandas as pd
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,
@@ -382,7 +382,7 @@ async def async_get_meta_pools(
     else:
         factories = [factory]
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

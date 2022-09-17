@@ -62,7 +62,7 @@ async def async_get_events(
     **query: typing.Any,
 ) -> spec.DataFrame:
 
-    start_block, end_block = await block_utils.async_parse_block_range(
+    start_block, end_block = await block_utils.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

@@ -27,7 +27,6 @@ def get_command_spec() -> toolcli.CommandSpec:
             },
             {
                 'name': '--blocks',
-                'nargs': '+',
                 'help': 'block range of datapoints',
             },
             {
@@ -67,7 +66,6 @@ def get_command_spec() -> toolcli.CommandSpec:
             'DAI_USD',
             '0xaed0c38402a5d19df6e4c03f4e2dced6e29c1ee9',
             'DAI_USD --blocks 14000000:14001000',
-            'DAI_USD --blocks "[14000000, 14001000]"',
         ],
     }
 
@@ -76,7 +74,7 @@ async def async_chainlink_command(
     *,
     feed: typing.Sequence[str],
     verbose: bool,
-    blocks: typing.Optional[typing.Sequence[str]],
+    blocks: str | None,
     timelength: str,
     export: str,
     overwrite: bool,
@@ -93,7 +91,7 @@ async def async_chainlink_command(
 
     if timelength is not None:
         timelength_seconds = tooltime.timelength_to_seconds(timelength)
-        start_block = await evm.async_get_block_of_timestamp(
+        start_block: int | None = await evm.async_get_block_of_timestamp(
             time.time() - timelength_seconds,
             mode='<=',
         )
@@ -127,13 +125,8 @@ async def async_chainlink_command(
         print('- fields:', fields)
         print('- output:', export)
 
-        # if cli_utils.is_block_range(blocks):
-        #     start_block, end_block = await cli_utils.async_resolve_block_range(blocks)
-        #     block_kwargs = {'start_block': start_block, 'end_block': end_block}
-        #     print('- block_range: [' + str(start_block) + ', ' + str(end_block) + ']')
-        # else:
         if blocks is not None:
-            start_block, end_block = await cli_utils.async_resolve_block_range(
+            start_block, end_block = await cli_utils.async_parse_block_range(
                 blocks
             )
         else:

@@ -41,7 +41,7 @@ class CurveDEX(dex_class.DEX):
 
         network, provider = evm.get_network_and_provider(network, provider)
 
-        start_block, end_block = await evm.async_parse_block_range(
+        start_block, end_block = await evm.async_resolve_block_range(
             start_block=start_block,
             end_block=end_block,
             start_time=start_time,

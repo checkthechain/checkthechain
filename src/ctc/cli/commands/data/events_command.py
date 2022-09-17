@@ -25,7 +25,6 @@ def get_command_spec() -> toolcli.CommandSpec:
             {
                 'name': '--blocks',
                 'help': 'block range',
-                'nargs': '+',
             },
             {
                 'name': '--include-timestamps',
@@ -63,7 +62,7 @@ async def async_events_command(
     *,
     contract: str,
     event: str,
-    blocks: typing.Sequence[str],
+    blocks: str,
     include_timestamps: bool,
     export: str,
     overwrite: bool,
@@ -73,7 +72,7 @@ async def async_events_command(
     contract = await evm.async_resolve_address(contract)
 
     if blocks is not None:
-        all_blocks = await cli_utils.async_resolve_block_range(blocks)
+        all_blocks = await cli_utils.async_parse_block_range(blocks)
         start_block = all_blocks[0]
         end_block = all_blocks[-1]
     else:

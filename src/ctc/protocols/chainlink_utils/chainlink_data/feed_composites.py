@@ -25,7 +25,7 @@ async def async_get_composite_feed_data(
     # TODO: other ways of specifying composites
     import asyncio
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

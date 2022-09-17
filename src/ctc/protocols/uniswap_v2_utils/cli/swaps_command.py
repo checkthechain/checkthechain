@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import typing
-
 import toolcli
 
 from ctc.protocols import uniswap_v2_utils
@@ -15,7 +13,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         'help': 'output information about pool swaps',
         'args': [
             {'name': 'pool', 'help': 'pool address'},
-            {'name': '--blocks', 'nargs': '+', 'help': 'block number range'},
+            {'name': '--blocks', 'help': 'block number range'},
             {
                 'name': '--export',
                 'default': 'stdout',
@@ -29,7 +27,6 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'examples': [
             '0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5 --blocks 14000000:14001000',
-            '0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5 --blocks "[14000000, 14001000]"',
         ],
     }
 
@@ -37,15 +34,13 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_swaps_command(
     *,
     pool: spec.Address,
-    blocks: typing.Sequence[str],
+    blocks: str,
     export: str,
     overwrite: bool,
 ) -> None:
 
     if blocks is not None:
-        start_block, end_block = await cli_utils.async_resolve_block_range(
-            blocks
-        )
+        start_block, end_block = await cli_utils.async_parse_block_range(blocks)
     else:
         start_block = None
         end_block = None

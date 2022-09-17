@@ -24,7 +24,7 @@ async def async_get_deposits(
 
     provider = rpc.get_provider(provider)
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,
@@ -74,7 +74,7 @@ async def async_get_withdrawals(
 
     provider = rpc.get_provider(provider)
 
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

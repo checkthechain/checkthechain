@@ -40,7 +40,7 @@ async def async_get_full_feed_event_data(
     )
 
     # get aggregator
-    start_block, end_block = await evm.async_parse_block_range(
+    start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
         start_time=start_time,

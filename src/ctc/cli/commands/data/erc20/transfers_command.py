@@ -16,7 +16,6 @@ def get_command_spec() -> toolcli.CommandSpec:
             {'name': 'erc20', 'help': 'ERC20 address'},
             {
                 'name': '--blocks',
-                'nargs': '+',
                 'help': 'block range of transfers',
             },
             {
@@ -47,14 +46,14 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_transfers_command(
     *,
     erc20: str,
-    blocks: typing.Sequence[str],
+    blocks: str | None,
     include_timestamps: bool,
     export: str,
     overwrite: bool,
 ) -> None:
 
     if blocks is not None:
-        start_block, end_block = await cli_utils.async_resolve_block_range(
+        start_block, end_block = await cli_utils.async_parse_block_range(
             blocks
         )
     else:

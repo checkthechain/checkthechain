@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 
 
 @typing.overload
-async def async_parse_block_range(
+async def async_resolve_block_range(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
@@ -23,7 +23,7 @@ async def async_parse_block_range(
 
 
 @typing.overload
-async def async_parse_block_range(
+async def async_resolve_block_range(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
@@ -35,7 +35,7 @@ async def async_parse_block_range(
     ...
 
 
-async def async_parse_block_range(
+async def async_resolve_block_range(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
