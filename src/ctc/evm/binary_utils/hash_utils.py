@@ -47,6 +47,15 @@ def keccak(
 ) -> spec.GenericBinaryData:
     """return keccack-256 hash of hex or binary data"""
 
+    # test that data is not a textual input
+    if isinstance(data, str) and data != '0x':
+        try:
+            int(data, 16)
+        except ValueError:
+            raise Exception(
+                'for text data, use keccak_text() instead of keccak()'
+            )
+
     # determine library
     if library is None:
         try:
