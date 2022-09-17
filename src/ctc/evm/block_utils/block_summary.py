@@ -50,7 +50,9 @@ async def async_print_block_summary(
     styles = cli.get_cli_styles()
     toolstr.print_text_box(title, style=styles['title'])
     cli.print_bullet(key='timestamp', value=block['timestamp'])
-    cli.print_bullet(key='time', value=tooltime.timestamp_to_iso(block['timestamp']))
+    cli.print_bullet(
+        key='time', value=tooltime.timestamp_to_iso(block['timestamp'])
+    )
     cli.print_bullet(
         key='age',
         value=tooltime.timelength_to_phrase(
@@ -80,11 +82,14 @@ async def async_print_block_summary(
             )
             + ')'
         )
-        print('- gas prices:', percentile_label, '=', gas_percentiles_str)
+        cli.print_bullet(
+            key='gas prices:',
+            value=percentile_label + '=' + gas_percentiles_str,
+        )
 
     message = block['extra_data']
     try:
-        message = binary.convert(message, 'binary').decode()
+        message = binary.binary_convert(message, 'binary').decode()
     except Exception:
         if len(message) > 80:
             message = message[:77] + '...'

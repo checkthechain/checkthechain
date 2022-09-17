@@ -18,7 +18,7 @@ from . import signature_creation
 from . import signature_recovery
 
 
-def eip712_hash(
+def hash_eip712_struct(
     struct_data: typing.Mapping[str, typing.Any],
     *,
     struct_type: spec.Eip712StructType,
@@ -34,7 +34,7 @@ def eip712_hash(
     return hash_utils.keccak(as_bytes, output_format)
 
 
-def eip712_sign(
+def sign_eip712_struct(
     struct_data: typing.Mapping[str, typing.Any],
     *,
     private_key: spec.Data,
@@ -42,7 +42,7 @@ def eip712_sign(
     domain: typing.Mapping[str, typing.Any],
 ) -> tuple[int, int, int]:
 
-    message_hash = eip712_hash(
+    message_hash = hash_eip712_struct(
         struct_data=struct_data,
         struct_type=struct_type,
         domain=domain,
@@ -62,7 +62,7 @@ def eip712_sign(
     )
 
 
-def eip712_verify(
+def verify_eip712_signature(
     signature: spec.Signature,
     *,
     struct_data: typing.Mapping[str, typing.Any],
@@ -72,7 +72,7 @@ def eip712_verify(
     address: spec.Data | None = None,
 ) -> bool:
 
-    message_hash = eip712_hash(
+    message_hash = hash_eip712_struct(
         struct_data=struct_data,
         struct_type=struct_type,
         domain=domain,
@@ -134,7 +134,8 @@ def _encode_datum(value: typing.Any, type: spec.ABIDatatypeStr) -> bytes:
     elif type == 'bool':
         return abi_utils.abi_encode(int(value), 'uint256')
     elif type == 'address':
-        return abi_utils.abi_encode(format_utils.convert(value, 'integer'), 'uint160')
+        converted = format_utils.binary_convert(value, 'integer')
+        return abi_utils.abi_encode(converted, 'uint160')
     elif type.startswith('int'):
         return abi_utils.abi_encode(value, 'int256')
     elif type.startswith('uint'):
@@ -240,4 +241,4 @@ def get_domain_separator(
         struct_data=domain,
         struct_type=domain_separator_type,
     )
-    return format_utils.convert(as_bytes, output_format)
+    return format_utils.binary_convert(as_bytes, output_format)

@@ -8,7 +8,7 @@ from . import secp256k1_utils
 
 
 def private_key_to_public_key(private_key: spec.Data) -> str:
-    binary_private_key = format_utils.convert(private_key, 'binary')
+    binary_private_key = format_utils.binary_convert(private_key, 'binary')
     as_tuple = secp256k1_utils.privtopub(binary_private_key)
     return public_key_tuple_to_hex(as_tuple)
 
@@ -24,7 +24,7 @@ def public_key_to_address(
     as_hex = public_key_tuple_to_hex(public_key)
     hash = hash_utils.keccak(as_hex, 'binary')
     address = hash[-20:]
-    return format_utils.convert(address, 'prefix_hex')
+    return format_utils.binary_convert(address, 'prefix_hex')
 
 
 def public_key_tuple_to_hex(public_key: tuple[int, int] | spec.Data) -> str:
@@ -33,11 +33,11 @@ def public_key_tuple_to_hex(public_key: tuple[int, int] | spec.Data) -> str:
         if len(public_key) == 2:
             x, y = public_key
             as_bytes = x.to_bytes(32, 'big') + y.to_bytes(32, 'big')
-            return format_utils.convert(as_bytes, 'prefix_hex')
+            return format_utils.binary_convert(as_bytes, 'prefix_hex')
         else:
             raise Exception('unknown pubilc key format')
 
     else:
-        return format_utils.convert(
+        return format_utils.binary_convert(
             public_key, output_format='prefix_hex', n_bytes=64
         )

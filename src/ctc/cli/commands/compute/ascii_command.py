@@ -20,5 +20,5 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def ascii_command(data: str) -> None:
-    ascii = binary.hex_to_ascii(data)
-    print(ascii)
+    text = binary.binary_to_text(data)
+    print(text)

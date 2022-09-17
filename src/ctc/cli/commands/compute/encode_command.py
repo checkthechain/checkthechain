@@ -53,5 +53,5 @@ def encode_command(*, type: str, data: str, packed: bool) -> None:
     else:
         encoded = binary.abi_encode(literal_data, type)
 
-    as_hex = binary.convert(encoded, 'prefix_hex')
+    as_hex = binary.binary_convert(encoded, 'prefix_hex')
     print(as_hex)

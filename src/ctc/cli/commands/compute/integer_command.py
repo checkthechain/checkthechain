@@ -20,5 +20,5 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def integer_command(data: str) -> None:
-    as_int = binary.convert(data, 'integer')
+    as_int = binary.binary_convert(data, 'integer')
     print(as_int)

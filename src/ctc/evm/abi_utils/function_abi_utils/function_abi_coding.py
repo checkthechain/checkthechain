@@ -32,7 +32,7 @@ def encode_call_data(
     # encode function selector
     if function_selector is None:
         function_selector = function_abi_parsing.get_function_selector(function_abi)
-    function_selector = binary.convert(function_selector, 'prefix_hex')
+    function_selector = binary.binary_convert(function_selector, 'prefix_hex')
 
     # encode parameters
     if encoded_parameters is None:
@@ -41,7 +41,7 @@ def encode_call_data(
             parameter_types=parameter_types,
             function_abi=function_abi,
         )
-    encoded_parameters = binary.convert(encoded_parameters, 'raw_hex')
+    encoded_parameters = binary.binary_convert(encoded_parameters, 'raw_hex')
 
     # join function selector with parameters
     return function_selector + encoded_parameters
@@ -55,8 +55,8 @@ def decode_call_data(
 ) -> spec.DecodedCallData:
 
     # get function selector
-    call_data_bytes = binary.convert(call_data, 'binary')
-    function_selector = binary.convert(call_data_bytes[:4], 'prefix_hex')
+    call_data_bytes = binary.binary_convert(call_data, 'binary')
+    function_selector = binary.binary_convert(call_data_bytes[:4], 'prefix_hex')
 
     # get function abi
     if function_abi is None:
@@ -138,7 +138,7 @@ def encode_function_parameters(
             parameter_type == 'bytes32'
             and binary.get_binary_format(parameter) != 'binary'
         ):
-            parameter = binary.convert(parameter, 'binary')
+            parameter = binary.binary_convert(parameter, 'binary')
         new_parameters.append(parameter)
     parameters = new_parameters
 
@@ -159,7 +159,7 @@ def decode_function_parameters(
 ) -> list[typing.Any]:
 
     parameter_types_str = '(' + ','.join(parameter_types) + ')'
-    encoded_parameters = binary.convert(encoded_parameters, 'binary')
+    encoded_parameters = binary.binary_convert(encoded_parameters, 'binary')
     parameters = binary.abi_decode(encoded_parameters, parameter_types_str)
 
     return list(parameters)
@@ -214,7 +214,7 @@ def decode_function_output(
     output_types_str = '(' + ','.join(output_types) + ')'
 
     # decode
-    encoded_output = binary.convert(encoded_output, 'binary')
+    encoded_output = binary.binary_convert(encoded_output, 'binary')
     decoded_output = binary.abi_decode(encoded_output, output_types_str)
 
     # decode strings
@@ -224,7 +224,7 @@ def decode_function_output(
             # item = item.decode()
             item = item
         elif output_type == 'bytes32':
-            item = binary.convert(item, 'prefix_hex')
+            item = binary.binary_convert(item, 'prefix_hex')
         new_decoded_output.append(item)
     decoded_output = new_decoded_output
 

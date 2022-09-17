@@ -7,7 +7,7 @@ from ctc import evm
 def test_pack_vrs_transaction():
     # from https://ethereum.stackexchange.com/a/107498
     target_signature = '0x28a0da4429a9e8e6b54cb101b2df002039f2879ab4ca0e8fae64134942cb81f3e581a03b90a37dc078a82dfc418695b1d4473661aa4d24dd874ac68678894ff44a6b27'
-    actual_signature = binary.pack_vrs(
+    actual_signature = binary.pack_signature_vrs(
         v='0x28',
         r='0xda4429a9e8e6b54cb101b2df002039f2879ab4ca0e8fae64134942cb81f3e581',
         s='0x3b90a37dc078a82dfc418695b1d4473661aa4d24dd874ac68678894ff44a6b27',

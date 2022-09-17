@@ -45,21 +45,4 @@ conversion_tests = [
 @pytest.mark.parametrize('test', conversion_tests)
 def test_convert(test):
     data, output_format, kwargs, target = test
-    assert binary.convert(data, output_format, **kwargs) == target
-
-
-def test_add_binary_pad():
-    pass
-
-
-match_tests = [
-    ['1234', '5789', '1234'],
-    ['1234', '0x5789', '0x1234'],
-    ['1234', bytes.fromhex('5789'), bytes.fromhex('1234')],
-]
-
-
-@pytest.mark.parametrize('test', match_tests)
-def test_match_format(test):
-    format_this, like_this, target = test
-    assert binary.match_format(format_this, like_this) == target
+    assert binary.binary_convert(data, output_format, **kwargs) == target

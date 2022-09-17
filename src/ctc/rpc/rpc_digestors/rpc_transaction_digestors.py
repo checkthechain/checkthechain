@@ -10,7 +10,7 @@ def digest_eth_get_transaction_count(
     response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 
@@ -76,7 +76,7 @@ def digest_eth_get_block_transaction_count_by_hash(
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 
@@ -86,5 +86,5 @@ def digest_eth_get_block_transaction_count_by_number(
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response

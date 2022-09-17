@@ -278,11 +278,11 @@ def _decode_raw_symbol(data: str | None) -> str:
     if data is None:
         return ''
     elif len(data) == 66:
-        return binary.hex_to_ascii(data).strip('\x00')
+        return binary.binary_to_text(data).strip('\x00')
     elif len(data) == 0 or data == '0x':
         return ''
     else:
-        as_binary = binary.convert(data, 'binary')
+        as_binary = binary.binary_convert(data, 'binary')
         as_str: str = binary.abi_decode(as_binary, '(string)')[0]
         return as_str
 

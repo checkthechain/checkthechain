@@ -13,6 +13,12 @@ from . import format_utils
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
 
+    # use recursive type once mypy#731 gets released
+    # https://github.com/python/mypy/issues/731
+
+    # RLPDecodeTypes = typing.Sequence[typing.Any] | typing.ExtendedBinaryFormat | None
+    RLPDecodeTypes = typing.Any
+
 
 #
 # # encoder
@@ -61,7 +67,7 @@ def rlp_encode(
         if item == 0:
             item = bytes()
         else:
-            item = format_utils.convert(item, 'binary')
+            item = format_utils.binary_convert(item, 'binary')
 
     if isinstance(item, (tuple, list)):
         output = _rlp_encode_list(item, str_mode=str_mode)
@@ -72,12 +78,12 @@ def rlp_encode(
     else:
         raise Exception('cannot rlp encode items of type ' + str(type(item)))
 
-    return format_utils.convert(output, output_format)
+    return format_utils.binary_convert(output, output_format)
 
 
 def _rlp_encode_bytes(data: bytes) -> bytes:
 
-    data = format_utils.convert(data, 'binary')
+    data = format_utils.binary_convert(data, 'binary')
 
     length = len(data)
     if length == 0:
@@ -86,11 +92,15 @@ def _rlp_encode_bytes(data: bytes) -> bytes:
         return data
     elif length <= 55:
         prefix = 128 + length
-        return format_utils.convert(prefix, 'binary') + data
+        return format_utils.binary_convert(prefix, 'binary') + data
     else:
-        length_as_bytes = format_utils.convert(length, 'binary')
+        length_as_bytes = format_utils.binary_convert(length, 'binary')
         prefix = 183 + len(length_as_bytes)
-        return format_utils.convert(prefix, 'binary') + length_as_bytes + data
+        return (
+            format_utils.binary_convert(prefix, 'binary')
+            + length_as_bytes
+            + data
+        )
 
 
 def _rlp_encode_list(
@@ -106,16 +116,22 @@ def _rlp_encode_list(
     total_payload_length = sum(item_lengths)
 
     if total_payload_length <= 55:
-        prefix = format_utils.convert(192 + total_payload_length, 'binary')
+        prefix = format_utils.binary_convert(
+            192 + total_payload_length, 'binary'
+        )
         output = prefix
         for item in encoded_items:
             output = output + item
         return output
 
     else:
-        bytes_of_length = format_utils.convert(total_payload_length, 'binary')
+        bytes_of_length = format_utils.binary_convert(
+            total_payload_length, 'binary'
+        )
         prefix_int = 247 + len(bytes_of_length)
-        output = format_utils.convert(prefix_int, 'binary') + bytes_of_length
+        output = (
+            format_utils.binary_convert(prefix_int, 'binary') + bytes_of_length
+        )
         for item in encoded_items:
             output = output + item
         return output
@@ -135,7 +151,7 @@ def _rlp_encode_str(
     if str_mode == 'text':
         as_bytes = item.encode()
     elif str_mode == 'hex':
-        as_bytes = format_utils.convert(item, 'binary')
+        as_bytes = format_utils.binary_convert(item, 'binary')
     else:
         raise Exception('unknown str mode: ' + str(str_mode))
 
@@ -145,12 +161,6 @@ def _rlp_encode_str(
 #
 # # decoder
 #
-
-# use recursive type once mypy#731 gets released
-# https://github.com/python/mypy/issues/731
-
-# RLPDecodeTypes = typing.Sequence[typing.Any] | typing.ExtendedBinaryFormat | None
-RLPDecodeTypes = typing.Any
 
 
 def rlp_decode(
@@ -165,7 +175,7 @@ def rlp_decode(
         2. list/tuple of binary format names, corresponding to items in rlp list
     """
 
-    data = format_utils.convert(data, 'binary')
+    data = format_utils.binary_convert(data, 'binary')
     decoded, remaining = _rlp_decode_chunk(data=data, types=types)
     if len(remaining) > 0:
         raise Exception('data contains extra bytes')
@@ -239,7 +249,7 @@ def _rlp_decode_primitive_chunk(
         if types == 'ascii':
             decoded = decoded.decode()
         else:
-            decoded = format_utils.convert(decoded, types)
+            decoded = format_utils.binary_convert(decoded, types)
 
     return decoded, remaining
 

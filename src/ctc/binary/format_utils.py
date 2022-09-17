@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import codecs
 import typing
 
 from ctc import spec
@@ -44,8 +45,19 @@ def get_binary_n_bytes(data: spec.BinaryInteger) -> int:
 #
 
 
+def text_to_binary(
+    text: str,
+    output_format: typing.Optional[spec.BinaryFormat] = None,
+) -> spec.BinaryInteger:
+    return binary_convert(text.encode(), output_format)
+
+
+def binary_to_text(binary: spec.BinaryInteger) -> str:
+    return codecs.decode(binary_convert(binary, 'binary'))
+
+
 @typing.overload
-def convert(
+def binary_convert(
     data: spec.BinaryInteger,
     output_format: typing.Literal['binary'],
     *,
@@ -56,7 +68,7 @@ def convert(
 
 
 @typing.overload
-def convert(
+def binary_convert(
     data: spec.BinaryInteger,
     output_format: typing.Literal['integer'],
     *,
@@ -67,7 +79,7 @@ def convert(
 
 
 @typing.overload
-def convert(
+def binary_convert(
     data: spec.BinaryInteger,
     output_format: typing.Optional[typing.Literal['prefix_hex', 'raw_hex']],
     *,
@@ -77,7 +89,7 @@ def convert(
     ...
 
 
-def convert(
+def binary_convert(
     data: spec.BinaryInteger,
     output_format: typing.Optional[spec.BinaryFormat] = None,
     *,
@@ -173,101 +185,3 @@ def convert(
     else:
 
         raise Exception('unknown input data format: ' + str(type(data)))
-
-
-def add_binary_pad(
-    data: spec.BinaryInteger,
-    *,
-    pad_side: typing.Literal['left', 'right', None] = None,
-    padded_size: int | None = None,
-) -> spec.BinaryInteger:
-    """add pad of zeros to left or right side of binary data"""
-
-    # default arguments
-    if pad_side is None:
-        pad_side = 'left'
-    if padded_size is None:
-        padded_size = 32
-
-    # determine pad bytes
-    binary_format = get_binary_format(data)
-    data_bytes = get_binary_n_bytes(data)
-    if padded_size < data_bytes:
-        raise Exception('pad size too small for data')
-    pad_bytes = padded_size - data_bytes
-
-    if binary_format == 'binary':
-
-        data = typing.cast(bytes, data)
-
-        if pad_side == 'left':
-            return bytes(0) * pad_bytes + data
-        elif pad_side == 'right':
-            return data + bytes(0) * pad_bytes
-        else:
-            raise Exception('invalid pad side: ' + str(pad_side))
-
-    elif binary_format == 'prefix_hex':
-
-        data = typing.cast(str, data)
-
-        if pad_side == 'left':
-            return '0x' + '0' * 2 * pad_bytes + data[2:]
-        elif pad_side == 'right':
-            return data + '0' * 2 * pad_bytes
-        else:
-            raise Exception('invalid pad side: ' + str(pad_side))
-
-    elif binary_format == 'raw_hex':
-
-        data = typing.cast(str, data)
-
-        if pad_side == 'left':
-            return '0' * 2 * pad_bytes + data
-        elif pad_side == 'right':
-            return data + '0' * 2 * pad_bytes
-        else:
-            raise Exception('invalid pad side: ' + str(pad_side))
-
-    else:
-
-        raise Exception('invalid binary format: ' + str(binary_format))
-
-
-def match_format(
-    format_this: spec.BinaryInteger,
-    like_this: spec.BinaryInteger,
-    *,
-    match_pad: bool = False,
-) -> spec.BinaryInteger:
-    """
-
-    will only match left pads, because pad size cannot be reliably determined
-    """
-
-    output_format = get_binary_format(like_this)
-    output = convert(data=format_this, output_format=output_format)
-
-    if match_pad:
-        padded_size = get_binary_n_bytes(like_this)
-        output = add_binary_pad(output, padded_size=padded_size)
-
-    return output
-
-
-def ascii_to_raw_hex(data: str) -> str:
-    return data.encode('ascii').hex()
-
-
-def ascii_to_prefix_hex(data: str) -> str:
-    return '0x' + ascii_to_raw_hex(data)
-
-
-def hex_to_ascii(data: str) -> str:
-    import codecs
-
-    if data.startswith('0x'):
-        data = data[2:]
-
-    cast_bytes = typing.cast(bytes, data)
-    return codecs.decode(cast_bytes, encoding='hex').decode('ascii')

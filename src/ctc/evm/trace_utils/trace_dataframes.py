@@ -41,7 +41,7 @@ async def async_get_transaction_traces_df(
         'result__gasUsed',
         'action__value',
     ]
-    f_to_int = functools.partial(binary.convert, output_format='integer')
+    f_to_int = functools.partial(binary.binary_convert, output_format='integer')
     for column in convert_int_columns:
         df[column] = df[column].map(f_to_int)
 

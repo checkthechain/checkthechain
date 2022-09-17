@@ -26,7 +26,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def hex_command(text: str, raw: bool) -> None:
     if raw:
-        output = binary.ascii_to_raw_hex(text)
+        output = binary.text_to_binary(text, 'raw_hex')
     else:
-        output = binary.ascii_to_prefix_hex(text)
+        output = binary.text_to_binary(text, 'prefix_hex')
     print(output)

@@ -32,10 +32,10 @@ def get_created_address(
     elif salt is not None and init_code is not None:
         # create2
         data = (
-            binary.convert('0xff', 'raw_hex')
-            + binary.convert(sender, 'raw_hex')
-            + binary.convert(salt, 'raw_hex')
-            + binary.convert(binary.keccak(init_code), 'raw_hex')
+            binary.binary_convert('0xff', 'raw_hex')
+            + binary.binary_convert(sender, 'raw_hex')
+            + binary.binary_convert(salt, 'raw_hex')
+            + binary.binary_convert(binary.keccak(init_code), 'raw_hex')
         )
     else:
         raise Exception('specify either {nonce} or {salt, init_code}')
@@ -86,7 +86,7 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
     address_format = binary.get_binary_format(address)
     if address_format not in ['prefix_hex', 'raw_hex']:
         raise Exception('checksum only relevant to hex formatted addresses')
-    address = binary.convert(address, 'raw_hex')
+    address = binary.binary_convert(address, 'raw_hex')
 
     # compute address hash
     address_hash = binary.keccak_text(
@@ -107,7 +107,7 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
     if address_format == 'raw_hex':
         return raw_checksum
     elif address_format == 'prefix_hex':
-        return binary.convert(raw_checksum, 'prefix_hex')
+        return binary.binary_convert(raw_checksum, 'prefix_hex')
     else:
         raise Exception('checksum only relevant to hex formatted addresses')
 

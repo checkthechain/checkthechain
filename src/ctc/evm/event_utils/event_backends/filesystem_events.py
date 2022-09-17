@@ -466,7 +466,7 @@ async def async_get_events_from_filesystem(
         if arg['type'] in ['bytes32']:
             column = prefix + arg['name']
             lam = functools.partial(
-                binary.convert,
+                binary.binary_convert,
                 output_format='prefix_hex',
             )
             df[column] = df[column].map(ast.literal_eval).map(lam)

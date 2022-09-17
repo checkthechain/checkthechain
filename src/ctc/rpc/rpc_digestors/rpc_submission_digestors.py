@@ -9,7 +9,7 @@ def digest_eth_gas_price(
     response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 

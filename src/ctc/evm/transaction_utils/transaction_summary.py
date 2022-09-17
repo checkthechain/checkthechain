@@ -201,7 +201,7 @@ async def async_print_transaction_summary(
 
                 # not sure if this is what should be done
                 if isinstance(value, bytes):
-                    value = binary.convert(value, 'prefix_hex')
+                    value = binary.binary_convert(value, 'prefix_hex')
 
                 cli.print_bullet(
                     key=name,

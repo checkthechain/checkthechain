@@ -10,7 +10,7 @@ def digest_eth_new_filter(
     response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 
@@ -18,7 +18,7 @@ def digest_eth_new_block_filter(
     response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 
@@ -26,7 +26,7 @@ def digest_eth_new_pending_transaction_filter(
     response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 
@@ -34,7 +34,7 @@ def digest_eth_uninstall_filter(
     response: spec.RpcSingularResponse, *, decode_response: bool = False
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 

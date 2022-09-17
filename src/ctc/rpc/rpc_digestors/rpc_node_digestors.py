@@ -39,7 +39,7 @@ def digest_eth_protocol_version(
     response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response
 
 
@@ -58,5 +58,5 @@ def digest_eth_chain_id(
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.convert(response, 'integer')
+        response = binary.binary_convert(response, 'integer')
     return response

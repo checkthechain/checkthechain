@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 def is_event_hash(data: spec.BinaryData) -> bool:
     try:
-        binary.convert(data, 'binary')
+        binary.binary_convert(data, 'binary')
         return len(binary) == 32
     except Exception:
         return False

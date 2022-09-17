@@ -21,7 +21,7 @@ def serialize_unsigned_transaction(
     # add EIP-155 chain_id
     if type == 0:
         if chain_id is None and transaction.get('chain_id') is not None:
-            chain_id = binary.convert(transaction.get('chain_id'), 'integer')  # type: ignore
+            chain_id = binary.binary_convert(transaction.get('chain_id'), 'integer')  # type: ignore
         if chain_id is not None:
             as_list.append(chain_id)
             as_list.append(0)

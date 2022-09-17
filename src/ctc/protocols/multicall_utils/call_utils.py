@@ -75,7 +75,7 @@ async def async_encode_call_data(
         function_abi=function_abi,
         parameters=function_parameters,
     )
-    return binary.convert(encoded_data, 'binary')
+    return binary.binary_convert(encoded_data, 'binary')
 
 
 async def async_decode_call_output(
@@ -135,7 +135,7 @@ async def async_get_call_function_abi(
             raise Exception('unknown call format')
 
     elif call_data is not None:
-        call_data = binary.convert(call_data, 'prefix_hex')
+        call_data = binary.binary_convert(call_data, 'prefix_hex')
         function_selector = call_data[:10]
         return await evm.async_get_function_abi(
             contract_address=get_call_contract(call),

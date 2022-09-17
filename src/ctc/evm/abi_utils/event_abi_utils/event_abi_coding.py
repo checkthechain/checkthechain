@@ -69,7 +69,7 @@ def decode_event_topics(
         ):
             decoded_topics.append(topic)  # type: ignore
         else:
-            topic = binary.convert(topic, 'binary')
+            topic = binary.binary_convert(topic, 'binary')
             decoded_topic = binary.abi_decode(topic, indexed_type)
             decoded_topics.append(decoded_topic)
 
@@ -137,10 +137,8 @@ def decode_event_unindexed_data(
         unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
 
     # decode data
-    data = binary.convert(data, 'binary')
-    decoded = binary.abi_decode(
-        data, '(' + ','.join(unindexed_types) + ')'
-    )
+    data = binary.binary_convert(data, 'binary')
+    decoded = binary.abi_decode(data, '(' + ','.join(unindexed_types) + ')')
 
     # package outputs
     if not use_names:
@@ -149,7 +147,9 @@ def decode_event_unindexed_data(
         if unindexed_names is None:
             if event_abi is None:
                 raise Exception('must specify event_abi')
-            unindexed_names = event_abi_parsing.get_event_unindexed_names(event_abi)
+            unindexed_names = event_abi_parsing.get_event_unindexed_names(
+                event_abi
+            )
         return dict(zip(unindexed_names, decoded))
 
 
@@ -273,14 +273,18 @@ def decode_events_dataframe(
 
     # decode other topics
     # need to double check this section
-    indexed_types = event_abi_parsing.get_event_indexed_types(event_abi=event_abi)
+    indexed_types = event_abi_parsing.get_event_indexed_types(
+        event_abi=event_abi
+    )
     for t, indexed_type in enumerate(indexed_types):
         if indexed_type == 'address':
             topic = 'topic' + str(t + 1)
             new_df[topic] = '0x' + new_df[topic].str[26:]
 
     # rename topicX to indexed variable names
-    indexed_names = event_abi_parsing.get_event_indexed_names(event_abi=event_abi)
+    indexed_names = event_abi_parsing.get_event_indexed_names(
+        event_abi=event_abi
+    )
     indexed_rename = {
         'topic' + str(i + 1): name for i, name in enumerate(indexed_names)
     }

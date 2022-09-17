@@ -18,7 +18,7 @@ def sign_transaction(
     if chain_id is None and 'chain_id' in transaction:
         tx_chain_id = transaction['chain_id']
         if tx_chain_id is not None:
-            chain_id = binary.convert(tx_chain_id, 'integer')
+            chain_id = binary.binary_convert(tx_chain_id, 'integer')
     message = transaction_serialize.serialize_unsigned_transaction(
         transaction,
         chain_id=chain_id,
@@ -51,12 +51,10 @@ def verify_transaction_signature(
             raise Exception('must provide signature for transaction')
 
     # get transaction hash
-    transaction_hash = transaction_hashes.hash_unsigned_transaction(
-        transaction
-    )
+    transaction_hash = transaction_hashes.hash_unsigned_transaction(transaction)
 
     # process signature
-    v, r, s = binary.unpack_vrs(signature)
+    v, r, s = binary.unpack_signature_vrs(signature)
     type = transaction_types.get_transaction_type(transaction)
     if type == 2 and v in [0, 1]:
         v = v + 27
@@ -81,7 +79,7 @@ def recover_transaction_sender(
     if 'from' in transaction:
         return transaction['from']  # type: ignore
 
-    v, r, s = binary.unpack_vrs(signature)
+    v, r, s = binary.unpack_signature_vrs(signature)
 
     # encode transaction data
     if r == 0 and s == 0:
@@ -90,7 +88,7 @@ def recover_transaction_sender(
     elif v in (27, 28):
         chain_id = None
     elif v >= 37:
-        chain_id = binary.vrs_to_network_id(v=v, r=r, s=s)
+        chain_id = binary.get_signature_network_id(signature)
         if chain_id is None:
             raise Exception('could not parse chain_id')
         v = v - chain_id * 2 - 8

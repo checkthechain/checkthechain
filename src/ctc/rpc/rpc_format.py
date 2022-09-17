@@ -19,7 +19,7 @@ def decode_response(
     decoded = {}
     for key, value in response.items():
         if key in quantities:
-            value = binary.convert(value, 'integer')
+            value = binary.binary_convert(value, 'integer')
         decoded[key] = value
     return decoded
 

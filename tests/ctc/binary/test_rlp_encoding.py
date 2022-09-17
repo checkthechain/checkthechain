@@ -11,11 +11,11 @@ rlp_examples = [
     # str
     [
         'dog',
-        binary.convert(bytes.fromhex('83') + 'dog'.encode(), 'prefix_hex'),
+        binary.binary_convert(bytes.fromhex('83') + 'dog'.encode(), 'prefix_hex'),
     ],
     [
         ['cat', 'dog'],
-        binary.convert(
+        binary.binary_convert(
             bytes.fromhex('c883')
             + 'cat'.encode()
             + bytes.fromhex('83')

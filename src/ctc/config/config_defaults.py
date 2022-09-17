@@ -105,7 +105,7 @@ def _sync_get_chain_id(provider_url: str) -> int:
     response = urllib.request.urlopen(request)
     response_data = json.loads(response.read().decode())
     raw_chain_id = response_data['result']
-    return binary.convert(raw_chain_id, 'integer')
+    return binary.binary_convert(raw_chain_id, 'integer')
 
 
 def get_default_data_dir() -> str:

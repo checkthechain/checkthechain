@@ -19,7 +19,7 @@ def sign_text_message(
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
 
-    message_hash = create_text_message_hash(
+    message_hash = _hash_text_message(
         message=message,
         mode=mode,
     )
@@ -39,7 +39,7 @@ def sign_data_message(
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
 
-    message_hash = create_data_message_hash(
+    message_hash = _hash_data_message(
         message=message,
         mode=mode,
     )
@@ -58,10 +58,10 @@ def sign_message_hash(
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
 
-    message_hash = format_utils.convert(message_hash, 'binary')
+    message_hash = format_utils.binary_convert(message_hash, 'binary')
 
     # compute signature
-    private_binary = format_utils.convert(private_key, 'binary')
+    private_binary = format_utils.binary_convert(private_key, 'binary')
     v, r, s = secp256k1_utils.ecdsa_raw_sign(
         message_hash,
         priv=private_binary,
@@ -74,7 +74,7 @@ def sign_message_hash(
     return v, r, s
 
 
-def create_text_message_hash(
+def _hash_text_message(
     message: str,
     mode: Literal['eth_sign', 'personal_sign'],
 ) -> bytes:
@@ -97,12 +97,12 @@ def create_text_message_hash(
     return message_hash
 
 
-def create_data_message_hash(
+def _hash_data_message(
     message: spec.Data,
     mode: Literal['eth_sign', 'personal_sign'],
 ) -> bytes:
 
-    message = format_utils.convert(message, 'binary')
+    message = format_utils.binary_convert(message, 'binary')
 
     # add prefix
     if mode == 'eth_sign':

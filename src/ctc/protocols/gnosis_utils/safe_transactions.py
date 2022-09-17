@@ -14,7 +14,7 @@ def parse_safe_signatures(
     """
     reference: https://docs.gnosis-safe.io/contracts/signatures
     """
-    as_bytes = binary.convert(signatures, 'binary')
+    as_bytes = binary.binary_convert(signatures, 'binary')
 
     eip_1271_positions = []
     eip_1271_indices = []
@@ -30,25 +30,27 @@ def parse_safe_signatures(
         if 31 > signature_type and signature_type > 26:
             parsed = {
                 'type': 'ecdsa',
-                'signature': binary.convert(signature, 'prefix_hex'),
-                'r': binary.convert(signature[:32], 'integer'),
-                's': binary.convert(signature[32:64], 'integer'),
-                'v': binary.convert(signature_type, 'integer'),
+                'signature': binary.binary_convert(signature, 'prefix_hex'),
+                'r': binary.binary_convert(signature[:32], 'integer'),
+                's': binary.binary_convert(signature[32:64], 'integer'),
+                'v': binary.binary_convert(signature_type, 'integer'),
             }
         elif signature_type > 30:
             parsed = {
                 'type': 'eth_sign',
-                'signature': binary.convert(signature, 'prefix_hex'),
-                'r': binary.convert(signature[:32], 'integer'),
-                's': binary.convert(signature[32:64], 'integer'),
-                'v': binary.convert(signature_type - 4, 'integer'),
+                'signature': binary.binary_convert(signature, 'prefix_hex'),
+                'r': binary.binary_convert(signature[:32], 'integer'),
+                's': binary.binary_convert(signature[32:64], 'integer'),
+                'v': binary.binary_convert(signature_type - 4, 'integer'),
             }
         elif signature_type == 0:
             parsed = {
                 'type': 'eip1271',
-                'signature': binary.convert(signature, 'prefix_hex'),
-                'verifier': binary.convert(signature[:32][-20:], 'prefix_hex'),
-                'position': binary.convert(signature[32:64], 'integer'),
+                'signature': binary.binary_convert(signature, 'prefix_hex'),
+                'verifier': binary.binary_convert(
+                    signature[:32][-20:], 'prefix_hex'
+                ),
+                'position': binary.binary_convert(signature[32:64], 'integer'),
             }
             position: int = typing.cast(int, parsed['position'])
             eip_1271_positions.append(position)
@@ -56,8 +58,10 @@ def parse_safe_signatures(
         elif signature_type == 1:
             parsed = {
                 'type': 'prevalidated',
-                'signature': binary.convert(signature, 'prefix_hex'),
-                'validator': binary.convert(signature[:32][-20:], 'prefix_hex'),
+                'signature': binary.binary_convert(signature, 'prefix_hex'),
+                'validator': binary.binary_convert(
+                    signature[:32][-20:], 'prefix_hex'
+                ),
             }
         else:
             raise Exception('unknown signature type: ' + str(signature_type))
@@ -163,7 +167,7 @@ def hash_safe_transaction(
         'chain_id': chain_id,
         'verifying_contract': safe_address,
     }
-    return binary.eip712_hash(
+    return binary.hash_eip712_struct(
         struct_data=safe_transaction,
         struct_type=safe_spec.safe_transaction_type,
         domain=domain,

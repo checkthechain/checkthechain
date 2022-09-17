@@ -37,8 +37,15 @@ def verify_signature(
 
 
 def get_signature_network_id(signature: spec.Signature) -> int | None:
-    v, r, s = vrs_utils.unpack_vrs(signature)
-    return vrs_utils.vrs_to_network_id(v=v, r=r, s=s)
+    """adapted from https://github.com/ethereum/pyethereum/blob/ecb14c937a0b6cb0a0dc4f06be3a88e6d53dcce3/ethereum/transactions.py#L93"""
+
+    v, r, s = vrs_utils.unpack_signature_vrs(signature)
+    if r == 0 and s == 0:
+        return v
+    elif v in (27, 28):
+        return None
+    else:
+        return ((v - 1) // 2) - 17
 
 
 def recover_signer_public_key(
@@ -51,28 +58,31 @@ def recover_signer_public_key(
     """
 
     # ger vrs
-    v, r, s = vrs_utils.unpack_vrs(signature)
-    v = format_utils.convert(v, 'integer')
-    r = format_utils.convert(r, 'integer')
-    s = format_utils.convert(s, 'integer')
+    v, r, s = vrs_utils.unpack_signature_vrs(signature)
+    v = format_utils.binary_convert(v, 'integer')
+    r = format_utils.binary_convert(r, 'integer')
+    s = format_utils.binary_convert(s, 'integer')
 
     if v >= 37:
-        network_id = vrs_utils.vrs_to_network_id(v=v, r=r, s=s)
+        network_id = get_signature_network_id(signature)
         if network_id is None:
             raise Exception('could not parse valid network_id')
         v = v - network_id * 2 - 8
 
     # get signer
-    message_hash = format_utils.convert(message_hash, 'binary')
+    message_hash = format_utils.binary_convert(message_hash, 'binary')
     x, y = secp256k1_utils.ecdsa_raw_recover(message_hash, (v, r, s))
     signer = x.to_bytes(32, byteorder='big') + y.to_bytes(32, byteorder='big')
 
-    return format_utils.convert(signer, 'prefix_hex')
+    return format_utils.binary_convert(signer, 'prefix_hex')
 
 
 def recover_signer_address(
-    message_hash: spec.Data, signature: spec.Signature
+    *,
+    message_hash: spec.Data,
+    signature: spec.Signature,
 ) -> spec.Address:
+
     public_key = recover_signer_public_key(
         message_hash=message_hash,
         signature=signature,
