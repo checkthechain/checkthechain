@@ -60,7 +60,7 @@ def rlp_encode(
     output_format: spec.BinaryFormat = 'prefix_hex',
     *,
     str_mode: Literal['auto', 'text', 'hex'] | None = 'auto',
-) -> spec.BinaryInteger:
+) -> spec.GenericBinaryData:
     """str_mode specifies how str values should be interpreted"""
 
     if isinstance(item, int):

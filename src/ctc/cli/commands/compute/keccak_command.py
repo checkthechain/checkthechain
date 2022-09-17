@@ -48,7 +48,7 @@ def keccack_command(*, data: str, text: bool, hex: bool, raw: bool) -> None:
     if hex:
 
         if typing.TYPE_CHECKING:
-            casted = typing.cast(spec.BinaryInteger, data)
+            casted = typing.cast(spec.GenericBinaryData, data)
         else:
             casted = data
 

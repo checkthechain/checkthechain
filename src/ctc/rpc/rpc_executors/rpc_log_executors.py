@@ -54,7 +54,7 @@ async def async_eth_new_pending_transaction_filter(
 
 
 async def async_eth_uninstall_filter(
-    filter_id: spec.BinaryInteger,
+    filter_id: spec.GenericBinaryData,
     *,
     provider: spec.ProviderReference = None,
     decode_response: bool = False,
@@ -70,7 +70,7 @@ async def async_eth_uninstall_filter(
 
 
 async def async_eth_get_filter_changes(
-    filter_id: spec.BinaryInteger,
+    filter_id: spec.GenericBinaryData,
     *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,
@@ -90,7 +90,7 @@ async def async_eth_get_filter_changes(
 
 
 async def async_eth_get_filter_logs(
-    filter_id: spec.BinaryInteger,
+    filter_id: spec.GenericBinaryData,
     *,
     provider: spec.ProviderReference = None,
     decode_response: bool = True,

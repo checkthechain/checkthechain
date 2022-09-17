@@ -6,7 +6,7 @@ import typing
 from ctc import spec
 
 
-def get_binary_format(data: spec.BinaryInteger) -> spec.BinaryFormat:
+def get_binary_format(data: spec.GenericBinaryData) -> spec.BinaryFormat:
     if isinstance(data, bytes):
         return 'binary'
     elif isinstance(data, str):
@@ -20,7 +20,7 @@ def get_binary_format(data: spec.BinaryInteger) -> spec.BinaryFormat:
         raise Exception('could not detect format')
 
 
-def get_binary_n_bytes(data: spec.BinaryInteger) -> int:
+def get_binary_n_bytes(data: spec.GenericBinaryData) -> int:
 
     if isinstance(data, bytes):
         return len(data)
@@ -48,17 +48,17 @@ def get_binary_n_bytes(data: spec.BinaryInteger) -> int:
 def text_to_binary(
     text: str,
     output_format: typing.Optional[spec.BinaryFormat] = None,
-) -> spec.BinaryInteger:
+) -> spec.GenericBinaryData:
     return binary_convert(text.encode(), output_format)
 
 
-def binary_to_text(binary: spec.BinaryInteger) -> str:
+def binary_to_text(binary: spec.GenericBinaryData) -> str:
     return codecs.decode(binary_convert(binary, 'binary'))
 
 
 @typing.overload
 def binary_convert(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: typing.Literal['binary'],
     *,
     n_bytes: int | None = None,
@@ -69,7 +69,7 @@ def binary_convert(
 
 @typing.overload
 def binary_convert(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: typing.Literal['integer'],
     *,
     n_bytes: int | None = None,
@@ -80,7 +80,7 @@ def binary_convert(
 
 @typing.overload
 def binary_convert(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: typing.Optional[typing.Literal['prefix_hex', 'raw_hex']],
     *,
     n_bytes: int | None = None,
@@ -90,12 +90,12 @@ def binary_convert(
 
 
 def binary_convert(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: typing.Optional[spec.BinaryFormat] = None,
     *,
     n_bytes: int | None = None,
     keep_leading_0: bool | None = None,
-) -> spec.BinaryInteger:
+) -> spec.GenericBinaryData:
     """convert {hex str or bytes} into {hex str or bytes}
 
     function should not be used with general text data

@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 
 @typing.overload
 def keccak(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: Literal['integer'],
     *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
@@ -21,7 +21,7 @@ def keccak(
 
 @typing.overload
 def keccak(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: Literal['binary'],
     *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
@@ -31,7 +31,7 @@ def keccak(
 
 @typing.overload
 def keccak(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: Literal['prefix_hex', 'raw_hex', None] = 'prefix_hex',
     *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
@@ -40,11 +40,11 @@ def keccak(
 
 
 def keccak(
-    data: spec.BinaryInteger,
+    data: spec.GenericBinaryData,
     output_format: typing.Optional[spec.BinaryFormat] = 'prefix_hex',
     *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
-) -> spec.BinaryInteger:
+) -> spec.GenericBinaryData:
     """return keccack-256 hash of hex or binary data"""
 
     # determine library
@@ -111,7 +111,7 @@ def keccak_text(
     output_format: spec.BinaryFormat = 'prefix_hex',
     *,
     library: typing.Optional[typing.Literal['pysha3', 'pycryptodome']] = None,
-) -> spec.BinaryInteger:
+) -> spec.GenericBinaryData:
     """return keccack-256 hash of text"""
 
     if isinstance(text, str):

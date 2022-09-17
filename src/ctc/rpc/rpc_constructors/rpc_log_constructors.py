@@ -41,19 +41,19 @@ def construct_eth_new_pending_transaction_filter() -> spec.RpcRequest:
 
 
 def construct_eth_uninstall_filter(
-    filter_id: spec.BinaryInteger,
+    filter_id: spec.GenericBinaryData,
 ) -> spec.RpcRequest:
     return rpc_request.create('eth_uninstallFilter', [filter_id])
 
 
 def construct_eth_get_filter_changes(
-    filter_id: spec.BinaryInteger,
+    filter_id: spec.GenericBinaryData,
 ) -> spec.RpcRequest:
     return rpc_request.create('eth_getFilterChanges', [filter_id])
 
 
 def construct_eth_get_filter_logs(
-    filter_id: spec.BinaryInteger,
+    filter_id: spec.GenericBinaryData,
 ) -> spec.RpcRequest:
     return rpc_request.create('eth_getFilterLogs', [filter_id])
 

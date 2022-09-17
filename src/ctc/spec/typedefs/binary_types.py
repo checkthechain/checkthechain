@@ -6,7 +6,7 @@ from . import abi_types
 
 
 BinaryData = typing.Union[bytes, str]
-BinaryInteger = typing.Union[int, BinaryData]
+GenericBinaryData = typing.Union[int, BinaryData]
 # BlockSpec = typing.Union[
 #     int, BinaryData, Literal['latest', 'earliest', 'pending']
 # ]
