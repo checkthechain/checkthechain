@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -21,5 +21,5 @@ in most cli shells must enclose parentheses in quotes " "''',
 def selector_command(text_signature: str) -> None:
     if '(' not in text_signature and ')' not in text_signature:
         text_signature = text_signature + '()'
-    selector = binary.keccak_text(text_signature)[:10]
+    selector = evm.keccak_text(text_signature)[:10]
     print(selector)

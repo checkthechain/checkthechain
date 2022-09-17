@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import address_utils
+from .. import binary_utils
 from . import erc20_generic
 from . import erc20_spec
 
@@ -281,12 +281,12 @@ def _decode_raw_symbol(data: str | None) -> str:
     if data is None:
         return ''
     elif len(data) == 66:
-        return binary.binary_to_text(data).strip('\x00')
+        return binary_utils.binary_to_text(data).strip('\x00')
     elif len(data) == 0 or data == '0x':
         return ''
     else:
-        as_binary = binary.binary_convert(data, 'binary')
-        as_str: str = binary.abi_decode(as_binary, '(string)')[0]
+        as_binary = binary_utils.binary_convert(data, 'binary')
+        as_str: str = abi_utils.abi_decode(as_binary, '(string)')[0]
         return as_str
 
 

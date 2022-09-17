@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import spec
+from ... import binary_utils
+from .. import abi_coding_utils
 from . import event_abi_parsing
 
 
@@ -69,8 +70,8 @@ def decode_event_topics(
         ):
             decoded_topics.append(topic)  # type: ignore
         else:
-            topic = binary.binary_convert(topic, 'binary')
-            decoded_topic = binary.abi_decode(topic, indexed_type)
+            topic = binary_utils.binary_convert(topic, 'binary')
+            decoded_topic = abi_coding_utils.abi_decode(topic, indexed_type)
             decoded_topics.append(decoded_topic)
 
     # package output
@@ -137,8 +138,10 @@ def decode_event_unindexed_data(
         unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
 
     # decode data
-    data = binary.binary_convert(data, 'binary')
-    decoded = binary.abi_decode(data, '(' + ','.join(unindexed_types) + ')')
+    data = binary_utils.binary_convert(data, 'binary')
+    decoded = abi_coding_utils.abi_decode(
+        data, '(' + ','.join(unindexed_types) + ')'
+    )
 
     # package outputs
     if not use_names:

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import spec
+from ... import binary_utils
 from . import function_abi_queries
 
 
@@ -191,7 +191,7 @@ def get_function_selector(
             raise Exception('must specify function_abi or function_signature')
         function_signature = get_function_signature(function_abi)
 
-    full_hash = binary.keccak(
+    full_hash = binary_utils.keccak(
         function_signature.encode(), output_format='raw_hex'
     )
     return full_hash[:8]

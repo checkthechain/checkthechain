@@ -1,6 +1,6 @@
 import pytest
 
-from ctc import binary
+from ctc import evm
 
 
 keccak_data_pairs = [
@@ -20,9 +20,9 @@ keccak_text_pairs = [
 
 @pytest.mark.parametrize('input_output', keccak_data_pairs)
 def test_keccak(input_output):
-    assert binary.keccak(input_output[0], 'prefix_hex') == input_output[1]
+    assert evm.keccak(input_output[0], 'prefix_hex') == input_output[1]
 
 
 @pytest.mark.parametrize('input_output', keccak_text_pairs)
 def test_keccak_text(input_output):
-    assert binary.keccak_text(input_output[0], 'prefix_hex') == input_output[1]
+    assert evm.keccak_text(input_output[0], 'prefix_hex') == input_output[1]

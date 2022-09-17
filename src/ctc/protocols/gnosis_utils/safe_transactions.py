@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
 from . import safe_spec
@@ -14,7 +13,7 @@ def parse_safe_signatures(
     """
     reference: https://docs.gnosis-safe.io/contracts/signatures
     """
-    as_bytes = binary.binary_convert(signatures, 'binary')
+    as_bytes = evm.binary_convert(signatures, 'binary')
 
     eip_1271_positions = []
     eip_1271_indices = []
@@ -30,27 +29,27 @@ def parse_safe_signatures(
         if 31 > signature_type and signature_type > 26:
             parsed = {
                 'type': 'ecdsa',
-                'signature': binary.binary_convert(signature, 'prefix_hex'),
-                'r': binary.binary_convert(signature[:32], 'integer'),
-                's': binary.binary_convert(signature[32:64], 'integer'),
-                'v': binary.binary_convert(signature_type, 'integer'),
+                'signature': evm.binary_convert(signature, 'prefix_hex'),
+                'r': evm.binary_convert(signature[:32], 'integer'),
+                's': evm.binary_convert(signature[32:64], 'integer'),
+                'v': evm.binary_convert(signature_type, 'integer'),
             }
         elif signature_type > 30:
             parsed = {
                 'type': 'eth_sign',
-                'signature': binary.binary_convert(signature, 'prefix_hex'),
-                'r': binary.binary_convert(signature[:32], 'integer'),
-                's': binary.binary_convert(signature[32:64], 'integer'),
-                'v': binary.binary_convert(signature_type - 4, 'integer'),
+                'signature': evm.binary_convert(signature, 'prefix_hex'),
+                'r': evm.binary_convert(signature[:32], 'integer'),
+                's': evm.binary_convert(signature[32:64], 'integer'),
+                'v': evm.binary_convert(signature_type - 4, 'integer'),
             }
         elif signature_type == 0:
             parsed = {
                 'type': 'eip1271',
-                'signature': binary.binary_convert(signature, 'prefix_hex'),
-                'verifier': binary.binary_convert(
+                'signature': evm.binary_convert(signature, 'prefix_hex'),
+                'verifier': evm.binary_convert(
                     signature[:32][-20:], 'prefix_hex'
                 ),
-                'position': binary.binary_convert(signature[32:64], 'integer'),
+                'position': evm.binary_convert(signature[32:64], 'integer'),
             }
             position: int = typing.cast(int, parsed['position'])
             eip_1271_positions.append(position)
@@ -58,8 +57,8 @@ def parse_safe_signatures(
         elif signature_type == 1:
             parsed = {
                 'type': 'prevalidated',
-                'signature': binary.binary_convert(signature, 'prefix_hex'),
-                'validator': binary.binary_convert(
+                'signature': evm.binary_convert(signature, 'prefix_hex'),
+                'validator': evm.binary_convert(
                     signature[:32][-20:], 'prefix_hex'
                 ),
             }
@@ -139,7 +138,7 @@ def _get_safe_transaction_signers(
 
         if signature['type'] in ['ecdsa', 'eth_sign']:
             vrs = signature['v'], signature['r'], signature['s']
-            signer = binary.recover_signer_address(
+            signer = evm.recover_signer_address(
                 message_hash=safe_transaction_hash,
                 signature=vrs,
             )
@@ -167,7 +166,7 @@ def hash_safe_transaction(
         'chain_id': chain_id,
         'verifying_contract': safe_address,
     }
-    return binary.hash_eip712_struct(
+    return evm.hash_eip712_struct(
         struct_data=safe_transaction,
         struct_type=safe_spec.safe_transaction_type,
         domain=domain,

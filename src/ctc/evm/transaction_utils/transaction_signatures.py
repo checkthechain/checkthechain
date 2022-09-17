@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import spec
+from .. import binary_utils
 from . import transaction_serialize
 from . import transaction_hashes
 from . import transaction_types
@@ -18,12 +18,12 @@ def sign_transaction(
     if chain_id is None and 'chain_id' in transaction:
         tx_chain_id = transaction['chain_id']
         if tx_chain_id is not None:
-            chain_id = binary.binary_convert(tx_chain_id, 'integer')
+            chain_id = binary_utils.binary_convert(tx_chain_id, 'integer')
     message = transaction_serialize.serialize_unsigned_transaction(
         transaction,
         chain_id=chain_id,
     )
-    return binary.sign_data_message(
+    return binary_utils.sign_data_message(
         message=message,
         private_key=private_key,
         chain_id=chain_id,
@@ -54,13 +54,13 @@ def verify_transaction_signature(
     transaction_hash = transaction_hashes.hash_unsigned_transaction(transaction)
 
     # process signature
-    v, r, s = binary.unpack_signature_vrs(signature)
+    v, r, s = binary_utils.unpack_signature_vrs(signature)
     type = transaction_types.get_transaction_type(transaction)
     if type == 2 and v in [0, 1]:
         v = v + 27
 
     # verify signature
-    return binary.verify_signature(
+    return binary_utils.verify_signature(
         signature=(v, r, s),
         message_hash=transaction_hash,
         public_key=public_key,
@@ -79,7 +79,7 @@ def recover_transaction_sender(
     if 'from' in transaction:
         return transaction['from']  # type: ignore
 
-    v, r, s = binary.unpack_signature_vrs(signature)
+    v, r, s = binary_utils.unpack_signature_vrs(signature)
 
     # encode transaction data
     if r == 0 and s == 0:
@@ -88,7 +88,7 @@ def recover_transaction_sender(
     elif v in (27, 28):
         chain_id = None
     elif v >= 37:
-        chain_id = binary.get_signature_network_id(signature)
+        chain_id = binary_utils.get_signature_network_id(signature)
         if chain_id is None:
             raise Exception('could not parse chain_id')
         v = v - chain_id * 2 - 8
@@ -96,8 +96,8 @@ def recover_transaction_sender(
     else:
         raise Exception('invalid v value')
     if (
-        r >= binary.signature_utils.secp256k1_utils.N
-        or s >= binary.signature_utils.secp256k1_utils.N
+        r >= binary_utils.signature_utils.secp256k1_utils.N
+        or s >= binary_utils.signature_utils.secp256k1_utils.N
         or r == 0
         or s == 0
     ):
@@ -108,14 +108,14 @@ def recover_transaction_sender(
         transaction,
         chain_id=chain_id,
     )
-    message_hash = binary.keccak(rlp_transaction)
-    public_key = binary.recover_signer_public_key(
+    message_hash = binary_utils.keccak(rlp_transaction)
+    public_key = binary_utils.recover_signer_public_key(
         message_hash=message_hash,
         signature=(v, r, s),
     )
 
     # convert public key to address
-    sender = '0x' + binary.keccak(public_key)[-40:]
+    sender = '0x' + binary_utils.keccak(public_key)[-40:]
     return sender
 
 

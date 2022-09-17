@@ -3,9 +3,8 @@ from __future__ import annotations
 import typing
 import time
 
-from ctc import binary
 from ctc import spec
-
+from .. import binary_utils
 from . import block_crud
 
 
@@ -89,7 +88,7 @@ async def async_print_block_summary(
 
     message = block['extra_data']
     try:
-        message = binary.binary_convert(message, 'binary').decode()
+        message = binary_utils.binary_convert(message, 'binary').decode()
     except Exception:
         if len(message) > 80:
             message = message[:77] + '...'

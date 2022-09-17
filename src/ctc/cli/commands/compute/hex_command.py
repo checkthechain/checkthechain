@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -26,7 +26,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 def hex_command(text: str, raw: bool) -> None:
     if raw:
-        output = binary.text_to_binary(text, 'raw_hex')
+        output = evm.text_to_binary(text, 'raw_hex')
     else:
-        output = binary.text_to_binary(text, 'prefix_hex')
+        output = evm.text_to_binary(text, 'prefix_hex')
     print(output)

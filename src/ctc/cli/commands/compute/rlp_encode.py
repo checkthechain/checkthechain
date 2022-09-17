@@ -5,7 +5,7 @@ import re
 
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -40,7 +40,7 @@ def rlp_encode_command(data: str) -> None:
         parsed = ast.literal_eval('"""' + data + '"""')
 
     # rlp encode
-    encoded = binary.rlp_encode(parsed)
+    encoded = evm.rlp_encode(parsed)
 
     # output encoded data
     print(encoded)

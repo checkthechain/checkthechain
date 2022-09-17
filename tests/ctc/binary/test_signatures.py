@@ -1,13 +1,12 @@
 import pytest
 
-from ctc import binary
 from ctc import evm
 
 
 def test_pack_vrs_transaction():
     # from https://ethereum.stackexchange.com/a/107498
     target_signature = '0x28a0da4429a9e8e6b54cb101b2df002039f2879ab4ca0e8fae64134942cb81f3e581a03b90a37dc078a82dfc418695b1d4473661aa4d24dd874ac68678894ff44a6b27'
-    actual_signature = binary.pack_signature_vrs(
+    actual_signature = evm.pack_signature_vrs(
         v='0x28',
         r='0xda4429a9e8e6b54cb101b2df002039f2879ab4ca0e8fae64134942cb81f3e581',
         s='0x3b90a37dc078a82dfc418695b1d4473661aa4d24dd874ac68678894ff44a6b27',
@@ -38,9 +37,9 @@ private_key_to_public_key_examples = [
 @pytest.mark.parametrize('test', private_key_to_public_key_examples)
 def test_private_key_to_public_key(test):
     private_key, target_public_key = test
-    actual_public_key = binary.private_key_to_public_key(private_key)
+    actual_public_key = evm.private_key_to_public_key(private_key)
     assert (
-        binary.public_key_tuple_to_hex(target_public_key) == actual_public_key
+        evm.public_key_tuple_to_hex(target_public_key) == actual_public_key
     )
 
 
@@ -59,7 +58,7 @@ private_key_to_address_examples = [
 @pytest.mark.parametrize('test', private_key_to_address_examples)
 def test_private_key_to_address(test):
     private_key, target_address = test
-    actual_address = binary.private_key_to_address(private_key)
+    actual_address = evm.private_key_to_address(private_key)
     assert target_address == actual_address
 
 
@@ -85,7 +84,7 @@ def test_sign_text_message(test):
     target_signature = test['target_signature']
     mode = test['mode']
 
-    actual_signature = binary.sign_text_message(
+    actual_signature = evm.sign_text_message(
         message=message,
         private_key=private_key,
         mode=mode,
@@ -113,7 +112,7 @@ def test_sign_message_hash(test):
     private_key = test['private_key']
     target_signature = test['target_signature']
 
-    actual_signature = binary.sign_message_hash(
+    actual_signature = evm.sign_message_hash(
         message_hash=message_hash,
         private_key=private_key,
         chain_id=1,
@@ -126,20 +125,20 @@ def test_sign_message_hash(test):
 def test_recover_address(test):
     test = sign_message_hash_examples[0]
 
-    signature = binary.sign_message_hash(
+    signature = evm.sign_message_hash(
         message_hash=test['message_hash'],
         private_key=test['private_key'],
         chain_id=1,
     )
 
-    target_public_key = binary.private_key_to_public_key(test['private_key'])
-    actual_public_key = binary.recover_signer_public_key(
+    target_public_key = evm.private_key_to_public_key(test['private_key'])
+    actual_public_key = evm.recover_signer_public_key(
         message_hash=test['message_hash'],
         signature=signature,
     )
     assert actual_public_key == target_public_key
 
-    assert binary.verify_signature(
+    assert evm.verify_signature(
         signature=signature,
         message_hash=test['message_hash'],
         public_key=target_public_key,

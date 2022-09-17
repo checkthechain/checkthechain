@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
 from .. import rpc_request
@@ -28,7 +27,7 @@ def construct_eth_get_transaction_by_block_hash_and_index(
     block_hash: spec.BinaryData,
     transaction_index: spec.BinaryData,
 ) -> spec.RpcRequest:
-    transaction_index = binary.binary_convert(transaction_index, 'prefix_hex')
+    transaction_index = evm.binary_convert(transaction_index, 'prefix_hex')
 
     return rpc_request.create(
         'eth_getTransactionByBlockHashAndIndex',
@@ -41,7 +40,7 @@ def construct_eth_get_transaction_by_block_number_and_index(
     transaction_index: spec.BinaryData,
 ) -> spec.RpcRequest:
     block_number = evm.encode_block_number(block_number)
-    transaction_index = binary.binary_convert(transaction_index, 'prefix_hex')
+    transaction_index = evm.binary_convert(transaction_index, 'prefix_hex')
 
     return rpc_request.create(
         'eth_getTransactionByBlockNumberAndIndex',

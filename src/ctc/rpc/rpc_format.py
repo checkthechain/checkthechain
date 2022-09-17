@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import typing
 
-from ctc import binary
+from ctc import evm
 
 
 if typing.TYPE_CHECKING:
@@ -19,7 +19,7 @@ def decode_response(
     decoded = {}
     for key, value in response.items():
         if key in quantities:
-            value = binary.binary_convert(value, 'integer')
+            value = evm.binary_convert(value, 'integer')
         decoded[key] = value
     return decoded
 

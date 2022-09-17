@@ -1,6 +1,6 @@
 import pytest
 
-from ctc import binary
+from ctc import evm
 from ctc import rpc
 
 
@@ -14,7 +14,7 @@ async def test_web3_client_version():
 async def test_web3_sha():
     data = '0x1234'
     result = await rpc.async_web3_sha3(data)
-    keccak = binary.keccak(data, output_format='prefix_hex')
+    keccak = evm.keccak(data, output_format='prefix_hex')
     assert keccak == result
 
 

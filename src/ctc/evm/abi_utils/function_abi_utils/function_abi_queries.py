@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
-from ctc import evm
 from ctc import spec
+from ... import binary_utils
 from .. import contract_abi_utils
 from . import function_abi_parsing
 
@@ -19,7 +18,7 @@ def get_function_abi(
 ) -> spec.FunctionABI:
 
     if function_selector is not None:
-        function_selector = binary.binary_convert(
+        function_selector = binary_utils.binary_convert(
             function_selector, 'prefix_hex'
         )
 
@@ -54,7 +53,7 @@ def get_function_abi(
             item_selector = function_abi_parsing.get_function_selector(
                 function_abi
             )
-            item_selector = binary.binary_convert(item_selector, 'prefix_hex')
+            item_selector = binary_utils.binary_convert(item_selector, 'prefix_hex')
             if item_selector != function_selector:
                 continue
         candidates.append(function_abi)
@@ -95,7 +94,7 @@ async def async_get_function_abi(
         )
 
     try:
-        return evm.get_function_abi(
+        return get_function_abi(
             function_name=function_name,
             contract_abi=contract_abi,
             n_parameters=n_parameters,
@@ -113,7 +112,7 @@ async def async_get_function_abi(
                 db_query=False,
             )
 
-            return evm.get_function_abi(
+            return get_function_abi(
                 function_name=function_name,
                 contract_abi=contract_abi,
                 n_parameters=n_parameters,

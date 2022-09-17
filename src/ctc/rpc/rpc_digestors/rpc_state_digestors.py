@@ -4,7 +4,6 @@ import typing
 
 from ctc import evm
 from ctc import spec
-from ctc import binary
 
 
 def digest_eth_call(
@@ -45,7 +44,7 @@ def digest_eth_estimate_gas(
     response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.binary_convert(response, 'integer')
+        response = evm.binary_convert(response, 'integer')
     return response
 
 
@@ -53,7 +52,7 @@ def digest_eth_get_balance(
     response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.binary_convert(response, 'integer')
+        response = evm.binary_convert(response, 'integer')
     return response
 
 

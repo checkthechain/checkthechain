@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -25,5 +25,5 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
 
 
 def decode_command(type: str, data: str) -> None:
-    decoded = binary.abi_decode(binary.binary_convert(data, 'binary'), type)
+    decoded = evm.abi_decode(evm.binary_convert(data, 'binary'), type)
     print(decoded)

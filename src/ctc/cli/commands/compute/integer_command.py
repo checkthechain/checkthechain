@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -20,5 +20,5 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def integer_command(data: str) -> None:
-    as_int = binary.binary_convert(data, 'integer')
+    as_int = evm.binary_convert(data, 'integer')
     print(as_int)

@@ -14,7 +14,6 @@ import typing
 import toolcli
 import toolstr
 
-from ctc import binary
 from ctc import cli
 from ctc import evm
 from ctc import rpc

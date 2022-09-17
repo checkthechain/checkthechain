@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -20,5 +20,5 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def ascii_command(data: str) -> None:
-    text = binary.binary_to_text(data)
+    text = evm.binary_to_text(data)
     print(text)

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import spec
+from .. import binary_utils
 
 
 def standardize_transaction(
@@ -37,14 +37,14 @@ def get_transaction_type(
 
     if isinstance(transaction_or_type, (int, str, bytes)):
         # if type provided directly, convert to int
-        return binary.binary_convert(transaction_or_type, 'integer')
+        return binary_utils.binary_convert(transaction_or_type, 'integer')
 
     elif isinstance(transaction_or_type, dict):
         transaction = transaction_or_type
 
         # if type explicitly provided, use it
         if 'type' in transaction:
-            return binary.binary_convert(transaction['type'], 'integer')
+            return binary_utils.binary_convert(transaction['type'], 'integer')
 
         # otherwise, infer type based on fields
         if 'max_fee_per_gas' in transaction:

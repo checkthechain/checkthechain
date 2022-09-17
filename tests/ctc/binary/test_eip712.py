@@ -1,6 +1,6 @@
 import pytest
 
-from ctc import binary
+from ctc import evm
 
 
 example_domains = {
@@ -22,5 +22,5 @@ example_domains = {
 @pytest.mark.parametrize('test', example_domains.items())
 def test_get_domain_separator(test):
     target_domain_separator, domain = test
-    actual_domain_separator = binary.get_domain_separator(domain)
+    actual_domain_separator = evm.get_domain_separator(domain)
     assert target_domain_separator == actual_domain_separator

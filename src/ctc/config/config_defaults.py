@@ -9,6 +9,7 @@ import os
 import typing
 
 import ctc
+from ctc import evm
 from ctc import spec
 
 if typing.TYPE_CHECKING:
@@ -93,8 +94,6 @@ def _sync_get_chain_id(provider_url: str) -> int:
     import json
     import urllib.request
 
-    from ctc import binary
-
     data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
     encoded_data = json.dumps(data).encode()
     request = urllib.request.Request(
@@ -105,7 +104,7 @@ def _sync_get_chain_id(provider_url: str) -> int:
     response = urllib.request.urlopen(request)
     response_data = json.loads(response.read().decode())
     raw_chain_id = response_data['result']
-    return binary.binary_convert(raw_chain_id, 'integer')
+    return evm.binary_convert(raw_chain_id, 'integer')
 
 
 def get_default_data_dir() -> str:

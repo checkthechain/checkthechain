@@ -1,6 +1,6 @@
 import pytest
 
-from ctc import binary
+from ctc import evm
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ from ctc import binary
 )
 def test_get_binary_format(test):
     data, binary_format = test
-    assert binary.get_binary_format(data) == binary_format
+    assert evm.get_binary_format(data) == binary_format
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ def test_get_binary_format(test):
 )
 def test_get_binary_n_bytes(test):
     data, n_bytes = test
-    assert binary.get_binary_n_bytes(data) == n_bytes
+    assert evm.get_binary_n_bytes(data) == n_bytes
 
 
 conversion_tests = [
@@ -45,4 +45,4 @@ conversion_tests = [
 @pytest.mark.parametrize('test', conversion_tests)
 def test_convert(test):
     data, output_format, kwargs, target = test
-    assert binary.binary_convert(data, output_format, **kwargs) == target
+    assert evm.binary_convert(data, output_format, **kwargs) == target

@@ -4,8 +4,8 @@ import typing
 
 import toolcli
 
+from ctc import evm
 from ctc import spec
-from ctc import binary
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -52,9 +52,9 @@ def keccack_command(*, data: str, text: bool, hex: bool, raw: bool) -> None:
         else:
             casted = data
 
-        keccak = binary.keccak(casted, output_format='prefix_hex')
+        keccak = evm.keccak(casted, output_format='prefix_hex')
     else:
-        keccak = binary.keccak_text(data)
+        keccak = evm.keccak_text(data)
 
     if raw:
         if not keccak.startswith('0x'):

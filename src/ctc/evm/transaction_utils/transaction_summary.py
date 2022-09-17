@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import time
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
+from .. import binary_utils
 from .. import block_utils
 from . import transaction_types
 
@@ -157,7 +157,7 @@ async def async_print_transaction_summary(
         # if sort_logs_by == 'signature':
         #     logs = sorted(
         #         logs,
-        #         key=lambda log: binary.get_event_signature(
+        #         key=lambda log: binary_utils.get_event_signature(
         #             contract_address=log['address'],
         #             event_hash=log['topics'][0],
         #         ),
@@ -175,7 +175,7 @@ async def async_print_transaction_summary(
                 arg_prefix=None,
                 event_abi=event_abi,
             )
-            # event_signature = binary.get_event_signature(event_abi=event_abi)
+            # event_signature = binary_utils.get_event_signature(event_abi=event_abi)
             stylized_event_signature = (
                 toolstr.add_style(event_abi['name'], styles['option'])
                 + toolstr.add_style('(', styles['title'])
@@ -200,7 +200,7 @@ async def async_print_transaction_summary(
 
                 # not sure if this is what should be done
                 if isinstance(value, bytes):
-                    value = binary.binary_convert(value, 'prefix_hex')
+                    value = binary_utils.binary_convert(value, 'prefix_hex')
 
                 cli.print_bullet(
                     key=name,

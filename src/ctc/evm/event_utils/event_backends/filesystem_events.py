@@ -8,12 +8,12 @@ import os
 import typing
 
 import ctc.config
-from ctc import binary
 from ctc import config
 from ctc import spec
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
 from ... import abi_utils
+from ... import binary_utils
 from ... import block_utils
 from ... import network_utils
 
@@ -469,7 +469,7 @@ async def async_get_events_from_filesystem(
         if arg['type'] in ['bytes32']:
             column = prefix + arg['name']
             lam = functools.partial(
-                binary.binary_convert,
+                binary_utils.binary_convert,
                 output_format='prefix_hex',
             )
             df[column] = df[column].map(ast.literal_eval).map(lam)

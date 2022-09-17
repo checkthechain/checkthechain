@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from ctc import binary
 from ctc import spec
+from ... import binary_utils
 from .. import function_abi_utils
 
 
 def get_event_hash(event_abi: spec.EventABI) -> str:
     """compute event hash from event's abi"""
     signature = get_event_signature(event_abi=event_abi)
-    return binary.keccak_text(signature)
+    return binary_utils.keccak_text(signature)
 
 
 def get_event_signature(event_abi: spec.EventABI) -> str:

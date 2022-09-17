@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -90,7 +89,7 @@ async def async_get_registration_block(name: str) -> int:
     parent_node = resolver.hash_name('.'.join(parent))
 
     registrations: spec.DataFrame = await async_get_registrations()
-    mask = (registrations['arg__label'] == binary.keccak_text(label)) & (
+    mask = (registrations['arg__label'] == evm.keccak_text(label)) & (
         registrations['arg__parent_node'] == parent_node
     )
     result = registrations[mask]

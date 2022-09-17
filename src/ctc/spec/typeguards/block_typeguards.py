@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
+from ctc import evm
 from .. import typedata
 from . import binary_typeguards
 
@@ -45,7 +45,7 @@ def is_block_number_reference(
 def is_block_hash(block: typing.Any) -> TypeGuard[block_types.BlockHash]:
     return (
         binary_typeguards.is_hex_data(block)
-        and binary.get_binary_n_bytes(block) == 32
+        and evm.get_binary_n_bytes(block) == 32
     )
 
 

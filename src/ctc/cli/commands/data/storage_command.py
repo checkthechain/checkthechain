@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import toolcli
 
-from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -51,6 +50,6 @@ async def async_storage_command(
     if datatype is None:
         print(result)
     else:
-        as_bytes = binary.binary_convert(result, 'binary')
-        decoded = binary.abi_decode(as_bytes, datatype)
+        as_bytes = evm.binary_convert(result, 'binary')
+        decoded = evm.abi_decode(as_bytes, datatype)
         print(decoded)

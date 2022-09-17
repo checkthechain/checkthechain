@@ -7,7 +7,6 @@ import toolstr
 import tooltime
 
 from ctc.protocols import chainlink_utils
-from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec

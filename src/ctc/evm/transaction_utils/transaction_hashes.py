@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from ctc import binary
 from ctc import spec
+from .. import binary_utils
 from . import transaction_serialize
 
 
@@ -15,9 +15,9 @@ def hash_unsigned_transaction(
         transaction,
         chain_id=chain_id,
     )
-    return binary.keccak(serialized)
+    return binary_utils.keccak(serialized)
 
 
 def hash_signed_transaction(transaction: spec.TransactionData) -> spec.Data:
     serialized = transaction_serialize.serialize_signed_transaction(transaction)
-    return binary.keccak(serialized)
+    return binary_utils.keccak(serialized)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ctc import binary
+from .. import binary_utils
 from ctc import spec
 
 
@@ -32,9 +32,9 @@ def serialize_block(block: spec.Block) -> spec.PrefixHexData:
     if block_type == 'eip1559':
         as_list.append(block['base_fee_per_gas'])
 
-    return binary.rlp_encode(as_list)
+    return binary_utils.rlp_encode(as_list)
 
 
 def hash_block(block: spec.Block) -> spec.PrefixHexData:
     serialized = serialize_block(block)
-    return binary.keccak(serialized)
+    return binary_utils.keccak(serialized)

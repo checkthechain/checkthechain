@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
 from .. import rpc_request
@@ -104,7 +103,7 @@ def construct_eth_get_storage_at(
     block_number: spec.BlockNumberReference = 'latest',
 ) -> spec.RpcRequest:
 
-    position = binary.binary_convert(
+    position = evm.binary_convert(
         position, 'prefix_hex', keep_leading_0=False
     )
     encoded_block_number = evm.encode_block_number(block_number)

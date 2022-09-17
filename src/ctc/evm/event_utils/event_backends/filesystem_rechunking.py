@@ -5,7 +5,6 @@ import os
 import typing
 
 from ctc import evm
-from ctc import binary
 from ctc import spec
 
 from . import filesystem_events

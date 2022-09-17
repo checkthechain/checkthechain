@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -18,8 +17,8 @@ def hash_name(name: str) -> spec.PrefixHexData:
     output = '00' * 32
     for label in labels[::-1]:
         label_bytes = idna.encode(label, uts46=True)
-        label_hash = binary.keccak_text(label_bytes, output_format='raw_hex')
-        output = binary.keccak(output + label_hash, output_format='raw_hex')
+        label_hash = evm.keccak_text(label_bytes, output_format='raw_hex')
+        output = evm.keccak(output + label_hash, output_format='raw_hex')
     return '0x' + output
 
 
@@ -252,7 +251,7 @@ async def async_get_expiration(name: str) -> int:
         raise NotImplementedError('only implemented for .eth domains')
 
     label = name.split('.')[-2]
-    label_id = binary.keccak_text(label, output_format='integer')
+    label_id = evm.keccak_text(label, output_format='integer')
 
     function_abi: spec.FunctionABI = {
         'name': 'nameExpires',

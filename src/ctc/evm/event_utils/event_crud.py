@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import evm
 from ctc import spec
 
+from .. import binary_utils
 from .. import block_utils
 from .. import abi_utils
 
@@ -15,8 +15,8 @@ if typing.TYPE_CHECKING:
 
 def is_event_hash(data: spec.BinaryData) -> bool:
     try:
-        binary.binary_convert(data, 'binary')
-        return len(binary) == 32
+        as_bytes = binary_utils.binary_convert(data, 'binary')
+        return len(as_bytes) == 32
     except Exception:
         return False
 

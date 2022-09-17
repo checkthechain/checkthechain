@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import typing
 
+from ctc import spec
+from .. import binary_utils
+
 if typing.TYPE_CHECKING:
     from typing_extensions import TypeGuard
-
-from ctc import binary
-from ctc import spec
 
 
 def is_address_str(some_str: typing.Any) -> TypeGuard[spec.Address]:
@@ -28,19 +28,23 @@ def get_created_address(
     # see https://ethereum.stackexchange.com/a/761
     if nonce is not None:
         # create
-        data: str | bytes = binary.rlp_encode((sender, nonce), str_mode='hex')
+        data: str | bytes = binary_utils.rlp_encode(
+            (sender, nonce), str_mode='hex'
+        )
     elif salt is not None and init_code is not None:
         # create2
         data = (
-            binary.binary_convert('0xff', 'raw_hex')
-            + binary.binary_convert(sender, 'raw_hex')
-            + binary.binary_convert(salt, 'raw_hex')
-            + binary.binary_convert(binary.keccak(init_code), 'raw_hex')
+            binary_utils.binary_convert('0xff', 'raw_hex')
+            + binary_utils.binary_convert(sender, 'raw_hex')
+            + binary_utils.binary_convert(salt, 'raw_hex')
+            + binary_utils.binary_convert(
+                binary_utils.keccak(init_code), 'raw_hex'
+            )
         )
     else:
         raise Exception('specify either {nonce} or {salt, init_code}')
 
-    result = binary.keccak(data, output_format='prefix_hex')
+    result = binary_utils.keccak(data, output_format='prefix_hex')
     result = '0x' + result[26:]
 
     return result
@@ -53,13 +57,13 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
     """
 
     # validate address
-    address_format = binary.get_binary_format(address)
+    address_format = binary_utils.get_binary_format(address)
     if address_format not in ['prefix_hex', 'raw_hex']:
         raise Exception('checksum only relevant to hex formatted addresses')
-    address = binary.binary_convert(address, 'raw_hex')
+    address = binary_utils.binary_convert(address, 'raw_hex')
 
     # compute address hash
-    address_hash = binary.keccak_text(
+    address_hash = binary_utils.keccak_text(
         address.lower(),
         output_format='raw_hex',
     )
@@ -77,6 +81,6 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
     if address_format == 'raw_hex':
         return raw_checksum
     elif address_format == 'prefix_hex':
-        return binary.binary_convert(raw_checksum, 'prefix_hex')
+        return binary_utils.binary_convert(raw_checksum, 'prefix_hex')
     else:
         raise Exception('checksum only relevant to hex formatted addresses')

@@ -1,5 +1,5 @@
 import pytest
-from ctc import binary
+from ctc import evm
 
 rlp_examples = [
     #
@@ -11,11 +11,11 @@ rlp_examples = [
     # str
     [
         'dog',
-        binary.binary_convert(bytes.fromhex('83') + 'dog'.encode(), 'prefix_hex'),
+        evm.binary_convert(bytes.fromhex('83') + 'dog'.encode(), 'prefix_hex'),
     ],
     [
         ['cat', 'dog'],
-        binary.binary_convert(
+        evm.binary_convert(
             bytes.fromhex('c883')
             + 'cat'.encode()
             + bytes.fromhex('83')
@@ -36,7 +36,7 @@ rlp_examples = [
 @pytest.mark.parametrize('test', rlp_examples)
 def test_rlp_encoding(test):
     data, target_encoding = test
-    actual_encoding = binary.rlp_encode(data, str_mode='text')
+    actual_encoding = evm.rlp_encode(data, str_mode='text')
     assert actual_encoding == target_encoding
 
 
@@ -73,22 +73,22 @@ prefix_hex_examples = [
 
 @pytest.mark.parametrize('test', ascii_examples)
 def test_rlp_decoding_ascii(test):
-    encoded = binary.rlp_encode(test)
-    decoded = binary.rlp_decode(encoded, types='ascii')
+    encoded = evm.rlp_encode(test)
+    decoded = evm.rlp_decode(encoded, types='ascii')
     assert decoded == test
 
 
 @pytest.mark.parametrize('test', raw_hex_examples)
 def test_rlp_decoding_raw_hex(test):
-    encoded = binary.rlp_encode(test, str_mode='hex')
-    decoded = binary.rlp_decode(encoded, types='raw_hex')
+    encoded = evm.rlp_encode(test, str_mode='hex')
+    decoded = evm.rlp_decode(encoded, types='raw_hex')
     assert decoded == test
 
 
 @pytest.mark.parametrize('test', prefix_hex_examples)
 def test_rlp_decoding_prefix_hex(test):
-    encoded = binary.rlp_encode(test)
-    decoded = binary.rlp_decode(encoded, types='prefix_hex')
+    encoded = evm.rlp_encode(test)
+    decoded = evm.rlp_decode(encoded, types='prefix_hex')
     assert decoded == test
 
 
@@ -166,17 +166,15 @@ encoded_address_nonce_tuples = [
 @pytest.mark.parametrize('test', zip(nonces, encoded_ints))
 def test_rlp_encode_integer(test):
     integer, target_encoding = test
-    assert binary.rlp_encode(integer) == target_encoding
+    assert evm.rlp_encode(integer) == target_encoding
 
 
 def test_rlp_encode_address():
-    assert binary.rlp_encode(address, str_mode='hex') == encoded_address
+    assert evm.rlp_encode(address, str_mode='hex') == encoded_address
 
 
 @pytest.mark.parametrize('test', zip(nonces, encoded_address_nonce_tuples))
 def test_rlp_encode_address_integer_tuples(test):
     nonce, target_encoding = test
 
-    assert (
-        binary.rlp_encode([address, nonce], str_mode='hex') == target_encoding
-    )
+    assert evm.rlp_encode([address, nonce], str_mode='hex') == target_encoding

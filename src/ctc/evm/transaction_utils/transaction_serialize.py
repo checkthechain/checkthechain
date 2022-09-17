@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from ctc import binary
 from ctc import spec
+from .. import binary_utils
 from . import transaction_types
 
 
@@ -21,7 +21,7 @@ def serialize_unsigned_transaction(
     # add EIP-155 chain_id
     if type == 0:
         if chain_id is None and transaction.get('chain_id') is not None:
-            chain_id = binary.binary_convert(transaction.get('chain_id'), 'integer')  # type: ignore
+            chain_id = binary_utils.binary_convert(transaction.get('chain_id'), 'integer')  # type: ignore
         if chain_id is not None:
             as_list.append(chain_id)
             as_list.append(0)
@@ -37,7 +37,7 @@ def serialize_unsigned_transaction(
     else:
         raise Exception('unknown transaction type: ' + str(type))
 
-    return prefix + binary.rlp_encode(as_list, 'raw_hex')
+    return prefix + binary_utils.rlp_encode(as_list, 'raw_hex')
 
 
 def serialize_signed_transaction(
@@ -62,4 +62,4 @@ def serialize_signed_transaction(
         raise Exception('unknown transaction type: ' + str(type))
 
     # encode as rlp
-    return prefix + binary.rlp_encode(as_list, 'raw_hex')
+    return prefix + binary_utils.rlp_encode(as_list, 'raw_hex')

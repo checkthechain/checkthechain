@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 import toolcli
 
-from ctc import binary
+from ctc import evm
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -49,9 +49,9 @@ def encode_command(*, type: str, data: str, packed: bool) -> None:
             literal_data = ast.literal_eval('"' + data + '"')
 
     if packed:
-        encoded = binary.abi_encode_packed(literal_data, type)
+        encoded = evm.abi_encode_packed(literal_data, type)
     else:
-        encoded = binary.abi_encode(literal_data, type)
+        encoded = evm.abi_encode(literal_data, type)
 
-    as_hex = binary.binary_convert(encoded, 'prefix_hex')
+    as_hex = evm.binary_convert(encoded, 'prefix_hex')
     print(as_hex)

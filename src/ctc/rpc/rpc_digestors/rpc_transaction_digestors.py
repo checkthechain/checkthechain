@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from ctc import evm
 from ctc import spec
-from ctc import binary
 from .. import rpc_format
 from .. import rpc_spec
 
@@ -10,7 +10,7 @@ def digest_eth_get_transaction_count(
     response: spec.RpcSingularResponse, *, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.binary_convert(response, 'integer')
+        response = evm.binary_convert(response, 'integer')
     return response
 
 
@@ -76,7 +76,7 @@ def digest_eth_get_block_transaction_count_by_hash(
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.binary_convert(response, 'integer')
+        response = evm.binary_convert(response, 'integer')
     return response
 
 
@@ -86,5 +86,5 @@ def digest_eth_get_block_transaction_count_by_number(
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if decode_response:
-        response = binary.binary_convert(response, 'integer')
+        response = evm.binary_convert(response, 'integer')
     return response
