@@ -4,6 +4,7 @@ import typing
 
 from ctc import binary
 from ctc import spec
+from . import function_abi_queries
 
 
 def function_signature_to_abi(function_signature: str) -> spec.FunctionABI:
@@ -23,6 +24,48 @@ def function_signature_to_abi(function_signature: str) -> spec.FunctionABI:
         ],
         'outputs': [],
     }
+
+
+async def async_parse_function_str_abi(
+    function: str,
+    contract_address: spec.Address | None = None,
+) -> spec.FunctionABI:
+    """parse a function str into a function ABI
+
+    function str can be a function name, 4byte selector, or ABI
+
+    used for cli commands
+    """
+
+    if is_function_selector(function):
+        # function given as a function selector
+        function_name = None
+        function_selector = function
+        function_abi = None
+    elif is_function_signature(function):
+        return function_signature_to_abi(function)
+    else:
+        try:
+            # function given as json / python dict str
+            import ast
+
+            function_name = None
+            function_selector = None
+            function_abi = ast.literal_eval(function)
+        except Exception:
+            # function given as a function name
+            function_name = function
+            function_selector = None
+            function_abi = None
+
+    if function_abi is None:
+        function_abi = await function_abi_queries.async_get_function_abi(
+            contract_address=contract_address,
+            function_name=function_name,
+            function_selector=function_selector,
+        )
+
+    return function_abi
 
 
 def get_function_parameter_types(
@@ -159,6 +202,18 @@ def is_function_selector(selector: typing.Any) -> bool:
         (spec.is_prefix_hex_data(selector) and len(selector) == 10)
         or (spec.is_raw_hex_data(selector) and len(selector) == 8)
     )
+
+
+def is_function_signature(signature: typing.Any) -> bool:
+    """return whether a str is a function signature
+
+    this is NOT a comprehensive test, only an approximation using regexes
+    """
+    if isinstance(signature, str):
+        import re
+
+        return re.fullmatch('[a-zA-Z_].*\([a-z,\[\]]*\)', signature) is not None
+    return False
 
 
 def get_function_output_types(
