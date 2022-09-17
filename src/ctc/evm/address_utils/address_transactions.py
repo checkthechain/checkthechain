@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class AddressTransactionCounts(TypedDict):
+        blocks: list[int]
+        diffs: list[int]
+        cummulative: list[int]
 
 
 @typing.overload
@@ -80,16 +86,12 @@ async def async_get_transactions_from_address(
         raise Exception('unknown output format: ' + str(output_format))
 
 
-class AddressTransactionCounts(TypedDict):
-    blocks: list[int]
-    diffs: list[int]
-    cummulative: list[int]
-
-
 async def async_get_address_transaction_counts_by_block(
     address: spec.Address, nary: int = 3
 ) -> AddressTransactionCounts:
+
     import asyncio
+    from ctc import rpc
 
     address = address.lower()
 
@@ -146,8 +148,10 @@ async def _async_get_block_range_transaction_counts(
     block_counts: dict[int, int],
     nary: int,
 ) -> None:
+
     import asyncio
     import numpy as np
+    from ctc import rpc
 
     n_unknown_blocks = max_block - min_block - 1
     if n_unknown_blocks <= 0:

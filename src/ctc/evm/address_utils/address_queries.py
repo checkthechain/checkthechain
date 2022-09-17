@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 
 
@@ -12,6 +11,9 @@ async def async_is_contract_address(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> bool:
+
+    from ctc import rpc
+
     code = await rpc.async_eth_get_code(
         address=address,
         block_number=block,
@@ -26,6 +28,9 @@ async def async_are_contract_addresses(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> dict[spec.Address, bool]:
+
+    from ctc import rpc
+
     codes = await rpc.async_batch_eth_get_code(
         addresses=addresses,
         block_number=block,

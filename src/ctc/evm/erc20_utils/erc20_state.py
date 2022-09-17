@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
-from ctc import rpc
 
 from .. import address_utils
 from . import erc20_generic
@@ -159,6 +158,8 @@ async def async_get_erc20_balances_of_addresses(
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
 
+    from ctc import rpc
+
     if block is None:
         block = 'latest'
 
@@ -195,6 +196,8 @@ async def async_get_erc20s_balances(
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
     """"""
+
+    from ctc import rpc
 
     if block is None:
         block = 'latest'
@@ -389,6 +392,8 @@ async def async_get_erc20s_allowances_of_addresses(
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int | float]:
+
+    from ctc import rpc
 
     wallets = await address_utils.async_resolve_addresses(
         wallets,

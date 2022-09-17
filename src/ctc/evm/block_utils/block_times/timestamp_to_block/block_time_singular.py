@@ -5,7 +5,6 @@ import typing
 if typing.TYPE_CHECKING:
     import tooltime
 
-from ctc import rpc
 from ctc import spec
 from .. import block_crud
 from . import block_time_search
@@ -46,6 +45,7 @@ async def async_get_block_of_timestamp(
         # db
         if use_db:
             from ctc import db
+            from ctc import rpc
 
             network = rpc.get_provider_network(provider=provider)
             block = await db.async_query_timestamp_block(

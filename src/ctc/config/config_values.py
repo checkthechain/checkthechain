@@ -18,7 +18,6 @@ if typing.TYPE_CHECKING:
     import toolsql
 
 from ctc import spec
-from ctc.toolbox import search_utils
 from . import config_defaults
 from . import config_read
 
@@ -109,6 +108,8 @@ def get_provider(
     protocol: str | None = None,
     url: str | None = None,
 ) -> spec.Provider:
+
+    from ctc.toolbox import search_utils
 
     providers = list(get_providers().values())
 

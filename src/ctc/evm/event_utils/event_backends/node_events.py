@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from ctc import binary
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 from ... import abi_utils
@@ -53,7 +51,9 @@ async def async_get_events_from_node(
     provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
     """see fetch_events() for complete kwarg list"""
+
     import asyncio
+    from ctc import rpc
 
     provider = rpc.get_provider(provider)
     network = provider['network']
@@ -152,6 +152,8 @@ async def _async_get_chunk_of_events_from_node(
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[spec.RawLog]:
 
+    from ctc import rpc
+
     if verbose > 1:
         print('scraping block range: ' + str(block_range) + '\n', end='')
 
@@ -182,6 +184,7 @@ async def _async_package_exported_events(
 ) -> spec.DataFrame:
 
     if event_abi is None:
+        from ctc import rpc
         network = rpc.get_provider_network(provider)
         event_abi = await abi_utils.async_get_event_abi(
             contract_address=contract_address,

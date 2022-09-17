@@ -6,7 +6,6 @@ import functools
 
 import pandas as pd
 
-from ctc.rpc.rpc_executors import rpc_trace_executors
 from ctc import binary
 from ctc import evm
 from ctc import spec
@@ -16,6 +15,9 @@ async def async_get_transaction_traces_df(
     transaction_hash: spec.PrefixHexData,
     provider: spec.ProviderReference = None,
 ) -> spec.DataFrame:
+
+    from ctc.rpc.rpc_executors import rpc_trace_executors
+
     traces = await rpc_trace_executors.async_trace_transaction(
         transaction_hash=transaction_hash,
     )

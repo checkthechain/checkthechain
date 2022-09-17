@@ -4,7 +4,6 @@ import typing
 
 from ctc import binary
 from ctc import config
-from ctc import rpc
 from ctc import spec
 from .. import abi_utils
 from .. import address_utils
@@ -84,6 +83,8 @@ async def async_get_erc20_metadata(
     **rpc_kwargs: typing.Any,
 ) -> spec.ERC20Metadata:
 
+    from ctc import rpc
+
     network = rpc.get_provider_network(provider)
     address = await async_get_erc20_address(token, network=network)
 
@@ -132,6 +133,7 @@ async def async_get_erc20_decimals(
 
     if use_db:
         from ctc import db
+        from ctc import rpc
 
         network = rpc.get_provider_network(provider)
         token = await async_get_erc20_address(token, network=network)
@@ -211,6 +213,7 @@ async def async_get_erc20_name(
     result: spec.ERC20Metadata | None = None
     if use_db:
         from ctc import db
+        from ctc import rpc
 
         network = rpc.get_provider_network(provider)
         token = await async_get_erc20_address(token, network=network)
@@ -299,6 +302,7 @@ async def async_get_erc20_symbol(
 
     if use_db:
         from ctc import db
+        from ctc import rpc
 
         network = rpc.get_provider_network(provider)
         token = await async_get_erc20_address(token, network=network)

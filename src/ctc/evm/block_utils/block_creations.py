@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc.toolbox import search_utils
-
-from ctc import rpc
 from ctc import spec
 from .. import address_utils
 from . import block_crud
@@ -22,6 +19,8 @@ async def async_get_contract_creation_block(
     - caches result in local database
     - behavior is undefined for functions that have undergone SELF-DESTRUCT(S)
     """
+
+    from ctc import rpc
 
     network = rpc.get_provider_network(provider)
 
@@ -88,6 +87,8 @@ async def _async_get_contract_creation_block_from_node(
 
     algorithm: perform a binary search across blocks, check code bytes in each
     """
+
+    from ctc.toolbox import search_utils
 
     contract_address = address_utils.get_address_checksum(contract_address)
 

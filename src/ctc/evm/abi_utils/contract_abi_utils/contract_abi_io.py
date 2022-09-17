@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from ctc import spec
-from ctc import rpc
 
 from ... import address_utils
 from . import contract_abi_modification
@@ -27,6 +26,7 @@ async def async_get_contract_abi(
         db_intake = use_db
 
     if network is None:
+        from ctc import rpc
         network = rpc.get_provider_network(provider)
 
     # load from db

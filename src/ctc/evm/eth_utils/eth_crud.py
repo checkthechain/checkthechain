@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 
 
@@ -35,6 +34,8 @@ async def async_get_eth_balance(
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
+
+    from ctc import rpc
 
     result = await rpc.async_eth_get_balance(
         address=address,
@@ -144,6 +145,8 @@ async def async_get_eth_balance_of_addresses(
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[list[int], list[float]]:
+
+    from ctc import rpc
 
     balances = await rpc.async_batch_eth_get_balance(
         addresses=addresses,

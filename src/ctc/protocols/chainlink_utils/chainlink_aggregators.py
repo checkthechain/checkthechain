@@ -8,8 +8,6 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 
-from ctc.toolbox import search_utils
-
 from . import chainlink_feed_metadata
 
 
@@ -86,6 +84,8 @@ async def _async_get_aggregator_start_blocks(
     *,
     provider: spec.ProviderReference,
 ) -> typing.Mapping[spec.Address, int]:
+
+    from ctc.toolbox import search_utils
 
     latest = await evm.async_get_latest_block_number(provider=provider)
 

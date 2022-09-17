@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 
 from . import block_crud
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 if typing.TYPE_CHECKING:
 
+    from typing_extensions import TypedDict
     from ctc import db
 
     class BlockGasStats(TypedDict):
@@ -74,6 +73,8 @@ async def async_get_median_block_gas_fee(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> db.BlockGasRow:
+
+    from ctc import rpc
 
     network, provider = evm.get_network_and_provider(network, provider)
     block = await evm.async_block_number_to_int(block, provider=provider)

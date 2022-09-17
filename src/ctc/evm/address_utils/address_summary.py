@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from ctc import evm
-from ctc import rpc
 from ctc import spec
 
 from .. import abi_utils
@@ -22,11 +21,12 @@ async def async_print_address_summary(
     - transactions
     - transfers
     """
-    import asyncio
 
+    import asyncio
     import toolstr
     import tooltime
     from ctc import cli
+    from ctc import rpc
 
     styles = cli.get_cli_styles()
 

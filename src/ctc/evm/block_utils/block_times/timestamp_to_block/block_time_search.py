@@ -4,16 +4,15 @@ from __future__ import annotations
 import functools
 import typing
 
-from typing_extensions import TypedDict, Literal
-
-from ctc.toolbox import search_utils
 from ctc import spec
 from .. import block_crud
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict, Literal
 
-class BlockTimestampSearchCache(TypedDict):
-    initializing: dict[int, bool]
-    timestamps: dict[int, int]
+    class BlockTimestampSearchCache(TypedDict):
+        initializing: dict[int, bool]
+        timestamps: dict[int, int]
 
 
 async def _async_get_block_of_timestamp_from_node(
@@ -31,6 +30,8 @@ async def _async_get_block_of_timestamp_from_node(
     - could make this efficiently parallelizable to multiple timestamps by sharing cache
         - would need to remove the initializing key from the shared cache
     """
+
+    from ctc.toolbox import search_utils
 
     if nary is None:
         nary = 6
@@ -141,7 +142,9 @@ def _get_next_probes_block_of_timestamp(
     cache: BlockTimestampSearchCache,
     debug: bool = True,
 ) -> list[int]:
+
     import numpy as np
+    from ctc.toolbox import search_utils
 
     if cache['initializing'][timestamp]:
         cache['initializing'][timestamp] = False

@@ -6,18 +6,27 @@ import ast
 import functools
 import os
 import typing
-from typing_extensions import TypedDict
 
 import ctc.config
 from ctc import binary
 from ctc import config
 from ctc import spec
-from ctc import rpc
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
 from ... import abi_utils
 from ... import block_utils
 from ... import network_utils
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    _PathEventsResult = typing.Dict[str, typing.Tuple[int, int]]
+
+    class _ListEventsResult(TypedDict):
+        paths: _PathEventsResult
+        block_range: spec.NumpyArray
+        block_mask: spec.NumpyArray
+        missing_blocks: spec.NumpyArray
 
 
 filesystem_layout = {
@@ -124,16 +133,6 @@ def list_events_contracts(
         contract_address = contract_dir.split('__')[-1]
         contracts.append(contract_address)
     return contracts
-
-
-_PathEventsResult = typing.Dict[str, typing.Tuple[int, int]]
-
-
-class _ListEventsResult(TypedDict):
-    paths: _PathEventsResult
-    block_range: spec.NumpyArray
-    block_mask: spec.NumpyArray
-    missing_blocks: spec.NumpyArray
 
 
 def list_contract_events(
@@ -301,6 +300,8 @@ async def async_save_events_to_filesystem(
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> spec.DataFrame:
 
+    from ctc import rpc
+
     if network is None:
         provider = rpc.get_provider(provider)
         network = provider['network']
@@ -353,6 +354,8 @@ async def async_get_events_from_filesystem(
     provider: spec.ProviderReference = None,
     network: spec.NetworkReference | None = None,
 ) -> spec.DataFrame:
+
+    from ctc import rpc
 
     # get network
     if network is None:

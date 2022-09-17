@@ -10,7 +10,6 @@ from __future__ import annotations
 import typing
 
 from ctc import config
-from ctc import rpc
 from ctc import spec
 
 
@@ -107,7 +106,9 @@ def get_network_and_provider(
     network: spec.NetworkReference | None,
     provider: spec.ProviderReference | None,
 ) -> tuple[spec.NetworkReference, spec.Provider]:
-    pass
+
+    from ctc import rpc
+
     # if network is None:
     #     network = 'mainnet'
     if provider is None and network is None:

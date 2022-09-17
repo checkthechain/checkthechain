@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import time
 import typing
-from typing_extensions import TypedDict
+
+from ctc import evm
+from ctc import spec
 
 if typing.TYPE_CHECKING:
     import asyncio
+    from typing_extensions import TypedDict
 
-from ctc import binary
-from ctc import evm
-from ctc import rpc
-from ctc import spec
+    class LatestBlockCacheEntry(TypedDict, total=False):
+        request_time: float
+        response_time: float
+        block_number: int
 
 
 async def async_get_block(
@@ -20,6 +23,8 @@ async def async_get_block(
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> spec.Block:
+
+    from ctc import rpc
 
     if spec.is_block_number_reference(block):
 
@@ -72,14 +77,16 @@ async def async_get_blocks(
     latest_block_number: int | None = None,
 ) -> list[spec.Block]:
 
+    from ctc import rpc
+
     if isinstance(provider, dict) and provider.get('chunk_size') is None:
-        provider = rpc.add_provider_parameters(provider, {'chunk_size': chunk_size})
+        provider = rpc.add_provider_parameters(
+            provider, {'chunk_size': chunk_size}
+        )
 
     if all(spec.is_block_number_reference(block) for block in blocks):
 
-        standardized = [
-            evm.standardize_block_number(block) for block in blocks
-        ]
+        standardized = [evm.standardize_block_number(block) for block in blocks]
         pending = standardized
 
         if use_db and not include_full_transactions:
@@ -138,12 +145,6 @@ async def async_get_blocks(
         )
 
 
-class LatestBlockCacheEntry(TypedDict, total=False):
-    request_time: float
-    response_time: float
-    block_number: int
-
-
 _latest_block_cache: typing.MutableMapping[int, LatestBlockCacheEntry] = {}
 _latest_block_lock: typing.MutableMapping[str, asyncio.Lock | None] = {
     'lock': None
@@ -156,6 +157,8 @@ async def async_get_latest_block_number(
     use_cache: bool = True,
     cache_time: int | float = 1,
 ) -> int:
+
+    from ctc import rpc
 
     if not use_cache:
         result = await rpc.async_eth_block_number(provider=provider)

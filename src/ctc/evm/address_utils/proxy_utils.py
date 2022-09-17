@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 
 if typing.TYPE_CHECKING:
@@ -124,6 +123,8 @@ async def _async_get_eip897_proxy_type(
     block: spec.BlockNumberReference | None = None,
 ) -> int | None:
 
+    from ctc import rpc
+
     function_abi: spec.FunctionABI = {
         'name': 'proxyType',
         'type': 'function',
@@ -150,6 +151,8 @@ async def _async_get_eip897_implementation(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
+
+    from ctc import rpc
 
     function_abi: spec.FunctionABI = {
         'name': 'implementation',
@@ -190,6 +193,8 @@ async def _async_get_eip1967_proxy_logic_address(
     see https://eips.ethereum.org/EIPS/eip-1967
     """
 
+    from ctc import rpc
+
     position = (
         '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
     )
@@ -219,6 +224,8 @@ async def _async_get_eip1967_proxy_beacon_address(
 
     see https://eips.ethereum.org/EIPS/eip-1967
     """
+
+    from ctc import rpc
 
     position = (
         '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'
@@ -272,6 +279,8 @@ async def _async_get_eip1967_proxy_admin_address(
     see https://eips.ethereum.org/EIPS/eip-1967
     """
 
+    from ctc import rpc
+
     position = (
         '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'
     )
@@ -306,6 +315,8 @@ async def _async_get_oz_proxy_address(
     provider: spec.ProviderReference = None,
 ) -> spec.Address | None:
 
+    from ctc import rpc
+
     position = (
         '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3'
     )
@@ -339,6 +350,8 @@ async def _async_get_gnosis_safe_proxy_address(
     confirm_bytecode: bool = True,
     provider: spec.ProviderReference = None,
 ) -> spec.Address | None:
+
+    from ctc import rpc
 
     if confirm_bytecode:
         gnosis_proxy_code = '0x608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea2646970667358221220d1429297349653a4918076d650332de1a1068c5f3e07c5c82360c277770b955264736f6c63430007060033'

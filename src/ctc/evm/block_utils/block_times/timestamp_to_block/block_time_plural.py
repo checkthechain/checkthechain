@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import typing
 
-from typing_extensions import Literal
-
 from ctc import spec
-from ctc import rpc
-
 from . import block_time_search
 from . import block_time_singular
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 
 async def async_get_blocks_of_timestamps(
@@ -59,6 +58,7 @@ async def async_get_blocks_of_timestamps(
         # get timestamps form db
         if use_db:
             from ctc import db
+            from ctc import rpc
 
             network = rpc.get_provider_network(provider)
             db_blocks = await db.async_query_timestamps_blocks(

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 
 from .. import block_crud
@@ -15,6 +14,8 @@ async def async_get_block_timestamp(
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> int:
+
+    from ctc import rpc
 
     if isinstance(block, int) and use_db:
         from ctc import db
@@ -39,6 +40,8 @@ async def async_get_block_timestamps(
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> list[int]:
+
+    from ctc import rpc
 
     blocks = await block_normalize.async_block_numbers_to_int(
         blocks=blocks,

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 
 from .. import abi_utils
@@ -39,6 +38,8 @@ async def async_get_erc20_transfers(
     provider: spec.ProviderReference = None,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
+
+    from ctc import rpc
 
     network = rpc.get_provider_network(provider)
     token_address = await erc20_metadata.async_get_erc20_address(

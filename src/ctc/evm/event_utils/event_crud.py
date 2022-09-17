@@ -4,9 +4,7 @@ import typing
 
 from ctc import binary
 from ctc import evm
-from ctc import rpc
 from ctc import spec
-from ctc.toolbox import backend_utils
 
 from .. import block_utils
 from .. import abi_utils
@@ -62,6 +60,8 @@ async def async_get_events(
     **query: typing.Any,
 ) -> spec.DataFrame:
 
+    from ctc.toolbox import backend_utils
+
     start_block, end_block = await block_utils.async_resolve_block_range(
         start_block=start_block,
         end_block=end_block,
@@ -113,6 +113,9 @@ async def async_get_events(
 async def async_save_events(
     events: spec.DataFrame, **query: typing.Any
 ) -> spec.DataFrame:
+
+    from ctc.toolbox import backend_utils
+
     return await backend_utils.async_run_on_backend(
         get_event_backend_functions()['save'], events=events, **query
     )
@@ -125,6 +128,8 @@ async def async_transfer_events(
     end_block: spec.BlockNumberReference | None = None,
     **query: typing.Any,
 ) -> spec.DataFrame:
+
+    from ctc.toolbox import backend_utils
 
     if start_block is not None and end_block is not None:
         start_block, end_block = await block_utils.async_block_numbers_to_int(
@@ -158,6 +163,8 @@ async def async_download_events(
     provider: spec.ProviderReference = None,
     verbose: bool = True,
 ) -> spec.DataFrame:
+
+    from ctc import rpc
     from .event_backends import filesystem_events
 
     if event_hash is None and event_name is None and event_abi is None:
