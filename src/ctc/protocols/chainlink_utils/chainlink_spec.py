@@ -1,12 +1,13 @@
 # https://docs.chain.link/docs/faq/
 from __future__ import annotations
 
+import os
 import typing
 from typing_extensions import TypedDict
 
 from ctc import spec
 
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING or os.environ.get('BUILDING_SPHINX') == '1':
     _FeedReference = typing.Union[spec.Address, str]
 
     class FeedRoundData(TypedDict):

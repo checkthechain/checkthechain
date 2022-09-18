@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import os
 import typing
 
 from . import block_crud
 from ctc import evm
 from ctc import spec
 
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING or os.environ.get('BUILDING_SPHINX') == '1':
 
     from typing_extensions import TypedDict
     from ctc import db
