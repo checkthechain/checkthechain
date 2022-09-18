@@ -6,6 +6,8 @@ import typing
 if typing.TYPE_CHECKING:
     import toolsql
 
+    import mypy_extensions
+
 import toolcli
 
 import ctc
@@ -226,20 +228,30 @@ def cd_dir_getter(dirname: str) -> str:
         raise Exception('unknown directory: ' + str(dirname))
 
 
-def help_url_getter(
-    *,
-    subcommand: typing.Tuple[str],
-    parse_spec: toolcli.ParseSpec,
-) -> str:
-    categories = parse_spec['config']['help_subcommand_categories']
-    category = categories.get(subcommand, 'other')
-    return (
-        'https://ctc.readthedocs.io/en/latest/cli/subcommands/'
-        + category
-        + '/'
-        + '_'.join(subcommand)
-        + '.html'
-    )
+if os.environ.get('BUILDING_SPHINX') != '1':
+    help_url_getter: None | typing.Callable[
+        [
+            mypy_extensions.NamedArg(tuple[str, ...], 'subcommand'),
+            mypy_extensions.NamedArg(toolcli.ParseSpec, 'parse_spec'),
+        ],
+        str,
+    ] = None
+else:
+
+    def help_url_getter(
+        *,
+        subcommand: typing.Tuple[str, ...],
+        parse_spec: toolcli.ParseSpec,
+    ) -> str:
+        categories = parse_spec['config']['help_subcommand_categories']
+        category = categories.get(subcommand, 'other')
+        return (
+            'https://ctc.readthedocs.io/en/latest/cli/subcommands/'
+            + category
+            + '/'
+            + '_'.join(subcommand)
+            + '.html'
+        )
 
 
 def _db_config_getter() -> toolsql.DBConfig | None:
