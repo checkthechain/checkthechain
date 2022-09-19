@@ -8,7 +8,6 @@ import toolsql
 from ctc import config
 from ctc import spec
 from ... import schema_utils
-from . import erc20_metadata_schema_defs
 
 
 async def async_upsert_erc20_metadata(
@@ -66,6 +65,7 @@ async def async_select_erc20_metadata(
     address: spec.Address | None = None,
     *,
     symbol: str | None = None,
+    case_insensitive_symbol: bool = False,
     network: spec.NetworkReference | None = None,
     conn: toolsql.SAConnection,
 ) -> spec.ERC20Metadata | None:
@@ -78,7 +78,10 @@ async def async_select_erc20_metadata(
     if address is not None:
         query: typing.Mapping[str, typing.Any] = {'row_id': address.lower()}
     elif symbol is not None:
-        query = {'where_equals': {'symbol': symbol}}
+        if case_insensitive_symbol:
+            query = {'where_ilike': {'symbol': symbol}}
+        else:
+            query = {'where_equals': {'symbol': symbol}}
     else:
         raise Exception('must specify address or symbol')
 

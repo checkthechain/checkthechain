@@ -14,6 +14,8 @@ from . import erc20_spec
 async def async_get_erc20_address(
     token: spec.ERC20Reference,
     network: spec.NetworkReference | None = None,
+    *,
+    case_insensitive_query: bool = True,
 ) -> spec.ERC20Address:
     """return address of input token, input as either symbol or address"""
 
@@ -29,6 +31,15 @@ async def async_get_erc20_address(
             symbol=token,
             network=network,
         )
+
+        # if no result, try again case insensitive
+        if metadata is None:
+            metadata = await db.async_query_erc20_metadata(
+                symbol=token,
+                network=network,
+                case_insensitive_symbol=case_insensitive_query,
+            )
+
         if metadata is not None:
             address = metadata['address']
             if isinstance(address, str):
