@@ -3,14 +3,18 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from .. import binary_utils
 
 
 def abi_decode(
-    data: bytes,
+    data: spec.GenericBinaryData,
     types: spec.ABIDatatypeStr | typing.Sequence[spec.ABIDatatypeStr],
 ) -> typing.Any:
-    # TODO: allow for any input format, allow specifying any output format
+    """decode ABI-encoded data, similar to solidity's abi.decode()"""
+
     import eth_abi_lite
+
+    data = binary_utils.binary_convert(data, 'binary')
 
     if isinstance(types, str):
         return eth_abi_lite.decode_single(types, data)
@@ -22,7 +26,6 @@ def abi_encode(
     data: typing.Any,
     types: spec.ABIDatatypeStr | typing.Sequence[spec.ABIDatatypeStr],
 ) -> bytes:
-    # TODO: allow for any input format, allow specifying any output format
     import eth_abi_lite
 
     if isinstance(types, str):

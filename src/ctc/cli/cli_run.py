@@ -172,7 +172,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     },
 }
 
-command_index = {}
+command_index: typing.MutableMapping[toolcli.CommandSequence, toolcli.CommandSpecReference] = {}
 help_subcommand_categories = {}
 for category, category_command_index in command_index_by_category.items():
     command_index.update(category_command_index)
