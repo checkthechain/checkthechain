@@ -24,12 +24,15 @@ from ctc.cli import cli_utils
 command_help = """output the result of multiple contract eth_call's
 
 This command can be used in two ways:
+
 [title]1) [option]**Multi-contract Calls**[/option][/title][comment]:[/comment] same call across multiple contracts
     - This is indicated by the `--addresses` parameter
     - Example: `call <function> --addresses <addr1> <addr2> <addr3>`
+
 [title]2) [option]**Multi-block Calls**[/option][/title][comment]:[/comment] same call across multiple blocks
     - This is indicated by either of the `--blocks` or `--time` parameters
     - Example: `call <addr1> <function> --time 30d`
+
 [comment]in each case, `<function>` can be a name, a 4byte selector, or an ABI[/comment]
 
 ## Multi-contract Calls

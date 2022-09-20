@@ -295,16 +295,29 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 
 
 def get_cli_styles() -> toolcli.StyleTheme:
-    return {
-        'title': 'bold #ce93f9',
-        'metavar': '#8be9fd',
-        'description': '#b9f29f',
-        'content': '#f1fa8c',
-        'option': '#64aaaa',
-        # 'description': '#64aaaa',
-        'comment': '#6272a4',
-        # 'comment': '#8be9fd',
-    }
+    try:
+        # if in notebook, do not use styles
+
+        get_ipython  # type: ignore
+
+        return {
+            'title': '',
+            'metavar': '',
+            'description': '',
+            'content': '',
+            'option': '',
+            'comment': '',
+        }
+
+    except NameError:
+        return {
+            'title': 'bold #ce93f9',
+            'metavar': '#8be9fd',
+            'description': '#b9f29f',
+            'content': '#f1fa8c',
+            'option': '#64aaaa',
+            'comment': '#6272a4',
+        }
 
 
 def run_cli(

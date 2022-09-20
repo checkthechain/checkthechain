@@ -33,10 +33,11 @@ def get_contract_abi_by_selectors(
 def summarize_contract_abi(
     contract_abi: spec.ContractABI,
     *,
-    max_width: int = 80,
+    max_width: int | None = None,
     verbose: bool | int = False,
-    read_write: bool = True,
+    read_write: bool = False,
 ) -> None:
+
     summarize_contract_abi_functions(
         contract_abi=contract_abi,
         max_width=max_width,
