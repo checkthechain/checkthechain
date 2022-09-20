@@ -175,11 +175,41 @@ def rlp_decode(
         2. list/tuple of binary format names, corresponding to items in rlp list
     """
 
+    # convert any abi types to RLP types
+    if types is not None:
+        types = _process_rlp_types(types)
+
     data = format_utils.binary_convert(data, 'binary')
     decoded, remaining = _rlp_decode_chunk(data=data, types=types)
     if len(remaining) > 0:
         raise Exception('data contains extra bytes')
     return decoded
+
+
+def _process_rlp_types(
+    types: str | typing.Sequence[str],
+) -> str | typing.Sequence[str]:
+
+    allowed_types = [
+        'prefix_hex',
+        'raw_hex',
+        'binary',
+        'integer',
+        'ascii',
+        'bool',
+    ]
+
+    if isinstance(types, str):
+        if types in allowed_types:
+            return types
+        elif types.startswith('int') and '[' not in types:
+            return 'integer'
+        elif types == 'string':
+            return 'ascii'
+        else:
+            raise Exception('RLP type not understood: ' + str(types))
+    else:
+        return [_process_rlp_types(type) for type in types]  # type: ignore
 
 
 def _rlp_decode_chunk(
@@ -248,6 +278,8 @@ def _rlp_decode_primitive_chunk(
     if types is not None:
         if types == 'ascii':
             decoded = decoded.decode()
+        elif types == 'bool':
+            decoded = bool(decoded)
         else:
             decoded = format_utils.binary_convert(decoded, types)
 
