@@ -199,10 +199,10 @@ deps =
     toml==0.10.2
     ;
     ; tool suite
-    toolcli==0.6.6
+    toolcli==0.6.7
     toolconf==0.1.2
-    toolsql==0.3.10
-    toolstr==0.7.4
+    toolsql==0.3.11
+    toolstr==0.7.5
     tooltime==0.2.7
     ;
     ; EVM dependencies
