@@ -54,7 +54,7 @@ async def async_resolve_addresses(
     """resolve alternate address formats (i.e. ENS) to standard address strs"""
 
     to_resolve: typing.Sequence[str] = []
-    for item in enumerate(names_or_addresses):
+    for item in names_or_addresses:
         if isinstance(item, str) and len(item) > 4 and item.endswith('.eth'):
             to_resolve.append(item)
 
