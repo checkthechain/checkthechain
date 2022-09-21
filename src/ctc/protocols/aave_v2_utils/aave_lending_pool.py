@@ -37,11 +37,6 @@ async def async_get_deposits(
     if network is None:
         raise Exception('could not determine network')
 
-    if start_block is None:
-        if network == 'mainnet':
-            start_block = 11362579
-        else:
-            start_block = 0
     if end_block is None:
         end_block = 'latest'
 
@@ -87,11 +82,6 @@ async def async_get_withdrawals(
     if network is None:
         raise Exception('could not determine network')
 
-    if start_block is None:
-        if network == 'mainnet':
-            start_block = 11362579
-        else:
-            start_block = 0
     if end_block is None:
         end_block = 'latest'
 
