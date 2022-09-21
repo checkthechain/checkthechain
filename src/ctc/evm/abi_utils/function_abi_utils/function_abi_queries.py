@@ -16,6 +16,7 @@ def get_function_abi(
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_selector: typing.Optional[spec.FunctionSelector] = None,
 ) -> spec.FunctionABI:
+    """get function ABI from contract ABI"""
 
     if function_selector is not None:
         function_selector = binary_utils.binary_convert(
@@ -84,6 +85,7 @@ async def async_get_function_abi(
     function_selector: typing.Optional[spec.FunctionSelector] = None,
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> spec.FunctionABI:
+    """get function ABI from local database or block explorer"""
 
     if contract_abi is None:
         if contract_address is None:
@@ -127,4 +129,5 @@ async def async_get_function_abi(
 def get_function_abis(
     contract_abi: spec.ContractABI,
 ) -> typing.Sequence[spec.FunctionABI]:
+    """get list of function ABI's in contract ABI"""
     return [item for item in contract_abi if item['type'] == 'function']

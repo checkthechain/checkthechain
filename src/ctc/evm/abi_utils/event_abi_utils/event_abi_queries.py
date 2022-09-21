@@ -15,7 +15,7 @@ def get_event_abi(
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
 ) -> spec.EventABI:
-    """get event abi from contract abi"""
+    """get event ABI from contract ABI"""
 
     if event_abi is not None:
         return event_abi
@@ -53,6 +53,7 @@ async def async_get_event_abi(
     event_abi: typing.Optional[spec.EventABI] = None,
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> spec.EventABI:
+    """get event ABI from local database or block explorer"""
 
     # get contract abi
     if contract_abi is None:
@@ -95,4 +96,5 @@ async def async_get_event_abi(
 def get_event_abis(
     contract_abi: spec.ContractABI,
 ) -> typing.Sequence[spec.EventABI]:
+    """get event ABI's from contract ABI"""
     return [item for item in contract_abi if item['type'] == 'event']

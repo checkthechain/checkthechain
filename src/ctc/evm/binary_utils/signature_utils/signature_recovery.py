@@ -14,6 +14,7 @@ def verify_signature(
     public_key: spec.Data | None = None,
     address: spec.Data | None = None,
 ) -> bool:
+    """verify that signature was signed using given public key"""
 
     # recover public key from signature
     recovered_public_key = recover_signer_public_key(
@@ -37,7 +38,10 @@ def verify_signature(
 
 
 def get_signature_network_id(signature: spec.Signature) -> int | None:
-    """adapted from https://github.com/ethereum/pyethereum/blob/ecb14c937a0b6cb0a0dc4f06be3a88e6d53dcce3/ethereum/transactions.py#L93"""
+    """extract network id from given signature
+
+    adapted from https://github.com/ethereum/pyethereum/blob/ecb14c937a0b6cb0a0dc4f06be3a88e6d53dcce3/ethereum/transactions.py#L93
+    """
 
     v, r, s = vrs_utils.unpack_signature_vrs(signature)
     if r == 0 and s == 0:
@@ -53,7 +57,8 @@ def recover_signer_public_key(
     message_hash: spec.Data,
     signature: spec.Signature,
 ) -> str:
-    """
+    """recover signer public key from signature
+
     adapted from https://github.com/ethereum/pyethereum/blob/ecb14c937a0b6cb0a0dc4f06be3a88e6d53dcce3/ethereum/utils.py#L87
     """
 
@@ -82,6 +87,7 @@ def recover_signer_address(
     message_hash: spec.Data,
     signature: spec.Signature,
 ) -> spec.Address:
+    """recover signer public address from signature"""
 
     public_key = recover_signer_public_key(
         message_hash=message_hash,

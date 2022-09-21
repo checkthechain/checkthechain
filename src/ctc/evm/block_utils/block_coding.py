@@ -95,7 +95,8 @@ def standardize_block_numbers(
     return [standardize_block_number(block) for block in blocks]
 
 
-def raw_block_number_to_ints(
+def raw_block_numbers_to_ints(
     blocks: typing.Iterable[spec.RawBlockNumber],
 ) -> list[int]:
+    """convert block numbers to integer"""
     return [raw_block_number_to_int(block) for block in blocks]

@@ -28,6 +28,7 @@ async def async_get_proxy_implementation(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address | None:
+    """return implementation address of proxy contract"""
 
     proxy_metadata = await async_get_proxy_metadata(
         contract_address=contract_address, provider=provider, block=block
@@ -42,6 +43,8 @@ async def async_get_proxy_metadata(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> ProxyAddressMetadata:
+    """return metadata of proxy address"""
+
     # try eip897
     try:
         eip897_address = await _async_get_eip897_implementation(
@@ -297,10 +300,10 @@ async def _async_get_eip1967_proxy_admin_address(
     return '0x' + result[-40:]
 
 
-async def async_get_eip1967_history() -> None:
-    raise NotImplementedError(
-        'use events here, see https://docs.openzeppelin.com/contracts/4.x/api/proxy#BeaconProxy'
-    )
+# async def async_get_eip1967_history() -> None:
+#     raise NotImplementedError(
+#         'use events here, see https://docs.openzeppelin.com/contracts/4.x/api/proxy#BeaconProxy'
+#     )
 
 
 #

@@ -34,6 +34,7 @@ async def async_get_eth_balance(
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
+    """get ETH balance"""
 
     from ctc import rpc
 
@@ -92,6 +93,7 @@ async def async_get_eth_balance_by_block(
     normalize: bool = True,
     provider: typing.Optional[spec.ProviderReference] = None,
 ) -> typing.Union[list[int], list[float]]:
+    """get historical ETH balance over multiple blocks"""
 
     coroutines = []
     for block in blocks:
@@ -145,6 +147,7 @@ async def async_get_eth_balance_of_addresses(
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[list[int], list[float]]:
+    """get ETH balance of multiple addresses"""
 
     from ctc import rpc
 

@@ -24,6 +24,7 @@ async def async_get_block_of_timestamp(
     use_db_assist: bool = True,
     mode: typing.Literal['<=', '>=', '=='] = '>=',
 ) -> int:
+    """search for the block that corresponds to a given timestamp"""
 
     if not isinstance(timestamp, int):
         import tooltime
@@ -105,6 +106,7 @@ async def async_get_block_number_and_time(
     block_timestamp: typing.Optional[tooltime.Timestamp] = None,
     provider: spec.ProviderReference = None,
 ) -> tuple[int, int]:
+    """get block number and timestamp corresponding to given input"""
 
     if block_timestamp is not None and block_number is not None:
         raise Exception('must specify start_time or block_number')

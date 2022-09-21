@@ -61,7 +61,10 @@ def rlp_encode(
     *,
     str_mode: Literal['auto', 'text', 'hex'] | None = 'auto',
 ) -> spec.GenericBinaryData:
-    """str_mode specifies how str values should be interpreted"""
+    """encode data as RLP
+
+    str_mode specifies how str values should be interpreted
+    """
 
     if isinstance(item, int):
         if item == 0:
@@ -167,7 +170,7 @@ def rlp_decode(
     data: spec.Data,
     types: RLPDecodeTypes = None,
 ) -> typing.Any:
-    """decode rlp data
+    """decode RLP data
 
     the types parameter determines how raw data will be decoded in python
     - types is one of:

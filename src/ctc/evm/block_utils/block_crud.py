@@ -23,6 +23,7 @@ async def async_get_block(
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> spec.Block:
+    """get block from local database or from RPC node"""
 
     from ctc import rpc
 
@@ -76,6 +77,7 @@ async def async_get_blocks(
     use_db: bool = True,
     latest_block_number: int | None = None,
 ) -> list[spec.Block]:
+    """get blocks from local database or from RPC node"""
 
     from ctc import rpc
 
@@ -157,6 +159,7 @@ async def async_get_latest_block_number(
     use_cache: bool = True,
     cache_time: int | float = 1,
 ) -> int:
+    """get latest block number"""
 
     from ctc import rpc
 

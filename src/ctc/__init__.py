@@ -6,8 +6,8 @@ from .evm import *
 __version__ = '0.3.0'
 
 
-# remove deep nested modules from ctc namespace
 def _clean_package_imports() -> None:
+    """remove deep nested modules from ctc namespace"""
 
     import sys
 

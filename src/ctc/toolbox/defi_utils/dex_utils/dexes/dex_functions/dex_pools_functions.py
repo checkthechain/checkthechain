@@ -24,6 +24,7 @@ async def async_get_pools(
     update: bool = False,
     provider: spec.ProviderReference | None = None,
 ) -> typing.Sequence[spec.DexPool]:
+    """get DEX pools matching given inputs"""
 
     # get dex
     all_dex_factories = dex is not None and factory is None
@@ -61,6 +62,7 @@ async def async_update_all_dexes(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
 ) -> typing.Mapping[str, typing.Mapping[str, typing.Any]]:
+    """update local DEX database with latest on-chain entries"""
 
     import asyncio
 

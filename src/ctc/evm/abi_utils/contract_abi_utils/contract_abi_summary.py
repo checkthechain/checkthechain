@@ -37,6 +37,7 @@ def summarize_contract_abi(
     verbose: bool | int = False,
     read_write: bool = False,
 ) -> None:
+    """print summary of contract ABI"""
 
     summarize_contract_abi_functions(
         contract_abi=contract_abi,
@@ -61,6 +62,8 @@ def summarize_contract_abi_functions(
     title: str = 'Contract ABI Functions',
     read_write: bool = False,
 ) -> None:
+    """print summary of contract ABI functions"""
+
     import toolstr
     from ctc import cli
 
@@ -220,6 +223,8 @@ def summarize_contract_abi_events(
     verbose: bool | int = False,
     title: str = 'Contract ABI Events',
 ) -> None:
+    """print summary of contract ABI events"""
+
     import toolstr
     from ctc import cli
 
@@ -283,6 +288,8 @@ def contract_abi_to_dataframe(
     contract_abi: spec.ContractABI,
     human_readable: bool,
 ) -> spec.DataFrame:
+    """create pandas DataFrame representation of contract ABI"""
+
     import copy
 
     contract_abi = copy.deepcopy(contract_abi)

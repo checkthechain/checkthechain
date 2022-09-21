@@ -16,6 +16,7 @@ def pack_signature_vrs(
     r: spec.Data | None = None,
     s: spec.Data | None = None,
 ) -> str:
+    """convert signature to singleton hdex data representation"""
 
     if len(vrs) == 3:
         v, r, s = vrs
@@ -39,6 +40,7 @@ def pack_signature_vrs(
 
 
 def unpack_signature_vrs(signature: spec.Signature) -> tuple[int, int, int]:
+    """convert signature to triplet VRS representation"""
 
     if isinstance(signature, tuple):
         v, r, s = signature

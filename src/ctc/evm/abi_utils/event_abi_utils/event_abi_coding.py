@@ -52,6 +52,7 @@ def decode_event_topics(
     indexed_names: typing.Optional[list[str]] = None,
     use_names: bool = True,
 ) -> typing.Union[list[str], dict[str, str]]:
+    """decode topic data (i.e. indexed data) of event"""
 
     # get abi
     if indexed_types is None:
@@ -162,6 +163,7 @@ def normalize_event(
     *,
     arg_prefix: str | None = 'arg__',
 ) -> spec.NormalizedLog:
+    """normalize raw log data into decoded semantic event data"""
 
     # decode event args
     decoded_topics = decode_event_topics(

@@ -10,6 +10,7 @@ def serialize_unsigned_transaction(
     *,
     chain_id: int | None = None,
 ) -> spec.PrefixHexData:
+    """serialize unsigned transaction"""
 
     # collect keys for transaction type
     type = transaction_types.get_transaction_type(transaction)
@@ -43,6 +44,7 @@ def serialize_unsigned_transaction(
 def serialize_signed_transaction(
     transaction: spec.TransactionData,
 ) -> spec.PrefixHexData:
+    """serialize signed transaction"""
 
     # collect keys for transaction type
     type = transaction_types.get_transaction_type(transaction)

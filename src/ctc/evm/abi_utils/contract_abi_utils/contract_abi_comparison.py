@@ -10,6 +10,7 @@ def get_contract_abi_diff(
     first_contract_abi: spec.ContractABI,
     second_contract_abi: spec.ContractABI,
 ) -> typing.Mapping[str, spec.ContractABI]:
+    """return difference between two contract ABI's"""
 
     first_by_selectors = contract_abi_summary.get_contract_abi_by_selectors(
         first_contract_abi
@@ -47,6 +48,7 @@ def print_contract_abi_diff(
     functions_only: bool = False,
     events_only: bool = False,
 ) -> None:
+    """print difference between contract ABI's"""
 
     if first_name is None:
         first_name = 'First Contract'

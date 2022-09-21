@@ -18,7 +18,10 @@ async def async_get_contract_abi(
     proxy_implementation: spec.Address | None = None,
     verbose: bool = True,
 ) -> spec.ContractABI:
-    """for addresses that change ABI's over time, use db_query=False to skip cache"""
+    """retrieve abi of contract either from local database or block explorer
+
+    for addresses that change ABI's over time, use db_query=False to skip cache
+    """
 
     if db_query is None:
         db_query = use_db

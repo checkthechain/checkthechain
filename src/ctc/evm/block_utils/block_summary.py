@@ -12,6 +12,7 @@ async def async_print_block_summary(
     block: spec.Block | spec.BlockNumberReference,
     provider: spec.ProviderReference = None,
 ) -> None:
+    """print summary of block"""
 
     import toolstr
     import tooltime

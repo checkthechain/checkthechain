@@ -72,6 +72,7 @@ def get_function_parameter_types(
     function_abi: spec.FunctionABI | None = None,
     function_signature: typing.Optional[str] = None,
 ) -> list[spec.ABIDatumType]:
+    """return list of function parameter types"""
 
     if function_abi is not None:
 
@@ -114,6 +115,7 @@ def get_function_parameter_names(
     function_abi: spec.FunctionABI,
     require_names: bool = False,
 ) -> typing.Union[list[str], list[typing.Optional[str]]]:
+    """return list of function parameter names"""
 
     names = [item.get('name') for item in function_abi.get('inputs', [])]
 
@@ -133,6 +135,7 @@ def get_function_signature(
     function_name: typing.Optional[str] = None,
     include_names: bool = False,
 ) -> str:
+    """return function signature"""
 
     # get parameter types
     if parameter_types is None:
@@ -185,6 +188,7 @@ def get_function_selector(
     function_abi: typing.Optional[spec.FunctionABI] = None,
     function_signature: typing.Optional[spec.FunctionSignature] = None,
 ) -> str:
+    """get function 4 byte selector"""
 
     if function_signature is None:
         if function_abi is None:
@@ -198,6 +202,7 @@ def get_function_selector(
 
 
 def is_function_selector(selector: typing.Any) -> bool:
+    """return whether input is a function selector"""
     return isinstance(selector, str) and (
         (spec.is_prefix_hex_data(selector) and len(selector) == 10)
         or (spec.is_raw_hex_data(selector) and len(selector) == 8)
@@ -219,6 +224,7 @@ def is_function_signature(signature: typing.Any) -> bool:
 def get_function_output_types(
     function_abi: spec.FunctionABI,
 ) -> list[spec.ABIDatumType]:
+    """return list of function output types"""
 
     import eth_utils_lite
 
@@ -234,6 +240,7 @@ def get_function_output_names(
     function_abi: spec.FunctionABI,
     human_readable: bool = False,
 ) -> list[typing.Optional[str]]:
+    """return list of function output names"""
 
     output_names = [output.get('name') for output in function_abi['outputs']]
 
@@ -251,6 +258,7 @@ def get_function_output_names(
 
 
 def is_function_read_only(function_abi: spec.FunctionABI) -> bool:
+    """return whether function is read-only"""
     return bool(function_abi.get('constant')) or (
         function_abi.get('stateMutability')
         in (

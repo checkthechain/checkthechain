@@ -16,8 +16,8 @@ async def async_get_contract_creation_block(
 ) -> int | None:
     """get block number of when contract was created
 
-    - caches result in local database
     - behavior is undefined for functions that have undergone SELF-DESTRUCT(S)
+    - caches result in local database
     """
 
     from ctc import rpc
@@ -58,6 +58,11 @@ async def async_get_contracts_creation_blocks(
     verbose: bool = False,
     **search_kwargs: typing.Any,
 ) -> typing.Sequence[int | None]:
+    """get creation blocks of mutliple contracts
+
+    - behavior is undefined for functions that have undergone SELF-DESTRUCT(S)
+    - caches results in local database
+    """
 
     import asyncio
 

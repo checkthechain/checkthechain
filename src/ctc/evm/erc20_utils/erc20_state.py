@@ -23,7 +23,7 @@ async def async_get_erc20_total_supply(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[int, float]:
-    """"""
+    """get total supply of ERC20"""
 
     if block is None:
         block = 'latest'
@@ -55,7 +55,7 @@ async def async_get_erc20s_total_supplies(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
-    """"""
+    """get total supplies of ERC20s"""
 
     if block is None:
         block = 'latest'
@@ -82,6 +82,7 @@ async def async_get_erc20_total_supply_by_block(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
+    """get historical total supply of ERC20 across multiple blocks"""
 
     total_supplies = await erc20_generic.async_erc20_eth_call_by_block(
         token=token,
@@ -118,6 +119,7 @@ async def async_get_erc20_balance(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[int, float]:
+    """get ERC20 balance"""
 
     if block is None:
         block = 'latest'
@@ -157,6 +159,7 @@ async def async_get_erc20_balances_of_addresses(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
+    """get ERC20 balance of multiple addresses"""
 
     from ctc import rpc
 
@@ -195,7 +198,7 @@ async def async_get_erc20s_balances(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
-    """"""
+    """get ERC20 balance of wallet for multiple tokens"""
 
     from ctc import rpc
 
@@ -244,7 +247,7 @@ async def async_get_erc20_balance_by_block(
     empty_token: typing.Any = 0,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
-    """"""
+    """get historical ERC20 balance over multiple blocks"""
 
     wallet = await address_utils.async_resolve_address(
         wallet,
@@ -288,6 +291,7 @@ async def async_get_erc20_allowance(
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[int, float]:
+    """get ERC20 allowance"""
 
     if block is None:
         block = 'latest'
@@ -325,6 +329,7 @@ async def async_get_erc20_allowance_by_block(
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[list[int], list[float]]:
+    """get historical ERC20 allowance over range of blocks"""
 
     wallet = await address_utils.async_resolve_address(
         wallet,
@@ -361,6 +366,7 @@ async def async_get_erc20s_allowances(
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Union[list[int], list[float]]:
+    """get ERC20 allowance of wallet for multiple tokens"""
 
     wallet = await address_utils.async_resolve_address(
         wallet,
@@ -392,6 +398,7 @@ async def async_get_erc20s_allowances_of_addresses(
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int | float]:
+    """get ERC20 allowance of multiple addresses"""
 
     from ctc import rpc
 

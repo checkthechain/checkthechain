@@ -4,6 +4,27 @@ import types
 import ctc
 
 
+def test_ctc_functions_have_docstrings():
+    functiontype = type(test_ctc_functions_have_docstrings)
+
+    functions_without_docstrings = []
+    for key, value in vars(ctc).items():
+        if isinstance(value, functiontype):
+            docstring = value.__doc__
+            if docstring is None or docstring == '':
+                functions_without_docstrings.append(value.__name__)
+                continue
+            lines = docstring.split('\n')
+            if lines[0] == '':
+                functions_without_docstrings.append(value.__name__)
+
+    if len(functions_without_docstrings) > 0:
+        raise Exception(
+            'some functions do not have docstrings:\n    '
+            + '\n    '.join(functions_without_docstrings)
+        )
+
+
 def test_code_imports_future_annotations():
 
     phrase = 'from __future__ import annotations'

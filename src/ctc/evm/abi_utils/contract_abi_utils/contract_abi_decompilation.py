@@ -4,6 +4,7 @@ import typing
 
 
 def extract_bytecode_function_selectors(bytecode: str) -> typing.Sequence[str]:
+    """extract solidity-style function selectors from contract bytecode"""
     import re
 
     # solidity style signatures
@@ -20,6 +21,7 @@ async def async_decompile_function_abis(
     bytecode: str,
     sort: str | None = None,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
+    """decompile solidity-style function ABI's from contract bytecode"""
 
     from ctc.protocols import fourbyte_utils
 

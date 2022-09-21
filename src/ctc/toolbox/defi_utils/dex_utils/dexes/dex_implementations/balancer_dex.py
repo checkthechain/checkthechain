@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 class BalancerDEX(dex_class.DEX):
+    """Balancer DEX"""
 
     _pool_factories = {1: ['0xba12222222228d8ba445958a75a0704d566bf2c8']}
 

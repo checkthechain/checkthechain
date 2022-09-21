@@ -5,6 +5,7 @@ from ctc import spec
 
 
 def serialize_block(block: spec.Block) -> spec.PrefixHexData:
+    """serialize block in preparation for hashing"""
 
     if block.get('base_fee_per_gas') is not None:
         block_type = 'eip1559'
@@ -36,5 +37,7 @@ def serialize_block(block: spec.Block) -> spec.PrefixHexData:
 
 
 def hash_block(block: spec.Block) -> spec.PrefixHexData:
+    """compute hash of block"""
+
     serialized = serialize_block(block)
     return binary_utils.keccak(serialized)

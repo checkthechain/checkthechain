@@ -27,6 +27,8 @@ async def async_block_numbers_to_int(
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int]:
+    """convert block numers to integer"""
+
     import asyncio
 
     coroutines = [

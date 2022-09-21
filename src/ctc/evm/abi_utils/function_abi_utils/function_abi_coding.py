@@ -29,6 +29,7 @@ def encode_call_data(
     encoded_parameters: typing.Optional[spec.BinaryData] = None,
     function_abi: typing.Optional[spec.FunctionABI] = None,
 ) -> str:
+    """encode function call data using solidity-style ABI encoding"""
 
     # encode function selector
     if function_selector is None:
@@ -60,6 +61,7 @@ def decode_call_data(
     *,
     contract_abi: typing.Optional[spec.ContractABI] = None,
 ) -> spec.DecodedCallData:
+    """decode function call data using solidity-style ABI decoding"""
 
     # get function selector
     call_data_bytes = binary_utils.binary_convert(call_data, 'binary')
@@ -119,6 +121,7 @@ def encode_function_parameters(
     function_signature: typing.Optional[str] = None,
     function_abi: typing.Optional[spec.FunctionABI] = None,
 ) -> bytes:
+    """encode function parameters using solidity-style ABI encoding"""
 
     if parameters is None:
         return bytes()
@@ -168,6 +171,7 @@ def decode_function_parameters(
     encoded_parameters: spec.BinaryData,
     parameter_types: list[spec.ABIDatumType],
 ) -> list[typing.Any]:
+    """decode function parameters using solidity-style ABI decoding"""
 
     parameter_types_str = '(' + ','.join(parameter_types) + ')'
     encoded_parameters = binary_utils.binary_convert(
@@ -186,6 +190,7 @@ def decode_function_named_parameters(
     encoded_parameters: spec.BinaryData,
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
 ) -> dict[str, typing.Any]:
+    """decode function named parameters using solidity-style ABI decoding"""
 
     if parameter_types is None:
         parameter_types = function_abi_parsing.get_function_parameter_types(
@@ -219,7 +224,7 @@ def decode_function_output(
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
 ) -> typing.Any:
-    # need to test case when function has no output
+    """decode function output using solidity-style ABI decoding"""
 
     # get output types
     if output_types is None:

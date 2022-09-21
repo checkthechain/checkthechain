@@ -30,11 +30,12 @@ def get_network_name(
 def get_network_name(
     network: spec.NetworkName | int, require: bool = True
 ) -> spec.NetworkName | None:
+    """get name of network"""
 
     if isinstance(network, str):
         return network
 
-    config_network_names_by_id = get_network_names_by_chain_id()
+    config_network_names_by_id = _get_network_names_by_chain_id()
     if network in config_network_names_by_id:
         name = config_network_names_by_id[network]
         if name is None:
@@ -51,18 +52,19 @@ def get_network_name(
 
 
 def get_network_chain_id(network: spec.NetworkName | int) -> spec.ChainId:
+    """get chain id of network"""
 
     if isinstance(network, int):
         return network
 
-    config_chain_ids_by_network_name = get_chain_ids_by_network_name()
+    config_chain_ids_by_network_name = _get_chain_ids_by_network_name()
     if network in config_chain_ids_by_network_name:
         return config_chain_ids_by_network_name[network]
     else:
         raise Exception('unknown network: ' + str(network))
 
 
-def get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
+def _get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
     return {
         network_metadata['name']: chain_id
         for chain_id, network_metadata in get_networks().items()
@@ -71,10 +73,11 @@ def get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
 
 
 def get_networks() -> typing.Mapping[int, spec.NetworkMetadata]:
+    """get networks of current configuation"""
     return config.get_config_networks()
 
 
-def get_network_names_by_chain_id() -> typing.Mapping[
+def _get_network_names_by_chain_id() -> typing.Mapping[
     int, spec.NetworkName | None
 ]:
     return {
@@ -86,6 +89,7 @@ def get_network_names_by_chain_id() -> typing.Mapping[
 def get_network_metadata(
     network: spec.NetworkReference,
 ) -> spec.NetworkMetadata:
+    """get metadata of network"""
 
     if isinstance(network, str):
         network = get_network_chain_id(network)
@@ -98,6 +102,8 @@ def get_network_metadata(
 
 
 def get_network_block_explorer(network: spec.NetworkReference) -> str | None:
+    """get block explorer for network"""
+
     network_metadata = get_network_metadata(network)
     return network_metadata['block_explorer']
 
@@ -106,11 +112,10 @@ def get_network_and_provider(
     network: spec.NetworkReference | None,
     provider: spec.ProviderReference | None,
 ) -> tuple[spec.NetworkReference, spec.Provider]:
+    """get network and provider for given network and provider"""
 
     from ctc import rpc
 
-    # if network is None:
-    #     network = 'mainnet'
     if provider is None and network is None:
         network = config.get_default_network()
         if network is None:

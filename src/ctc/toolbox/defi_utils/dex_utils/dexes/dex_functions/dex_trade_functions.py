@@ -29,6 +29,7 @@ async def async_get_pool_trades(
     include_prices: bool = False,
     include_volumes: bool = False,
 ) -> spec.DataFrame:
+    """get trades of a DEX pool"""
 
     dex = await dex_class_utils.async_get_dex_class(
         dex=dex,

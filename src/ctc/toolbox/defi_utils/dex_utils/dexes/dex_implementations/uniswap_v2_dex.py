@@ -13,6 +13,7 @@ from .. import dex_class
 
 
 class UniswapV2DEX(dex_class.DEX):
+    """Uniswap V2 DEX"""
 
     _pool_factories = {1: [uniswap_v2_utils.uniswap_v2_factory]}
 

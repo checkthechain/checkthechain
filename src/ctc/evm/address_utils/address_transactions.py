@@ -89,6 +89,7 @@ async def async_get_transactions_from_address(
 async def async_get_address_transaction_counts_by_block(
     address: spec.Address, nary: int = 3
 ) -> AddressTransactionCounts:
+    """return historical transaction count of address by block"""
 
     import asyncio
     from ctc import rpc

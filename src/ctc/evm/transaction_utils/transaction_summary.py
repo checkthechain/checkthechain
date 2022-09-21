@@ -13,6 +13,7 @@ async def async_print_transaction_summary(
     transaction_hash: str,
     sort_logs_by: str | None = None,
 ) -> None:
+    """print summary of transaction"""
 
     import asyncio
     import toolstr

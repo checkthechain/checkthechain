@@ -26,6 +26,8 @@ def abi_encode(
     data: typing.Any,
     types: spec.ABIDatatypeStr | typing.Sequence[spec.ABIDatatypeStr],
 ) -> bytes:
+    """encode data in ABI format, similar to solidity's abi.encode()"""
+
     import eth_abi_lite
 
     if isinstance(types, str):
@@ -38,6 +40,8 @@ def abi_encode_packed(
     data: typing.Any,
     types: spec.ABIDatatypeStr | typing.Sequence[spec.ABIDatatypeStr],
 ) -> bytes:
+    """encode data in ABI format, similar to solidity's abi.encode_packed()"""
+
     from eth_abi_lite import packed
 
     if isinstance(types, str):

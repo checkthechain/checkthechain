@@ -26,6 +26,7 @@ def hash_eip712_struct(
     output_format: spec.BinaryFormat = 'prefix_hex',
 ) -> spec.Data:
     """encode structured data message for use with EIP-712"""
+
     as_bytes = (
         '\x19\x01'.encode()
         + get_domain_separator(domain, 'binary')
@@ -41,6 +42,7 @@ def sign_eip712_struct(
     struct_type: spec.Eip712StructType,
     domain: typing.Mapping[str, typing.Any],
 ) -> tuple[int, int, int]:
+    """sign EIP-712 struc data"""
 
     message_hash = hash_eip712_struct(
         struct_data=struct_data,
@@ -71,6 +73,7 @@ def verify_eip712_signature(
     public_key: spec.Data | None = None,
     address: spec.Data | None = None,
 ) -> bool:
+    """verify signed EIP-712 data"""
 
     message_hash = hash_eip712_struct(
         struct_data=struct_data,
@@ -91,6 +94,7 @@ def _hash_struct(
     struct_type: spec.Eip712StructType,
 ) -> bytes:
     """compute struct hash for use with EIP-712"""
+
     return hash_utils.keccak(
         _hash_struct_type(struct_type)
         + _encode_struct_data(struct_data=struct_data, struct_type=struct_type),

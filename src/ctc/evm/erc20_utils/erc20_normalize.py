@@ -44,6 +44,7 @@ async def async_normalize_erc20_quantities(
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> list[float]:
+    """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
 
     if all(quantity == 0 for quantity in quantities):
         return [float(0) for quantity in quantities]
@@ -70,6 +71,7 @@ async def async_normalize_erc20s_quantities(
     block: typing.Optional[spec.BlockNumberReference] = None,
     provider: spec.ProviderReference = None,
 ) -> list[float]:
+    """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
 
     # take subset of non zero values
     mask = [quantity != 0 for quantity in quantities]
@@ -126,6 +128,7 @@ async def async_normalize_erc20_quantities_by_block(
     decimals: typing.Optional[list[typing.SupportsInt]] = None,
     provider: spec.ProviderReference = None,
 ) -> list[float]:
+    """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
 
     # take subset of non zero values
     mask = [quantity != 0 for quantity in quantities]

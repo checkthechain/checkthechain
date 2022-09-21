@@ -22,7 +22,7 @@ async def async_get_blocks_of_timestamps(
     use_db: bool = True,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> list[int]:
-    """once parallel node search created, use that"""
+    """search for blocks corresponding to list of timestamps"""
 
     if block_timestamps is not None or (
         block_number_array is not None and block_timestamp_array is not None

@@ -15,6 +15,8 @@ def sign_transaction(
     private_key: str,
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
+    """sign transaction using private key"""
+
     if chain_id is None and 'chain_id' in transaction:
         tx_chain_id = transaction['chain_id']
         if tx_chain_id is not None:
@@ -38,6 +40,7 @@ def verify_transaction_signature(
     public_key: spec.Data | None = None,
     address: spec.Data | None = None,
 ) -> bool:
+    """verify that transaction was signed by given public key"""
 
     # extract signature from transaction
     if signature is None:
@@ -72,7 +75,8 @@ def recover_transaction_sender(
     transaction: spec.TransactionData,
     signature: spec.Signature,
 ) -> spec.Address:
-    """
+    """recover signing address of transaction from signature
+
     adapted from https://github.com/ethereum/pyethereum/blob/ecb14c937a0b6cb0a0dc4f06be3a88e6d53dcce3/ethereum/transactions.py#L68
     """
 
@@ -120,6 +124,8 @@ def recover_transaction_sender(
 
 
 def is_transaction_signed(transaction: typing.Mapping[str, typing.Any]) -> bool:
+    """return whether transaction is signed"""
+
     return (
         transaction.get('v') is not None
         and transaction.get('r') is not None

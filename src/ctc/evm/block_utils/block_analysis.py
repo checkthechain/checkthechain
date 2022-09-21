@@ -15,7 +15,9 @@ def bin_by_blocks(
     *,
     block_index_name: typing.Optional[str] = 'block_number',
 ) -> T:
-    """TODO: deprecate
+    """bin data into according to given block bins
+
+    TODO: deprecate
     - either:
         - refactor using pd.cut() https://stackoverflow.com/a/33761120
         - kill this whole function

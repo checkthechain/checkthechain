@@ -10,6 +10,7 @@ def hash_unsigned_transaction(
     *,
     chain_id: int | None = None,
 ) -> spec.Data:
+    """compute hash of unsigned transaction"""
 
     serialized = transaction_serialize.serialize_unsigned_transaction(
         transaction,
@@ -19,5 +20,7 @@ def hash_unsigned_transaction(
 
 
 def hash_signed_transaction(transaction: spec.TransactionData) -> spec.Data:
+    """compute hash of signed transaction"""
+
     serialized = transaction_serialize.serialize_signed_transaction(transaction)
     return binary_utils.keccak(serialized)

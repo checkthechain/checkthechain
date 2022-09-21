@@ -23,6 +23,7 @@ async def async_resolve_address(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
+    """resolve alternate address formats (i.e. ENS) to standard address str"""
 
     if not (
         isinstance(name_or_address, str)
@@ -50,6 +51,7 @@ async def async_resolve_addresses(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[str]:
+    """resolve alternate address formats (i.e. ENS) to standard address strs"""
 
     to_resolve: typing.Sequence[str] = []
     for item in enumerate(names_or_addresses):
@@ -89,6 +91,8 @@ async def async_resolve_address_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[str]:
+    """return resolution history of address over multiple blocks"""
+
     import asyncio
 
     coroutines = [

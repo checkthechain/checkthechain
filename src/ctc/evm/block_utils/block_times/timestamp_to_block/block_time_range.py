@@ -44,6 +44,7 @@ async def async_resolve_block_range(
     allow_none: bool,
     provider: spec.ProviderReference = None,
 ) -> tuple[spec.BlockNumberReference | None, spec.BlockNumberReference | None]:
+    """resolve block or timestamp range to a block range"""
 
     import asyncio
 

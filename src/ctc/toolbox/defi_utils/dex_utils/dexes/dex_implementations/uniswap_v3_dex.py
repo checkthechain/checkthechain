@@ -13,6 +13,7 @@ if typing.TYPE_CHECKING:
 
 
 class UniswapV3DEX(dex_class.DEX):
+    """Uniswap V3 DEX"""
 
     _pool_factories = {1: ['0x1f98431c8ad98523631ae4a59f267346ea31f984']}
 

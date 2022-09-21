@@ -18,6 +18,7 @@ def sign_text_message(
     mode: Literal['eth_sign', 'personal_sign'],
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
+    """sign text message using private key"""
 
     message_hash = _hash_text_message(
         message=message,
@@ -38,6 +39,7 @@ def sign_data_message(
     mode: Literal['eth_sign', 'personal_sign'],
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
+    """sign data message using private key"""
 
     message_hash = _hash_data_message(
         message=message,
@@ -57,6 +59,7 @@ def sign_message_hash(
     private_key: spec.Data,
     chain_id: int | None = None,
 ) -> tuple[int, int, int]:
+    """sign message hash using private key"""
 
     message_hash = format_utils.binary_convert(message_hash, 'binary')
 

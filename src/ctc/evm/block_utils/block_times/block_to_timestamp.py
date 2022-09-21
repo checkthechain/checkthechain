@@ -14,6 +14,7 @@ async def async_get_block_timestamp(
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> int:
+    """get timestamp of block"""
 
     from ctc import rpc
 
@@ -40,6 +41,7 @@ async def async_get_block_timestamps(
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> list[int]:
+    """get timestamps of blocks"""
 
     from ctc import rpc
 

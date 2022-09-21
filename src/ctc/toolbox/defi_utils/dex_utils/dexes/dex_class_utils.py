@@ -11,6 +11,7 @@ from . import dex_class
 
 
 def get_all_dex_classes() -> typing.Mapping[str, typing.Type[dex_class.DEX]]:
+    """get all DEX classes"""
     dex_names = [
         'balancer',
         'curve',
@@ -50,6 +51,7 @@ async def async_get_dex_class(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> typing.Type[dex_class.DEX]:
+    """get DEX class matching given inputs"""
 
     network, provider = evm.get_network_and_provider(network, provider)
     if factory is not None or dex is not None:
@@ -111,6 +113,7 @@ async def _async_get_dex_class_of_pool(
     pool: spec.Address,
     network: spec.NetworkReference | None,
 ) -> typing.Type[dex_class.DEX]:
+    """get DEX class for given pool"""
 
     from ctc import db
 

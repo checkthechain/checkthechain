@@ -17,6 +17,7 @@ async def async_get_pool_assets(
     use_db: bool = True,
     factory: spec.Address | None = None,
 ) -> typing.Sequence[spec.Address]:
+    """get assets of a given DEX pool"""
 
     network, provider = evm.get_network_and_provider(network, provider)
 

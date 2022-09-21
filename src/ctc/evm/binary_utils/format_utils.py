@@ -7,6 +7,7 @@ from ctc import spec
 
 
 def get_binary_format(data: spec.GenericBinaryData) -> spec.BinaryFormat:
+    """return binary format of input data"""
     if isinstance(data, bytes):
         return 'binary'
     elif isinstance(data, str):
@@ -21,6 +22,7 @@ def get_binary_format(data: spec.GenericBinaryData) -> spec.BinaryFormat:
 
 
 def get_binary_n_bytes(data: spec.GenericBinaryData) -> int:
+    """return number of bytes in input data"""
 
     if isinstance(data, bytes):
         return len(data)
@@ -49,10 +51,12 @@ def text_to_binary(
     text: str,
     output_format: typing.Optional[spec.BinaryFormat] = None,
 ) -> spec.GenericBinaryData:
+    """convert text to binary data"""
     return binary_convert(text.encode(), output_format)
 
 
 def binary_to_text(binary: spec.GenericBinaryData) -> str:
+    """convert binary data to text"""
     return codecs.decode(binary_convert(binary, 'binary'))
 
 

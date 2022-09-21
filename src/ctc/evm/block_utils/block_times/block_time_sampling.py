@@ -25,6 +25,7 @@ async def async_sample_blocks(
     include_misaligned_bound: bool = False,
     include_misaligned_overflow: bool = False,
 ) -> typing.Sequence[int]:
+    """create sample of blocks matching input sampling parameters"""
 
     import tooltime
 

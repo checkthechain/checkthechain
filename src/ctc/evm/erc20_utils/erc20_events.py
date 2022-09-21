@@ -38,6 +38,7 @@ async def async_get_erc20_transfers(
     provider: spec.ProviderReference = None,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
+    """get transfer events of ERC20 token"""
 
     from ctc import rpc
 
@@ -113,6 +114,7 @@ async def async_get_erc20_balances_from_transfers(
     ] = None,
     normalize: bool = False,
 ) -> spec.DataFrame:
+    """compute ERC20 balance of each wallet using Transfer events"""
 
     # filter block
     if block is not None:

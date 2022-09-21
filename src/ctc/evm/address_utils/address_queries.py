@@ -11,6 +11,7 @@ async def async_is_contract_address(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> bool:
+    """return whether address has bytecode on chain"""
 
     from ctc import rpc
 
@@ -28,6 +29,7 @@ async def async_are_contract_addresses(
     block: spec.BlockNumberReference = 'latest',
     provider: spec.ProviderReference = None,
 ) -> dict[spec.Address, bool]:
+    """return whether addresses have bytecode on chain"""
 
     from ctc import rpc
 

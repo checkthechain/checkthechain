@@ -15,7 +15,7 @@ async def async_predict_block_timestamp(
     provider: spec.ProviderReference = None,
     window_size: int = 88295,
 ) -> int:
-    """TODO: mode that uses database only, no rpc calls"""
+    """predict timestamp of future block number"""
 
     block = int(block)
 
@@ -44,6 +44,8 @@ async def async_predict_block_timestamps(
     provider: spec.ProviderReference = None,
     window_size: int = 100000,
 ) -> typing.Sequence[int]:
+    """predict timestamps of future block numbers"""
+
     import asyncio
 
     int_blocks = [int(block) for block in blocks]
@@ -99,6 +101,7 @@ async def async_predict_timestamp_block(
     provider: spec.ProviderReference = None,
     window_size: int = 86400 * 16,
 ) -> int:
+    """predict block number of future timestamp"""
 
     import tooltime
 
@@ -133,8 +136,9 @@ async def async_predict_timestamp_blocks(
     provider: spec.ProviderReference = None,
     window_size: int = 86400 * 16,
 ) -> typing.Sequence[int]:
-    import asyncio
+    """predict timestamps of future block numbers"""
 
+    import asyncio
     import tooltime
 
     int_timestamps = [

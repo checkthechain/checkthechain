@@ -28,6 +28,8 @@ def compute_median_block_gas_fee(
     *,
     normalize: bool,
 ) -> int | float | None:
+    """compute median gas fee of transactions in block"""
+
     import numpy as np
 
     # get transactions
@@ -59,6 +61,7 @@ def compute_median_blocks_gas_fees(
     *,
     normalize: bool = True,
 ) -> typing.Sequence[int | float | None]:
+    """compute median gas fees of transactionss in multiple blocks"""
 
     return [
         compute_median_block_gas_fee(block, normalize=normalize)
@@ -74,6 +77,7 @@ async def async_get_median_block_gas_fee(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference = None,
 ) -> db.BlockGasRow:
+    """get median gas fee for a given block"""
 
     from ctc import rpc
 
@@ -122,6 +126,7 @@ async def async_get_median_blocks_gas_fees(
     verbose: bool = True,
     latest_block_number: int | None = None,
 ) -> typing.Sequence[db.BlockGasRow]:
+    """get median gas fees for multiple blocks"""
 
     network, provider = evm.get_network_and_provider(network, provider)
     blocks = await evm.async_block_numbers_to_int(blocks)
@@ -193,7 +198,7 @@ async def async_get_block_gas_stats(
     normalize: bool = True,
     provider: spec.ProviderReference = None,
 ) -> BlockGasStats:
-    """get gas statistics for a given block"""
+    """get gas usage statistics for a given block"""
     if isinstance(block, dict):
         block_data = block
     else:
@@ -201,14 +206,37 @@ async def async_get_block_gas_stats(
             block, include_full_transactions=True, provider=provider
         )
 
-    return get_block_gas_stats(block_data, normalize=normalize)
+    return compute_block_gas_stats(block_data, normalize=normalize)
 
 
-def get_block_gas_stats(
+async def async_get_gas_stats_by_block(
+    blocks: typing.Sequence[spec.BlockNumberReference | spec.Block],
+    *,
+    normalize: bool = True,
+    provider: spec.ProviderReference = None,
+) -> list[BlockGasStats]:
+    """get block gas usage statistics of multiple blocks"""
+
+    import asyncio
+
+    coroutines = [
+        async_get_block_gas_stats(
+            block=block,
+            normalize=normalize,
+            provider=provider,
+        )
+        for block in blocks
+    ]
+
+    return await asyncio.gather(*coroutines)
+
+
+def compute_block_gas_stats(
     block: spec.Block,
     *,
     normalize: bool = True,
 ) -> BlockGasStats:
+    """compute gas usage statistics for given block"""
     import numpy as np
 
     base_fee: int | float | None = block.get('base_fee_per_gas')
@@ -250,23 +278,3 @@ def get_block_gas_stats(
         'gas_limit': block['gas_limit'],
         'n_transactions': len(block['transactions']),
     }
-
-
-async def async_get_gas_stats_by_block(
-    blocks: typing.Sequence[spec.BlockNumberReference | spec.Block],
-    *,
-    normalize: bool = True,
-    provider: spec.ProviderReference = None,
-) -> list[BlockGasStats]:
-    import asyncio
-
-    coroutines = [
-        async_get_block_gas_stats(
-            block=block,
-            normalize=normalize,
-            provider=provider,
-        )
-        for block in blocks
-    ]
-
-    return await asyncio.gather(*coroutines)

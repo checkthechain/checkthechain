@@ -15,7 +15,7 @@ async def async_print_address_summary(
     provider: spec.ProviderReference = None,
     raw: bool = False,
 ) -> None:
-    """
+    """print summary of address
 
     TODO (with more data)
     - transactions

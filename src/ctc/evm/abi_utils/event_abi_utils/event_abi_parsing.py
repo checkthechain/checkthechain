@@ -6,12 +6,13 @@ from .. import function_abi_utils
 
 
 def get_event_hash(event_abi: spec.EventABI) -> str:
-    """compute event hash from event's abi"""
+    """compute event hash from event abi"""
     signature = get_event_signature(event_abi=event_abi)
     return binary_utils.keccak_text(signature)
 
 
 def get_event_signature(event_abi: spec.EventABI) -> str:
+    """get event signature from event ABI"""
     arg_types = [var['type'] for var in event_abi['inputs']]
     arg_types = [
         function_abi_utils.get_function_selector_type(item)

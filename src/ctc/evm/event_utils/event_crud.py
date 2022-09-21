@@ -14,6 +14,8 @@ if typing.TYPE_CHECKING:
 
 
 def is_event_hash(data: spec.BinaryData) -> bool:
+    """return whether input is an event hash"""
+
     try:
         as_bytes = binary_utils.binary_convert(data, 'binary')
         return len(as_bytes) == 32
@@ -59,6 +61,7 @@ async def async_get_events(
     provider: spec.ProviderReference = None,
     **query: typing.Any,
 ) -> spec.DataFrame:
+    """get events matching given inputs"""
 
     from ctc.toolbox import backend_utils
 

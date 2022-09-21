@@ -9,7 +9,8 @@ from .. import binary_utils
 def standardize_transaction(
     transaction: typing.Mapping[str, typing.Any]
 ) -> typing.Mapping[str, typing.Any]:
-    """
+    """return standardized version of transaction
+
     - convert any camelcase keys or non-standard keys to single format
     - fill in missing keys
     """
@@ -34,6 +35,7 @@ def standardize_transaction(
 def get_transaction_type(
     transaction_or_type: spec.Data | typing.Mapping[str, typing.Any]
 ) -> int:
+    """get transaction type"""
 
     if isinstance(transaction_or_type, (int, str, bytes)):
         # if type provided directly, convert to int
@@ -61,6 +63,7 @@ def get_transaction_type(
 def get_transaction_type_name(
     transaction_or_type: typing.Mapping[str, typing.Any] | spec.Data
 ) -> str:
+    """get transaction type name"""
 
     transaction_type = get_transaction_type(transaction_or_type)
 
@@ -80,6 +83,7 @@ def get_transaction_type_keys(
     *,
     signed: bool,
 ) -> tuple[str, ...]:
+    """return list of keys that are used by a given transaction type"""
 
     transaction_type = get_transaction_type(transaction_or_type)
 

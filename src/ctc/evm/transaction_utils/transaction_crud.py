@@ -6,12 +6,16 @@ from ctc import spec
 
 
 async def async_get_transaction(transaction_hash: str) -> spec.Transaction:
+    """get transaction"""
+
     from ctc import rpc
 
     return await rpc.async_eth_get_transaction_by_hash(transaction_hash)  # type: ignore
 
 
 async def async_get_transaction_count(address: spec.Address) -> int:
+    """get transaction count of address"""
+
     from ctc import rpc
 
     result = await rpc.async_eth_get_transaction_count(address)
@@ -23,6 +27,8 @@ async def async_get_transaction_count(address: spec.Address) -> int:
 async def async_get_transactions(
     transaction_hashes: typing.Sequence[str],
 ) -> list[spec.Transaction]:
+    """get transactions"""
+
     import asyncio
 
     coroutines = [

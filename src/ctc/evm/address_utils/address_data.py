@@ -10,6 +10,8 @@ if typing.TYPE_CHECKING:
 
 
 def is_address_str(some_str: typing.Any) -> TypeGuard[spec.Address]:
+    """return whether input is an address str"""
+
     return (
         isinstance(some_str, str)
         and some_str.startswith('0x')
@@ -24,8 +26,12 @@ def get_created_address(
     salt: str | None = None,
     init_code: spec.HexData | None = None,
 ) -> spec.Address:
-    # see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md
-    # see https://ethereum.stackexchange.com/a/761
+    """return address created by EVM opcodes CREATE or CREATE2
+
+    see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md
+    see https://ethereum.stackexchange.com/a/761
+    """
+
     if nonce is not None:
         # create
         data: str | bytes = binary_utils.rlp_encode(
@@ -51,7 +57,7 @@ def get_created_address(
 
 
 def get_address_checksum(address: spec.Address) -> spec.Address:
-    """
+    """return checksummed version of address str
 
     - adapted from eth_utils.to_checksum_address()
     """

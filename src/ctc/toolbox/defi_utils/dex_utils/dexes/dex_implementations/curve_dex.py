@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
 
 
 class CurveDEX(dex_class.DEX):
+    """Curve DEX"""
 
     _pool_factories = {
         1: [

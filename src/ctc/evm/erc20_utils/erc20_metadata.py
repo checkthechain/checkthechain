@@ -77,7 +77,9 @@ async def async_is_erc20(
 async def async_get_default_erc20_tokens() -> typing.Sequence[
     spec.ERC20Metadata
 ]:
-    """TODO: add db table for tracking erc20 token lists
+    """get list of default ERC20s
+
+    TODO: add db table for tracking erc20 token lists
     - use a token list as tokens to check during block exploration
     - "default" can be one of the token lists
     """
@@ -93,6 +95,7 @@ async def async_get_erc20_metadata(
     provider: spec.ProviderReference = None,
     **rpc_kwargs: typing.Any,
 ) -> spec.ERC20Metadata:
+    """get metadata for ERC20 token"""
 
     from ctc import rpc
 
