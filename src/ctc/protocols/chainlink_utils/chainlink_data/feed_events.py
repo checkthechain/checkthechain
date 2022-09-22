@@ -72,7 +72,6 @@ async def async_get_full_feed_event_data(
         )
     )
     if aggregator_address != initial_aggregator_address:
-        print('performing meta-aggregation')
         history = await chainlink_aggregators.async_get_feed_aggregator_history(
             feed=feed,
             provider=provider,

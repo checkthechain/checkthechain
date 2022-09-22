@@ -8,6 +8,7 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 
+from . import chainlink_db
 from . import chainlink_feed_metadata
 
 
@@ -54,28 +55,110 @@ async def async_get_aggregator_base_quote(
 
 
 async def async_get_feed_aggregator_history(
-    feed: str, provider: spec.ProviderReference = None
+    feed: spec.Address,
+    *,
+    provider: spec.ProviderReference = None,
+    network: spec.NetworkReference | None = None,
 ) -> typing.Mapping[spec.Address, int]:
-    # TODO: can make it go 2x as fast by searching at start and end concurrently
-    # TODO: be able to give block range to search within
+
+    network, provider = evm.get_network_and_provider(network, provider)
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
         feed,
         provider=provider,
     )
 
-    aggregators = await async_get_feed_previous_aggregators(
+    # query current feed aggregator
+    aggregator_coroutine = chainlink_feed_metadata.async_get_feed_aggregator(
         feed=feed,
+        block='latest',
         provider=provider,
     )
 
-    aggregator_start_blocks = await _async_get_aggregator_start_blocks(
-        previous_aggregators=aggregators,
+    # get known updates
+    db_results = await chainlink_db.async_query_aggregator_updates(
         feed=feed,
-        provider=provider,
+        network=network,
     )
+    if db_results is not None:
+        db_results = sorted(
+            db_results, key=lambda result: result['block_number']
+        )
+        feed_aggregator_updates = {
+            update['aggregator']: update['block_number']
+            for update in db_results
+        }
+    else:
+        feed_aggregator_updates = {}
 
-    return aggregator_start_blocks
+    # await current aggregator
+    aggregator = await aggregator_coroutine
+
+    # if current aggregator is in database, then data are up to date
+    if aggregator in feed_aggregator_updates:
+        return feed_aggregator_updates
+
+    # otherwise, need to update data
+    else:
+
+        # collect new update data
+        previous_aggregators = await async_get_feed_previous_aggregators(
+            feed=feed,
+            provider=provider,
+        )
+        previous_aggregators = [
+            aggregator
+            for aggregator in previous_aggregators
+            if aggregator not in feed_aggregator_updates
+        ]
+        aggregator_start_blocks = await _async_get_aggregator_start_blocks(
+            previous_aggregators=previous_aggregators,
+            feed=feed,
+            provider=provider,
+        )
+
+        # intake new data to database
+        updates: typing.Sequence[
+            chainlink_db.chainlink_schema_defs._FeedAggregatorUpdate
+        ] = [
+            {
+                'feed': feed,
+                'aggregator': aggregator,
+                'block_number': block_number,
+            }
+            for aggregator, block_number in aggregator_start_blocks.items()
+        ]
+        await chainlink_db.async_intake_aggregator_updates(
+            updates=updates,
+            network=network,
+        )
+
+        return dict(feed_aggregator_updates, **aggregator_start_blocks)
+
+
+# async def async_get_feed_aggregator_history(
+#     feed: str, provider: spec.ProviderReference = None
+# ) -> typing.Mapping[spec.Address, int]:
+#     # TODO: can make it go 2x as fast by searching at start and end concurrently
+#     # TODO: be able to give block range to search within
+
+#     feed = await chainlink_feed_metadata.async_resolve_feed_address(
+#         feed,
+#         provider=provider,
+#     )
+
+#     aggregators = await async_get_feed_previous_aggregators(
+#         feed=feed,
+#         provider=provider,
+#     )
+
+#     aggregator_start_blocks = await _async_get_aggregator_start_blocks(
+#         previous_aggregators=aggregators,
+#         feed=feed,
+#         provider=provider,
+#     )
+
+#     return aggregator_start_blocks
 
 
 async def _async_get_aggregator_start_blocks(
@@ -84,6 +167,8 @@ async def _async_get_aggregator_start_blocks(
     *,
     provider: spec.ProviderReference,
 ) -> typing.Mapping[spec.Address, int]:
+
+    print('locating Chainlink aggregator update blocks...')
 
     from ctc.toolbox import search_utils
 

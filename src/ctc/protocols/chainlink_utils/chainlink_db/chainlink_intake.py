@@ -6,6 +6,7 @@ from ctc import db
 from ctc import evm
 from ctc import spec
 
+from . import chainlink_schema_defs
 from . import chainlink_statements
 
 
@@ -209,4 +210,45 @@ def summarize_payload(payload: ChainlinkFeedPayload) -> None:
                 '    -',
                 network['name'],
                 '(' + str(len(network['proxies'])) + ')',
+            )
+
+
+async def async_intake_aggregator_update(
+    *,
+    feed: spec.Address,
+    aggregator: spec.Address,
+    block_number: int,
+    network: spec.NetworkReference,
+) -> None:
+
+    engine = db.create_engine(
+        schema_name='chainlink',
+        network=network,
+    )
+    if engine is not None:
+        with engine.begin() as conn:
+            await chainlink_statements.async_upsert_aggregator_update(
+                feed=feed,
+                aggregator=aggregator,
+                block_number=block_number,
+                network=network,
+                conn=conn,
+            )
+
+
+async def async_intake_aggregator_updates(
+    updates: typing.Sequence[chainlink_schema_defs._FeedAggregatorUpdate],
+    network: spec.NetworkReference,
+) -> None:
+
+    engine = db.create_engine(
+        schema_name='chainlink',
+        network=network,
+    )
+    if engine is not None:
+        with engine.begin() as conn:
+            await chainlink_statements.async_upsert_aggregator_updates(
+                updates=updates,
+                network=network,
+                conn=conn,
             )

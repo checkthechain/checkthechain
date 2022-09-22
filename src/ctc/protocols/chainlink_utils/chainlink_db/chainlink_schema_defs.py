@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from ctc import spec
+
 if typing.TYPE_CHECKING:
 
     from typing_extensions import TypedDict
@@ -18,6 +20,11 @@ if typing.TYPE_CHECKING:
         asset_type: str
         status: str
 
+    class _FeedAggregatorUpdate(TypedDict):
+        feed: spec.Address
+        aggregator: spec.Address
+        block_number: int
+
 
 chainlink_schema: toolsql.DBSchema = {
     'tables': {
@@ -31,6 +38,13 @@ chainlink_schema: toolsql.DBSchema = {
                 {'name': 'asset', 'type': 'Text', 'index': True},
                 {'name': 'asset_type', 'type': 'Text', 'index': True},
                 {'name': 'status', 'type': 'Text'},
+            ],
+        },
+        'chainlink_aggregator_updates': {
+            'columns': [
+                {'name': 'feed', 'type': 'Text', 'primary': True},
+                {'name': 'aggregator', 'type': 'Text', 'primary': True},
+                {'name': 'block_number', 'type': 'Integer', 'primary': True},
             ],
         },
     },

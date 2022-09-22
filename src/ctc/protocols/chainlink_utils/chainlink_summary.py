@@ -155,7 +155,7 @@ async def async_summarize_feed(
         indent='    ',
         column_formats={'value': {'decimals': 5}},
         column_styles={
-            'value': styles['description'] + ' bold',
+            'value': ' '.join(styles['description'] + 'bold'),
         },
         label_style=styles['title'],
         border=styles['comment'],
