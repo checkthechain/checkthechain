@@ -46,17 +46,17 @@ async def async_fuse_command(arg: str, block: str) -> None:
             arg_type = 'token'
 
         if arg_type == 'pool_index':
-            await async_summarize_fuse_pool(
+            await async_print_fuse_pool_summary(
                 pool_index=pool_index, block=block_number
             )
         elif arg_type == 'token':
-            await async_summarize_fuse_token(token, block_number)
+            await async_print_fuse_token_summary(token, block_number)
 
     else:
-        await async_summarize_all_fuse_pools(block=block_number)
+        await async_print_all_fuse_pools_summary(block=block_number)
 
 
-async def async_summarize_fuse_pool(
+async def async_print_fuse_pool_summary(
     pool_index: int, block: spec.BlockNumberReference
 ) -> None:
     all_pools = await rari_utils.async_get_all_pools(block=block)
@@ -81,14 +81,14 @@ async def async_summarize_fuse_pool(
     )
 
 
-async def async_summarize_all_fuse_pools(
+async def async_print_all_fuse_pools_summary(
     block: spec.BlockNumberReference,
 ) -> None:
 
     await rari_utils.async_print_all_pool_summary(block=block)
 
 
-async def async_summarize_fuse_token(
+async def async_print_fuse_token_summary(
     token: spec.Address,
     block: spec.BlockNumberReference,
 ) -> None:

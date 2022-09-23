@@ -141,7 +141,7 @@ async def async_print_aave_addresses(
         )
 
 
-async def async_summarize_token_markets(
+async def async_print_token_markets_summary(
     *,
     verbose: bool = False,
     block: spec.BlockNumberReference | None = None,
@@ -342,7 +342,7 @@ async def async_summarize_token_markets(
     toolstr.print('network = mainnet', style=styles['comment'])
 
 
-async def async_summarize_token_market(
+async def async_print_token_market_summary(
     token: str | spec.Address,
     *,
     blocks: typing.Sequence[int],

@@ -131,7 +131,7 @@ async def async_get_timestamps_blocks(
     return blocks
 
 
-def summarize_timestamps(
+def print_timestamp_summary(
     timescale: analytics_spec.Timescale,
     timestamps: analytics_spec.Timestamps,
 ) -> None:

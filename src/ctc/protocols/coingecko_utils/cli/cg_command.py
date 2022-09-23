@@ -121,7 +121,7 @@ async def async_cg_command(
         toolstr.print(note, style='#555555')
 
     elif len(tokens) == 3 and tokens[1] == '/':
-        await coingecko_utils.async_summarize_coin_quotient(
+        await coingecko_utils.async_print_coin_quotient_summary(
             tokens[0],
             tokens[2],
             days=days,
@@ -129,7 +129,7 @@ async def async_cg_command(
 
     elif len(tokens) == 1:
 
-        await coingecko_utils.async_summarize_token_data(
+        await coingecko_utils.async_print_token_data_summary(
             query=tokens[0],
             verbose=verbose,
             update=update,

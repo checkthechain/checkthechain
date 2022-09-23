@@ -30,7 +30,7 @@ def get_contract_abi_by_selectors(
     return by_selectors
 
 
-def summarize_contract_abi(
+def print_contract_abi(
     contract_abi: spec.ContractABI,
     *,
     max_width: int | None = None,
@@ -39,7 +39,7 @@ def summarize_contract_abi(
 ) -> None:
     """print summary of contract ABI"""
 
-    summarize_contract_abi_functions(
+    print_contract_abi_functions(
         contract_abi=contract_abi,
         max_width=max_width,
         verbose=verbose,
@@ -47,14 +47,14 @@ def summarize_contract_abi(
     )
     print()
     print()
-    summarize_contract_abi_events(
+    print_contract_abi_events(
         contract_abi=contract_abi,
         max_width=max_width,
         verbose=verbose,
     )
 
 
-def summarize_contract_abi_functions(
+def print_contract_abi_functions(
     contract_abi: spec.ContractABI,
     *,
     max_width: int | None = None,
@@ -216,7 +216,7 @@ def summarize_contract_abi_functions(
     )
 
 
-def summarize_contract_abi_events(
+def print_contract_abi_events(
     contract_abi: spec.ContractABI,
     *,
     max_width: int | None = None,

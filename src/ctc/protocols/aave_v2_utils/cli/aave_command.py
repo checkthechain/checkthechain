@@ -73,14 +73,14 @@ async def async_aave_command(
             end_block=block_reference,
         )
 
-        await aave_v2_utils.async_summarize_token_market(
+        await aave_v2_utils.async_print_token_market_summary(
             token=token,
             verbose=verbose,
             blocks=blocks,
         )
 
     else:
-        await aave_v2_utils.async_summarize_token_markets(
+        await aave_v2_utils.async_print_token_markets_summary(
             verbose=verbose,
             block=block,
         )

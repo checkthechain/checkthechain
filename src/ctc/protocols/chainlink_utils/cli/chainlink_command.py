@@ -104,7 +104,7 @@ async def async_chainlink_command(
         fields = 'answer'
 
     if blocks is None:
-        await chainlink_utils.async_summarize_feed(
+        await chainlink_utils.async_print_feed_summary(
             feed=feed_str,
             verbose=verbose,
             start_block=start_block,

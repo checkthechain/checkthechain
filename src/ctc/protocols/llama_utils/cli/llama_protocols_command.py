@@ -46,7 +46,7 @@ async def async_llama_protocols_command(
     chain: str | None = None,
 ) -> None:
 
-    await llama_tvls.async_summarize_protocols_tvls(
+    await llama_tvls.async_print_protocols_tvls(
         verbose=verbose,
         n=n,
         filter_category=category,

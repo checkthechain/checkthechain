@@ -186,7 +186,7 @@ async def async_abi_command(
         columns = toolcli.get_n_terminal_cols()
 
         if functions:
-            evm.summarize_contract_abi_functions(
+            evm.print_contract_abi_functions(
                 contract_abi,
                 max_width=columns,
                 verbose=verbose,
@@ -194,14 +194,14 @@ async def async_abi_command(
             )
 
         elif events:
-            evm.summarize_contract_abi_events(
+            evm.print_contract_abi_events(
                 contract_abi,
                 max_width=columns,
                 verbose=verbose,
             )
 
         else:
-            evm.summarize_contract_abi(
+            evm.print_contract_abi(
                 contract_abi,
                 max_width=columns,
                 verbose=verbose,

@@ -28,7 +28,7 @@ async def async_search_single_vault_address(
         return vault['address']
 
 
-async def async_summarize_vault(
+async def async_print_vault_summary(
     query: str,
     network: spec.NetworkReference,
     *,
@@ -257,7 +257,7 @@ async def async_summarize_vault(
     )
 
 
-async def async_summarize_vaults(
+async def async_print_vaults_summary(
     *,
     network: spec.NetworkReference,
     sort_by: str | None = None,

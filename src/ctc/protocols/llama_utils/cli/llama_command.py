@@ -14,4 +14,4 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_llama_command() -> None:
-    await llama_tvls.async_summarize_historical_defi_tvl()
+    await llama_tvls.async_print_historical_defi_tvl()

@@ -202,7 +202,7 @@ async def async_import_network_to_db(
         print(indent + 'added', len(feeds), network, 'Chainlink feeds to db')
 
 
-def summarize_payload(payload: ChainlinkFeedPayload) -> None:
+def print_payload_summary(payload: ChainlinkFeedPayload) -> None:
     for group in payload.keys():
         print(group)
         for network in payload[group]['networks']:

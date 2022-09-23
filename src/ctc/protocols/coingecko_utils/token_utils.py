@@ -259,7 +259,7 @@ async def async_get_market_chart(
 #
 
 
-async def async_summarize_token_data(
+async def async_print_token_data_summary(
     *,
     token_id: str | None = None,
     query: str | None = None,
@@ -436,7 +436,7 @@ async def async_summarize_token_data(
     toolstr.print(combined_str, style=styles['comment'])
 
 
-async def async_summarize_coin_quotient(
+async def async_print_coin_quotient_summary(
     coin1: str,
     coin2: str,
     *,

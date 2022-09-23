@@ -28,7 +28,7 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_llama_protocol_command(protocol: str, verbose: bool) -> None:
-    await llama_tvls.async_summarize_historical_protocol_tvl(
+    await llama_tvls.async_print_historical_protocol_tvl(
         protocol=protocol,
         verbose=verbose,
     )

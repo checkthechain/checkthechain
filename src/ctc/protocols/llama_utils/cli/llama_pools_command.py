@@ -118,7 +118,7 @@ async def async_llama_pools_command(
     else:
         use_stablecoin = None
 
-    await llama_yields.async_summarize_llama_pools(
+    await llama_yields.async_print_llama_pools_summary(
         chain=chain,
         project=project,
         stablecoin=use_stablecoin,

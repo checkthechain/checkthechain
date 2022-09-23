@@ -75,7 +75,7 @@ async def async_yearn_vaults_command(
 ) -> None:
 
     if query is not None:
-        await yearn_utils.async_summarize_vault(
+        await yearn_utils.async_print_vault_summary(
             query=query,
             verbose=verbose,
             network='mainnet',
@@ -83,7 +83,7 @@ async def async_yearn_vaults_command(
         )
 
     else:
-        await yearn_utils.async_summarize_vaults(
+        await yearn_utils.async_print_vaults_summary(
             sort_by=sort,
             min_tvl=min_tvl,
             min_apy=min_apy,

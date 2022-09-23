@@ -14,7 +14,7 @@ from . import chainlink_feed_metadata
 from . import chainlink_spec
 
 
-async def async_summarize_feed(
+async def async_print_feed_summary(
     feed: str,
     *,
     start_block: spec.BlockNumberReference | None = None,

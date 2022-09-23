@@ -25,4 +25,4 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_llama_chains_command(n: int = 15) -> None:
-    await llama_tvls.async_summarize_chains_tvls(n=n)
+    await llama_tvls.async_print_chains_tvls(n=n)

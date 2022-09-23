@@ -15,7 +15,7 @@ from . import llama_requests
 #
 
 
-async def async_summarize_llama_pools(
+async def async_print_llama_pools_summary(
     *,
     chain: str | None = None,
     project: str | None = None,
@@ -114,7 +114,7 @@ async def async_summarize_llama_pools(
         + ' pools found'
     )
     if verbose:
-        summarize_pool_counts(pools)
+        print_pool_counts_summary(pools)
 
     highest_apy_pools = sorted(
         pools, key=lambda pool: float(pool['apy']), reverse=True
@@ -205,7 +205,7 @@ def print_pools_table(
     )
 
 
-def summarize_pool_counts(
+def print_pool_counts_summary(
     pools: typing.Sequence[typing.Any],
     n: int = 10,
 ) -> None:
@@ -329,7 +329,7 @@ def summarize_pool_counts(
 #
 
 
-async def async_summarize_pool_yield(pool: typing.Any) -> None:
+async def async_print_pool_yield_summary(pool: typing.Any) -> None:
 
     styles = cli.get_cli_styles()
 

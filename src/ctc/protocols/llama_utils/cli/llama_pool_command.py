@@ -22,4 +22,4 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_llama_pool_command(pool: str) -> None:
-    await llama_yields.async_summarize_pool_yield(pool)
+    await llama_yields.async_print_pool_yield_summary(pool)

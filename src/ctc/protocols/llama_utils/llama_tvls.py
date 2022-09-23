@@ -11,7 +11,7 @@ from . import llama_requests
 #
 
 
-async def async_summarize_protocols_tvls(
+async def async_print_protocols_tvls(
     *,
     verbose: bool = False,
     n: int = 50,
@@ -67,7 +67,7 @@ async def async_summarize_protocols_tvls(
     )
 
 
-async def async_summarize_chains_tvls(n: int = 50) -> None:
+async def async_print_chains_tvls(n: int = 50) -> None:
 
     styles = cli.get_cli_styles()
 
@@ -115,7 +115,7 @@ async def async_summarize_chains_tvls(n: int = 50) -> None:
 #
 
 
-async def async_summarize_historical_defi_tvl() -> None:
+async def async_print_historical_defi_tvl() -> None:
 
     styles = cli.get_cli_styles()
 
@@ -137,7 +137,7 @@ async def async_summarize_historical_defi_tvl() -> None:
     toolstr.print(plot)
 
 
-async def async_summarize_historical_chain_tvl(chain: str) -> None:
+async def async_print_historical_chain_tvl(chain: str) -> None:
 
     styles = cli.get_cli_styles()
 
@@ -161,7 +161,7 @@ async def async_summarize_historical_chain_tvl(chain: str) -> None:
     toolstr.print(plot, indent=4)
 
 
-async def async_summarize_historical_protocol_tvl(
+async def async_print_historical_protocol_tvl(
     protocol: str, verbose: bool = False
 ) -> None:
 

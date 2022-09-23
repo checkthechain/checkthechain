@@ -22,4 +22,4 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_llama_chain_command(chain: str) -> None:
-    await llama_tvls.async_summarize_historical_chain_tvl(chain)
+    await llama_tvls.async_print_historical_chain_tvl(chain)
