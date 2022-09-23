@@ -98,6 +98,7 @@ async def async_get_registration_block(name: str) -> int:
         raise Exception('could not find registration')
 
     block = result.iloc[0].name[0]
+    block = int(block)
 
     if not isinstance(block, int):
         raise Exception('invalid rpc result')

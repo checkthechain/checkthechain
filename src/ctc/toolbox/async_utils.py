@@ -27,7 +27,10 @@ async def async_gather_coroutines(
 ) -> list[R]:
     """gather without erasing type information"""
     results = await asyncio.gather(*coroutines)
-    return typing.cast(list[R], results)
+    if typing.TYPE_CHECKING:
+        return typing.cast(list[R], results)
+    else:
+        return results
 
 
 async def async_gather_dict(

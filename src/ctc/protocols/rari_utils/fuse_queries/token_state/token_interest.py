@@ -87,7 +87,10 @@ async def async_get_supply_apy(
             block=block,
         )
 
-    return (1 + supply_interest_per_block) ** blocks_per_year - 1
+    try:
+        return (1 + supply_interest_per_block) ** blocks_per_year - 1
+    except OverflowError:
+        return float('inf')
 
 
 async def async_get_borrow_apy(
@@ -119,4 +122,7 @@ async def async_get_borrow_apy(
             block=block,
         )
 
-    return (1 + borrow_interest_per_block) ** blocks_per_year - 1
+    try:
+        return (1 + borrow_interest_per_block) ** blocks_per_year - 1
+    except OverflowError:
+        return float('inf')

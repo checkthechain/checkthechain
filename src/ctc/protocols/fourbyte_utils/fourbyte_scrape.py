@@ -19,7 +19,7 @@ async def async_build_function_signatures_dataset(
 
     if signature_data is None:
         # TODO: smarter detection of what is currently in database
-        print('(building function signatures db from scratch, may take awhile')
+        print('building function signatures db from scratch, may take awhile')
         signature_data = await async_scrape_function_signatures()
 
     await fourbyte_db.async_intake_function_signatures(
@@ -35,7 +35,7 @@ async def async_build_event_signatures_dataset(
 
     if signature_data is None:
         # TODO: smarter detection of what is currently in database
-        print('(building event signatures db from scratch, may take awhile')
+        print('building event signatures db from scratch, may take awhile')
         signature_data = await async_scrape_event_signatures()
 
     await fourbyte_db.async_intake_event_signatures(

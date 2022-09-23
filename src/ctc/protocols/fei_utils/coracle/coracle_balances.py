@@ -338,10 +338,20 @@ async def async_get_tokens_balances_by_block(
     )
 
     if normalize:
-        int_type = typing.List[typing.Dict[spec.Address, int]]
-        int_result = typing.cast(int_type, block_token_balances)
-        return nested_utils.list_of_dicts_to_dict_of_lists(int_result)
+        if typing.TYPE_CHECKING:
+            int_type = typing.List[typing.Dict[spec.Address, int]]
+            int_result = typing.cast(int_type, block_token_balances)
+            return nested_utils.list_of_dicts_to_dict_of_lists(int_result)
+        else:
+            return nested_utils.list_of_dicts_to_dict_of_lists(
+                block_token_balances
+            )
     else:
-        float_type = typing.List[typing.Dict[spec.Address, float]]
-        float_result = typing.cast(float_type, block_token_balances)
-        return nested_utils.list_of_dicts_to_dict_of_lists(float_result)
+        if typing.TYPE_CHECKING:
+            float_type = typing.List[typing.Dict[spec.Address, float]]
+            float_result = typing.cast(float_type, block_token_balances)
+            return nested_utils.list_of_dicts_to_dict_of_lists(float_result)
+        else:
+            return nested_utils.list_of_dicts_to_dict_of_lists(
+                block_token_balances
+            )
