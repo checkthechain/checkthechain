@@ -50,10 +50,10 @@ dependencies = [
     'toml >=0.10.2, <0.11',
     #
     # tool suite
-    'toolcli >=0.6.7, <0.7',
+    'toolcli >=0.6.8, <0.7',
     'toolconf >=0.1.2, <0.2',
     'toolsql >=0.3.11, <0.4',
-    'toolstr >=0.7.5, <0.8',
+    'toolstr >=0.8.1, <0.9',
     'tooltime >=0.2.7, <0.3',
     #
     # EVM dependencies
@@ -199,10 +199,10 @@ deps =
     toml==0.10.2
     ;
     ; tool suite
-    toolcli==0.6.7
+    toolcli==0.6.8
     toolconf==0.1.2
     toolsql==0.3.11
-    toolstr==0.7.5
+    toolstr==0.8.1
     tooltime==0.2.7
     ;
     ; EVM dependencies
