@@ -96,7 +96,7 @@ cli_examples = collect_cli_examples()
 @pytest.mark.parametrize('cli_example', cli_examples)
 def test_subcommand_examples(cli_example):
 
-    max_example_time = 20
+    max_example_time = 30
 
     exit_code = subprocess.call(cli_example, timeout=max_example_time)
     if exit_code != 0:

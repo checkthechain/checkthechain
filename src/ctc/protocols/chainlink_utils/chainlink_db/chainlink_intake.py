@@ -44,29 +44,54 @@ if typing.TYPE_CHECKING:
         feedType: str
 
 
-network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, str]] = {
-    'mainnet': ('ethereum-addresses', 'Ethereum Mainnet'),
-    'kovan': ('ethereum-addresses', 'Kovan Testnet'),
-    'rinkeby': ('ethereum-addresses', 'Rinkeby Testnet'),
-    'bnb': ('bnb-chain-addresses-price', 'BNB Chain Mainnet'),
-    'bnb_testnet': ('bnb-chain-addresses-price', 'BNB Chain Testnet'),
-    'polygon': ('matic-addresses', 'Polygon Mainnet'),
-    'polygon_mumbai': ('matic-addresses', 'Mumbai Testnet'),
-    'gnosis': ('data-feeds-gnosis-chain', 'Gnosis Chain Mainnet'),
-    'heco': ('huobi-eco-chain-price-feeds', 'HECO Mainnet'),
-    'avalanche': ('avalanche-price-feeds', 'Avalanche Mainnet'),
-    'avalanche_fuji': ('avalanche-price-feeds', 'Avalanche Testnet'),
-    'fantom': ('fantom-price-feeds', 'Fantom Mainnet'),
-    'arbitrum': ('arbitrum-price-feeds', 'Arbitrum Mainnet'),
-    'arbitrum_rinkeby': ('arbitrum-price-feeds', 'Arbitrum Rinkeby'),
-    'harmony': ('harmony-price-feeds', 'Harmony Mainnet'),
-    'harmony_testnet': ('harmony-price-feeds', 'Harmony Testnet'),
-    # 'solana': ('data-feeds-solana', 'Solana Mainnet'),
-    # 'solana_testnet': ('data-feeds-solana', 'Solana Devnet'),
-    'optimism': ('optimism-price-feeds', 'Optimism Mainnet'),
-    'optimism_kovan': ('optimism-price-feeds', 'Optimism Kovan'),
-    'moonriver': ('data-feeds-moonriver', 'Moonriver Mainnet'),
-    'moonbeam': ('data-feeds-moonbeam', 'Moonbeam Mainnet'),
+# # legacy version of chainlink payload data
+# _legacy_network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, str]] = {
+#     'mainnet': ('ethereum-addresses', 'Ethereum Mainnet'),
+#     'kovan': ('ethereum-addresses', 'Kovan Testnet'),
+#     'rinkeby': ('ethereum-addresses', 'Rinkeby Testnet'),
+#     'bnb': ('bnb-chain-addresses-price', 'BNB Chain Mainnet'),
+#     'bnb_testnet': ('bnb-chain-addresses-price', 'BNB Chain Testnet'),
+#     'polygon': ('matic-addresses', 'Polygon Mainnet'),
+#     'polygon_mumbai': ('matic-addresses', 'Mumbai Testnet'),
+#     'gnosis': ('data-feeds-gnosis-chain', 'Gnosis Chain Mainnet'),
+#     'heco': ('huobi-eco-chain-price-feeds', 'HECO Mainnet'),
+#     'avalanche': ('avalanche-price-feeds', 'Avalanche Mainnet'),
+#     'avalanche_fuji': ('avalanche-price-feeds', 'Avalanche Testnet'),
+#     'fantom': ('fantom-price-feeds', 'Fantom Mainnet'),
+#     'arbitrum': ('arbitrum-price-feeds', 'Arbitrum Mainnet'),
+#     'arbitrum_rinkeby': ('arbitrum-price-feeds', 'Arbitrum Rinkeby'),
+#     'harmony': ('harmony-price-feeds', 'Harmony Mainnet'),
+#     'harmony_testnet': ('harmony-price-feeds', 'Harmony Testnet'),
+#     # 'solana': ('data-feeds-solana', 'Solana Mainnet'),
+#     # 'solana_testnet': ('data-feeds-solana', 'Solana Devnet'),
+#     'optimism': ('optimism-price-feeds', 'Optimism Mainnet'),
+#     'optimism_kovan': ('optimism-price-feeds', 'Optimism Kovan'),
+#     'moonriver': ('data-feeds-moonriver', 'Moonriver Mainnet'),
+#     'moonbeam': ('data-feeds-moonbeam', 'Moonbeam Mainnet'),
+# }
+
+network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, int]] = {
+    'mainnet': ('ethereum', 0),
+    'goerli': ('ethereum', 1),
+    'bnb': ('bnb-chain', 0),
+    'bnb_testnet': ('bnb-chain', 1),
+    'polygon': ('polygon', 0),
+    'polygon_mumbai': ('polygon', 0),
+    'gnosis': ('gnosis-chain', 0),
+    'heco': ('heco-chain', 0),
+    'avalanche': ('avalanche', 0),
+    'avalanche_fuji': ('avalanche', 1),
+    'fantom': ('fantom', 0),
+    'fantom_testnet': ('fantom', 1),
+    'arbitrum': ('arbitrum', 0),
+    'arbitrum_rinkeby': ('arbitrum', 1),
+    'harmony': ('harmony', 0),
+    'optimism': ('optimism', 0),
+    'optimism_goerli': ('optimism', 1),
+    'moonriver': ('moonriver', 0),
+    'moonbeam': ('moonbeam', 0),
+    'metis': ('metis', 0),
+    'klaytn': ('klaytn', 0),
 }
 
 
@@ -93,15 +118,11 @@ async def async_get_network_feed_data(
             network = evm.get_network_chain_id(network)
         if not isinstance(network, str):
             raise Exception('unknown network type: ' + str(type(network)))
-        network_group, network_name = network_payload_locations[network]
+        network_group, index = network_payload_locations[network]
     else:
         raise Exception('unknown network')
 
-    for network_data in payload[network_group]['networks']:
-        if network_data['name'] == network_name:
-            return network_data['proxies']
-    else:
-        raise Exception('could not find network feeds')
+    return payload[network_group]['networks'][index]['proxies']
 
 
 async def async_import_networks_to_db(
@@ -121,17 +142,30 @@ async def async_import_networks_to_db(
 
     # determine which networks to use
     if networks is None:
-        # use all networks
-        locations_to_network = {
-            v: k for k, v in network_payload_locations.items()
-        }
+
+        known_networks = {datum['name'] for datum in evm.get_networks().values()}
+
         networks = []
-        for key in payload.keys():
-            for network_data in payload[key]['networks']:
-                subkey = network_data['name']
-                if (key, subkey) in locations_to_network:
-                    network = locations_to_network[(key, subkey)]
-                    networks.append(network)
+        for network_name in network_payload_locations.keys():
+            network_group, index = network_payload_locations[network_name]
+            if (
+                network_name in known_networks
+                and network_group in payload
+                and len(payload[network_group]['networks']) > index
+            ):
+                networks.append(network_name)
+
+    #         # use all networks
+    #         locations_to_network = {
+    #             v: k for k, v in network_payload_locations.items()
+    #         }
+    #         networks = []
+    #         for key in payload.keys():
+    #             for network_data in payload[key]['networks']:
+    #                 subkey = network_data['name']
+    #                 if (key, subkey) in locations_to_network:
+    #                     network = locations_to_network[(key, subkey)]
+    #                     networks.append(network)
 
     if verbose:
         print(

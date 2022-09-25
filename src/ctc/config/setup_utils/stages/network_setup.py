@@ -9,7 +9,6 @@ import toolstr
 
 from ctc import rpc
 from ctc import spec
-from ctc.cli import cli_run
 from ... import config_defaults
 
 
