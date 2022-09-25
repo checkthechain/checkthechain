@@ -29,11 +29,19 @@ for details check out [the docs](https://ctc.readthedocs.io/)
 3. [**FAQ**](#faq)
 4. [**Similar Projects**](#similar-projects)
 
-
+<table>
+  <tbody>
+    <tr>
+      <td>
+        <b>📜 Legal Disclaimer 📜</b> As stated in the MIT license, <code>ctc</code> comes with no warranty of any kind. The authors of <code>ctc</code> accept no responsibility for any damages or negative outcomes that result from using <code>ctc</code> or <code>ctc</code>-derived data. <code>ctc</code> is not audited and using it as the basis for making financial decisions is not recommended.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Example Usage
 
-for more examples see examples in (the docs)[https://ctc.readthedocs.io/en/latest/index.html#datatypes]
+for more examples see examples in [the docs](https://ctc.readthedocs.io/en/latest/index.html#datatypes)
 
 
 #### Get all token transfers of an ERC20
