@@ -1,6 +1,6 @@
 # ⛓🔍 Check the Chain (`ctc`) 🔎⛓
 
-`ctc` is a tool for historical data analysis of Ethereum and other EVM chains
+`ctc` is a tool for collecting and analyzing data from Ethereum and other EVM chains
 
 It can be used as either 1) a python package or 2) a cli tool
 
@@ -12,11 +12,11 @@ It can be used as either 1) a python package or 2) a cli tool
 - **data storage**: stores collected data on disk so that it only needs to be collected once
 - **data coding**: handles data encoding and decoding automatically by default
 - **data analysis**: computes derived metrics and other quantitative data summaries
-- **data visualization**: plots data to maximize data interpretability and sharing
+- **data visualization**: plots data to maximize data interpretability
 - **protocol specificity**: includes functionality for protocols like Chainlink, Uniswap, ERC20, and more
 - **command line interface**: performs many block explorer tasks in the terminal
 
-for details check out [the docs](https://ctc.readthedocs.io/)
+For detailed information check out [the documentation](https://ctc.readthedocs.io/)
 
 
 ## Contents
@@ -33,7 +33,7 @@ for details check out [the docs](https://ctc.readthedocs.io/)
   <tbody>
     <tr>
       <td>
-        <b>📜 Legal Disclaimer 📜</b> As stated in the MIT license, <code>ctc</code> comes with no warranty of any kind. The authors of <code>ctc</code> accept no responsibility for any damages or negative outcomes that result from using <code>ctc</code> or <code>ctc</code>-derived data. <code>ctc</code> is not audited and using it as the basis for making financial decisions is not recommended.
+        <b>📜 Legal Disclaimer 📜</b> As stated in the MIT license, <code>ctc</code> comes with no warranty of any kind. The authors of <code>ctc</code> accept no responsibility for any damages or negative outcomes that result from using <code>ctc</code> or <code>ctc</code>-derived data. <code>ctc</code> is not audited and using it as a basis for making financial decisions is not recommended.
       </td>
     </tr>
   </tbody>
@@ -146,28 +146,29 @@ ctc uniswap burns $POOL --export burns.csv
 
 ## Installation
 
-**note: the 0.2.10 version of ctc on pypi is very old. the upcoming 0.3.0 version will come out soon. installing the latest commit from the main branch fixes many bugs and adds many features. stay tuned for the upcoming 0.3.0 release on pypi**
-
 Two steps:
 1. `pip install checkthechain`
 2. run `ctc setup` in terminal to specify data provider and data storage path
 
 If your shell's `PATH` does not include python scripts you may need to do something like `python3 -m pip ...` and `python3 -m ctc ...`
 
-`ctc` requires python >= 3.7. Detailed instructions and requirements can be found in the [installation docs](https://ctc.readthedocs.io/en/latest/overview/installation.html).
+Detailed instructions can be found in the [installation documentation](https://ctc.readthedocs.io/en/latest/overview/installation.html).
 
+`ctc` requires python >= 3.7. 
 
 ## FAQ
 - What are the goals of `ctc`?
-    - **Treat historical data as a first-class feature**: This means having historical data functionality well-integrated into each part of the of the API. It also means optimizing the codebase with historical data workloads in mind.
-    - **Clean API emphasizing UX**: With `ctc` most data queries can be obtained with a single function call. No need to instantiate objects. RPC inputs/outputs are automatically encoded/decoded by default.
-    - **Maximize data accessibility**: Blockchains contain vast amounts of data, but accessing this data can require large amounts of time, effort, and expertise. `ctc` aims to lower the barrier to entry on all fronts.
+    1. **Treat historical data as a first-class feature**: This means having historical data functionality well-integrated into each part of the of the API. It also means optimizing the codebase with historical data workloads in mind.
+    2. **Protocol-specific functionality**: This means having built-in support for popular on-chain protocols.
+    3. **Terminal-based block explorer**: This means supporting as many block explorer tasks as possible from the terminal. And doing so in a way that is faster than can be done with a web browser.
+    4. **Clean API emphasizing UX**: With `ctc` most data queries can be obtained with a single function call. No need to instantiate objects. RPC inputs/outputs are automatically encoded/decoded by default.
+    5. **Maximize data accessibility**: Blockchains contain vast amounts of data, but accessing this data can require large amounts of time, effort, and expertise. `ctc` aims to lower the barrier to entry on all fronts.
 - Why use `async`?
     - `async` is a natural fit for efficiently querying large amounts of data from an archive node. All `ctc` functions that fetch external data use `async`. For tips on using `async` see [this section](https://ctc.readthedocs.io/en/latest/python/async_code.html) in the docs. Future versions of `ctc` will include some wrappers for synchronous code.
 - Do I need an archive node?
     - If you want to query historical data, you will need an archive node. You can either [run one yourself](https://github.com/ledgerwatch/erigon) or use a third-party provider such as [Alchemy](https://www.alchemy.com/), [Quicknode](https://www.quicknode.com/), or [Moralis](https://moralis.io/speedy-nodes/). You can also use `ctc` to query current (non-historical) data using a non-archive node.
 - Is `ctc` useful for recent, non-historical data?
-    Yes, `ctc` has lots of functionality for querying the current state of the chain.
+    - Yes, `ctc` has lots of functionality for querying the current state of the chain.
 
 
 ## Similar Projects
@@ -177,5 +178,6 @@ If your shell's `PATH` does not include python scripts you may need to do someth
 - [`seth`](https://github.com/dapphub/dapptools/tree/master/src/seth) cli EVM swiss army knife (bash / js)
 - [`ethereal`](https://github.com/wealdtech/ethereal) cli EVM swiss army knife (go)
 - [`web3.py`](https://github.com/ethereum/web3.py/) official Ethereum python client
+- [`ape`](https://github.com/ApeWorX/ape) general python framework for many tasks including smart contract dev
 - [`ethtx.info`](https://ethtx.info/) EVM transaction trace visualizer
 
