@@ -53,7 +53,7 @@ dependencies = [
     'toolcli >=0.6.8, <0.7',
     'toolconf >=0.1.2, <0.2',
     'toolsql >=0.3.11, <0.4',
-    'toolstr >=0.8.1, <0.9',
+    'toolstr >=0.8.2, <0.9',
     'tooltime >=0.2.7, <0.3',
     #
     # EVM dependencies
@@ -202,7 +202,7 @@ deps =
     toolcli==0.6.8
     toolconf==0.1.2
     toolsql==0.3.11
-    toolstr==0.8.1
+    toolstr==0.8.2
     tooltime==0.2.7
     ;
     ; EVM dependencies
