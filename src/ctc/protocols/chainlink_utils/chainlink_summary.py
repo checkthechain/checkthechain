@@ -104,7 +104,7 @@ async def async_print_feed_summary(
         value=str(creation_timestamp),
     )
     cli.print_bullet(
-        key='feed age:',
+        key='feed age',
         value=tooltime.get_age(creation_timestamp, 'TimelengthPhrase'),
     )
 
@@ -154,12 +154,16 @@ async def async_print_feed_summary(
         labels=labels,
         indent='    ',
         column_formats={'value': {'decimals': 5}},
-        column_styles={
-            'value': ' '.join(styles['description'] + 'bold'),
-        },
         label_style=styles['title'],
         border=styles['comment'],
         limit_rows=21,
+        column_styles={
+            'value': styles['description'] + ' bold',
+            'age': styles['description'],
+            'block': styles['option'],
+            'timestamp': styles['option'],
+            'time': styles['option'],
+        },
     )
 
     xvals = data['timestamp'].values.astype(float)

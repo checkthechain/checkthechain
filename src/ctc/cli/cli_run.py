@@ -94,7 +94,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
         ('chainlink',): 'ctc.protocols.chainlink_utils.cli.chainlink_command',
         (
             'chainlink',
-            'ls',
+            'feeds',
         ): 'ctc.protocols.chainlink_utils.cli.chainlink_ls_command',
         ('curve', 'pools'): 'ctc.protocols.curve_utils.cli.curve_pools_command',
         ('ens',): 'ctc.protocols.ens_utils.cli.ens_command',
