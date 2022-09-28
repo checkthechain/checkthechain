@@ -386,14 +386,29 @@ class DEX:
         network, provider = evm.get_network_and_provider(network, provider)
 
         pool_tokens = await cls.async_get_pool_assets(pool=pool)
-        balances = await evm.async_get_erc20s_balances(
-            wallet=pool,
-            tokens=pool_tokens,
-            normalize=normalize,
-            block=block,
-            provider=provider,
-        )
-        return dict(zip(pool_tokens, balances))
+
+        if cls.async_get_pool_balance == DEX.async_get_pool_balance:
+            balances = await evm.async_get_erc20s_balances(
+                wallet=pool,
+                tokens=pool_tokens,
+                normalize=normalize,
+                block=block,
+                provider=provider,
+            )
+            return dict(zip(pool_tokens, balances))
+        else:
+            coroutines = []
+            for token in pool_tokens:
+                coroutine = cls.async_get_pool_balance(
+                    pool=pool,
+                    asset=token,
+                    normalize=normalize,
+                    block=block,
+                    provider=provider,
+                )
+                coroutines.append(coroutine)
+            results = await asyncio.gather(*coroutines)
+            return dict(zip(pool_tokens, results))
 
     @classmethod
     async def async_get_pool_balance_by_block(
