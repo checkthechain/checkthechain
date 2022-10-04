@@ -130,7 +130,13 @@ def get_provider(
     if url is not None:
         query['url'] = url
 
-    return search_utils.get_matching_entry(sequence=providers, query=query)
+    entries = search_utils.get_matching_entries(sequence=providers, query=query)
+    if len(entries) == 1:
+        return entries[0]
+    elif len(entries) > 1:
+        return get_default_provider(network)
+    else:
+        raise LookupError('could not detect suitable RPC provider')
 
 
 def get_default_provider(
