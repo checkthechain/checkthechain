@@ -58,7 +58,7 @@ def setup_dbs(
             )
 
     print()
-    _delete_incomplete_chainlink_schemas()
+    _delete_incomplete_chainlink_schemas(db_configs['main'])
 
     # create tables
     used_networks: set[spec.NetworkReference] = set()
@@ -116,20 +116,17 @@ async def async_populate_db_tables(
         print('Could not add feeds to db, skipping')
 
 
-def _delete_incomplete_chainlink_schemas() -> None:
+def _delete_incomplete_chainlink_schemas(db_config) -> None:
     """detect any tables missing in chainlink schema
 
     this is a stopgap until a more comprehensive migration system is in place
     """
 
-    from ctc import config
     from ctc import db
     from ctc import evm
 
     # looking for schemas that have already been created, but are missing tables
-    metadata = toolsql.create_metadata_object_from_db(
-        db_config=config.get_db_config()
-    )
+    metadata = toolsql.create_metadata_object_from_db(db_config=db_config)
     if 'schema_versions' not in metadata.tables.keys():
         return
     for network in evm.get_networks():
