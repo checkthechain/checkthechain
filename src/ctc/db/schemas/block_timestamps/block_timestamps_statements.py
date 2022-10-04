@@ -203,8 +203,11 @@ async def async_select_timestamp_block_range(
     this function is used to confine a block-of-timestamp search
     """
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    # convert numpy types to native python type
+    if type(timestamp).__name__.startswith('int'):
+        timestamp = int(timestamp)
 
+    table = schema_utils.get_table_name('block_timestamps', network=network)
     lower_bound = toolsql.select(
         conn=conn,
         table=table,
