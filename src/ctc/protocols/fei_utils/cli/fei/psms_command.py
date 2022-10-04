@@ -40,10 +40,11 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
-        'examples': [
-            '',
-            '--verbose',
-        ],
+        'hidden': True,
+        'examples': {
+            '': {'runnable': False},
+            '--verbose': {'runnable': False},
+        },
     }
 
 
