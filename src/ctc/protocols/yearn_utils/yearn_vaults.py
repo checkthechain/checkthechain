@@ -280,6 +280,8 @@ async def async_print_vaults_summary(
     filtered_data = []
     for datum in api_vaults:
         tvl = datum['tvl']['tvl']
+        if tvl is None:
+            tvl = 0
         net_apy = datum['apy']['net_apy']
         gross_apr = datum['apy']['gross_apr']
         if (
@@ -310,6 +312,8 @@ async def async_print_vaults_summary(
         net_apy = datum['apy']['net_apy']
         gross_apr = datum['apy']['gross_apr']
 
+        if tvl is None:
+            tvl = 0
         if tvl < 0.01:
             tvl = 0
         total_tvl += tvl
