@@ -116,7 +116,7 @@ async def async_populate_db_tables(
         print('Could not add feeds to db, skipping')
 
 
-def _delete_incomplete_chainlink_schemas(db_config) -> None:
+def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
     """detect any tables missing in chainlink schema
 
     this is a stopgap until a more comprehensive migration system is in place
