@@ -13,11 +13,18 @@ def get_event_hash(event_abi: spec.EventABI) -> str:
 
 def get_event_signature(event_abi: spec.EventABI) -> str:
     """get event signature from event ABI"""
-    arg_types = [var['type'] for var in event_abi['inputs']]
-    arg_types = [
-        function_abi_utils.get_function_selector_type(item)
-        for item in arg_types
-    ]
+    import eth_utils_lite
+
+    base_arg_types = [var['type'] for var in event_abi['inputs']]
+    arg_types = []
+    for i, item in enumerate(base_arg_types):
+        if item.startswith('tuple'):
+            arg_type = eth_utils_lite.abi.collapse_if_tuple(
+                event_abi['inputs'][i]
+            )
+        else:
+            arg_type = function_abi_utils.get_function_selector_type(item)
+        arg_types.append(arg_type)
     inputs = ','.join(arg_types)
     return event_abi['name'] + '(' + inputs + ')'
 
@@ -26,7 +33,14 @@ def get_event_unindexed_types(
     event_abi: spec.EventABI,
 ) -> list[spec.ABIDatumType]:
     """get list of data types in signature of event"""
-    return [var['type'] for var in event_abi['inputs'] if not var['indexed']]
+
+    import eth_utils_lite
+
+    return [
+        eth_utils_lite.abi.collapse_if_tuple(var)
+        for var in event_abi['inputs']
+        if not var['indexed']
+    ]
 
 
 def get_event_unindexed_names(event_abi: spec.EventABI) -> list[str]:
