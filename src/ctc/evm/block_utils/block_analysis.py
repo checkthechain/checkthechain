@@ -22,6 +22,8 @@ def bin_by_blocks(
         - refactor using pd.cut() https://stackoverflow.com/a/33761120
         - kill this whole function
     """
+    raise Exception('this function is deprecated, use pd_utils.bin_data() or pd.cut()')
+
     import numpy as np
     import pandas as pd
 
