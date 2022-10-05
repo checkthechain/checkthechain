@@ -37,7 +37,7 @@ async def async_get_block_timestamps(
     blocks: typing.Sequence[spec.BlockReference],
     *,
     include_full_transactions: bool = False,
-    chunk_size: int = 500,
+    chunk_size: int = 1,
     provider: spec.ProviderReference = None,
     use_db: bool = True,
 ) -> list[int]:
