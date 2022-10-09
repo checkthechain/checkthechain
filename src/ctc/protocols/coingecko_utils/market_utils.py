@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-import os
 import typing
 
 if typing.TYPE_CHECKING:
@@ -16,6 +15,8 @@ token_url_template = 'https://www.coingecko.com/en/coins/{name}'
 
 async def async_get_market_data(
     n: int,
+    *,
+    mode: str = 'serial',
 ) -> typing.Sequence[typing.Mapping[typing.Any, typing.Any]]:
     import asyncio
     import aiohttp
@@ -23,9 +24,20 @@ async def async_get_market_data(
     n_per_page = 100
     n_pages = math.ceil(n / n_per_page)
 
-    async with aiohttp.ClientSession() as session:
-        coroutines = [async_get_page(session, p) for p in range(n_pages)]
-        pages = await asyncio.gather(*coroutines)
+    if mode == 'concurrent':
+        async with aiohttp.ClientSession() as session:
+            coroutines = [async_get_page(session, p) for p in range(n_pages)]
+            pages = await asyncio.gather(*coroutines)
+
+    elif mode == 'serial':
+        for p in range(n_pages):
+            pages = []
+            async with aiohttp.ClientSession() as session:
+                page = await async_get_page(session, p)
+                pages.append(page)
+
+    else:
+        raise Exception('unknown mode: ' + str(mode))
 
     items = [item for page in pages for item in page]
 
