@@ -229,6 +229,9 @@ def test_max_positional_args():
     import inspect
 
     max_positional_args = 2
+    allowed_exceptions = [
+        'ctc.toolbox.pd_utils.pandas_bin_utils.bin_data',
+    ]
 
     too_many = []
     for function_name, function_data in iterate_package_functions(
@@ -236,13 +239,16 @@ def test_max_positional_args():
     ).items():
         argspec = inspect.getfullargspec(function_data['function'])
         if len(argspec.args) > max_positional_args:
-            too_many.append(function_name)
+            if function_name not in allowed_exceptions:
+                too_many.append(function_name)
 
     for class_name, class_data in iterate_package_classes('ctc.').items():
         for method_name, method in class_data['methods']:
             argspec = inspect.getfullargspec(method)
             if len(argspec.args) > max_positional_args + 1:
-                too_many.append(class_name + '.' + method_name)
+                name = class_name + '.' + method_name
+                if name not in allowed_exceptions:
+                    too_many.append(name)
 
     if len(too_many) > 0:
         message = (
