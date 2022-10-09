@@ -342,23 +342,17 @@ async def async_print_token_markets_summary(
     toolstr.print('network = mainnet', style=styles['comment'])
 
 
-async def async_print_token_market_summary(
+async def async_get_token_market_summary(
     token: str | spec.Address,
     *,
     blocks: typing.Sequence[int],
     verbose: bool = False,
-) -> None:
-
-    from ctc import cli
+) -> typing.Mapping[str, typing.Any]:
 
     if not evm.is_address_str(token):
         token_address = await evm.async_get_erc20_address(token)
     else:
         token_address = token
-
-    timestamps_task = asyncio.create_task(
-        evm.async_get_block_timestamps(blocks)
-    )
 
     reserve_data_by_block = (
         await aave_interest_rates.async_get_reserve_data_by_block(
@@ -414,11 +408,46 @@ async def async_print_token_market_summary(
 
     if verbose:
         utilization = tvbs / tvls
+    else:
+        utilization = None
 
     # compute interest rates
     interest_rates = await interest_rates_task
     supply_apy = np.array(interest_rates['supply_apy']) * 100
     borrow_apy = np.array(interest_rates['borrow_apy']) * 100
+
+    return {
+        'prices': prices_array,
+        'tvl': tvls,
+        'tvb': tvbs,
+        'supply_apy': supply_apy,
+        'borrow_apy': borrow_apy,
+        'utilization': utilization,
+    }
+
+
+async def async_print_token_market_summary(
+    token: str | spec.Address,
+    *,
+    blocks: typing.Sequence[int],
+    verbose: bool = False,
+) -> None:
+
+    from ctc import cli
+
+    summary = await async_get_token_market_summary(
+        token=token, blocks=blocks, verbose=verbose
+    )
+    prices_array = summary['prices']
+    tvls = summary['tvl']
+    tvbs = summary['tvb']
+    supply_apy = summary['supply_apy']
+    borrow_apy = summary['borrow_apy']
+    utilization = summary['utilization']
+
+    timestamps_task = asyncio.create_task(
+        evm.async_get_block_timestamps(blocks)
+    )
 
     styles = cli.get_cli_styles()
     toolstr.print_text_box(
