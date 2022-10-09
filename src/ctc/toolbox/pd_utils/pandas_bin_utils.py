@@ -14,7 +14,7 @@ def bin_data(
     labels: typing.Sequence[str] | None = None,
 ) -> typing.Any:
 
-    if len(data.index.levels) == 1:  # type: ignore
+    if not hasattr(data.index, 'levels'):
         index = data.index
     else:
         index = data.index.get_level_values('block_number')
