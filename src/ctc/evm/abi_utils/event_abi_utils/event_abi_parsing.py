@@ -13,7 +13,7 @@ def get_event_hash(event_abi: spec.EventABI) -> str:
 
 def get_event_signature(event_abi: spec.EventABI) -> str:
     """get event signature from event ABI"""
-    import eth_utils_lite
+    import eth_utils_lite  # type: ignore
 
     base_arg_types = [var['type'] for var in event_abi['inputs']]
     arg_types = []
