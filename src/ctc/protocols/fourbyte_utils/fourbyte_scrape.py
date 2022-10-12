@@ -23,7 +23,7 @@ async def async_build_function_signatures_dataset(
         signature_data = await async_scrape_function_signatures()
 
     await fourbyte_db.async_intake_function_signatures(
-        function_signatures=signature_data
+        function_signatures=signature_data  # type: ignore
     )
 
 
@@ -39,7 +39,7 @@ async def async_build_event_signatures_dataset(
         signature_data = await async_scrape_event_signatures()
 
     await fourbyte_db.async_intake_event_signatures(
-        event_signatures=signature_data
+        event_signatures=signature_data,  # type: ignore
     )
 
 

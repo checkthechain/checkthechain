@@ -20,10 +20,21 @@ async def async_get_eth_balance(
 async def async_get_eth_balance(
     address: spec.Address,
     *,
-    normalize: bool = True,
+    normalize: typing.Literal[True] = True,
     provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> float:
+    ...
+
+
+@typing.overload
+async def async_get_eth_balance(
+    address: spec.Address,
+    *,
+    normalize: bool,
+    provider: typing.Optional[spec.ProviderReference] = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> int | float:
     ...
 
 
