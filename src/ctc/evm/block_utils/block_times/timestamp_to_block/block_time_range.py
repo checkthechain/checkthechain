@@ -18,6 +18,21 @@ async def async_resolve_block_range(
     end_time: tooltime.Timestamp | None = None,
     allow_none: typing.Literal[False],
     provider: spec.ProviderReference = None,
+    to_int: typing.Literal[True],
+) -> tuple[int, int]:
+    ...
+
+
+@typing.overload
+async def async_resolve_block_range(
+    *,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
+    allow_none: typing.Literal[False],
+    provider: spec.ProviderReference = None,
+    to_int: typing.Literal[False] = False,
 ) -> tuple[spec.BlockNumberReference, spec.BlockNumberReference]:
     ...
 
@@ -31,6 +46,21 @@ async def async_resolve_block_range(
     end_time: tooltime.Timestamp | None = None,
     allow_none: bool,
     provider: spec.ProviderReference = None,
+    to_int: typing.Literal[True],
+) -> tuple[int | None, int | None]:
+    ...
+
+
+@typing.overload
+async def async_resolve_block_range(
+    *,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
+    allow_none: bool,
+    provider: spec.ProviderReference = None,
+    to_int: bool = False,
 ) -> tuple[spec.BlockNumberReference | None, spec.BlockNumberReference | None]:
     ...
 
@@ -43,6 +73,7 @@ async def async_resolve_block_range(
     end_time: tooltime.Timestamp | None = None,
     allow_none: bool,
     provider: spec.ProviderReference = None,
+    to_int: bool = False,
 ) -> tuple[spec.BlockNumberReference | None, spec.BlockNumberReference | None]:
     """resolve block or timestamp range to a block range"""
 
@@ -50,7 +81,12 @@ async def async_resolve_block_range(
 
     tasks = {}
     if start_block is not None:
-        start_block = start_block
+        if to_int:
+            tasks['start_block'] = asyncio.create_task(
+                evm.async_block_number_to_int(start_block, provider=provider)
+            )
+        else:
+            start_block = start_block
     elif start_time is not None:
         tasks['start_block'] = asyncio.create_task(
             evm.async_get_block_of_timestamp(start_time, provider=provider)
@@ -62,7 +98,12 @@ async def async_resolve_block_range(
             raise Exception('must specify start_block or start_time')
 
     if end_block is not None:
-        end_block = end_block
+        if to_int:
+            tasks['end_block'] = asyncio.create_task(
+                evm.async_block_number_to_int(end_block, provider=provider)
+            )
+        else:
+            end_block = end_block
     elif end_time is not None:
         tasks['end_block'] = asyncio.create_task(
             evm.async_get_block_of_timestamp(end_time, provider=provider)
