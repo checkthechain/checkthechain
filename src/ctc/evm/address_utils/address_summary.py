@@ -57,9 +57,18 @@ async def async_print_address_summary(
     rows = [
         ('checksum', toolstr.add_style(address_data.get_address_checksum(address), styles['metavar'])),
         ('address type', address_type),
-        ('ETH balance', eth_balance),
-        ('transaction count', transaction_count),
     ]
+
+    if is_contract:
+        deploy_block_coroutine = evm.async_address_deployed_at_block(
+            address, provider=provider
+        )
+        deploy_block = await deploy_block_coroutine
+        rows.append(('deployed at block', toolstr.add_style(str(deploy_block), styles['metavar'])))
+    
+    rows.append(('transaction count', transaction_count))
+    rows.append(('ETH balance', eth_balance))
+        
     print()
     toolstr.print_table(
         rows,

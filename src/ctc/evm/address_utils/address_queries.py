@@ -39,3 +39,27 @@ async def async_are_contract_addresses(
         provider=provider,
     )
     return {address: len(code) > 3 for address, code in zip(addresses, codes)}
+
+
+async def async_address_deployed_at_block(
+    address: spec.Address,
+    *,
+    provider: spec.ProviderReference = None,
+) -> int:
+    """return the block number at which a smart contract was deployed"""
+
+    from ctc import rpc
+
+    latest_block = await rpc.async_eth_block_number(provider=provider)
+
+    # binary search from the latest block to the block where the address has code
+    lower_bound = 0
+    upper_bound = latest_block
+    while lower_bound <= upper_bound:
+        mid = (lower_bound + upper_bound) // 2
+        code = await rpc.async_eth_get_code(address, block_number=mid, provider=provider)
+        if code == '0x':
+            lower_bound = mid + 1
+        else:
+            upper_bound = mid - 1
+    return lower_bound
