@@ -7,9 +7,11 @@ from . import erc721_spec
 
 async def async_get_erc721_transfers(
     token: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
 ) -> spec.DataFrame:
+    """get transfers of erc721 token"""
     return await event_utils.async_get_events(
         contract_address=token,
         event_abi=erc721_spec.erc721_event_abis['Transfer'],
@@ -21,9 +23,11 @@ async def async_get_erc721_transfers(
 
 async def async_get_erc721_approvals(
     token: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
 ) -> spec.DataFrame:
+    """get approval of erc721 token"""
     return await event_utils.async_get_events(
         contract_address=token,
         event_abi=erc721_spec.erc721_event_abis['Approve'],
@@ -35,9 +39,11 @@ async def async_get_erc721_approvals(
 
 async def async_get_erc721_approvals_for_all(
     token: spec.Address,
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
 ) -> spec.DataFrame:
+    """get approvals for all of erc721 token"""
     return await event_utils.async_get_events(
         contract_address=token,
         event_abi=erc721_spec.erc721_event_abis['ApproveForAll'],

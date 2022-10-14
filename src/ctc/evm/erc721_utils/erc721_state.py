@@ -10,6 +10,7 @@ async def async_get_erc721_total_supply(
     *,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
+    """get total supply of erc721 token"""
     result = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc721_spec.erc721_function_abis['totalSupply'],
@@ -28,6 +29,7 @@ async def async_get_erc721_owner(
     *,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
+    """get owner of erc721 by token_id"""
 
     result = await rpc.async_eth_call(
         to_address=token,
@@ -48,6 +50,7 @@ async def async_get_erc721_balance(
     *,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
+    """get number of erc721 tokens owner by wallet"""
 
     result = await rpc.async_eth_call(
         to_address=token,
@@ -68,6 +71,7 @@ async def async_get_erc721_approved(
     *,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
+    """return address approved for erc721 token_id"""
 
     result = await rpc.async_eth_call(
         to_address=token,
@@ -89,6 +93,7 @@ async def async_get_erc721_approved_for_all(
     operator: spec.Address,
     block: spec.BlockNumberReference | None = None,
 ) -> bool:
+    """return whether owner has approved operator for all erc721 transfers"""
 
     result = await rpc.async_eth_call(
         to_address=token,

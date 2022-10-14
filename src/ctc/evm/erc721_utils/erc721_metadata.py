@@ -9,6 +9,7 @@ async def async_is_erc721(
     *,
     contract_abi: spec.ContractABI | None = None,
 ) -> bool:
+    """return whether contract at address implements erc721 standard"""
 
     if contract_abi is None:
         if contract_address is None:
@@ -19,6 +20,7 @@ async def async_is_erc721(
 
 
 def _is_erc721_contract_abi(contract_abi: spec.ContractABI) -> bool:
+    """return whether contract abi implements erc721 standard"""
 
     erc721_signatures = {
         #

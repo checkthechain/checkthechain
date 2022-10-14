@@ -18,6 +18,12 @@ async def async_get_erc721_owners(
     method: Literal['transfers', 'calls'] | None = None,
     token_ids: typing.Sequence[int] | None = None,
 ) -> typing.Mapping[int, spec.Address]:
+    """return owners of erc721 token
+
+    can multiple methods:
+    - transfers: compute owners based on erc721 transfers
+    - calls: use eth_call's on enumerated list of all token_id's
+    """
 
     if method is None:
         if token_ids is not None:
