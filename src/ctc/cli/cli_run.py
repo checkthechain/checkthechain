@@ -294,22 +294,17 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 #     return help_cache_path
 
 
-def get_cli_styles() -> toolcli.StyleTheme:
-    try:
-        # if in notebook, do not use styles
+def get_cli_styles(color: bool = None) -> toolcli.StyleTheme:
 
-        get_ipython  # type: ignore
+    # if in notebook, do not use styles
+    if color is None:
+        try:
+            get_ipython  # type: ignore
+            color = False
+        except NameError:
+            color = True
 
-        return {
-            'title': '',
-            'metavar': '',
-            'description': '',
-            'content': '',
-            'option': '',
-            'comment': '',
-        }
-
-    except NameError:
+    if color:
         return {
             'title': 'bold #ce93f9',
             'metavar': '#8be9fd',
@@ -317,6 +312,15 @@ def get_cli_styles() -> toolcli.StyleTheme:
             'content': '#f1fa8c',
             'option': '#64aaaa',
             'comment': '#6272a4',
+        }
+    else:
+        return {
+            'title': '',
+            'metavar': '',
+            'description': '',
+            'content': '',
+            'option': '',
+            'comment': '',
         }
 
 
