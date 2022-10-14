@@ -390,7 +390,7 @@ async def async_get_erc20s_allowances(
     return allowances
 
 
-async def async_get_erc20s_allowances_of_addresses(
+async def async_get_erc20_allowances_of_addresses(
     token: spec.ERC20Reference,
     wallets: typing.Sequence[spec.Address],
     *,
