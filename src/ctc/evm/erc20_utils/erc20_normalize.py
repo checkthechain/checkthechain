@@ -125,7 +125,7 @@ async def async_normalize_erc20_quantities_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     token: typing.Optional[spec.ERC20Address] = None,
-    decimals: typing.Optional[list[typing.SupportsInt]] = None,
+    decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
     provider: spec.ProviderReference = None,
 ) -> list[float]:
     """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
