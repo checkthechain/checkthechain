@@ -294,7 +294,7 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 #     return help_cache_path
 
 
-def get_cli_styles(color: bool = None) -> toolcli.StyleTheme:
+def get_cli_styles(color: bool | None = None) -> toolcli.StyleTheme:
 
     # if in notebook, do not use styles
     if color is None:
