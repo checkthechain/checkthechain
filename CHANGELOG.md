@@ -3,6 +3,31 @@
 
 *until version `1.0.0` is reached, will use `0.X.Y` versioning where `X` is for breaking changes / major feature upgrades, and `Y` is for bug fixes / minor feature upgrades*
 
+## 0.3.1
+
+**[WIP] Not Released Yet**
+
+## New Features
+- added erc721_utils for collecting NFT data
+- added erc4626_utils for collecting tokenized vault data
+- upgrade to mypy 0.982 for type annotations
+- add `--receipt` flag to `tx` command
+- add `pd_utils.bin_data()` for performing various bin operations
+- refactor internal versioning system for more robustness
+- add `cli_color_theme` and `cli_chart_charset` options to config for customizing cli colors and charts
+- [WIP]
+
+## Bugfixes
+- adjust request chunk size to prevent server timeouts
+- fix pluralized version of dex pool tvl getters for custom pools
+- support numpy int types in block timestamp search
+- handle null values in yearn api
+- various bugfixes for use of multiple providers on a single network
+- fix hashing of event and function signatures with deep nested structs
+- [WIP]
+
+Update also includes many micro-features and micro-fixes not worth mentioning
+
 ## 0.3.0
 
 **September 25, 2022**
