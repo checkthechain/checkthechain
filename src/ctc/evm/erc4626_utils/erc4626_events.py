@@ -25,6 +25,7 @@ async def async_get_erc4626_deposits(
     provider: spec.ProviderReference = None,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
+    """get Deposit events for ERC-4626 vault"""
 
     event_abi = erc4626_spec.erc4626_event_abis['Deposit']
 
@@ -83,6 +84,7 @@ async def async_get_erc4626_withdraws(
     convert_from_str: bool = True,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
+    """get Withdraw events for ERC-4626 vault"""
 
     event_abi = erc4626_spec.erc4626_event_abis['Withdraw']
 

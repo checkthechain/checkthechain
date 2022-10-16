@@ -13,6 +13,7 @@ async def async_get_erc4626_asset(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
+    """get asset address of ERC-4626 vault"""
 
     asset: spec.Address = await rpc.async_eth_call(
         to_address=token,
@@ -29,6 +30,7 @@ async def async_get_erc4626s_assets(
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[spec.Address]:
+    """get asset addresses of ERC-4626 vaults"""
 
     assets: typing.Sequence[spec.Address] = await rpc.async_batch_eth_call(
         to_addresses=tokens,

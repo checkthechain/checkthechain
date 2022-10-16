@@ -67,6 +67,7 @@ async def async_normalize_erc4626_shares(
     decimals: typing.SupportsInt | None = None,
     provider: spec.ProviderReference = None,
 ) -> float | typing.Sequence[float] | spec.Series | spec.NumpyArray:
+    """normalize ERC-4626 vault shares (divide by 10 ** decimals)"""
 
     if hasattr(shares, '__iter__'):
         return await erc20_utils.async_normalize_erc20_quantities(
@@ -95,6 +96,7 @@ async def async_normalize_erc4626s_shares(
     provider: spec.ProviderReference = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
 ) -> typing.Sequence[float]:
+    """normalize ERC-4626 vaults shares (divide by 10 ** decimals)"""
 
     return await erc20_utils.async_normalize_erc20s_quantities(
         quantities=shares,
@@ -166,6 +168,7 @@ async def async_normalize_erc4626_assets(
     decimals: typing.SupportsInt | None = None,
     provider: spec.ProviderReference = None,
 ) -> float | typing.Sequence[float] | spec.Series | spec.NumpyArray:
+    """normalize ERC-4626 vault assets (divide by 10 ** decimals)"""
 
     asset = await erc4626_metadata.async_get_erc4626_asset(
         token=token,
@@ -199,6 +202,7 @@ async def async_normalize_erc4626s_assets(
     provider: spec.ProviderReference = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
 ) -> typing.Sequence[float]:
+    """normalize ERC-4626 vaults assets (divide by 10 ** decimals)"""
 
     asset_addresses = await erc4626_metadata.async_get_erc4626s_assets(
         tokens=tokens,
