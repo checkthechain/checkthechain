@@ -26,6 +26,30 @@ async def async_normalize_erc4626_shares(
 @typing.overload
 async def async_normalize_erc4626_shares(
     token: spec.Address,
+    shares: spec.Series,
+    *,
+    block: spec.BlockNumberReference | None = None,
+    decimals: typing.SupportsInt | None = None,
+    provider: spec.ProviderReference = None,
+) -> spec.Series:
+    ...
+
+
+@typing.overload
+async def async_normalize_erc4626_shares(
+    token: spec.Address,
+    shares: spec.NumpyArray,
+    *,
+    block: spec.BlockNumberReference | None = None,
+    decimals: typing.SupportsInt | None = None,
+    provider: spec.ProviderReference = None,
+) -> spec.NumpyArray:
+    ...
+
+
+@typing.overload
+async def async_normalize_erc4626_shares(
+    token: spec.Address,
     shares: typing.Sequence[int],
     *,
     block: spec.BlockNumberReference | None = None,
@@ -37,12 +61,12 @@ async def async_normalize_erc4626_shares(
 
 async def async_normalize_erc4626_shares(
     token: spec.Address,
-    shares: int | typing.Sequence[int],
+    shares: int | typing.Sequence[int] | spec.Series | spec.NumpyArray,
     *,
     block: spec.BlockNumberReference | None = None,
     decimals: typing.SupportsInt | None = None,
     provider: spec.ProviderReference = None,
-) -> float | typing.Sequence[float]:
+) -> float | typing.Sequence[float] | spec.Series | spec.NumpyArray:
 
     if hasattr(shares, '__iter__'):
         return await erc20_utils.async_normalize_erc20_quantities(
@@ -119,6 +143,30 @@ async def async_normalize_erc4626_assets(
 @typing.overload
 async def async_normalize_erc4626_assets(
     token: spec.Address,
+    assets: spec.Series,
+    *,
+    block: spec.BlockNumberReference | None = None,
+    decimals: typing.SupportsInt | None = None,
+    provider: spec.ProviderReference = None,
+) -> spec.Series:
+    ...
+
+
+@typing.overload
+async def async_normalize_erc4626_assets(
+    token: spec.Address,
+    assets: spec.NumpyArray,
+    *,
+    block: spec.BlockNumberReference | None = None,
+    decimals: typing.SupportsInt | None = None,
+    provider: spec.ProviderReference = None,
+) -> spec.NumpyArray:
+    ...
+
+
+@typing.overload
+async def async_normalize_erc4626_assets(
+    token: spec.Address,
     assets: typing.Sequence[int],
     *,
     block: spec.BlockNumberReference | None = None,
@@ -130,12 +178,12 @@ async def async_normalize_erc4626_assets(
 
 async def async_normalize_erc4626_assets(
     token: spec.Address,
-    assets: int | typing.Sequence[int],
+    assets: int | typing.Sequence[int] | spec.Series | spec.NumpyArray,
     *,
     block: spec.BlockNumberReference | None = None,
     decimals: typing.SupportsInt | None = None,
     provider: spec.ProviderReference = None,
-) -> float | typing.Sequence[float]:
+) -> float | typing.Sequence[float] | spec.Series | spec.NumpyArray:
 
     asset = await erc4626_metadata.async_get_erc4626_asset(
         token=token,
