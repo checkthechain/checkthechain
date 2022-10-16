@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import spec
 
 
@@ -74,6 +73,9 @@ def _get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
 
 def get_networks() -> typing.Mapping[int, spec.NetworkMetadata]:
     """get networks of current configuation"""
+
+    from ctc import config
+
     return config.get_config_networks()
 
 
@@ -117,6 +119,8 @@ def get_network_and_provider(
     from ctc import rpc
 
     if provider is None and network is None:
+        from ctc import config
+
         network = config.get_default_network()
         if network is None:
             raise Exception('no network or provider specified')

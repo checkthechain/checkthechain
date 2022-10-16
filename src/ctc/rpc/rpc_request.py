@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 import typing
 
-from ctc import config
 from ctc import spec
 from . import rpc_provider
 
@@ -15,6 +14,7 @@ _rpc_logger_state = {
 
 def setup_rpc_logger() -> None:
     import loguru
+    from ctc import config
 
     if not _rpc_logger_state['logger_setup']:
 
@@ -99,6 +99,8 @@ async def async_send(
     request: spec.RpcRequest,
     provider: typing.Optional[spec.ProviderReference] = None,
 ) -> spec.RpcResponse:
+    from ctc import config
+
     full_provider = rpc_provider.get_provider(provider)
 
     try:
