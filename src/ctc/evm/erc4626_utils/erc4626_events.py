@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing
 
-import tooltime
+if typing.TYPE_CHECKING:
+    import tooltime
 
 from ctc import spec
 from .. import event_utils

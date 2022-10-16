@@ -20,7 +20,7 @@ from . import erc4626_spec
 
 async def async_convert_to_erc4626_assets(
     token: spec.Address,
-    shares: float | int,
+    shares: typing.SupportsInt,
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
@@ -37,7 +37,7 @@ async def async_convert_to_erc4626_assets(
 
 async def async_convert_to_erc4626_assets_by_block(
     token: spec.Address,
-    shares: float | int,
+    shares: typing.SupportsInt,
     *,
     provider: spec.ProviderReference = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
@@ -72,7 +72,7 @@ async def async_convert_to_erc4626s_assets(
 
 async def async_convert_to_erc4626_shares(
     token: spec.Address,
-    assets: float | int,
+    assets: typing.SupportsInt,
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
@@ -89,7 +89,7 @@ async def async_convert_to_erc4626_shares(
 
 async def async_convert_to_erc4626_shares_by_block(
     token: spec.Address,
-    assets: float | int,
+    assets: typing.SupportsInt,
     *,
     provider: spec.ProviderReference = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
@@ -106,7 +106,7 @@ async def async_convert_to_erc4626_shares_by_block(
 
 async def async_convert_to_erc4626s_shares(
     tokens: typing.Sequence[spec.Address],
-    assets: float | int,
+    assets: typing.Sequence[typing.SupportsInt],
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
@@ -133,7 +133,8 @@ async def async_get_erc4626_max_deposit(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> int:
+    normalize: bool = True,
+) -> int | float:
     max_deposit: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
@@ -141,7 +142,15 @@ async def async_get_erc4626_max_deposit(
         block_number=block,
         provider=provider,
     )
-    return max_deposit
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_assets(
+            token=token,
+            assets=max_deposit,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_deposit
 
 
 async def async_get_erc4626_max_deposit_by_block(
@@ -150,7 +159,8 @@ async def async_get_erc4626_max_deposit_by_block(
     *,
     provider: spec.ProviderReference = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_deposits: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
@@ -158,7 +168,15 @@ async def async_get_erc4626_max_deposit_by_block(
         block_numbers=blocks,
         provider=provider,
     )
-    return max_deposits
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_assets(
+            token=token,
+            assets=max_deposits,
+            provider=provider,
+            block=blocks[-1],
+        )
+    else:
+        return max_deposits
 
 
 async def async_get_erc4626s_max_deposits(
@@ -167,7 +185,8 @@ async def async_get_erc4626s_max_deposits(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_deposits: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
@@ -175,7 +194,15 @@ async def async_get_erc4626s_max_deposits(
         block_number=block,
         provider=provider,
     )
-    return max_deposits
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626s_assets(
+            tokens=tokens,
+            assets=max_deposits,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_deposits
 
 
 async def async_get_erc4626_max_mint(
@@ -184,7 +211,8 @@ async def async_get_erc4626_max_mint(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> int:
+    normalize: bool = True,
+) -> int | float:
     max_mint: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
@@ -192,7 +220,15 @@ async def async_get_erc4626_max_mint(
         block_number=block,
         provider=provider,
     )
-    return max_mint
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_shares(
+            token=token,
+            shares=max_mint,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_mint
 
 
 async def async_get_erc4626_max_mint_by_block(
@@ -201,7 +237,8 @@ async def async_get_erc4626_max_mint_by_block(
     *,
     provider: spec.ProviderReference = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_mints: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
@@ -209,7 +246,15 @@ async def async_get_erc4626_max_mint_by_block(
         block_numbers=blocks,
         provider=provider,
     )
-    return max_mints
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_shares(
+            token=token,
+            shares=max_mints,
+            provider=provider,
+            block=blocks[-1],
+        )
+    else:
+        return max_mints
 
 
 async def async_get_erc4626s_max_mints(
@@ -218,7 +263,8 @@ async def async_get_erc4626s_max_mints(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_mints: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
@@ -226,7 +272,15 @@ async def async_get_erc4626s_max_mints(
         block_number=block,
         provider=provider,
     )
-    return max_mints
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626s_shares(
+            tokens=tokens,
+            shares=max_mints,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_mints
 
 
 async def async_get_erc4626_max_redeem(
@@ -235,7 +289,8 @@ async def async_get_erc4626_max_redeem(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> int:
+    normalize: bool = True,
+) -> int | float:
     max_redeem: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
@@ -243,7 +298,15 @@ async def async_get_erc4626_max_redeem(
         block_number=block,
         provider=provider,
     )
-    return max_redeem
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_shares(
+            token=token,
+            shares=max_redeem,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_redeem
 
 
 async def async_get_erc4626_max_redeem_by_block(
@@ -252,7 +315,8 @@ async def async_get_erc4626_max_redeem_by_block(
     *,
     provider: spec.ProviderReference = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_redeems: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
@@ -260,7 +324,15 @@ async def async_get_erc4626_max_redeem_by_block(
         block_numbers=blocks,
         provider=provider,
     )
-    return max_redeems
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_shares(
+            token=token,
+            shares=max_redeems,
+            provider=provider,
+            block=blocks[-1],
+        )
+    else:
+        return max_redeems
 
 
 async def async_get_erc4626s_max_redeems(
@@ -269,7 +341,8 @@ async def async_get_erc4626s_max_redeems(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_redeems: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
@@ -277,7 +350,15 @@ async def async_get_erc4626s_max_redeems(
         block_number=block,
         provider=provider,
     )
-    return max_redeems
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626s_shares(
+            tokens=tokens,
+            shares=max_redeems,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_redeems
 
 
 async def async_get_erc4626_max_withdraw(
@@ -286,7 +367,8 @@ async def async_get_erc4626_max_withdraw(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> int:
+    normalize: bool = True,
+) -> int | float:
     max_withdraw: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
@@ -294,7 +376,15 @@ async def async_get_erc4626_max_withdraw(
         block_number=block,
         provider=provider,
     )
-    return max_withdraw
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_assets(
+            token=token,
+            assets=max_withdraw,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_withdraw
 
 
 async def async_get_erc4626_max_withdraw_by_block(
@@ -303,7 +393,8 @@ async def async_get_erc4626_max_withdraw_by_block(
     *,
     provider: spec.ProviderReference = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
-) -> typing.Sequence[int]:
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
     max_withdraws: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
@@ -311,7 +402,15 @@ async def async_get_erc4626_max_withdraw_by_block(
         block_numbers=blocks,
         provider=provider,
     )
-    return max_withdraws
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626_assets(
+            token=token,
+            assets=max_withdraws,
+            provider=provider,
+            block=blocks[-1],
+        )
+    else:
+        return max_withdraws
 
 
 async def async_get_erc4626s_max_withdraws(
@@ -320,15 +419,24 @@ async def async_get_erc4626s_max_withdraws(
     *,
     provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
-) -> typing.Sequence[int]:
-    max_redeems: typing.Sequence[int] = await rpc.async_batch_eth_call(
+    normalize: bool = True,
+) -> typing.Sequence[int | float]:
+    max_withdraws: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
         function_parameters=[owner],
         block_number=block,
         provider=provider,
     )
-    return max_redeems
+    if normalize:
+        return await erc4626_normalize.async_normalize_erc4626s_assets(
+            tokens=tokens,
+            assets=max_withdraws,
+            provider=provider,
+            block=block,
+        )
+    else:
+        return max_withdraws
 
 
 #
