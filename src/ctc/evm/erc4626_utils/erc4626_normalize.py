@@ -87,30 +87,12 @@ async def async_normalize_erc4626_shares(
         )
 
 
-async def async_normalize_erc4626_shares_by_block(
-    token: spec.Address,
-    shares: typing.Sequence[int],
-    *,
-    blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference,
-    decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
-) -> typing.Sequence[float]:
-
-    return await erc20_utils.async_normalize_erc20_quantities_by_block(
-        quantities=shares,
-        token=token,
-        blocks=blocks,
-        decimals=decimals,
-        provider=provider,
-    )
-
-
 async def async_normalize_erc4626s_shares(
     tokens: typing.Sequence[spec.Address],
     shares: typing.Sequence[int],
     *,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference,
+    provider: spec.ProviderReference = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
 ) -> typing.Sequence[float]:
 
@@ -209,36 +191,12 @@ async def async_normalize_erc4626_assets(
         )
 
 
-async def async_normalize_erc4626_assets_by_block(
-    token: spec.Address,
-    assets: typing.Sequence[int],
-    *,
-    blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference,
-    decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
-) -> typing.Sequence[float]:
-
-    asset = await erc4626_metadata.async_get_erc4626_asset(
-        token=token,
-        block=blocks[-1],
-        provider=provider,
-    )
-
-    return await erc20_utils.async_normalize_erc20_quantities_by_block(
-        quantities=assets,
-        token=asset,
-        blocks=blocks,
-        decimals=decimals,
-        provider=provider,
-    )
-
-
 async def async_normalize_erc4626s_assets(
     tokens: typing.Sequence[spec.Address],
     assets: typing.Sequence[int],
     *,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference,
+    provider: spec.ProviderReference = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
 ) -> typing.Sequence[float]:
 
