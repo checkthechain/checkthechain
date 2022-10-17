@@ -60,6 +60,7 @@ def get_config(
 def get_config(
     validate: toolconfig.ValidationOption = False,
     warn_if_dne: bool = True,
+    warn_if_outdated: bool = True,
 ) -> typing.Union[spec.Config, typing.MutableMapping[str, typing.Any]]:
 
     import toolconfig
@@ -90,10 +91,11 @@ def get_config(
         config_stable_version = None
     ctc_stable_version = upgrade_utils.get_stable_version(ctc.__version__)
     if config_stable_version != ctc_stable_version:
-        print(
-            '[WARNING] using outdated config -- run `ctc setup` on command line to update',
-            file=sys.stderr,
-        )
+        if warn_if_outdated:
+            print(
+                '[WARNING] using outdated config -- run `ctc setup` on command line to update',
+                file=sys.stderr,
+            )
 
         config_from_file = upgrade_utils.upgrade_config(config_from_file)
 

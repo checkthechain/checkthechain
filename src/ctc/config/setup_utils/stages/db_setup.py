@@ -123,15 +123,17 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
     """
 
     from ctc import db
-    from ctc import evm
 
     # looking for schemas that have already been created, but are missing tables
     metadata = toolsql.create_metadata_object_from_db(db_config=db_config)
     if 'schema_versions' not in metadata.tables.keys():
         return
-    for network in evm.get_networks():
+    networks = list(config_defaults.get_default_networks_metadata().keys())
+    for network in networks:
         schema_version = db.get_schema_version(
-            schema_name='chainlink', network=network
+            schema_name='chainlink',
+            network=network,
+            db_config=db_config,
         )
         if schema_version is not None:
             schema = db.get_prepared_schema(
