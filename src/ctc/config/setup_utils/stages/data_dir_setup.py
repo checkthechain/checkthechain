@@ -7,7 +7,9 @@ import typing
 import toolcli
 import toolstr
 
+import ctc
 from ctc import spec
+from ... import upgrade_utils
 from ...upgrade_utils import data_dir_versioning
 from ... import config_defaults
 
@@ -85,7 +87,10 @@ def setup_data_dir(
                     shutil.move(old_data_root, new_data_root)
 
     # create files and subdirectories and upgrade if need be
-    data_dir_versioning.initialize_data_subdirs(new_data_root, version='0.3.0')
+    data_dir_versioning.initialize_data_subdirs(
+        new_data_root,
+        version=upgrade_utils.get_stable_version(ctc.__version__),
+    )
 
     print()
     prompt = 'Do you want to disable ctc logging? '
