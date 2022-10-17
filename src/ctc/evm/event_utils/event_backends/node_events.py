@@ -108,7 +108,7 @@ async def async_get_events_from_node(
                 network=network,
             )
         if event_name is not None:
-            event_hash = abi_utils.get_event_hash(event_abi=event_abi)
+            event_hash = abi_utils.get_event_hash(event_abi)
         elif event_abi is not None:
             event_hash = contract_address.get_event_hash(event_abi=event_abi)
 

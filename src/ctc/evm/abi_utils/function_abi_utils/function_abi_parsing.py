@@ -185,10 +185,24 @@ def get_function_selector_type(
 
 
 def get_function_selector(
+    function: spec.FunctionABI | spec.FunctionSignature | None = None,
+    *,
     function_abi: typing.Optional[spec.FunctionABI] = None,
     function_signature: typing.Optional[spec.FunctionSignature] = None,
 ) -> str:
-    """get function 4 byte selector"""
+    """get function 4 byte selector
+
+    TODO: deprecate function_abi and function_signature inputs
+    """
+
+    if isinstance(function, dict):
+        function_abi = function
+    elif isinstance(function, str):
+        function_signature = function
+    elif function is None:
+        assert function_abi is not None or function_signature is not None
+    else:
+        raise Exception('unknown funciton format: ' + str(type(function)))
 
     if function_signature is None:
         if function_abi is None:

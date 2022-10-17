@@ -5,9 +5,12 @@ from ... import binary_utils
 from .. import function_abi_utils
 
 
-def get_event_hash(event_abi: spec.EventABI) -> str:
-    """compute event hash from event abi"""
-    signature = get_event_signature(event_abi=event_abi)
+def get_event_hash(event_data: spec.EventABI | str) -> str:
+    """compute event hash from event signature or event abi"""
+    if isinstance(event_data, str):
+        signature = event_data
+    else:
+        signature = get_event_signature(event_abi=event_data)
     return binary_utils.keccak_text(signature)
 
 
