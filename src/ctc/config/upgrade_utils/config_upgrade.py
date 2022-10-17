@@ -6,6 +6,7 @@ import typing
 import ctc
 from ctc import spec
 from .. import config_defaults
+from . import version_utils
 
 
 def upgrade_config(
@@ -20,16 +21,44 @@ def upgrade_config(
 
     # perform upgrade
     if not isinstance(version, str):
-        print('old_config has unknown version, using default config', file=sys.stderr)
+        print(
+            'old_config has unknown version, using default config',
+            file=sys.stderr,
+        )
         return dict(config_defaults.get_default_config())
-    if version.startswith('0.2.'):
-        return upgrade__0_2_0__to__0_3_0(old_config)
-    elif version == '0.3.0':
-        return old_config
-    else:
-        raise spec.ConfigUpgradeError('old_config has unknown version')
 
-    # ? perform validation
+    new_config = old_config
+    config_version = version
+    if not (
+        config_version.startswith('0.2.')
+        or config_version.startswith('0.3.0')
+        or config_version.startswith('0.3.1')
+    ):
+        raise Exception('invalid config version')
+
+    # update config from old version using upgrade path
+    upgrade_functions = {
+        '0.2.': upgrade__0_2_0__to__0_3_0,
+        '0.3.0': upgrade__0_3_0__to__0_3_1,
+    }
+    for from_version, upgrade_function in upgrade_functions.items():
+        if config_version.startswith(from_version):
+            new_config = upgrade_function(new_config)
+            config_version = new_config['config_spec_version']
+
+    new_config_stable = version_utils.get_stable_version(
+        new_config['config_spec_version']
+    )
+    ctc_stable = version_utils.get_stable_version(ctc.__version__)
+    if (
+        new_config_stable == ctc_stable
+        and new_config['config_spec_version'] != ctc.__version__
+    ):
+        new_config['config_spec_version'] = ctc.__version__
+
+    return new_config
+
+    # # ? perform validation
 
 
 def upgrade__0_2_0__to__0_3_0(
@@ -90,16 +119,28 @@ def upgrade__0_2_0__to__0_3_0(
     )
     upgraded['db_configs'] = {'main': default_db_config}
 
-    # get version
+    # set new version
     if 'version' in upgraded:
         del upgraded['version']
-    new_version = ctc.__version__
+    upgraded['config_spec_version'] = '0.3.0'
 
-    # strip extra versioning data
-    new_version = omit_extra_version_data(new_version)
+    return upgraded
 
-    # set version
-    upgraded['config_spec_version'] = new_version
+
+def upgrade__0_3_0__to__0_3_1(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+
+    upgraded = dict(old_config)
+    if 'cli_color_theme' not in upgraded:
+        upgraded[
+            'cli_color_theme'
+        ] = config_defaults.get_default_cli_color_theme()
+    if 'cli_chart_charset' not in upgraded:
+        upgraded[
+            'cli_chart_charset'
+        ] = config_defaults.get_default_cli_chart_charset()
+    upgraded['config_spec_version'] = '0.3.1'
 
     return upgraded
 

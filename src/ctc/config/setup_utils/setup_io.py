@@ -45,10 +45,13 @@ def load_old_config(
                         del old_providers[provider_name]
 
     # upgrade config file if need be
-    if (
-        convert_to_latest
-        and old_config.get('config_spec_version') != ctc.__version__
-    ):
+    config_version = old_config.get('config_spec_version')
+    if config_version is not None:
+        config_stable_version = upgrade_utils.get_stable_version(config_version)
+    else:
+        config_stable_version = None
+    ctc_stable_version = upgrade_utils.get_stable_version(ctc.__version__)
+    if convert_to_latest and config_stable_version != ctc_stable_version:
         try:
             old_config = upgrade_utils.upgrade_config(old_config)
         except spec.ConfigUpgradeError:
@@ -81,8 +84,6 @@ def write_new_config(
 
     config_path = config_read.get_config_path(raise_if_dne=False)
 
-    version = upgrade_utils.omit_extra_version_data(ctc.__version__)
-
     networks = {
         str(key): value for key, value in network_data['networks'].items()
     }
@@ -92,7 +93,7 @@ def write_new_config(
     }
 
     config: spec.JsonConfig = {
-        'config_spec_version': version,
+        'config_spec_version': ctc.__version__,
         'data_dir': data_dir_data['data_dir'],
         'networks': networks,
         'providers': network_data['providers'],
