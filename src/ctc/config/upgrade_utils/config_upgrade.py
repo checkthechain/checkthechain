@@ -119,6 +119,9 @@ def upgrade__0_2_0__to__0_3_0(
     )
     upgraded['db_configs'] = {'main': default_db_config}
 
+    upgraded['log_rpc_calls'] = True
+    upgraded['log_sql_queries'] = True
+
     # set new version
     if 'version' in upgraded:
         del upgraded['version']

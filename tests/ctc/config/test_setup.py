@@ -287,7 +287,7 @@ old_config_examples = [
         default_config,
         data_dir=tempfile.mkdtemp(),
         providers={},
-        default_provider=None,
+        default_providers={},
     ),
 ]
 

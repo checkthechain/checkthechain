@@ -58,7 +58,7 @@ def validate_config(config: typing.Mapping[typing.Any, typing.Any]) -> None:
 
         # check that key is allowed
         if key not in spec.config_keys:
-            raise spec.ConfigInvalid('key not allowed in config:')
+            raise spec.ConfigInvalid('key not allowed in config: ' + str(key))
 
         # check value type
         if not isinstance(value, config_base_types[key]):

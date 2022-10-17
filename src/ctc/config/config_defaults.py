@@ -92,6 +92,7 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
             'url': eth_rpc_url,
             'session_kwargs': {},
             'chunk_size': None,
+            'convert_reverts_to_none': False,
         }
         default_config['default_providers'][chain_id] = provider_name  # type: ignore
 
