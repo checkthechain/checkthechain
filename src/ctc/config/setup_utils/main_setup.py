@@ -10,6 +10,7 @@ from .stages import alias_setup
 from .stages import data_dir_setup
 from .stages import db_setup
 from .stages import network_setup
+from .stages import cli_setup
 
 
 styles = {
@@ -76,6 +77,11 @@ async def async_setup_ctc(
         default_data_dir=data_dir,
         disable_logs=disable_logs,
     )
+    cli_data = cli_setup.setup_cli(
+        old_config=old_config,
+        styles=styles,
+        headless=headless,
+    )
     if not skip_db:
         db_data = db_setup.setup_dbs(
             data_dir=data_dir_data['data_dir'],
@@ -96,6 +102,7 @@ async def async_setup_ctc(
         network_data=network_data,
         db_data=db_data,
         data_dir_data=data_dir_data,
+        cli_data=cli_data,
         styles=styles,
         headless=headless,
         overwrite=overwrite,

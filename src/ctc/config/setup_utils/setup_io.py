@@ -75,6 +75,7 @@ def write_new_config(
     network_data: spec.PartialConfig,
     db_data: spec.PartialConfig,
     data_dir_data: spec.PartialConfig,
+    cli_data: spec.PartialConfig,
     styles: typing.Mapping[str, str],
     overwrite: bool = False,
     headless: bool = False,
@@ -102,6 +103,8 @@ def write_new_config(
         'db_configs': db_data['db_configs'],
         'log_rpc_calls': data_dir_data['log_rpc_calls'],
         'log_sql_queries': data_dir_data['log_sql_queries'],
+        'cli_color_theme': cli_data['cli_color_theme'],
+        'cli_chart_charset': cli_data['cli_chart_charset'],
     }
     print()
     print()

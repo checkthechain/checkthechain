@@ -8,6 +8,8 @@ from . import rpc_types
 
 if typing.TYPE_CHECKING:
     import toolsql
+    import toolcli
+    import toolstr
 
 
 class PartialConfig(TypedDict, total=False):
@@ -25,6 +27,9 @@ class PartialConfig(TypedDict, total=False):
 
     log_rpc_calls: bool
     log_sql_queries: bool
+
+    cli_color_theme: toolcli.StyleTheme
+    cli_chart_charset: toolstr.SampleMode
 
 
 class Config(TypedDict):
@@ -44,6 +49,9 @@ class Config(TypedDict):
     log_rpc_calls: bool
     log_sql_queries: bool
 
+    cli_color_theme: toolcli.StyleTheme
+    cli_chart_charset: toolstr.SampleMode
+
 
 class JsonConfig(TypedDict):
     config_spec_version: str
@@ -57,3 +65,6 @@ class JsonConfig(TypedDict):
 
     log_rpc_calls: bool
     log_sql_queries: bool
+
+    cli_color_theme: toolcli.StyleTheme
+    cli_chart_charset: toolstr.SampleMode
