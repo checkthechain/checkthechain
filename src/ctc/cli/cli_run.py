@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 import toolcli
 
 import ctc
+import ctc.config
 from .plugins import toolsql_plugin
 from . import cli_utils
 
@@ -297,22 +298,10 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 def get_cli_styles(color: bool | None = None) -> toolcli.StyleTheme:
 
     # if in notebook, do not use styles
-    if color is None:
-        try:
-            get_ipython  # type: ignore
-            color = False
-        except NameError:
-            color = True
+    color = not _is_jupyter_notebook()
 
     if color:
-        return {
-            'title': 'bold #ce93f9',
-            'metavar': '#8be9fd',
-            'description': '#b9f29f',
-            'content': '#f1fa8c',
-            'option': '#64aaaa',
-            'comment': '#6272a4',
-        }
+        return ctc.config.get_cli_color_theme()
     else:
         return {
             'title': '',
@@ -322,6 +311,23 @@ def get_cli_styles(color: bool | None = None) -> toolcli.StyleTheme:
             'option': '',
             'comment': '',
         }
+
+
+def _is_jupyter_notebook() -> bool:
+    """adapted from https://gist.github.com/thomasaarholt/e5e2da71ea3ee412616b27d364e3ae82"""
+    try:
+        from IPython import get_ipython  # type: ignore
+
+        if 'IPKernelApp' not in get_ipython().config:
+            raise ImportError("console")
+            return False
+        if 'VSCODE_PID' in os.environ:
+            raise ImportError("vscode")
+            return False
+    except Exception:
+        return False
+    else:
+        return True
 
 
 def run_cli(
