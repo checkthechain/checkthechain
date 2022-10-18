@@ -59,7 +59,7 @@ dependencies = [
     # EVM dependencies
     'pycryptodome >=3.9.1, <4',  # for keccak()
     'eth_abi_lite >=3.0.3, <4',  # for abi encoding
-    'idna >=3.3, <4',  # ENS resolution
+    'idna >=2.10, <4',  # ENS resolution
 ]
 
 [project.optional-dependencies]
@@ -208,7 +208,7 @@ deps =
     ; EVM dependencies
     pycryptodome==3.9.1
     eth_abi_lite==3.0.3
-    idna==3.3
+    idna==2.10
 
 commands = pytest --disable-warnings
 """
