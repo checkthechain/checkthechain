@@ -28,6 +28,9 @@ def setup_dbs(
 
     db_configs = config_defaults.get_default_db_configs(data_dir)
 
+    # check database versions
+    check_db_versions(list(db_configs.values()))
+
     # create db
     print()
     for db_config in db_configs.values():
@@ -147,3 +150,34 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
                     db.drop_schema(
                         schema_name='chainlink', network=network, confirm=True
                     )
+
+
+def check_db_versions(db_configs: typing.Sequence[toolsql.DBConfig]) -> None:
+
+    dbms_set = {db_config.get('dbms') for db_config in db_configs}
+    for dbms in dbms_set:
+
+        # check sqlite
+        if dbms == 'sqlite':
+            import sqlite3
+
+            # get sqlite3 version
+            if sqlite3.sqlite_version.count('.') == 2:
+                major_str, minor_str, _ = sqlite3.sqlite_version.split('.')
+            elif sqlite3.sqlite_version.count('.') == 1:
+                major_str, minor_str = sqlite3.sqlite_version.split('.')
+            else:
+                major_str, minor_str = '0', '0'
+            major = int(major_str)
+            minor = int(minor_str)
+
+            if (major < 3) or (major == 3 and minor < 24):
+                raise Exception(
+                    'ctc requires sqlite verison >= 3.24. This environment is using sqlite version '
+                    + str(sqlite3.sqlite_version)
+                    + '. You must upgrade sqlite3 before continuing.'
+                    + ' If using apt, this can be accomplished using `apt install sqlite3` or `sudo apt-get install sqlite3`'
+                )
+
+        else:
+            raise Exception('dbms not supported: ' + str(dbms))
