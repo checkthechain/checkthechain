@@ -76,7 +76,7 @@ def write_new_config(
     db_data: spec.PartialConfig,
     data_dir_data: spec.PartialConfig,
     cli_data: spec.PartialConfig,
-    styles: typing.Mapping[str, str],
+    styles: toolcli.StyleTheme,
     overwrite: bool = False,
     headless: bool = False,
 ) -> None:
@@ -108,7 +108,7 @@ def write_new_config(
     }
     print()
     print()
-    toolstr.print('## Creating Configuration File', style=styles['header'])
+    toolstr.print('## Creating Configuration File', style=styles['title'])
     if os.path.isfile(config_path):
         with open(config_path, 'r') as f:
             old_config_raw = json.load(f)
@@ -122,7 +122,7 @@ def write_new_config(
             if not toolcli.input_yes_or_no(
                 'Overwrite old config file? ',
                 default='yes',
-                style=styles['question'],
+                style=styles['metavar'],
                 headless=headless,
             ):
                 raise Exception('cannot continue without replacing config file')
@@ -135,7 +135,7 @@ def write_new_config(
             json.dump(config, f)
         toolstr.print(
             'Config file created at',
-            toolstr.add_style(config_path, styles['path']),
+            toolstr.add_style(config_path, styles['description']),
         )
     else:
         print('Config unchanged')

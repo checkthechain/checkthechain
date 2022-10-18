@@ -12,14 +12,14 @@ from ctc.config import config_defaults
 
 def setup_cli(
     *,
-    styles: dict[str, str],
+    styles: toolcli.StyleTheme,
     old_config: typing.Mapping[typing.Any, typing.Any],
     headless: bool,
 ) -> spec.PartialConfig:
 
     print()
     print()
-    toolstr.print('## CLI Customization', style=styles['header'])
+    toolstr.print('## CLI Customization', style=styles['title'])
 
     print()
     cli_color_theme = _get_cli_color_theme(
@@ -42,7 +42,7 @@ def setup_cli(
 
 def _get_cli_color_theme(
     *,
-    styles: dict[str, str],
+    styles: toolcli.StyleTheme,
     old_config: typing.Mapping[typing.Any, typing.Any],
     headless: bool,
 ) -> toolcli.StyleTheme:
@@ -62,21 +62,16 @@ def _get_cli_color_theme(
     answer = toolcli.input_yes_or_no(
         'Modify this theme? ',
         default='no',
-        style=styles['question'],
+        style=styles['metavar'],
         headless=headless,
     )
     if answer:
-        new_color_theme: toolcli.StyleTheme = {}
-        for key, value in old_color_theme.items():
-            style = toolcli.input_prompt(
-                'What style to use for '
-                + toolstr.add_style(key, 'bold')
-                + ' ? ',
-                style=styles['question'],
-                default='"' + toolstr.add_style(str(value), str(value)) + '"',
-                headless=headless,
-            )
-            new_color_theme[key] = style  # type: ignore
+        from ctc.cli import cli_utils
+
+        new_color_theme = cli_utils.create_custom_color_theme(
+            old_color_theme=cli.get_cli_styles(),
+            headless=headless,
+        )
         return new_color_theme
     else:
         return old_color_theme
@@ -84,7 +79,7 @@ def _get_cli_color_theme(
 
 def _get_cli_chart_charset(
     *,
-    styles: dict[str, str],
+    styles: toolcli.StyleTheme,
     old_config: typing.Mapping[typing.Any, typing.Any],
     headless: bool,
 ) -> toolstr.SampleMode:

@@ -16,7 +16,7 @@ from ... import config_defaults
 
 def setup_data_dir(
     *,
-    styles: dict[str, str],
+    styles: toolcli.StyleTheme,
     old_config: typing.Mapping[typing.Any, typing.Any],
     headless: bool,
     default_data_dir: str | None,
@@ -25,7 +25,7 @@ def setup_data_dir(
 
     print()
     print()
-    toolstr.print('## Data Root Directory', style=styles['header'])
+    toolstr.print('## Data Root Directory', style=styles['title'])
     print()
 
     new_data_root = None
@@ -39,17 +39,17 @@ def setup_data_dir(
         if os.path.isdir(old_data_root):
             prompt = (
                 'Continue using data directory ['
-                + styles['path']
+                + styles['description']
                 + ']'
                 + str(old_data_root)
                 + '[/'
-                + styles['path']
+                + styles['description']
                 + ']? '
             )
             if toolcli.input_yes_or_no(
                 prompt,
                 default='yes',
-                style=styles['question'],
+                style=styles['metavar'],
                 headless=headless,
             ):
                 new_data_root = old_data_root
@@ -69,7 +69,7 @@ def setup_data_dir(
             require_absolute=True,
             must_already_exist=False,
             create_directory=False,
-            style=styles['question'],
+            style=styles['metavar'],
             headless=headless,
         )
 
@@ -80,7 +80,7 @@ def setup_data_dir(
                 prompt,
                 default='yes',
                 headless=headless,
-                style=styles['question'],
+                style=styles['metavar'],
             )
             if answer:
                 if not os.path.isdir(new_data_root):
@@ -101,7 +101,7 @@ def setup_data_dir(
     disable_logs = toolcli.input_yes_or_no(
         prompt,
         default=default,
-        style=styles['question'],
+        style=styles['metavar'],
         headless=headless,
     )
 

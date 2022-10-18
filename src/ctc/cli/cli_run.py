@@ -20,6 +20,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'admin': {
         (): 'ctc.cli.commands.root_command',
         ('aliases',): 'ctc.cli.commands.admin.aliases_command',
+        ('color',): 'ctc.cli.commands.admin.color_command',
         ('config',): 'ctc.cli.commands.admin.config_command',
         ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
         ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
@@ -295,41 +296,6 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 #     return help_cache_path
 
 
-def get_cli_styles(color: bool | None = None) -> toolcli.StyleTheme:
-
-    # if in notebook, do not use styles
-    color = not _is_jupyter_notebook()
-
-    if color:
-        return ctc.config.get_cli_color_theme()
-    else:
-        return {
-            'title': '',
-            'metavar': '',
-            'description': '',
-            'content': '',
-            'option': '',
-            'comment': '',
-        }
-
-
-def _is_jupyter_notebook() -> bool:
-    """adapted from https://gist.github.com/thomasaarholt/e5e2da71ea3ee412616b27d364e3ae82"""
-    try:
-        from IPython import get_ipython  # type: ignore
-
-        if 'IPKernelApp' not in get_ipython().config:
-            raise ImportError("console")
-            return False
-        if 'VSCODE_PID' in os.environ:
-            raise ImportError("vscode")
-            return False
-    except Exception:
-        return False
-    else:
-        return True
-
-
 def run_cli(
     raw_command: str | None = None,
     **toolcli_kwargs: typing.Any,
@@ -352,7 +318,7 @@ def run_cli(
     #         except Exception:
     #             pass
 
-    styles = get_cli_styles()
+    styles = cli_utils.get_cli_styles()
 
     config: toolcli.CLIConfig = {
         #

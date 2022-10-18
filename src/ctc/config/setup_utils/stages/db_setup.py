@@ -4,6 +4,7 @@ import os
 import typing
 
 import aiohttp
+import toolcli
 import toolstr
 import toolsql
 
@@ -14,7 +15,7 @@ from ... import config_defaults
 
 def setup_dbs(
     *,
-    styles: typing.Mapping[str, str],
+    styles: toolcli.StyleTheme,
     data_dir: str,
     network_data: spec.PartialConfig,
     db_config: toolsql.DBConfig | None = None,
@@ -22,7 +23,7 @@ def setup_dbs(
 
     print()
     print()
-    toolstr.print('## Database Setup', style=styles['header'])
+    toolstr.print('## Database Setup', style=styles['title'])
     print()
     print('ctc stores its collected chain data in an sql database')
 
@@ -42,21 +43,21 @@ def setup_dbs(
         if not os.path.isfile(db_path):
             toolstr.print(
                 'Creating database at path ['
-                + styles['path']
+                + styles['description']
                 + ']'
                 + db_path
                 + '[/'
-                + styles['path']
+                + styles['description']
                 + ']'
             )
         else:
             toolstr.print(
                 'Existing database detected at path ['
-                + styles['path']
+                + styles['description']
                 + ']'
                 + db_path
                 + '[/'
-                + styles['path']
+                + styles['description']
                 + ']'
             )
 
@@ -87,7 +88,7 @@ def setup_dbs(
 
 async def async_populate_db_tables(
     db_config: toolsql.SAEngine,
-    styles: typing.Mapping[str, str],
+    styles: toolcli.StyleTheme,
 ) -> None:
     from ctc.protocols.chainlink_utils import chainlink_db
     from ..default_data import default_erc20s
@@ -96,7 +97,7 @@ async def async_populate_db_tables(
 
     print()
     print()
-    toolstr.print('## Populating Database', style=styles['header'])
+    toolstr.print('## Populating Database', style=styles['title'])
 
     # populate data: erc20s
     print()
