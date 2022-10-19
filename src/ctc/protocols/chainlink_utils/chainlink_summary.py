@@ -5,6 +5,7 @@ import time
 import tooltime
 import toolstr
 
+import ctc.config
 from ctc import cli
 from ctc import evm
 from ctc import rpc
@@ -171,12 +172,13 @@ async def async_print_feed_summary(
     plot = toolstr.render_line_plot(
         xvals=xvals,  # type: ignore
         yvals=yvals,  # type: ignore
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
         xaxis_kwargs={'tick_label_format': 'age'},
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
     print()
     print()

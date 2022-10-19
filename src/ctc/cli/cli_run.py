@@ -20,6 +20,7 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'admin': {
         (): 'ctc.cli.commands.root_command',
         ('aliases',): 'ctc.cli.commands.admin.aliases_command',
+        ('charset',): 'ctc.cli.commands.admin.charset_command',
         ('color',): 'ctc.cli.commands.admin.color_command',
         ('config',): 'ctc.cli.commands.admin.config_command',
         ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',

@@ -6,6 +6,7 @@ import typing
 import toolstr
 import numpy as np
 
+import ctc.config
 from ctc import evm
 from ctc import spec
 from . import aave_spec
@@ -479,11 +480,12 @@ async def async_print_token_market_summary(
         plot = toolstr.render_line_plot(
             xvals=timestamps,
             yvals=data,
-            n_rows=40,
-            n_columns=120,
+            n_rows=10,
+            n_columns=60,
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
+            char_dict=ctc.config.get_cli_chart_charset(),
             **plot_kwargs,  # type: ignore
         )
         toolstr.print(

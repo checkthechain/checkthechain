@@ -6,6 +6,7 @@ from typing_extensions import Literal
 
 import toolstr
 
+import ctc.config
 from ctc import cli
 from . import llama_requests
 
@@ -344,12 +345,13 @@ async def async_print_pool_yield_summary(pool: typing.Any) -> None:
     plot = toolstr.render_line_plot(
         xvals=data['timestamp'],
         yvals=data['apy'],
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
         yaxis_kwargs={'tick_label_format': {'postfix': '%'}},
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
     toolstr.print(
         toolstr.hjustify('APY', 'center', 70),
@@ -362,12 +364,13 @@ async def async_print_pool_yield_summary(pool: typing.Any) -> None:
     plot = toolstr.render_line_plot(
         xvals=data['timestamp'],
         yvals=data['tvl'],
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
         yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
     toolstr.print(
         toolstr.hjustify('TVL', 'center', 70),

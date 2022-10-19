@@ -23,6 +23,7 @@ import toolcli
 import toolstr
 import tooltime
 
+import ctc.config
 from ctc import cli
 from ctc import evm
 from ctc import rpc
@@ -296,8 +297,8 @@ async def async_gas_command(
         plot = toolstr.render_line_plot(
             xvals=xvals,
             yvals=yvals,  # type: ignore
-            n_rows=40,
-            n_columns=120,
+            n_rows=10,
+            n_columns=60,
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
@@ -305,7 +306,7 @@ async def async_gas_command(
                 'tick_label_format': xtick_format,
                 'n_ticks': n_ticks,
             },
-            # char_dict='sextants',
+            char_dict=ctc.config.get_cli_chart_charset(),
         )
         print()
         print()

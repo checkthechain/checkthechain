@@ -13,6 +13,7 @@ import typing
 import toolcli
 import toolstr
 
+import ctc.config
 from ctc import cli
 from ctc import evm
 from ctc import spec
@@ -167,12 +168,13 @@ async def async_balances_command(
         plot = toolstr.render_line_plot(
             xvals=xvals,
             yvals=yvals,
-            n_rows=40,
-            n_columns=120,
+            n_rows=10,
+            n_columns=60,
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
             xaxis_kwargs={'formatter': formatter},
+            char_dict=ctc.config.get_cli_chart_charset(),
         )
         print()
         print()
@@ -189,13 +191,14 @@ async def async_balances_command(
             plot = toolstr.render_line_plot(
                 xvals=xvals,
                 yvals=yvals,
-                n_rows=40,
-                n_columns=120,
+                n_rows=10,
+                n_columns=60,
                 line_style=styles['description'],
                 chrome_style=styles['comment'],
                 tick_label_style=styles['metavar'],
                 xaxis_kwargs={'formatter': formatter},
                 yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+                char_dict=ctc.config.get_cli_chart_charset(),
             )
             print()
             print()
