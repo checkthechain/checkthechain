@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 import toolcli
 
 import ctc
+import ctc.config
 from .plugins import toolsql_plugin
 from . import cli_utils
 
@@ -19,6 +20,8 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     'admin': {
         (): 'ctc.cli.commands.root_command',
         ('aliases',): 'ctc.cli.commands.admin.aliases_command',
+        ('charset',): 'ctc.cli.commands.admin.charset_command',
+        ('color',): 'ctc.cli.commands.admin.color_command',
         ('config',): 'ctc.cli.commands.admin.config_command',
         ('config', 'edit'): 'ctc.cli.commands.admin.config.edit_command',
         ('config', 'path'): 'ctc.cli.commands.admin.config.path_command',
@@ -294,36 +297,6 @@ def _db_config_getter() -> toolsql.DBConfig | None:
 #     return help_cache_path
 
 
-def get_cli_styles(color: bool = None) -> toolcli.StyleTheme:
-
-    # if in notebook, do not use styles
-    if color is None:
-        try:
-            get_ipython  # type: ignore
-            color = False
-        except NameError:
-            color = True
-
-    if color:
-        return {
-            'title': 'bold #ce93f9',
-            'metavar': '#8be9fd',
-            'description': '#b9f29f',
-            'content': '#f1fa8c',
-            'option': '#64aaaa',
-            'comment': '#6272a4',
-        }
-    else:
-        return {
-            'title': '',
-            'metavar': '',
-            'description': '',
-            'content': '',
-            'option': '',
-            'comment': '',
-        }
-
-
 def run_cli(
     raw_command: str | None = None,
     **toolcli_kwargs: typing.Any,
@@ -346,7 +319,7 @@ def run_cli(
     #         except Exception:
     #             pass
 
-    styles = get_cli_styles()
+    styles = cli_utils.get_cli_styles()
 
     config: toolcli.CLIConfig = {
         #

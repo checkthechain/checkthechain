@@ -42,7 +42,15 @@ async def async_intake_default_erc20s(
 
     # print summary
     if verbose:
-        print('Added metadata of', len(data), 'default ERC20 tokens to db')
+        import toolstr
+        from ctc import cli
+
+        styles = cli.get_cli_styles()
+        toolstr.print(
+            'Added metadata of',
+            toolstr.add_style(str(len(data)), styles['description'] + ' bold'),
+            'default ERC20 tokens to db',
+        )
 
 
 def load_default_erc20s(

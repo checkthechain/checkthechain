@@ -13,7 +13,9 @@ from ctc import evm
 from ctc import spec
 
 if typing.TYPE_CHECKING:
+    import toolcli
     import toolsql
+    import toolstr
 
 
 def get_default_config(use_env_variables: bool = True) -> spec.Config:
@@ -38,6 +40,10 @@ def get_default_config(use_env_variables: bool = True) -> spec.Config:
         # logging
         'log_rpc_calls': get_default_log_rpc_calls(),
         'log_sql_queries': get_default_log_sql_queries(),
+        #
+        # cli
+        'cli_color_theme': get_default_cli_color_theme(),
+        'cli_chart_charset': get_default_cli_chart_charset(),
     }
     # add in ETH_RPC_URL provider for no config mode
     if use_env_variables:
@@ -86,6 +92,7 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
             'url': eth_rpc_url,
             'session_kwargs': {},
             'chunk_size': None,
+            'convert_reverts_to_none': False,
         }
         default_config['default_providers'][chain_id] = provider_name  # type: ignore
 
@@ -229,3 +236,22 @@ def get_default_log_rpc_calls() -> bool:
 
 def get_default_log_sql_queries() -> bool:
     return False
+
+
+#
+# # cli
+#
+
+def get_default_cli_color_theme() -> toolcli.StyleTheme:
+    return {
+        'title': 'bold #ce93f9',
+        'metavar': '#8be9fd',
+        'description': '#b9f29f',
+        'content': '#f1fa8c',
+        'option': '#64aaaa',
+        'comment': '#6272a4',
+    }
+
+
+def get_default_cli_chart_charset() -> toolstr.SampleMode:
+    return 'braille'

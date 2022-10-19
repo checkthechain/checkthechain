@@ -15,7 +15,9 @@ from typing_extensions import Literal
 import os
 
 if typing.TYPE_CHECKING:
+    import toolcli
     import toolsql
+    import toolstr
 
 from ctc import spec
 from . import config_defaults
@@ -217,7 +219,7 @@ def get_db_config(
 
 
 def get_log_rpc_calls() -> bool:
-    config = config_read.get_config(warn_if_dne=False)
+    config = config_read.get_config()
     return config.get('log_rpc_calls', False)
 
 
@@ -240,3 +242,18 @@ def get_sql_queries_log_path() -> str:
     log_dir = get_log_dir()
     os.makedirs(log_dir, exist_ok=True)
     return os.path.join(log_dir, 'sql_queries.log')
+
+
+#
+# # cli
+#
+
+
+def get_cli_color_theme() -> toolcli.StyleTheme:
+    config = config_read.get_config()
+    return config['cli_color_theme']
+
+
+def get_cli_chart_charset() -> toolstr.SampleMode:
+    config = config_read.get_config()
+    return config['cli_chart_charset']

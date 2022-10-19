@@ -12,7 +12,9 @@
 - added erc4626_utils for collecting tokenized vault data
 - upgrade to mypy 0.982 for type annotations
 - add `--receipt` flag to `tx` command
-- add `pd_utils.bin_data()` for performing many bin operations
+- add `pd_utils.bin_data()` for performing various bin operations
+- refactor internal versioning system for more robustness
+- add `cli_color_theme` and `cli_chart_charset` options to config for customizing cli colors and charts
 - [WIP]
 
 ## Bugfixes

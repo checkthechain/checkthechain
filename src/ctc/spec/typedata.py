@@ -16,6 +16,8 @@ config_keys = (
     'db_configs',
     'log_rpc_calls',
     'log_sql_queries',
+    'cli_color_theme',
+    'cli_chart_charset',
 )
 
 block_keys = (

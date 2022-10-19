@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 import toolstr
+import toolcli
 
 import ctc
 from . import setup_io
@@ -10,14 +11,15 @@ from .stages import alias_setup
 from .stages import data_dir_setup
 from .stages import db_setup
 from .stages import network_setup
+from .stages import cli_setup
 
 
-styles = {
-    'header': '#ce93f9 bold',
-    'path': '#b9f29f bold',
-    'question': '#8be9fd',
-    'quote': '#f1fa8c',
-    'command': '#64aaaa',
+styles: toolcli.StyleTheme = {
+    'title': '#ce93f9 bold',
+    'description': '#b9f29f bold',
+    'metavar': '#8be9fd',
+    'content': '#f1fa8c',
+    'option': '#64aaaa',
     'comment': '#6272a4',
 }
 
@@ -37,12 +39,11 @@ async def async_setup_ctc(
 ) -> None:
 
     # print intro
-    toolstr.print('# Setting up ctc...', style=styles['header'])
-    # toolstr.print_text_box('Setting up ctc', style=styles['header'])
+    toolstr.print('# Setting up ctc...', style=styles['title'])
     print()
     toolstr.print(
         'Running setup process for ctc '
-        + toolstr.add_style(ctc.__version__, styles['path'] + ' bold')
+        + toolstr.add_style(ctc.__version__, styles['description'] + ' bold')
     )
     print()
     print('Each step is optional')
@@ -76,6 +77,11 @@ async def async_setup_ctc(
         default_data_dir=data_dir,
         disable_logs=disable_logs,
     )
+    cli_data = cli_setup.setup_cli(
+        old_config=old_config,
+        styles=styles,
+        headless=headless,
+    )
     if not skip_db:
         db_data = db_setup.setup_dbs(
             data_dir=data_dir_data['data_dir'],
@@ -96,6 +102,7 @@ async def async_setup_ctc(
         network_data=network_data,
         db_data=db_data,
         data_dir_data=data_dir_data,
+        cli_data=cli_data,
         styles=styles,
         headless=headless,
         overwrite=overwrite,
@@ -118,6 +125,6 @@ async def async_setup_ctc(
     # finalize
     print()
     print()
-    toolstr.print('## Final Steps', style=styles['header'])
+    toolstr.print('## Final Steps', style=styles['title'])
     print()
     print('ctc setup complete')

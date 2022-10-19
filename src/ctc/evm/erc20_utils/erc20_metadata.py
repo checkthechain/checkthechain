@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import address_utils
@@ -25,6 +24,8 @@ async def async_get_erc20_address(
         from ctc import db
 
         if network is None:
+            from ctc import config
+
             network = config.get_default_network()
 
         metadata = await db.async_query_erc20_metadata(

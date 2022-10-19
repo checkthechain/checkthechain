@@ -31,6 +31,7 @@ def get_schema_version(
     network: spec.NetworkReference | None,
     *,
     conn: toolsql.SAConnection | None = None,
+    db_config: toolsql.DBConfig | None = None,
 ) -> str | None:
 
     if network is None:
@@ -45,7 +46,7 @@ def get_schema_version(
         chain_id = evm.get_network_chain_id(network)
 
     if conn is None:
-        engine = _get_schema_version_engine()
+        engine = _get_schema_version_engine(db_config=db_config)
         with engine.begin() as conn:
             result = toolsql.select(
                 conn=conn,
@@ -70,11 +71,14 @@ def get_schema_version(
     return result
 
 
-def _get_schema_version_engine() -> toolsql.SAEngine:
+def _get_schema_version_engine(
+    db_config: toolsql.DBConfig | None = None,
+) -> toolsql.SAEngine:
     lock = typing.cast(threading.Lock, _schema_version_cache['lock'])
     with lock:
         if _schema_version_cache.get('engine') is None:
-            db_config = config.get_db_config()
+            if db_config is None:
+                db_config = config.get_db_config()
             _schema_version_cache['engine'] = toolsql.create_engine(
                 db_config=db_config
             )

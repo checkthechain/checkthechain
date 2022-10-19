@@ -3,11 +3,11 @@ from __future__ import annotations
 import os
 import typing
 
-import ctc.config
 from ctc import spec
 
 
 def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
+    import ctc.config
 
     if provider is None:
 

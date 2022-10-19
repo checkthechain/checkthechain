@@ -45,10 +45,13 @@ def load_old_config(
                         del old_providers[provider_name]
 
     # upgrade config file if need be
-    if (
-        convert_to_latest
-        and old_config.get('config_spec_version') != ctc.__version__
-    ):
+    config_version = old_config.get('config_spec_version')
+    if config_version is not None:
+        config_stable_version = upgrade_utils.get_stable_version(config_version)
+    else:
+        config_stable_version = None
+    ctc_stable_version = upgrade_utils.get_stable_version(ctc.__version__)
+    if convert_to_latest and config_stable_version != ctc_stable_version:
         try:
             old_config = upgrade_utils.upgrade_config(old_config)
         except spec.ConfigUpgradeError:
@@ -72,7 +75,8 @@ def write_new_config(
     network_data: spec.PartialConfig,
     db_data: spec.PartialConfig,
     data_dir_data: spec.PartialConfig,
-    styles: typing.Mapping[str, str],
+    cli_data: spec.PartialConfig,
+    styles: toolcli.StyleTheme,
     overwrite: bool = False,
     headless: bool = False,
 ) -> None:
@@ -80,8 +84,6 @@ def write_new_config(
     import json
 
     config_path = config_read.get_config_path(raise_if_dne=False)
-
-    version = upgrade_utils.omit_extra_version_data(ctc.__version__)
 
     networks = {
         str(key): value for key, value in network_data['networks'].items()
@@ -92,7 +94,7 @@ def write_new_config(
     }
 
     config: spec.JsonConfig = {
-        'config_spec_version': version,
+        'config_spec_version': ctc.__version__,
         'data_dir': data_dir_data['data_dir'],
         'networks': networks,
         'providers': network_data['providers'],
@@ -101,10 +103,12 @@ def write_new_config(
         'db_configs': db_data['db_configs'],
         'log_rpc_calls': data_dir_data['log_rpc_calls'],
         'log_sql_queries': data_dir_data['log_sql_queries'],
+        'cli_color_theme': cli_data['cli_color_theme'],
+        'cli_chart_charset': cli_data['cli_chart_charset'],
     }
     print()
     print()
-    toolstr.print('## Creating Configuration File', style=styles['header'])
+    toolstr.print('## Creating Configuration File', style=styles['title'])
     if os.path.isfile(config_path):
         with open(config_path, 'r') as f:
             old_config_raw = json.load(f)
@@ -118,7 +122,7 @@ def write_new_config(
             if not toolcli.input_yes_or_no(
                 'Overwrite old config file? ',
                 default='yes',
-                style=styles['question'],
+                style=styles['metavar'],
                 headless=headless,
             ):
                 raise Exception('cannot continue without replacing config file')
@@ -131,7 +135,7 @@ def write_new_config(
             json.dump(config, f)
         toolstr.print(
             'Config file created at',
-            toolstr.add_style(config_path, styles['path']),
+            toolstr.add_style(config_path, styles['description']),
         )
     else:
         print('Config unchanged')

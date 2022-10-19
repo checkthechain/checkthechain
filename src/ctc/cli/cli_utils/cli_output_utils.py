@@ -15,11 +15,24 @@ def print_bullet(
     number: int | None = None,
     colon_str: str | None = None,
     indent: int | str | None = None,
+    bullet_style: str | None = None,
+    colon_style: str | None = None,
+    key_style: str | None = None,
+    value_style: str | None = None,
 ) -> None:
 
     import toolstr
 
     styles = cli.get_cli_styles()
+
+    if bullet_style is None:
+        bullet_style = styles['title']
+    if colon_style is None:
+        colon_style = styles['comment']
+    if key_style is None:
+        key_style = styles['option']
+    if value_style is None:
+        value_style = styles['description']
 
     toolstr.print_bullet(
         key=key,
@@ -27,10 +40,10 @@ def print_bullet(
         number=number,
         colon_str=colon_str,
         indent=indent,
-        bullet_style=styles['title'],
-        colon_style=styles['comment'],
-        key_style=styles['option'],
-        value_style=styles['description'],
+        bullet_style=bullet_style,
+        colon_style=colon_style,
+        key_style=key_style,
+        value_style=value_style,
     )
 
 

@@ -9,7 +9,7 @@ from ctc.config import config_validate
 default_db_configs = config_defaults.get_default_db_configs('/path/to/data')
 
 valid_values = {
-    'config_spec_version': ['0.3.0'],
+    'config_spec_version': ['0.3.1'],
     'data_dir': ['/path/to/data'],
     'networks': [
         {
@@ -60,7 +60,7 @@ valid_values = {
 }
 
 invalid_values = {
-    'config_spec_version': ['0.3.0b', '0.2.10', None],
+    'config_spec_version': ['0.2.10', None],
     'data_dir': ['relpath/to/data'],
     'networks': [
         {

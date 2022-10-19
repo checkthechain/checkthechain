@@ -7,6 +7,7 @@ import typing
 import aiohttp
 import toolstr
 
+import ctc.config
 from ctc import spec
 from . import coingecko_db
 
@@ -369,12 +370,13 @@ async def async_print_token_data_summary(
         plot = toolstr.render_line_plot(
             xvals=xvals,
             yvals=yvals,
-            n_rows=40,
-            n_columns=120,
+            n_rows=10,
+            n_columns=60,
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
             yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+            char_dict=ctc.config.get_cli_chart_charset(),
         )
         print()
 
@@ -477,11 +479,12 @@ async def async_print_coin_quotient_summary(
     plot = toolstr.render_line_plot(
         xvals=coin1_over_coin2_times,  # type: ignore
         yvals=coin1_over_coin2_prices,  # type: ignore
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
     toolstr.print(plot, indent=4)
 
@@ -496,11 +499,12 @@ async def async_print_coin_quotient_summary(
     plot = toolstr.render_line_plot(
         xvals=coin2_over_coin1_times,  # type: ignore
         yvals=coin2_over_coin1_prices,  # type: ignore
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
     toolstr.print(plot, indent=4)
 

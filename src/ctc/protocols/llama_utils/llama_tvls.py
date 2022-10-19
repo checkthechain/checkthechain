@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import toolstr
 
+import ctc.config
 from ctc import cli
 from . import llama_requests
 
@@ -124,12 +125,13 @@ async def async_print_historical_defi_tvl() -> None:
     plot = toolstr.render_line_plot(
         xvals=data['timestamp'],
         yvals=data['tvl'],
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
         yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
 
     toolstr.print_text_box('Historical Defi TVL', style=styles['title'])
@@ -146,12 +148,13 @@ async def async_print_historical_chain_tvl(chain: str) -> None:
     plot = toolstr.render_line_plot(
         xvals=data['timestamp'],
         yvals=data['tvl'],
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
         yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
 
     toolstr.print_text_box(
@@ -178,12 +181,13 @@ async def async_print_historical_protocol_tvl(
     plot = toolstr.render_line_plot(
         xvals=timestamp,
         yvals=tvl,
-        n_rows=40,
-        n_columns=120,
+        n_rows=10,
+        n_columns=60,
         line_style=styles['description'],
         chrome_style=styles['comment'],
         tick_label_style=styles['metavar'],
         yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+        char_dict=ctc.config.get_cli_chart_charset(),
     )
 
     toolstr.print_text_box(
@@ -218,12 +222,13 @@ async def async_print_historical_protocol_tvl(
             plot = toolstr.render_line_plot(
                 xvals=timestamp,
                 yvals=tvl,
-                n_rows=40,
-                n_columns=120,
+                n_rows=10,
+                n_columns=60,
                 line_style=styles['description'],
                 chrome_style=styles['comment'],
                 tick_label_style=styles['metavar'],
                 yaxis_kwargs={'tick_label_format': {'prefix': '$'}},
+                char_dict=ctc.config.get_cli_chart_charset(),
             )
             print()
             toolstr.print(

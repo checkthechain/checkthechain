@@ -19,6 +19,8 @@ def get_config_validators() -> typing.Mapping[
         'db_configs': validate_db_configs,
         'log_rpc_calls': None,
         'log_sql_queries': None,
+        'cli_color_theme': None,
+        'cli_chart_charset': None,
     }
 
 
@@ -35,6 +37,8 @@ def get_config_base_types() -> typing.Mapping[
         'db_configs': dict,
         'log_rpc_calls': bool,
         'log_sql_queries': bool,
+        'cli_color_theme': dict,
+        'cli_chart_charset': str,
     }
 
 
@@ -54,7 +58,7 @@ def validate_config(config: typing.Mapping[typing.Any, typing.Any]) -> None:
 
         # check that key is allowed
         if key not in spec.config_keys:
-            raise spec.ConfigInvalid('key not allowed in config:')
+            raise spec.ConfigInvalid('key not allowed in config: ' + str(key))
 
         # check value type
         if not isinstance(value, config_base_types[key]):
@@ -87,7 +91,7 @@ def validate_config_spec_version(
     pieces = value.split('.')
     if len(pieces) != 3:
         raise spec.ConfigInvalid('invalid config_spec_version: ' + str(value))
-    if not all(piece.isnumeric() for piece in pieces):
+    if not all(piece.isnumeric() for piece in pieces[:2]):
         raise spec.ConfigInvalid('invalid config_spec_version: ' + str(value))
 
     if pieces[0] != '0' or pieces[1] != '3':

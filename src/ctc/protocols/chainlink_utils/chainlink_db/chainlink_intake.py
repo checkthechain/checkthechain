@@ -143,7 +143,9 @@ async def async_import_networks_to_db(
     # determine which networks to use
     if networks is None:
 
-        known_networks = {datum['name'] for datum in evm.get_networks().values()}
+        known_networks = {
+            datum['name'] for datum in evm.get_networks().values()
+        }
 
         networks = []
         for network_name in network_payload_locations.keys():
@@ -168,9 +170,16 @@ async def async_import_networks_to_db(
     #                     networks.append(network)
 
     if verbose:
-        print(
+        import toolstr
+        from ctc import cli
+
+        styles = cli.get_cli_styles()
+
+        toolstr.print(
             'Adding Chainlink feed metadata to db for',
-            len(networks),
+            toolstr.add_style(
+                str(len(networks)), styles['description'] + ' bold'
+            ),
             'networks...',
         )
 
@@ -229,11 +238,22 @@ async def async_import_network_to_db(
         )
 
     if verbose:
+        import toolstr
+        from ctc import cli
+
         if indent is None:
             indent = ''
         if isinstance(indent, int):
             indent = ' ' * indent
-        print(indent + 'added', len(feeds), network, 'Chainlink feeds to db')
+
+        styles = cli.get_cli_styles()
+
+        toolstr.print(
+            indent + 'added',
+            toolstr.add_style(str(len(feeds)), styles['description'] + ' bold'),
+            toolstr.add_style(network, styles['metavar']),
+            'Chainlink feeds to db',
+        )
 
 
 def print_payload_summary(payload: ChainlinkFeedPayload) -> None:

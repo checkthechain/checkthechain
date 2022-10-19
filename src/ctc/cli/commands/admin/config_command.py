@@ -103,7 +103,21 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
         )
         for key in sorted(config.keys()):
 
-            if key == 'networks':
+            if key == 'cli_color_theme':
+                toolstr.print(
+                    toolstr.add_style('-', chrome_style),
+                    toolstr.add_style(key, key_style)
+                    + toolstr.add_style(':', chrome_style),
+                )
+                for subkey, subvalue in config[key].items():
+                    toolstr.print(
+                        '    ' + toolstr.add_style('-', chrome_style),
+                        toolstr.add_style(subkey, key_style)
+                        + toolstr.add_style(':', chrome_style),
+                        toolstr.add_style(subvalue, subvalue),
+                    )
+
+            elif key == 'networks':
                 print()
                 toolstr.print(
                     toolstr.add_style('-', chrome_style),

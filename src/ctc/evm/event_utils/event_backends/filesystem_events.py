@@ -7,8 +7,6 @@ import functools
 import os
 import typing
 
-import ctc.config
-from ctc import config
 from ctc import spec
 from ctc.toolbox import backend_utils
 from ctc.toolbox import filesystem_utils
@@ -44,13 +42,16 @@ filesystem_layout = {
 def get_events_root(
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> str:
+
+    from ctc import config
+
     if network is None:
         network = config.get_default_network()
         if network is None:
             raise Exception('must specify network or configure default network')
     network_name = network_utils.get_network_name(network, require=True)
     return os.path.join(
-        ctc.config.get_data_dir(), 'evm/networks', network_name, 'events'
+        config.get_data_dir(), 'evm/networks', network_name, 'events'
     )
 
 
@@ -90,6 +91,8 @@ def get_events_filepath(
     network: typing.Optional[spec.NetworkReference] = None,
 ) -> str:
 
+    from ctc import config
+
     # create lowercase versions of contract_address and event_hash
     contract_address = contract_address.lower()
     if event_hash is None:
@@ -113,7 +116,7 @@ def get_events_filepath(
             raise Exception('must specify network or configure default network')
     network_name = network_utils.get_network_name(network, require=True)
     return os.path.join(
-        ctc.config.get_data_dir(), 'evm/networks', network_name, subpath
+        config.get_data_dir(), 'evm/networks', network_name, subpath
     )
 
 

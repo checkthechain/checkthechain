@@ -14,6 +14,7 @@ import ctc
 from ctc import spec
 from . import config_spec
 from . import config_validate
+from . import upgrade_utils
 
 
 class _ToolconfigKwargs(TypedDict):
@@ -59,7 +60,9 @@ def get_config(
 def get_config(
     validate: toolconfig.ValidationOption = False,
     warn_if_dne: bool = True,
+    warn_if_outdated: bool = True,
 ) -> typing.Union[spec.Config, typing.MutableMapping[str, typing.Any]]:
+
     import toolconfig
 
     # load from file
@@ -81,11 +84,18 @@ def get_config(
             use_env_variables=True,
         )  # type: ignore
 
-    if config_from_file.get('config_spec_version') != ctc.__version__:
-        print(
-            '[WARNING] using outdated config -- run `ctc setup` on command line'
-        )
-        from . import upgrade_utils
+    config_version = config_from_file.get('config_spec_version')
+    if config_version is not None:
+        config_stable_version = upgrade_utils.get_stable_version(config_version)
+    else:
+        config_stable_version = None
+    ctc_stable_version = upgrade_utils.get_stable_version(ctc.__version__)
+    if config_stable_version != ctc_stable_version:
+        if warn_if_outdated:
+            print(
+                '[WARNING] using outdated config -- run `ctc setup` on command line to update',
+                file=sys.stderr,
+            )
 
         config_from_file = upgrade_utils.upgrade_config(config_from_file)
 

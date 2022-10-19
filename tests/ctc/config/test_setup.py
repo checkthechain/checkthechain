@@ -267,6 +267,7 @@ old_config__0_2_10 = {
     },
 }
 
+old_config__0_3_0 = upgrade_utils.upgrade__0_2_0__to__0_3_0(old_config__0_2_10)
 
 default_config = config_defaults.get_default_config()
 
@@ -278,7 +279,7 @@ old_config_examples = [
     # blank old config
     {},
     #
-    # 0.3.0 style default config
+    # current style default config
     default_config,
     #
     # default config with small changes
@@ -286,7 +287,7 @@ old_config_examples = [
         default_config,
         data_dir=tempfile.mkdtemp(),
         providers={},
-        default_provider=None,
+        default_providers={},
     ),
 ]
 
@@ -319,7 +320,10 @@ def test_ctc_setup__use_old_config(monkeypatch, old_config):
     new_config = get_ctc_config()
 
     # check that current ctc value is used
-    assert new_config['config_spec_version'] == ctc.__version__
+    assert new_config['config_spec_version'] in [
+        ctc.__version__,
+        upgrade_utils.get_stable_version(ctc.__version__),
+    ]
 
     # check that providers are preserved
     assert len(old_config_upgraded['providers']) == len(new_config['providers'])

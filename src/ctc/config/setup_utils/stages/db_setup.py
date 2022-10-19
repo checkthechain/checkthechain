@@ -4,6 +4,7 @@ import os
 import typing
 
 import aiohttp
+import toolcli
 import toolstr
 import toolsql
 
@@ -14,7 +15,7 @@ from ... import config_defaults
 
 def setup_dbs(
     *,
-    styles: typing.Mapping[str, str],
+    styles: toolcli.StyleTheme,
     data_dir: str,
     network_data: spec.PartialConfig,
     db_config: toolsql.DBConfig | None = None,
@@ -22,11 +23,14 @@ def setup_dbs(
 
     print()
     print()
-    toolstr.print('## Database Setup', style=styles['header'])
+    toolstr.print('## Database Setup', style=styles['title'])
     print()
     print('ctc stores its collected chain data in an sql database')
 
     db_configs = config_defaults.get_default_db_configs(data_dir)
+
+    # check database versions
+    check_db_versions(list(db_configs.values()))
 
     # create db
     print()
@@ -39,21 +43,21 @@ def setup_dbs(
         if not os.path.isfile(db_path):
             toolstr.print(
                 'Creating database at path ['
-                + styles['path']
+                + styles['description']
                 + ']'
                 + db_path
                 + '[/'
-                + styles['path']
+                + styles['description']
                 + ']'
             )
         else:
             toolstr.print(
                 'Existing database detected at path ['
-                + styles['path']
+                + styles['description']
                 + ']'
                 + db_path
                 + '[/'
-                + styles['path']
+                + styles['description']
                 + ']'
             )
 
@@ -84,7 +88,7 @@ def setup_dbs(
 
 async def async_populate_db_tables(
     db_config: toolsql.SAEngine,
-    styles: typing.Mapping[str, str],
+    styles: toolcli.StyleTheme,
 ) -> None:
     from ctc.protocols.chainlink_utils import chainlink_db
     from ..default_data import default_erc20s
@@ -93,7 +97,7 @@ async def async_populate_db_tables(
 
     print()
     print()
-    toolstr.print('## Populating Database', style=styles['header'])
+    toolstr.print('## Populating Database', style=styles['title'])
 
     # populate data: erc20s
     print()
@@ -123,15 +127,17 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
     """
 
     from ctc import db
-    from ctc import evm
 
     # looking for schemas that have already been created, but are missing tables
     metadata = toolsql.create_metadata_object_from_db(db_config=db_config)
     if 'schema_versions' not in metadata.tables.keys():
         return
-    for network in evm.get_networks():
+    networks = list(config_defaults.get_default_networks_metadata().keys())
+    for network in networks:
         schema_version = db.get_schema_version(
-            schema_name='chainlink', network=network
+            schema_name='chainlink',
+            network=network,
+            db_config=db_config,
         )
         if schema_version is not None:
             schema = db.get_prepared_schema(
@@ -145,3 +151,34 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
                     db.drop_schema(
                         schema_name='chainlink', network=network, confirm=True
                     )
+
+
+def check_db_versions(db_configs: typing.Sequence[toolsql.DBConfig]) -> None:
+
+    dbms_set = {db_config.get('dbms') for db_config in db_configs}
+    for dbms in dbms_set:
+
+        # check sqlite
+        if dbms == 'sqlite':
+            import sqlite3
+
+            # get sqlite3 version
+            if sqlite3.sqlite_version.count('.') == 2:
+                major_str, minor_str, _ = sqlite3.sqlite_version.split('.')
+            elif sqlite3.sqlite_version.count('.') == 1:
+                major_str, minor_str = sqlite3.sqlite_version.split('.')
+            else:
+                major_str, minor_str = '0', '0'
+            major = int(major_str)
+            minor = int(minor_str)
+
+            if (major < 3) or (major == 3 and minor < 24):
+                raise Exception(
+                    'ctc requires sqlite verison >= 3.24. This environment is using sqlite version '
+                    + str(sqlite3.sqlite_version)
+                    + '. You must upgrade sqlite3 before continuing.'
+                    + ' If using apt, this can be accomplished using `apt install sqlite3` or `sudo apt-get install sqlite3`'
+                )
+
+        else:
+            raise Exception('dbms not supported: ' + str(dbms))

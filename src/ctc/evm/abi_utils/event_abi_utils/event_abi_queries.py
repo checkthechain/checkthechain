@@ -30,7 +30,7 @@ def get_event_abi(
         if event_name is not None and item.get('name') != event_name:
             continue
         if event_hash is not None:
-            item_hash = event_abi_parsing.get_event_hash(event_abi=item)
+            item_hash = event_abi_parsing.get_event_hash(item)
             if item_hash != event_hash:
                 continue
 
