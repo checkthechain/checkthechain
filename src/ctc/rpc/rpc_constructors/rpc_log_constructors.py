@@ -9,7 +9,7 @@ from .. import rpc_request
 
 def construct_eth_new_filter(
     address: spec.BinaryData | None = None,
-    topics: typing.Sequence[spec.BinaryData] | None = None,
+    topics: typing.Sequence[spec.BinaryData | None] | None = None,
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
@@ -59,7 +59,7 @@ def construct_eth_get_filter_logs(
 
 def construct_eth_get_logs(
     address: spec.BinaryData | None = None,
-    topics: typing.Sequence[spec.BinaryData] | None = None,
+    topics: typing.Sequence[spec.BinaryData | None] | None = None,
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,

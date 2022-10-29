@@ -17,6 +17,9 @@ def get_range_gaps(
 ) -> typing.Sequence[Range]:
     """get gaps between subranges of a given range"""
 
+    if len(subranges) == 0:
+        return [[start, end]]
+
     # make ranges non-overlapping
     subranges = combine_overlapping_ranges(subranges)
 
@@ -41,8 +44,10 @@ def get_range_gaps(
             gap_range = [current_start, substart - 1]
             gap_ranges.append(gap_range)
             current_start = subend + 1
+    if current_start < end:
+        gap_ranges.append([current_start, end])
 
-    if gap_ranges[-1][-1] < end:
+    if len(gap_ranges) > 0 and gap_ranges[-1][-1] < end:
         gap_range = [subend + 1, end]
         gap_ranges.append(gap_range)
 
@@ -86,28 +91,83 @@ def combine_overlapping_ranges(
         include_contiguous=include_contiguous,
     )
 
-    if len(overlapping_ranges) == 0:
-        return ranges
+    connections: typing.Mapping[int, set[int]] = {
+        r: set() for r in range(len(ranges))
+    }
+    for i, j in overlapping_ranges:
+        connections[i].add(j)
+        connections[j].add(i)
 
-    else:
-        combined_ranges = []
-        for i, j in overlapping_ranges:
-            combined_start = min(ranges[i][0], ranges[j][0])
-            combined_end = max(ranges[i][1], ranges[j][1])
-            combined_ranges.append([combined_start, combined_end])
-        fixed_ranges = combine_overlapping_ranges(
-            combined_ranges,
-            include_contiguous=include_contiguous,
-        )
+    group_of_each_range: typing.MutableMapping[int, set[int]] = {}
+    for r in range(len(ranges)):
 
-        overlapping_indices = {index for r in overlapping_ranges for index in r}
-        nonoverlapping_ranges = [
-            range
-            for r, range in enumerate(ranges)
-            if r not in overlapping_indices
-        ]
+        # check which groups its neighbors are in
+        groups_of_range = set()
+        for other_r in connections[r]:
+            if other_r in group_of_each_range:
+                groups_of_range.add(other_r)
 
-        return nonoverlapping_ranges + list(fixed_ranges)
+        group = {r}
+        if len(groups_of_range) == 0:
+            # if no neighbors are in groups, create a new one
+            group |= set(connections[r])
+
+        else:
+            # if neighbors are in groups, combine those groups
+            for other_r in groups_of_range:
+                group |= group_of_each_range[other_r]
+
+        for i in group:
+            group_of_each_range[i] = group
+
+    unique_groups = set(tuple(group) for group in group_of_each_range.values())
+
+    combined_ranges = []
+    for group_rs in unique_groups:
+        range_start = min(ranges[group_range][0] for group_range in group_rs)
+        range_end = max(ranges[group_range][1] for group_range in group_rs)
+        combined_ranges.append([range_start, range_end])
+
+    return combined_ranges
+
+
+# def combine_overlapping_ranges(
+#     ranges: typing.Sequence[Range],
+#     *,
+#     include_contiguous: bool = False,
+# ) -> typing.Sequence[Range]:
+#     """combine ranges as needed to produce list of non-overlapping ranges"""
+
+#     print("RANGES (" + str(len(ranges)) + ')', ranges)
+#     print()
+
+#     overlapping_ranges = get_overlapping_ranges(
+#         ranges,
+#         include_contiguous=include_contiguous,
+#     )
+
+#     if len(overlapping_ranges) == 0:
+#         return ranges
+
+#     else:
+#         combined_ranges = []
+#         for i, j in overlapping_ranges:
+#             combined_start = min(ranges[i][0], ranges[j][0])
+#             combined_end = max(ranges[i][1], ranges[j][1])
+#             combined_ranges.append([combined_start, combined_end])
+#         fixed_ranges = combine_overlapping_ranges(
+#             combined_ranges,
+#             include_contiguous=include_contiguous,
+#         )
+
+#         overlapping_indices = {index for r in overlapping_ranges for index in r}
+#         nonoverlapping_ranges = [
+#             range
+#             for r, range in enumerate(ranges)
+#             if r not in overlapping_indices
+#         ]
+
+#         return nonoverlapping_ranges + list(fixed_ranges)
 
 
 def range_to_chunks(

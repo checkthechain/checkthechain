@@ -12,7 +12,7 @@ async def async_intake_encoded_events(
     *,
     encoded_events: typing.Sequence[spec.EncodedEvent],
     # encoded_events: spec.DataFrame,
-    query: spec.EventQuery,
+    query: spec.DBEventQuery,
     network: spec.NetworkReference,
     latest_block: int | None = None,
 ) -> None:
@@ -28,7 +28,7 @@ async def async_intake_encoded_events(
     blocks = np.array([event['block_number'] for event in encoded_events])
     # blocks = encoded_events.index.get_level_values('block_number')
     required_confirmations = management.get_required_confirmations(network)
-    if blocks[-1] > latest_block - required_confirmations:
+    if len(blocks) > 0 and blocks[-1] > latest_block - required_confirmations:
         confirmed_mask = blocks <= latest_block - required_confirmations
         encoded_events = [
             event
@@ -44,7 +44,7 @@ async def async_intake_encoded_events(
     try:
         with engine.connect() as conn:
             await events_statements.async_upsert_event_query(
-                query=query,
+                event_query=query,
                 conn=conn,
                 network=network,
             )

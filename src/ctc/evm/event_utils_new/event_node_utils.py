@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import asyncio
 import typing
 
 from ctc import rpc
 from ctc import spec
-
+from .. import binary_utils
+from . import event_query_utils
 
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T', typing.Sequence[spec.RawLog], spec.DataFrame)
@@ -14,34 +14,61 @@ if typing.TYPE_CHECKING:
 async def _async_query_events_from_node(
     *,
     contract_address: spec.Address | None,
-    topics: typing.Sequence[typing.Any] | None,
+    event_hash: typing.Any | None,
+    topic1: typing.Any | None,
+    topic2: typing.Any | None,
+    topic3: typing.Any | None,
     start_block: int,
     end_block: int,
     write_to_db: bool,
     provider: spec.ProviderReference,
-) -> spec.DataFrame:
+    verbose: bool | int,
+) -> typing.Sequence[spec.EncodedEvent]:
     """query events from node and cache results in db if desired"""
 
-    import pandas as pd
-    from ctc.toolbox import chunk_utils
+    import asyncio
+    from ctc.toolbox import range_utils
+
+    network = rpc.get_provider_network(provider)
 
     # break into chunks, each will be independently written to db
     chunk_size = 100000
-    chunk_ranges = chunk_utils.range_to_chunks(
+    chunk_ranges = range_utils.range_to_chunks(
         start_block,
         end_block,
         chunk_size,
     )
 
+    if verbose >= 1:
+        n_blocks = end_block - start_block + 1
+        print('fetching events from node over', n_blocks, 'blocks')
+    if verbose >= 2:
+        from ctc import cli
+
+        event_query_utils.print_event_query_summary(
+            contract_address=contract_address,
+            event_hash=event_hash,
+            topic1=topic1,
+            topic2=topic2,
+            topic3=topic3,
+            start_block=start_block,
+            end_block=end_block,
+        )
+        cli.print_bullet(key='network', value=network)
+        cli.print_bullet(key='chunk_size', value=chunk_size)
+        cli.print_bullet(key='n_chunks', value=len(chunk_ranges))
+
     # process each meta chunk
-    network = rpc.get_provider_network(provider)
     coroutines = []
-    for chunk_range in chunk_ranges:
+    for chunk_start, chunk_end in chunk_ranges:
         coroutine = _async_query_node_events_chunk(
             contract_address=contract_address,
-            topics=topics,
-            chunk_start=start_block,
-            chunk_end=end_block,
+            event_hash=event_hash,
+            topic1=topic1,
+            topic2=topic2,
+            topic3=topic3,
+            chunk_start=chunk_start,
+            chunk_end=chunk_end,
             provider=provider,
             network=network,
             write_to_db=write_to_db,
@@ -50,10 +77,10 @@ async def _async_query_events_from_node(
 
     chunks = await asyncio.gather(*coroutines)
 
-    # return lists
-    return pd.DataFrame(
-        [log for chunk in chunks for response in chunk for log in response]
-    )
+    # # return lists
+    # return pd.DataFrame(
+    #     [log for chunk in chunks for response in chunk for log in response]
+    # )
 
     # # return dataframes
     # return pd.concat(chunks)
@@ -61,39 +88,52 @@ async def _async_query_events_from_node(
     # # possible should return list of dataframes
     # return chunks
 
-    # # possible should return list of dataframes
+    # possible should return list of dataframes
     # return [log for chunk in chunks for response in chunk for log in response]
+    return [response for chunk in chunks for response in chunk]
 
 
 async def _async_query_node_events_chunk(
     *,
     contract_address: spec.Address | None,
-    topics: typing.Sequence[typing.Any] | None,
+    event_hash: spec.BinaryData | None,
+    topic1: spec.BinaryData | None,
+    topic2: spec.BinaryData | None,
+    topic3: spec.BinaryData | None,
     chunk_start: int,
     chunk_end: int,
     provider: spec.ProviderReference,
     network: spec.NetworkReference,
     write_to_db: bool,
     max_request_size: int = 2000,
-) -> spec.DataFrame:
-    """process a chunk"""
+) -> typing.Sequence[spec.EncodedEvent]:
+    """process a chunk of events from node"""
 
-    import pandas as pd
-    from ctc.toolbox import chunk_utils
+    import asyncio
+    from ctc.toolbox import range_utils
 
     # break each meta chunk into requests
-    chunk_requests = chunk_utils.range_to_chunks(
+    chunk_requests = range_utils.range_to_chunks(
         chunk_start,
         chunk_end,
         max_request_size,
     )
 
+    if event_hash is not None:
+        event_hash = binary_utils.binary_convert(event_hash, 'prefix_hex')
+    if topic1 is not None:
+        topic1 = binary_utils.binary_convert(topic1, 'prefix_hex')
+    if topic2 is not None:
+        topic2 = binary_utils.binary_convert(topic2, 'prefix_hex')
+    if topic3 is not None:
+        topic3 = binary_utils.binary_convert(topic3, 'prefix_hex')
+
     # request from node
     coroutines = []
     for request_start, request_end in chunk_requests:
-        coroutine = await rpc.async_eth_get_logs(
+        coroutine = rpc.async_eth_get_logs(
             address=contract_address,
-            topics=topics,
+            topics=[event_hash, topic1, topic2, topic3],
             start_block=request_start,
             end_block=request_end,
             provider=provider,
@@ -109,9 +149,21 @@ async def _async_query_node_events_chunk(
     if write_to_db:
         from ctc import db
 
-        query: spec.EventQuery = {
+        query_type = event_query_utils._parse_event_query_type(
+            contract_address=contract_address,
+            event_hash=event_hash,
+            topic1=topic1,
+            topic2=topic2,
+            topic3=topic3,
+        )
+
+        query: spec.DBEventQuery = {
+            'query_type': query_type,
             'contract_address': contract_address,
-            'topics': topics,
+            'event_hash': event_hash,
+            'topic1': topic1,
+            'topic2': topic2,
+            'topic3': topic3,
             'start_block': chunk_start,
             'end_block': chunk_end,
         }
@@ -121,7 +173,7 @@ async def _async_query_node_events_chunk(
             network=network,
         )
 
-    return pd.DataFrame(encoded_events)
+    return encoded_events
 
 
 async def _async_process_raw_node_logs(
@@ -141,8 +193,9 @@ async def _async_process_raw_node_logs_list(
 ) -> typing.Sequence[spec.EncodedEvent]:
     """modified in-place for performance"""
     for log in raw_logs:
-        event = typing.cast(spec.EncodedEvent, log)
+        event: spec.EncodedEvent = log  # type: ignore
         event['contract_address'] = log.pop('address')  # type: ignore
+        event['unindexed'] = log.pop('data')  # type: ignore
         topics = log.pop('topics')  # type: ignore
         if topics is not None and len(topics) > 0:
             topic_iter = iter(topics)
@@ -154,7 +207,7 @@ async def _async_process_raw_node_logs_list(
                 event['topic2'] = next(topic_iter)
             if len(topics) >= 4:
                 event['topic3'] = next(topic_iter)
-    return typing.cast(typing.Sequence[spec.EncodedEvent], raw_logs)
+    return raw_logs  # type: ignore
 
 
 async def _async_process_raw_node_logs_dataframe(

@@ -12,7 +12,7 @@ from .. import rpc_request
 async def async_eth_new_filter(
     *,
     address: spec.Address | None = None,
-    topics: typing.Sequence[spec.BinaryData] | None = None,
+    topics: typing.Sequence[spec.BinaryData | None] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     provider: spec.ProviderReference = None,
@@ -112,7 +112,7 @@ async def async_eth_get_filter_logs(
 async def async_eth_get_logs(
     *,
     address: spec.BinaryData | None = None,
-    topics: typing.Sequence[spec.BinaryData] | None = None,
+    topics: typing.Sequence[spec.BinaryData | None] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     block_hash: spec.BinaryData | None = None,

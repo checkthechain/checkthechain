@@ -65,12 +65,17 @@ def get_data_source(**tags: typing.Any) -> DataSource:
             'db_config': db_config,
         }
     elif tags.get('datatype') in [
+        #
+        # # evm
         'erc20_metadata',
         'block_timestamps',
         'block_gas',
         'blocks',
         'contract_abis',
         'contract_creation_blocks',
+        'events',
+        #
+        # # protocols
         'chainlink',
         '4byte',
         'dex_pools',
@@ -85,14 +90,6 @@ def get_data_source(**tags: typing.Any) -> DataSource:
             'backend': 'hybrid',
             'hybrid_order': [
                 {'backend': 'db', 'db_config': db_config},
-                {'backend': 'rpc'},
-            ],
-        }
-    elif tags.get('datatype') == 'events':
-        return {
-            'backend': 'hybrid',
-            'hybrid_order': [
-                {'backend': 'filesystem'},
                 {'backend': 'rpc'},
             ],
         }

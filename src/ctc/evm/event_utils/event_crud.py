@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import evm
+from ctc import rpc
 from ctc import spec
 
 from .. import binary_utils
@@ -269,6 +270,13 @@ async def async_get_event_timestamps(
         block_numbers = events.index.values
 
     # get timestamps
+    provider = rpc.get_provider(provider)
+    if typing.TYPE_CHECKING:
+        provider = typing.cast(
+            spec.ProviderReference, dict(provider, chunk_size=1)
+        )
+    else:
+        provider = dict(provider, chunk_size=1)
     return await block_utils.async_get_block_timestamps(
         block_numbers,
         provider=provider,

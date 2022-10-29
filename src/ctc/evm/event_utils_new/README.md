@@ -1,4 +1,36 @@
 
+TODO
+- event decoding
+- db-vs-node query planning
+- import old data
+- use binary for encoded event storage
+- consider changing
+    - keep_multiindex --> multiindex
+- implement connectorx in toolsql
+
+
+TODO medium term
+- decoded event cache (DEC)
+    - create custom event caches for specific event types
+    - each DEC gets their own table called network_<chain_id>__dec__<event_hash>
+    - track which event types are DEC'd using a table called decoded_event_caches
+        - columns = [event_abi, topic0_type, topic1_type, topic2_type, topic3_type]
+    - when performing a query,
+        1. check whether query is covered by DEC
+        2. if DEC'd, use DEC table, otherwise use non-DEC table
+    - when performing a write
+
+
+## Advantages of New System
+- more robust (ACID compliant)
+- more storage efficient
+- faster (5x faster)
+- supports many more query types
+
+
+
+
+
 ## New event cache TLDR
 - use sql instead of fragile slow poorly-scaling csv
 - cache many more types of queries
@@ -30,6 +62,32 @@
 - ctc 0.3.0 only supported type (3)
 - cannot decode if topic0 not present as in (4) or (6)
 - every query type should specify block numbers
+
+#### Query Types
+
+  query type  │  contract specified?  │  event type specified?  │  additional topics?  
+──────────────┼───────────────────────┼─────────────────────────┼──────────────────────
+           1  │    specific contract  │    specific event type  │           no topics  
+           2  │        all contracts  │    specific event type  │           no topics  
+           3  │    specific contract  │        all event types  │           no topics  
+           4  │        all contracts  │        all event types  │           no topics  
+           5  │    specific contract  │    specific event type  │         some topics  
+           6  │        all contracts  │    specific event type  │         some topics  
+           7  │    specific contract  │        all event types  │         some topics  
+           8  │        all contracts  │        all event types  │         some topics  
+
+
+#### Parameters for each query type
+
+             1  2  3  4  5  6  7  8
+───────────────────────────────────
+   contract  ✓     ✓     ✓     ✓   
+     topic0  ✓  ✓        ✓  ✓      
+     topic1              ?  ?  ?  ?
+     topic2              ?  ?  ?  ?
+     topic3              ?  ?  ?  ?
+start_block  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓
+  end_block  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓
 
 
 ```python
