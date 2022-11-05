@@ -30,6 +30,8 @@ async def async_upsert_function_signatures(
     conn: toolsql.SAConnection,
 ) -> None:
 
+    if len(function_signatures) == 0:
+        return
     toolsql.insert(
         conn=conn,
         table='function_signatures',
@@ -112,6 +114,8 @@ async def async_upsert_event_signatures(
     conn: toolsql.SAConnection,
 ) -> None:
 
+    if len(event_signatures) == 0:
+        return
     toolsql.insert(
         conn=conn,
         table='event_signatures',

@@ -25,13 +25,14 @@ events_schema: toolsql.DBSchema = {
     'tables': {
         'events': {
             'columns': [
-                {'name': 'block_number', 'type': 'Integer', 'primary': True},
+                {'name': 'block_number', 'type': 'Integer', 'primary': True, 'null': False},
                 {
                     'name': 'transaction_index',
                     'type': 'Integer',
                     'primary': True,
+                    'null': False,
                 },
-                {'name': 'log_index', 'type': 'Integer', 'primary': True},
+                {'name': 'log_index', 'type': 'Integer', 'primary': True, 'null': False},
                 {'name': 'contract_address', 'type': 'Binary', 'index': True},
                 {'name': 'transaction_hash', 'type': 'Binary', 'null': False},
                 {'name': 'event_hash', 'type': 'Binary', 'index': True},

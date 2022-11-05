@@ -1,12 +1,12 @@
 
 TODO
-- event decoding
-- db-vs-node query planning
 - import old data
-- use binary for encoded event storage
+    - verify that all of the following give the same results:
+        - old event system
+        - new event system, db query
+        - new event system, hybrid query query
 - consider changing
     - keep_multiindex --> multiindex
-- implement connectorx in toolsql
 
 
 TODO medium term
@@ -21,11 +21,18 @@ TODO medium term
     - when performing a write
 
 
+# DONE
+- event decoding
+- db-vs-node query planning
+
+
+
+
 ## Advantages of New System
 - more robust (ACID compliant)
 - more storage efficient
-- faster (5x faster)
-- supports many more query types
+- faster (5x faster read speeds)
+- supports many more query types (6 vs 1)
 
 
 

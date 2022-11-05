@@ -116,7 +116,7 @@ async def _async_query_events_from_node_and_db(
     provider: spec.ProviderReference,
     network: spec.NetworkReference,
     verbose: bool | int,
-) -> typing.Sequence[spec.EncodedEvent]:
+) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     from ctc import db
 
@@ -137,27 +137,35 @@ async def _async_query_events_from_node_and_db(
         print('- db queries:', len(queries['db']))
         print('- node queries:', len(queries['node']))
 
-    results: typing.MutableMapping[int, typing.Sequence[spec.EncodedEvent]] = {}
+    results: typing.MutableMapping[int, spec.DataFrame] = {}
 
     # send db queries to db
     for query in queries['db']:
-        result = await db.async_query_events(network=network, **query)
-        if result is None:
+        db_result = await db.async_query_events(network=network, **query)
+        if db_result is None:
             raise Exception('could not obtain results from db')
-        results[query['start_block']] = result
+        elif spec.is_dataframe(db_result):
+            results[query['start_block']] = db_result
+        else:
+            raise Exception('unknown db_result format: ' + str(type(db_result)))
 
     # send node queries to node
     for query in queries['node']:
+        import pandas as pd
+
         result = await event_node_utils._async_query_events_from_node(
             write_to_db=write_to_db,
             provider=provider,
             verbose=verbose,
+            output_format='dataframe',
             **query,
         )
-        results[query['start_block']] = result
+        results[query['start_block']] = pd.DataFrame(result)
 
     sorted_results = [results[key] for key in sorted(results.keys())]
-    # events = pd.concat(sorted_results)
-    events = [event for result in sorted_results for event in result]
+    import pandas as pd
+
+    events = pd.concat(sorted_results)
+    # events = [event for result in sorted_results for event in result]
 
     return events

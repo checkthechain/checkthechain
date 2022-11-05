@@ -10,6 +10,8 @@ from ctc import spec
 from ... import schema_utils
 from . import events_schema_defs
 
+from typing_extensions import Literal
+
 
 async def async_upsert_events(
     *,
@@ -25,6 +27,13 @@ async def async_upsert_events(
             typing.Sequence[spec.EncodedEvent],
             encoded_events,
         )
+
+    # fill missing rows
+    for event in encoded_events:
+        event.setdefault('topic1', None)
+        event.setdefault('topic2', None)
+        event.setdefault('topic3', None)
+        event.setdefault('unindexed', None)
 
     as_binary = [
         evm.binarize_fields(
@@ -100,53 +109,129 @@ async def async_select_events(
     start_block: int | None = None,
     end_block: int | None = None,
     only_columns: typing.Sequence[str] | None = None,
-) -> typing.Sequence[spec.EncodedEvent]:
+    backend: Literal['sqlalchemy', 'connectorx'] = 'connectorx',
+) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     # get table
     if network is None:
         network = config.get_default_network()
     table = schema_utils.get_table_name('events', network=network)
 
-    # create filters
-    where_equals: typing.Mapping[str, typing.Any] | None
-    where_equals = {
-        'contract_address': contract_address,
-        'event_hash': event_hash,
-        'topic1': topic1,
-        'topic2': topic2,
-        'topic3': topic3,
-    }
-    where_equals = {
-        k: evm.binary_convert(v, 'binary')
-        for k, v in where_equals.items()
-        if v is not None
-    }
-    if len(where_equals) == 0:
-        where_equals = None
-    if start_block is not None:
-        where_gte: typing.Mapping[str, typing.Any] | None = {
-            'block_number': start_block
-        }
-    else:
-        where_gte = None
-    if end_block is not None:
-        where_lte: typing.Mapping[str, typing.Any] | None = {
-            'block_number': end_block
-        }
-    else:
-        where_lte = None
+    if backend == 'sqlalchemy':
 
-    # dispatch query
-    results: typing.Sequence[spec.EncodedEvent] = toolsql.select(
-        conn=conn,
-        table=table,
-        where_equals=where_equals,
-        where_lte=where_lte,
-        where_gte=where_gte,
-        only_columns=only_columns,
-    )
+        # create filters
+        where_equals: typing.Mapping[str, typing.Any] | None
+        where_equals = {
+            'contract_address': contract_address,
+            'event_hash': event_hash,
+            'topic1': topic1,
+            'topic2': topic2,
+            'topic3': topic3,
+        }
+        where_equals = {
+            k: evm.binary_convert(v, 'binary')
+            for k, v in where_equals.items()
+            if v is not None
+        }
+        if len(where_equals) == 0:
+            where_equals = None
+        if start_block is not None:
+            where_gte: typing.Mapping[str, typing.Any] | None = {
+                'block_number': start_block
+            }
+        else:
+            where_gte = None
+        if end_block is not None:
+            where_lte: typing.Mapping[str, typing.Any] | None = {
+                'block_number': end_block
+            }
+        else:
+            where_lte = None
 
-    return results
+        # dispatch query
+        results: typing.Sequence[spec.EncodedEvent] = toolsql.select(
+            conn=conn,
+            table=table,
+            where_equals=where_equals,
+            where_lte=where_lte,
+            where_gte=where_gte,
+            only_columns=only_columns,
+        )
+
+        return results
+
+    elif backend == 'connectorx':
+        # assert that all values are properly typed
+        if contract_address is not None:
+            contract_address = evm.binary_convert(contract_address, 'raw_hex')
+        if event_hash is not None:
+            event_hash = evm.binary_convert(event_hash, 'raw_hex')
+        if topic1 is not None:
+            topic1 = evm.binary_convert(topic1, 'raw_hex')
+        if topic2 is not None:
+            topic2 = evm.binary_convert(topic2, 'raw_hex')
+        if topic3 is not None:
+            topic3 = evm.binary_convert(topic3, 'raw_hex')
+        if start_block is not None and not isinstance(start_block, int):
+            raise Exception('start_block must be an integer')
+        if end_block is not None and not isinstance(end_block, int):
+            raise Exception('end_block must be an integer')
+
+        # need to be careful to prevent sql injections from user input here
+        assert ';' not in table
+        # raw_sql = """SELECT * FROM """ + table
+        raw_sql = (
+            """SELECT
+            block_number,
+            transaction_index,
+            log_index,
+            '0x' || lower(hex(transaction_hash)) as transaction_hash,
+            '0x' || lower(hex(contract_address)) as contract_address,
+            '0x' || lower(hex(event_hash)) as event_hash,
+            topic1,
+            topic2,
+            topic3,
+            unindexed
+        FROM """
+            + table
+        )
+        where_equals_params = {
+            'contract_address': contract_address,
+            'event_hash': event_hash,
+            'topic1': topic1,
+            'topic2': topic2,
+            'topic3': topic3,
+        }
+        where_equals_params = {
+            k: v for k, v in where_equals_params.items() if v is not None
+        }
+        where_equals_params = {
+            k: ("X'" + v + "'") if v is not None else v
+            for k, v in where_equals_params.items()
+        }
+
+        # add sql clauses
+        clauses = []
+        for param_name, param_value in where_equals_params.items():
+            if param_value is None:
+                param_value = 'NULL'
+            clauses.append(param_name + '=' + str(param_value))
+        if start_block is not None:
+            clauses.append(' block_number>=' + str(start_block))
+        if end_block is not None:
+            clauses.append(' block_number<=' + str(end_block))
+        if len(clauses) > 0:
+            raw_sql += ' WHERE ' + ' AND '.join(clauses)
+
+        import connectorx  # type: ignore
+
+        result: spec.DataFrame = connectorx.read_sql(
+            str(conn.engine.url), raw_sql
+        )
+        return result
+
+    else:
+        raise Exception()
 
 
 async def async_select_event_queries(

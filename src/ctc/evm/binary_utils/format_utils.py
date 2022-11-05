@@ -123,7 +123,10 @@ def binary_convert(
             raw_data = data
 
         if n_bytes is not None and len(raw_data) / 2 != n_bytes:
-            raise Exception('data does not have target length')
+            if len(raw_data) % 2 != 0:
+                raise Exception('incomplete byte representation')
+            input_bytes = int(len(raw_data) / 2)
+            raw_data = '00' * (n_bytes - input_bytes) + raw_data
 
         if output_format == 'prefix_hex':
             return '0x' + raw_data
@@ -141,7 +144,7 @@ def binary_convert(
     elif isinstance(data, bytes):
 
         if n_bytes is not None and len(data) != n_bytes:
-            raise Exception('data does not have target length')
+            data = b'0' * (n_bytes - len(data)) + data
 
         if output_format == 'binary':
             return data

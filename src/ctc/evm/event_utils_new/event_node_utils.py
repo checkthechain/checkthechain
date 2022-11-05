@@ -10,6 +10,8 @@ from . import event_query_utils
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T', typing.Sequence[spec.RawLog], spec.DataFrame)
 
+    from typing_extensions import Literal
+
 
 async def _async_query_events_from_node(
     *,
@@ -23,13 +25,27 @@ async def _async_query_events_from_node(
     write_to_db: bool,
     provider: spec.ProviderReference,
     verbose: bool | int,
-) -> typing.Sequence[spec.EncodedEvent]:
+    output_format: Literal['dataframe', 'dict'] = 'dataframe',
+) -> spec.DataFrame | typing.Sequence[spec.EncodedEvent]:
     """query events from node and cache results in db if desired"""
 
     import asyncio
     from ctc.toolbox import range_utils
 
+    query_type = event_query_utils._parse_event_query_type(
+        contract_address=contract_address,
+        event_hash=event_hash,
+        topic1=topic1,
+        topic2=topic2,
+        topic3=topic3,
+    )
+    if query_type == 8:
+        raise Exception('querying only by non-event-type topics is unsupported by some providers')
+
     network = rpc.get_provider_network(provider)
+
+    topics = [topic1, topic2, topic3]
+    print("ENCODED_TOPICS_INTERNAL:", topics)
 
     # break into chunks, each will be independently written to db
     chunk_size = 100000
@@ -77,20 +93,32 @@ async def _async_query_events_from_node(
 
     chunks = await asyncio.gather(*coroutines)
 
-    # # return lists
-    # return pd.DataFrame(
-    #     [log for chunk in chunks for response in chunk for log in response]
-    # )
+    result = [response for chunk in chunks for response in chunk]
 
-    # # return dataframes
-    # return pd.concat(chunks)
+    if verbose >= 2:
+        print()
+        print('events gathered')
+        cli.print_bullet(key='n_events', value=len(result))
+        n_contracts = len(set(event['contract_address'] for event in result))
+        cli.print_bullet(key='n_contracts', value=n_contracts)
+        n_event_types = len(set(event['event_hash'] for event in result))
+        cli.print_bullet(key='n_event_types', value=n_event_types)
 
-    # # possible should return list of dataframes
-    # return chunks
+    if output_format == 'dict':
+        return result
+    elif output_format == 'dataframe':
+        import pandas as pd
 
-    # possible should return list of dataframes
-    # return [log for chunk in chunks for response in chunk for log in response]
-    return [response for chunk in chunks for response in chunk]
+        df = pd.DataFrame(
+            result,
+            columns=spec.encoded_event_fields,
+        )
+        if 'removed' in df.columns:
+            del df['removed']
+        return df
+
+    else:
+        raise Exception('unknown output_format: ' + str(output_format))
 
 
 async def _async_query_node_events_chunk(
@@ -138,6 +166,7 @@ async def _async_query_node_events_chunk(
             end_block=request_end,
             provider=provider,
         )
+        print("TPICSISCI", [event_hash, topic1, topic2, topic3])
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
 

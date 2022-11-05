@@ -36,12 +36,12 @@ def _parse_event_query_type(
         return 5
     elif not has_contract and has_event_type and has_other_topics:
         return 6
-    elif has_contract and has_event_type and has_other_topics:
+    elif has_contract and not has_event_type and has_other_topics:
         return 7
     elif not has_contract and not has_event_type and has_other_topics:
         return 8
     else:
-        raise Exception('parsing error')
+        raise Exception('could not parse query type')
 
 
 async def _async_parse_event_query_args(
@@ -59,10 +59,7 @@ async def _async_parse_event_query_args(
     encoded_topic3: spec.BinaryData | None = None,
     decode_output: bool,
     network: spec.NetworkReference,
-) -> tuple[
-    typing.Sequence[spec.BinaryData | None],
-    spec.EventABI | None,
-]:
+) -> tuple[typing.Sequence[spec.BinaryData | None], spec.EventABI | None]:
     """compute encoded topics and event abi of query as needed
 
     ## Topic Encoding
@@ -73,7 +70,6 @@ async def _async_parse_event_query_args(
     - event_abi
     - encoded_topics
     - contract_address + event_name
-
     """
 
     # determine how topics are being specified
@@ -113,10 +109,8 @@ async def _async_parse_event_query_args(
             event_hash=event_hash,
             network=network,
         )
-    if using_name_for_hash:
-        if event_abi is None:
-            raise Exception('did not obtain proper event abi')
-        event_hash = abi_utils.get_event_hash(event_abi)
+    if using_name_for_hash and event_abi is None:
+        raise Exception('did not obtain proper event abi')
 
     # parse named event topics
     if named_topics is not None:
@@ -132,6 +126,19 @@ async def _async_parse_event_query_args(
         for name in named_topics.keys():
             if name not in names:
                 raise Exception('unknown topic name: ' + str(name))
+
+    if encoded_topic1 is not None:
+        encoded_topic1 = binary_utils.binary_convert(
+            encoded_topic1, 'binary', n_bytes=32
+        )
+    if encoded_topic2 is not None:
+        encoded_topic2 = binary_utils.binary_convert(
+            encoded_topic2, 'binary', n_bytes=32
+        )
+    if encoded_topic3 is not None:
+        encoded_topic3 = binary_utils.binary_convert(
+            encoded_topic3, 'binary', n_bytes=32
+        )
 
     # encode decoded event topics
     if using_decoded_topics or using_named_topics:
@@ -157,16 +164,20 @@ async def _async_parse_event_query_args(
             )
 
     # return result
+    if event_abi is not None:
+        event_hash = abi_utils.get_event_hash(event_abi)
     if event_hash is not None:
         encoded_event_hash = binary_utils.binary_convert(event_hash, 'binary')
     else:
         encoded_event_hash = None
+
     encoded_topics = (
         encoded_event_hash,
         encoded_topic1,
         encoded_topic2,
         encoded_topic3,
     )
+    print('ENCODED_TOPICS', encoded_topics)
     return encoded_topics, event_abi
 
 

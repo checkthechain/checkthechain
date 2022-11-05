@@ -144,3 +144,21 @@ default_provider_settings = {
     'chunk_size': None,
     'convert_reverts_to_none': False,
 }
+
+
+#
+# # events
+#
+
+encoded_event_fields = [
+    'block_number',
+    'transaction_index',
+    'log_index',
+    'transaction_hash',
+    'contract_address',
+    'event_hash',
+    'topic1',
+    'topic2',
+    'topic3',
+    'unindexed',
+]
