@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import math
 import typing
+from typing_extensions import Literal
 
 from ctc import spec
 from ... import binary_utils
@@ -296,7 +298,115 @@ def encode_events_dataframe_event_type(
     return pd.DataFrame(encoded_events)
 
 
-def decode_events_dataframe(
+async def async_decode_events_dataframe(
+    events: spec.DataFrame,
+    event_abis: typing.Mapping[str | tuple[str, str], spec.EventABI] | None,
+    *,
+    sort_index: bool = True,
+    decode_metadata: bool = True,
+    decode_topics: bool = True,
+    decode_unindexed: bool = True,
+    output_format: Literal['dict', 'dataframe'],
+    share_abis_across_contracts: bool = True,
+) -> spec.DataFrame:
+
+    import pandas as pd
+
+    if event_abis is None:
+        event_abis = {}
+
+    decoded_groups = {}
+    for event_hash, event_type_events in events.groupby('event_hash'):
+
+        # get event abi
+        if share_abis_across_contracts:
+
+            # use single event abi across all addresses
+            if event_abis is not None and event_hash in event_abis:
+                event_abi = event_abis[event_hash]
+            else:
+                if len(event_type_events) == 0:
+                    continue
+                else:
+                    contract_address = event_type_events[
+                        'contract_address'
+                    ].values[0]
+                    event_abi = await event_abi_queries.async_get_event_abi(
+                        event_hash=event_hash,
+                        contract_address=contract_address,
+                    )
+
+            # decode using event_abi
+            decoded_groups[event_hash] = decode_events_dataframe_event_type(
+                events=event_type_events,
+                event_abi=event_abi,
+                decode_metadata=decode_metadata,
+                decode_topics=decode_topics,
+                decode_unindexed=decode_unindexed,
+            )
+
+        else:
+
+            # handle each contract separately
+            groups = event_type_events.groupby('contract_address')
+            events_by_contract = {}
+            for contract_address, contract_events in groups:
+
+                # use event abi specific to contract
+                key = (contract_address, event_hash)
+                if key in event_abis:
+                    event_abi = event_abis[key]
+                else:
+                    event_abi = await event_abi_queries.async_get_event_abi(
+                        event_hash=event_hash,
+                        contract_address=contract_address,
+                    )
+
+                # contract
+                events_by_contract[
+                    contract_address
+                ] = decode_events_dataframe_event_type(
+                    events=contract_events,
+                    event_abi=event_abi,
+                    decode_metadata=decode_metadata,
+                    decode_topics=decode_topics,
+                    decode_unindexed=decode_unindexed,
+                )
+
+            decoded_groups[event_hash] = pd.concat(
+                list(events_by_contract.values())
+            )
+
+    if output_format == 'dataframe':
+
+        all_events = pd.concat(list(decoded_groups.values()))
+
+        if sort_index:
+            all_events = all_events.sort_index()
+
+        return all_events
+
+    elif output_format == 'dict':
+
+        decoded_events: typing.Sequence[typing.Mapping[str, typing.Any]] = [
+            event  # type: ignore
+            for decoded_group in decoded_groups.values()
+            for event in decoded_group.reset_index().to_dict(orient='records')
+        ]
+
+        if sort_index:
+            decoded_events = sorted(
+                decoded_events,
+                key=lambda event: (event['block_number'], event['log_index']),
+            )
+
+        return decoded_events  # type: ignore
+
+    else:
+        raise Exception('unknown output format: ' + str(output_format))
+
+
+def decode_events_dataframe_event_type(
     events: spec.DataFrame,
     event_abi: spec.EventABI,
     *,
@@ -305,6 +415,8 @@ def decode_events_dataframe(
     decode_unindexed: bool = True,
 ) -> spec.DataFrame:
     """decode according to single specific event type"""
+
+    import pandas as pd
 
     # decode metadata
     if decode_metadata:
@@ -322,17 +434,14 @@ def decode_events_dataframe(
         indexed_types = event_abi_parsing.get_event_indexed_types(event_abi)
         n_indexed_inputs = len(indexed_types)
         if n_indexed_inputs >= 1:
-            events['arg__' + indexed_names[0]] = events['topic1'].map(
-                lambda x: abi_coding_utils.abi_decode(x, indexed_types[0])
-            )
+            name = 'arg__' + indexed_names[0]
+            events[name] = _decode_column(events['topic1'], indexed_types[0])
         if n_indexed_inputs >= 2:
-            events['arg__' + indexed_names[1]] = events['topic2'].map(
-                lambda x: abi_coding_utils.abi_decode(x, indexed_types[1])
-            )
+            name = 'arg__' + indexed_names[1]
+            events[name] = _decode_column(events['topic2'], indexed_types[1])
         if n_indexed_inputs >= 3:
-            events['arg__' + indexed_names[2]] = events['topic3'].map(
-                lambda x: abi_coding_utils.abi_decode(x, indexed_types[2])
-            )
+            name = 'arg__' + indexed_names[2]
+            events[name] = _decode_column(events['topic3'], indexed_types[2])
 
         if 'topic1' in events.columns:
             del events['topic1']
@@ -345,22 +454,17 @@ def decode_events_dataframe(
     if decode_unindexed:
         unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
         if len(unindexed_types) > 0:
-            import pandas as pd
 
-            unindexed_names = event_abi_parsing.get_event_unindexed_names(
-                event_abi
-            )
+            names = event_abi_parsing.get_event_unindexed_names(event_abi)
+            unindexed_columns = ['arg__' + name for name in names]
+
             decode_type_str = '(' + ','.join(unindexed_types) + ')'
-            decoded_unindexed_data = map(
-                lambda x: abi_coding_utils.abi_decode(x, decode_type_str),  # type: ignore
-                events['unindexed'],
-            )
-            unindexed_column_names = [
-                'arg__' + name for name in unindexed_names
+            decoded = [
+                abi_coding_utils.abi_decode(datum, decode_type_str)
+                for datum in events['unindexed']
             ]
-            unindexed_df = pd.DataFrame(
-                decoded_unindexed_data, columns=unindexed_column_names
-            )
+            unindexed_df = pd.DataFrame(decoded, columns=unindexed_columns)
+            unindexed_df.index = events.index
 
             for column_name, column_value in unindexed_df.items():
                 events[column_name] = column_value
@@ -373,6 +477,22 @@ def decode_events_dataframe(
             del events['unindexed']
 
     return events
+
+
+def _decode_column(series: spec.Series, abi_type: str) -> spec.Series:
+    import pandas as pd
+
+    decoded = []
+    for value in series.values:
+        if value is not None and not (
+            isinstance(value, float) and math.isnan(value)
+        ):
+            datum = abi_coding_utils.abi_decode(value, abi_type)
+        else:
+            datum = None
+        decoded.append(datum)
+
+    return pd.Series(decoded, index=series.index)
 
 
 def decode_events_dicts(
@@ -427,13 +547,9 @@ def decode_event_dict(
         del event['topic3']  # type: ignore
 
     # decode unindexed data
-    unindexed_types = event_abi_parsing.get_event_unindexed_types(
-        event_abi
-    )
+    unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
     if len(unindexed_types) > 0:
-        unindexed_names = event_abi_parsing.get_event_unindexed_names(
-            event_abi
-        )
+        unindexed_names = event_abi_parsing.get_event_unindexed_names(event_abi)
         decode_type_str = '(' + ','.join(unindexed_types) + ')'
         decoded_unindexed_data = abi_coding_utils.abi_decode(
             event['unindexed'],

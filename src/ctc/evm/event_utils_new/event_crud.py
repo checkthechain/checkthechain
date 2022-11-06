@@ -84,7 +84,6 @@ async def async_get_events(
         encoded_topic1=encoded_topic1,
         encoded_topic2=encoded_topic2,
         encoded_topic3=encoded_topic3,
-        decode_output=decode,
         network=network,
     )
 
@@ -130,15 +129,17 @@ async def async_get_events(
     else:
         raise Exception('unknown events format: ' + str(events))
 
-    # decode indexed and unindexed data
-    if decode:
-        if event_abi is None:
-            raise Exception('could not determine event_abi for decoding')
-        df = abi_utils.decode_events_dataframe(
-            df,
-            event_abi=event_abi,
-            decode_metadata=False,
-        )
+    # summarize output
+    if verbose >= 2:
+        from ctc import cli
+
+        print()
+        print('events gathered')
+        cli.print_bullet(key='n_events', value=len(df))
+        n_contracts = len(set(df['contract_address'].values))
+        cli.print_bullet(key='n_contracts', value=n_contracts)
+        n_event_types = len(set(df['event_hash'].values))
+        cli.print_bullet(key='n_event_types', value=n_event_types)
 
     # set index
     if multiindex:
@@ -159,10 +160,28 @@ async def async_get_events(
         )
         df.insert(0, 'timestamp', timestamps)  # type: ignore
 
-    # convert to output format
-    if output_format == 'dataframe':
+    # format data
+    if decode:
+
+        if event_abi is not None:
+            event_abis: typing.Mapping[str | tuple[str, str], spec.EventABI] | None
+            event_abis = {abi_utils.get_event_hash(event_abi): event_abi}
+        else:
+            event_abis = None
+        df = await abi_utils.async_decode_events_dataframe(
+            df,
+            event_abis=event_abis,
+            decode_metadata=False,
+            output_format=output_format,
+        )
         return df
-    elif output_format == 'dict':
-        return df.to_dict(orient='records')  # type: ignore
+
     else:
-        raise Exception('unknown output format: ' + str(output_format))
+
+        # convert to output format
+        if output_format == 'dataframe':
+            return df
+        elif output_format == 'dict':
+            return df.reset_index().to_dict(orient='records')  # type: ignore
+        else:
+            raise Exception('unknown output format: ' + str(output_format))

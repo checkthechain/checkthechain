@@ -44,9 +44,6 @@ async def _async_query_events_from_node(
 
     network = rpc.get_provider_network(provider)
 
-    topics = [topic1, topic2, topic3]
-    print("ENCODED_TOPICS_INTERNAL:", topics)
-
     # break into chunks, each will be independently written to db
     chunk_size = 100000
     chunk_ranges = range_utils.range_to_chunks(
@@ -94,15 +91,6 @@ async def _async_query_events_from_node(
     chunks = await asyncio.gather(*coroutines)
 
     result = [response for chunk in chunks for response in chunk]
-
-    if verbose >= 2:
-        print()
-        print('events gathered')
-        cli.print_bullet(key='n_events', value=len(result))
-        n_contracts = len(set(event['contract_address'] for event in result))
-        cli.print_bullet(key='n_contracts', value=n_contracts)
-        n_event_types = len(set(event['event_hash'] for event in result))
-        cli.print_bullet(key='n_event_types', value=n_event_types)
 
     if output_format == 'dict':
         return result
@@ -166,7 +154,6 @@ async def _async_query_node_events_chunk(
             end_block=request_end,
             provider=provider,
         )
-        print("TPICSISCI", [event_hash, topic1, topic2, topic3])
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
 

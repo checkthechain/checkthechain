@@ -57,7 +57,6 @@ async def _async_parse_event_query_args(
     encoded_topic1: spec.BinaryData | None = None,
     encoded_topic2: spec.BinaryData | None = None,
     encoded_topic3: spec.BinaryData | None = None,
-    decode_output: bool,
     network: spec.NetworkReference,
 ) -> tuple[typing.Sequence[spec.BinaryData | None], spec.EventABI | None]:
     """compute encoded topics and event abi of query as needed
@@ -99,7 +98,6 @@ async def _async_parse_event_query_args(
     need_event_abi = (
         using_named_topics
         or using_decoded_topics
-        or decode_output
         or using_name_for_hash
     )
     if need_event_abi and event_abi is None:
@@ -177,7 +175,6 @@ async def _async_parse_event_query_args(
         encoded_topic2,
         encoded_topic3,
     )
-    print('ENCODED_TOPICS', encoded_topics)
     return encoded_topics, event_abi
 
 

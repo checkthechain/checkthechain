@@ -26,16 +26,11 @@ TODO medium term
 - db-vs-node query planning
 
 
-
-
 ## Advantages of New System
 - more robust (ACID compliant)
 - more storage efficient
 - faster (5x faster read speeds)
 - supports many more query types (6 vs 1)
-
-
-
 
 
 ## New event cache TLDR
