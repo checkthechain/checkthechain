@@ -35,6 +35,13 @@ async def async_upsert_events(
         event.setdefault('topic3', None)
         event.setdefault('unindexed', None)
 
+        if (
+            event.get('block_number') is None
+            or event.get('transaction_index') is None
+            or event.get('log_index') is None
+        ):
+            raise Exception('must specify full index for event')
+
     as_binary = [
         evm.binarize_fields(
             encoded_event,

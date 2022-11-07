@@ -10,7 +10,7 @@ from . import events_statements
 
 async def async_intake_encoded_events(
     *,
-    encoded_events: typing.Sequence[spec.EncodedEvent],
+    encoded_events: typing.Sequence[spec.EncodedEvent] | spec.DataFrame,
     # encoded_events: spec.DataFrame,
     query: spec.DBEventQuery,
     network: spec.NetworkReference,
@@ -19,8 +19,10 @@ async def async_intake_encoded_events(
 
     import sqlalchemy.exc  # type: ignore
     import numpy as np
-
     from ctc import db
+
+    if spec.is_dataframe(encoded_events):
+        encoded_events = encoded_events.reset_index().to_dict(orient='records')  # type: ignore
 
     # only insert blocks after a given number of confirmations
     if latest_block is None:

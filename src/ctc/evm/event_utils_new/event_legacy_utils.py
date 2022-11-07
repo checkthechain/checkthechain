@@ -7,6 +7,7 @@ import typing
 
 from ctc import spec
 from .. import abi_utils
+from .. import block_utils
 
 if typing.TYPE_CHECKING:
 
@@ -24,13 +25,20 @@ if typing.TYPE_CHECKING:
         end_block: int
         network: spec.NetworkReference
         event_abi: spec.EventABI
+        latest_block: int
 
 
 async def async_import_events_dir_to_db(
-    *, events_dir: str, network: spec.NetworkReference, verbose: bool = True,
+    *,
+    events_dir: str,
+    network: spec.NetworkReference,
+    verbose: bool = True,
 ) -> DirectoryCSVFiles:
+    """import all legacy csv events in root events dir to database"""
 
     import toolstr
+
+    latest_block = await block_utils.async_get_latest_block_number()
 
     total_bytes = 0
     csv_files = []
@@ -54,7 +62,12 @@ async def async_import_events_dir_to_db(
                 network=network,
             )
         except (spec.AbiNotFoundException, LookupError):
-            print('skipping because could not find ABI for contract: ' + str(contract_address))
+            print(
+                'skipping because could not find ABI for contract: '
+                + str(contract_address)
+                + '__'
+                + event_hash
+            )
             continue
 
         for filename in filenames:
@@ -76,6 +89,7 @@ async def async_import_events_dir_to_db(
                     'end_block': end_block,
                     'network': network,
                     'event_abi': event_abi,
+                    'latest_block': latest_block,
                 }
                 csv_files.append(file)
 
@@ -95,7 +109,7 @@ async def async_import_events_dir_to_db(
             fraction_done = i / len(csv_files)
             if fraction_done >= next_milestone:
                 print(i, '/', len(csv_files), 'complete')
-        import_events_csv_file_to_db(**csv_file)
+        await async_import_events_csv_file_to_db(**csv_file)
 
     if verbose:
         print()
@@ -107,7 +121,7 @@ async def async_import_events_dir_to_db(
     }
 
 
-def import_events_csv_file_to_db(
+async def async_import_events_csv_file_to_db(
     *,
     path: str,
     contract_address: spec.Address,
@@ -116,18 +130,28 @@ def import_events_csv_file_to_db(
     end_block: int,
     network: spec.NetworkReference,
     event_abi: spec.EventABI,
+    latest_block: int | None = None,
 ) -> None:
 
+    import ast
     import pandas as pd
+    from ctc import db
 
+    # load data
     events = pd.read_csv(path)
+
+    # modify columns
+    events['event_hash'] = event_hash
+    if 'address' in events.columns:
+        del events['address']
+    del events['block_hash']
 
     # check columns present
     required_columns = [
         'block_number',
         'transaction_index',
         'log_index',
-        'block_hash',
+        'event_hash',
         'transaction_hash',
         'contract_address',
         'event_name',
@@ -137,17 +161,57 @@ def import_events_csv_file_to_db(
             raise Exception('column missing from file: ' + str(column))
     for column in events.columns.values.tolist():
         if column not in required_columns and not column.startswith('arg__'):
-            raise Exception()
+            raise Exception('extra column in file: ' + str(column))
 
-    event_query = {
+    # convert complex types from str to native types
+    indexed_names = abi_utils.get_event_indexed_names(event_abi)
+    indexed_types = abi_utils.get_event_indexed_types(event_abi)
+    unindexed_names = abi_utils.get_event_unindexed_names(event_abi)
+    unindexed_types = abi_utils.get_event_unindexed_types(event_abi)
+    names = indexed_names + unindexed_names
+    types = indexed_types + unindexed_types
+    for name, arg_type in zip(names, types):
+        if arg_type.endswith(']') or arg_type in ['bytes']:
+            column = 'arg__' + name
+            events[column] = events[column].map(lambda x: ast.literal_eval(x))
+
+    # set index
+    events = events.set_index(['block_number', 'transaction_index', 'log_index'])
+
+    # encode fields
+    encoded_events = abi_utils.encode_events_dataframe_event_type(
+        events=events,
+        event_abi=event_abi,
+    )
+
+    # convert nan's to None
+    for column in encoded_events.columns:
+        mask = encoded_events[column].isnull()
+        if mask.any():
+            encoded_events[column] = encoded_events[column].astype(object)
+            encoded_events[column].values[mask] = None
+
+    # construct query
+    event_query: spec.DBEventQuery = {
         'query_type': 1,
         'contract_address': contract_address,
         'event_hash': event_hash,
         'start_block': start_block,
         'end_block': end_block,
+        'topic1': None,
+        'topic2': None,
+        'topic3': None,
     }
 
-    # encode the topics
-    pass
+    # insert into database
+    if latest_block is None:
+        latest_block = await block_utils.async_get_latest_block_number()
+    await db.async_intake_encoded_events(
+        encoded_events=encoded_events,
+        query=event_query,
+        network=network,
+        latest_block=latest_block,
+    )
 
-    raise NotImplementedError('need to re-code topics and unindexed data')
+    # validate result
+    pass

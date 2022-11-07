@@ -23,12 +23,9 @@ async def async_get_events(
     end_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
-    include_timestamps: bool = False,
-    multiindex: bool = True,
     use_db: bool = True,
     read_from_db: bool | None = None,
     write_to_db: bool | None = None,
-    decode: bool = True,
     provider: spec.ProviderReference = None,
     network: spec.NetworkReference | None = None,
     named_topics: typing.Mapping[str, typing.Any] | None = None,
@@ -39,6 +36,11 @@ async def async_get_events(
     encoded_topic2: spec.BinaryData | None = None,
     encoded_topic3: spec.BinaryData | None = None,
     verbose: int | bool = 1,
+    decode: bool = True,
+    multiindex: bool = True,
+    share_abis_across_contracts: bool = True,
+    include_timestamps: bool = False,
+    include_event_names: bool = False,
     output_format: Literal['dataframe', 'dict'] = 'dataframe',
 ) -> spec.DataFrame:
     """get events"""
@@ -46,7 +48,7 @@ async def async_get_events(
     from . import event_hybrid_queries
     from . import event_node_utils
     from . import event_query_utils
-    from . import event_timestamps
+    from . import event_metadata
 
     network, provider = network_utils.get_network_and_provider(
         network, provider
@@ -152,19 +154,26 @@ async def async_get_events(
     else:
         df.index = df.index.get_level_values('block_number')
 
-    # insert timestamps
+    # insert metadata columns
     if include_timestamps:
-        timestamps = await event_timestamps.async_get_event_timestamps(
+        timestamps = await event_metadata.async_get_event_timestamps(
             df,
             provider=provider,
         )
         df.insert(0, 'timestamp', timestamps)  # type: ignore
+    if include_event_names:
+        df['event_name'] = event_metadata._async_get_event_names_column(
+            events=df,
+            share_abis_across_contracts=share_abis_across_contracts,
+        )
 
     # format data
     if decode:
 
         if event_abi is not None:
-            event_abis: typing.Mapping[str | tuple[str, str], spec.EventABI] | None
+            event_abis: typing.Mapping[
+                str | tuple[str, str], spec.EventABI
+            ] | None
             event_abis = {abi_utils.get_event_hash(event_abi): event_abi}
         else:
             event_abis = None
@@ -173,6 +182,7 @@ async def async_get_events(
             event_abis=event_abis,
             decode_metadata=False,
             output_format=output_format,
+            share_abis_across_contracts=share_abis_across_contracts,
         )
         return df
 

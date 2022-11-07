@@ -214,7 +214,7 @@ def normalize_event(
 
 async def async_encode_events_dataframe(
     events: spec.DataFrame,
-    event_abis: typing.Mapping[str, spec.EventABI],
+    event_abis: typing.Mapping[str, spec.EventABI] | None = None,
     *,
     sort_index: bool = True,
 ) -> spec.DataFrame:
@@ -234,6 +234,9 @@ async def async_encode_events_dataframe(
                     contract_address=sub_events['contract_address'].values[0],
                 )
 
+        if len(set(sub_events['contract_address'])) > 1:
+            raise NotImplementedError('re-encoding implemented only for single contracts')
+
         encoded_groups[event_hash] = encode_events_dataframe_event_type(
             events=sub_events,
             event_abi=event_abi,
@@ -241,7 +244,7 @@ async def async_encode_events_dataframe(
 
     import pandas as pd
 
-    all_events = pd.concat(encoded_groups)
+    all_events = pd.concat(list(encoded_groups.values()))
 
     if sort_index:
         all_events = all_events.sort_index()
@@ -258,7 +261,7 @@ def encode_events_dataframe_event_type(
     import pandas as pd
 
     encoded_events: typing.MutableMapping[
-        str, typing.Sequence[typing.Any] | spec.Series | None
+        str, float | typing.Sequence[typing.Any] | spec.Series | None
     ] = {}
 
     # encode metadata
@@ -275,27 +278,61 @@ def encode_events_dataframe_event_type(
     for t, (topic_name, topic_type) in enumerate(
         zip(indexed_names, indexed_types)
     ):
-        column_name = 'arg__' + topic_name
-        decoded_topic = events[column_name]
-        encoded_events['topic' + str(t + 1)] = decoded_topic.map(
-            lambda x: abi_coding_utils.abi_encode(x, topic_type)
-        )
+
+        new_column = []
+        for value in events['arg__' + topic_name].values:
+            encoded = binary_utils.binary_convert(
+                abi_coding_utils.abi_encode(value, topic_type),
+                'prefix_hex',
+            )
+            new_column.append(encoded)
+        encoded_events['topic' + str(t + 1)] = new_column
 
     # encode unindexed data
     unindexed_names = event_abi_parsing.get_event_unindexed_names(event_abi)
     unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
     if len(unindexed_names) > 0:
         unindexed_columns = ['arg__' + name for name in unindexed_names]
-        encoded_events['unindexed'] = [
-            abi_coding_utils.abi_encode(tuple(datum), unindexed_types)
-            for datum in events[unindexed_columns].values
-        ]
+        new_column = []
+        for datum in events[unindexed_columns].values:
+            encoded = binary_utils.binary_convert(
+                abi_coding_utils.abi_encode(tuple(datum), unindexed_types),
+                'prefix_hex',
+            )
+            new_column.append(encoded)
+        encoded_events['unindexed'] = new_column
 
     # set unspecified columns to None
     for column_name in ['topic1', 'topic2', 'topic3', 'unindexed']:
-        encoded_events.setdefault(column_name, None)
+        encoded_events.setdefault(column_name, float('nan'))
 
-    return pd.DataFrame(encoded_events)
+    # create dataframe
+    column_order = [
+        'transaction_hash',
+        'contract_address',
+        'event_hash',
+        'topic1',
+        'topic2',
+        'topic3',
+        'unindexed',
+    ]
+    return pd.DataFrame(encoded_events)[column_order]
+
+
+# def _encode_column(series: spec.Series, abi_type: str) -> spec.Series:
+#     import pandas as pd
+
+#     encoded = []
+#     for value in series.values:
+#         if value is not None and not (
+#             isinstance(value, float) and math.isnan(value)
+#         ):
+#             datum = abi_coding_utils.abi_encode(value, abi_type)
+#         else:
+#             datum = None
+#         encoded.append(datum)
+
+#     return pd.Series(encoded, index=series.index)
 
 
 async def async_decode_events_dataframe(
