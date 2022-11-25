@@ -19,6 +19,8 @@ async def async_resolve_block_range(
     allow_none: typing.Literal[False],
     provider: spec.ProviderReference = None,
     to_int: typing.Literal[True],
+    start_none_means: spec.BlockNumberReference | None = None,
+    end_none_means: spec.BlockNumberReference | None = None,
 ) -> tuple[int, int]:
     ...
 
@@ -33,6 +35,8 @@ async def async_resolve_block_range(
     allow_none: typing.Literal[False],
     provider: spec.ProviderReference = None,
     to_int: typing.Literal[False] = False,
+    start_none_means: spec.BlockNumberReference | None = None,
+    end_none_means: spec.BlockNumberReference | None = None,
 ) -> tuple[spec.BlockNumberReference, spec.BlockNumberReference]:
     ...
 
@@ -47,6 +51,8 @@ async def async_resolve_block_range(
     allow_none: bool,
     provider: spec.ProviderReference = None,
     to_int: typing.Literal[True],
+    start_none_means: spec.BlockNumberReference | None = None,
+    end_none_means: spec.BlockNumberReference | None = None,
 ) -> tuple[int | None, int | None]:
     ...
 
@@ -61,6 +67,8 @@ async def async_resolve_block_range(
     allow_none: bool,
     provider: spec.ProviderReference = None,
     to_int: bool = False,
+    start_none_means: spec.BlockNumberReference | None = None,
+    end_none_means: spec.BlockNumberReference | None = None,
 ) -> tuple[spec.BlockNumberReference | None, spec.BlockNumberReference | None]:
     ...
 
@@ -74,10 +82,17 @@ async def async_resolve_block_range(
     allow_none: bool,
     provider: spec.ProviderReference = None,
     to_int: bool = False,
+    start_none_means: spec.BlockNumberReference | None = None,
+    end_none_means: spec.BlockNumberReference | None = None,
 ) -> tuple[spec.BlockNumberReference | None, spec.BlockNumberReference | None]:
     """resolve block or timestamp range to a block range"""
 
     import asyncio
+
+    if start_block is None and start_time is None:
+        start_block = start_none_means
+    if end_block is None and end_time is None:
+        end_block = end_none_means
 
     tasks = {}
     if start_block is not None:
