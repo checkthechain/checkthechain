@@ -218,6 +218,7 @@ async def async_encode_events_dataframe(
     *,
     sort_index: bool = True,
 ) -> spec.DataFrame:
+    """encode the fields of an events dataframe"""
 
     encoded_groups = {}
     for event_hash, sub_events in events.groupby('event_hash'):
@@ -235,7 +236,9 @@ async def async_encode_events_dataframe(
                 )
 
         if len(set(sub_events['contract_address'])) > 1:
-            raise NotImplementedError('re-encoding implemented only for single contracts')
+            raise NotImplementedError(
+                're-encoding implemented only for single contracts'
+            )
 
         encoded_groups[event_hash] = encode_events_dataframe_event_type(
             events=sub_events,
@@ -280,7 +283,7 @@ def encode_events_dataframe_event_type(
     ):
 
         new_column = []
-        for value in events['arg__' + topic_name].values:
+        for value in events['arg__' + topic_name].values.astype(object):
             encoded = binary_utils.binary_convert(
                 abi_coding_utils.abi_encode(value, topic_type),
                 'prefix_hex',
@@ -294,7 +297,7 @@ def encode_events_dataframe_event_type(
     if len(unindexed_names) > 0:
         unindexed_columns = ['arg__' + name for name in unindexed_names]
         new_column = []
-        for datum in events[unindexed_columns].values:
+        for datum in events[unindexed_columns].values.astype(object):
             encoded = binary_utils.binary_convert(
                 abi_coding_utils.abi_encode(tuple(datum), unindexed_types),
                 'prefix_hex',
@@ -335,6 +338,29 @@ def encode_events_dataframe_event_type(
 #     return pd.Series(encoded, index=series.index)
 
 
+def get_decoded_event_column_names(
+    event_abi: spec.EventABI | typing.Sequence[spec.EventABI],
+) -> typing.Sequence[str]:
+
+    if isinstance(event_abi, dict):
+        arg_names = event_abi_parsing.get_event_indexed_names(
+            event_abi
+        ) + event_abi_parsing.get_event_unindexed_names(event_abi)
+    elif isinstance(event_abi, list):
+        arg_names = []
+        for sub_event_abi in event_abi:
+            sub_arg_names = event_abi_parsing.get_event_indexed_names(
+                sub_event_abi
+            ) + event_abi_parsing.get_event_unindexed_names(sub_event_abi)
+            for name in sub_arg_names:
+                if name not in arg_names:
+                    arg_names.append(name)
+    else:
+        raise Exception('unknown format: ' + str(type(event_abi)))
+
+    return spec.decoded_event_fields + ['arg__' for name in arg_names]
+
+
 async def async_decode_events_dataframe(
     events: spec.DataFrame,
     event_abis: typing.Mapping[str | tuple[str, str], spec.EventABI] | None,
@@ -346,8 +372,10 @@ async def async_decode_events_dataframe(
     output_format: Literal['dict', 'dataframe'],
     share_abis_across_contracts: bool = True,
 ) -> spec.DataFrame:
+    """encode the fields of an events dataframe"""
 
     import pandas as pd
+    from ctc.toolbox import pd_utils
 
     if event_abis is None:
         event_abis = {}
@@ -387,17 +415,17 @@ async def async_decode_events_dataframe(
             # handle each contract separately
             groups = event_type_events.groupby('contract_address')
             events_by_contract = {}
+            event_abis = dict(event_abis)
             for contract_address, contract_events in groups:
 
                 # use event abi specific to contract
                 key = (contract_address, event_hash)
-                if key in event_abis:
-                    event_abi = event_abis[key]
-                else:
-                    event_abi = await event_abi_queries.async_get_event_abi(
+                if key not in event_abis:
+                    event_abis[key] = await event_abi_queries.async_get_event_abi(
                         event_hash=event_hash,
                         contract_address=contract_address,
                     )
+                event_abi = event_abis[key]
 
                 # contract
                 events_by_contract[
@@ -410,13 +438,20 @@ async def async_decode_events_dataframe(
                     decode_unindexed=decode_unindexed,
                 )
 
-            decoded_groups[event_hash] = pd.concat(
-                list(events_by_contract.values())
-            )
+            contents = list(events_by_contract.values())
+            decoded_groups[event_hash] = pd.concat(contents)
 
     if output_format == 'dataframe':
 
-        all_events = pd.concat(list(decoded_groups.values()))
+        contents = list(decoded_groups.values())
+        if all(len(subcontents) == 0 for subcontents in contents):
+            columns = get_decoded_event_column_names(list(event_abis.values()))
+            all_events = pd_utils.create_empty_dataframe(
+                column_names=columns,
+                index_names=spec.event_index_fields,
+            )
+        else:
+            all_events = pd.concat(contents)
 
         if sort_index:
             all_events = all_events.sort_index()
@@ -505,10 +540,6 @@ def decode_events_dataframe_event_type(
 
             for column_name, column_value in unindexed_df.items():
                 events[column_name] = column_value
-            # events = pd.concat([events.reset_index(), unindexed_df], axis=1)
-            # events = events.set_index(
-            #     ['block_number', 'transaction_index', 'log_index']
-            # )
 
         if 'unindexed' in events:
             del events['unindexed']
@@ -536,6 +567,7 @@ def decode_events_dicts(
     events: typing.Sequence[spec.EncodedEvent],
     event_abi: spec.EventABI,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
+    """decode a list of event dicts"""
     return [decode_event_dict(event, event_abi) for event in events]
 
 
@@ -543,6 +575,7 @@ def decode_event_dict(
     event: spec.EncodedEvent,
     event_abi: spec.EventABI,
 ) -> typing.Mapping[str, typing.Any]:
+    """decode fields of an event dict"""
 
     # decode metadata
     event['contract_address'] = binary_utils.binary_convert(

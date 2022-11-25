@@ -47,9 +47,9 @@ async def _async_query_events_from_node(
     # break into chunks, each will be independently written to db
     chunk_size = 100000
     chunk_ranges = range_utils.range_to_chunks(
-        start_block,
-        end_block,
-        chunk_size,
+        start=start_block,
+        end=end_block,
+        chunk_size=chunk_size,
     )
 
     if verbose >= 1:
@@ -97,10 +97,8 @@ async def _async_query_events_from_node(
     elif output_format == 'dataframe':
         import pandas as pd
 
-        df = pd.DataFrame(
-            result,
-            columns=spec.encoded_event_fields,
-        )
+        columns = spec.event_index_fields + spec.encoded_event_fields
+        df = pd.DataFrame(result, columns=columns)
         if 'removed' in df.columns:
             del df['removed']
         return df
@@ -130,9 +128,9 @@ async def _async_query_node_events_chunk(
 
     # break each meta chunk into requests
     chunk_requests = range_utils.range_to_chunks(
-        chunk_start,
-        chunk_end,
-        max_request_size,
+        start=chunk_start,
+        end=chunk_end,
+        chunk_size=max_request_size,
     )
 
     if event_hash is not None:

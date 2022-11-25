@@ -150,10 +150,19 @@ default_provider_settings = {
 # # events
 #
 
-encoded_event_fields = [
+event_index_fields = [
     'block_number',
     'transaction_index',
     'log_index',
+]
+
+decoded_event_fields = [
+    'transaction_hash',
+    'contract_address',
+    'event_hash',
+]
+
+encoded_event_fields = [
     'transaction_hash',
     'contract_address',
     'event_hash',

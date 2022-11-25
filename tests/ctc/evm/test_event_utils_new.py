@@ -3,8 +3,8 @@
 
              1  2  3  4  5  6  7  8
 ───────────────────────────────────
-   contract  ✓     ✓     ✓     ✓   
-     topic0  ✓  ✓        ✓  ✓      
+   contract  ✓     ✓     ✓     ✓
+     topic0  ✓  ✓        ✓  ✓
      topic1              ?  ?  ?  ?
      topic2              ?  ?  ?  ?
      topic3              ?  ?  ?  ?
@@ -213,6 +213,36 @@ async def test_get_events_from_db_to_dict(test):
 @pytest.mark.parametrize('test', query_type_examples)
 async def test_get_events_and_decode(test):
     query, target_result = test
+    actual_result = await event_utils.async_get_events(
+        verbose=2,
+        decode=True,
+        use_db=True,
+        **query,
+    )
+
+    assert len(actual_result) == target_result['n_events']
+    assert (
+        len(set(actual_result['contract_address']))
+        == target_result['n_contracts']
+    )
+    assert (
+        len(set(actual_result['event_hash'])) == target_result['n_event_types']
+    )
+
+
+@pytest.mark.parametrize('test', query_type_examples)
+async def test_get_events_and_decode_empty(test):
+    query, target_result = test
+
+    # change query to an empty block range
+    target_result = dict(target_result)
+    target_result['n_events'] = 0
+    target_result['n_contracts'] = 0
+    target_result['n_event_types'] = 0
+    query = dict(query)
+    query['start_block'] = 100
+    query['end_block'] = 200
+
     actual_result = await event_utils.async_get_events(
         verbose=2,
         decode=True,

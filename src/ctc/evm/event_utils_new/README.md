@@ -28,9 +28,16 @@ TODO medium term
 
 ## Advantages of New System
 - more robust (ACID compliant)
-- more storage efficient
-- faster (5x faster read speeds)
+- more storage efficient (approx 50%)
+- faster (up to 5x faster reads)
 - supports many more query types (6 vs 1)
+- supports complex nested event data types
+
+this also speeds up many other data processing operations that have dependence on events
+
+
+disadvantages
+- slower write speeds (lots of possible optimizations)
 
 
 ## New event cache TLDR

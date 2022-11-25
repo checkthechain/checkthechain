@@ -68,7 +68,13 @@ async def async_get_events(
         end_time=end_time,
         allow_none=False,
         to_int=True,
+        end_none_means='latest',
     )
+    if start_block is None:
+        start_block = await block_utils.async_get_contract_creation_block(
+            contract_address=contract_address,
+            provider=provider,
+        )
 
     # get event query metadata
     (

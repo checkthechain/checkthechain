@@ -291,6 +291,7 @@ async def async_scrub_db_queries(
 
 
 def print_event_query_summary(
+    *,
     contract_address: spec.Address | None,
     event_hash: typing.Any | None,
     topic1: typing.Any | None,

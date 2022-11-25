@@ -33,6 +33,7 @@ async def async_import_events_dir_to_db(
     events_dir: str,
     network: spec.NetworkReference,
     verbose: bool = True,
+    skip: int | None = None,
 ) -> DirectoryCSVFiles:
     """import all legacy csv events in root events dir to database"""
 
@@ -105,10 +106,19 @@ async def async_import_events_dir_to_db(
 
     next_milestone = 0
     for i, csv_file in enumerate(csv_files):
+        if skip is not None and i < skip:
+            continue
         if verbose:
             fraction_done = i / len(csv_files)
             if fraction_done >= next_milestone:
-                print(i, '/', len(csv_files), 'complete')
+                print(
+                    'importing',
+                    i,
+                    '/',
+                    len(csv_files),
+                    'contract=' + csv_file['contract_address'],
+                    'event=' + csv_file['event_hash'][:12] + '...',
+                )
         await async_import_events_csv_file_to_db(**csv_file)
 
     if verbose:
@@ -171,12 +181,17 @@ async def async_import_events_csv_file_to_db(
     names = indexed_names + unindexed_names
     types = indexed_types + unindexed_types
     for name, arg_type in zip(names, types):
-        if arg_type.endswith(']') or arg_type in ['bytes']:
+        if arg_type.endswith(']') or arg_type in ['bytes', 'bytes32']:
             column = 'arg__' + name
             events[column] = events[column].map(lambda x: ast.literal_eval(x))
+        elif arg_type.startswith('int') or arg_type.startswith('uint'):
+            column = 'arg__' + name
+            events[column] = events[column].map(int)
 
     # set index
-    events = events.set_index(['block_number', 'transaction_index', 'log_index'])
+    events = events.set_index(
+        ['block_number', 'transaction_index', 'log_index']
+    )
 
     # encode fields
     encoded_events = abi_utils.encode_events_dataframe_event_type(
