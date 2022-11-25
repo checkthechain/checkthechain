@@ -163,9 +163,13 @@ async def async_select_events(
             where_lte=where_lte,
             where_gte=where_gte,
             only_columns=only_columns,
+            raise_if_table_dne=False,
         )
 
-        return results
+        if results is None:
+            return []
+        else:
+            return results
 
     elif backend == 'connectorx':
         # assert that all values are properly typed
@@ -238,7 +242,7 @@ async def async_select_events(
         return result
 
     else:
-        raise Exception()
+        raise Exception('unknown backend: ' + str(backend))
 
 
 async def async_select_event_queries(
@@ -316,9 +320,13 @@ async def async_select_event_queries(
         where_equals=where_equals,
         where_lte=where_lte,
         where_gte=where_gte,
+        raise_if_table_dne=False,
     )
 
-    return results
+    if results is None:
+        return None
+    else:
+        return results
 
 
 async def async_delete_event_query(

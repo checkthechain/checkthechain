@@ -341,6 +341,7 @@ def encode_events_dataframe_event_type(
 def get_decoded_event_column_names(
     event_abi: spec.EventABI | typing.Sequence[spec.EventABI],
 ) -> typing.Sequence[str]:
+    """get column of dataframe of decoded event type(s)"""
 
     if isinstance(event_abi, dict):
         arg_names = event_abi_parsing.get_event_indexed_names(
