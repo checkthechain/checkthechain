@@ -201,6 +201,7 @@ def binarize_fields(
     binary_format: spec.BinaryFormat = 'binary',
     allow_none: bool = True,
 ) -> typing.Mapping[str, typing.Any]:
+    """convert fields of dict to specific binary format"""
 
     if fields is None:
         fields = list(mapping.keys())

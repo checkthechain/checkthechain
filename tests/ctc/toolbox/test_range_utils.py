@@ -57,7 +57,11 @@ range_gap_tests = [
 @pytest.mark.parametrize('test', range_gap_tests)
 def test_get_range_gaps(test):
     (start, end), subranges, target = test
-    actual = range_utils.get_range_gaps(start, end, subranges)
+    actual = range_utils.get_range_gaps(
+        start=start,
+        end=end,
+        subranges=subranges,
+    )
     assert actual == target
 
 
@@ -174,5 +178,10 @@ range_to_chunk_tests = [
 @pytest.mark.parametrize('test', range_to_chunk_tests)
 def test_range_to_chunks(test):
     start, end, chunk_size, kwargs, target = test
-    actual = range_utils.range_to_chunks(start, end, chunk_size, **kwargs)
+    actual = range_utils.range_to_chunks(
+        start=start,
+        end=end,
+        chunk_size=chunk_size,
+        **kwargs,
+    )
     assert target == actual

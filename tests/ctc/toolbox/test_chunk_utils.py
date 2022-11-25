@@ -1,6 +1,6 @@
 import pytest
 
-from ctc.toolbox import chunk_utils
+from ctc.toolbox import range_utils
 
 
 # additional tests
@@ -238,5 +238,5 @@ range_to_chunks_examples = [
 @pytest.mark.parametrize('example', range_to_chunks_examples)
 def test_range_to_chunks(example):
     kwargs, target = example
-    actual = chunk_utils.range_to_chunks(**kwargs)
+    actual = range_utils.range_to_chunks(**kwargs)
     assert actual == target

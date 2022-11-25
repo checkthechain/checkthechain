@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 
 
 def get_range_gaps(
+    *,
     start: int,
     end: int,
     subranges: typing.Sequence[Range],
@@ -171,10 +172,10 @@ def combine_overlapping_ranges(
 
 
 def range_to_chunks(
+    *,
     start: int,
     end: int,
     chunk_size: int,
-    *,
     round_bounds: bool = False,
     trim_outer_bounds: bool = False,
     index: bool = False,
@@ -182,13 +183,13 @@ def range_to_chunks(
     """break a range into chunks of a given chunk size
 
     ## Examples
-    1. range_to_chunks(390, 710, 100)
+    1. range_to_chunks(start=390, end=710, chunk_size=100)
         --> [[390, 489], [490, 589], [590, 689], [690, 710]]
-    2. range_to_chunks(390, 710, 100, round_bounds=True)
+    2. range_to_chunks(start=390, end=710, chunk_size=100, round_bounds=True)
         --> [[300, 399], [400, 499], [500, 599], [600, 699], [700, 799]
-    3. range_to_chunks(390, 710, 100, round_bounds=True, trim_outer_bounds=True)
+    3. range_to_chunks(start=390, end=710, chunk_size=100, round_bounds=True, trim_outer_bounds=True)
         --> [[390, 399], [400, 499], [500, 599], [600, 699], [700, 710]
-    4. range_to_chunks(390, 710, 100, index=True)
+    4. range_to_chunks(start=390, end=710, chunk_size=100, index=True)
         --> [[390, 490], [490, 590], [590, 690], [690, 711]]
 
     ## Inputs
