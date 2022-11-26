@@ -48,6 +48,7 @@ dependencies = [
     'aiohttp >=3.7.4, <4',
     'loguru >=0.5.3, <0.7',
     'toml >=0.10.2, <0.11',
+    'connectorx >=0.3.1, <0.4',
     #
     # tool suite
     'toolcli >=0.6.8, <0.7',
@@ -197,6 +198,7 @@ deps =
     aiohttp==3.7.4
     loguru==0.5.3
     toml==0.10.2
+    connectorx==0.3.1
     ;
     ; tool suite
     toolcli==0.6.8
