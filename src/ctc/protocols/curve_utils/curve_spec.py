@@ -154,7 +154,7 @@ pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
     },
 }
 
-pool_event_abis = {
+pool_event_abis: typing.Mapping[str, spec.EventABI] = {
     'TokenExchange': {
         'anonymous': False,
         'inputs': [
