@@ -28,23 +28,27 @@ async def async_intake_encoded_events(
     if latest_block is None:
         latest_block = await evm.async_get_latest_block_number()
     blocks = np.array([event['block_number'] for event in encoded_events])
-    # blocks = encoded_events.index.get_level_values('block_number')
     required_confirmations = management.get_required_confirmations(network)
-    if len(blocks) > 0 and blocks[-1] > latest_block - required_confirmations:
-        confirmed_mask = blocks <= latest_block - required_confirmations
-        encoded_events = [
-            event
-            for event, confirmed in zip(encoded_events, confirmed_mask)
-            if confirmed
-        ]
-        # encoded_events = encoded_events[confirmed_mask]
+    latest_allowed_block = latest_block - required_confirmations
+    if query['start_block'] > latest_allowed_block:
+        return
+    if query['end_block'] > latest_allowed_block:
+        if len(blocks) > 0:
+            confirmed_mask = blocks <= latest_allowed_block
+            encoded_events = [
+                event
+                for event, confirmed in zip(encoded_events, confirmed_mask)
+                if confirmed
+            ]
+        query['end_block'] = latest_allowed_block
 
     engine = db.create_engine(schema_name='events', network=network)
     if engine is None:
         return None
 
     try:
-        with engine.connect() as conn:
+        with engine.begin() as conn:
+
             await events_statements.async_upsert_event_query(
                 event_query=query,
                 conn=conn,

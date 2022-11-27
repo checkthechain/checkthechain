@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolcli
 
 from ctc import evm
-from ctc.evm.event_utils import event_backends
+from ctc.evm.event_utils_old import event_backends
 from ctc import spec
 
 
@@ -95,7 +95,7 @@ async def async_rechunk(
 
     elif contract is not None and event is not None:
 
-        if evm.is_event_hash(event):
+        if evm.event_utils_old.is_event_hash(event):
             event_name = event
             event_hash = None
         else:

@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import typing
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
+
 from ctc import spec
 from . import event_node_utils
 from . import event_query_utils
@@ -116,6 +119,7 @@ async def _async_query_events_from_node_and_db(
     provider: spec.ProviderReference,
     network: spec.NetworkReference,
     verbose: bool | int,
+    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
 ) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     from ctc import db
@@ -141,7 +145,11 @@ async def _async_query_events_from_node_and_db(
 
     # send db queries to db
     for query in queries['db']:
-        db_result = await db.async_query_events(network=network, **query)
+        db_result = await db.async_query_events(
+            network=network,
+            output_encoded_format=output_encoded_format,
+            **query,
+        )
         if db_result is None:
             raise Exception('could not obtain results from db')
         elif spec.is_dataframe(db_result):
@@ -158,6 +166,7 @@ async def _async_query_events_from_node_and_db(
             provider=provider,
             verbose=verbose,
             output_format='dataframe',
+            output_encoded_format=output_encoded_format,
             **query,
         )
         results[query['start_block']] = pd.DataFrame(result)
@@ -166,6 +175,5 @@ async def _async_query_events_from_node_and_db(
     import pandas as pd
 
     events = pd.concat(sorted_results)
-    # events = [event for result in sorted_results for event in result]
 
     return events

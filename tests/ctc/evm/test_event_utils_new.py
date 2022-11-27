@@ -14,7 +14,8 @@ start_block  ✓  ✓  ✓  ✓  ✓  ✓  ✓  ✓
 
 import pytest
 
-from ctc.evm import event_utils_new as event_utils
+# from ctc.evm import event_utils_new as event_utils
+from ctc.evm import event_utils
 
 
 contract_address = '0x6b175474e89094c44da98b954eedeac495271d0f'

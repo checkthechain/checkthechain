@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import typing
 
 from ctc import rpc
@@ -26,6 +27,7 @@ async def _async_query_events_from_node(
     provider: spec.ProviderReference,
     verbose: bool | int,
     output_format: Literal['dataframe', 'dict'] = 'dataframe',
+    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
 ) -> spec.DataFrame | typing.Sequence[spec.EncodedEvent]:
     """query events from node and cache results in db if desired"""
 
@@ -40,7 +42,9 @@ async def _async_query_events_from_node(
         topic3=topic3,
     )
     if query_type == 8:
-        raise Exception('querying only by non-event-type topics is unsupported by some providers')
+        raise Exception(
+            'querying only by non-event-type topics is unsupported by some providers'
+        )
 
     network = rpc.get_provider_network(provider)
 
@@ -93,7 +97,23 @@ async def _async_query_events_from_node(
     result = [response for chunk in chunks for response in chunk]
 
     if output_format == 'dict':
+
+        if output_encoded_format == 'prefix_hex':
+            # already in prefix hex
+            pass
+        elif output_encoded_format == 'binary':
+            for event in result:
+                for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
+                    value = event[field]
+                    if not (isinstance(value, float) and math.isnan(value)):
+                        event[field] = binary_utils.binary_convert(
+                            value, 'binary'
+                        )
+        else:
+            raise Exception('unknown output_encoded_format')
+
         return result
+
     elif output_format == 'dataframe':
         import pandas as pd
 
@@ -101,6 +121,19 @@ async def _async_query_events_from_node(
         df = pd.DataFrame(result, columns=columns)
         if 'removed' in df.columns:
             del df['removed']
+
+        if output_encoded_format == 'prefix_hex':
+            # already in prefix hex
+            pass
+        elif output_encoded_format == 'binary':
+            for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
+                mask = ~pd.isnull(df[field])
+                df.loc[mask, field] = df[field][mask].map(
+                    lambda x: binary_utils.binary_convert(x, 'binary')
+                ).values
+        else:
+            raise Exception('unknown output_encoded_format')
+
         return df
 
     else:
@@ -133,6 +166,7 @@ async def _async_query_node_events_chunk(
         chunk_size=max_request_size,
     )
 
+    # encode topics
     if event_hash is not None:
         event_hash = binary_utils.binary_convert(event_hash, 'prefix_hex')
     if topic1 is not None:
@@ -142,12 +176,22 @@ async def _async_query_node_events_chunk(
     if topic3 is not None:
         topic3 = binary_utils.binary_convert(topic3, 'prefix_hex')
 
+    # assemble topics
+    if topic3 is not None:
+        topics = [event_hash, topic1, topic2, topic3]
+    elif topic2 is not None:
+        topics = [event_hash, topic1, topic2]
+    elif topic1 is not None:
+        topics = [event_hash, topic1]
+    else:
+        topics = [event_hash]
+
     # request from node
     coroutines = []
     for request_start, request_end in chunk_requests:
         coroutine = rpc.async_eth_get_logs(
             address=contract_address,
-            topics=[event_hash, topic1, topic2, topic3],
+            topics=topics,
             start_block=request_start,
             end_block=request_end,
             provider=provider,

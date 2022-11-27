@@ -11,6 +11,7 @@ async def async_get_event_timestamps(
     events: spec.DataFrame,
     provider: spec.ProviderReference = None,
 ) -> typing.Sequence[int]:
+    """get timestamps of an events dataframe"""
 
     # get block_numbers
     multi_index = 'block_number' in events.index.names

@@ -117,6 +117,7 @@ async def async_select_events(
     end_block: int | None = None,
     only_columns: typing.Sequence[str] | None = None,
     backend: Literal['sqlalchemy', 'connectorx'] = 'connectorx',
+    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
 ) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     # get table
@@ -125,6 +126,8 @@ async def async_select_events(
     table = schema_utils.get_table_name('events', network=network)
 
     if backend == 'sqlalchemy':
+
+        raise NotImplementedError('deprecating soon, binary format args unsupported')
 
         # create filters
         where_equals: typing.Mapping[str, typing.Any] | None
@@ -188,24 +191,36 @@ async def async_select_events(
         if end_block is not None and not isinstance(end_block, int):
             raise Exception('end_block must be an integer')
 
-        # need to be careful to prevent sql injections from user input here
-        assert ';' not in table
-        # raw_sql = """SELECT * FROM """ + table
-        raw_sql = (
-            """SELECT
-            block_number,
-            transaction_index,
-            log_index,
-            '0x' || lower(hex(transaction_hash)) as transaction_hash,
-            '0x' || lower(hex(contract_address)) as contract_address,
-            '0x' || lower(hex(event_hash)) as event_hash,
-            topic1,
-            topic2,
-            topic3,
-            unindexed
-        FROM """
-            + table
-        )
+        if output_encoded_format == 'binary':
+            raw_sql = """SELECT
+                block_number,
+                transaction_index,
+                log_index,
+                '0x' || lower(hex(transaction_hash)) as transaction_hash,
+                '0x' || lower(hex(contract_address)) as contract_address,
+                '0x' || lower(hex(event_hash)) as event_hash,
+                topic1,
+                topic2,
+                topic3,
+                unindexed
+            FROM """
+        elif output_encoded_format == 'prefix_hex':
+            raw_sql = """SELECT
+                block_number,
+                transaction_index,
+                log_index,
+                '0x' || lower(hex(transaction_hash)) as transaction_hash,
+                '0x' || lower(hex(contract_address)) as contract_address,
+                '0x' || lower(hex(event_hash)) as event_hash,
+                '0x' || lower(hex(topic1)) as topic1,
+                '0x' || lower(hex(topic2)) as topic2,
+                '0x' || lower(hex(topic3)) as topic3,
+                '0x' || lower(hex(unindexed)) as unindexed
+            FROM """
+        else:
+            raise Exception('unknown output_encoded_format: ' + str(output_encoded_format))
+        raw_sql += table
+
         where_equals_params = {
             'contract_address': contract_address,
             'event_hash': event_hash,
@@ -234,7 +249,13 @@ async def async_select_events(
         if len(clauses) > 0:
             raw_sql += ' WHERE ' + ' AND '.join(clauses)
 
+        raw_sql += " ORDER BY block_number, transaction_index, log_index"
+
         import connectorx  # type: ignore
+
+        # need to be careful to prevent sql injections from user input here
+        if ';' in raw_sql:
+            raise Exception('invalid inputs, possible sql injection detected')
 
         result: spec.DataFrame = connectorx.read_sql(
             str(conn.engine.url), raw_sql

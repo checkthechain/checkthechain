@@ -556,7 +556,10 @@ def _decode_column(series: spec.Series, abi_type: str) -> spec.Series:
         if value is not None and not (
             isinstance(value, float) and math.isnan(value)
         ):
-            datum = abi_coding_utils.abi_decode(value, abi_type)
+            if abi_type in ['string', 'bytes'] or abi_type[-1] in (')', ']'):
+                datum = binary_utils.binary_convert(value, 'prefix_hex')
+            else:
+                datum = abi_coding_utils.abi_decode(value, abi_type)
         else:
             datum = None
         decoded.append(datum)
