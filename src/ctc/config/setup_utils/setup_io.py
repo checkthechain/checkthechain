@@ -116,6 +116,28 @@ def write_new_config(
             old_config_raw, sort_keys=True
         )
 
+        # print updated keys
+        if write_new:
+
+            # detect updated keys
+            changed_keys: set[str] = set()
+            for key, value in config.items():
+                if json.dumps(value, sort_keys=True) != json.dumps(
+                    old_config_raw[key], sort_keys=True
+                ):
+                    changed_keys.add(key)
+            for key in old_config_raw.keys():
+                if key not in config:
+                    changed_keys.add(key)
+
+            print()
+            if changed_keys == set(config.keys()):
+                print('All keys updated')
+            else:
+                print('Updated keys:')
+                for key in sorted(changed_keys):
+                    print('-', key)
+
         # make sure file overwrite is confirmed
         if write_new and not overwrite:
             print()
