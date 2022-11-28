@@ -119,7 +119,8 @@ async def _async_query_events_from_node_and_db(
     provider: spec.ProviderReference,
     network: spec.NetworkReference,
     verbose: bool | int,
-    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
+    columns_to_load: set[str],
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
 ) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     from ctc import db
@@ -147,7 +148,8 @@ async def _async_query_events_from_node_and_db(
     for query in queries['db']:
         db_result = await db.async_query_events(
             network=network,
-            output_encoded_format=output_encoded_format,
+            binary_output_format=binary_output_format,
+            only_columns=columns_to_load,
             **query,
         )
         if db_result is None:
@@ -166,10 +168,27 @@ async def _async_query_events_from_node_and_db(
             provider=provider,
             verbose=verbose,
             output_format='dataframe',
-            output_encoded_format=output_encoded_format,
+            binary_output_format=binary_output_format,
             **query,
         )
-        results[query['start_block']] = pd.DataFrame(result)
+        result_df = pd.DataFrame(result)
+
+        # omit unwanted columns
+        for key in {
+            'transaction_index',
+            'log_index',
+            'transaction_hash',
+            'contract_address',
+            'event_hash',
+            'topic1',
+            'topic2',
+            'topic3',
+            'unindexed',
+        }:
+            if key not in columns_to_load:
+                del result_df[key]
+
+        results[query['start_block']] = result_df
 
     sorted_results = [results[key] for key in sorted(results.keys())]
     import pandas as pd

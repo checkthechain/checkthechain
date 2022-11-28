@@ -117,7 +117,7 @@ async def async_select_events(
     end_block: int | None = None,
     only_columns: typing.Sequence[str] | None = None,
     backend: Literal['sqlalchemy', 'connectorx'] = 'connectorx',
-    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
 ) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     # get table
@@ -191,35 +191,74 @@ async def async_select_events(
         if end_block is not None and not isinstance(end_block, int):
             raise Exception('end_block must be an integer')
 
-        if output_encoded_format == 'binary':
-            raw_sql = """SELECT
-                block_number,
-                transaction_index,
-                log_index,
-                '0x' || lower(hex(transaction_hash)) as transaction_hash,
-                '0x' || lower(hex(contract_address)) as contract_address,
-                '0x' || lower(hex(event_hash)) as event_hash,
-                topic1,
-                topic2,
-                topic3,
-                unindexed
-            FROM """
-        elif output_encoded_format == 'prefix_hex':
-            raw_sql = """SELECT
-                block_number,
-                transaction_index,
-                log_index,
-                '0x' || lower(hex(transaction_hash)) as transaction_hash,
-                '0x' || lower(hex(contract_address)) as contract_address,
-                '0x' || lower(hex(event_hash)) as event_hash,
-                '0x' || lower(hex(topic1)) as topic1,
-                '0x' || lower(hex(topic2)) as topic2,
-                '0x' || lower(hex(topic3)) as topic3,
-                '0x' || lower(hex(unindexed)) as unindexed
-            FROM """
+        if only_columns is None:
+            if binary_output_format == 'binary':
+                raw_sql = """SELECT
+                    block_number,
+                    transaction_index,
+                    log_index,
+                    '0x' || lower(hex(transaction_hash)) as transaction_hash,
+                    '0x' || lower(hex(contract_address)) as contract_address,
+                    '0x' || lower(hex(event_hash)) as event_hash,
+                    topic1,
+                    topic2,
+                    topic3,
+                    unindexed"""
+            elif binary_output_format == 'prefix_hex':
+                raw_sql = """SELECT
+                    block_number,
+                    transaction_index,
+                    log_index,
+                    '0x' || lower(hex(transaction_hash)) as transaction_hash,
+                    '0x' || lower(hex(contract_address)) as contract_address,
+                    '0x' || lower(hex(event_hash)) as event_hash,
+                    '0x' || lower(hex(topic1)) as topic1,
+                    '0x' || lower(hex(topic2)) as topic2,
+                    '0x' || lower(hex(topic3)) as topic3,
+                    '0x' || lower(hex(unindexed)) as unindexed"""
+            else:
+                raise Exception('unknown binary_output_format: ' + str(binary_output_format))
         else:
-            raise Exception('unknown output_encoded_format: ' + str(output_encoded_format))
-        raw_sql += table
+            raw_sql = """SELECT block_number"""
+
+            # index columns
+            if 'transaction_index' in only_columns:
+                raw_sql += ', transaction_index'
+            if 'log_index' in only_columns:
+                raw_sql += ', log_index'
+
+            # standard columns
+            if 'transaction_hash' in only_columns:
+                raw_sql += ", '0x' || lower(hex(transaction_hash)) as transaction_hash"
+            if 'contract_address' in only_columns:
+                raw_sql += ", '0x' || lower(hex(contract_address)) as contract_address"
+            if 'event_hash' in only_columns:
+                raw_sql += ", '0x' || lower(hex(event_hash)) as event_hash"
+
+            # arg columns
+            if binary_output_format == 'binary':
+                if 'topic1' in only_columns:
+                    raw_sql += ", topic1"
+                if 'topic2' in only_columns:
+                    raw_sql += ", topic2"
+                if 'topic3' in only_columns:
+                    raw_sql += ", topic3"
+                if 'unindexed' in only_columns:
+                    raw_sql += ", unindexed"
+            elif binary_output_format == 'prefix_hex':
+                if 'topic1' in only_columns:
+                    raw_sql += ", '0x' || lower(hex(topic1)) as topic1"
+                if 'topic2' in only_columns:
+                    raw_sql += ", '0x' || lower(hex(topic2)) as topic2"
+                if 'topic3' in only_columns:
+                    raw_sql += ", '0x' || lower(hex(topic3)) as topic3"
+                if 'unindexed' in only_columns:
+                    raw_sql += ", '0x' || lower(hex(unindexed)) as unindexed"
+            else:
+                raise Exception('unknown binary_output_format: ' + str(binary_output_format))
+
+        # add table
+        raw_sql += ' FROM ' + table
 
         where_equals_params = {
             'contract_address': contract_address,

@@ -27,7 +27,7 @@ async def _async_query_events_from_node(
     provider: spec.ProviderReference,
     verbose: bool | int,
     output_format: Literal['dataframe', 'dict'] = 'dataframe',
-    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
 ) -> spec.DataFrame | typing.Sequence[spec.EncodedEvent]:
     """query events from node and cache results in db if desired"""
 
@@ -98,10 +98,10 @@ async def _async_query_events_from_node(
 
     if output_format == 'dict':
 
-        if output_encoded_format == 'prefix_hex':
+        if binary_output_format == 'prefix_hex':
             # already in prefix hex
             pass
-        elif output_encoded_format == 'binary':
+        elif binary_output_format == 'binary':
             for event in result:
                 for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
                     value = event[field]
@@ -110,7 +110,7 @@ async def _async_query_events_from_node(
                             value, 'binary'
                         )
         else:
-            raise Exception('unknown output_encoded_format')
+            raise Exception('unknown binary_output_format')
 
         return result
 
@@ -122,17 +122,17 @@ async def _async_query_events_from_node(
         if 'removed' in df.columns:
             del df['removed']
 
-        if output_encoded_format == 'prefix_hex':
+        if binary_output_format == 'prefix_hex':
             # already in prefix hex
             pass
-        elif output_encoded_format == 'binary':
+        elif binary_output_format == 'binary':
             for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
                 mask = ~pd.isnull(df[field])
                 df.loc[mask, field] = df[field][mask].map(
                     lambda x: binary_utils.binary_convert(x, 'binary')
                 ).values
         else:
-            raise Exception('unknown output_encoded_format')
+            raise Exception('unknown binary_output_format')
 
         return df
 

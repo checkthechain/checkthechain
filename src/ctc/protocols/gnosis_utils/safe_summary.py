@@ -200,7 +200,9 @@ async def async_print_safe_owner_history(
     diffs = ['safe initialized']
     for change in changes:
         blocks.append(change.Index[0])
-        if change.event_name == 'AddedOwner':
+
+        # AddedOwner
+        if change.event_hash == '0x9465fa0c962cc76958e6373a993326400c1c94f8be2fe3a952adfa7f60b2ea26':
             diffs.append(
                 'add owner '
                 + toolstr.add_style(change.arg__owner, styles['metavar'])
@@ -209,7 +211,9 @@ async def async_print_safe_owner_history(
             new_owners.add(change.arg__owner)
             owners.append(new_owners)
             threshold.append(threshold[-1])
-        elif change.event_name == 'RemovedOwner':
+
+        # RemovedOwner
+        elif change.event_hash == '0xf8d49fc529812e9a7c5c50e69c20f0dccc0db8fa95c98bc58cc9a4f1c1299eaf':
             diffs.append(
                 'remove owner '
                 + toolstr.add_style(change.arg__owner, styles['metavar'])
@@ -218,7 +222,9 @@ async def async_print_safe_owner_history(
             new_owners.remove(change.arg__owner)
             owners.append(new_owners)
             threshold.append(threshold[-1])
-        elif change.event_name == 'ChangedThreshold':
+
+        # ChangedThreshold
+        elif change.event_hash == '0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93':
             diffs.append(
                 'change signing threshold to '
                 + toolstr.add_style(
@@ -227,6 +233,7 @@ async def async_print_safe_owner_history(
             )
             owners.append(owners[-1])
             threshold.append(change.arg__threshold)
+
         else:
             raise Exception()
 

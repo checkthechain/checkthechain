@@ -19,5 +19,4 @@ async def test_transfer_events():
     assert len(df) == 6
     assert df.iloc[0]["contract_address"] == DAI_CONTRACT
     assert df.iloc[0]["block_number"] == START_BLOCK
-    assert df.iloc[0]["event_name"] == "Transfer"
     assert "timestamp" not in df.columns

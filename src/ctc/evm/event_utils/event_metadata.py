@@ -57,7 +57,8 @@ async def _async_get_event_names_column(
     # construct column
     event_abi_column = []
     for contract_address, event_hash in zip(
-        events['contract_address'], events['event_hash']
+        events['contract_address'].values,
+        events['event_hash'].values,
     ):
 
         if share_abis_across_contracts:

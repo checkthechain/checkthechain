@@ -42,7 +42,9 @@ async def async_get_events(
     include_timestamps: bool = False,
     include_event_names: bool = False,
     output_format: Literal['dataframe', 'dict'] = 'dataframe',
-    output_encoded_format: Literal['binary', 'prefix_hex'] = 'binary',
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    only_columns: typing.Sequence[str] | None = None,
+    exclude_columns: typing.Sequence[str] | None = None,
 ) -> spec.DataFrame:
     """get events"""
 
@@ -102,6 +104,16 @@ async def async_get_events(
         network=network,
     )
 
+    # compute which columns to return
+    columns_to_load = _get_columns_to_load(
+        decode=decode,
+        event_abi=event_abi,
+        only_columns=only_columns,
+        exclude_columns=exclude_columns,
+        keep_multiindex=keep_multiindex,
+        include_event_names=include_event_names,
+    )
+
     # query data from db and/or node
     events: typing.Union[spec.DataFrame, typing.Sequence[spec.EncodedEvent]]
     if read_from_db:
@@ -118,7 +130,8 @@ async def async_get_events(
                 provider=provider,
                 verbose=verbose,
                 network=network,
-                output_encoded_format=output_encoded_format,
+                binary_output_format=binary_output_format,
+                columns_to_load=columns_to_load,
             )
         )
     else:
@@ -133,7 +146,7 @@ async def async_get_events(
             write_to_db=write_to_db,
             provider=provider,
             verbose=verbose,
-            output_encoded_format=output_encoded_format,
+            binary_output_format=binary_output_format,
         )
 
     # convert to dataframe as needed
@@ -153,10 +166,12 @@ async def async_get_events(
         print()
         print('events gathered')
         cli.print_bullet(key='n_events', value=len(df))
-        n_contracts = len(set(df['contract_address'].values))
-        cli.print_bullet(key='n_contracts', value=n_contracts)
-        n_event_types = len(set(df['event_hash'].values))
-        cli.print_bullet(key='n_event_types', value=n_event_types)
+        if 'contract_address' in columns_to_load:
+            n_contracts = len(set(df['contract_address'].values))
+            cli.print_bullet(key='n_contracts', value=n_contracts)
+        if 'event_hash' in columns_to_load:
+            n_event_types = len(set(df['event_hash'].values))
+            cli.print_bullet(key='n_event_types', value=n_event_types)
 
     # set index
     if keep_multiindex:
@@ -177,7 +192,7 @@ async def async_get_events(
         )
         df.insert(0, 'timestamp', timestamps)  # type: ignore
     if include_event_names:
-        df['event_name'] = event_metadata._async_get_event_names_column(
+        df['event_name'] = await event_metadata._async_get_event_names_column(
             events=df,
             share_abis_across_contracts=share_abis_across_contracts,
         )
@@ -185,19 +200,13 @@ async def async_get_events(
     # format data
     if decode:
 
-        if event_abi is not None:
-            event_abis: typing.Mapping[
-                str | tuple[str, str], spec.EventABI
-            ] | None
-            event_abis = {abi_utils.get_event_hash(event_abi): event_abi}
-        else:
-            event_abis = None
         df = await abi_utils.async_decode_events_dataframe(
             df,
-            event_abis=event_abis,
             decode_metadata=False,
-            output_format=output_format,
+            single_event_abi=event_abi,
             share_abis_across_contracts=share_abis_across_contracts,
+            output_format=output_format,
+            binary_output_format=binary_output_format,
         )
         return df
 
@@ -210,3 +219,165 @@ async def async_get_events(
             return df.reset_index().to_dict(orient='records')  # type: ignore
         else:
             raise Exception('unknown output format: ' + str(output_format))
+
+
+def _get_columns_to_load(
+    *,
+    only_columns: typing.Sequence[str] | None,
+    exclude_columns: typing.Sequence[str] | None,
+    decode: bool,
+    event_abi: spec.EventABI | None,
+    keep_multiindex: bool,
+    include_event_names: bool,
+) -> set[str]:
+    """specify which columns to use for partial loading"""
+
+    if only_columns is None and exclude_columns is None:
+        exclude_columns = []
+    if only_columns is not None and exclude_columns is not None:
+        raise Exception(
+            'can only specify one of only_columns or exclude_columns'
+        )
+
+    # index columns
+    columns = set()
+    if keep_multiindex:
+        columns.update({'block_number', 'transaction_index', 'log_index'})
+    else:
+        columns.update({'block_number'})
+
+    # standard columns
+    standard_columns = {'transaction_hash', 'contract_address', 'event_hash'}
+    for column in standard_columns:
+        if (only_columns is not None and column in only_columns) or (
+            exclude_columns is not None and column not in exclude_columns
+        ):
+            columns.add(column)
+
+    # arg columns
+    if decode:
+
+        if event_abi is None:
+            columns.update({'topic1', 'topic2', 'topic3', 'unindexed'})
+
+        else:
+            # indexed names
+            indexed = abi_utils.get_event_indexed_names(event_abi)
+            if len(indexed) >= 1:
+                name = 'arg__' + indexed[0]
+                if (only_columns is not None and name in only_columns) or (
+                    exclude_columns is not None and name not in exclude_columns
+                ):
+                    columns.add('topic1')
+            if len(indexed) >= 2:
+                name = 'arg__' + indexed[1]
+                if (only_columns is not None and name in only_columns) or (
+                    exclude_columns is not None and name not in exclude_columns
+                ):
+                    columns.add('topic2')
+            if len(indexed) >= 3:
+                name = 'arg__' + indexed[2]
+                if (only_columns is not None and name in only_columns) or (
+                    exclude_columns is not None and name not in exclude_columns
+                ):
+                    columns.add('topic3')
+
+            # unindexed names
+            unindexed = abi_utils.get_event_unindexed_names(event_abi)
+            if only_columns is not None:
+                if any('arg__' + name in only_columns for name in unindexed):
+                    columns.add('unindexed')
+            elif exclude_columns is not None:
+                if any('arg__' + name not in exclude_columns for name in unindexed):
+                    columns.add('unindexed')
+            else:
+                raise Exception('both only_columns and exclude_columns are None')
+
+    else:
+
+        if event_abi is not None:
+            abi_has_indexed = len(abi_utils.get_event_indexed_names(event_abi))
+            abi_has_unindexed = (
+                len(abi_utils.get_event_unindexed_names(event_abi)) > 0
+            )
+        else:
+            abi_has_indexed = 3
+            abi_has_unindexed = True
+
+        if only_columns is not None:
+            if abi_has_indexed >= 1 and 'topic1' in only_columns:
+                columns.add('topic1')
+            if abi_has_indexed >= 2 and 'topic2' in only_columns:
+                columns.add('topic2')
+            if abi_has_indexed >= 3 and 'topic3' in only_columns:
+                columns.add('topic3')
+            if abi_has_unindexed and 'unindexed' in only_columns:
+                columns.add('unindexed')
+
+        elif exclude_columns is not None:
+            if abi_has_indexed >= 1 and 'topic1' not in exclude_columns:
+                columns.add('topic1')
+            if abi_has_indexed >= 2 and 'topic2' not in exclude_columns:
+                columns.add('topic2')
+            if abi_has_indexed >= 3 and 'topic3' not in exclude_columns:
+                columns.add('topic3')
+            if abi_has_unindexed and 'unindexed' not in exclude_columns:
+                columns.add('unindexed')
+
+        else:
+            raise Exception('exclude_columns should have been []')
+
+    # validate
+    if only_columns is not None:
+        if 'timestamp' in only_columns:
+            raise Exception(
+                'use include_timestamps to include/exclude timestamp'
+            )
+        if 'event_name' in only_columns:
+            raise Exception(
+                'use include_event_names to include/exclude timestamp'
+            )
+        for column in columns:
+            if column not in only_columns and column not in {
+                'block_number',
+                'transaction_index',
+                'log_index',
+            }:
+                if column.startswith('arg__') and not decode:
+                    message = 'cannot include arg__ columns when decode=False'
+                elif (
+                    column in {'topic1', 'topic2', 'topic3', 'unindexed'}
+                    and decode
+                ):
+                    message = 'cannot include ' + column + ' when decode=True'
+                else:
+                    message = 'cannot include column: ' + str(column)
+                raise Exception(message)
+    if exclude_columns is not None:
+        if 'timestamp' in exclude_columns:
+            raise Exception(
+                'use include_timestamps to include/exclude timestamp'
+            )
+        if 'event_name' in exclude_columns:
+            raise Exception(
+                'use include_event_names to include/exclude timestamp'
+            )
+        for column in exclude_columns:
+            if column in columns:
+                if column == 'block_number':
+                    message = 'cannot exclude block_number'
+                elif column in ['transaction_index', 'log_index']:
+                    message = (
+                        'to exclude index columns, use keep_multiindex=False'
+                    )
+                else:
+                    message = 'cannot exclude column: ' + str(column)
+                raise Exception(message)
+    if include_event_names and (
+        'event_hash' not in columns or 'contract_address' not in columns
+    ):
+        raise Exception(
+            'must load event_hash and contract_address to load event names'
+        )
+
+    return columns
