@@ -329,6 +329,8 @@ def _get_columns_to_load(
 
     # validate
     if only_columns is not None:
+
+        # control specialty columns elsewhere
         if 'timestamp' in only_columns:
             raise Exception(
                 'use include_timestamps to include/exclude timestamp'
@@ -338,18 +340,21 @@ def _get_columns_to_load(
                 'use include_event_names to include/exclude timestamp'
             )
         for column in columns:
-            if column not in only_columns and column not in {
+            if column in {
                 'block_number',
                 'transaction_index',
                 'log_index',
             }:
+                # ok, this is expected
+                pass
+            elif column not in only_columns:
                 if column.startswith('arg__') and not decode:
                     message = 'cannot include arg__ columns when decode=False'
                 elif (
                     column in {'topic1', 'topic2', 'topic3', 'unindexed'}
                     and decode
                 ):
-                    message = 'cannot include ' + column + ' when decode=True'
+                    continue
                 else:
                     message = 'cannot include column: ' + str(column)
                 raise Exception(message)

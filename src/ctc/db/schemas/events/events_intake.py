@@ -22,12 +22,14 @@ async def async_intake_encoded_events(
     from ctc import db
 
     if spec.is_dataframe(encoded_events):
+        blocks = encoded_events.index.get_level_values('block_number')
         encoded_events = encoded_events.reset_index().to_dict(orient='records')  # type: ignore
+    else:
+        blocks = np.array([event['block_number'] for event in encoded_events])
 
     # only insert blocks after a given number of confirmations
     if latest_block is None:
         latest_block = await evm.async_get_latest_block_number()
-    blocks = np.array([event['block_number'] for event in encoded_events])
     required_confirmations = management.get_required_confirmations(network)
     latest_allowed_block = latest_block - required_confirmations
     if query['start_block'] > latest_allowed_block:

@@ -6,6 +6,7 @@ import typing
 from ctc import rpc
 from ctc import spec
 from .. import binary_utils
+from .. import block_utils
 from . import event_query_utils
 
 if typing.TYPE_CHECKING:
@@ -75,6 +76,9 @@ async def _async_query_events_from_node(
         cli.print_bullet(key='chunk_size', value=chunk_size)
         cli.print_bullet(key='n_chunks', value=len(chunk_ranges))
 
+    # TODO: make this async, store indirect reference in dict and pass dict
+    latest_block_number = await block_utils.async_get_latest_block_number()
+
     # process each meta chunk
     coroutines = []
     for chunk_start, chunk_end in chunk_ranges:
@@ -89,6 +93,7 @@ async def _async_query_events_from_node(
             provider=provider,
             network=network,
             write_to_db=write_to_db,
+            latest_block_number=latest_block_number,
         )
         coroutines.append(coroutine)
 
@@ -153,6 +158,7 @@ async def _async_query_node_events_chunk(
     network: spec.NetworkReference,
     write_to_db: bool,
     max_request_size: int = 2000,
+    latest_block_number: int | None = None,
 ) -> typing.Sequence[spec.EncodedEvent]:
     """process a chunk of events from node"""
 
@@ -229,6 +235,7 @@ async def _async_query_node_events_chunk(
             encoded_events=encoded_events,
             query=query,
             network=network,
+            latest_block=latest_block_number,
         )
 
     return encoded_events
