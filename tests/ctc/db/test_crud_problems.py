@@ -129,6 +129,17 @@ schema_datas = [
         'plural_queryer': db.async_query_median_blocks_gas_fees,
         'plural_query': {'block_numbers': [14000000, 14000001, 14000002]},
     },
+    {
+        'schema_name': 'events',
+        'plural_selector': db.async_select_event_queries,
+        'plural_queryer': db.async_query_event_queries,
+        'plural_query': {
+            'query_type': 3,
+            'contract_address': '0x6b175474e89094c44da98b954eedeac495271d0f',
+            'start_block': 14000000,
+            'end_block': 14000000,
+        },
+    },
 ]
 
 non_network_schemas = (

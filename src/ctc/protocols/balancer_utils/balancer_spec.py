@@ -64,7 +64,7 @@ vault_function_abis: typing.Mapping[str, spec.FunctionABI] = {
     },
 }
 
-vault_event_abis = {
+vault_event_abis: typing.Mapping[str, spec.EventABI] = {
     'PoolRegistered': {
         'anonymous': False,
         'inputs': [

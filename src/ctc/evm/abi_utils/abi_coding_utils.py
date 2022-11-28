@@ -16,6 +16,14 @@ def abi_decode(
 
     data = binary_utils.binary_convert(data, 'binary')
 
+    # hardcode some conversions for speed
+    if types == 'address':
+        return '0x' + data[-20:].hex()
+    elif types in ['uint256']:
+        return int.from_bytes(data, 'big', signed=False)
+    elif types == '(uint256)':
+        return (int.from_bytes(data, 'big', signed=False),)
+
     if isinstance(types, str):
         return eth_abi_lite.decode_single(types, data)
     else:

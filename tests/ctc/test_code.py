@@ -1,4 +1,5 @@
 import os
+import sys
 import types
 
 import ctc
@@ -11,18 +12,24 @@ def test_ctc_functions_have_docstrings():
     for key, value in vars(ctc).items():
         if isinstance(value, functiontype):
             docstring = value.__doc__
+            missing = False
             if docstring is None or docstring == '':
-                functions_without_docstrings.append(value.__name__)
-                continue
-            lines = docstring.split('\n')
-            if lines[0] == '':
-                functions_without_docstrings.append(value.__name__)
+                missing = True
+            else:
+                lines = docstring.split('\n')
+                if lines[0] == '':
+                    missing = True
+
+            if missing:
+                name = value.__name__
+                file = sys.modules[value.__module__].__file__
+                functions_without_docstrings.append((name, file))
 
     if len(functions_without_docstrings) > 0:
-        raise Exception(
-            'some functions do not have docstrings:\n    '
-            + '\n    '.join(functions_without_docstrings)
-        )
+        message = 'some functions do not have docstrings:\n'
+        for name, file in functions_without_docstrings:
+            message += '    - ' + name + ': ' + file + '\n\n'
+        raise Exception(message)
 
 
 def test_code_imports_future_annotations():

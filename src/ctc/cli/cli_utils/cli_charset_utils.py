@@ -97,8 +97,8 @@ def reset_charset() -> None:
 
 
 def _get_example_chart(
-    *,
     charset: toolstr.SampleMode,
+    *,
     bold: bool,
     n_rows: int,
     n_columns: int,

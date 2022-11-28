@@ -91,7 +91,7 @@ async def async_get_event_abi(event_name: str, contract: str) -> spec.EventABI:
         return abi_entry[event_name]
 
 
-factory_event_abis = {
+factory_event_abis: typing.Mapping[str, spec.EventABI] = {
     'PoolCreated': {
         'anonymous': False,
         'inputs': [

@@ -123,7 +123,10 @@ def binary_convert(
             raw_data = data
 
         if n_bytes is not None and len(raw_data) / 2 != n_bytes:
-            raise Exception('data does not have target length')
+            if len(raw_data) % 2 != 0:
+                raise Exception('incomplete byte representation')
+            input_bytes = int(len(raw_data) / 2)
+            raw_data = '00' * (n_bytes - input_bytes) + raw_data
 
         if output_format == 'prefix_hex':
             return '0x' + raw_data
@@ -141,7 +144,7 @@ def binary_convert(
     elif isinstance(data, bytes):
 
         if n_bytes is not None and len(data) != n_bytes:
-            raise Exception('data does not have target length')
+            data = b'0' * (n_bytes - len(data)) + data
 
         if output_format == 'binary':
             return data
@@ -189,3 +192,31 @@ def binary_convert(
     else:
 
         raise Exception('unknown input data format: ' + str(type(data)))
+
+
+def binarize_fields(
+    mapping: typing.Mapping[str, typing.Any],
+    fields: typing.Sequence[str] | None = None,
+    *,
+    binary_format: spec.BinaryFormat = 'binary',
+    allow_none: bool = True,
+) -> typing.Mapping[str, typing.Any]:
+    """convert fields of dict to specific binary format"""
+
+    if fields is None:
+        fields = list(mapping.keys())
+
+    binarized: typing.MutableMapping[str, typing.Any] = {}
+    for key, value in mapping.items():
+        if key in fields:
+            if value is not None:
+                binarized[key] = binary_convert(value, binary_format)
+            else:
+                if allow_none:
+                    binarized[key] = value
+                else:
+                    raise Exception('field has value None: ' + str(key))
+        else:
+            binarized[key] = value
+
+    return binarized

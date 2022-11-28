@@ -168,7 +168,7 @@ function_abis: typing.Mapping[str, spec.FunctionABI] = {
     },
 }
 
-event_abis = {
+event_abis: typing.Mapping[str, spec.EventABI] = {
     'AddedOwner': {
         'anonymous': False,
         'inputs': [

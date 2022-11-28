@@ -31,6 +31,7 @@ NetworkSchemaName = Literal[
     'contract_creation_blocks',
     'erc20_metadata',
     'dex_pools',
+    'events',
     # 'erc20_state',
     # 'events',
     #
@@ -66,6 +67,8 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
         return schemas.contract_creation_blocks_schema
     elif schema_name == 'erc20_metadata':
         return schemas.erc20_metadata_schema
+    elif schema_name == 'events':
+        return schemas.events_schema
     elif schema_name == 'dex_pools':
         return schemas.dex_pools_schema
     # elif schema_name == 'erc20_state':
