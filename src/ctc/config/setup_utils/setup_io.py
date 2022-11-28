@@ -123,7 +123,7 @@ def write_new_config(
             changed_keys: set[str] = set()
             for key, value in config.items():
                 if json.dumps(value, sort_keys=True) != json.dumps(
-                    old_config_raw[key], sort_keys=True
+                    old_config_raw.get(key), sort_keys=True
                 ):
                     changed_keys.add(key)
             for key in old_config_raw.keys():
