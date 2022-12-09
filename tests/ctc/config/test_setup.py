@@ -225,7 +225,7 @@ def test_ctc_setup__skip_db(monkeypatch):
 
 old_config__0_2_10 = {
     'config_spec_version': '0.2.10',
-    'data_dir': '/home/storm/ctc_data',
+    'data_dir': os.path.expanduser('~/ctc_data'),
     'providers': {
         'example_provider_1': {
             'url': 'https://example_provider.com',
