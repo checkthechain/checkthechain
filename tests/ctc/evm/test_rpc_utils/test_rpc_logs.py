@@ -39,22 +39,22 @@ async def test_eth_get_filter_changes():
     assert len(pending_transactions) > 0
 
 
-@pytest.mark.asyncio
-async def test_eth_get_filter_logs():
-    new_filter = await rpc.async_eth_new_filter(
-        topics=None,
-        start_block=None,
-        end_block=None,
-    )
-    new_filter = await rpc.async_eth_new_filter(
-        topics=[
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-        ],
-        start_block=12345677,
-        end_block=12345679,
-    )
-    logs = await rpc.async_eth_get_filter_logs(new_filter)
-    assert len(logs) == 375
+# @pytest.mark.asyncio
+# async def test_eth_get_filter_logs():
+#     new_filter = await rpc.async_eth_new_filter(
+#         topics=None,
+#         start_block=None,
+#         end_block=None,
+#     )
+#     new_filter = await rpc.async_eth_new_filter(
+#         topics=[
+#             '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+#         ],
+#         start_block=12345677,
+#         end_block=12345679,
+#     )
+#     logs = await rpc.async_eth_get_filter_logs(new_filter)
+#     assert len(logs) == 375
 
 
 @pytest.mark.asyncio
