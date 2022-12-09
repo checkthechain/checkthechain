@@ -263,7 +263,7 @@ async def _async_get_eip1967_proxy_beacon_address(
     except Exception:
         proxy_in_beacon = None
 
-    if not isinstance(proxy_in_beacon, str):
+    if not isinstance(proxy_in_beacon, str) and proxy_in_beacon is not None:
         raise Exception('bad rpc data')
     return proxy_in_beacon
 
