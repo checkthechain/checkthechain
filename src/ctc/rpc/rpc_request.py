@@ -139,6 +139,9 @@ async def async_send(
 
     elif isinstance(request, list):
 
+        if len(request) == 0:
+            return []
+
         # chunk request
         request_chunks = chunk_request(request=request, provider=full_provider)
 
