@@ -53,7 +53,7 @@ class BalancerDEX(dex_class.DEX):
         dex_pools = []
         for index, row in balancer_pools.iterrows():
 
-            block = typing.cast(int, index)
+            block = int(index)
 
             assets: typing.Sequence[str | None] = token_registrations.get(
                 row['arg__poolId'], []

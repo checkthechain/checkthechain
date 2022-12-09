@@ -107,9 +107,6 @@ async def async_get_token_registrations(
         end_time=end_time,
         provider=provider,
     )
-    balancer_token_registrations['arg__tokens'] = balancer_token_registrations[
-        'arg__tokens'
-    ].map(ast.literal_eval)
 
     token_registrations_by_pool: typing.MutableMapping[
         str, typing.MutableSequence[str]
