@@ -95,8 +95,6 @@ async def _async_get_contract_creation_block_from_node(
 
     from ctc.toolbox import search_utils
 
-    contract_address = address_utils.get_address_checksum(contract_address)
-
     if start_block is None:
         start_block = 0
     if end_block is None:
