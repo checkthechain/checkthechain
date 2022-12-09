@@ -27,9 +27,6 @@ async def async_intake_encoded_events(
     else:
         blocks = np.array([event['block_number'] for event in encoded_events])
 
-    if len(encoded_events) == 0:
-        return
-
     # only insert blocks after a given number of confirmations
     if latest_block is None:
         latest_block = await evm.async_get_latest_block_number()
@@ -46,6 +43,9 @@ async def async_intake_encoded_events(
                 if confirmed
             ]
         query['end_block'] = latest_allowed_block
+
+    if len(encoded_events) == 0:
+        return
 
     engine = db.create_engine(schema_name='events', network=network)
     if engine is None:
