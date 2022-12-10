@@ -67,7 +67,7 @@ dependencies = [
 test = [
     'mypy ==0.981',
     'mypy_extensions >= 0.4.3, <0.5.0',
-    'pandas-stubs >=1.2.0.1',
+    'pandas-stubs ==1.2.0.62',
     'pytest-asyncio ==0.18.0',
     'pytest >=6',
     'tox-asdf ==0.1.0',
