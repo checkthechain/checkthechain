@@ -499,9 +499,9 @@ async def async_perform_multi_contract_call(
     else:
         import pandas as pd
 
-        df = pd.DataFrame(results, index=addresses)
+        df: spec.DataFrame = pd.DataFrame(results, index=addresses)  # type: ignore
         df.index.name = 'to_address'
-        df.columns = output_names
+        df.columns = output_names  # type: ignore
 
         return df
 

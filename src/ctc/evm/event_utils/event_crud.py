@@ -190,7 +190,7 @@ async def async_get_events(
             df,
             provider=provider,
         )
-        df.insert(0, 'timestamp', timestamps)  # type: ignore
+        df.insert(0, 'timestamp', timestamps)
     if include_event_names:
         df['event_name'] = await event_metadata._async_get_event_names_column(
             events=df,

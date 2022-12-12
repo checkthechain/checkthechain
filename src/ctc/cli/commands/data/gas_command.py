@@ -258,7 +258,7 @@ async def async_gas_command(
         import pandas as pd
 
         final_df = pd.DataFrame(rows)
-        final_df.columns = labels
+        final_df.columns = labels  # type: ignore
         final_df = final_df.sort_values(by='time')
         final_df = final_df.set_index('blocks')
 

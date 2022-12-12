@@ -48,7 +48,7 @@ class UniswapV3DEX(dex_class.DEX):
 
         dex_pools = []
         for index, row in df.iterrows():
-            block = int(index)
+            block = int(index)  # type: ignore
             dex_pool: spec.DexPool = {
                 'address': row['arg__pool'],
                 'factory': factory,

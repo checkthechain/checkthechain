@@ -213,7 +213,7 @@ async def async_read_csv_dask(path: str) -> spec.DataFrame:
 
 async def async_read_csv_aiofiles(path: str) -> spec.DataFrame:
     import io
-    import aiofiles
+    import aiofiles  # type: ignore
     import pandas as pd
 
     async with aiofiles.open(path, 'r') as f:

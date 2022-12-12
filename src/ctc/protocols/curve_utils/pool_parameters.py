@@ -182,7 +182,7 @@ async def async_get_A_history(
     # initial deployment parameters
     initial_A = await async_get_pool_initial_A(pool, block=pool_start_block)
     initial_A_time = 0
-    events.loc[start_block, 0, 0] = [initial_A, initial_A, initial_A_time, 0]
+    events.loc[start_block, 0, 0] = [initial_A, initial_A, initial_A_time, 0]  # type: ignore
     events = events.sort_index()
 
     # interpolate per block

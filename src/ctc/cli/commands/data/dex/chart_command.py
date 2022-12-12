@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import functools
 import math
+import typing
 
 import rich.console
 import toolcli
@@ -88,8 +89,8 @@ async def async_dex_chart_command(
     )
 
     # compute candlesticks
-    prices = swaps['price__0__per__1'].values
-    x_volumes = swaps['volume__0'].values
+    prices = swaps['price__0__per__1'].values  # type: ignore
+    x_volumes = swaps['volume__0'].values  # type: ignore
     if invert:
         prices = 1 / prices
     block_numbers = list(swaps.index.get_level_values('block_number'))
@@ -105,10 +106,10 @@ async def async_dex_chart_command(
     )
     ohlc = ohlc.iloc[-n_candles:]
 
-    min_price = min(prices)
-    max_price = max(prices)
-    min_time = ohlc.index[0]
-    max_time = ohlc.index[-1] + candle_seconds
+    min_price = typing.cast(typing.Union[int, float], min(prices))
+    max_price = typing.cast(typing.Union[int, float], max(prices))
+    min_time = typing.cast(typing.Union[int, float], ohlc.index[0])
+    max_time = typing.cast(typing.Union[int, float], ohlc.index[-1] + candle_seconds)  # type: ignore
     render_grid = toolstr.create_grid(
         n_rows=20,
         n_columns=n_candles * 2,

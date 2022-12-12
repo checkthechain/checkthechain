@@ -130,7 +130,7 @@ async def async_balances_command(
             ]
             if verbose:
                 row.append(usd_balances[b])
-                row.append(eth_usd[b])
+                row.append(eth_usd[b])  # type: ignore
             rows.append(row)
 
         labels = ['block', 'balance']
@@ -210,7 +210,7 @@ async def async_balances_command(
             toolstr.print(plot, indent=4)
 
         if export != 'stdout':
-            df = pd.DataFrame(balances, index=resolved_blocks)
+            df = pd.DataFrame(balances, index=resolved_blocks)  # type: ignore
             df.index.name = 'block'
             df.columns = ['balance']
             output_data: typing.Union[spec.DataFrame, spec.Series] = df
@@ -236,7 +236,7 @@ async def async_balances_command(
                 normalize=(not raw),
             )
 
-            series = pd.Series(balances, index=wallets)
+            series = pd.Series(balances, index=wallets)  # type: ignore
             series.name = 'balance'
             series.index.name = 'address'
             output_data = series

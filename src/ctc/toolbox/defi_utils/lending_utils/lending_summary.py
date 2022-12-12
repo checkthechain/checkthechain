@@ -63,7 +63,7 @@ async def async_get_lending_flows(
 
     # queue tasks
     timestamps_coroutine = evm.async_get_block_timestamps(
-        blocks=blocks,
+        blocks=blocks,  # type: ignore
         provider=provider,
     )
     timestamps_task = asyncio.create_task(timestamps_coroutine)
@@ -71,7 +71,7 @@ async def async_get_lending_flows(
         evm.async_get_erc20_balance_by_block(
             token=pool_token,
             wallet=wallet,
-            blocks=blocks_before,
+            blocks=blocks_before,  # type: ignore
             provider=provider,
         )
     )
@@ -82,7 +82,7 @@ async def async_get_lending_flows(
         evm.async_get_erc20_balance_by_block(
             token=pool_token,
             wallet=wallet,
-            blocks=blocks,
+            blocks=blocks,  # type: ignore
             provider=provider,
         )
     )
@@ -133,7 +133,7 @@ async def async_get_lending_flows(
 
     # compute time columns
     timestamps = await timestamps_task
-    df.insert(loc=0, column='timestamp', value=timestamps)  # type: ignore
+    df.insert(loc=0, column='timestamp', value=timestamps)
     df.insert(
         loc=1,
         column='time',
@@ -230,6 +230,6 @@ async def _async_create_raw_wallet_flows_df(
 
     if include_latest:
         block = await evm.async_get_latest_block_number(provider=provider)
-        raw_df.loc[block] = [0, 0]
+        raw_df.loc[block] = [0, 0]  # type: ignore
 
     return raw_df

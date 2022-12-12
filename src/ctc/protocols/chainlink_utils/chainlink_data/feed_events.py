@@ -139,7 +139,7 @@ async def async_get_full_feed_event_data(
 
         if keep_multiindex:
             raise Exception('cannot use keep_multiindex and interpolate')
-        df.index = pd_utils.keep_level(df.index, level='block_number')
+        df.index = pd_utils.keep_level(df.index, level='block_number')  # type: ignore
 
         # TODO: better detection of initial feed data point
         first_feed_block = (
@@ -169,7 +169,7 @@ async def async_get_full_feed_event_data(
         df = pd_utils.interpolate_dataframe(df, end_index=end_block)
 
     elif not keep_multiindex:
-        df.index = pd_utils.keep_level(df.index, level='block_number')
+        df.index = pd_utils.keep_level(df.index, level='block_number')  # type: ignore
 
     if invert:
         df['answer'] = 1 / df['answer']

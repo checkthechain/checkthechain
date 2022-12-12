@@ -551,8 +551,8 @@ class DEX:
 
             sold_decimals = output['sold_id'].map(lambda i: decimals[i])
             bought_decimals = output['bought_id'].map(lambda i: decimals[i])
-            output['sold_amount'] /= 10**sold_decimals  # type: ignore
-            output['bought_amount'] /= 10**bought_decimals  # type: ignore
+            output['sold_amount'] /= 10**sold_decimals
+            output['bought_amount'] /= 10**bought_decimals
 
         # replace labels
         if label in ['symbol', 'address']:
@@ -732,3 +732,4 @@ def _filter_pools(
         filtered.append(pool)
 
     return filtered
+

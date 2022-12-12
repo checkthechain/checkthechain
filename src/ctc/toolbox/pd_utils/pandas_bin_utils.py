@@ -23,7 +23,7 @@ def bin_data(
         labels = labels[:-1]
 
     cuts = pd.cut(index, bins=bin_edges, labels=labels)
-    groups = data.groupby(cuts)
+    groups = data.groupby(cuts)  # type: ignore
 
     if f == 'groupby':
         return groups

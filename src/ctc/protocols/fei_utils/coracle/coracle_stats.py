@@ -118,6 +118,10 @@ async def async_get_pcv_stats_by_block(
     # create dataframe
     import pandas as pd
 
-    df = pd.DataFrame(as_array, index=blocks)
+    df = pd.DataFrame(as_array, index=blocks)  # type: ignore
 
-    return df
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.DataFrame, df)
+    else:
+        return df
+

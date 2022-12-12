@@ -42,8 +42,8 @@ async def async_plot_lbp_summary(
         title = pool_name + ', in=' + in_token + ', out=' + out_token
 
         if oracle_data is not None:
-            min_block = swaps.index[0][0]
-            max_block = swaps.index[-1][0]
+            min_block = swaps.index[0][0]  # type: ignore
+            max_block = swaps.index[-1][0]  # type: ignore
             oracle_mask = (oracle_data.index >= min_block) & (
                 oracle_data.index <= max_block
             )

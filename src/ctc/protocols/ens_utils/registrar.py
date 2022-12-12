@@ -97,7 +97,7 @@ async def async_get_registration_block(name: str) -> int:
     if len(result) == 0:
         raise Exception('could not find registration')
 
-    block = result.iloc[0].name[0]
+    block = result.iloc[0].name[0]  # type: ignore
     block = int(block)
 
     if not isinstance(block, int):

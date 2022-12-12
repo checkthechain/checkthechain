@@ -80,7 +80,7 @@ async def async_get_fei_psm_mints(
     # add extra fields
     redeem_blocks = mints.index.values
     if timestamp:
-        mints['timestamp'] = await evm.async_get_block_timestamps(redeem_blocks)
+        mints['timestamp'] = await evm.async_get_block_timestamps(redeem_blocks)  # type: ignore
     if normalize:
         mints['arg__amountFeiOut'] = (
             mints['arg__amountFeiOut'].map(int) / 1e18
@@ -143,7 +143,7 @@ async def async_get_fei_psm_redemptions(
     redeem_blocks = redemptions.index.values
     if timestamp:
         redemptions['timestamp'] = await evm.async_get_block_timestamps(
-            redeem_blocks
+            redeem_blocks  # type: ignore
         )
     if normalize:
         redemptions['arg__amountFeiIn'] = (

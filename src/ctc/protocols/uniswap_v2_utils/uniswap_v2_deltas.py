@@ -160,7 +160,7 @@ async def async_get_pool_state_per_log(
     state_per_log: spec.DataFrame = log_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
-    state_per_log.columns = ['token0_reserves', 'token1_reserves']
+    state_per_log.columns = ['token0_reserves', 'token1_reserves']  # type: ignore
 
     _put_price_in_state(state_per_log)
 
@@ -185,7 +185,7 @@ async def async_get_pool_state_per_transaction(
     state_per_transaction: spec.DataFrame = transaction_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
-    state_per_transaction.columns = ['token0_reserves', 'token1_reserves']
+    state_per_transaction.columns = ['token0_reserves', 'token1_reserves']  # type: ignore
 
     _put_price_in_state(state_per_transaction)
 
@@ -212,7 +212,7 @@ async def async_integrate_pool_deltas(
     state_per_block: spec.DataFrame = block_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
-    state_per_block.columns = ['token0_reserves', 'token1_reserves']
+    state_per_block.columns = ['token0_reserves', 'token1_reserves']  # type: ignore
 
     _put_price_in_state(state_per_block)
 

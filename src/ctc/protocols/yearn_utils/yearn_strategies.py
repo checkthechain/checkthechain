@@ -55,14 +55,17 @@ async def async_get_harvest_aprs(
         * 86400
         * 365
     )
-    return aprs.values
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.NumpyArray, aprs.values)
+    else:
+        return aprs.values
 
 
 async def async_get_harvest_durations(
     harvests: spec.DataFrame,
 ) -> typing.Sequence[int | float]:
     blocks = harvests.index.values
-    timestamps = await evm.async_get_block_timestamps(blocks)
+    timestamps = await evm.async_get_block_timestamps(blocks)  # type: ignore
     durations = [float('inf')] + [
         after - before for after, before in zip(timestamps[1:], timestamps[:-1])
     ]

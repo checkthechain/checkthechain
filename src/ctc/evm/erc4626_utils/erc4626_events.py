@@ -54,16 +54,16 @@ async def async_get_erc4626_deposits(
             'arg__assets'
         ] = await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
-            assets=deposits['arg__assets'].values,
-            block=blocks[-1],
+            assets=deposits['arg__assets'].values,  # type: ignore
+            block=blocks[-1],  # type: ignore
             provider=provider,
         )
         deposits[
             'arg__shares'
         ] = await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
-            shares=deposits['arg__shares'].values,
-            block=blocks[-1],
+            shares=deposits['arg__shares'].values,  # type: ignore
+            block=blocks[-1],  # type: ignore
             provider=provider,
         )
 
@@ -113,16 +113,16 @@ async def async_get_erc4626_withdraws(
             'arg__assets'
         ] = await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
-            assets=withdraws['arg__assets'].values,
-            block=blocks[-1],
+            assets=withdraws['arg__assets'].values,  # type: ignore
+            block=blocks[-1],  # type: ignore
             provider=provider,
         )
         withdraws[
             'arg__shares'
         ] = await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
-            shares=withdraws['arg__shares'].values,
-            block=blocks[-1],
+            shares=withdraws['arg__shares'].values,  # type: ignore
+            block=blocks[-1],  # type: ignore
             provider=provider,
         )
 

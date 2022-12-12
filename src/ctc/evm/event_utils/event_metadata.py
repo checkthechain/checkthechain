@@ -16,9 +16,15 @@ async def async_get_event_timestamps(
     # get block_numbers
     multi_index = 'block_number' in events.index.names
     if multi_index:
-        block_numbers = events.index.get_level_values('block_number')
+        block_numbers: typing.Sequence[int] = typing.cast(
+            typing.Sequence[int],
+            events.index.get_level_values('block_number'),
+        )
     else:
-        block_numbers = events.index.values
+        block_numbers = typing.cast(
+            typing.Sequence[int],
+            events.index.values,
+        )
 
     # get timestamps
     return await block_utils.async_get_block_timestamps(

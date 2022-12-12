@@ -39,13 +39,16 @@ async def async_get_feed_answer_datum_by_block(
     result = await asyncio.gather(*coroutines)
 
     # create series
-    series = pd.Series(data=result, index=int_blocks)
+    series = pd.Series(data=result, index=int_blocks)  # type: ignore
 
     # interpolate blocks
     if interpolate:
         series = pd_utils.interpolate_series(series=series)
 
-    return series
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.Series, series)
+    else:
+        return series
 
 
 async def async_get_feed_full_datum_by_block(
@@ -78,7 +81,7 @@ async def async_get_feed_full_datum_by_block(
     result = await asyncio.gather(*coroutines)
 
     # create series
-    df = pd.DataFrame(result, index=int_blocks)
+    df: spec.DataFrame = pd.DataFrame(result, index=int_blocks)  # type: ignore
 
     # interpolate blocks
     if interpolate:

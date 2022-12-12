@@ -20,10 +20,7 @@ def create_timestamp_column(
         n_levels = len(df.index.names)
 
         dropped_level = df.droplevel(list(range(1, n_levels)))
-        if typing.TYPE_CHECKING:
-            df = typing.cast(spec.DataFrame, dropped_level)
-        else:
-            df = dropped_level
+        df = dropped_level
 
     merged = pd.merge(
         df,

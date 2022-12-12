@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:
     import pandas
 
     DataFrame = pandas.core.frame.DataFrame
-    Series = pandas.core.series.Series
+    Series = pandas.core.series.Series[typing.Any]
     PandasIndex = pandas.core.indexes.base.Index
     DType = numpy.typing.DTypeLike
     NumpyArray = numpy.typing.NDArray  # type: ignore

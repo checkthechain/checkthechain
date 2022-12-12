@@ -150,7 +150,7 @@ async def async_balances_command(
             )
             symbol = await symbol_coroutine
 
-            series = pd.Series(balances, index=wallets)
+            series = pd.Series(balances, index=wallets)  # type: ignore
             series.name = 'balance'
             series.index.name = 'address'
             output_data = series
@@ -296,9 +296,9 @@ async def async_balances_command(
             return
 
         else:
-            df = pd.dataframe(balances, index=resolved_blocks)
+            df = pd.DataFrame(balances, index=resolved_blocks)  # type: ignore
             df.index.name = 'block'
-            df.columns = ['balance']
+            df.columns = ['balance']  # type: ignore
             output_data = df
 
     else:

@@ -46,9 +46,7 @@ def interpolate_series(
     )
 
     # create new series
-    new_series = typing.cast(
-        pd.Series, series.reindex(new_index, fill_value=pd.NA)
-    )
+    new_series = series.reindex(new_index, fill_value=pd.NA)  # type: ignore
 
     # insert pre fill value
     if len(series) > 0:
@@ -61,7 +59,7 @@ def interpolate_series(
             new_series.iloc[0] = series.values[-1]
         elif start_index > series.index.values[0]:
             # fill in any initial values that were cut off
-            fill_index = np.nonzero(series.index > start_index)[0][0] - 1  # type: ignore
+            fill_index = np.nonzero(series.index > start_index)[0][0] - 1
             new_series.iloc[0] = series.iloc[fill_index]
 
     # interpolate values
@@ -101,7 +99,7 @@ def interpolate_dataframe(
     )
 
     # create new series
-    new_df = df.reindex(new_index, fill_value=pd.NA)
+    new_df = df.reindex(new_index, fill_value=pd.NA)  # type: ignore
 
     # fill in cut off values
     if start_index > df.index.values[0]:

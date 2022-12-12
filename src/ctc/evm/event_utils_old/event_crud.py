@@ -104,12 +104,12 @@ async def async_get_events(
         from ctc.toolbox import pd_utils
 
         events.index = pd_utils.keep_level(
-            index=events.index, level='block_number'
+            index=events.index, level='block_number'  # type: ignore
         )
 
     if include_timestamps:
         timestamps = await async_get_event_timestamps(events, provider=provider)
-        events.insert(0, 'timestamp', timestamps)  # type: ignore
+        events.insert(0, 'timestamp', timestamps)
 
     return events
 
@@ -267,7 +267,7 @@ async def async_get_event_timestamps(
     if multi_index:
         block_numbers = events.index.get_level_values('block_number')
     else:
-        block_numbers = events.index.values
+        block_numbers = events.index.values  # type: ignore
 
     # get timestamps
     provider = rpc.get_provider(provider)
@@ -278,6 +278,7 @@ async def async_get_event_timestamps(
     else:
         provider = dict(provider, chunk_size=1)
     return await block_utils.async_get_block_timestamps(
-        block_numbers,
+        block_numbers,  # type: ignore
         provider=provider,
     )
+

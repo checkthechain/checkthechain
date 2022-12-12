@@ -126,7 +126,7 @@ async def async_print_safe_executions(address: spec.Address) -> None:
     for i in range(len(executions)):
         row = [
             i,
-            executions.index[i][0],
+            executions.index[i][0],  # type: ignore
         ]
         row.append(executions['transaction_hash'].values[i])
         rows.append(row)

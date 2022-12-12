@@ -53,7 +53,7 @@ class BalancerDEX(dex_class.DEX):
         dex_pools = []
         for index, row in balancer_pools.iterrows():
 
-            block = int(index)
+            block = int(index)  # type: ignore
 
             assets: typing.Sequence[str | None] = token_registrations.get(
                 row['arg__poolId'], []
@@ -173,7 +173,7 @@ class BalancerDEX(dex_class.DEX):
 
         if include_timestamps:
             output['timestamp'] = await evm.async_get_block_timestamps(
-                blocks=trades.index.values,
+                blocks=trades.index.values,  # type: ignore
                 provider=provider,
             )
 

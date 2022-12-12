@@ -25,7 +25,7 @@ async def async_intake_encoded_events(
         blocks = encoded_events.index.get_level_values('block_number')
         encoded_events = encoded_events.reset_index().to_dict(orient='records')  # type: ignore
     else:
-        blocks = np.array([event['block_number'] for event in encoded_events])
+        blocks = np.array([event['block_number'] for event in encoded_events])  # type: ignore
 
     # only insert blocks after a given number of confirmations
     if latest_block is None:
@@ -38,7 +38,7 @@ async def async_intake_encoded_events(
         if len(blocks) > 0:
             confirmed_mask = blocks <= latest_allowed_block
             encoded_events = [
-                event
+                event  # type: ignore
                 for event, confirmed in zip(encoded_events, confirmed_mask)
                 if confirmed
             ]

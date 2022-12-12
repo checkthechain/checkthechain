@@ -11,7 +11,7 @@ from . import registrar
 
 
 def hash_name(name: str) -> spec.PrefixHexData:
-    import idna  # type: ignore
+    import idna
 
     labels = name.split('.')
     output = '00' * 32

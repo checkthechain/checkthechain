@@ -87,9 +87,9 @@ async def async_chart_command(
     prices = swaps['price__0__per__1'].values
     x_volumes = swaps['volume__0'].values
     if invert:
-        prices = 1 / prices
+        prices = 1 / prices  # type: ignore
     block_timestamps = await evm.async_get_block_timestamps(
-        swaps.index.get_level_values('block_number'),
+        swaps.index.get_level_values('block_number'),  # type: ignore
         provider={'chunk_size': 1},
     )
     ohlc = ohlc_utils.compute_ohlc(
@@ -103,12 +103,12 @@ async def async_chart_command(
     min_price = min(prices)
     max_price = max(prices)
     min_time = ohlc.index[0]
-    max_time = ohlc.index[-1] + candle_seconds
+    max_time = ohlc.index[-1] + candle_seconds  # type: ignore
     render_grid = toolstr.create_grid(
         n_rows=20,
         n_columns=n_candles * 2,
-        xmin=min_time - 0.05 * (max_time - min_time),
-        xmax=max_time + 0.05 * (max_time - min_time),
+        xmin=min_time - 0.05 * (max_time - min_time),  # type: ignore
+        xmax=max_time + 0.05 * (max_time - min_time),  # type: ignore
         ymin=min_price - 0.05 * (max_price - min_price),
         ymax=max_price + 0.05 * (max_price - min_price),
     )

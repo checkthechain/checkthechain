@@ -22,7 +22,7 @@ def compute_ohlc(
     import pandas as pd
 
     # assemble data
-    df = pd.DataFrame({'value': values}, index=indices)
+    df = pd.DataFrame({'value': values}, index=indices)  # type: ignore
     if volumes is not None:
         df['volume'] = volumes
 
@@ -63,4 +63,8 @@ def compute_ohlc(
         df.loc[missing_bin] = row
     df = df.sort_index()
 
-    return df
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.DataFrame, df)
+    else:
+        return df
+

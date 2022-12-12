@@ -66,7 +66,7 @@ def output_data(
         if isinstance(data, pd.DataFrame):
             iterator = data.iterrows()
         elif isinstance(data, pd.Series):
-            iterator = data.iteritems()
+            iterator = data.iteritems()  # type: ignore
         else:
             raise Exception('unknown data format')
 
@@ -82,7 +82,7 @@ def output_data(
             else:
                 # series
                 if raw:
-                    row.append(values)
+                    row.append(values)  # type: ignore
                 else:
                     row.append(toolstr.format(values, order_of_magnitude=True))
             rows.append(row)

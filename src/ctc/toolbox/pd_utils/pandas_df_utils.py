@@ -16,12 +16,16 @@ def create_empty_dataframe(
     """create empty dataframe with specified metadata"""
 
     if index_names is not None:
-        df = pd.DataFrame(columns=tuple(column_names) + tuple(index_names))
+        df = pd.DataFrame(columns=tuple(column_names) + tuple(index_names))  # type: ignore
         df = df.set_index(index_names)
     else:
-        df = pd.DataFrame(columns=column_names)
+        df = pd.DataFrame(columns=column_names)  # type: ignore
 
     if column_types is not None:
         raise NotImplementedError()
 
-    return df
+    if typing.TYPE_CHECKING:
+        return typing.cast(spec.DataFrame, df)
+    else:
+        return df
+

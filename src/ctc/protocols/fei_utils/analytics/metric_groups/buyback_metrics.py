@@ -33,7 +33,7 @@ async def async_compute_tribe_buybacks_usd(
 
     dropped_level = swaps.droplevel('transaction_index').droplevel('log_index')
     if typing.TYPE_CHECKING:
-        swaps = typing.cast(spec.DataFrame, dropped_level)
+        swaps = dropped_level
     else:
         swaps = dropped_level
 

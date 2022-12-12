@@ -131,11 +131,11 @@ async def async_get_erc20_balances_from_transfers(
     # subtract transfers out from transfers in
     from_transfers = transfers.groupby('arg__from')[amount_key].sum()
     to_transfers = transfers.groupby('arg__to')[amount_key].sum()
-    balances: spec.DataFrame = to_transfers.sub(from_transfers, fill_value=0)
+    balances: spec.DataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
 
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
-            transfers['contract_address'].values[0]
+            typing.cast(str, transfers['contract_address'].values[0])
         )
         balances /= 10 ** decimals
 

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import ast
+import typing
 
 from ctc import evm
 from ctc import spec
 from . import safe_spec
 
 
-async def async_get_safe_setup(safe_address: spec.Address) -> spec.Series | None:
+async def async_get_safe_setup(
+    safe_address: spec.Address,
+) -> spec.Series | None:
     creation_block = await evm.async_get_contract_creation_block(safe_address)
     events = await evm.async_get_events(
         safe_address,
@@ -91,3 +94,4 @@ async def async_get_safe_guard_changes(
         event_abi=safe_spec.event_abis['ChangedGuard'],
         verbose=False,
     )
+

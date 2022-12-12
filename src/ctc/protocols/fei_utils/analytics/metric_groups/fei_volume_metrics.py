@@ -80,7 +80,7 @@ async def async_compute_uniswap_v2_volume(
     fei_sold = evm.bin_by_blocks(swaps['FEI_sold'], blocks)
     fei_bought = evm.bin_by_blocks(swaps['FEI_sold'], blocks)
     return {
-        'values': list(fei_sold.values + fei_bought.values),
+        'values': list(fei_sold.values + fei_bought.values),  # type: ignore
         'units': 'FEI',
     }
 
@@ -96,7 +96,7 @@ async def async_compute_uniswap_v3_volume(
         start_block=blocks[0],
         replace_symbols=True,
     )
-    binned: spec.Series = evm.bin_by_blocks(np.abs(swaps['FEI_amount']), blocks)  # type: ignore
+    binned: spec.Series = evm.bin_by_blocks(np.abs(swaps['FEI_amount']), blocks)
     return {
         'values': list(binned.values),
         'units': 'FEI',

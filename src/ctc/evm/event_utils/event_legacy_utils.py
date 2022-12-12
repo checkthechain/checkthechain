@@ -204,7 +204,7 @@ async def async_import_events_csv_file_to_db(
         mask = encoded_events[column].isnull()
         if mask.any():
             encoded_events[column] = encoded_events[column].astype(object)
-            encoded_events[column].values[mask] = None
+            encoded_events[column].values[mask] = None  # type: ignore
 
     # construct query
     event_query: spec.DBEventQuery = {

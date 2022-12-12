@@ -221,7 +221,9 @@ async def async_encode_events_dataframe(
     """encode the fields of an events dataframe"""
 
     encoded_groups = {}
-    for event_hash, sub_events in events.groupby('event_hash'):
+    for eh, sub_events in events.groupby('event_hash'):
+
+        event_hash = typing.cast(str, eh)
 
         # get event abi
         if event_abis is not None and event_hash in event_abis:
@@ -401,7 +403,9 @@ async def async_decode_events_dataframe(
 
     else:
 
-        for event_hash, event_type_events in events.groupby('event_hash'):
+        for eh, event_type_events in events.groupby('event_hash'):
+
+            event_hash = typing.cast(str, eh)
 
             # get event abi
             if share_abis_across_contracts:
@@ -443,12 +447,12 @@ async def async_decode_events_dataframe(
                     key = (contract_address, event_hash)
                     if key not in event_abis:
                         event_abis[
-                            key
+                            key  # type: ignore
                         ] = await event_abi_queries.async_get_event_abi(
                             event_hash=event_hash,
-                            contract_address=contract_address,
+                            contract_address=contract_address,  # type: ignore
                         )
-                    event_abi = event_abis[key]
+                    event_abi = event_abis[key]  # type: ignore
 
                     # contract
                     events_by_contract[
