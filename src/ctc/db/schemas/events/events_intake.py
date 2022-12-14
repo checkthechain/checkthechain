@@ -4,6 +4,7 @@ import typing
 
 from ctc import evm
 from ctc import spec
+from ... import connect_utils
 from ... import management
 from . import events_statements
 
@@ -19,7 +20,6 @@ async def async_intake_encoded_events(
 
     import sqlalchemy.exc  # type: ignore
     import numpy as np
-    from ctc import db
 
     if spec.is_dataframe(encoded_events):
         blocks = encoded_events.index.get_level_values('block_number')
@@ -47,7 +47,7 @@ async def async_intake_encoded_events(
     if len(encoded_events) == 0:
         return
 
-    engine = db.create_engine(schema_name='events', network=network)
+    engine = connect_utils.create_engine(schema_name='events', network=network)
     if engine is None:
         return None
 

@@ -23,6 +23,7 @@ RawBlockNumber = typing.Union[typing.SupportsRound, binary_types.HexData, str]
 class RawBlock(TypedDict):
     pass
 
+
 # an int or block number name
 StandardBlockNumber = typing.Union[int, BlockNumberName]
 
@@ -74,30 +75,3 @@ class Block(TypedDict):
     transactions_root: binary_types.PrefixHexData
     uncles: typing.List[BlockHash]
 
-
-class RawLog(TypedDict):
-    removed: bool
-    logIndex: int
-    transactionIndex: int
-    transactionHash: transaction_types.TransactionHash
-    blockHash: BlockHash
-    blockNumber: int
-    address: address_types.Address
-    data: binary_types.PrefixHexData
-    topics: typing.List[binary_types.PrefixHexData]
-
-
-class PendingRawLog(TypedDict):
-    # many log fields are nullable if a log is pending
-    removed: bool
-    logIndex: typing.Union[None, int]
-    transactionIndex: typing.Union[None, int]
-    transactionHash: typing.Union[None, transaction_types.TransactionHash]
-    blockHash: typing.Union[None, BlockHash]
-    blockNumber: typing.Union[None, int]
-    address: address_types.Address
-    data: binary_types.PrefixHexData
-    topics: typing.List[binary_types.PrefixHexData]
-
-
-NormalizedLog = typing.Dict[str, typing.Any]

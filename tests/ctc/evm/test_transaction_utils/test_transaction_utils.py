@@ -1,6 +1,7 @@
 import pytest
 
 from ctc import evm
+from ctc import rpc
 
 
 example_txs = [
@@ -14,7 +15,7 @@ example_txs = [
 async def test_get_tx_hash(test):
 
     target_hash = test
-    transaction = await evm.async_get_transaction(target_hash)
+    transaction = await rpc.async_eth_get_transaction_by_hash(target_hash)
     actual_hash = evm.hash_signed_transaction(transaction)
     assert actual_hash == target_hash
 
@@ -23,7 +24,7 @@ async def test_get_tx_hash(test):
 async def test_verify_transaction_signature(test):
 
     tx_hash = test
-    transaction = await evm.async_get_transaction(tx_hash)
+    transaction = await rpc.async_eth_get_transaction_by_hash(tx_hash)
     signature = (
         transaction['v'],
         transaction['r'],

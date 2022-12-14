@@ -4,6 +4,7 @@ import typing
 from typing_extensions import TypedDict, NotRequired
 
 from . import address_types
+from . import log_types
 from . import binary_types
 
 
@@ -115,3 +116,44 @@ TransactionData = typing.Union[
     EIP2930Transaction,
     EIP1559Transaction,
 ]
+
+
+TransactionReceipt = TypedDict(
+    'TransactionReceipt',
+    {
+        'block_hash': str,
+        'block_number': int,
+        'contract_address': str,
+        'cumulative_gas_used': int,
+        'effective_gas_price': int,
+        'from': str,
+        'gas_used': int,
+        'logs': typing.Sequence[log_types.RawLog],
+        'logs_bloom': str,
+        'status': int,
+        'to': str,
+        'transaction_hash': str,
+        'transaction_index': int,
+        'type': int,
+    },
+)
+
+
+DBTransaction = TypedDict(
+    'DBTransaction',
+    {
+        'transaction_hash': TransactionHash,
+        'block_number': int,
+        'transaction_index': int,
+        'to': address_types.Address,
+        'from': address_types.Address,
+        'value': int,
+        'input': str,
+        'nonce': int,
+        'type': int,
+        'access_list': typing.Sequence[str],
+        'gas_used': int,
+        'effective_gas_price': int,
+    },
+)
+

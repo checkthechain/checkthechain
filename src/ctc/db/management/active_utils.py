@@ -21,6 +21,7 @@ def get_active_schemas() -> typing.Mapping[
         'dex_pools': True,
         'erc20_metadata': True,
         'events': True,
+        'transactions': True,
         # 'erc20_state': False,
         '4byte': True,
         'chainlink': True,

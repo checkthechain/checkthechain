@@ -6,6 +6,7 @@ from .config_types import *
 from .defi_types import *
 from .event_types import *
 from .external_types import *
+from .log_types import *
 from .network_types import *
 from .number_types import *
 from .rpc_types import *

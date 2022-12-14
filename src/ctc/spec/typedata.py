@@ -118,6 +118,23 @@ transaction_keys_standardized = {
     'signature_s': 's',
 }
 
+transaction_keys_db = {
+    'hash',
+    'block_number',
+    'transaction_index',
+    'to',
+    'from',
+    'value',
+    'input',
+    'nonce',
+    'type',
+    'access_list',
+    'gas_used',
+    'effective_gas_price',
+}
+
+# removed_rpc_keys = {'v', 'r', 's', 'chain_id'}
+
 
 #
 # # providers

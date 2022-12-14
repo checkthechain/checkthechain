@@ -74,6 +74,7 @@ def get_data_source(**tags: typing.Any) -> DataSource:
         'contract_abis',
         'contract_creation_blocks',
         'events',
+        'transactions',
         #
         # # protocols
         'chainlink',
