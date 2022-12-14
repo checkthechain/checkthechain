@@ -89,10 +89,10 @@ async def async_dex_chart_command(
     )
 
     # compute candlesticks
-    prices = swaps['price__0__per__1'].values  # type: ignore
-    x_volumes = swaps['volume__0'].values  # type: ignore
+    prices = swaps['price__0__per__1'].values
+    x_volumes = swaps['volume__0'].values
     if invert:
-        prices = 1 / prices
+        prices = 1 / prices  # type: ignore
     block_numbers = list(swaps.index.get_level_values('block_number'))
     block_timestamps = await evm.async_get_block_timestamps(
         block_numbers,
