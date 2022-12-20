@@ -41,7 +41,7 @@ def drop_command(
             network = int(network)
 
     db.drop_schema(
-        schema_name=typing.cast(db.SchemaName, schema_name),
+        schema_name=schema_name,
         network=network,
         confirm=confirm,
     )

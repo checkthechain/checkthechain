@@ -37,6 +37,7 @@ async def async_create_tables_command(
             if schema_name not in db.DBSchemaName.__args__:  # type: ignore
                 raise Exception('unknown schema_name: ' + str(schema_name))
     db.create_missing_tables(
-        schema_names=typing.cast(typing.Sequence[db.SchemaName], schema_names),
+        schema_names=schema_names,
         networks=networks,
     )
+

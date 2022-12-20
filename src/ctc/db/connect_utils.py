@@ -8,13 +8,12 @@ import toolsql
 from ctc import config
 from ctc import spec
 
-from . import schema_utils
 from .management import dba_utils
 from .management import version_utils
 
 
 def create_engine(
-    schema_name: schema_utils.SchemaName,
+    schema_name: spec.SchemaName,
     *,
     network: spec.NetworkReference | None,
     create_missing_schema: bool = True,
@@ -22,11 +21,11 @@ def create_engine(
     """create sqlalchemy engine object"""
 
     # get db config
-    data_source: config.DataSource | config.LeafDataSource = (
+    data_source: spec.DataSource | spec.LeafDataSource = (
         config.get_data_source(datatype=schema_name, network=network)
     )
     if data_source['backend'] == 'hybrid':
-        data_source = typing.cast(config.DataSource, data_source)[
+        data_source = typing.cast(spec.DataSource, data_source)[
             'hybrid_order'
         ][0]
     if data_source.get('backend') != 'db' or 'db_config' not in data_source:

@@ -5,11 +5,10 @@ import typing
 if typing.TYPE_CHECKING:
     from .. import schema_utils
 
+from ctc import spec
 
-def get_active_schemas() -> typing.Mapping[
-    schema_utils.SchemaName,
-    bool,
-]:
+
+def get_active_schemas() -> typing.Mapping[spec.SchemaName, bool]:
     """return specification of which subset of incoming data to store in db"""
     return {
         # 'block_gas_stats': False,
@@ -29,7 +28,7 @@ def get_active_schemas() -> typing.Mapping[
     }
 
 
-def get_active_timestamp_schema() -> schema_utils.NetworkSchemaName | None:
+def get_active_timestamp_schema() -> spec.NetworkSchemaName | None:
     active_schemas = get_active_schemas()
     if active_schemas['block_timestamps']:
         return 'block_timestamps'

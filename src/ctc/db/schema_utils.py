@@ -2,60 +2,39 @@ from __future__ import annotations
 
 import copy
 import typing
-from typing_extensions import Literal
 
 import toolsql
 
 from ctc import config
 from ctc import evm
 from ctc import spec
+from ctc.spec import db_types
 
 from . import schemas
 
-# admin schemas = those related to managing ctc
-AdminSchemaName = Literal['schema_versions']
 
-# generic schemas = those agnostic to network
-GenericSchemaName = Literal[
-    '4byte',
-    'coingecko',
-]
-
-# network schemas = those that have unique data on each network
-NetworkSchemaName = Literal[
-    # 'block_gas_stats',
-    'block_timestamps',
-    'block_gas',
-    'blocks',
-    'contract_abis',
-    'contract_creation_blocks',
-    'dex_pools',
-    'erc20_metadata',
-    'events',
-    'transactions',
-    # 'erc20_state',
-    # 'events',
-    #
-    # protocols
-    'chainlink',
-]
-
-SchemaName = typing.Union[NetworkSchemaName, GenericSchemaName, AdminSchemaName]
+def get_admin_schema_names() -> tuple[db_types.AdminSchemaName]:
+    return db_types.AdminSchemaName.__args__  # type: ignore
 
 
-def get_admin_schema_names() -> tuple[AdminSchemaName]:
-    return AdminSchemaName.__args__  # type: ignore
+def get_generic_schema_names() -> tuple[db_types.GenericSchemaName]:
+    return db_types.GenericSchemaName.__args__  # type: ignore
 
 
-def get_generic_schema_names() -> tuple[GenericSchemaName]:
-    return GenericSchemaName.__args__  # type: ignore
+def get_network_schema_names() -> tuple[db_types.NetworkSchemaName]:
+    return db_types.NetworkSchemaName.__args__  # type: ignore
 
 
-def get_network_schema_names() -> tuple[NetworkSchemaName]:
-    return NetworkSchemaName.__args__  # type: ignore
+def get_all_schema_names() -> typing.Sequence[db_types.SchemaName]:
+    schema_names = (
+        get_admin_schema_names()
+        + get_generic_schema_names()
+        + get_network_schema_names()
+    )
+    return typing.cast(typing.Sequence[db_types.SchemaName], schema_names)
 
 
-def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
+def get_raw_schema(schema_name: str) -> toolsql.DBSchema:
     if schema_name == 'block_timestamps':
         return schemas.block_timestamps_schema
     elif schema_name == 'block_gas':
@@ -98,7 +77,7 @@ def get_raw_schema(schema_name: SchemaName) -> toolsql.DBSchema:
 
 
 def get_prepared_schema(
-    schema_name: NetworkSchemaName,
+    schema_name: str,
     network: spec.NetworkReference | None = None,
 ) -> toolsql.DBSchema:
 
@@ -139,7 +118,7 @@ def get_complete_prepared_schema(
     # include network schemas
     if networks is None:
         networks = config.get_networks_that_have_providers()
-    schema_name: SchemaName
+    schema_name: db_types.SchemaName
     all_schemas = []
     for network in networks:
         for schema_name in get_network_schema_names():
@@ -172,3 +151,4 @@ def _combine_db_schemas(
             tables[table_name] = table_spec
     combined_schema: toolsql.DBSchema = {'tables': tables}
     return combined_schema
+

@@ -8,7 +8,6 @@ import toolsql
 
 from ctc import spec
 from . import connect_utils
-from . import schema_utils
 
 
 R = TypeVar('R')
@@ -16,8 +15,7 @@ R = TypeVar('R')
 
 def wrap_selector_with_connection(
     async_f: Callable[..., Coroutine[Any, Any, R | None]],
-    schema_name: schema_utils.SchemaName
-    | Callable[..., schema_utils.SchemaName | None],
+    schema_name: spec.SchemaName | Callable[..., spec.SchemaName | None],
     *,
     require_network: bool = True,
 ) -> Callable[..., Coroutine[Any, Any, R | None]]:

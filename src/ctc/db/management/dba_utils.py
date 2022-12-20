@@ -8,6 +8,7 @@ import toolsql
 
 from ctc import config
 from ctc import spec
+from ctc.spec import db_types
 from .. import connect_utils
 from .. import schema_utils
 from . import version_utils
@@ -15,7 +16,7 @@ from . import version_utils
 
 def create_missing_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
-    schema_names: typing.Sequence[schema_utils.SchemaName] | None = None,
+    schema_names: typing.Sequence[str] | None = None,
     *,
     db_config: toolsql.DBConfig | None = None,
     verbose: bool = True,
@@ -65,9 +66,14 @@ def create_missing_tables(
 
     # get missing tables
     schemas_to_create: list[
-        tuple[spec.NetworkReference | None, schema_utils.SchemaName]
+        tuple[spec.NetworkReference | None, spec.SchemaName]
     ] = []
-    for schema_name in schema_names:
+    for schema_name_raw in schema_names:
+
+        if schema_name_raw in schema_utils.get_all_schema_names():
+            schema_name = typing.cast(db_types.SchemaName, schema_name_raw)
+        else:
+            raise Exception('unknown schema name: ' + str(schema_name_raw))
 
         # determine schema networks
         if schema_name in network_schema_names:
@@ -81,9 +87,7 @@ def create_missing_tables(
 
             if schema_network is not None:
                 schema = schema_utils.get_prepared_schema(
-                    schema_name=typing.cast(
-                        schema_utils.NetworkSchemaName, schema_name
-                    ),
+                    schema_name=schema_name,
                     network=schema_network,
                 )
             else:
@@ -148,7 +152,7 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
 
 
 def initialize_schema(
-    schema_name: schema_utils.SchemaName,
+    schema_name: spec.SchemaName,
     *,
     network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
@@ -175,9 +179,7 @@ def initialize_schema(
     # load schema data
     if prepared_schema:
         schema = schema_utils.get_prepared_schema(
-            schema_name=typing.cast(
-                schema_utils.NetworkSchemaName, schema_name
-            ),
+            schema_name=schema_name,
             network=network,
         )
     else:
@@ -202,17 +204,21 @@ def initialize_schema(
 
 
 def drop_schema(
-    schema_name: schema_utils.SchemaName,
+    schema_name: str,
     network: spec.NetworkReference | None = None,
     *,
     confirm: bool = False,
 ) -> None:
 
+    if schema_name not in schema_utils.get_all_schema_names():
+        raise Exception('unknown schema name: ' + str(schema_name))
+    schema = typing.cast(db_types.SchemaName, schema_name)
+
     if not confirm:
         if network is not None:
             answer = toolcli.input_yes_or_no(
                 'Delete version row for schema '
-                + schema_name
+                + schema
                 + ' for network '
                 + str(network)
                 + '? '
@@ -221,13 +227,13 @@ def drop_schema(
                 raise Exception('aborting')
         else:
             answer = toolcli.input_yes_or_no(
-                'Delete ALL version rows for schema ' + schema_name + '? '
+                'Delete ALL version rows for schema ' + schema + '? '
             )
             if not answer:
                 raise Exception('aborting')
 
     if network is None:
-        if schema_name in schema_utils.get_network_schema_names():
+        if schema in schema_utils.get_network_schema_names():
             networks: typing.Sequence[
                 spec.NetworkReference | None
             ] = config.get_networks_that_have_providers()
@@ -240,7 +246,7 @@ def drop_schema(
 
         # determine tables in db
         engine = connect_utils.create_engine(
-            schema_name=schema_name,
+            schema_name=schema,
             network=network,
             create_missing_schema=False,
         )
@@ -251,13 +257,11 @@ def drop_schema(
         # determine tables in schema
         if network is not None:
             schema_data = schema_utils.get_prepared_schema(
-                schema_name=typing.cast(
-                    schema_utils.NetworkSchemaName, schema_name
-                ),
+                schema_name=schema,
                 network=network,
             )
         else:
-            schema_data = schema_utils.get_raw_schema(schema_name=schema_name)
+            schema_data = schema_utils.get_raw_schema(schema_name=schema)
         schema_table_names = schema_data['tables']
 
         # determine which tables to drop
@@ -283,9 +287,10 @@ def drop_schema(
         with schema_version_engine.begin() as conn:
             for network in networks:
                 version_utils.delete_schema_version(
-                    schema_name=schema_name,
+                    schema_name=schema,
                     network=network,
                     conn=conn,
                     confirm_delete_row=True,
                     confirm_delete_schema=True,
                 )
+
