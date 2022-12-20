@@ -3,6 +3,8 @@ from __future__ import annotations
 import typing
 from typing_extensions import TypedDict
 
+from . import context_types
+from . import db_types
 from . import network_types
 from . import rpc_types
 
@@ -46,6 +48,15 @@ class Config(TypedDict):
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]
 
+    default_cache: context_types.CacheContext
+    caches: typing.Mapping[
+        network_types.ChainId,
+        typing.Mapping[
+            db_types.SchemaName,
+            context_types.CacheContext,
+        ],
+    ]
+
     log_rpc_calls: bool
     log_sql_queries: bool
 
@@ -68,3 +79,4 @@ class JsonConfig(TypedDict):
 
     cli_color_theme: toolcli.StyleTheme
     cli_chart_charset: toolstr.SampleMode
+

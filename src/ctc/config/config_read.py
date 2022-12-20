@@ -154,3 +154,30 @@ def get_config_version_tuple(
             return (config_version[0], config_version[1], config_version[2])
 
     raise Exception('could not detect config version')
+
+
+def get_cache_config(
+    chain_id: spec.ChainId,
+    schema_name: spec.SchemaName | None,
+) -> spec.CacheContext:
+    """get cache config for a given network and schema
+
+    specifying None for schema_name indicates the default for the given network
+    - network-level defaults are not currently implemented, so returns global default
+    """
+    config = get_config()
+    caches = config['caches']
+    if chain_id not in caches:
+        return config['default_cache']
+    else:
+        network_caches = caches[chain_id]
+
+        if schema_name is None:
+            return config['default_cache']
+
+        network_schema_cache = network_caches.get(schema_name)
+        if network_schema_cache is not None:
+            return network_schema_cache
+        else:
+            return config['default_cache']
+
