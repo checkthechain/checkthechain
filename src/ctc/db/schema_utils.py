@@ -8,7 +8,7 @@ import toolsql
 from ctc import config
 from ctc import evm
 from ctc import spec
-from ctc.spec import db_types
+from ctc.spec.typedefs import db_types
 
 from . import schemas
 
