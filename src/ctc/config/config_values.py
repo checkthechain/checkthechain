@@ -10,11 +10,13 @@ these functions should
 
 from __future__ import annotations
 
+import functools
 import typing
-from typing_extensions import Literal
 import os
 
 if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
+
     import toolcli
     import toolsql
     import toolstr
@@ -174,6 +176,68 @@ def get_default_provider(
 
 
 #
+# # caches
+#
+
+
+@functools.lru_cache()
+def get_all_cache_configs(
+    chain_id: spec.ChainId | None,
+) -> spec.MultiCacheContext:
+
+    from ctc import db
+
+    schema_names: tuple[spec.SchemaName] = db.get_generic_schema_names()
+    if chain_id is not None:
+        schema_names = schema_names + db.get_network_schema_names()  # type: ignore
+
+    cache_configs: spec.MutableMultiCacheContext = {}
+    for schema_name in schema_names:
+        cache_configs[schema_name] = get_schema_cache_config(
+            schema_name=schema_name,
+            chain_id=chain_id,
+        )
+
+    return cache_configs
+
+
+@functools.lru_cache()
+def get_schema_cache_config(
+    *,
+    schema_name: spec.SchemaName,
+    chain_id: spec.ChainId | None,
+) -> spec.SingleCacheContext:
+    """get cache config for a given network and schema
+
+    for network-specific schemas, must specify chain_id
+    """
+
+    import copy
+
+    config = config_read.get_config()
+    cache_config = copy.copy(config['default_cache_config'])
+
+    # copy values form schema_cache_configs
+    schema_cache_configs = config['schema_cache_configs']
+    if schema_name in schema_cache_configs:
+        cache_config.update(schema_cache_configs[schema_name])
+
+    # copy values from network_cache_configs
+    if (
+        chain_id is not None
+        and chain_id in config['network_cache_configs']
+        and schema_name in config['network_cache_configs'][chain_id]
+    ):
+        values = config['network_cache_configs'][chain_id][schema_name]
+        cache_config.update(values)
+
+    # copy values from global_cache_override
+    cache_config.update(config['global_cache_override'])
+
+    return cache_config
+
+
+#
 # # db
 #
 
@@ -257,3 +321,4 @@ def get_cli_color_theme() -> toolcli.StyleTheme:
 def get_cli_chart_charset() -> toolstr.SampleMode:
     config = config_read.get_config()
     return config['cli_chart_charset']
+

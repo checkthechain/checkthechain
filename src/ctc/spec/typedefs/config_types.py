@@ -4,7 +4,6 @@ import typing
 from typing_extensions import TypedDict
 
 from . import context_types
-from . import db_types
 from . import network_types
 from . import rpc_types
 
@@ -47,15 +46,13 @@ class Config(TypedDict):
     ]
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]
-
-    default_cache: context_types.CacheContext
-    caches: typing.Mapping[
+    global_cache_override: context_types.PartialSingleCacheContext
+    network_cache_configs: typing.Mapping[
         network_types.ChainId,
-        typing.Mapping[
-            db_types.SchemaName,
-            context_types.CacheContext,
-        ],
+        context_types.PartialMultiCacheContext,
     ]
+    schema_cache_configs: context_types.PartialMultiCacheContext
+    default_cache_config: context_types.SingleCacheContext
 
     log_rpc_calls: bool
     log_sql_queries: bool

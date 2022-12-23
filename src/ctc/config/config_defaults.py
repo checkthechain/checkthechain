@@ -37,6 +37,16 @@ def get_default_config(use_env_variables: bool = True) -> spec.Config:
         # db
         'db_configs': get_default_db_configs(data_dir=data_dir),
         #
+        # cache
+        'global_cache_override': {},
+        'schema_cache_configs': {},
+        'network_cache_configs': {},
+        'default_cache_config': {
+            'cache': 'main',
+            'read_cache': True,
+            'write_cache': True,
+        },
+        #
         # logging
         'log_rpc_calls': get_default_log_rpc_calls(),
         'log_sql_queries': get_default_log_sql_queries(),
@@ -242,6 +252,7 @@ def get_default_log_sql_queries() -> bool:
 # # cli
 #
 
+
 def get_default_cli_color_theme() -> toolcli.StyleTheme:
     return {
         'title': 'bold #ce93f9',
@@ -255,3 +266,4 @@ def get_default_cli_color_theme() -> toolcli.StyleTheme:
 
 def get_default_cli_chart_charset() -> toolstr.SampleMode:
     return 'braille'
+

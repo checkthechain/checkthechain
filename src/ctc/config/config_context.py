@@ -1,18 +1,21 @@
 """
 # Context
 - every `ctc` function that queries data can specify a `context` argument
+- `context` can specify the data source and various query behaviors
 - for example:
     - specify that a query should be sent to Polygon, Arbitrum, or Mainnet
     - specify which RPC provider to use if multiple are avaiable
     - specify whether to read results from cache, or write results to cache
-- `context` can specify the data source and various query behaviors
 
 
 ## Context Format
 - `context` can be a `dict`, `str`, or `int`
     - `dict`: map of context options
-    - `str`: either the name of an EVM network or the name of an RPC provider
     - `int`: the chain id of an EVM network
+    - `str`: one of
+        1. the name of an EVM network
+        2. the name of an RPC provider
+        3. the url of an RPC provider
 - a `context` `dict` has many possible options
     - see sections below for possible keys and their behaviors
     - unspecified keys will use default values
@@ -26,17 +29,21 @@
     - `read_db`
     - `write_db`
 - `context` has the following advantages:
-    - simplifies `ctc` API and minimize cognitive overhead for end user
-    - allow granular configuration of multiple caches
-    - future proof for specifying additional data sources like BigQuery or theGraph
+    - simplifies `ctc` API and makes it easier to use
+    - allows granular configuration of multiple caches
+    - future proofs many extensions of cache config
 
+
+# Context Attributes
 
 ## Provider / Network
 - Functions that acquire on-chain data can specify `provider` and/or `network`
 - if both are specified, they should be compatible
+- a context currently describes a query environment for a single network
+    - multiple networks require multiple contexts
+    - future versions of `ctc` may use multi-network contexts
 
-
-## Cache Context
+## Caches
 - For functions that use a cache, context can contain the following
     - `cache`: attempt to read from and write to cache
     - `read_cache`: attempt to read result from cache
@@ -73,32 +80,88 @@
 - be able to specify no provider should be used, only cache
 
 
-## What is and is not a context
-- a context describes a query environment for a single network
-    - multiple networks require multiple contexts
-
-
 ## TODO
 - add check that there is no conflicts between
     - provider names
     - network names
     - cache names
 """
+
 from __future__ import annotations
+
+import typing
 
 from ctc import config
 from ctc import spec
 from ctc import rpc
 
 
-def get_full_context(context: spec.Context) -> spec.FullContext:
+def get_context_chain_id(context: spec.Context) -> spec.ChainId:
+    """get chain_id of a given context"""
+    chain_id, provider = _get_context_network_and_provider(context=context)
+    return chain_id
 
-    # determine network and provider
+
+def get_context_provider(context: spec.Context) -> spec.Provider:
+    """get provider of a given context"""
+    chain_id, provider = _get_context_network_and_provider(context=context)
+    return provider
+
+
+def get_schema_cache_context(
+    *,
+    schema_name: spec.SchemaName,
+    chain_id: spec.ChainId | None,
+    context: spec.Context,
+) -> tuple[spec.CacheId | None, bool, bool]:
+    """get cache_id, read_cache, and write_cache according to given context
+
+    cache_id==None indicates no cache
+    """
+    if chain_id is None:
+        from ctc import db
+
+        if schema_name in db.get_network_schema_names():
+            chain_id = config.get_default_network()
+    cache = _get_context_cache_config(
+        schema_name=schema_name,
+        chain_id=chain_id,
+        context=context,
+    )
+    return cache['cache'], cache['read_cache'], cache['write_cache']
+
+
+def get_full_context(context: spec.Context) -> spec.FullContext:
+    """expand given context to its full context with all fields shown
+
+    it is less computationally expensive to retrieve partial contexts
+    """
+
+    chain_id, provider = _get_context_network_and_provider(context)
+    cache = _get_all_context_cache_configs(context=context, chain_id=chain_id)
+
+    return {
+        'network': chain_id,
+        'provider': provider,
+        'cache': cache,
+    }
+
+
+def _get_context_network_and_provider(
+    context: spec.Context,
+) -> tuple[spec.ChainId, spec.Provider]:
+
     if context is None:
-        chain_id = config.get_default_network()
+        # case: no context provided
+        default_network = config.get_default_network()
+        if default_network is None:
+            raise Exception('no default network specified')
+        else:
+            chain_id = default_network
         provider = rpc.get_provider({'network': chain_id})
 
     elif isinstance(context, int):
+        # case: context is only a chain_id
         for chain_id in config.get_config_networks().keys():
             if chain_id == context:
                 break
@@ -109,6 +172,7 @@ def get_full_context(context: spec.Context) -> spec.FullContext:
         provider = rpc.get_provider({'network': chain_id})
 
     elif isinstance(context, str):
+        # case: context is a network name, provider name, or provider url
         for chain_id, network_metadata in config.get_config_networks().items():
             if network_metadata.get('name') == context:
                 provider = rpc.get_provider({'network': chain_id})
@@ -118,174 +182,155 @@ def get_full_context(context: spec.Context) -> spec.FullContext:
         chain_id = provider['network']
 
     elif isinstance(context, dict):
+        # case: context is a dict
+
         if context.get('provider') is not None:
+            # subcase: provider is given
             provider = rpc.get_provider(context['provider'])
             chain_id = provider['network']
+
         elif context.get('network') is not None:
+            # subcase: network is given
             context_network = context['network']
-            for chain_id, network_metadata in config.get_config_networks().items():
+            for (
+                chain_id,
+                network_metadata,
+            ) in config.get_config_networks().items():
                 if isinstance(context_network, int):
                     if context_network == chain_id:
                         break
                 elif isinstance(context_network, str):
                     if context_network == network_metadata['name']:
                         break
+                else:
+                    raise Exception(
+                        'unknown network format: ' + str(context_network)
+                    )
             provider = rpc.get_provider({'network': chain_id})
+
         else:
+            # subcase: neither provider nor network are given
             default_network = config.get_default_network()
             if default_network is None:
                 raise Exception('no default network specified')
             else:
-                chain_id
+                chain_id = default_network
             provider = rpc.get_provider({'network': chain_id})
 
     else:
         raise Exception('unknown context format: ' + str(type(context)))
 
-    # determine cache attributes
-    if isinstance(context, dict):
-        cache = config.get_network_cache_config(chain_id=chain_id)
-        read_cache = context.get('read_cache')
-        write_cache = context.get('write_cache')
-        if read_cache is not None or write_cache is not None:
-            new_cache = {}
-            for schema_name, cache_context in cache.items():
-                new_cache_context = dict(cache_context)
-                if read_cache is not None:
-                    new_cache_context['read_cache'] = read_cache
-                if write_cache is not None:
-                    new_cache_context['write_cache'] = write_cache
-                new_cache[schema_name] = new_cache_context
-            cache = new_cache
-    else:
-        cache = config.get_network_cache_config(chain_id=chain_id)
-
-    return {
-        'network': chain_id,
-        'provider': provider,
-        'cache': cache,
-    }
+    return chain_id, provider
 
 
-def get_context_provider(context: spec.Context) -> spec.Provider:
-    if context is None:
-        return config.get_default_provider()
-    elif isinstance(context, int):
-        for chain_id in config.get_config_networks().keys():
-            if chain_id == context:
-                return rpc.get_provider({'network': context})
-        raise Exception(
-            'could not find provider for chain_id = ' + str(context)
-        )
-    elif isinstance(context, str):
-        # check for networks
-        for chain_id, network_metadata in config.get_config_networks().items():
-            if network_metadata.get('name') == context:
-                return rpc.get_provider({'network': chain_id})
-
-        # check for providers
-        return rpc.get_provider(context)
-    elif isinstance(context, dict):
-        if context.get('network') is not None:
-            return rpc.get_provider({'network': context['network']})
-        elif context.get('provider') is not None:
-            return rpc.get_provider(context['provider'])
-        else:
-            return config.get_default_provider()
-    else:
-        raise Exception('unknown context format')
-
-
-def get_context_chain_id(context: spec.Context) -> spec.ChainId:
-    full_context = get_full_context(context)
-    return full_context['network']
-
-
-def get_cache_context(
-    schema_name: spec.SchemaName | None,
+def _get_all_context_cache_configs(
     context: spec.Context,
-) -> tuple[spec.CacheId | None, bool, bool]:
-    """get cache_id, read_cache, and write_cache according to given context"""
+    chain_id: spec.ChainId | None,
+) -> spec.MultiCacheContext:
 
-    if not isinstance(context, dict):
-        # if context not a dict, default cache behavior for network
-        chain_id = get_context_chain_id(context)
-        cache_config = config.get_cache_config(
+    from ctc import db
+
+    schema_names: tuple[spec.SchemaName] = db.get_generic_schema_names()
+    if chain_id is not None:
+        schema_names = schema_names + db.get_network_schema_names()  # type: ignore
+
+    cache_configs: spec.MutableMultiCacheContext = {}
+    for schema_name in schema_names:
+        cache_configs[schema_name] = _get_context_cache_config(
             schema_name=schema_name,
             chain_id=chain_id,
-        )
-        return (
-            cache_config['cache'],
-            cache_config['read_cache'],
-            cache_config['write_cache'],
+            context=context,
         )
 
-    else:
-        # if context is a dict, determine behavior from context cache fields
+    return cache_configs
 
-        # get cache fields
-        context_cache = context.get('cache')
-        read_cache = context.get('read_cache')
-        write_cache = context.get('write_cache')
-        if isinstance(context_cache, bool) and (write_cache or read_cache):
-            raise Exception(
-                'if specifying write_cache=True or read_cache=True,'
-                'should not specify boolean value for cache'
-            )
 
-        # determine read_cache if not specified
-        if read_cache is None:
-            if context_cache is not None:
-                # if context parameter specified, use it
-                if isinstance(context_cache, str):
-                    read_cache = True
-                elif isinstance(context_cache, bool):
-                    read_cache = context_cache
-                else:
-                    raise Exception('unknown context cache format given')
-            else:
-                # otherwise use default read_cache value
-                chain_id = get_context_chain_id(context)
-                config_cache = config.get_cache_config(
-                    schema_name=schema_name,
-                    chain_id=chain_id,
+def _get_context_cache_config(
+    *,
+    context: spec.Context,
+    chain_id: spec.ChainId | None,
+    schema_name: spec.SchemaName,
+) -> spec.SingleCacheContext:
+
+    cache_config = config.get_schema_cache_config(
+        schema_name=schema_name,
+        chain_id=chain_id,
+    )
+
+    # chain_id already determined, so cache only affected if context also a dict
+    if isinstance(context, dict):
+        import copy
+
+        cache_config = copy.copy(cache_config)
+
+        cache = context.get('cache')
+
+        # case: read_cache or write_cache specified
+        keys: typing.Sequence[typing.Literal['read_cache', 'write_cache']] = [
+            'read_cache',
+            'write_cache',
+        ]
+        # key: typing.Literal['read_cache', 'write_cache']
+        # for key in ['read_cache', 'write_cache']:
+        for key in keys:
+            value = context.get(key)
+            if value is None:
+                continue
+            if cache is not None:
+                raise Exception(
+                    'context should not specify both cache and read_cache'
                 )
-                read_cache = config_cache['write_cache']
-
-        # determine write_cache if not specified
-        if write_cache is None:
-            if context_cache is not None:
-                # if context parameter specified, use it
-                if isinstance(context_cache, str):
-                    write_cache = True
-                elif isinstance(context_cache, bool):
-                    write_cache = context_cache
-                else:
-                    raise Exception('unknown context cache format given')
+            if isinstance(value, bool):
+                cache_config[key] = value
             else:
-                # otherwise use default write_cache value
-                chain_id = get_context_chain_id(context)
-                config_cache = config.get_cache_config(
-                    schema_name=schema_name,
-                    chain_id=chain_id,
+                raise Exception(
+                    'invalid type for ' + key + ': ' + str(type(value))
                 )
-                write_cache = config_cache['write_cache']
 
-        # determine cache id
-        if isinstance(context_cache, str):
-            cache_id = context_cache
-        elif isinstance(context_cache, bool):
-            if not context_cache:
-                cache_id = None
+        # case: cache is specified
+        if cache is not None:
+
+            # subcase: cache is a bool
+            if isinstance(cache, bool):
+                cache_config['read_cache'] = cache
+                cache_config['write_cache'] = cache
+
+            # subcase: cache is a str
+            elif isinstance(cache, str):
+                cache_config['cache'] = cache
+                cache_config['read_cache'] = True
+                cache_config['write_cache'] = True
+
+            # subcase: cache is a dict
+            elif isinstance(cache, dict):
+
+                cache_keys = ['read_cache', 'write_cache', 'cache']
+                if any(key in cache for key in cache_keys):
+                    raise Exception(
+                        'wrong level of nesting used for cache context'
+                    )
+
+                if schema_name in cache:
+                    if isinstance(cache[schema_name], bool):
+                        cache_config['read_cache'] = cache[schema_name]
+                        cache_config['write_cache'] = cache[schema_name]
+
+                    elif isinstance(cache[schema_name], str):
+                        cache_config['cache'] = cache[schema_name]
+                        cache_config['read_cache'] = True
+                        cache_config['write_cache'] = True
+
+                    elif isinstance(cache[schema_name], dict):
+                        cache_config.update(cache[schema_name])
+
+                    else:
+                        raise Exception(
+                            'unknown type for cache: '
+                            + str(type(cache[schema_name]))
+                        )
+
             else:
-                chain_id = get_context_chain_id(context)
-                config_cache = config.get_cache_config(
-                    schema_name=schema_name,
-                    chain_id=chain_id,
-                )
-                cache_id = config_cache['cache']
-        else:
-            raise Exception('unknown format for context cache')
+                raise Exception('unknown type for cache: ' + str(type(cache)))
 
-        return cache_id, read_cache, write_cache
+    return cache_config
 

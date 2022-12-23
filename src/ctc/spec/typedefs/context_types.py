@@ -15,33 +15,18 @@ class PartialContext(TypedDict, total=False):
     # cache settings
     cache: bool | CacheId | typing.Mapping[
         db_types.SchemaName,
-        bool | CacheId | CacheContext,
+        bool | CacheId | SingleCacheContext,
     ]
     read_cache: bool
     write_cache: bool
 
 
 class FullContext(TypedDict):
-    provider: rpc_types.ProviderReference
+    provider: rpc_types.Provider
     network: network_types.ChainId
     #
     # cache settings
-    cache: typing.Mapping[db_types.SchemaName, CacheContext]
-
-
-CacheId = str
-
-
-class CacheContext(TypedDict):
-    cache: CacheId
-    read_cache: bool
-    write_cache: bool
-
-
-class CacheContextShorthand(TypedDict, total=False):
-    cache: bool | CacheId
-    read_cache: bool
-    write_cache: bool
+    cache: MultiCacheContext
 
 
 # one of: provider url, network name
@@ -53,4 +38,46 @@ Context = typing.Union[
     ContextStr,
     network_types.ChainId,
 ]
+
+
+#
+# # cache configuration
+#
+
+CacheId = str
+
+
+class SingleCacheContext(TypedDict):
+    cache: CacheId
+    read_cache: bool
+    write_cache: bool
+
+
+MultiCacheContext = typing.Mapping[
+    db_types.SchemaName,
+    SingleCacheContext,
+]
+
+MutableMultiCacheContext = typing.MutableMapping[
+    db_types.SchemaName,
+    SingleCacheContext,
+]
+
+
+class PartialSingleCacheContext(TypedDict, total=False):
+    cache: CacheId
+    read_cache: bool
+    write_cache: bool
+
+
+PartialMultiCacheContext = typing.Mapping[
+    db_types.SchemaName,
+    PartialSingleCacheContext,
+]
+
+
+class SingleCacheContextShorthand(TypedDict, total=False):
+    cache: bool | CacheId
+    read_cache: bool
+    write_cache: bool
 
