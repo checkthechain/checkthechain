@@ -80,7 +80,7 @@ async def async_normalize_erc4626_shares(
 
     else:
         return await erc20_utils.async_normalize_erc20_quantity(
-            quantity=typing.cast(int, shares),
+            quantity=shares,
             token=token,
             block=block,
             decimals=decimals,
@@ -186,7 +186,7 @@ async def async_normalize_erc4626_assets(
         )
     else:
         return await erc20_utils.async_normalize_erc20_quantity(
-            quantity=typing.cast(int, assets),
+            quantity=assets,
             token=asset,
             block=block,
             decimals=decimals,

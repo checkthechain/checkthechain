@@ -58,7 +58,7 @@ async def async_pcv_command(
         print('- PCV equity:', toolstr.format(protocol_equity, **format_kwargs))
         print('- CR:', toolstr.format(cr, percentage=True))
     elif output == 'table':
-        rows = [
+        rows: typing.Sequence[typing.Sequence[typing.Any]] = [
             ['total PCV', total_pcv],
             ['total FEI', total_fei],
             ['user FEI', user_fei],

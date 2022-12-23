@@ -34,7 +34,7 @@ async def async_get_asset_price(
     )
 
     if units == 'eth':
-        price = await price_coroutine
+        price: int | float = await price_coroutine
 
     elif units == 'usd':
         eth_usd_coroutine = chainlink_utils.async_get_eth_price(

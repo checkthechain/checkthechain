@@ -65,7 +65,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    'mypy ==0.981',
+    'mypy ==0.991',
     'mypy_extensions >= 0.4.3, <0.5.0',
     'pandas-stubs ==1.5.2.221124',
     'pytest-asyncio ==0.18.0',
