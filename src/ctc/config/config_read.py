@@ -100,20 +100,12 @@ def get_config(
         config_from_file = upgrade_utils.upgrade_config(config_from_file)
 
     # convert int keys from str to int
-    if config_from_file.get('networks') is not None:
-        config_from_file['networks'] = {
-            int(chain_id): network_metadata
-            for chain_id, network_metadata in config_from_file[
-                'networks'
-            ].items()
-        }
-    if config_from_file.get('default_providers') is not None:
-        config_from_file['default_providers'] = {
-            int(chain_id): provider
-            for chain_id, provider in config_from_file[
-                'default_providers'
-            ].items()
-        }
+    for key in spec.typedata.config_int_subkeys:
+        if config_from_file.get(key) is not None:
+            config_from_file[key] = {
+                int(chain_id): network_metadata
+                for chain_id, network_metadata in config_from_file[key].items()
+            }
 
     config = config_from_file
 

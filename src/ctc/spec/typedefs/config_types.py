@@ -26,6 +26,14 @@ class PartialConfig(TypedDict, total=False):
     ]
     db_configs: typing.Mapping[str, toolsql.DBConfig]
 
+    global_cache_override: context_types.PartialSingleCacheContext
+    network_cache_configs: typing.Mapping[
+        network_types.ChainId,
+        context_types.PartialMultiCacheContext,
+    ]
+    schema_cache_configs: context_types.PartialMultiCacheContext
+    default_cache_config: context_types.SingleCacheContext
+
     log_rpc_calls: bool
     log_sql_queries: bool
 
@@ -46,6 +54,7 @@ class Config(TypedDict):
     ]
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]
+
     global_cache_override: context_types.PartialSingleCacheContext
     network_cache_configs: typing.Mapping[
         network_types.ChainId,
@@ -70,6 +79,14 @@ class JsonConfig(TypedDict):
     default_providers: typing.Mapping[str, rpc_types.ProviderName]
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]
+
+    global_cache_override: context_types.PartialSingleCacheContext
+    network_cache_configs: typing.Mapping[
+        str,
+        context_types.PartialMultiCacheContext,
+    ]
+    schema_cache_configs: context_types.PartialMultiCacheContext
+    default_cache_config: context_types.SingleCacheContext
 
     log_rpc_calls: bool
     log_sql_queries: bool

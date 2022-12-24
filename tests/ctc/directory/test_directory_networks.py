@@ -3,7 +3,7 @@ import pytest
 import toolconfig
 
 from ctc import evm
-from ctc.spec import typedefs
+from ctc.spec.typedefs import network_types
 from ctc.config import config_defaults
 
 
@@ -50,5 +50,5 @@ def test_get_networks():
     networks = config_defaults.get_default_networks_metadata()
     for network_metadata in networks.values():
         toolconfig.conforms_to_spec(
-            data=network_metadata, spec=typedefs.NetworkMetadata
+            data=network_metadata, spec=network_types.NetworkMetadata
         )

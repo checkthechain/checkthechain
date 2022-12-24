@@ -105,6 +105,14 @@ def write_new_config(
         'log_sql_queries': data_dir_data['log_sql_queries'],
         'cli_color_theme': cli_data['cli_color_theme'],
         'cli_chart_charset': cli_data['cli_chart_charset'],
+        'global_cache_override': {},
+        'network_cache_configs': {},
+        'schema_cache_configs': {},
+        'default_cache_config': {
+            'cache': 'main',
+            'read_cache': True,
+            'write_cache': True,
+        },
     }
     print()
     print()

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import typing
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict
 
 
 if typing.TYPE_CHECKING:
@@ -28,6 +28,7 @@ data_spec_order = [
     '0.2.0',
     '0.3.0',
     '0.3.1',
+    '0.3.2',
 ]
 
 data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
@@ -62,6 +63,16 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
         ],
     },
     '0.3.1': {
+        'directory_tree': {
+            'dbs': {},
+            'logs': {'rpc': {}, 'db': {}},
+            'evm': {},
+        },
+        'files': [
+            './directory_version',
+        ],
+    },
+    '0.3.2': {
         'directory_tree': {
             'dbs': {},
             'logs': {'rpc': {}, 'db': {}},

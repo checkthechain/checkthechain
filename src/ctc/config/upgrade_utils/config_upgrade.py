@@ -9,10 +9,26 @@ from .. import config_defaults
 from . import version_utils
 
 
+def get_config_upgrade_functions() -> typing.Mapping[
+    str,
+    typing.Callable[
+        [typing.MutableMapping[typing.Any, typing.Any]],
+        typing.MutableMapping[typing.Any, typing.Any],
+    ],
+]:
+    return {
+        '0.2.': upgrade__0_2_0__to__0_3_0,
+        '0.3.0': upgrade__0_3_0__to__0_3_1,
+        '0.3.1': upgrade__0_3_1__to__0_3_2,
+    }
+
+
 def upgrade_config(
     old_config: typing.MutableMapping[typing.Any, typing.Any]
 ) -> typing.MutableMapping[str, typing.Any]:
     """upgrade config to latest version as much as possible"""
+
+    import string
 
     # detect version
     version = old_config.get('config_spec_version')
@@ -29,18 +45,17 @@ def upgrade_config(
 
     new_config = old_config
     config_version = version
-    if not (
-        config_version.startswith('0.2.')
-        or config_version.startswith('0.3.0')
-        or config_version.startswith('0.3.1')
+    current_version_clean = ctc.__version__.rstrip(string.ascii_letters)
+    upgrade_functions = get_config_upgrade_functions()
+
+    # check that current config version is recognized
+    if not config_version.startswith(current_version_clean) and not any(
+        config_version.startswith(upgrade_version)
+        for upgrade_version in upgrade_functions.keys()
     ):
         raise Exception('invalid config version')
 
     # update config from old version using upgrade path
-    upgrade_functions = {
-        '0.2.': upgrade__0_2_0__to__0_3_0,
-        '0.3.0': upgrade__0_3_0__to__0_3_1,
-    }
     for from_version, upgrade_function in upgrade_functions.items():
         if config_version.startswith(from_version):
             new_config = upgrade_function(new_config)
@@ -148,9 +163,31 @@ def upgrade__0_3_0__to__0_3_1(
     return upgraded
 
 
+def upgrade__0_3_1__to__0_3_2(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+
+    upgraded = dict(old_config)
+    default_config: typing.Mapping[
+        str, typing.Any
+    ] = config_defaults.get_default_config()
+    for key in [
+        'global_cache_override',
+        'schema_cache_configs',
+        'network_cache_configs',
+        'default_cache_config',
+    ]:
+        if key not in upgraded:
+            upgraded[key] = default_config[key]
+    upgraded['config_spec_version'] = '0.3.2'
+
+    return upgraded
+
+
 def omit_extra_version_data(version: str) -> str:
     for substr in ['a', 'b', 'rc']:
         if substr in version:
             index = version.index(substr)
             version = version[:index]
     return version
+

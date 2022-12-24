@@ -91,3 +91,4 @@ async def async_close_http_session(
 
     await asyncio.sleep(0)
     await session.close()
+
