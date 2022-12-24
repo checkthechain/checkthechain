@@ -88,7 +88,7 @@ async def async_upsert_block_transaction_queries(
 
 
 async def async_select_transaction(
-    transaction_hash: str,
+    hash: str,
     *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
@@ -99,7 +99,7 @@ async def async_select_transaction(
     tx: spec.DBTransaction | None = toolsql.select(
         conn=conn,
         table=table,
-        where_equals={'transaction_hash': transaction_hash},
+        where_equals={'hash': hash},
         return_count='one',
         raise_if_table_dne=False,
     )
@@ -108,7 +108,7 @@ async def async_select_transaction(
 
 
 async def async_select_transactions(
-    transaction_hashes: typing.Sequence[str],
+    hashes: typing.Sequence[str],
     *,
     conn: toolsql.SAConnection,
     network: spec.NetworkReference,
@@ -119,16 +119,16 @@ async def async_select_transactions(
     transactions = toolsql.select(
         conn=conn,
         table=table,
-        where_in={'transaction_hash': transaction_hashes},
+        where_in={'hash': hashes},
         raise_if_table_dne=False,
     )
 
     if transactions is None:
         return None
 
-    result = {tx['transaction_hash']: tx for tx in transactions}
+    result = {tx['hash']: tx for tx in transactions}
 
-    return [result.get(tx_hash) for tx_hash in transaction_hashes]
+    return [result.get(tx_hash) for tx_hash in hashes]
 
 
 async def async_select_block_transaction_query(
@@ -212,7 +212,7 @@ async def async_select_block_transaction_queries(
 
 
 async def async_delete_transaction(
-    transaction_hash: str,
+    hash: str,
     *,
     network: spec.NetworkReference,
     conn: toolsql.SAConnection,
@@ -223,18 +223,18 @@ async def async_delete_transaction(
     toolsql.delete(
         conn=conn,
         table=table,
-        where_equals={'transaction_hash': transaction_hash},
+        where_equals={'hash': hash},
     )
 
 
 async def async_delete_transactions(
-    transaction_hashes: typing.Sequence[str],
+    hashes: typing.Sequence[str],
     *,
     network: spec.NetworkReference,
     conn: toolsql.SAConnection,
 ) -> None:
 
-    if len(transaction_hashes) == 0:
+    if len(hashes) == 0:
         return
 
     table = schema_utils.get_table_name('transactions', network=network)
@@ -242,7 +242,7 @@ async def async_delete_transactions(
     toolsql.delete(
         conn=conn,
         table=table,
-        where_in={'transaction_hash': transaction_hashes},
+        where_in={'hash': hashes},
     )
 
 

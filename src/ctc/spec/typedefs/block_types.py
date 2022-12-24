@@ -70,7 +70,35 @@ class Block(TypedDict):
     total_difficulty: str
     transactions: typing.Union[
         typing.List[transaction_types.TransactionHash],
-        typing.List[transaction_types.Transaction],
+        typing.List[transaction_types.DBTransaction],
+    ]
+    transactions_root: binary_types.PrefixHexData
+    uncles: typing.List[BlockHash]
+
+
+# block returned from RPC request
+class RPCBlock(TypedDict):
+    base_fee_per_gas: NotRequired[int | None]
+    difficulty: int
+    extra_data: binary_types.PrefixHexData
+    gas_limit: int
+    gas_used: int
+    hash: BlockHash
+    logs_bloom: binary_types.PrefixHexData
+    miner: address_types.Address
+    mix_hash: BlockHash
+    nonce: binary_types.PrefixHexData
+    number: int
+    parent_hash: BlockHash
+    receipts_root: binary_types.PrefixHexData
+    sha3_uncles: binary_types.PrefixHexData
+    size: int
+    state_root: binary_types.PrefixHexData
+    timestamp: int
+    total_difficulty: str
+    transactions: typing.Union[
+        typing.List[transaction_types.TransactionHash],
+        typing.List[transaction_types.RPCTransaction],
     ]
     transactions_root: binary_types.PrefixHexData
     uncles: typing.List[BlockHash]

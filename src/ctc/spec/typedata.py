@@ -18,6 +18,16 @@ config_keys = (
     'log_sql_queries',
     'cli_color_theme',
     'cli_chart_charset',
+    'global_cache_override',
+    'network_cache_configs',
+    'schema_cache_configs',
+    'default_cache_config',
+)
+
+config_int_subkeys = (
+    'networks',
+    'default_providers',
+    'network_cache_configs',
 )
 
 block_keys = (
@@ -130,7 +140,7 @@ transaction_keys_db = {
     'type',
     'access_list',
     'gas_used',
-    'effective_gas_price',
+    'gas_price',
 }
 
 # removed_rpc_keys = {'v', 'r', 's', 'chain_id'}

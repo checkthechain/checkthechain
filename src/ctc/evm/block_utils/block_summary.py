@@ -37,7 +37,7 @@ async def async_print_block_summary(
         gas_prices = []
         for transaction in block['transactions']:
             if typing.TYPE_CHECKING:
-                transaction = typing.cast(spec.Transaction, transaction)
+                transaction = typing.cast(spec.DBTransaction, transaction)
             gas_prices.append(transaction['gas_price'] / 1e9)
         import numpy as np
 

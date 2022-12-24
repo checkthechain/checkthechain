@@ -6,7 +6,7 @@ from . import transaction_types
 
 
 def serialize_unsigned_transaction(
-    transaction: spec.TransactionData,
+    transaction: spec.PrechainTransaction,
     *,
     chain_id: int | None = None,
 ) -> spec.PrefixHexData:
@@ -42,7 +42,7 @@ def serialize_unsigned_transaction(
 
 
 def serialize_signed_transaction(
-    transaction: spec.TransactionData,
+    transaction: spec.PrechainTransaction,
 ) -> spec.PrefixHexData:
     """serialize signed transaction"""
 
@@ -65,3 +65,4 @@ def serialize_signed_transaction(
 
     # encode as rlp
     return prefix + binary_utils.rlp_encode(as_list, 'raw_hex')
+

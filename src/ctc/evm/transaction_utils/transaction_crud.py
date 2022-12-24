@@ -30,7 +30,7 @@ async def async_get_transaction(
         write_to_db = use_db
     if read_from_db:
         db_tx = await db.async_query_transaction(
-            transaction_hash=transaction_hash,
+            hash=transaction_hash,
             network=network,
         )
         if db_tx is not None:
@@ -52,7 +52,7 @@ async def async_get_transaction(
     tx: spec.DBTransaction = {
         #
         # tx fields
-        'transaction_hash': raw_tx['hash'],
+        'hash': raw_tx['hash'],
         'block_number': raw_tx['block_number'],
         'transaction_index': raw_tx['transaction_index'],
         'to': raw_tx['to'],
@@ -65,7 +65,7 @@ async def async_get_transaction(
         #
         # receipt fields
         'gas_used': raw_receipt['gas_used'],
-        'effective_gas_price': raw_receipt['effective_gas_price'],
+        'gas_price': raw_receipt['effective_gas_price'],
     }
 
     if write_to_db:
@@ -103,7 +103,7 @@ async def async_get_transaction_logs(
 
     from ctc import rpc
 
-    receipt: spec.TransactionReceipt = (
+    receipt: spec.RPCTransactionReceipt = (
         await rpc.async_eth_get_transaction_receipt(transaction_hash)
     )
 

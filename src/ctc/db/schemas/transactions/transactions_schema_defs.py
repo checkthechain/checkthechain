@@ -7,7 +7,7 @@ transactions_schema: toolsql.DBSchema = {
     'tables': {
         'transactions': {
             'columns': [
-                {'name': 'transaction_hash', 'type': 'Text', 'primary': True},
+                {'name': 'hash', 'type': 'Text', 'primary': True},
                 {'name': 'block_number', 'type': 'Integer'},
                 {'name': 'transaction_index', 'type': 'Integer'},
                 {'name': 'to', 'type': 'Text'},
@@ -20,7 +20,7 @@ transactions_schema: toolsql.DBSchema = {
 
                 # receipt related
                 {'name': 'gas_used', 'type': 'Integer'},
-                {'name': 'effective_gas_price', 'type': 'Text'},  # int <-> str
+                {'name': 'gas_price', 'type': 'Text'},  # int <-> str
             ],
         },
         'block_transaction_queries': {

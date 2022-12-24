@@ -144,11 +144,11 @@ schema_datas = [
         'schema_name': 'transactions',
         'selector': db.async_select_transaction,
         'queryer': db.async_query_transaction,
-        'query': {'transaction_hash': '0xaef402056d26796c49a7cdc0be9fa09f193e48458a1829dd788c38a8ae143683'},
+        'query': {'hash': '0xaef402056d26796c49a7cdc0be9fa09f193e48458a1829dd788c38a8ae143683'},
         'plural_selector': db.async_select_transactions,
         'plural_queryer': db.async_query_transactions,
         'plural_query': {
-            'transaction_hashes': [
+            'hashes': [
                 '0xaef402056d26796c49a7cdc0be9fa09f193e48458a1829dd788c38a8ae143683',
                 '0xb451a6aa6a5a0f30b62ea616f581b8f4c9a2e52091a6787591c5941be9995f75',
                 '0x3ccc6a654fd68a2a2303c9ef2a54512890c96376016a50c83f227ef705d27a05',

@@ -44,6 +44,7 @@ rpc_transaction_quantities = [
     'maxPriorityFeePerGas',
     'nonce',
     'transactionIndex',
+    'type',
     'value',
     'v',
 ]
@@ -55,6 +56,7 @@ rpc_transaction_receipt_quantities = [
     'gasUsed',
     'quantity',
     'status',
+    'type',
 ]
 
 rpc_result_scalar_quantities = [

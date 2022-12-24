@@ -34,7 +34,7 @@ async def async_get_transactions_from_address(
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['full'] = 'full',
-) -> typing.Sequence[spec.Transaction]:
+) -> typing.Sequence[spec.DBTransaction]:
     ...
 
 
@@ -42,14 +42,14 @@ async def async_get_transactions_from_address(
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['full', 'dataframe', 'hashes'],
-) -> typing.Sequence[spec.Transaction] | spec.DataFrame | typing.Sequence[str]:
+) -> typing.Sequence[spec.DBTransaction] | spec.DataFrame | typing.Sequence[str]:
     ...
 
 
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['full', 'dataframe', 'hashes'] = 'full',
-) -> typing.Sequence[spec.Transaction] | spec.DataFrame | typing.Sequence[str]:
+) -> typing.Sequence[spec.DBTransaction] | spec.DataFrame | typing.Sequence[str]:
     """get all transactions from an address"""
 
     address = address.lower()
@@ -66,7 +66,7 @@ async def async_get_transactions_from_address(
         n_block_transactions = 0
         for transaction_data in block['transactions']:
             if typing.TYPE_CHECKING:
-                transaction = typing.cast(spec.Transaction, transaction_data)
+                transaction = typing.cast(spec.DBTransaction, transaction_data)
             else:
                 transaction = transaction_data
             if transaction['from'] == address:

@@ -10,7 +10,7 @@ from . import transaction_types
 
 
 def sign_transaction(
-    transaction: spec.TransactionData,
+    transaction: spec.PrechainTransaction,
     *,
     private_key: str,
     chain_id: int | None = None,
@@ -35,7 +35,7 @@ def sign_transaction(
 
 def verify_transaction_signature(
     *,
-    transaction: spec.TransactionData,
+    transaction: spec.PrechainTransaction,
     signature: spec.Signature | None = None,
     public_key: spec.Data | None = None,
     address: spec.Data | None = None,
@@ -72,7 +72,7 @@ def verify_transaction_signature(
 
 
 def recover_transaction_sender(
-    transaction: spec.TransactionData,
+    transaction: spec.PrechainTransaction,
     signature: spec.Signature,
 ) -> spec.Address:
     """recover signing address of transaction from signature

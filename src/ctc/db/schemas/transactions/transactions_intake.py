@@ -11,13 +11,21 @@ from . import transactions_statements
 
 
 async def _async_convert_rpc_transaction_to_db_transaction(
-    transaction: spec.DBTransaction | spec.RPCTransaction,
+    transaction: str | spec.DBTransaction | spec.RPCTransaction,
     provider: spec.ProviderReference,
 ) -> spec.DBTransaction:
 
+    from ctc import rpc
+
+    if isinstance(transaction, str):
+        tx: spec.RPCTransaction = await rpc.async_eth_get_transaction_by_hash(
+            transaction
+        )
+        transaction = tx
+
     if set(transaction.keys()) == spec.transaction_keys_db:
 
-        return transaction
+        return transaction  # type: ignore
 
     else:
 
@@ -25,28 +33,32 @@ async def _async_convert_rpc_transaction_to_db_transaction(
         need_receipt = False
         for k in spec.transaction_keys_db:
             if k not in transaction:
-                if k in ['gas_used', 'effective_gas_price']:
+                if k in ['gas_used', 'gas_price']:
                     need_receipt = True
                 else:
-                    raise Exception('incomplete')
+                    raise Exception('transaction is missing key: ' + str(k))
             else:
                 converted[k] = transaction[k]  # type: ignore
 
         if need_receipt:
-            from ctc import rpc
 
             receipt = await rpc.async_eth_get_transaction_receipt(
-                transaction_hash=transaction['transaction_hash'],
+                transaction_hash=transaction['hash'],
                 provider=provider,
             )
-            for key in ['gas_used', 'effective_gas_price']:
-                converted[key] = receipt[key]
+            for tx_key, receipt_key in [
+                ['gas_used', 'gas_used'],
+                ['gas_price', 'effective_gas_price'],
+            ]:
+                converted[tx_key] = receipt[receipt_key]
 
         return typing.cast(spec.DBTransaction, converted)
 
 
 async def _async_convert_rpc_transactions_to_db_transactions(
-    transactions: typing.Sequence[spec.DBTransaction | spec.RPCTransaction],
+    transactions: typing.Sequence[
+        str | spec.DBTransaction | spec.RPCTransaction
+    ],
     provider: spec.ProviderReference,
 ) -> typing.Sequence[spec.DBTransaction]:
 
@@ -89,7 +101,9 @@ async def async_intake_transactions(
     network, provider = evm.get_network_and_provider(network, provider)
 
     if latest_block is None:
-        latest_block = await evm.async_get_latest_block_number(provider=provider)
+        latest_block = await evm.async_get_latest_block_number(
+            provider=provider
+        )
     required_confirmations = management.get_required_confirmations(network)
     latest_allowed_block = latest_block - required_confirmations
     confirmed_txs = [
@@ -123,7 +137,7 @@ async def async_intake_transactions(
 
 
 async def async_intake_block_transaction_query(
-    block: spec.Block,
+    block: spec.Block | spec.RPCBlock,
     *,
     network: spec.NetworkReference,
     provider: spec.ProviderReference,
@@ -139,7 +153,7 @@ async def async_intake_block_transaction_query(
 
 
 async def async_intake_block_transaction_queries(
-    blocks: typing.Sequence[spec.Block],
+    blocks: typing.Sequence[spec.Block | spec.RPCBlock],
     *,
     network: spec.NetworkReference,
     provider: spec.ProviderReference,
@@ -151,7 +165,9 @@ async def async_intake_block_transaction_queries(
     network, provider = evm.get_network_and_provider(network, provider)
 
     if latest_block is None:
-        latest_block = await evm.async_get_latest_block_number(provider=provider)
+        latest_block = await evm.async_get_latest_block_number(
+            provider=provider
+        )
 
     required_confirmations = management.get_required_confirmations(network)
     latest_allowed_block = latest_block - required_confirmations

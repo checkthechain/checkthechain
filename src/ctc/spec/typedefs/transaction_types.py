@@ -8,35 +8,21 @@ from . import log_types
 from . import binary_types
 
 
-class RawTransaction(TypedDict):
-    pass
-
-
 TransactionHash = binary_types.PrefixHexData
 
-# use literal definition because 'from' is a python keyword
-Transaction = TypedDict(
-    'Transaction',
-    {
-        'hash': TransactionHash,
-        'block_hash': binary_types.PrefixHexData,
-        'block_number': int,
-        'chain_id': binary_types.PrefixHexData,
-        'from': address_types.Address,
-        'gas': int,
-        'gas_price': int,
-        'input': binary_types.PrefixHexData,
-        'nonce': int,
-        'r': binary_types.PrefixHexData,
-        's': binary_types.PrefixHexData,
-        'to': address_types.Address,
-        'transaction_index': int,
-        'type': binary_types.PrefixHexData,
-        'v': int,
-        'value': int,
-    },
-)
+TransactionAccessList = typing.Sequence[
+    typing.Tuple[
+        address_types.Address,
+        typing.Sequence[binary_types.PrefixHexData],
+    ]
+]
 
+
+#
+# # pre-chain transaction types
+#
+
+# these transaction types are either sign-able or submit-able
 
 class LegacyTransaction(TypedDict):
     #
@@ -68,12 +54,7 @@ class EIP2930Transaction(TypedDict):
     to: address_types.Address
     value: int
     input: binary_types.Data
-    access_list: typing.Sequence[
-        typing.Tuple[
-            address_types.Address,
-            typing.Sequence[binary_types.PrefixHexData],
-        ]
-    ]
+    access_list: TransactionAccessList
     #
     # included once sigend
     v: NotRequired[binary_types.Data]
@@ -95,12 +76,7 @@ class EIP1559Transaction(TypedDict):
     to: address_types.Address
     value: int
     input: binary_types.Data
-    access_list: typing.Sequence[
-        typing.Tuple[
-            address_types.Address,
-            typing.Sequence[binary_types.PrefixHexData],
-        ]
-    ]
+    access_list: TransactionAccessList
     #
     # included once sigend
     v: NotRequired[binary_types.Data]
@@ -111,15 +87,48 @@ class EIP1559Transaction(TypedDict):
     type: NotRequired[binary_types.Data]
 
 
-TransactionData = typing.Union[
+PrechainTransaction = typing.Union[
     LegacyTransaction,
     EIP2930Transaction,
     EIP1559Transaction,
 ]
 
 
-TransactionReceipt = TypedDict(
-    'TransactionReceipt',
+#
+# # RPC transaction types
+#
+
+# these transaction types are the results of RPC requests
+
+RPCTransaction = TypedDict(
+    'RPCTransaction',
+    {
+        'block_hash': binary_types.PrefixHexData,
+        'block_number': int,
+        'from': address_types.Address,
+        'gas': int,
+        'gas_price': int,
+        'hash': TransactionHash,
+        'input': binary_types.PrefixHexData,
+        'nonce': int,
+        'to': address_types.Address,
+        'transaction_index': int,
+        'value': int,
+        'type': binary_types.PrefixHexData,
+        'chain_id': binary_types.PrefixHexData,
+        'v': int,
+        'r': binary_types.PrefixHexData,
+        's': binary_types.PrefixHexData,
+        #
+        # newer attributes that may or may not be present
+        'max_priority_fee_per_gas': NotRequired[int],
+        'max_fee_per_gas': NotRequired[int],
+        'access_list': NotRequired[TransactionAccessList],
+    },
+)
+
+RPCTransactionReceipt = TypedDict(
+    'RPCTransactionReceipt',
     {
         'block_hash': str,
         'block_number': int,
@@ -139,10 +148,16 @@ TransactionReceipt = TypedDict(
 )
 
 
+#
+# # DB transaction types
+#
+
+# these transaction types are stored in the ctc DB
+
 DBTransaction = TypedDict(
     'DBTransaction',
     {
-        'transaction_hash': TransactionHash,
+        'hash': TransactionHash,
         'block_number': int,
         'transaction_index': int,
         'to': address_types.Address,
@@ -153,7 +168,7 @@ DBTransaction = TypedDict(
         'type': int,
         'access_list': typing.Sequence[str],
         'gas_used': int,
-        'effective_gas_price': int,
+        'gas_price': int,
     },
 )
 

@@ -12,7 +12,7 @@ def _remove_block_transactions(block: spec.Block) -> spec.Block:
     txs = block['transactions']
     if len(txs) > 0 and isinstance(txs[0], dict):
         if typing.TYPE_CHECKING:
-            full_txs = typing.cast(list[spec.Transaction], txs)
+            full_txs = typing.cast(list[spec.RPCTransaction], txs)
         else:
             full_txs = txs
         tx_hashes = [tx['hash'] for tx in full_txs]
