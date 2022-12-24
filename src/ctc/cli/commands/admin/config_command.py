@@ -101,6 +101,26 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
         config = typing.cast(
             typing.Mapping[str, typing.Any], ctc.config.get_config()
         )
+
+        # print cache config
+        toolstr.print_bullet(
+            key='cache settings', value='', key_style=key_style
+        )
+        for key in [
+            'global_cache_override',
+            'network_cache_configs',
+            'default_cache_config',
+            'schema_cache_configs',
+        ]:
+            toolstr.print_bullet(
+                key=key,
+                value=config[key],
+                key_style=content_style,
+                value_style=content_style,
+                indent=4,
+            )
+
+        # print the rest of the config
         for key in sorted(config.keys()):
 
             if key == 'cli_color_theme':
@@ -227,6 +247,15 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                             + toolstr.add_style(':', chrome_style),
                             toolstr.add_style(str(subvalue), content_style),
                         )
+
+            elif key in [
+                'global_cache_override',
+                'network_cache_configs',
+                'default_cache_config',
+                'schema_cache_configs',
+            ]:
+                continue
+
             else:
                 if key == 'data_dir':
                     style = path_style
@@ -239,3 +268,4 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                     + toolstr.add_style(':', chrome_style),
                     toolstr.add_style(str(config[key]), style),
                 )
+
