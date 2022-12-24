@@ -14,4 +14,3 @@
     - cookiecutter tests in `tests/ctc/db/test_crud_probems.py`
     - additional tests in `tests/ctc/db/db_crud/test_db_<schema_name>.py`
 
-*TODO*: drastically simplify the schema addition process
