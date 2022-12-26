@@ -154,7 +154,7 @@ If your shell's `PATH` does not include python scripts you may need to do someth
 
 Detailed instructions can be found in the [installation documentation](https://ctc.readthedocs.io/en/latest/overview/installation.html).
 
-`ctc` requires python >= 3.7. 
+`ctc` requires python >= 3.7 (supports `3.7`, `3.8`, `3.9`, `3.10`, and `3.11`). 
 
 ## FAQ
 - What are the goals of `ctc`?
