@@ -20,7 +20,7 @@ def construct_eth_call(
     | typing.Mapping[str, typing.Any]
     | None = None,
     function_abi: spec.FunctionABI | None = None,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
 
     if block_number is None:
         block_number = 'latest'

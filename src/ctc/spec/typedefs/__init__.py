@@ -18,5 +18,6 @@ if typing.TYPE_CHECKING or os.environ.get('BUILDING_SPHINX') == '1':
     from .number_types import *
     from .rpc_types import *
     from .storage_types import *
+    from .trace_types import *
     from .transaction_types import *
 

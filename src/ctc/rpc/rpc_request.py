@@ -84,7 +84,7 @@ def log_rpc_response(
         loguru.logger.info('bulk response\n' + entries)
 
 
-def create(method: str, parameters: list[typing.Any]) -> spec.RpcRequest:
+def create(method: str, parameters: list[typing.Any]) -> spec.RpcSingularRequest:
     import random
 
     return {

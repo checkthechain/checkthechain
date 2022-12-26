@@ -9,6 +9,5 @@ from .eth_utils import *
 from .event_utils import *
 from .network_utils import *
 from .transaction_utils import *
+from .trace_utils import *
 
-
-# from .event_utils_new import *

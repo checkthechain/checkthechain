@@ -10,6 +10,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from .. import binary_utils
 
 
 @typing.overload
@@ -141,3 +142,4 @@ def get_network_and_provider(
         raise Exception('internal logic error')
 
     return network_reference, full_provider
+
