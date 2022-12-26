@@ -36,6 +36,7 @@ def construct_trace_raw_transaction(
 # # calls
 #
 
+
 def construct_trace_call(
     to_address: spec.BinaryData,
     *,
@@ -106,6 +107,7 @@ def construct_trace_call_many(
 # # trace ranges
 #
 
+
 def construct_trace_get(
     transaction_hash: str,
     trace_indices: typing.Sequence[int],
@@ -113,6 +115,29 @@ def construct_trace_get(
     return rpc_request.create(
         'trace_get',
         [transaction_hash, trace_indices],
+    )
+
+
+def construct_trace_filter(
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    from_addresses: spec.Address | None = None,
+    to_addresses: spec.Address | None = None,
+    after: int | None = None,
+    count: int | None = None,
+) -> spec.RpcRequest:
+    payload = {
+        'start_block': start_block,
+        'end_block': end_block,
+        'from_addresses': from_addresses,
+        'to_addresses': to_addresses,
+        'after': after,
+        'count': count,
+    }
+    payload = {k: v for k, v in payload.items() if v is not None}
+    return rpc_request.create(
+        'trace_filter',
+        [payload],
     )
 
 

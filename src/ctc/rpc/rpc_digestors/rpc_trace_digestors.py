@@ -163,6 +163,22 @@ def digest_trace_get(
     return response
 
 
+def digest_trace_filter(
+    response: spec.RpcSingularResponse,
+    *,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+
+    if decode_response:
+        _decode_trace_list(response)
+
+    if snake_case_response:
+        _snake_case_trace_list(response)
+
+    return response
+
+
 def digest_trace_block(
     response: spec.RpcSingularResponse,
     *,

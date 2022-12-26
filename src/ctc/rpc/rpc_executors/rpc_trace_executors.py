@@ -144,9 +144,24 @@ async def async_trace_get(
 
 async def async_trace_filter(
     *,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    from_addresses: spec.Address | None = None,
+    to_addresses: spec.Address | None = None,
+    after: int | None = None,
+    count: int | None = None,
     provider: spec.ProviderReference = None,
 ) -> spec.RpcSingularResponse:
-    pass
+    request = rpc_constructors.construct_trace_filter(
+        start_block=start_block,
+        end_block=end_block,
+        from_addresses=from_addresses,
+        to_addresses=to_addresses,
+        after=after,
+        count=count,
+    )
+    response = await rpc_request.async_send(request, provider=provider)
+    return rpc_digestors.digest_trace_filter(response=response)
 
 
 async def async_trace_block(
