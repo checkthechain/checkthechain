@@ -19,43 +19,6 @@ def is_address_str(some_str: typing.Any) -> TypeGuard[spec.Address]:
     )
 
 
-def get_created_address(
-    sender: spec.Address,
-    nonce: int | None = None,
-    *,
-    salt: str | None = None,
-    init_code: spec.HexData | None = None,
-) -> spec.Address:
-    """return address created by EVM opcodes CREATE or CREATE2
-
-    see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md
-    see https://ethereum.stackexchange.com/a/761
-    """
-
-    if nonce is not None:
-        # create
-        data: str | bytes = binary_utils.rlp_encode(
-            (sender, nonce), str_mode='hex'
-        )
-    elif salt is not None and init_code is not None:
-        # create2
-        data = (
-            binary_utils.binary_convert('0xff', 'raw_hex')
-            + binary_utils.binary_convert(sender, 'raw_hex')
-            + binary_utils.binary_convert(salt, 'raw_hex')
-            + binary_utils.binary_convert(
-                binary_utils.keccak(init_code), 'raw_hex'
-            )
-        )
-    else:
-        raise Exception('specify either {nonce} or {salt, init_code}')
-
-    result = binary_utils.keccak(data, output_format='prefix_hex')
-    result = '0x' + result[26:]
-
-    return result
-
-
 def get_address_checksum(address: spec.Address) -> spec.Address:
     """return checksummed version of address str
 

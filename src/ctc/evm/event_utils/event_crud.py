@@ -5,6 +5,7 @@ import typing
 from ctc import spec
 from .. import abi_utils
 from .. import block_utils
+from .. import contract_utils
 from .. import network_utils
 
 if typing.TYPE_CHECKING:
@@ -76,7 +77,7 @@ async def async_get_events(
     if start_block is None:
         if contract_address is None:
             raise Exception('must specify contract_address or start_block')
-        start_block = await block_utils.async_get_contract_creation_block(
+        start_block = await contract_utils.async_get_contract_creation_block(
             contract_address=contract_address,
             provider=provider,
         )

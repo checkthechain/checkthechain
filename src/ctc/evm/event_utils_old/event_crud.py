@@ -6,9 +6,10 @@ from ctc import evm
 from ctc import rpc
 from ctc import spec
 
+from .. import abi_utils
 from .. import binary_utils
 from .. import block_utils
-from .. import abi_utils
+from .. import contract_utils
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -75,7 +76,7 @@ async def async_get_events(
         provider=provider,
     )
     if start_block is None:
-        start_block = await block_utils.async_get_contract_creation_block(
+        start_block = await contract_utils.async_get_contract_creation_block(
             contract_address,
             verbose=verbose,
         )

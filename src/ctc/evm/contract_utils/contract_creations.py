@@ -1,12 +1,51 @@
 """should move this file to evm.contract_utils"""
+
 from __future__ import annotations
 
 import typing
 
 from ctc import spec
-from .. import address_utils
+from .. import binary_utils
+from .. import block_utils
 from .. import transaction_utils
-from . import block_crud
+from . import contract_tests
+
+
+def get_created_address(
+    sender: spec.Address,
+    nonce: int | None = None,
+    *,
+    salt: str | None = None,
+    init_code: spec.HexData | None = None,
+) -> spec.Address:
+    """return address created by EVM opcodes CREATE or CREATE2
+
+    see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md
+    see https://ethereum.stackexchange.com/a/761
+    """
+
+    if nonce is not None:
+        # create
+        data: str | bytes = binary_utils.rlp_encode(
+            (sender, nonce), str_mode='hex'
+        )
+    elif salt is not None and init_code is not None:
+        # create2
+        data = (
+            binary_utils.binary_convert('0xff', 'raw_hex')
+            + binary_utils.binary_convert(sender, 'raw_hex')
+            + binary_utils.binary_convert(salt, 'raw_hex')
+            + binary_utils.binary_convert(
+                binary_utils.keccak(init_code), 'raw_hex'
+            )
+        )
+    else:
+        raise Exception('specify either {nonce} or {salt, init_code}')
+
+    result = binary_utils.keccak(data, output_format='prefix_hex')
+    result = '0x' + result[26:]
+
+    return result
 
 
 async def async_get_contract_creation_transaction(
@@ -131,7 +170,7 @@ async def _async_get_contract_creation_block_from_node(
     if end_block is None:
         end_block = 'latest'
     if start_block == 'latest' or end_block == 'latest':
-        latest_block = await block_crud.async_get_latest_block_number(
+        latest_block = await block_utils.async_get_latest_block_number(
             provider=provider
         )
         if start_block == 'latest':
@@ -150,7 +189,7 @@ async def _async_get_contract_creation_block_from_node(
     async def async_is_match(index: int) -> bool:
         if verbose:
             print('- trying block:', index)
-        return await address_utils.async_is_contract_address(
+        return await contract_tests.async_is_contract_address(
             address=contract_address,
             block=index,
             provider=provider,
