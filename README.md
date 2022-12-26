@@ -33,7 +33,7 @@ For detailed information check out [the documentation](https://ctc.readthedocs.i
   <tbody>
     <tr>
       <td>
-        <b>📜 Legal Disclaimer 📜</b> As stated in the MIT license, <code>ctc</code> comes with no warranty of any kind. The authors of <code>ctc</code> accept no responsibility for any damages or negative outcomes that result from using <code>ctc</code> or <code>ctc</code>-derived data. <code>ctc</code> is not audited and using it as a basis for making financial decisions is not recommended.
+        <b>📜 Legal Disclaimer 📜</b> <code>ctc</code> is available under either the MIT license or the Apache license at your option. As stated in both licenses, <code>ctc</code> comes with no warranty of any kind. The authors of <code>ctc</code> accept no responsibility for any damages or negative outcomes that result from using <code>ctc</code> or <code>ctc</code>-derived data. <code>ctc</code> is not audited and using it as a basis for making financial decisions is not recommended.
       </td>
     </tr>
   </tbody>

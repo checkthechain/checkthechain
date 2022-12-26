@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
 
 #
 # # resources
@@ -20,12 +21,13 @@ name = "checkthechain"
 readme = "README.md"
 requires-python = ">=3.7"
 dynamic = ["version", "description"]
-license = {file = "LICENSE"}
+license = {text = "MIT OR Apache-2.0"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
     "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: MacOS",
