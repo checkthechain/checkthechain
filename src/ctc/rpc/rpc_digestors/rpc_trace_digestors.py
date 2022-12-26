@@ -57,16 +57,19 @@ def _decode_state_diff(state_diff: spec.StateDiffTrace) -> None:
                     raise Exception('unknown subdiff format')
 
 
-def _snake_case_single_trace(trace: typing.Any) -> None:
+def _snake_case_single_trace(trace: typing.Any) -> typing.Any:
     trace['action'] = rpc_format.keys_to_snake_case(trace['action'])
     if trace['result'] is not None:
         trace['result'] = rpc_format.keys_to_snake_case(trace['result'])
+    return rpc_format.keys_to_snake_case(trace)
 
 
-def _snake_case_trace_list(traces: typing.Any) -> None:
+def _snake_case_trace_list(traces: typing.Any) -> typing.Any:
     traces = [rpc_format.keys_to_snake_case(trace) for trace in traces]
-    for trace in traces:
+    return [
         _snake_case_single_trace(trace)
+        for trace in traces
+    ]
 
 
 def _snake_case_trace_collection(traces: typing.Any) -> None:
@@ -79,7 +82,7 @@ def _snake_case_trace_collection(traces: typing.Any) -> None:
         traces['state_diff'] = traces.pop('stateDiff')
 
     if traces['trace'] is not None:
-        _snake_case_trace_list(traces['trace'])
+        traces['trace'] = _snake_case_trace_list(traces['trace'])
 
 
 #
@@ -98,7 +101,7 @@ def digest_trace_transaction(
         _decode_trace_list(response)
 
     if snake_case_response:
-        _snake_case_trace_list(response)
+        response = _snake_case_trace_list(response)
 
     return response
 
@@ -183,7 +186,7 @@ def digest_trace_get(
         _decode_single_trace(response)
 
     if snake_case_response:
-        _snake_case_single_trace(response)
+        response = _snake_case_single_trace(response)
 
     return response
 
@@ -199,7 +202,7 @@ def digest_trace_filter(
         _decode_trace_list(response)
 
     if snake_case_response:
-        _snake_case_trace_list(response)
+        response = _snake_case_trace_list(response)
 
     return response
 
@@ -215,7 +218,7 @@ def digest_trace_block(
         _decode_trace_list(response)
 
     if snake_case_response:
-        _snake_case_trace_list(response)
+        response = _snake_case_trace_list(response)
 
     return response
 

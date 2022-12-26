@@ -1,10 +1,41 @@
+"""should move this file to evm.contract_utils"""
 from __future__ import annotations
 
 import typing
 
 from ctc import spec
 from .. import address_utils
+from .. import transaction_utils
 from . import block_crud
+
+
+async def async_get_contract_creation_transaction(
+    contract_address: spec.Address,
+) -> spec.TransactionHash:
+    """get hash of contract's creation transaction"""
+    from ctc import rpc
+
+    creation_block = await async_get_contract_creation_block(contract_address)
+    if creation_block is None:
+        raise Exception('could not determine creation block of contract')
+    trace_block: spec.TraceList = await rpc.async_trace_block(creation_block)
+    for item in trace_block:
+        if (
+            item['type'] == 'create'
+            and item['result']['address'] == contract_address  # type: ignore
+        ):
+            return item['transaction_hash']
+    else:
+        raise Exception('could not find creation transaction for contract')
+
+
+async def async_get_contract_deployer(
+    contract_address: spec.Address,
+) -> spec.Address:
+    """get EOA deployer of contract"""
+    tx_hash = await async_get_contract_creation_transaction(contract_address)
+    tx = await transaction_utils.async_get_transaction(tx_hash)
+    return tx['from']
 
 
 async def async_get_contract_creation_block(
@@ -138,3 +169,4 @@ async def _async_get_contract_creation_block_from_node(
         print('result:', result)
 
     return result
+

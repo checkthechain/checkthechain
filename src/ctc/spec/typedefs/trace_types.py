@@ -99,7 +99,7 @@ class SingleTrace(TypedDict):
     trace_address: typing.Sequence[int]
     transaction_hash: str
     transaction_position: int
-    type: TraceOutputType
+    type: TraceItemType
 
 
 TraceList = typing.Sequence[SingleTrace]
