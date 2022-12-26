@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import typing
 
+from ctc import evm
 from ctc import spec
 
 
@@ -21,10 +22,8 @@ def get_provider(provider: spec.ProviderReference = None) -> spec.Provider:
             if ctc.config.has_provider(url=provider):
                 return ctc.config.get_provider(url=provider)
             else:
-                from ctc.config import config_defaults
-
                 try:
-                    network = config_defaults._sync_get_chain_id(provider)
+                    network = _sync_get_chain_id(provider)
                 except Exception:
                     raise Exception('could not determine chain_id of provider')
 
@@ -106,6 +105,23 @@ def get_provider_network(provider: spec.ProviderReference) -> spec.ChainId:
             return evm.get_network_chain_id(network)
     else:
         raise spec.CouldNotDetermineNetwork('could not determine network')
+
+
+def _sync_get_chain_id(provider_url: str) -> int:
+    import json
+    import urllib.request
+
+    data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
+    encoded_data = json.dumps(data).encode()
+    request = urllib.request.Request(
+        provider_url,
+        data=encoded_data,
+        headers={'User-Agent': 'python3'},
+    )
+    response = urllib.request.urlopen(request)
+    response_data = json.loads(response.read().decode())
+    raw_chain_id = response_data['result']
+    return evm.binary_convert(raw_chain_id, 'integer')
 
 
 def add_provider_parameters(

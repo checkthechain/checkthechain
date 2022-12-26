@@ -9,7 +9,6 @@ import os
 import typing
 
 import ctc
-from ctc import evm
 from ctc import spec
 
 if typing.TYPE_CHECKING:
@@ -77,7 +76,9 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
                 pass
         if chain_id is None:
             try:
-                chain_id = _sync_get_chain_id(eth_rpc_url)
+                from ctc.rpc import rpc_provider
+
+                chain_id = rpc_provider._sync_get_chain_id(eth_rpc_url)
             except Exception:
                 print(
                     '[WARNING] not using value in ETH_RPC_URL because could not determine its chain_id (value = '
@@ -105,23 +106,6 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
             'convert_reverts_to_none': False,
         }
         default_config['default_providers'][chain_id] = provider_name  # type: ignore
-
-
-def _sync_get_chain_id(provider_url: str) -> int:
-    import json
-    import urllib.request
-
-    data = {'jsonrpc': '2.0', 'method': 'eth_chainId', 'params': [], 'id': 1}
-    encoded_data = json.dumps(data).encode()
-    request = urllib.request.Request(
-        provider_url,
-        data=encoded_data,
-        headers={'User-Agent': 'python3'},
-    )
-    response = urllib.request.urlopen(request)
-    response_data = json.loads(response.read().decode())
-    raw_chain_id = response_data['result']
-    return evm.binary_convert(raw_chain_id, 'integer')
 
 
 def get_default_data_dir() -> str:
