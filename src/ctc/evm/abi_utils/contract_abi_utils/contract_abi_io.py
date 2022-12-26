@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from ctc import spec
 
-from ... import address_utils
+from ... import contract_utils
 from . import contract_abi_modification
 
 
@@ -30,6 +30,7 @@ async def async_get_contract_abi(
 
     if network is None:
         from ctc import rpc
+
         network = rpc.get_provider_network(provider)
 
     # load from db
@@ -57,7 +58,7 @@ async def async_get_contract_abi(
         provider = {'network': network}
     if proxy_implementation is None:
         proxy_implementation = (
-            await address_utils.async_get_proxy_implementation(
+            await contract_utils.async_get_proxy_implementation(
                 contract_address=contract_address,
                 provider=provider,
                 block=block,
@@ -87,3 +88,4 @@ async def async_get_contract_abi(
         )
 
     return abi
+

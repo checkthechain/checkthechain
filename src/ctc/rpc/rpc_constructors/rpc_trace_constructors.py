@@ -8,7 +8,7 @@ from .. import rpc_request
 
 def construct_trace_transaction(
     transaction_hash: str,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_transaction',
         [transaction_hash],
@@ -18,7 +18,7 @@ def construct_trace_transaction(
 def construct_trace_replay_transaction(
     transaction_hash: str,
     trace_type: typing.Sequence[spec.TraceOutputType],
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_replayTransaction',
         [transaction_hash, trace_type],
@@ -28,7 +28,7 @@ def construct_trace_replay_transaction(
 def construct_trace_raw_transaction(
     call_data: str,
     trace_type: typing.Sequence[spec.TraceOutputType],
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     raise NotImplementedError()
 
 
@@ -77,7 +77,7 @@ def construct_trace_call_many(
     trace_type: typing.Sequence[spec.TraceOutputType] | None,
     *,
     block_number: spec.BlockNumberReference | None = None,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     """not an efficient implementation"""
 
     subrequests = []
@@ -111,7 +111,7 @@ def construct_trace_call_many(
 def construct_trace_get(
     transaction_hash: str,
     trace_indices: typing.Sequence[int],
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_get',
         [transaction_hash, trace_indices],
@@ -126,7 +126,7 @@ def construct_trace_filter(
     to_addresses: spec.Address | None = None,
     after: int | None = None,
     count: int | None = None,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     payload = {
         'start_block': start_block,
         'end_block': end_block,
@@ -144,7 +144,7 @@ def construct_trace_filter(
 
 def construct_trace_block(
     block_number: spec.BlockNumberReference,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_block',
         [block_number],
@@ -154,7 +154,7 @@ def construct_trace_block(
 def construct_trace_replay_block_transactions(
     block_number: spec.BlockNumberReference,
     trace_type: typing.Sequence[spec.TraceOutputType] | None,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_replayBlockTransactions',
         [block_number, trace_type],

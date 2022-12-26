@@ -4,15 +4,17 @@ from ctc import spec
 from .. import rpc_request
 
 
-def construct_eth_gas_price() -> spec.RpcRequest:
+def construct_eth_gas_price() -> spec.RpcSingularRequest:
     return rpc_request.create('eth_gasPrice', [])
 
 
-def construct_eth_accounts() -> spec.RpcRequest:
+def construct_eth_accounts() -> spec.RpcSingularRequest:
     return rpc_request.create('eth_accounts', [])
 
 
-def construct_eth_sign(address: spec.Address, message: str) -> spec.RpcRequest:
+def construct_eth_sign(
+    address: spec.Address, message: str
+) -> spec.RpcSingularRequest:
     return rpc_request.create('eth_sign', [address, message])
 
 
@@ -25,7 +27,7 @@ def construct_eth_sign_transaction(
     gas_price: int | None = None,
     value: int | None = None,
     nonce: str | None = None,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
 
     parameters = {
         'from': from_address,
@@ -50,7 +52,7 @@ def construct_eth_send_transaction(
     gas_price: int | None = None,
     value: int | None = None,
     nonce: spec.BinaryData | None = None,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     parameters = {
         'from': from_address,
         'to': to_address,
@@ -67,5 +69,6 @@ def construct_eth_send_transaction(
 
 def construct_eth_send_raw_transaction(
     data: spec.BinaryData,
-) -> spec.RpcRequest:
+) -> spec.RpcSingularRequest:
     return rpc_request.create('eth_sendRawTransaction', [data])
+
