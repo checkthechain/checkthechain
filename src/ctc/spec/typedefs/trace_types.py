@@ -106,10 +106,8 @@ TraceList = typing.Sequence[SingleTrace]
 
 
 IntegerStateDiffEqual = Literal['=']
-IntegerStateDiffMult = TypedDict(
-    'IntegerStateDiffMult',
-    {'from': int, 'to': int},
-)
+IntegerFromTo = TypedDict('IntegerFromTo', {'from': int, 'to': int})
+IntegerStateDiffMult = TypedDict('IntegerStateDiffMult', {'*': IntegerFromTo})
 IntegerStateDiffAdd = TypedDict(
     'IntegerStateDiffAdd',
     {'+': int},
@@ -126,10 +124,11 @@ IntegerStateDiff = typing.Union[
 
 
 BinaryStateDiffEqual = Literal['=']
-BinaryStateDiffMult = TypedDict(
-    'BinaryStateDiffMult',
+BinaryFromTo = TypedDict(
+    'BinaryFromTo',
     {'from': binary_types.PrefixHexData, 'to': binary_types.PrefixHexData},
 )
+BinaryStateDiffMult = TypedDict('BinaryStateDiffMult', {'*': BinaryFromTo})
 BinaryStateDiffAdd = TypedDict(
     'BinaryStateDiffAdd',
     {'+': binary_types.PrefixHexData},

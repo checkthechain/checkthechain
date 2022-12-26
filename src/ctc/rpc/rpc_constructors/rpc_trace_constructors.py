@@ -119,6 +119,7 @@ def construct_trace_get(
 
 
 def construct_trace_filter(
+    *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     from_addresses: spec.Address | None = None,

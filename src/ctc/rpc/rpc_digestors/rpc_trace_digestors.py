@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import typing
-from ctc import spec
 
+from ctc import evm
+from ctc import spec
 from .. import rpc_format
 
 
@@ -31,6 +32,29 @@ def _decode_trace_list(traces: typing.Any) -> None:
 def _decode_trace_collection(traces: typing.Any) -> None:
     if traces['trace'] is not None:
         _decode_trace_list(traces['trace'])
+    if traces.get('stateDiff') is not None:
+        _decode_state_diff(traces['stateDiff'])
+
+
+def _decode_state_diff(state_diff: spec.StateDiffTrace) -> None:
+
+    for diff in state_diff.values():
+        for key in ['balance', 'nonce']:
+            subdiff = diff[key]  # type: ignore
+            if isinstance(subdiff, dict):
+                if '+' in subdiff:
+                    subdiff['+'] = evm.binary_convert(subdiff['+'], 'integer')
+                elif '*' in subdiff:
+                    subdiff['*']['to'] = evm.binary_convert(
+                        subdiff['*']['to'], 'integer'
+                    )
+                    subdiff['*']['from'] = evm.binary_convert(
+                        subdiff['*']['from'], 'integer'
+                    )
+                elif '-' in subdiff:
+                    subdiff['-'] = evm.binary_convert(subdiff['-'], 'integer')
+                else:
+                    raise Exception('unknown subdiff format')
 
 
 def _snake_case_single_trace(trace: typing.Any) -> None:
@@ -146,6 +170,7 @@ def digest_trace_call_many(
 #
 # # trace ranges
 #
+
 
 def digest_trace_get(
     response: spec.RpcSingularResponse,
