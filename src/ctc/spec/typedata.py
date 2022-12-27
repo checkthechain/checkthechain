@@ -30,6 +30,12 @@ config_int_subkeys = (
     'network_cache_configs',
 )
 
+context_keys = (
+    'network',
+    'provider',
+    'cache',
+)
+
 block_keys = (
     'base_fee_per_gas',
     'difficulty',

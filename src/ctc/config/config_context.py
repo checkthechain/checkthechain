@@ -71,6 +71,7 @@
 - specify additional primary data sources
     - BigQuery
     - theGraph
+    - non-rpc interface to erigon or reth
 - specify multiple caches
 - specify communication protocols
     - websocket
@@ -98,17 +99,19 @@ from ctc import rpc
 
 def get_context_chain_id(context: spec.Context) -> spec.ChainId:
     """get chain_id of a given context"""
+    _validate_context(context)
     chain_id, provider = _get_context_network_and_provider(context=context)
     return chain_id
 
 
 def get_context_provider(context: spec.Context) -> spec.Provider:
     """get provider of a given context"""
+    _validate_context(context)
     chain_id, provider = _get_context_network_and_provider(context=context)
     return provider
 
 
-def get_schema_cache_context(
+def get_context_schema_cache(
     *,
     schema_name: spec.SchemaName,
     chain_id: spec.ChainId | None,
@@ -118,6 +121,9 @@ def get_schema_cache_context(
 
     cache_id==None indicates no cache
     """
+
+    _validate_context(context)
+
     if chain_id is None:
         from ctc import db
 
@@ -134,8 +140,10 @@ def get_schema_cache_context(
 def get_full_context(context: spec.Context) -> spec.FullContext:
     """expand given context to its full context with all fields shown
 
-    it is less computationally expensive to retrieve partial contexts
+    this is more computationally expensive than retrieving partial contexts
     """
+
+    _validate_context(context)
 
     chain_id, provider = _get_context_network_and_provider(context)
     cache = _get_all_context_cache_configs(context=context, chain_id=chain_id)
@@ -145,6 +153,18 @@ def get_full_context(context: spec.Context) -> spec.FullContext:
         'provider': provider,
         'cache': cache,
     }
+
+
+def _validate_context(context: spec.Context) -> None:
+
+    if isinstance(context, dict):
+        if not set(context.keys()).issubset(spec.context_keys):
+            raise Exception(
+                'invalid keys for context: '
+                + str(set(context.keys()) - set(spec.context_keys))
+                + ', valid keys are: '
+                + str(set(spec.context_keys))
+            )
 
 
 def _get_context_network_and_provider(
