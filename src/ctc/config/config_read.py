@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 
 import ctc
 from ctc import spec
+from . import config_overrides
 from . import config_spec
 from . import config_validate
 from . import upgrade_utils
@@ -84,6 +85,7 @@ def get_config(
             use_env_variables=True,
         )  # type: ignore
 
+    # auto-upgrade config if need be
     config_version = config_from_file.get('config_spec_version')
     if config_version is not None:
         config_stable_version = upgrade_utils.get_stable_version(config_version)
@@ -108,6 +110,10 @@ def get_config(
             }
 
     config = config_from_file
+
+    # add config overrides
+    overrides = config_overrides.get_config_overrides()
+    config.update(overrides)
 
     # validate
     config_validate.validate_config(config)
@@ -146,4 +152,21 @@ def get_config_version_tuple(
             return (config_version[0], config_version[1], config_version[2])
 
     raise Exception('could not detect config version')
+
+
+def reset_config_cache() -> None:
+    for cache_function in _get_config_cache_functions():
+        cache_function.cache_clear()
+
+
+def _get_config_cache_functions() -> typing.Sequence[
+    functools._lru_cache_wrapper[typing.Any]
+]:
+    from . import config_values
+
+    return [
+        get_config,  # type: ignore
+        config_values.get_all_cache_configs,
+        config_values.get_schema_cache_config,
+    ]
 
