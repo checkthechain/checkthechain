@@ -23,7 +23,7 @@ def clear_config_override(key: str) -> None:
     config_read.reset_config_cache()
 
 
-def clear_all_config_overrides(key: str) -> None:
+def clear_all_config_overrides() -> None:
     for key in list(_config_overrides.keys()):
         del _config_overrides[key]  # type: ignore
     config_read.reset_config_cache()

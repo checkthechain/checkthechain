@@ -113,7 +113,9 @@ def get_config(
 
     # add config overrides
     overrides = config_overrides.get_config_overrides()
-    config.update(overrides)
+    if len(overrides) > 0:
+        config = config.copy()
+        config.update(overrides)
 
     # validate
     config_validate.validate_config(config)

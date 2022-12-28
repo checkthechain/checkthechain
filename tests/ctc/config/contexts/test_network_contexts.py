@@ -163,6 +163,10 @@ def set_example_context_config():
     for key, value in example_context_config.items():
         ctc.config.set_config_override(key=key, value=value)
 
+    yield
+
+    ctc.config.clear_all_config_overrides()
+
 
 @pytest.mark.parametrize('test', example_context_tests)
 def test_get_context_chain_id(test, set_example_context_config):
