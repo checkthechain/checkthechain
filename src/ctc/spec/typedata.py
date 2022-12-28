@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+from typing_extensions import Literal
+
 
 config_keys = (
     'config_spec_version',
@@ -34,6 +36,12 @@ context_keys = (
     'network',
     'provider',
     'cache',
+)
+
+context_cache_keys: tuple[Literal['backend', 'read', 'write'], ...] = (
+    'backend',
+    'read',
+    'write',
 )
 
 block_keys = (

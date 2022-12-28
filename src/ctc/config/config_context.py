@@ -90,8 +90,6 @@
 
 from __future__ import annotations
 
-import typing
-
 from ctc import config
 from ctc import spec
 from ctc import rpc
@@ -114,12 +112,12 @@ def get_context_provider(context: spec.Context) -> spec.Provider:
 def get_context_schema_cache(
     *,
     schema_name: spec.SchemaName,
-    chain_id: spec.ChainId | None,
     context: spec.Context,
-) -> tuple[spec.CacheId | None, bool, bool]:
-    """get cache_id, read_cache, and write_cache according to given context
+    chain_id: spec.ChainId | None = None,
+) -> tuple[spec.CacheBackend | None, bool, bool]:
+    """get cache backend, read, and write according to given context
 
-    cache_id==None indicates no cache
+    backend==None indicates no cache
     """
 
     _validate_context(context)
@@ -129,12 +127,14 @@ def get_context_schema_cache(
 
         if schema_name in db.get_network_schema_names():
             chain_id = config.get_default_network()
+
     cache = _get_context_cache_config(
         schema_name=schema_name,
         chain_id=chain_id,
         context=context,
     )
-    return cache['cache'], cache['read_cache'], cache['write_cache']
+
+    return cache['backend'], cache['read'], cache['write']
 
 
 def get_full_context(context: spec.Context) -> spec.FullContext:
@@ -156,6 +156,7 @@ def get_full_context(context: spec.Context) -> spec.FullContext:
 
 
 def _validate_context(context: spec.Context) -> None:
+    """validate user-given context specification"""
 
     if isinstance(context, dict):
         if not set(context.keys()).issubset(spec.context_keys):
@@ -271,86 +272,55 @@ def _get_context_cache_config(
     chain_id: spec.ChainId | None,
     schema_name: spec.SchemaName,
 ) -> spec.SingleCacheContext:
-
-    cache_config = config.get_schema_cache_config(
+    config_cache = config.get_schema_cache_config(
         schema_name=schema_name,
         chain_id=chain_id,
     )
-
-    # chain_id already determined, so cache only affected if context also a dict
     if isinstance(context, dict):
-        import copy
+        return _resolve_context_cache(
+            output=config_cache.copy(),
+            context_cache=context.get('cache'),
+            schema_name=schema_name,
+        )
+    else:
+        return config_cache
 
-        cache_config = copy.copy(cache_config)
 
-        cache = context.get('cache')
+def _resolve_context_cache(
+    *,
+    output: spec.SingleCacheContext,
+    context_cache: spec.CacheContextShorthand | None,
+    schema_name: spec.SchemaName,
+    allow_nesting: bool = True,
+) -> spec.SingleCacheContext:
 
-        # case: read_cache or write_cache specified
-        keys: typing.Sequence[typing.Literal['read_cache', 'write_cache']] = [
-            'read_cache',
-            'write_cache',
-        ]
-        # key: typing.Literal['read_cache', 'write_cache']
-        # for key in ['read_cache', 'write_cache']:
-        for key in keys:
-            value = context.get(key)
-            if value is None:
-                continue
-            if cache is not None:
-                raise Exception(
-                    'context should not specify both cache and read_cache'
-                )
-            if isinstance(value, bool):
-                cache_config[key] = value
-            else:
-                raise Exception(
-                    'invalid type for ' + key + ': ' + str(type(value))
-                )
+    if context_cache is None:
+        return output
+    elif isinstance(context_cache, bool):
+        output['read'] = context_cache
+        output['write'] = context_cache
+        return output
+    elif isinstance(context_cache, str):
+        output['backend'] = context_cache
+        return output
+    elif isinstance(context_cache, dict):
+        keys = set(context_cache.keys())
+        if keys.issubset(spec.context_cache_keys):
+            for key in spec.context_cache_keys:
+                if context_cache.get(key) is not None:
+                    output[key] = context_cache[key]
+            return output
+        elif allow_nesting:
+            from ctc import db
 
-        # case: cache is specified
-        if cache is not None:
+            if not keys.issubset(db.get_all_schema_names()):
+                raise Exception('some keys in cache spec are unknown')
+            return _resolve_context_cache(
+                output=output,
+                context_cache=context_cache.get(schema_name),
+                schema_name=schema_name,
+                allow_nesting=False,
+            )
 
-            # subcase: cache is a bool
-            if isinstance(cache, bool):
-                cache_config['read_cache'] = cache
-                cache_config['write_cache'] = cache
-
-            # subcase: cache is a str
-            elif isinstance(cache, str):
-                cache_config['cache'] = cache
-                cache_config['read_cache'] = True
-                cache_config['write_cache'] = True
-
-            # subcase: cache is a dict
-            elif isinstance(cache, dict):
-
-                cache_keys = ['read_cache', 'write_cache', 'cache']
-                if any(key in cache for key in cache_keys):
-                    raise Exception(
-                        'wrong level of nesting used for cache context'
-                    )
-
-                if schema_name in cache:
-                    if isinstance(cache[schema_name], bool):
-                        cache_config['read_cache'] = cache[schema_name]
-                        cache_config['write_cache'] = cache[schema_name]
-
-                    elif isinstance(cache[schema_name], str):
-                        cache_config['cache'] = cache[schema_name]
-                        cache_config['read_cache'] = True
-                        cache_config['write_cache'] = True
-
-                    elif isinstance(cache[schema_name], dict):
-                        cache_config.update(cache[schema_name])
-
-                    else:
-                        raise Exception(
-                            'unknown type for cache: '
-                            + str(type(cache[schema_name]))
-                        )
-
-            else:
-                raise Exception('unknown type for cache: ' + str(type(cache)))
-
-    return cache_config
+    raise Exception('unknown cache format: ' + str(context_cache))
 

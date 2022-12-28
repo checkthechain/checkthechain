@@ -9,23 +9,14 @@ from . import network_types
 
 
 class PartialContext(TypedDict, total=False):
-    provider: rpc_types.ProviderReference
     network: network_types.NetworkReference
-    #
-    # cache settings
-    cache: bool | CacheId | typing.Mapping[
-        db_types.SchemaName,
-        bool | CacheId | SingleCacheContext,
-    ]
-    read_cache: bool
-    write_cache: bool
+    provider: rpc_types.ProviderReference
+    cache: 'CacheContextShorthand'
 
 
 class FullContext(TypedDict):
-    provider: rpc_types.Provider
     network: network_types.ChainId
-    #
-    # cache settings
+    provider: rpc_types.Provider
     cache: MultiCacheContext
 
 
@@ -44,13 +35,14 @@ Context = typing.Union[
 # # cache configuration
 #
 
-CacheId = str
+# name of cache backend, e.g. 'local_sqlite' or 'local_postgres'
+CacheBackend = str
 
 
 class SingleCacheContext(TypedDict):
-    cache: CacheId
-    read_cache: bool
-    write_cache: bool
+    backend: CacheBackend
+    read: bool
+    write: bool
 
 
 MultiCacheContext = typing.Mapping[
@@ -65,9 +57,9 @@ MutableMultiCacheContext = typing.MutableMapping[
 
 
 class PartialSingleCacheContext(TypedDict, total=False):
-    cache: CacheId
-    read_cache: bool
-    write_cache: bool
+    backend: CacheBackend
+    read: bool
+    write: bool
 
 
 PartialMultiCacheContext = typing.Mapping[
@@ -75,9 +67,13 @@ PartialMultiCacheContext = typing.Mapping[
     PartialSingleCacheContext,
 ]
 
-
-class SingleCacheContextShorthand(TypedDict, total=False):
-    cache: bool | CacheId
-    read_cache: bool
-    write_cache: bool
+CacheContextShorthand = typing.Union[
+    None,
+    bool,
+    CacheBackend,
+    typing.Mapping[
+        db_types.SchemaName,
+        typing.Union[bool, CacheBackend, SingleCacheContext],
+    ],
+]
 

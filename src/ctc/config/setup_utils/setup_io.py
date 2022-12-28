@@ -109,9 +109,9 @@ def write_new_config(
         'network_cache_configs': {},
         'schema_cache_configs': {},
         'default_cache_config': {
-            'cache': 'main',
-            'read_cache': True,
-            'write_cache': True,
+            'backend': 'main',
+            'read': True,
+            'write': True,
         },
     }
     print()
