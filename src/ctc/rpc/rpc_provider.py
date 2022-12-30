@@ -116,7 +116,10 @@ def _sync_get_chain_id(provider_url: str) -> int:
     request = urllib.request.Request(
         provider_url,
         data=encoded_data,
-        headers={'User-Agent': 'python3'},
+        headers={
+            'User-Agent': 'python3',
+            'Content-Type': 'application/json',
+        },
     )
     response = urllib.request.urlopen(request)
     response_data = json.loads(response.read().decode())
