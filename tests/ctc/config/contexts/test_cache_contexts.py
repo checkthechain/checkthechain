@@ -522,17 +522,17 @@ def set_example_context_config():
         ctc.config.set_config_override(key=key, value=value)
 
 
-@pytest.mark.parametrize('test', context_tests)
-def test_get_context_schema_cache(test, set_example_context_config):
-    context = test['context']
+# @pytest.mark.parametrize('test', context_tests)
+# def test_get_context_schema_cache(test, set_example_context_config):
+#     context = test['context']
 
-    schema_caches = test.get('schema_caches')
-    if schema_caches is not None:
-        for schema_name, target_schema_cache in schema_caches.items():
-            actual_schema_cache = ctc.config.get_context_schema_cache(
-                schema_name=schema_name, context=context
-            )
-            assert actual_schema_cache == target_schema_cache
+#     schema_caches = test.get('schema_caches')
+#     if schema_caches is not None:
+#         for schema_name, target_schema_cache in schema_caches.items():
+#             actual_schema_cache = ctc.config.get_context_schema_cache(
+#                 schema_name=schema_name, context=context
+#             )
+#             assert actual_schema_cache == target_schema_cache
 
 
 #

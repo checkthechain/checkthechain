@@ -5,8 +5,11 @@ from ctc import spec
 
 def get_aave_address(
     name: str,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> spec.Address:
+    from ctc import config
+
+    network = config.get_context_chain_id(context)
     # TODO: move to directory
     if network in ('mainnet', 1):
         if name == 'PriceOracle':
@@ -23,3 +26,4 @@ def get_aave_address(
             raise Exception('unknown contract: ' + str(name))
     else:
         raise Exception('invalid network: ' + str(network))
+

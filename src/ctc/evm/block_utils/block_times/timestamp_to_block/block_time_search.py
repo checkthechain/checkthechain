@@ -20,7 +20,7 @@ async def _async_get_block_of_timestamp_from_node(
     *,
     nary: typing.Optional[int] = None,
     cache: typing.Optional[BlockTimestampSearchCache] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     mode: Literal['<=', '>=', '=='] = '>=',
     verbose: bool = True,
     use_db_assist: bool = True,
@@ -54,11 +54,9 @@ async def _async_get_block_of_timestamp_from_node(
     end_index: int | None = None
     if use_db_assist:
         from ctc import db
-        from ctc import rpc
 
-        network = rpc.get_provider_network(provider)
         result = await db.async_query_timestamp_block_range(
-            timestamp, network=network
+            timestamp, context=context
         )
         if result is not None:
             start_index, end_index = result
@@ -68,7 +66,7 @@ async def _async_get_block_of_timestamp_from_node(
         start_index = 1
     if end_index is None:
         end_index = await block_crud.async_get_latest_block_number(
-            provider=provider
+            context=context,
         )
 
     try:
@@ -113,7 +111,7 @@ async def _async_is_match_block_of_timestamp(
     timestamp: int,
     *,
     cache: BlockTimestampSearchCache,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[bool]:
 
     # retrieve values not in cache
@@ -122,7 +120,7 @@ async def _async_is_match_block_of_timestamp(
         for block_number in block_numbers
         if block_number not in cache['timestamps']
     ]
-    gotten = await block_crud.async_get_blocks(not_in_cache, provider=provider)
+    gotten = await block_crud.async_get_blocks(not_in_cache, context=context)
     for block_number, block in zip(not_in_cache, gotten):
         cache['timestamps'][block_number] = block['timestamp']
 

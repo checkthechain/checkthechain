@@ -13,10 +13,10 @@ async def async_upsert_block_timestamp(
     conn: toolsql.SAConnection,
     block_number: int,
     timestamp: int,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -30,7 +30,7 @@ async def async_upsert_block_timestamps(
     conn: toolsql.SAConnection,
     block_timestamps: typing.Mapping[int, int] | None = None,
     blocks: typing.Sequence[spec.Block] | None = None,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     if block_timestamps is None:
@@ -44,7 +44,7 @@ async def async_upsert_block_timestamps(
         {'block_number': block_number, 'timestamp': timestamp}
         for block_number, timestamp in block_timestamps.items()
     ]
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -57,10 +57,10 @@ async def async_delete_block_timestamp(
     *,
     conn: toolsql.SAConnection,
     block_number: typing.Sequence[int],
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -73,10 +73,10 @@ async def async_delete_block_timestamps(
     *,
     conn: toolsql.SAConnection,
     block_numbers: typing.Sequence[int],
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -94,10 +94,10 @@ async def async_select_block_timestamp(
     block_number: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
 
     result = toolsql.select(
         conn=conn,
@@ -117,10 +117,10 @@ async def async_select_block_timestamps(
     block_numbers: typing.Sequence[typing.SupportsInt],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> list[int | None] | None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
 
     block_numbers_int = [int(item) for item in block_numbers]
 
@@ -146,10 +146,10 @@ async def async_select_block_timestamps(
 async def async_select_max_block_number(
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
     result = toolsql.select(
         conn=conn,
         table=table,
@@ -170,10 +170,10 @@ async def async_select_max_block_number(
 async def async_select_max_block_timestamp(
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
     result = toolsql.select(
         conn=conn,
         table=table,
@@ -196,7 +196,7 @@ async def async_select_timestamp_block_range(
     timestamp: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> tuple[int | None, int | None]:
     """return block range that must contain timestamp
 
@@ -207,7 +207,7 @@ async def async_select_timestamp_block_range(
     if type(timestamp).__name__.startswith('int'):
         timestamp = int(timestamp)
 
-    table = schema_utils.get_table_name('block_timestamps', network=network)
+    table = schema_utils.get_table_name('block_timestamps', context=context)
     lower_bound = toolsql.select(
         conn=conn,
         table=table,

@@ -19,7 +19,7 @@ async def async_get_block_of_timestamp(
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     verbose: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     use_db: bool = True,
     use_db_assist: bool = True,
     mode: typing.Literal['<=', '>=', '=='] = '>=',
@@ -46,13 +46,11 @@ async def async_get_block_of_timestamp(
         # db
         if use_db:
             from ctc import db
-            from ctc import rpc
 
-            network = rpc.get_provider_network(provider=provider)
             block = await db.async_query_timestamp_block(
-                network=network,
                 timestamp=timestamp,
                 mode=mode,
+                context=context,
             )
             if block is not None:
                 return block
@@ -63,7 +61,7 @@ async def async_get_block_of_timestamp(
             nary=nary,
             cache=cache,
             verbose=verbose,
-            provider=provider,
+            context=context,
             mode=mode,
             use_db_assist=use_db_assist,
         )
@@ -104,7 +102,7 @@ async def async_get_block_number_and_time(
     *,
     block_number: typing.Optional[spec.BlockNumberReference] = None,
     block_timestamp: typing.Optional[tooltime.Timestamp] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> tuple[int, int]:
     """get block number and timestamp corresponding to given input"""
 
@@ -113,16 +111,16 @@ async def async_get_block_number_and_time(
 
     if block_number is not None:
         block = await block_crud.async_get_block(
-            block_number, provider=provider
+            block_number, context=context
         )
         return block['number'], block['timestamp']
 
     elif block_timestamp is not None:
         block_number = await async_get_block_of_timestamp(
-            block_timestamp, provider=provider
+            block_timestamp, context=context
         )
         block = await block_crud.async_get_block(
-            block_number, provider=provider
+            block_number, context=context
         )
         return block['number'], block['timestamp']
 

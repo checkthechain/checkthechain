@@ -21,16 +21,16 @@ def get_call_contract(call: multicall_spec.Call) -> spec.Address:
 
 async def async_encode_call(
     call: multicall_spec.Call,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> tuple[spec.Address, spec.BinaryData]:
     contract = get_call_contract(call)
-    call_data = await async_encode_call_data(call=call, network=network)
+    call_data = await async_encode_call_data(call=call, context=context)
     return (contract, call_data)
 
 
 async def async_encode_call_data(
     call: multicall_spec.Call,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> spec.BinaryData:
 
     # parse components
@@ -64,7 +64,7 @@ async def async_encode_call_data(
         function_abi = await evm.async_get_function_abi(
             contract_address=contract,
             function_name=function,
-            network=network,
+            context=context,
         )
     else:
         raise Exception('could not determine function_abi')
@@ -81,7 +81,7 @@ async def async_decode_call_output(
     call: multicall_spec.Call,
     encoded_output: spec.BinaryData,
     *,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> typing.Any:
     function_abi = await async_get_call_function_abi(call)
     return evm.decode_function_output(
@@ -92,7 +92,7 @@ async def async_decode_call_output(
 
 async def async_get_call_function_abi(
     call: multicall_spec.Call,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> spec.FunctionABI:
 
     function: spec.FunctionABI | str | None = None
@@ -128,7 +128,7 @@ async def async_get_call_function_abi(
             return await evm.async_get_function_abi(
                 contract_address=get_call_contract(call),
                 function_name=function,
-                network=network,
+                context=context,
             )
         else:
             raise Exception('unknown call format')
@@ -139,7 +139,7 @@ async def async_get_call_function_abi(
         return await evm.async_get_function_abi(
             contract_address=get_call_contract(call),
             function_selector=function_selector,
-            network=network,
+            context=context,
         )
 
     else:

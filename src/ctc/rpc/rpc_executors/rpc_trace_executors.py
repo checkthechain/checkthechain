@@ -12,14 +12,14 @@ from .. import rpc_request
 async def async_trace_transaction(
     transaction_hash: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_trace_transaction(
         transaction_hash=transaction_hash
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_transaction(
         response=response,
         decode_response=decode_response,
@@ -31,14 +31,14 @@ async def async_trace_replay_transaction(
     transaction_hash: str,
     trace_type: typing.Sequence[spec.TraceOutputType],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_trace_replay_transaction(
         transaction_hash=transaction_hash, trace_type=trace_type
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_replay_transaction(
         response=response,
         decode_response=decode_response,
@@ -50,7 +50,7 @@ async def async_trace_raw_transaction(
     call_data: str,
     trace_type: typing.Sequence[spec.TraceOutputType],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -75,7 +75,7 @@ async def async_trace_call(
     | None = None,
     function_abi: spec.FunctionABI | None = None,
     trace_type: typing.Sequence[spec.TraceOutputType],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
     block_number: spec.BlockNumberReference | None = None,
@@ -93,7 +93,7 @@ async def async_trace_call(
         function_abi=function_abi,
         trace_type=trace_type,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_call(
         response=response,
         decode_response=decode_response,
@@ -106,7 +106,7 @@ async def async_trace_call_many(
     trace_type: typing.Sequence[spec.TraceOutputType] | None,
     *,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
@@ -115,7 +115,7 @@ async def async_trace_call_many(
         trace_type=trace_type,
         block_number=block_number,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_call_many(
         response=response,
         decode_response=decode_response,
@@ -132,13 +132,13 @@ async def async_trace_get(
     transaction_hash: spec.TransactionHash,
     trace_indices: typing.Sequence[int],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_trace_get(
         transaction_hash=transaction_hash,
         trace_indices=trace_indices,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_get(response=response)
 
 
@@ -150,7 +150,7 @@ async def async_trace_filter(
     to_addresses: spec.Address | None = None,
     after: int | None = None,
     count: int | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_trace_filter(
         start_block=start_block,
@@ -160,19 +160,19 @@ async def async_trace_filter(
         after=after,
         count=count,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_filter(response=response)
 
 
 async def async_trace_block(
     block_number: spec.BlockNumberReference,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_trace_block(
         block_number=block_number,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_trace_block(response=response)
 
 
@@ -180,12 +180,14 @@ async def async_trace_replay_block_transactions(
     block_number: spec.BlockNumberReference,
     trace_type: typing.Sequence[spec.TraceOutputType] | None,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_trace_replay_block_transactions(
         block_number=block_number,
         trace_type=trace_type,
     )
-    response = await rpc_request.async_send(request, provider=provider)
-    return rpc_digestors.digest_trace_replay_block_transactions(response=response)
+    response = await rpc_request.async_send(request, context=context)
+    return rpc_digestors.digest_trace_replay_block_transactions(
+        response=response
+    )
 

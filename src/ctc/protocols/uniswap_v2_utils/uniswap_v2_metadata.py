@@ -9,19 +9,19 @@ from . import uniswap_v2_spec
 
 async def async_get_pool_tokens(
     pool: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> tuple[spec.Address, spec.Address]:
     import asyncio
 
     token0 = rpc.async_eth_call(
         function_abi=uniswap_v2_spec.pool_function_abis['token0'],
         to_address=pool,
-        provider=provider,
+        context=context,
     )
     token1 = rpc.async_eth_call(
         function_abi=uniswap_v2_spec.pool_function_abis['token1'],
         to_address=pool,
-        provider=provider,
+        context=context,
     )
 
     return await asyncio.gather(token0, token1)
@@ -32,19 +32,19 @@ async def async_get_pool_symbols(
     *,
     x_address: spec.Address | None = None,
     y_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[str]:
 
     if x_address is None or y_address is None:
         if pool is None:
             raise Exception('must specify pool or tokens')
         x_address, y_address = await async_get_pool_tokens(
-            pool=pool, provider=provider
+            pool=pool, context=context
         )
 
     return await evm.async_get_erc20s_symbols(
         tokens=[x_address, y_address],
-        provider=provider,
+        context=context,
     )
 
 
@@ -53,43 +53,43 @@ async def async_get_pool_decimals(
     *,
     x_address: spec.Address | None = None,
     y_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[int]:
 
     if x_address is None or y_address is None:
         if pool is None:
             raise Exception('must specify pool or tokens')
         x_address, y_address = await async_get_pool_tokens(
-            pool=pool, provider=provider
+            pool=pool, context=context
         )
 
     return await evm.async_get_erc20s_decimals(
         tokens=[x_address, y_address],
-        provider=provider,
+        context=context,
     )
 
 
 async def async_get_pool_tokens_metadata(
     pool: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> uniswap_v2_spec.PoolTokensMetadata:
     import asyncio
 
     x_address, y_address = await async_get_pool_tokens(
         pool=pool,
-        provider=provider,
+        context=context,
     )
 
     symbols_coroutine = async_get_pool_symbols(
         x_address=x_address,
         y_address=y_address,
-        provider=provider,
+        context=context,
     )
 
     decimals_coroutine = async_get_pool_decimals(
         x_address=x_address,
         y_address=y_address,
-        provider=provider,
+        context=context,
     )
 
     symbols, decimals = await asyncio.gather(

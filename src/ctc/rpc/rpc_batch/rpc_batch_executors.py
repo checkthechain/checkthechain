@@ -5,7 +5,6 @@ import typing
 from ctc import evm
 from ctc import spec
 
-from .. import rpc_provider
 from . import rpc_batch_utils
 
 
@@ -28,7 +27,7 @@ async def async_batch_eth_call(
     function_abi: spec.FunctionABI | None = None,
     function_name: str | None = None,
     function_selector: spec.FunctionSelector | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     to_address: spec.Address | None = None,
     to_addresses: typing.Sequence[spec.Address] | None = None,
     **kwargs: typing.Any,
@@ -45,22 +44,17 @@ async def async_batch_eth_call(
                 'must specify to_address or to_addresses'
             )
 
-        provider = rpc_provider.get_provider(provider)
-        network = provider['network']
-        if network is None:
-            raise Exception('could not determine network')
-
         function_abi = await evm.async_get_function_abi(
             contract_address=contract_address,
             function_name=function_name,
             function_selector=function_selector,
-            network=network,
+            context=context,
         )
 
     return await rpc_batch_utils.async_batch_execute(
         'eth_call',
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         to_address=to_address,
         to_addresses=to_addresses,
         **kwargs,

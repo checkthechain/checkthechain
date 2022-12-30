@@ -10,7 +10,7 @@ async def async_get_eth_balance(
     address: spec.Address,
     *,
     normalize: typing.Literal[False],
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> int:
     ...
@@ -21,7 +21,7 @@ async def async_get_eth_balance(
     address: spec.Address,
     *,
     normalize: typing.Literal[True] = True,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> float:
     ...
@@ -32,7 +32,7 @@ async def async_get_eth_balance(
     address: spec.Address,
     *,
     normalize: bool,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> int | float:
     ...
@@ -42,7 +42,7 @@ async def async_get_eth_balance(
     address: spec.Address,
     *,
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
     """get ETH balance"""
@@ -51,8 +51,8 @@ async def async_get_eth_balance(
 
     result = await rpc.async_eth_get_balance(
         address=address,
-        provider=provider,
         block_number=block,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -70,7 +70,7 @@ async def async_get_eth_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: typing.Literal[False],
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> list[int]:
     ...
 
@@ -81,7 +81,7 @@ async def async_get_eth_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: typing.Literal[True] = True,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> list[float]:
     ...
 
@@ -92,7 +92,7 @@ async def async_get_eth_balance_by_block(
     *,
     normalize: bool = True,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> typing.Union[list[int], list[float]]:
     ...
 
@@ -102,14 +102,14 @@ async def async_get_eth_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> typing.Union[list[int], list[float]]:
     """get historical ETH balance over multiple blocks"""
 
     coroutines = []
     for block in blocks:
         coroutine = async_get_eth_balance(
-            address=address, provider=provider, block=block, normalize=normalize
+            address=address, context=context, block=block, normalize=normalize
         )
         coroutines.append(coroutine)
 
@@ -124,7 +124,7 @@ async def async_get_eth_balance_of_addresses(
     *,
     normalize: typing.Literal[False],
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> list[int]:
     ...
 
@@ -135,7 +135,7 @@ async def async_get_eth_balance_of_addresses(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: typing.Literal[True] = True,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> list[float]:
     ...
 
@@ -146,7 +146,7 @@ async def async_get_eth_balance_of_addresses(
     *,
     normalize: bool = True,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: typing.Optional[spec.ProviderReference] = None,
+    context: spec.Context = None,
 ) -> typing.Union[list[int], list[float]]:
     ...
 
@@ -155,8 +155,8 @@ async def async_get_eth_balance_of_addresses(
     addresses: typing.Sequence[spec.Address],
     *,
     normalize: bool = True,
-    provider: typing.Optional[spec.ProviderReference] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
 ) -> typing.Union[list[int], list[float]]:
     """get ETH balance of multiple addresses"""
 
@@ -164,7 +164,7 @@ async def async_get_eth_balance_of_addresses(
 
     balances = await rpc.async_batch_eth_get_balance(
         addresses=addresses,
-        provider=provider,
+        context=context,
         block_number=block,
     )
 

@@ -9,7 +9,7 @@ async def async_is_contract_address(
     address: spec.Address,
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> bool:
     """return whether address has bytecode on chain"""
 
@@ -18,7 +18,7 @@ async def async_is_contract_address(
     code = await rpc.async_eth_get_code(
         address=address,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return len(code) >= 3
 
@@ -27,7 +27,7 @@ async def async_are_contract_addresses(
     addresses: typing.Sequence[spec.Address],
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> dict[spec.Address, bool]:
     """return whether addresses have bytecode on chain"""
 
@@ -36,6 +36,6 @@ async def async_are_contract_addresses(
     codes = await rpc.async_batch_eth_get_code(
         addresses=addresses,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return {address: len(code) > 3 for address, code in zip(addresses, codes)}

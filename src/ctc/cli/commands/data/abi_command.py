@@ -115,7 +115,8 @@ async def async_abi_command(
 
     address = await evm.async_resolve_address(address)
     contract_abi = await evm.async_get_contract_abi(
-        contract_address=address, db_query=(not update),
+        contract_address=address,
+        context={'cache': (not update)},
     )
 
     # filter by name
@@ -207,3 +208,4 @@ async def async_abi_command(
                 verbose=verbose,
                 read_write=True,
             )
+

@@ -16,7 +16,7 @@ async def async_create_payload(
     end_time: analytics_spec.Timestamp | None = None,
     window_size: str | None = None,
     interval_size: str | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> analytics_spec.AnalyticsPayload:
     """create data payload from scratch"""
 
@@ -27,12 +27,12 @@ async def async_create_payload(
         end_time=end_time,
         window_size=window_size,
         interval_size=interval_size,
-        provider=provider,
+        context=context,
     )
 
     # get data
     data = await metric_crud.async_get_metrics(
-        blocks=time_data['block_numbers']
+        blocks=time_data['block_numbers'],
     )
 
     return {

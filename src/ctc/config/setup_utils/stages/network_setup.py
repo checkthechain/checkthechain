@@ -267,7 +267,7 @@ async def async_collect_provider_metadata(
             }
             try:
                 chain_id = await rpc.async_eth_chain_id(
-                    provider=temporary_provider
+                    context=dict(provider=temporary_provider),
                 )
             except Exception:
                 chain_id = toolcli.input_int(

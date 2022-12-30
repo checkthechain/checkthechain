@@ -13,7 +13,7 @@ async def async_get_pool_tokens(
     pool: spec.Address,
     *,
     n_tokens: int | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[spec.Address]:
     import asyncio
 
@@ -49,7 +49,7 @@ async def async_get_pool_tokens(
                     to_address=pool,
                     function_abi=function_abi,
                     function_parameters=[t],
-                    provider=provider,
+                    context=context,
                 )
                 token_addresses.append(token_address)
                 t += 1
@@ -61,7 +61,7 @@ async def async_get_pool_tokens(
                 to_address=pool,
                 function_abi=function_abi,
                 function_parameters=[i],
-                provider=provider,
+                context=context,
             )
             for i in range(n_tokens)
         ]
@@ -76,7 +76,7 @@ async def async_get_token_index(
     *,
     metadata: curve_spec.CurvePoolMetadata | None = None,
     n_tokens: int | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
 
     if isinstance(token, int):
@@ -91,7 +91,7 @@ async def async_get_token_index(
             pool_addresses = await async_get_pool_tokens(
                 pool=pool,
                 n_tokens=n_tokens,
-                provider=provider,
+                context=context,
             )
         else:
             raise Exception('must specify more parameters')
@@ -105,13 +105,13 @@ async def async_get_token_index(
             pool_addresses = await async_get_pool_tokens(
                 pool=pool,
                 n_tokens=n_tokens,
-                provider=provider,
+                context=context,
             )
         else:
             raise Exception('must specify more parameters')
         token_symbols = await evm.async_get_erc20s_symbols(
             pool_addresses,
-            provider=provider,
+            context=context,
         )
         return token_symbols.index(token)
 
@@ -123,7 +123,7 @@ async def async_get_pool_metadata(
     pool: spec.Address,
     *,
     n_tokens: int | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> curve_spec.CurvePoolMetadata:
 
     import asyncio
@@ -145,7 +145,7 @@ async def async_get_pool_metadata(
         to_address=pool,
         function_abi=function_abi,
         function_parameters=[],
-        provider=provider,
+        context=context,
     )
     a_task = asyncio.create_task(a_coroutine)
 
@@ -153,17 +153,17 @@ async def async_get_pool_metadata(
     token_addresses = await async_get_pool_tokens(
         pool,
         n_tokens=n_tokens,
-        provider=provider,
+        context=context,
     )
 
     # get additional metadata
     symbol_coroutine = evm.async_get_erc20s_symbols(
         token_addresses,
-        provider=provider,
+        context=context,
     )
     decimal_coroutine = evm.async_get_erc20s_decimals(
         token_addresses,
-        provider=provider,
+        context=context,
     )
     symbol_task = asyncio.create_task(symbol_coroutine)
     decimal_task = asyncio.create_task(decimal_coroutine)
@@ -180,3 +180,4 @@ async def async_get_pool_metadata(
         'A': A,
         # fee:
     }
+

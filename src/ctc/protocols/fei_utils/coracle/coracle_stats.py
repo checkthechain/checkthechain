@@ -20,7 +20,7 @@ async def async_get_pcv_stats(
     block: spec.BlockNumberReference | None = None,
     *,
     wrapper: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> FeiPcvStats:
 
     if block is None:
@@ -35,7 +35,7 @@ async def async_get_pcv_stats(
     result = await rpc.async_eth_call(
         function_name='pcvStats',
         block_number=block,
-        provider=provider,
+        context=context,
         to_address=to_address,
     )
     return {
@@ -50,7 +50,7 @@ async def async_get_pcv_stats_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     wrapper: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     nullify_invalid: bool = True,
 ) -> spec.DataFrame:
 
@@ -60,11 +60,6 @@ async def async_get_pcv_stats_by_block(
     if blocks is not None:
         blocks = await evm.async_block_numbers_to_int(blocks=blocks)
 
-    # assemble kwargs
-    provider = rpc.get_provider(provider)
-    if provider['chunk_size'] is None:
-        provider['chunk_size'] = 1
-
     async def _wrapped_call(
         block: spec.BlockNumberReference, to_address: spec.Address
     ) -> typing.Sequence[None | list[typing.Any]]:
@@ -72,7 +67,7 @@ async def async_get_pcv_stats_by_block(
             result = await rpc.async_eth_call(
                 function_name='pcvStats',
                 block_number=block,
-                provider=provider,
+                context=context,
                 to_address=to_address,
             )
             return typing.cast(

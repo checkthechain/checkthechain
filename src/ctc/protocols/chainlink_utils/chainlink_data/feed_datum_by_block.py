@@ -13,7 +13,7 @@ async def async_get_feed_answer_datum_by_block(
     feed: chainlink_spec._FeedReference,
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     interpolate: bool = True,
     invert: bool = False,
@@ -22,7 +22,7 @@ async def async_get_feed_answer_datum_by_block(
     import pandas as pd
     from ctc.toolbox import pd_utils
 
-    int_blocks = await evm.async_block_numbers_to_int(blocks=blocks)
+    int_blocks = await evm.async_block_numbers_to_int(blocks=blocks, context=context)
 
     # query data
     coroutines = []
@@ -32,8 +32,8 @@ async def async_get_feed_answer_datum_by_block(
             fields='answer',
             normalize=normalize,
             block=block,
-            provider=provider,
             invert=invert,
+            context=context,
         )
         coroutines.append(coroutine)
     result = await asyncio.gather(*coroutines)
@@ -55,7 +55,7 @@ async def async_get_feed_full_datum_by_block(
     feed: chainlink_spec._FeedReference,
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     interpolate: bool = True,
     invert: bool = False,
@@ -64,7 +64,7 @@ async def async_get_feed_full_datum_by_block(
     import pandas as pd
     from ctc.toolbox import pd_utils
 
-    int_blocks = await evm.async_block_numbers_to_int(blocks=blocks)
+    int_blocks = await evm.async_block_numbers_to_int(blocks=blocks, context=context)
 
     # query data
     coroutines = []
@@ -72,10 +72,10 @@ async def async_get_feed_full_datum_by_block(
         coroutine = feed_datum.async_get_feed_datum(
             feed=feed,
             block=block,
-            provider=provider,
             normalize=normalize,
             fields='full',
             invert=invert,
+            context=context,
         )
         coroutines.append(coroutine)
     result = await asyncio.gather(*coroutines)

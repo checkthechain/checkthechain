@@ -22,7 +22,7 @@ async def async_rechunk_events(
     chunk_size_tolerance: float = 0.1,
     verbose: bool = True,
     dry: bool = False,
-    network: spec.NetworkReference = 'mainnet',
+    context: spec.Context = None,
 ) -> None:
     import numpy as np
 
@@ -39,7 +39,7 @@ async def async_rechunk_events(
     event_list = filesystem_events.list_events(
         contract_address=contract_address,
         event_hash=event_hash,
-        network=network,
+        context=context,
     )
     if event_list is None:
         if verbose:
@@ -50,7 +50,7 @@ async def async_rechunk_events(
             event_dir = filesystem_events.get_events_event_dir(
                 contract_address=contract_address,
                 event_hash=event_hash,
-                network=network,
+                context=context,
             )
             message = (
                 'there exists <filename>__OLD files from an incomplete'
@@ -136,7 +136,7 @@ async def async_rechunk_events(
             event_hash=event_hash,
             start_block=min_block_start,
             end_block=max_block_end,
-            network=network,
+            context=context,
         )
 
     # split into chunks
@@ -172,7 +172,7 @@ async def async_rechunk_events(
         event_dir = filesystem_events.get_events_event_dir(
             contract_address=contract_address,
             event_hash=event_hash,
-            network=network,
+            context=context,
         )
         if dry:
             print('[DRY RUN -- WILL NOT CHANGE FILES]')
@@ -214,7 +214,7 @@ async def async_rechunk_events(
             event_hash=event_hash,
             start_block=chunk_start_block,
             end_block=chunk_end_block,
-            network=network,
+            context=context,
         )
 
     # remove original files
@@ -228,7 +228,7 @@ async def async_rechunk_events(
 
 async def async_rechunk_all_events(
     chunk_target_bytes: int,
-    network: spec.NetworkReference = 'mainnet',
+    context: spec.Context = None,
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
@@ -236,7 +236,7 @@ async def async_rechunk_all_events(
     verbose: bool = True,
     dry: bool = False,
 ) -> None:
-    contracts_events = filesystem_events.list_contracts_events(network=network)
+    contracts_events = filesystem_events.list_contracts_events(context=context)
 
     for contract_address, events_data in contracts_events.items():
         for event_hash, event_data in events_data.items():

@@ -14,7 +14,8 @@ from . import chainlink_feed_metadata
 
 async def async_get_aggregator_description(
     aggregator: spec.Address,
-    provider: spec.ProviderReference = None,
+    *,
+    context: spec.Context = None,
 ) -> str:
 
     function_abi: spec.FunctionABI = {
@@ -25,11 +26,10 @@ async def async_get_aggregator_description(
         'type': 'function',
     }
 
-    provider = rpc.get_provider(provider)
     result = await rpc.async_eth_call(
         to_address=aggregator,
-        provider=provider,
         function_abi=function_abi,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -38,11 +38,11 @@ async def async_get_aggregator_description(
 
 async def async_get_aggregator_base_quote(
     aggregator: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> dict[str, str]:
     description = await async_get_aggregator_description(
         aggregator=aggregator,
-        provider=provider,
+        context=context,
     )
     try:
         base, quote = description.split(' / ')
@@ -57,28 +57,27 @@ async def async_get_aggregator_base_quote(
 async def async_get_feed_aggregator_history(
     feed: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[spec.Address, int]:
-
-    network, provider = evm.get_network_and_provider(network, provider)
+    # TODO: can make it go 2x as fast by searching at start and end concurrently
+    # TODO: be able to give block range to search within
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
         feed,
-        provider=provider,
+        context=context,
     )
 
     # query current feed aggregator
     aggregator_coroutine = chainlink_feed_metadata.async_get_feed_aggregator(
         feed=feed,
         block='latest',
-        provider=provider,
+        context=context,
     )
 
     # get known updates
     db_results = await chainlink_db.async_query_aggregator_updates(
         feed=feed,
-        network=network,
+        context=context,
     )
     if db_results is not None:
         db_results = sorted(
@@ -104,7 +103,7 @@ async def async_get_feed_aggregator_history(
         # collect new update data
         previous_aggregators = await async_get_feed_previous_aggregators(
             feed=feed,
-            provider=provider,
+            context=context,
         )
         previous_aggregators = [
             aggregator
@@ -114,7 +113,7 @@ async def async_get_feed_aggregator_history(
         aggregator_start_blocks = await _async_get_aggregator_start_blocks(
             previous_aggregators=previous_aggregators,
             feed=feed,
-            provider=provider,
+            context=context,
         )
 
         # intake new data to database
@@ -130,54 +129,29 @@ async def async_get_feed_aggregator_history(
         ]
         await chainlink_db.async_intake_aggregator_updates(
             updates=updates,
-            network=network,
+            context=context,
         )
 
         return dict(feed_aggregator_updates, **aggregator_start_blocks)
-
-
-# async def async_get_feed_aggregator_history(
-#     feed: str, provider: spec.ProviderReference = None
-# ) -> typing.Mapping[spec.Address, int]:
-#     # TODO: can make it go 2x as fast by searching at start and end concurrently
-#     # TODO: be able to give block range to search within
-
-#     feed = await chainlink_feed_metadata.async_resolve_feed_address(
-#         feed,
-#         provider=provider,
-#     )
-
-#     aggregators = await async_get_feed_previous_aggregators(
-#         feed=feed,
-#         provider=provider,
-#     )
-
-#     aggregator_start_blocks = await _async_get_aggregator_start_blocks(
-#         previous_aggregators=aggregators,
-#         feed=feed,
-#         provider=provider,
-#     )
-
-#     return aggregator_start_blocks
 
 
 async def _async_get_aggregator_start_blocks(
     previous_aggregators: typing.Sequence[spec.Address],
     feed: spec.Address,
     *,
-    provider: spec.ProviderReference,
+    context: spec.Context = None,
 ) -> typing.Mapping[spec.Address, int]:
 
     print('locating Chainlink aggregator update blocks...')
 
     from ctc.toolbox import search_utils
 
-    latest = await evm.async_get_latest_block_number(provider=provider)
+    latest = await evm.async_get_latest_block_number(context=context)
 
     # TODO: use chainlink feed registry for this
     feed_creation_block = await evm.async_get_contract_creation_block(
         contract_address=feed,
-        provider=provider,
+        context=context,
     )
 
     aggregator_start_blocks = {}
@@ -190,6 +164,7 @@ async def _async_get_aggregator_start_blocks(
             _async_aggregator_transition,
             feed=feed,
             next_aggregator=next_aggregator,
+            context=context,
         )
 
         block = await search_utils.async_binary_search(
@@ -214,23 +189,24 @@ async def _async_aggregator_transition(
     next_aggregator: spec.Address,
     *,
     feed: spec.Address,
+    context: spec.Context = None,
 ) -> bool:
-    return (
-        next_aggregator
-        == await chainlink_feed_metadata.async_get_feed_aggregator(
-            feed,
-            block=block,
-        )
+
+    aggregator = await chainlink_feed_metadata.async_get_feed_aggregator(
+        feed,
+        block=block,
+        context=context,
     )
+    return next_aggregator == aggregator
 
 
 async def async_get_feed_previous_aggregators(
     feed: str,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[spec.Address]:
 
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
-        feed, provider=provider
+        feed, context=context
     )
 
     phase_id_abi: spec.FunctionABI = {
@@ -244,6 +220,7 @@ async def async_get_feed_previous_aggregators(
     current_phase = await rpc.async_eth_call(
         to_address=feed,
         function_abi=phase_id_abi,
+        context=context,
     )
 
     phase_aggregators_abi: spec.FunctionABI = {
@@ -265,9 +242,11 @@ async def async_get_feed_previous_aggregators(
             to_address=feed,
             function_abi=phase_aggregators_abi,
             function_parameters=[i],
+            context=context,
         )
         for i in range(1, current_phase + 1)
     ]
     aggregators = await asyncio.gather(*coroutines)
 
     return aggregators
+

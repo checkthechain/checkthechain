@@ -36,11 +36,8 @@ class CurveDEX(dex_class.DEX):
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         start_block, end_block = await evm.async_resolve_block_range(
             start_block=start_block,
@@ -48,11 +45,11 @@ class CurveDEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             allow_none=False,
-            provider=provider,
+            context=context,
         )
 
         start_block, end_block = await evm.async_block_numbers_to_int(
-            [start_block, end_block]
+            [start_block, end_block], context=context
         )
 
         if factory == curve_utils.curve_deployer_eoa:
@@ -70,7 +67,7 @@ class CurveDEX(dex_class.DEX):
                 to_address=factory,
                 function_abi=curve_utils.function_abis['pool_count'],
                 block_numbers=[start_block, end_block],
-                provider=provider,
+                context=context,
             )
 
             pools = await rpc.async_batch_eth_call(
@@ -79,17 +76,17 @@ class CurveDEX(dex_class.DEX):
                 function_parameter_list=[
                     [index] for index in range(start_pool_count, end_pool_count)
                 ],
-                provider=provider,
+                context=context,
             )
 
             creation_blocks_coroutine = asyncio.create_task(
                 evm.async_get_contracts_creation_blocks(
-                    pools, provider=provider
+                    pools, context=context
                 )
             )
 
         coroutines = [
-            curve_utils.async_get_pool_tokens(pool, provider=provider)
+            curve_utils.async_get_pool_tokens(pool, context=context)
             for pool in pools
         ]
         pools_tokens = await asyncio.gather(*coroutines)
@@ -140,14 +137,12 @@ class CurveDEX(dex_class.DEX):
         cls,
         pool: spec.Address,
         *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         block: spec.BlockNumberReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
-        network, provider = evm.get_network_and_provider(network, provider)
         return await curve_utils.async_get_pool_tokens(
             pool=pool,
-            provider=provider,
+            context=context,
         )
 
     @classmethod
@@ -160,14 +155,11 @@ class CurveDEX(dex_class.DEX):
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
         include_timestamps: bool = False,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         verbose: bool = False,
+        context: spec.Context = None,
     ) -> spec.RawDexTrades:
 
         import pandas as pd
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         # get data
         trades = await evm.async_get_events(
@@ -179,14 +171,16 @@ class CurveDEX(dex_class.DEX):
             end_time=end_time,
             verbose=verbose,
             include_timestamps=include_timestamps,
+            context=context,
         )
 
         # check factory for whether TokenExchangeUnderlying is present
-        contract_abi = await evm.async_get_contract_abi(pool, network=network)
+        contract_abi = await evm.async_get_contract_abi(pool, context=context)
         try:
             await evm.async_get_event_abi(
                 contract_abi=contract_abi,
                 event_name='TokenExchangeUnderlying',
+                context=context,
             )
             has_token_exchange_underlying = True
         except LookupError:
@@ -204,6 +198,7 @@ class CurveDEX(dex_class.DEX):
                 end_time=end_time,
                 verbose=verbose,
                 include_timestamps=include_timestamps,
+                context=context,
             )
             trades = pd.concat([trades, token_exchange_underlyings])
             trades = trades.sort_index()

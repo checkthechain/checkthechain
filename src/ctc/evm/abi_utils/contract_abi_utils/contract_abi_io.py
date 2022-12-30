@@ -9,11 +9,7 @@ from . import contract_abi_modification
 async def async_get_contract_abi(
     contract_address: spec.Address,
     *,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
-    use_db: bool = True,
-    db_query: bool | None = None,
-    db_intake: bool | None = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     proxy_implementation: spec.Address | None = None,
     verbose: bool = True,
@@ -22,24 +18,18 @@ async def async_get_contract_abi(
 
     for addresses that change ABI's over time, use db_query=False to skip cache
     """
-
-    if db_query is None:
-        db_query = use_db
-    if db_intake is None:
-        db_intake = use_db
-
-    if network is None:
-        from ctc import rpc
-
-        network = rpc.get_provider_network(provider)
+    from ctc import config
 
     # load from db
-    if db_query:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        context=context, schema_name='contract_abis'
+    )
+    if read_cache:
         from ctc import db
 
         abi = await db.async_query_contract_abi(
             address=contract_address,
-            network=network,
+            context=context,
         )
         if abi is not None:
             return abi
@@ -49,18 +39,16 @@ async def async_get_contract_abi(
     # load from block explorer
     abi = await etherscan_utils.async_get_contract_abi(
         contract_address,
-        network=network,
+        context=context,
         verbose=verbose,
     )
 
     # get proxy implementation
-    if provider is None:
-        provider = {'network': network}
     if proxy_implementation is None:
         proxy_implementation = (
             await contract_utils.async_get_proxy_implementation(
                 contract_address=contract_address,
-                provider=provider,
+                context=context,
                 block=block,
             )
         )
@@ -70,19 +58,19 @@ async def async_get_contract_abi(
     if proxy_implementation is not None:
         proxy_abi = await etherscan_utils.async_get_contract_abi(
             contract_address=proxy_implementation,
-            network=network,
+            context=context,
             verbose=verbose,
         )
         abi = contract_abi_modification.combine_contract_abis([abi, proxy_abi])
         includes_proxy = True
 
     # save to db
-    if db_intake:
+    if write_cache:
         from ctc import db
 
         await db.async_intake_contract_abi(
             contract_address=contract_address,
-            network=network,
+            context=context,
             abi=abi,
             includes_proxy=includes_proxy,
         )

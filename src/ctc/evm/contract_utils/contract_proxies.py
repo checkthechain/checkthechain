@@ -25,13 +25,13 @@ if typing.TYPE_CHECKING:
 async def async_get_proxy_implementation(
     contract_address: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address | None:
     """return implementation address of proxy contract"""
 
     proxy_metadata = await async_get_proxy_metadata(
-        contract_address=contract_address, provider=provider, block=block
+        contract_address=contract_address, context=context, block=block
     )
 
     return proxy_metadata['implementation']
@@ -40,7 +40,7 @@ async def async_get_proxy_implementation(
 async def async_get_proxy_metadata(
     contract_address: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> ProxyAddressMetadata:
     """return metadata of proxy address"""
@@ -49,7 +49,7 @@ async def async_get_proxy_metadata(
     try:
         eip897_address = await _async_get_eip897_implementation(
             contract_address=contract_address,
-            provider=provider,
+            context=context,
             block=block,
         )
         if eip897_address is not None:
@@ -63,7 +63,7 @@ async def async_get_proxy_metadata(
     # try eip1967 logic
     eip1967_logic_address = await _async_get_eip1967_proxy_logic_address(
         contract_address=contract_address,
-        provider=provider,
+        context=context,
         block=block,
     )
     if eip1967_logic_address != '0x0000000000000000000000000000000000000000':
@@ -75,7 +75,7 @@ async def async_get_proxy_metadata(
     # try eip1967 beacon
     eip1967_beacon_address = await _async_get_eip1967_proxy_beacon_address(
         contract_address=contract_address,
-        provider=provider,
+        context=context,
         block=block,
     )
     if eip1967_beacon_address is not None:
@@ -87,7 +87,7 @@ async def async_get_proxy_metadata(
     # try openzeppelin
     openzeppelin_address = await _async_get_oz_proxy_address(
         contract_address=contract_address,
-        provider=provider,
+        context=context,
         block=block,
     )
     if openzeppelin_address is not None:
@@ -99,7 +99,7 @@ async def async_get_proxy_metadata(
     # try gnosis proxy
     gnosis_proxy_address = await _async_get_gnosis_safe_proxy_address(
         contract_address,
-        provider=provider,
+        context=context,
         block=block,
     )
     if gnosis_proxy_address is not None:
@@ -122,7 +122,7 @@ async def async_get_proxy_metadata(
 async def _async_get_eip897_proxy_type(
     contract_address: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int | None:
 
@@ -140,7 +140,7 @@ async def _async_get_eip897_proxy_type(
     result = await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if result is not None and not isinstance(result, int):
@@ -151,7 +151,7 @@ async def _async_get_eip897_proxy_type(
 async def _async_get_eip897_implementation(
     contract_address: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
 
@@ -169,7 +169,7 @@ async def _async_get_eip897_implementation(
     result = await rpc.async_eth_call(
         to_address=contract_address,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, str):
@@ -186,7 +186,7 @@ async def _async_get_eip1967_proxy_logic_address(
     contract_address: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
     """get a contract's logic address
 
@@ -206,7 +206,7 @@ async def _async_get_eip1967_proxy_logic_address(
         address=contract_address,
         position=position,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -218,7 +218,7 @@ async def _async_get_eip1967_proxy_beacon_address(
     contract_address: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address | None:
     """get a contract's logic address
 
@@ -238,7 +238,7 @@ async def _async_get_eip1967_proxy_beacon_address(
         address=contract_address,
         position=position,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -258,7 +258,7 @@ async def _async_get_eip1967_proxy_beacon_address(
         proxy_in_beacon = await rpc.async_eth_call(
             to_address=beacon,
             function_abi=implementation_abi,
-            provider=provider,
+            context=context,
         )
     except Exception:
         proxy_in_beacon = None
@@ -272,7 +272,7 @@ async def _async_get_eip1967_proxy_admin_address(
     contract_address: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
     """get a contract's logic address
 
@@ -292,7 +292,7 @@ async def _async_get_eip1967_proxy_admin_address(
         address=contract_address,
         position=position,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -315,7 +315,7 @@ async def _async_get_oz_proxy_address(
     contract_address: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address | None:
 
     from ctc import rpc
@@ -328,7 +328,7 @@ async def _async_get_oz_proxy_address(
         address=contract_address,
         position=position,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -351,7 +351,7 @@ async def _async_get_gnosis_safe_proxy_address(
     *,
     block: spec.BlockNumberReference | None = None,
     confirm_bytecode: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address | None:
 
     from ctc import rpc
@@ -367,10 +367,11 @@ async def _async_get_gnosis_safe_proxy_address(
     result = await rpc.async_eth_get_storage_at(
         address=contract_address,
         position='0x0',
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
 
     return '0x' + result[-40:]
+

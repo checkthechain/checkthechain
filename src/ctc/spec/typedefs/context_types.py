@@ -8,72 +8,49 @@ from . import rpc_types
 from . import network_types
 
 
-class PartialContext(TypedDict, total=False):
-    network: network_types.NetworkReference
-    provider: rpc_types.ProviderReference
-    cache: 'CacheContextShorthand'
+# Context can be any of the context types, either short-hand or full
+Context = typing.Union[None, int, str, 'ShorthandContext', 'NormalizedContext']
 
 
-class FullContext(TypedDict):
-    network: network_types.ChainId
-    provider: rpc_types.Provider
-    cache: MultiCacheContext
+# ShorthandContext is maximally flexible, allowing many nested data types
+class ShorthandContext(TypedDict, total=False):
+    network: network_types.NetworkReference | None
+    provider: rpc_types.ProviderReference | None
+    cache: CacheContextShorthand
 
 
-# one of: provider url, network name
-ContextStr = str
-
-Context = typing.Union[
-    PartialContext,
-    FullContext,
-    ContextStr,
-    network_types.ChainId,
-]
+# NormalizedContext is a normalized context dict with all fields present
+class NormalizedContext(TypedDict):
+    network: network_types.NetworkReference | None
+    provider: rpc_types.ProviderReference | None
+    cache: typing.Sequence[ContextCacheRule]
 
 
-#
-# # cache configuration
-#
-
-# name of cache backend, e.g. 'local_sqlite' or 'local_postgres'
-CacheBackend = str
-
-
-class SingleCacheContext(TypedDict):
-    backend: CacheBackend
+# ContextCacheRule specifies cache rules for contexts that satisfy filter
+class ContextCacheRule(TypedDict, total=False):
+    backend: str
     read: bool
     write: bool
+    filter: 'ContextCacheFilter'
 
 
-MultiCacheContext = typing.Mapping[
-    db_types.SchemaName,
-    SingleCacheContext,
-]
-
-MutableMultiCacheContext = typing.MutableMapping[
-    db_types.SchemaName,
-    SingleCacheContext,
-]
+# ContextCacheFilter determines the scope of when rule is applicable
+class ContextCacheFilter(TypedDict, total=False):
+    chain_id: network_types.ChainId | None
+    schema: db_types.SchemaName
+    backend: str
 
 
-class PartialSingleCacheContext(TypedDict, total=False):
-    backend: CacheBackend
-    read: bool
-    write: bool
-
-
-PartialMultiCacheContext = typing.Mapping[
-    db_types.SchemaName,
-    PartialSingleCacheContext,
-]
-
+# CacheContextShorthand is a maximally flexible cache specification
 CacheContextShorthand = typing.Union[
     None,
     bool,
-    CacheBackend,
+    str,
+    'ContextCacheRule',
     typing.Mapping[
-        db_types.SchemaName,
-        typing.Union[bool, CacheBackend, SingleCacheContext],
+        typing.Union[str, int],
+        typing.Union[None, bool, str, 'ContextCacheRule'],
     ],
+    typing.Sequence['ContextCacheRule'],
 ]
 

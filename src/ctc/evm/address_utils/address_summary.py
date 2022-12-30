@@ -12,7 +12,7 @@ async def async_print_address_summary(
     *,
     verbose: bool | int = False,
     max_width: int = 80,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     raw: bool = False,
 ) -> None:
     """print summary of address
@@ -30,15 +30,13 @@ async def async_print_address_summary(
 
     styles = cli.get_cli_styles()
 
-    eth_balance_coroutine = evm.async_get_eth_balance(
-        address, provider=provider
-    )
+    eth_balance_coroutine = evm.async_get_eth_balance(address, context=context)
     transaction_count_coroutine = rpc.async_eth_get_transaction_count(
-        address, provider=provider
+        address, context=context
     )
 
     # contract data
-    code_coroutine = rpc.async_eth_get_code(address, provider=provider)
+    code_coroutine = rpc.async_eth_get_code(address, context=context)
 
     [eth_balance, transaction_count, code] = await asyncio.gather(
         eth_balance_coroutine,
@@ -55,7 +53,12 @@ async def async_print_address_summary(
     title = 'Address ' + address.lower()
     toolstr.print_text_box(title, style=styles['title'])
     rows = [
-        ('checksum', toolstr.add_style(address_data.get_address_checksum(address), styles['metavar'])),
+        (
+            'checksum',
+            toolstr.add_style(
+                address_data.get_address_checksum(address), styles['metavar']
+            ),
+        ),
         ('address type', address_type),
         ('ETH balance', eth_balance),
         ('transaction count', transaction_count),
@@ -69,10 +72,12 @@ async def async_print_address_summary(
     )
 
     if verbose:
-        creation_block = await evm.async_get_contract_creation_block(address)
+        creation_block = await evm.async_get_contract_creation_block(
+            address, context=context
+        )
         if creation_block is not None:
             block_timestamp = await evm.async_get_block_timestamp(
-                creation_block
+                creation_block, context=context
             )
             age = tooltime.get_age(block_timestamp, 'TimelengthPhrase')
             print('- creation block:', creation_block)
@@ -80,18 +85,18 @@ async def async_print_address_summary(
 
     if is_contract:
 
-        is_erc20 = await evm.async_is_erc20(address)
+        is_erc20 = await evm.async_is_erc20(address, context=context)
 
         if is_erc20:
             print()
             print()
-            await evm.async_print_erc20_summary(address, include_address=False)
+            await evm.async_print_erc20_summary(
+                address, include_address=False, context=context
+            )
 
-        provider = rpc.get_provider(provider)
-        network = provider['network']
         contract_abi = await abi_utils.async_get_contract_abi(
             contract_address=address,
-            network=network,
+            context=context,
         )
 
         print()
@@ -109,3 +114,4 @@ async def async_print_address_summary(
                 max_width=max_width,
                 verbose=verbose,
             )
+

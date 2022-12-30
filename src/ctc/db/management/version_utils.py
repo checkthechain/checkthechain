@@ -28,22 +28,17 @@ def is_schema_versions_initialized(engine: toolsql.SAEngine) -> bool:
 
 def get_schema_version(
     schema_name: str,
-    network: spec.NetworkReference | None,
+    context: spec.Context,
     *,
     conn: toolsql.SAConnection | None = None,
     db_config: toolsql.DBConfig | None = None,
 ) -> str | None:
 
-    if network is None:
-        # use chain_id = -1 for dbs that have no network association
-        if schema_name not in schema_utils.get_network_schema_names():
-            chain_id = -1
-        else:
-            raise Exception(
-                'must specify network for schema ' + str(schema_name)
-            )
+    # use chain_id = -1 for dbs that have no network association
+    if schema_name not in schema_utils.get_network_schema_names():
+        chain_id = -1
     else:
-        chain_id = evm.get_network_chain_id(network)
+        chain_id = config.get_context_chain_id(context)
 
     if conn is None:
         engine = _get_schema_version_engine(db_config=db_config)

@@ -4,9 +4,9 @@ import toolcli
 import toolstr
 
 from ctc import cli
+from ctc import config
 from ctc import evm
 from ctc import spec
-from ctc import rpc
 
 
 help_message = """register custom proxy implementation of a contract
@@ -52,8 +52,8 @@ async def async_proxy_add_command(
 
     styles = cli.get_cli_styles()
 
-    provider = rpc.get_provider()
-    network = evm.get_network_name(provider['network'])
+    context: spec.Context = {}
+    network = config.get_context_chain_id(context)
 
     if not confirm:
         toolstr.print(
@@ -82,11 +82,11 @@ async def async_proxy_add_command(
         if not answer:
             return
 
+    context = config.create_user_input_context(network=network, cache=False)
     abi = await evm.async_get_contract_abi(
         contract_address=proxy_contract,
-        network=network,
         proxy_implementation=implementation_contract,
-        db_query=False,
+        context=context,
     )
 
     print('resulting abi contains', len(abi), 'items')

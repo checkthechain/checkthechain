@@ -22,7 +22,7 @@ async def _async_plan_event_query(
     topic3: typing.Any | None,
     start_block: int,
     end_block: int,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> spec.EventQueryPlan:
     """plan which parts of query should be dispatched to db vs node"""
 
@@ -44,7 +44,7 @@ async def _async_plan_event_query(
         topic1=topic1,
         topic2=topic2,
         topic3=topic3,
-        network=network,
+        context=context,
         start_block=start_block,
         end_block=end_block,
     )
@@ -116,8 +116,7 @@ async def _async_query_events_from_node_and_db(
     start_block: int,
     end_block: int,
     write_to_db: bool,
-    provider: spec.ProviderReference,
-    network: spec.NetworkReference,
+    context: spec.Context,
     verbose: bool | int,
     columns_to_load: set[str],
     binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
@@ -134,7 +133,7 @@ async def _async_query_events_from_node_and_db(
         topic3=topic3,
         start_block=start_block,
         end_block=end_block,
-        network=network,
+        context=context,
     )
 
     if verbose >= 2:
@@ -147,7 +146,7 @@ async def _async_query_events_from_node_and_db(
     # send db queries to db
     for query in queries['db']:
         db_result = await db.async_query_events(
-            network=network,
+            context=context,
             binary_output_format=binary_output_format,
             only_columns=columns_to_load,
             **query,
@@ -165,7 +164,7 @@ async def _async_query_events_from_node_and_db(
 
         result = await event_node_utils._async_query_events_from_node(
             write_to_db=write_to_db,
-            provider=provider,
+            context=context,
             verbose=verbose,
             output_format='dataframe',
             binary_output_format=binary_output_format,
@@ -196,3 +195,4 @@ async def _async_query_events_from_node_and_db(
     events = pd.concat(sorted_results)
 
     return events
+

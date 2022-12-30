@@ -22,7 +22,7 @@ async def async_get_erc4626_deposits(
     verbose: bool = False,
     normalize: bool = True,
     convert_from_str: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
     """get Deposit events for ERC-4626 vault"""
@@ -38,7 +38,7 @@ async def async_get_erc4626_deposits(
         end_time=end_time,
         include_timestamps=include_timestamps,
         verbose=verbose,
-        provider=provider,
+        context=context,
         **event_kwargs,
     )
 
@@ -56,7 +56,7 @@ async def async_get_erc4626_deposits(
             token=token,
             assets=deposits['arg__assets'].values,  # type: ignore
             block=blocks[-1],  # type: ignore
-            provider=provider,
+            context=context,
         )
         deposits[
             'arg__shares'
@@ -64,7 +64,7 @@ async def async_get_erc4626_deposits(
             token=token,
             shares=deposits['arg__shares'].values,  # type: ignore
             block=blocks[-1],  # type: ignore
-            provider=provider,
+            context=context,
         )
 
     return deposits
@@ -79,7 +79,7 @@ async def async_get_erc4626_withdraws(
     end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     verbose: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     convert_from_str: bool = True,
     **event_kwargs: typing.Any,
@@ -97,7 +97,7 @@ async def async_get_erc4626_withdraws(
         end_time=end_time,
         include_timestamps=include_timestamps,
         verbose=verbose,
-        provider=provider,
+        context=context,
         **event_kwargs,
     )
 
@@ -115,7 +115,7 @@ async def async_get_erc4626_withdraws(
             token=token,
             assets=withdraws['arg__assets'].values,  # type: ignore
             block=blocks[-1],  # type: ignore
-            provider=provider,
+            context=context,
         )
         withdraws[
             'arg__shares'
@@ -123,7 +123,7 @@ async def async_get_erc4626_withdraws(
             token=token,
             shares=withdraws['arg__shares'].values,  # type: ignore
             block=blocks[-1],  # type: ignore
-            provider=provider,
+            context=context,
         )
 
     return withdraws

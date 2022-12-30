@@ -45,7 +45,7 @@ def test_initialize_schemas(schema_name):
     with engine.begin() as conn:
         schema_version = db.get_schema_version(
             schema_name=schema_name,
-            network=network,
+            context=dict(network=network),
             conn=conn,
         )
         assert schema_version == ctc.__version__

@@ -12,14 +12,14 @@ from .. import uniswap_v3_spec
 async def async_pool_slot0(
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi('slot0', 'pool')
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     return {
@@ -36,7 +36,7 @@ async def async_pool_slot0(
 async def async_pool_fee_growth_global_0_x128(
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -46,7 +46,7 @@ async def async_pool_fee_growth_global_0_x128(
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
@@ -57,7 +57,7 @@ async def async_pool_fee_growth_global_0_x128(
 async def async_pool_fee_growth_global_1_x128(
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -67,7 +67,7 @@ async def async_pool_fee_growth_global_1_x128(
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
@@ -78,7 +78,7 @@ async def async_pool_fee_growth_global_1_x128(
 async def async_pool_protocol_fees(
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> tuple[int, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -88,7 +88,7 @@ async def async_pool_protocol_fees(
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if (
@@ -104,7 +104,7 @@ async def async_pool_protocol_fees(
 async def async_pool_liquidity(
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -114,7 +114,7 @@ async def async_pool_liquidity(
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
@@ -137,7 +137,7 @@ async def async_pool_ticks(
     tick: int,
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> UniswapV3Ticks:
     function_abi = await uniswap_v3_spec.async_get_function_abi('ticks', 'pool')
@@ -145,7 +145,7 @@ async def async_pool_ticks(
         to_address=pool,
         function_abi=function_abi,
         function_parameters=[tick],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     return {
@@ -164,7 +164,7 @@ async def async_pool_tick_bitmap(
     word_position: int,
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -174,7 +174,7 @@ async def async_pool_tick_bitmap(
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
         block_number=block,
         function_parameters=[word_position],
     )
@@ -187,7 +187,7 @@ async def async_pool_positions(
     key: str,
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -198,7 +198,7 @@ async def async_pool_positions(
         to_address=pool,
         function_abi=function_abi,
         function_parameters=[key],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     return {
@@ -221,7 +221,7 @@ async def async_pool_observations(
     index: int,
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> UniswapV3Observations:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -232,7 +232,7 @@ async def async_pool_observations(
         to_address=pool,
         function_abi=function_abi,
         function_parameters=[index],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     return {
@@ -241,3 +241,4 @@ async def async_pool_observations(
         'seconds_per_liquidity_cummulative_x128': result[2],
         'initialized': result[3],
     }
+

@@ -96,7 +96,7 @@ async def async_dex_chart_command(
     block_numbers = list(swaps.index.get_level_values('block_number'))
     block_timestamps = await evm.async_get_block_timestamps(
         block_numbers,
-        provider={'chunk_size': 1},
+        context={'provider': {'chunk_size': 1}},
     )
     ohlc = ohlc_utils.compute_ohlc(
         values=prices,  # type: ignore

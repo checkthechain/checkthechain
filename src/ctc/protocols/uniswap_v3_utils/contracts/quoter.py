@@ -13,7 +13,7 @@ async def async_quote_exact_input_single(
     fee: int,
     amount_in: int,
     sqrt_price_limit_x96: int = 0,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -30,7 +30,7 @@ async def async_quote_exact_input_single(
             amount_in,
             sqrt_price_limit_x96,
         ],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
@@ -42,7 +42,7 @@ async def async_quote_exact_input(
     path: str,
     amount_in: int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -53,7 +53,7 @@ async def async_quote_exact_input(
         to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[path, amount_in],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
@@ -68,7 +68,7 @@ async def async_quote_exact_output_single(
     fee: int,
     amount_out: int,
     sqrt_price_limit_x96: int = 0,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -85,7 +85,7 @@ async def async_quote_exact_output_single(
             amount_out,
             sqrt_price_limit_x96,
         ],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
@@ -97,7 +97,7 @@ async def async_quote_exact_output(
     path: str,
     amount_in: int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -108,9 +108,10 @@ async def async_quote_exact_output(
         to_address=uniswap_v3_spec.quoter,
         function_abi=function_abi,
         function_parameters=[path, amount_in],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
     return result
+

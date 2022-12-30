@@ -17,7 +17,7 @@ async def async_create_fei_yield_payload(
     end_time: analytics_spec.Timestamp | None = None,
     window_size: str | None = None,
     interval_size: str | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> yields_spec.FeiYieldPayload:
     """create data payload from scratch"""
 
@@ -28,12 +28,13 @@ async def async_create_fei_yield_payload(
         end_time=end_time,
         window_size=window_size,
         interval_size=interval_size,
-        provider=provider,
+        context=context,
     )
 
     # get data
     data = await yields_source_utils.async_get_fei_yield_data(
         block_numbers=time_data['block_numbers'],
+        context=context,
     )
 
     return {

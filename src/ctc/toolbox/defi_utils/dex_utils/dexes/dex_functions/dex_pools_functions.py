@@ -15,14 +15,13 @@ async def async_get_pools(
     *,
     dex: typing.Type[dex_class.DEX] | str | None = None,
     factory: spec.Address | None = None,
-    network: spec.NetworkReference | None = None,
     assets: typing.Sequence[spec.Address] | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     update: bool = False,
-    provider: spec.ProviderReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.DexPool]:
     """get DEX pools matching given inputs"""
 
@@ -32,17 +31,14 @@ async def async_get_pools(
         dex = dex_class.DEX
 
         if update:
-            await async_update_all_dexes(
-                network=network,
-                provider=provider,
-            )
+            await async_update_all_dexes(context=context)
             update = False
 
     else:
         dex = dex_class_utils.get_dex_class(
             dex=dex,
             factory=factory,
-            network=network,
+            context=context,
         )
 
     return await dex.async_get_pools(
@@ -54,13 +50,12 @@ async def async_get_pools(
         start_time=start_time,
         end_time=end_time,
         update=update,
-        provider=provider,
+        context=context,
     )
 
 
 async def async_update_all_dexes(
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[str, typing.Mapping[str, typing.Any]]:
     """update local DEX database with latest on-chain entries"""
 
@@ -70,7 +65,7 @@ async def async_update_all_dexes(
 
     coroutines = []
     for dex in all_dexes.values():
-        coroutine = dex.async_update_pools(network=network, provider=provider)
+        coroutine = dex.async_update_pools(context=context)
         coroutines.append(coroutine)
 
     results = await asyncio.gather(*coroutines)

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import toolcli
 
+from ctc import config
 from ctc import evm
-from ctc.evm.event_utils_old import event_backends
 from ctc import spec
+from ctc.evm.event_utils_old import event_backends
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -82,10 +83,12 @@ async def async_rechunk(
     network: spec.NetworkReference,
 ) -> None:
 
+    context = config.create_user_input_context(network=network)
+
     if all_events:
 
         await event_backends.async_rechunk_all_events(
-            network=network,
+            context=context,
             start_block=start_block,
             end_block=end_block,
             chunk_target_bytes=chunk_bytes,
@@ -104,7 +107,7 @@ async def async_rechunk(
 
         await event_backends.async_rechunk_events(
             contract_address=contract,
-            network=network,
+            context=context,
             event_name=event_name,
             event_hash=event_hash,
             start_block=start_block,

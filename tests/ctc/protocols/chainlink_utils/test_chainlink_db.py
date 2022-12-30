@@ -24,7 +24,7 @@ async def test_populate_feeds():
     engine = toolsql.create_engine(db_config=db_config)
     with engine.begin() as conn:
         db.initialize_schema(
-            schema_name='chainlink', network='mainnet', conn=conn
+            schema_name='chainlink', context=dict(network='mainnet'), conn=conn
         )
     await chainlink_db.async_import_network_to_db(
         network='mainnet', engine=engine
@@ -60,7 +60,7 @@ async def test_chainlink_crud():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='chainlink',
-        network='mainnet',
+        context=dict(network='mainnet'),
     )
     toolsql.create_tables(
         db_config=db_config,
@@ -78,7 +78,9 @@ async def test_chainlink_crud():
         with conn.begin():
             for feed_data in example_data:
                 await chainlink_db.async_upsert_feed(
-                    conn=conn, feed=feed_data, network=network
+                    conn=conn,
+                    feed=feed_data,
+                    context=dict(network=network),
                 )
 
         # get data individually
@@ -87,7 +89,7 @@ async def test_chainlink_crud():
                 db_feed = await chainlink_db.async_select_feed(
                     conn=conn,
                     address=feed_data['address'],
-                    network=network,
+                    context=dict(network=network),
                 )
                 for key, target_value in feed_data.items():
                     assert target_value == db_feed[key]
@@ -98,7 +100,7 @@ async def test_chainlink_crud():
             db_feeds = await chainlink_db.async_select_feeds(
                 conn=conn,
                 addresses=addresses,
-                network=network,
+                context=dict(network=network),
             )
             db_feeds = sorted(db_feeds, key=lambda feed: feed['address'])
             assert db_feeds == example_data
@@ -109,7 +111,7 @@ async def test_chainlink_crud():
                 await chainlink_db.async_delete_feed(
                     conn=conn,
                     address=feed_data['address'],
-                    network=network,
+                    context=dict(network=network),
                 )
 
         # ensure all entries deleted
@@ -117,6 +119,7 @@ async def test_chainlink_crud():
             db_feeds = await chainlink_db.async_select_feeds(
                 conn=conn,
                 addresses=addresses,
-                network=network,
+                context=dict(network=network),
             )
             assert all(item is None for item in db_feeds)
+

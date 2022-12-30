@@ -144,7 +144,9 @@ schema_datas = [
         'schema_name': 'transactions',
         'selector': db.async_select_transaction,
         'queryer': db.async_query_transaction,
-        'query': {'hash': '0xaef402056d26796c49a7cdc0be9fa09f193e48458a1829dd788c38a8ae143683'},
+        'query': {
+            'hash': '0xaef402056d26796c49a7cdc0be9fa09f193e48458a1829dd788c38a8ae143683'
+        },
         'plural_selector': db.async_select_transactions,
         'plural_queryer': db.async_query_transactions,
         'plural_query': {
@@ -190,7 +192,9 @@ async def test_select_when_db_folder_does_not_exist(schema_data):
     engine = toolsql.create_engine(**db_config)
 
     if schema_data.get('queryer') is not None:
-        result = await schema_data['queryer'](network=1, engine=engine)
+        result = await schema_data['queryer'](
+            context=dict(network=1), engine=engine
+        )
 
         assert result is None
 
@@ -203,7 +207,7 @@ async def test_select_when_db_file_does_not_exist(schema_data):
 
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
-            network=1, engine=engine, **schema_data['query']
+            context=dict(network=1), engine=engine, **schema_data['query']
         )
 
         assert result is None
@@ -218,7 +222,7 @@ async def test_select_when_schema_not_initialized(schema_data):
         db.initialize_schema_versions(conn=conn)
 
     if schema_data['schema_name'] not in non_network_schemas:
-        network_kwargs = {'network': 1}
+        network_kwargs = {'context': {'network': 1}}
     else:
         network_kwargs = {}
 
@@ -250,9 +254,9 @@ async def test_query_when_schema_not_initialized(schema_data):
         db.initialize_schema_versions(conn=conn)
 
     if schema_data['schema_name'] not in non_network_schemas:
-        network_kwargs = {'network': 1}
+        network_kwargs = {'context': {'network': 1}}
     else:
-        network_kwargs = {}
+        network_kwargs = {'context': None}
 
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
@@ -269,16 +273,16 @@ async def test_select_when_row_does_not_exist(schema_data):
     engine = toolsql.create_engine(**db_config)
     with engine.begin() as conn:
         if schema_data['schema_name'] not in non_network_schemas:
-            network_kwargs = {'network': 1}
+            network_kwargs = {'context': {'network': 1}}
         else:
-            network_kwargs = {'network': None}
+            network_kwargs = {'context': {'network': None}}
 
         db.initialize_schema(
             schema_name=schema_data['schema_name'], conn=conn, **network_kwargs
         )
 
     if schema_data['schema_name'] not in non_network_schemas:
-        network_kwargs = {'network': 1}
+        network_kwargs = {'context': {'network': 1}}
     else:
         network_kwargs = {}
 
@@ -308,9 +312,9 @@ async def test_query_when_row_does_not_exist(schema_data):
     engine = toolsql.create_engine(**db_config)
     with engine.begin() as conn:
         if schema_data['schema_name'] not in non_network_schemas:
-            network_kwargs = {'network': 1}
+            network_kwargs = {'context': {'network': 1}}
         else:
-            network_kwargs = {'network': None}
+            network_kwargs = {'context': {'network': None}}
 
         db.initialize_schema(
             schema_name=schema_data['schema_name'], conn=conn, **network_kwargs
@@ -318,9 +322,9 @@ async def test_query_when_row_does_not_exist(schema_data):
 
     if schema_data.get('queryer') is not None:
         if schema_data['schema_name'] not in non_network_schemas:
-            network_kwargs = {'network': 1}
+            network_kwargs = {'context': {'network': 1}}
         else:
-            network_kwargs = {}
+            network_kwargs = {'context': None}
 
         result = await schema_data['queryer'](
             engine=engine, **schema_data['query'], **network_kwargs

@@ -21,13 +21,12 @@ async def async_get_pool_trades(
     end_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
-    network: spec.NetworkReference | None = None,
     label: Literal['index', 'symbol', 'address'] = 'index',
-    provider: spec.ProviderReference = None,
     include_timestamps: bool = False,
     remove_missing_fields: bool = True,
     include_prices: bool = False,
     include_volumes: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """get trades of a DEX pool"""
 
@@ -35,8 +34,7 @@ async def async_get_pool_trades(
         dex=dex,
         factory=factory,
         pool=pool,
-        network=network,
-        provider=provider,
+        context=context,
     )
 
     return await dex.async_get_pool_trades(
@@ -47,8 +45,7 @@ async def async_get_pool_trades(
         start_time=start_time,
         end_time=end_time,
         label=label,
-        network=network,
-        provider=provider,
+        context=context,
         include_timestamps=include_timestamps,
         remove_missing_fields=remove_missing_fields,
         include_prices=include_prices,

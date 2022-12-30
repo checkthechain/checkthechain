@@ -17,7 +17,7 @@ async def async_get_token_oracle(
     token: spec.Address,
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     replace_missing: bool = True,
     raise_if_missing: bool = True,
 ) -> spec.ContractAddress:
@@ -28,7 +28,7 @@ async def async_get_token_oracle(
         function_name='tokenToOracle',
         function_parameters=[token],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(oracle, str):
         raise Exception('invalid rpc result')
@@ -37,7 +37,7 @@ async def async_get_token_oracle(
         oracle = await _async_replace_missing_oracle(
             token=token,
             oracle=oracle,
-            provider=provider,
+            context=context,
             replacement_block='latest',
         )
 
@@ -51,12 +51,12 @@ async def async_get_tokens_oracles(
     tokens: typing.Sequence[spec.Address],
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     replace_missing: bool = True,
     raise_if_missing: bool = True,
 ) -> list[spec.ContractAddress]:
 
-    block = await evm.async_block_number_to_int(block, provider=provider)
+    block = await evm.async_block_number_to_int(block, context=context)
     oracles: typing.Sequence[
         spec.ContractAddress
     ] = await rpc.async_batch_eth_call(
@@ -64,14 +64,14 @@ async def async_get_tokens_oracles(
         function_name='tokenToOracle',
         function_parameter_list=[[token] for token in tokens],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     if replace_missing:
         oracles = await _async_replace_missing_oracles(
             oracles=oracles,
             tokens=tokens,
-            provider=provider,
+            context=context,
             replacement_block=block,
         )
 
@@ -86,7 +86,7 @@ async def async_get_token_oracle_by_block(
     token: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[spec.ContractAddress]:
 
     import asyncio
@@ -96,7 +96,7 @@ async def async_get_token_oracle_by_block(
         coroutine = async_get_token_oracle(
             token=token,
             block=block,
-            provider=provider,
+            context=context,
         )
         coroutines.append(coroutine)
     return await asyncio.gather(*coroutines)
@@ -111,14 +111,14 @@ async def async_get_token_price(
     token: spec.Address,
     *,
     block: spec.BlockReference = 'latest',
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
 ) -> typing.Union[int, float]:
 
     # get oracle
-    block = await evm.async_block_number_to_int(block, provider=provider)
+    block = await evm.async_block_number_to_int(block, context=context)
     oracle = await async_get_token_oracle(
-        token=token, block=block, provider=provider
+        token=token, block=block, context=context
     )
 
     # get price
@@ -126,7 +126,7 @@ async def async_get_token_price(
         to_address=oracle,
         function_name='read',
         block_number=block,
-        provider=provider,
+        context=context,
     )
     subresult = result[0][0]
     if not isinstance(subresult, int):
@@ -143,7 +143,7 @@ async def async_get_token_price_by_block(
     token: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
     import asyncio
@@ -154,7 +154,7 @@ async def async_get_token_price_by_block(
         coroutine = async_get_token_price(
             token=token,
             block=block,
-            provider=provider,
+            context=context,
             normalize=normalize,
         )
         coroutines.append(coroutine)
@@ -165,24 +165,24 @@ async def async_get_tokens_prices(
     tokens: typing.Sequence[spec.Address],
     *,
     block: typing.Optional[spec.BlockReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
 ) -> typing.Union[list[int], list[float]]:
 
     if block is None:
         block = 'latest'
 
-    block = await evm.async_block_number_to_int(block, provider=provider)
+    block = await evm.async_block_number_to_int(block, context=context)
     oracles = await async_get_tokens_oracles(
         tokens=tokens,
         block=block,
-        provider=provider,
+        context=context,
     )
     results = await rpc.async_batch_eth_call(
         to_addresses=oracles,
         function_name='read',
         block_number=block,
-        provider=provider,
+        context=context,
     )
     prices = [result[0][0] for result in results]
 
@@ -218,7 +218,7 @@ async def _async_replace_missing_oracle(
     *,
     oracle: spec.ContractAddress,
     token: spec.Address,
-    provider: spec.ProviderReference,
+    context: spec.Context,
     replacement_block: spec.BlockNumberReference,
 ) -> spec.Address:
 
@@ -226,7 +226,7 @@ async def _async_replace_missing_oracle(
         return await async_get_token_oracle(
             token=token,
             block=replacement_block,
-            provider=provider,
+            context=context,
             replace_missing=False,
             raise_if_missing=False,
         )
@@ -238,7 +238,7 @@ async def _async_replace_missing_oracles(
     *,
     oracles: typing.Sequence[spec.ContractAddress],
     tokens: typing.Sequence[spec.Address],
-    provider: spec.ProviderReference,
+    context: spec.Context,
     replacement_block: spec.BlockNumberReference,
 ) -> typing.Sequence[spec.Address]:
     missing = [
@@ -251,7 +251,7 @@ async def _async_replace_missing_oracles(
         results = await async_get_tokens_oracles(
             tokens=tokens,
             block=replacement_block,
-            provider=provider,
+            context=context,
             replace_missing=False,
             raise_if_missing=False,
         )
@@ -266,3 +266,4 @@ async def _async_replace_missing_oracles(
 
     else:
         return oracles
+

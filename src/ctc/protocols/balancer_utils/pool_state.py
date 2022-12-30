@@ -50,12 +50,15 @@ pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
 async def async_get_pool_weights_raw(
     pool_address: spec.ContractAddress,
     block: spec.BlockNumberReference = 'latest',
+    *,
+    context: spec.Context = None,
 ) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
 
     result = await rpc.async_eth_call(
         to_address=pool_address,
         function_abi=pool_function_abis['getNormalizedWeights'],
         block_number=block,
+        context=context,
     )
     if not isinstance(result, (tuple, list)) or not all(
         isinstance(item, (int, float)) for item in result
@@ -71,6 +74,7 @@ async def async_get_pool_weights(
     block: spec.BlockNumberReference = 'latest',
     *,
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> typing.Union[
     dict[spec.ContractAddress, int],
     dict[spec.ContractAddress, float],
@@ -78,10 +82,10 @@ async def async_get_pool_weights(
     import asyncio
 
     tokens_coroutine = pool_metadata.async_get_pool_tokens(
-        pool_address=pool_address, block=block
+        pool_address=pool_address, block=block, context=context
     )
     weights_coroutine = async_get_pool_weights_raw(
-        pool_address=pool_address, block=block
+        pool_address=pool_address, block=block, context=context
     )
 
     tokens, weights = await asyncio.gather(tokens_coroutine, weights_coroutine)
@@ -97,16 +101,20 @@ async def async_get_pool_weights_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> typing.Union[
     dict[spec.BlockNumberReference, int],
     dict[spec.BlockNumberReference, float],
 ]:
+    from ctc import config
+
+    context = config.update_context(context, merge_provider={'chunk_size': 100})
 
     weights = await rpc.async_batch_eth_call(
         to_address=pool_address,
         function_abi=pool_function_abis['getNormalizedWeights'],
         block_numbers=blocks,
-        provider={'chunk_size': 100},
+        context=context,
     )
 
     if normalize:
@@ -128,12 +136,14 @@ async def async_get_pool_fees(
     *,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> typing.Union[int, float]:
 
     fees = await rpc.async_eth_call(
         to_address=pool_address,
         function_abi=pool_function_abis['getSwapFeePercentage'],
         block_number=block,
+        context=context,
     )
 
     if not isinstance(fees, int):
@@ -158,7 +168,7 @@ async def async_get_pool_balances(
     block: spec.BlockNumberReference | None = None,
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
-    provider: spec.ProviderReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Union[dict[spec.Address, int], dict[spec.Address, float]]:
 
     if block is None:
@@ -172,7 +182,7 @@ async def async_get_pool_balances(
         pool_id = await pool_metadata.async_get_pool_id(
             pool_address,
             block=block,
-            provider=provider,
+            context=context,
         )
 
     pool_tokens = await rpc.async_eth_call(
@@ -181,7 +191,7 @@ async def async_get_pool_balances(
         function_parameters=[pool_id],
         block_number=block,
         package_named_outputs=True,
-        provider=provider,
+        context=context,
     )
 
     pool_balances = dict(zip(pool_tokens['tokens'], pool_tokens['balances']))
@@ -191,7 +201,7 @@ async def async_get_pool_balances(
         decimals = await evm.async_get_erc20s_decimals(
             tokens=tokens,
             block=block,
-            provider=provider,
+            context=context,
         )
         for token, decimal in zip(tokens, decimals):
             pool_balances[token] /= 10**decimal
@@ -206,6 +216,7 @@ async def async_get_pool_balances_by_block(
     pool_id: typing.Optional[spec.HexData] = None,
     vault: typing.Optional[spec.ContractAddress] = None,
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> typing.Union[dict[spec.Address, list[int | float]]]:
     import asyncio
 
@@ -216,6 +227,7 @@ async def async_get_pool_balances_by_block(
             block=block,
             vault=vault,
             normalize=normalize,
+            context=context,
         )
         for block in blocks
     ]

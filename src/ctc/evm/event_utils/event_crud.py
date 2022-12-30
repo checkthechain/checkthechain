@@ -27,8 +27,7 @@ async def async_get_events(
     use_db: bool = True,
     read_from_db: bool | None = None,
     write_to_db: bool | None = None,
-    provider: spec.ProviderReference = None,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     named_topics: typing.Mapping[str, typing.Any] | None = None,
     decoded_topic1: typing.Any | None = None,
     decoded_topic2: typing.Any | None = None,
@@ -54,10 +53,6 @@ async def async_get_events(
     from . import event_query_utils
     from . import event_metadata
 
-    network, provider = network_utils.get_network_and_provider(
-        network, provider
-    )
-
     # determine how much to use db
     if read_from_db is None:
         read_from_db = use_db
@@ -79,7 +74,7 @@ async def async_get_events(
             raise Exception('must specify contract_address or start_block')
         start_block = await contract_utils.async_get_contract_creation_block(
             contract_address=contract_address,
-            provider=provider,
+            context=context,
         )
     if start_block is None:
         raise Exception('could not determine start_block')
@@ -102,7 +97,7 @@ async def async_get_events(
         encoded_topic1=encoded_topic1,
         encoded_topic2=encoded_topic2,
         encoded_topic3=encoded_topic3,
-        network=network,
+        context=context,
     )
 
     # compute which columns to return
@@ -128,11 +123,10 @@ async def async_get_events(
                 start_block=start_block,
                 end_block=end_block,
                 write_to_db=write_to_db,
-                provider=provider,
                 verbose=verbose,
-                network=network,
                 binary_output_format=binary_output_format,
                 columns_to_load=columns_to_load,
+                context=context,
             )
         )
     else:
@@ -145,9 +139,9 @@ async def async_get_events(
             start_block=start_block,
             end_block=end_block,
             write_to_db=write_to_db,
-            provider=provider,
             verbose=verbose,
             binary_output_format=binary_output_format,
+            context=context,
         )
 
     # convert to dataframe as needed
@@ -189,13 +183,14 @@ async def async_get_events(
     if include_timestamps:
         timestamps = await event_metadata.async_get_event_timestamps(
             df,
-            provider=provider,
+            context=context,
         )
         df.insert(0, 'timestamp', timestamps)
     if include_event_names:
         df['event_name'] = await event_metadata._async_get_event_names_column(
             events=df,
             share_abis_across_contracts=share_abis_across_contracts,
+            context=context,
         )
 
     # format data
@@ -208,6 +203,7 @@ async def async_get_events(
             share_abis_across_contracts=share_abis_across_contracts,
             output_format=output_format,
             binary_output_format=binary_output_format,
+            context=context,
         )
         return df
 

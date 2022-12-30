@@ -17,13 +17,13 @@ if typing.TYPE_CHECKING:
 
 
 async def async_xtick_block_dates(
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> None:
     import tooltime
 
     start_block, end_block = plt.xlim()
     start_time, end_time = await evm.async_predict_block_timestamps(
-        [round(start_block), round(end_block)], provider=provider
+        [round(start_block), round(end_block)], context=context
     )
     date_timestamps = tooltime.get_standard_intervals(
         interval_size='1d',
@@ -63,7 +63,7 @@ def _select_interleaved(
 
 
 async def async_block_timestamp_xticks(
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     representation: tooltime.TimestampExtendedRepresentation | None = None,
     *,
     omit: str | None = 'year',
@@ -75,7 +75,7 @@ async def async_block_timestamp_xticks(
     raw_blocks, labels = plt.xticks()
     blocks = [int(block) for block in raw_blocks]
     block_timestamps = await evm.async_predict_block_timestamps(
-        blocks, provider=provider
+        blocks, context=context
     )
 
     if representation is None:

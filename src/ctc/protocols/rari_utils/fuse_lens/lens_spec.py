@@ -3,24 +3,21 @@ from __future__ import annotations
 import typing
 from typing_extensions import TypedDict
 
-from ctc import rpc
+from ctc import evm
 from ctc import spec
 
 
 def get_lens_address(
     lens_name: str,
-    network: spec.NetworkReference | None = None,
-    *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
 
-    if network is None:
-        provider = rpc.get_provider(provider)
-        network = provider['network']
-        if network is None:
-            raise Exception('could not determine network')
+    from ctc import config
 
-    if network == 'mainnet':
+    network = config.get_context_chain_id(context)
+    network_name = evm.get_network_name(network)
+
+    if network_name == 'mainnet':
 
         if lens_name == 'primary':
             return '0x6dc585ad66a10214ef0502492b0cc02f0e836eec'
@@ -29,7 +26,7 @@ def get_lens_address(
         else:
             raise Exception('unknown lens name: ' + str(lens_name))
 
-    elif network == 'arbitrum':
+    elif network_name == 'arbitrum':
 
         if lens_name == 'primary':
             return '0xd6e194af3d9674b62d1b30ec676030c23961275e'

@@ -42,7 +42,9 @@ async def async_print_aave_addresses(
     ]
     rows = []
     for contract in contracts:
-        address = aave_spec.get_aave_address(contract, network=network)
+        address = aave_spec.get_aave_address(
+            contract, context=dict(network=network)
+        )
         row = [contract, address]
         rows.append(row)
     print()
@@ -359,7 +361,7 @@ async def async_get_token_market_summary(
         await aave_interest_rates.async_get_reserve_data_by_block(
             asset=token_address,
             blocks=blocks,
-            provider={'chunk_size': 1},
+            context=dict(provider={'chunk_size': 1}),
         )
     )
 
@@ -497,3 +499,4 @@ async def async_print_token_market_summary(
         toolstr.print(plot, indent=4)
         print()
         print()
+

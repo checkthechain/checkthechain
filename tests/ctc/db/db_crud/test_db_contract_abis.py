@@ -35,7 +35,7 @@ async def test_contract_abis_crud():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='contract_abis',
-        network='mainnet',
+        context=dict(network='mainnet'),
     )
     toolsql.create_tables(
         db_config=db_config,

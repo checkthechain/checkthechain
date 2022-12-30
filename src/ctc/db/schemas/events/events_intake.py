@@ -14,7 +14,7 @@ async def async_intake_encoded_events(
     encoded_events: typing.Sequence[spec.EncodedEvent] | spec.DataFrame,
     # encoded_events: spec.DataFrame,
     query: spec.DBEventQuery,
-    network: spec.NetworkReference,
+    context: spec.Context,
     latest_block: int | None = None,
 ) -> None:
 
@@ -30,7 +30,9 @@ async def async_intake_encoded_events(
     # only insert blocks after a given number of confirmations
     if latest_block is None:
         latest_block = await evm.async_get_latest_block_number()
-    required_confirmations = management.get_required_confirmations(network)
+    required_confirmations = management.get_required_confirmations(
+        context=context
+    )
     latest_allowed_block = latest_block - required_confirmations
     if query['start_block'] > latest_allowed_block:
         return
@@ -47,7 +49,7 @@ async def async_intake_encoded_events(
     if len(encoded_events) == 0:
         return
 
-    engine = connect_utils.create_engine(schema_name='events', network=network)
+    engine = connect_utils.create_engine(schema_name='events', context=context)
     if engine is None:
         return None
 
@@ -57,14 +59,15 @@ async def async_intake_encoded_events(
             await events_statements.async_upsert_event_query(
                 event_query=query,
                 conn=conn,
-                network=network,
+                context=context,
             )
             await events_statements.async_upsert_events(
                 encoded_events=encoded_events,
                 conn=conn,
-                network=network,
+                context=context,
             )
     except sqlalchemy.exc.OperationalError:
         pass
 
     return None
+

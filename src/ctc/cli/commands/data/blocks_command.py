@@ -91,7 +91,7 @@ async def async_blocks_command(
     blocks_data = await rpc.async_batch_eth_get_block_by_number(
         block_numbers=export_blocks,
         include_full_transactions=True,
-        provider=provider,
+        context=dict(provider=provider),
     )
 
     if export == 'stdout':

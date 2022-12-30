@@ -12,8 +12,8 @@ from ... import schema_utils
 
 async def async_upsert_erc20_metadata(
     *,
+    context: spec.Context,
     address: spec.Address,
-    network: spec.NetworkReference,
     symbol: str | None = None,
     decimals: int | None = None,
     name: str | None = None,
@@ -37,7 +37,7 @@ async def async_upsert_erc20_metadata(
         upsert_option = None
 
     # get table name
-    table = schema_utils.get_table_name('erc20_metadata', network=network)
+    table = schema_utils.get_table_name('erc20_metadata', context=context)
 
     # insert data
     toolsql.insert(
@@ -51,11 +51,11 @@ async def async_upsert_erc20_metadata(
 async def async_upsert_erc20s_metadata(
     *,
     erc20s_metadata: typing.Sequence[spec.ERC20Metadata],
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
     coroutines = [
-        async_upsert_erc20_metadata(conn=conn, network=network, **metadata)
+        async_upsert_erc20_metadata(conn=conn, context=context, **metadata)
         for metadata in erc20s_metadata
     ]
     await asyncio.gather(*coroutines)
@@ -66,14 +66,11 @@ async def async_select_erc20_metadata(
     *,
     symbol: str | None = None,
     case_insensitive_symbol: bool = False,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context | None = None,
     conn: toolsql.SAConnection,
 ) -> spec.ERC20Metadata | None:
 
-    if network is None:
-        network = config.get_default_network()
-
-    table = schema_utils.get_table_name('erc20_metadata', network=network)
+    table = schema_utils.get_table_name('erc20_metadata', context=context)
 
     if address is not None:
         query: typing.Mapping[str, typing.Any] = {'row_id': address.lower()}
@@ -101,14 +98,11 @@ async def async_select_erc20_metadata(
 async def async_select_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
     *,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context | None = None,
     conn: toolsql.SAConnection,
 ) -> typing.Sequence[spec.ERC20Metadata | None] | None:
 
-    if network is None:
-        network = config.get_default_network()
-
-    table = schema_utils.get_table_name('erc20_metadata', network=network)
+    table = schema_utils.get_table_name('erc20_metadata', context=context)
     results = toolsql.select(
         conn=conn,
         table=table,
@@ -128,22 +122,23 @@ async def async_select_erc20s_metadata(
 async def async_delete_erc20_metadata(
     address: spec.Address,
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
-    table = schema_utils.get_table_name('erc20_metadata', network=network)
+    table = schema_utils.get_table_name('erc20_metadata', context=context)
     toolsql.delete(table=table, conn=conn, row_id=address.lower())
 
 
 async def async_delete_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
-    table = schema_utils.get_table_name('erc20_metadata', network=network)
+    table = schema_utils.get_table_name('erc20_metadata', context=context)
     toolsql.delete(
         table=table,
         conn=conn,
         row_ids=[address.lower() for address in addresses],
     )
+

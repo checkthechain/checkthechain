@@ -46,36 +46,32 @@ def get_command_spec() -> toolcli.CommandSpec:
 async def async_dex_pool_command(
     *,
     pool: spec.Address,
-    network: str | int | None,
     block: str | None,
+    network: str,
+    context: spec.Context = None,
 ) -> None:
     from ctc import db
 
-    if network is not None:
-        network = cli_utils.parse_network(typing.cast(str, network))
-    if network is None:
-        network = config.get_default_network()
-
     if block is not None:
-        block_number = await cli_utils.async_parse_block(block)
+        block_number = await cli_utils.async_parse_block(block, context=context)
     else:
         block_number = None
 
-    dex_pool = await db.async_query_dex_pool(address=pool, network=network)
+    dex_pool = await db.async_query_dex_pool(address=pool, context=context)
     if dex_pool is None:
         print('pool not found, updating dex database')
         await dex_utils.async_update_all_dexes()
-        dex_pool = await db.async_query_dex_pool(address=pool, network=network)
+        dex_pool = await db.async_query_dex_pool(address=pool, context=context)
         if dex_pool is None:
             raise Exception('could not find pool data')
 
     dex = await dex_utils.async_get_dex_class(
-        pool=dex_pool['address'],
+        pool=dex_pool['address'], context=context,
     )
 
     # queue creation timestamp task
     creation_timestamp_coroutine = evm.async_get_block_timestamp(
-        dex_pool['creation_block'],
+        dex_pool['creation_block'], context=context
     )
     creation_timestamp_task = asyncio.create_task(creation_timestamp_coroutine)
 
@@ -86,14 +82,14 @@ async def async_dex_pool_command(
         if dex_pool.get(key) is not None
     ]
     asset_symbols_task = asyncio.create_task(
-        evm.async_get_erc20s_symbols(assets)
+        evm.async_get_erc20s_symbols(assets, context=context)
     )
 
     # queue balances task
     balances_coroutine = dex.async_get_pool_balances(
         pool,
-        network=network,
         block=block_number,
+        context=context,
     )
     balances_task = asyncio.create_task(balances_coroutine)
 
@@ -155,13 +151,15 @@ async def async_dex_pool_command(
         print()
         toolstr.print_header('Pool State', style=styles['title'])
         tokens_metadata = await uniswap_v2_utils.async_get_pool_tokens_metadata(
-            pool
+            pool,
+            context=context,
         )
         x_symbol = tokens_metadata['x_symbol']
         y_symbol = tokens_metadata['y_symbol']
         pool_state = await uniswap_v2_utils.async_get_pool_state(
             pool,
             block=block_number,
+            context=context,
         )
         cpmm.print_pool_summary(
             x_name=x_symbol,

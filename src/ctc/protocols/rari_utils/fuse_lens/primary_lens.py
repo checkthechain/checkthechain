@@ -15,20 +15,20 @@ from . import lens_spec
 async def async_get_public_pools_with_data(
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
 ) -> lens_spec.PublicPoolsWithData:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
 
     # on-chain implementation reverts, python implementation instead
     all_pools = await fuse_queries.async_get_all_pools(
-        block=block, provider=provider
+        block=block, context=context
     )
     comptrollers = [pool[2] for pool in all_pools]
     coroutines = [
         _async_get_pool_summary_or_error(
-            comptroller, block=block, provider=provider
+            comptroller, block=block, context=context
         )
         for comptroller in comptrollers
     ]
@@ -54,15 +54,15 @@ async def _async_get_pool_summary_or_error(
     comptroller: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> _ReturnPoolSummaryOrError:
     try:
         summary = await async_get_pool_summary(
             comptroller=comptroller,
             lens_address=lens_address,
-            provider=provider,
             block=block,
+            context=context,
         )
         return {'summary': summary, 'error': None}
     except spec.RpcException as e:
@@ -73,20 +73,20 @@ async def async_get_public_pools_by_verification_with_data(
     *,
     whitelisted_admin: bool,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.PublicPoolsWithData:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
 
     # on-chain implementation reverts, python implementation instead
     all_pools = await fuse_queries.async_get_all_pools(
-        block=block, provider=provider
+        block=block, context=context
     )
     comptrollers = [pool[2] for pool in all_pools]
     coroutines = [
         _async_get_pool_summary_or_error(
-            comptroller, block=block, provider=provider
+            comptroller, block=block, context=context
         )
         for comptroller in comptrollers
     ]
@@ -118,18 +118,18 @@ async def async_get_pools_by_account_with_data(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplierWithData:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getPoolsByAccountWithData')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return {
         'indices': result[0],
@@ -145,18 +145,18 @@ async def async_get_pool_summary(
     comptroller: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolSummary:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getPoolSummary')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[comptroller],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return lens_spec.return_pool_summary_to_dict(result)
 
@@ -165,18 +165,18 @@ async def async_get_pool_assets_with_data(
     comptroller: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> list[lens_spec.FusePoolAsset]:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getPoolAssetsWithData')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[comptroller],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return [lens_spec.fuse_pool_asset_to_dict(item) for item in result]
 
@@ -185,19 +185,19 @@ async def async_get_public_pool_users_with_data(
     *,
     max_health: int = int(1e36),
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPublicPoolUsersWithData:
 
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
 
     # on-chain implementation reverts, python implementation instead
     # kwargs = {'block': block, 'provider': provider}
     max_health = int(1e36)
 
     all_pools = await fuse_queries.async_get_all_pools(
-        block=block, provider=provider
+        block=block, context=context
     )
     comptrollers = [pool[2] for pool in all_pools]
     coroutines = [
@@ -205,7 +205,7 @@ async def async_get_public_pool_users_with_data(
             comptroller=comptroller,
             max_health=max_health,
             block=block,
-            provider=provider,
+            context=context,
         )
         for comptroller in comptrollers
     ]
@@ -253,11 +253,11 @@ async def async_get_pool_users_with_data(
     *,
     max_health: int = int(1e36),
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolUsersWithData:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi(
         'getPoolUsersWithData',
         parameter_types=('address', 'uint256'),
@@ -267,7 +267,7 @@ async def async_get_pool_users_with_data(
         function_abi=function_abi,
         function_parameters=[comptroller, max_health],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     return lens_spec.return_pool_users_with_data_to_dict(result)
@@ -278,13 +278,13 @@ async def async_get_pools_users_with_data(
     *,
     max_health: int = int(1e36),
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsUsersWithData:
     """renamed to prevent name collision with async_get_pool_users_with_data"""
 
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi(
         'getPoolUsersWithData',
         parameter_types=('address[]', 'uint256'),
@@ -294,7 +294,7 @@ async def async_get_pools_users_with_data(
         function_abi=function_abi,
         function_parameters=[comptrollers, max_health],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     return {
@@ -312,18 +312,18 @@ async def async_get_pools_by_supplier(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplier:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getPoolsBySupplier')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return {
         'indices': result[0],
@@ -335,18 +335,18 @@ async def async_get_pools_by_supplier_with_data(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPoolsBySupplierWithData:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getPoolsBySupplierWithData')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return {
         'indices': result[0],
@@ -362,18 +362,18 @@ async def async_get_user_summary(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.UserSummary:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getUserSummary')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     return {
@@ -388,18 +388,18 @@ async def async_get_pool_user_summary(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.PoolUserSummary:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getPoolUserSummary')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[comptroller, account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return {
         'supply_balance': result[0],
@@ -411,18 +411,18 @@ async def async_get_whitelisted_pools_by_account(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Sequence[lens_spec.FusePool]:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi('getWhitelistedPoolsByAccount')
     result = await rpc.async_eth_call(
         to_address=lens_address,
         function_abi=function_abi,
         function_parameters=[account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     output = result[1]
     return typing.cast(typing.Sequence[lens_spec.FusePool], output)
@@ -432,11 +432,11 @@ async def async_get_whitelisted_pools_by_account_with_data(
     account: spec.Address,
     *,
     lens_address: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnWhitelistedPoolsByAccountWithData:
     if lens_address is None:
-        lens_address = lens_spec.get_lens_address('primary', provider=provider)
+        lens_address = lens_spec.get_lens_address('primary', context=context)
     function_abi = lens_abis.get_function_abi(
         'getWhitelistedPoolsByAccountWithData'
     )
@@ -445,7 +445,7 @@ async def async_get_whitelisted_pools_by_account_with_data(
         function_abi=function_abi,
         function_parameters=[account],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     output: lens_spec.ReturnWhitelistedPoolsByAccountWithData = {
@@ -468,3 +468,4 @@ async def async_get_whitelisted_pools_by_account_with_data(
     ]
 
     return output
+

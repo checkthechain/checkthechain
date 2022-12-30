@@ -3,6 +3,7 @@ from __future__ import annotations
 import toolcli
 import toolstr
 
+import ctc.config
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -45,27 +46,27 @@ async def async_chain_command(
     no_check: bool,
 ) -> None:
 
+    context = ctc.config.create_user_input_context(provider=provider)
+
     # gather configured chain_id
-    provider_network = None
     config_chain_id = None
     if verbose or config or not no_check:
         try:
-            provider_network = rpc.get_provider_network(provider)
-            config_chain_id = evm.get_network_chain_id(provider_network)
+            config_chain_id = ctc.config.get_context_chain_id(context)
         except spec.CouldNotDetermineNetwork:
             pass
 
     # gather reported chain_id
     reported_chain_id = None
     if verbose or not config or not no_check:
-        reported_chain_id = await rpc.async_eth_chain_id(provider=provider)
+        reported_chain_id = await rpc.async_eth_chain_id(context=context)
 
     # print output
     if verbose:
         toolstr.print_text_box('Provider chain information')
         print()
 
-        reported_chain_id = await rpc.async_eth_chain_id(provider=provider)
+        reported_chain_id = await rpc.async_eth_chain_id(context=context)
         toolstr.print_header('Info reported by node')
         print('- chain_id:', reported_chain_id)
         print('- name:', evm.get_network_name(reported_chain_id))

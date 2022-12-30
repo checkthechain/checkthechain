@@ -48,22 +48,16 @@ async def async_get_events_from_node(
     contract_abi: spec.ContractABI | None = None,
     blocks_per_chunk: int = 2000,
     verbose: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """see fetch_events() for complete kwarg list"""
 
     import asyncio
-    from ctc import rpc
-
-    provider = rpc.get_provider(provider)
-    network = provider['network']
-    if network is None:
-        raise Exception('could not determine network')
 
     # create chunks
     start_block, end_block = await block_utils.async_block_numbers_to_int(
         blocks=[start_block, end_block],
-        provider=provider,
+        context=context,
     )
     if verbose:
         print(
@@ -85,7 +79,7 @@ async def async_get_events_from_node(
         if contract_address is not None:
             contract_abi = await abi_utils.async_get_contract_abi(
                 contract_address=contract_address,
-                network=network,
+                context=context,
             )
     if event_name is None and event_hash is None and event_abi is None:
         raise Exception('must specify event_name or event_hash or event_abi')
@@ -95,7 +89,7 @@ async def async_get_events_from_node(
                 event_hash=event_hash,
                 contract_abi=contract_abi,
                 contract_address=contract_address,
-                network=network,
+                context=context,
             )
         event_name = event_abi['name']
     if event_hash is None:
@@ -105,7 +99,7 @@ async def async_get_events_from_node(
                 event_name=event_name,
                 contract_abi=contract_abi,
                 contract_address=contract_address,
-                network=network,
+                context=context,
             )
         if event_name is not None:
             event_hash = abi_utils.get_event_hash(event_abi)
@@ -123,7 +117,7 @@ async def async_get_events_from_node(
             event_hash=event_hash,
             contract_address=contract_address,
             verbose=verbose,
-            provider=provider,
+            context=context,
         )
         coroutines.append(coroutine)
     chunks_entries = await asyncio.gather(*coroutines)
@@ -139,7 +133,7 @@ async def async_get_events_from_node(
         event_hash=event_hash,
         event_name=event_name,
         event_abi=event_abi,
-        provider=provider,
+        context=context,
     )
 
 
@@ -149,7 +143,7 @@ async def _async_get_chunk_of_events_from_node(
     *,
     contract_address: spec.Address | None,
     verbose: bool,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.RawLog]:
 
     from ctc import rpc
@@ -166,7 +160,7 @@ async def _async_get_chunk_of_events_from_node(
         topics=[event_hash],
         start_block=start_block,
         end_block=end_block,
-        provider=provider,
+        context=context,
     )
 
     return entries
@@ -180,18 +174,16 @@ async def _async_package_exported_events(
     event_hash: str,
     event_name: str,
     event_abi: spec.EventABI | None,
-    provider: spec.ProviderReference,
+    context: spec.Context,
 ) -> spec.DataFrame:
 
     if event_abi is None:
-        from ctc import rpc
-        network = rpc.get_provider_network(provider)
         event_abi = await abi_utils.async_get_event_abi(
             contract_address=contract_address,
             contract_abi=contract_abi,
             event_hash=event_hash,
             event_name=event_name,
-            network=network,
+            context=context,
         )
 
     if len(entries) == 0:

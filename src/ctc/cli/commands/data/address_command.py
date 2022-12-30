@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import toolcli
 
+from ctc import config
 from ctc import evm
 from ctc import spec
 
@@ -38,6 +39,8 @@ async def async_address_command(
     *, address: spec.Address, verbose: bool | int, network: str, raw: bool
 ) -> None:
 
+    context = config.create_user_input_context(network=network)
+
     max_width = toolcli.get_n_terminal_cols()
 
     address = await evm.async_resolve_address(address)
@@ -49,5 +52,5 @@ async def async_address_command(
         verbose=verbose,
         max_width=max_width,
         raw=raw,
-        provider={'network': network},
+        context=context,
     )

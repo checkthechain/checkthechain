@@ -20,7 +20,7 @@ async def async_get_erc20_total_supply(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[int, float]:
     """get total supply of ERC20"""
@@ -32,7 +32,7 @@ async def async_get_erc20_total_supply(
         token=token,
         function_name='totalSupply',
         block=block,
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
     if not isinstance(result, int):
@@ -41,7 +41,7 @@ async def async_get_erc20_total_supply(
 
     if normalize:
         total_supply = await erc20_normalize.async_normalize_erc20_quantity(
-            quantity=total_supply, token=token, provider=provider
+            quantity=total_supply, token=token, context=context
         )
 
     return total_supply
@@ -52,7 +52,7 @@ async def async_get_erc20s_total_supplies(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
     """get total supplies of ERC20s"""
@@ -67,7 +67,7 @@ async def async_get_erc20s_total_supplies(
     if normalize:
         total_supplies = (
             await erc20_normalize.async_normalize_erc20s_quantities(
-                tokens=tokens, quantities=total_supplies, provider=provider
+                tokens=tokens, quantities=total_supplies, context=context
             )
         )
 
@@ -79,7 +79,7 @@ async def async_get_erc20_total_supply_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
     """get historical total supply of ERC20 across multiple blocks"""
@@ -88,7 +88,7 @@ async def async_get_erc20_total_supply_by_block(
         token=token,
         function_name='totalSupply',
         blocks=blocks,
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
 
@@ -97,7 +97,7 @@ async def async_get_erc20_total_supply_by_block(
             await erc20_normalize.async_normalize_erc20_quantities_by_block(
                 token=token,
                 quantities=total_supplies,
-                provider=provider,
+                context=context,
                 blocks=blocks,
             )
         )
@@ -116,7 +116,7 @@ async def async_get_erc20_balance(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[int, float]:
     """get ERC20 balance"""
@@ -127,7 +127,7 @@ async def async_get_erc20_balance(
     wallet = await address_utils.async_resolve_address(
         wallet,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     result = await erc20_generic.async_erc20_eth_call(
@@ -135,7 +135,7 @@ async def async_get_erc20_balance(
         function_name='balanceOf',
         block=block,
         function_parameters=[wallet],
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
     if not isinstance(result, int):
@@ -144,7 +144,7 @@ async def async_get_erc20_balance(
 
     if normalize:
         balance = await erc20_normalize.async_normalize_erc20_quantity(
-            quantity=balance, token=token, provider=provider, block=block
+            quantity=balance, token=token, context=context, block=block
         )
 
     return balance
@@ -156,7 +156,7 @@ async def async_get_erc20_balances_of_addresses(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
     """get ERC20 balance of multiple addresses"""
@@ -169,7 +169,7 @@ async def async_get_erc20_balances_of_addresses(
     wallets = await address_utils.async_resolve_addresses(
         wallets,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     balances = await rpc.async_batch_eth_call(
@@ -177,13 +177,13 @@ async def async_get_erc20_balances_of_addresses(
         block_number=block,
         function_abi=erc20_spec.erc20_function_abis['balanceOf'],
         function_parameter_list=[[wallet] for wallet in wallets],
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
 
     if normalize:
         balances = await erc20_normalize.async_normalize_erc20_quantities(
-            quantities=balances, token=token, provider=provider, block=block
+            quantities=balances, token=token, context=context, block=block
         )
 
     return balances
@@ -195,12 +195,12 @@ async def async_get_erc20s_balances(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
     """get ERC20 balance of wallet for multiple tokens"""
 
-    from ctc import rpc
+    from ctc import config
 
     if block is None:
         block = 'latest'
@@ -208,21 +208,19 @@ async def async_get_erc20s_balances(
     wallet = await address_utils.async_resolve_address(
         wallet,
         block=block,
-        provider=provider,
+        context=context,
     )
 
-    provider = rpc.get_provider(provider)
-
-    if typing.TYPE_CHECKING:
-        provider = typing.cast(spec.Provider, dict(provider))
-
-    provider['chunk_size'] = 100
+    context = config.update_context(
+        context=context,
+        merge_provider={'chunk_size': 100},
+    )
     balances = await erc20_generic.async_erc20s_eth_calls(
         tokens=tokens,
         function_name='balanceOf',
         block=block,
         function_parameters=[wallet],
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
 
@@ -230,7 +228,7 @@ async def async_get_erc20s_balances(
         balances = await erc20_normalize.async_normalize_erc20s_quantities(
             quantities=balances,
             tokens=tokens,
-            provider=provider,
+            context=context,
             block=block,
         )
 
@@ -243,7 +241,7 @@ async def async_get_erc20_balance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     empty_token: typing.Any = 0,
     **rpc_kwargs: typing.Any,
 ) -> typing.Union[list[int], list[float]]:
@@ -252,7 +250,7 @@ async def async_get_erc20_balance_by_block(
     wallet = await address_utils.async_resolve_address(
         wallet,
         block=blocks[-1],
-        provider=provider,
+        context=context,
     )
 
     balances = await erc20_generic.async_erc20_eth_call_by_block(
@@ -260,7 +258,7 @@ async def async_get_erc20_balance_by_block(
         function_name='balanceOf',
         blocks=blocks,
         function_parameters=[wallet],
-        provider=provider,
+        context=context,
         empty_token=empty_token,
         **rpc_kwargs,
     )
@@ -270,7 +268,7 @@ async def async_get_erc20_balance_by_block(
             await erc20_normalize.async_normalize_erc20_quantities_by_block(
                 quantities=balances,
                 token=token,
-                provider=provider,
+                context=context,
                 blocks=blocks,
             )
         )
@@ -289,7 +287,7 @@ async def async_get_erc20_allowance(
     *,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[int, float]:
     """get ERC20 allowance"""
 
@@ -299,7 +297,7 @@ async def async_get_erc20_allowance(
     wallet = await address_utils.async_resolve_address(
         wallet,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     result = await erc20_generic.async_erc20_eth_call(
@@ -307,7 +305,7 @@ async def async_get_erc20_allowance(
         function_name='allowance',
         block=block,
         function_parameters=[wallet],
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -315,7 +313,7 @@ async def async_get_erc20_allowance(
 
     if normalize:
         allowance = await erc20_normalize.async_normalize_erc20_quantity(
-            quantity=allowance, token=token, provider=provider, block=block
+            quantity=allowance, token=token, context=context, block=block
         )
 
     return allowance
@@ -327,14 +325,14 @@ async def async_get_erc20_allowance_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[list[int], list[float]]:
     """get historical ERC20 allowance over range of blocks"""
 
     wallet = await address_utils.async_resolve_address(
         wallet,
         block=blocks[-1],
-        provider=provider,
+        context=context,
     )
 
     allowances = await erc20_generic.async_erc20_eth_call_by_block(
@@ -342,7 +340,7 @@ async def async_get_erc20_allowance_by_block(
         function_name='allowance',
         blocks=blocks,
         function_parameters=[wallet],
-        provider=provider,
+        context=context,
     )
 
     if normalize:
@@ -350,7 +348,7 @@ async def async_get_erc20_allowance_by_block(
             await erc20_normalize.async_normalize_erc20_quantities_by_block(
                 quantities=allowances,
                 token=token,
-                provider=provider,
+                context=context,
                 blocks=blocks,
             )
         )
@@ -364,14 +362,14 @@ async def async_get_erc20s_allowances(
     *,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[list[int], list[float]]:
     """get ERC20 allowance of wallet for multiple tokens"""
 
     wallet = await address_utils.async_resolve_address(
         wallet,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     allowances = await erc20_generic.async_erc20s_eth_calls(
@@ -379,12 +377,12 @@ async def async_get_erc20s_allowances(
         function_name='allowance',
         block=block,
         function_parameters=[wallet],
-        provider=provider,
+        context=context,
     )
 
     if normalize:
         allowances = await erc20_normalize.async_normalize_erc20s_quantities(
-            quantities=allowances, tokens=tokens, provider=provider, block=block
+            quantities=allowances, tokens=tokens, context=context, block=block
         )
 
     return allowances
@@ -396,7 +394,7 @@ async def async_get_erc20_allowances_of_addresses(
     *,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
     """get ERC20 allowance of multiple addresses"""
 
@@ -405,7 +403,7 @@ async def async_get_erc20_allowances_of_addresses(
     wallets = await address_utils.async_resolve_addresses(
         wallets,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     allowances = await rpc.async_batch_eth_call(
@@ -413,12 +411,13 @@ async def async_get_erc20_allowances_of_addresses(
         block_number=block,
         function_abi=erc20_spec.erc20_function_abis['allowance'],
         function_parameter_list=[[wallet] for wallet in wallets],
-        provider=provider,
+        context=context,
     )
 
     if normalize:
         allowances = await erc20_normalize.async_normalize_erc20_quantities(
-            quantities=allowances, token=token, provider=provider, block=block
+            quantities=allowances, token=token, context=context, block=block
         )
 
     return allowances
+

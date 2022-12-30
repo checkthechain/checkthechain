@@ -2,13 +2,19 @@ from __future__ import annotations
 
 import typing
 
+from ctc import config
 from ctc import spec
 
 
 def get_dex_names_of_factories(
-    network: spec.NetworkReference,
+    *,
+    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[spec.Address, str]:
     """get mapping of factory_address -> dex_name"""
+
+    if network is None:
+        network = config.get_context_chain_id(context)
 
     if network in (1, 'mainnet'):
         return {
@@ -31,9 +37,11 @@ def get_dex_names_of_factories(
 
 def get_dex_name_of_factory(
     factory: spec.Address,
-    network: spec.NetworkReference,
+    *,
+    context: spec.Context = None,
 ) -> str:
     """get dex_name of factory address"""
 
-    names_of_factories = get_dex_names_of_factories(network=network)
+    names_of_factories = get_dex_names_of_factories(context=context)
     return names_of_factories[factory]
+

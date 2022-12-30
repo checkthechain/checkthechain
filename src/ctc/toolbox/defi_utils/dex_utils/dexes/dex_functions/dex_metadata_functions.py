@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import evm
 from ctc import spec
 
 from .. import dex_class_utils
@@ -11,21 +10,18 @@ from .. import dex_directory
 
 async def async_get_pool_assets(
     pool: spec.Address,
-    network: spec.NetworkReference | None = None,
     *,
-    provider: spec.ProviderReference | None = None,
+    context: spec.Context = None,
     use_db: bool = True,
     factory: spec.Address | None = None,
 ) -> typing.Sequence[spec.Address]:
     """get assets of a given DEX pool"""
 
-    network, provider = evm.get_network_and_provider(network, provider)
-
     # try obtaining pool from db
     if use_db:
         from ctc import db
 
-        pool_data = await db.async_query_dex_pool(address=pool, network=network)
+        pool_data = await db.async_query_dex_pool(address=pool, context=context)
         if pool_data is not None:
             assets: typing.MutableSequence[spec.Address] = []
             asset0 = pool_data['asset0']
@@ -47,7 +43,8 @@ async def async_get_pool_assets(
         raise Exception('must specify factory if pool not in db')
     dex_name = dex_directory.get_dex_name_of_factory(
         factory=factory,
-        network=network,
+        context=context,
     )
     dex = dex_class_utils.get_dex_class(dex_name)
-    return await dex.async_get_pool_assets(pool=pool, provider=provider)
+    return await dex.async_get_pool_assets(pool=pool, context=context)
+

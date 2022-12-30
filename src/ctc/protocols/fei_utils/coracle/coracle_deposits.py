@@ -28,7 +28,7 @@ async def async_get_tokens_deposits(
     *,
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
     block: typing.Optional[spec.BlockReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> dict[spec.Address, typing.Tuple[spec.ContractAddress, ...]]:
     """get all deposits of all tokens in pcv"""
 
@@ -36,12 +36,12 @@ async def async_get_tokens_deposits(
 
     if block is None:
         block = 'latest'
-    block = await evm.async_block_number_to_int(block=block, provider=provider)
+    block = await evm.async_block_number_to_int(block=block, context=context)
 
     # get tokens in pcv
     if tokens is None:
         tokens = await coracle_tokens.async_get_tokens_in_pcv(
-            block=block, provider=provider
+            block=block, context=context
         )
 
     # get deposits of each token
@@ -50,7 +50,7 @@ async def async_get_tokens_deposits(
         coroutine = async_get_token_deposits(
             token=token,
             block=block,
-            provider=provider,
+            context=context,
         )
         coroutines.append(coroutine)
 
@@ -65,13 +65,13 @@ async def async_get_token_deposits(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     wrapper: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Tuple[spec.ContractAddress, ...]:
     """get list of a token's deposits"""
 
     if block is None:
         block = 'latest'
-    block = await evm.async_block_number_to_int(block=block, provider=provider)
+    block = await evm.async_block_number_to_int(block=block, context=context)
 
     coracle = coracle_spec.get_coracle_address(wrapper=wrapper, block=block)
     result = await rpc.async_eth_call(
@@ -79,7 +79,7 @@ async def async_get_token_deposits(
         block_number=block,
         function_abi=coracle_function_abis['getDepositsForToken'],
         function_parameters={'_token': token},
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, tuple) or not all(
         isinstance(item, str) for item in result
@@ -92,14 +92,14 @@ async def async_get_deposit_token(
     deposit: spec.ContractAddress,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
     """get the token address of a deposit"""
     result = await rpc.async_eth_call(
         to_address=deposit,
         block_number=block,
         function_name='token',
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')

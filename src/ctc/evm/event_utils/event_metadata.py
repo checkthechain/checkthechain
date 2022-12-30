@@ -9,7 +9,7 @@ from ctc import spec
 
 async def async_get_event_timestamps(
     events: spec.DataFrame,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """get timestamps of an events dataframe"""
 
@@ -29,13 +29,15 @@ async def async_get_event_timestamps(
     # get timestamps
     return await block_utils.async_get_block_timestamps(
         block_numbers,
-        provider=provider,
+        context=context,
     )
 
 
 async def _async_get_event_names_column(
     events: spec.DataFrame,
+    *,
     share_abis_across_contracts: bool = True,
+    context: spec.Context = None,
 ) -> typing.Sequence[str]:
 
     # compile which event abis are needed
@@ -58,7 +60,9 @@ async def _async_get_event_names_column(
     # get event abis
     event_abis = {}
     for key, query in event_abi_queries.items():
-        event_abis[key] = await abi_utils.async_get_event_abi(**query)
+        event_abis[key] = await abi_utils.async_get_event_abi(
+            context=context, **query
+        )
 
     # construct column
     event_abi_column = []
@@ -75,3 +79,4 @@ async def _async_get_event_names_column(
         event_abi_column.append(event_abis[key].get('name', ''))
 
     return event_abi_column
+

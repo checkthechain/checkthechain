@@ -9,7 +9,11 @@ from . import yields_spec
 
 async def async_get_fei_yield_data(
     block_numbers: typing.Sequence[spec.BlockNumberReference],
+    context: spec.Context = None,
 ) -> typing.Mapping[str, yields_spec.YieldSourceData]:
+
+    import warnings
+    warnings.warn('deprecated code')
 
     # get yield sources
     yields_sources = get_yields_sources()

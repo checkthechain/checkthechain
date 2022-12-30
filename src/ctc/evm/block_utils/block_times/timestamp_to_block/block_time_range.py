@@ -17,7 +17,7 @@ async def async_resolve_block_range(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     allow_none: typing.Literal[False],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     to_int: typing.Literal[True],
     start_none_means: spec.BlockNumberReference | None = None,
     end_none_means: spec.BlockNumberReference | None = None,
@@ -33,7 +33,7 @@ async def async_resolve_block_range(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     allow_none: typing.Literal[False],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     to_int: typing.Literal[False] = False,
     start_none_means: spec.BlockNumberReference | None = None,
     end_none_means: spec.BlockNumberReference | None = None,
@@ -49,7 +49,7 @@ async def async_resolve_block_range(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     allow_none: bool,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     to_int: typing.Literal[True],
     start_none_means: spec.BlockNumberReference | None = None,
     end_none_means: spec.BlockNumberReference | None = None,
@@ -65,7 +65,7 @@ async def async_resolve_block_range(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     allow_none: bool,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     to_int: bool = False,
     start_none_means: spec.BlockNumberReference | None = None,
     end_none_means: spec.BlockNumberReference | None = None,
@@ -80,7 +80,7 @@ async def async_resolve_block_range(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     allow_none: bool,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     to_int: bool = False,
     start_none_means: spec.BlockNumberReference | None = None,
     end_none_means: spec.BlockNumberReference | None = None,
@@ -98,13 +98,13 @@ async def async_resolve_block_range(
     if start_block is not None:
         if to_int:
             tasks['start_block'] = asyncio.create_task(
-                evm.async_block_number_to_int(start_block, provider=provider)
+                evm.async_block_number_to_int(start_block, context=context)
             )
         else:
             start_block = start_block
     elif start_time is not None:
         tasks['start_block'] = asyncio.create_task(
-            evm.async_get_block_of_timestamp(start_time, provider=provider)
+            evm.async_get_block_of_timestamp(start_time, context=context)
         )
     else:
         if allow_none:
@@ -115,13 +115,13 @@ async def async_resolve_block_range(
     if end_block is not None:
         if to_int:
             tasks['end_block'] = asyncio.create_task(
-                evm.async_block_number_to_int(end_block, provider=provider)
+                evm.async_block_number_to_int(end_block, context=context)
             )
         else:
             end_block = end_block
     elif end_time is not None:
         tasks['end_block'] = asyncio.create_task(
-            evm.async_get_block_of_timestamp(end_time, provider=provider)
+            evm.async_get_block_of_timestamp(end_time, context=context)
         )
     else:
         if allow_none:

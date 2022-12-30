@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import typing
 
+from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import block_utils
@@ -23,7 +24,7 @@ if typing.TYPE_CHECKING:
         event_hash: str
         start_block: int
         end_block: int
-        network: spec.NetworkReference
+        context: spec.Context
         event_abi: spec.EventABI
         latest_block: int
 
@@ -31,7 +32,7 @@ if typing.TYPE_CHECKING:
 async def async_import_events_dir_to_db(
     *,
     events_dir: str,
-    network: spec.NetworkReference,
+    context: spec.Context,
     verbose: bool = True,
     skip: int | None = None,
 ) -> DirectoryCSVFiles:
@@ -60,7 +61,7 @@ async def async_import_events_dir_to_db(
             event_abi = await abi_utils.async_get_event_abi(
                 contract_address=contract_address,
                 event_hash=event_hash,
-                network=network,
+                context=context,
             )
         except (spec.AbiNotFoundException, LookupError):
             print(
@@ -88,7 +89,7 @@ async def async_import_events_dir_to_db(
                     'event_hash': event_hash,
                     'start_block': start_block,
                     'end_block': end_block,
-                    'network': network,
+                    'context': context,
                     'event_abi': event_abi,
                     'latest_block': latest_block,
                 }
@@ -138,7 +139,7 @@ async def async_import_events_csv_file_to_db(
     event_hash: str,
     start_block: int,
     end_block: int,
-    network: spec.NetworkReference,
+    context: spec.Context,
     event_abi: spec.EventABI,
     latest_block: int | None = None,
 ) -> None:
@@ -224,7 +225,7 @@ async def async_import_events_csv_file_to_db(
     await db.async_intake_encoded_events(
         encoded_events=encoded_events,
         query=event_query,
-        network=network,
+        context=context,
         latest_block=latest_block,
     )
 

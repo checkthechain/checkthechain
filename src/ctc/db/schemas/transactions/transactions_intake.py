@@ -12,14 +12,15 @@ from . import transactions_statements
 
 async def _async_convert_rpc_transaction_to_db_transaction(
     transaction: str | spec.DBTransaction | spec.RPCTransaction,
-    provider: spec.ProviderReference,
+    context: spec.Context = None,
 ) -> spec.DBTransaction:
 
     from ctc import rpc
 
     if isinstance(transaction, str):
         tx: spec.RPCTransaction = await rpc.async_eth_get_transaction_by_hash(
-            transaction
+            transaction,
+            context=context,
         )
         transaction = tx
 
@@ -44,7 +45,7 @@ async def _async_convert_rpc_transaction_to_db_transaction(
 
             receipt = await rpc.async_eth_get_transaction_receipt(
                 transaction_hash=transaction['hash'],
-                provider=provider,
+                context=context,
             )
             for tx_key, receipt_key in [
                 ['gas_used', 'gas_used'],
@@ -59,7 +60,7 @@ async def _async_convert_rpc_transactions_to_db_transactions(
     transactions: typing.Sequence[
         str | spec.DBTransaction | spec.RPCTransaction
     ],
-    provider: spec.ProviderReference,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
 
     import asyncio
@@ -67,7 +68,7 @@ async def _async_convert_rpc_transactions_to_db_transactions(
     coroutines = [
         _async_convert_rpc_transaction_to_db_transaction(
             transaction=transaction,
-            provider=provider,
+            context=context,
         )
         for transaction in transactions
     ]
@@ -77,34 +78,27 @@ async def _async_convert_rpc_transactions_to_db_transactions(
 async def async_intake_transaction(
     transaction: spec.DBTransaction | spec.RPCTransaction,
     *,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     latest_block: int | None = None,
 ) -> None:
 
     await async_intake_transactions(
         transactions=[transaction],
-        network=network,
-        provider=provider,
         latest_block=latest_block,
+        context=context,
     )
 
 
 async def async_intake_transactions(
     transactions: typing.Sequence[spec.DBTransaction | spec.RPCTransaction],
     *,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
     latest_block: int | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    network, provider = evm.get_network_and_provider(network, provider)
-
     if latest_block is None:
-        latest_block = await evm.async_get_latest_block_number(
-            provider=provider
-        )
-    required_confirmations = management.get_required_confirmations(network)
+        latest_block = await evm.async_get_latest_block_number(context=context)
+    required_confirmations = management.get_required_confirmations(context=context)
     latest_allowed_block = latest_block - required_confirmations
     confirmed_txs = [
         transaction
@@ -117,12 +111,12 @@ async def async_intake_transactions(
 
     db_txs = await _async_convert_rpc_transactions_to_db_transactions(
         confirmed_txs,
-        provider=provider,
+        context=context,
     )
 
     engine = connect_utils.create_engine(
         schema_name='transactions',
-        network=network,
+        context=context,
     )
 
     if engine is None:
@@ -131,51 +125,44 @@ async def async_intake_transactions(
     with engine.connect() as conn:
         await transactions_statements.async_upsert_transactions(
             transactions=db_txs,
-            network=network,
             conn=conn,
+            context=context,
         )
 
 
 async def async_intake_block_transaction_query(
     block: spec.Block | spec.RPCBlock,
     *,
-    network: spec.NetworkReference,
-    provider: spec.ProviderReference,
     latest_block: int | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     await async_intake_block_transaction_queries(
         blocks=[block],
-        network=network,
-        provider=provider,
         latest_block=latest_block,
+        context=context,
     )
 
 
 async def async_intake_block_transaction_queries(
     blocks: typing.Sequence[spec.Block | spec.RPCBlock],
     *,
-    network: spec.NetworkReference,
-    provider: spec.ProviderReference,
     latest_block: int | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     import sqlalchemy.exc  # type: ignore
 
-    network, provider = evm.get_network_and_provider(network, provider)
-
     if latest_block is None:
-        latest_block = await evm.async_get_latest_block_number(
-            provider=provider
-        )
+        latest_block = await evm.async_get_latest_block_number(context=context)
 
-    required_confirmations = management.get_required_confirmations(network)
+    required_confirmations = management.get_required_confirmations(context=context)
     latest_allowed_block = latest_block - required_confirmations
     confirmed_blocks = [
         block for block in blocks if block['number'] > latest_allowed_block
     ]
 
-    engine = connect_utils.create_engine(schema_name='events', network=network)
+    engine = connect_utils.create_engine(schema_name='events', context=context)
     if engine is None:
         return None
 
@@ -185,7 +172,7 @@ async def async_intake_block_transaction_queries(
     block_numbers = [block['number'] for block in confirmed_blocks]
     transactions = await _async_convert_rpc_transactions_to_db_transactions(
         [tx for block in confirmed_blocks for tx in block['transactions']],
-        provider=provider,
+        context=context,
     )
 
     try:
@@ -194,12 +181,12 @@ async def async_intake_block_transaction_queries(
             await transactions_statements.async_upsert_block_transaction_queries(
                 block_numbers=block_numbers,
                 conn=conn,
-                network=network,
+                context=context,
             )
             await transactions_statements.async_upsert_transactions(
                 transactions=transactions,
                 conn=conn,
-                network=network,
+                context=context,
             )
 
     except sqlalchemy.exc.OperationalError:

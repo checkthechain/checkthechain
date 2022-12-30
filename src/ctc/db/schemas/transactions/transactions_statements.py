@@ -12,10 +12,10 @@ async def async_upsert_transaction(
     transaction: spec.DBTransaction,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('transactions', network=network)
+    table = schema_utils.get_table_name('transactions', context=context)
 
     toolsql.insert(
         conn=conn,
@@ -29,10 +29,10 @@ async def async_upsert_transactions(
     transactions: typing.Sequence[spec.DBTransaction],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('transactions', network=network)
+    table = schema_utils.get_table_name('transactions', context=context)
 
     if len(transactions) == 0:
         return
@@ -49,12 +49,12 @@ async def async_upsert_block_transaction_query(
     block_number: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     table = schema_utils.get_table_name(
         'block_transaction_queries',
-        network=network,
+        context=context,
     )
     toolsql.insert(
         conn=conn,
@@ -68,7 +68,7 @@ async def async_upsert_block_transaction_queries(
     block_numbers: typing.Sequence[int],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     if len(block_numbers) == 0:
@@ -76,7 +76,7 @@ async def async_upsert_block_transaction_queries(
 
     table = schema_utils.get_table_name(
         'block_transaction_queries',
-        network=network,
+        context=context,
     )
     rows = [{'block_number': block_number} for block_number in block_numbers]
     toolsql.insert(
@@ -91,10 +91,10 @@ async def async_select_transaction(
     hash: str,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> spec.DBTransaction | None:
 
-    table = schema_utils.get_table_name('transactions', network=network)
+    table = schema_utils.get_table_name('transactions', context=context)
 
     tx: spec.DBTransaction | None = toolsql.select(
         conn=conn,
@@ -111,10 +111,10 @@ async def async_select_transactions(
     hashes: typing.Sequence[str],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> typing.Sequence[spec.DBTransaction | None] | None:
 
-    table = schema_utils.get_table_name('transactions', network=network)
+    table = schema_utils.get_table_name('transactions', context=context)
 
     transactions = toolsql.select(
         conn=conn,
@@ -135,13 +135,13 @@ async def async_select_block_transaction_query(
     block_number: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> bool | None:
     """return True if transaction query exists for given block number"""
 
     table = schema_utils.get_table_name(
         'block_transaction_queries',
-        network=network,
+        context=context,
     )
 
     result = toolsql.select(
@@ -160,13 +160,13 @@ async def async_select_block_transaction_queries(
     block_numbers: typing.Sequence[int] | None = None,
     start_block: int | None = None,
     end_block: int | None = None,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> typing.Mapping[int, bool] | None:
 
     table = schema_utils.get_table_name(
         'block_transaction_queries',
-        network=network,
+        context=context,
     )
 
     if block_numbers is not None:
@@ -214,11 +214,11 @@ async def async_select_block_transaction_queries(
 async def async_delete_transaction(
     hash: str,
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
-    table = schema_utils.get_table_name('transactions', network=network)
+    table = schema_utils.get_table_name('transactions', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -230,14 +230,14 @@ async def async_delete_transaction(
 async def async_delete_transactions(
     hashes: typing.Sequence[str],
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
     if len(hashes) == 0:
         return
 
-    table = schema_utils.get_table_name('transactions', network=network)
+    table = schema_utils.get_table_name('transactions', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -249,12 +249,12 @@ async def async_delete_transactions(
 async def async_delete_block_transaction_query(
     block_number: int,
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
     table = schema_utils.get_table_name(
-        'block_transaction_queries', network=network
+        'block_transaction_queries', context=context
     )
 
     toolsql.delete(
@@ -267,7 +267,7 @@ async def async_delete_block_transaction_query(
 async def async_delete_block_transaction_queries(
     block_numbers: typing.Sequence[int],
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
@@ -275,7 +275,7 @@ async def async_delete_block_transaction_queries(
         return
 
     table = schema_utils.get_table_name(
-        'block_transaction_queries', network=network
+        'block_transaction_queries', context=context
     )
 
     toolsql.delete(

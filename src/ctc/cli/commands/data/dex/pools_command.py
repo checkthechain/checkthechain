@@ -117,7 +117,9 @@ async def async_dex_pools_command(
     assets = await asyncio.gather(*coroutines)
 
     if created is not None:
-        start_block, end_block = await cli_utils.async_parse_block_range(created)
+        start_block, end_block = await cli_utils.async_parse_block_range(
+            created
+        )
     else:
         start_block = None
         end_block = None
@@ -186,7 +188,9 @@ async def async_dex_pools_command(
     ordered_assets = [asset for asset in all_assets if asset is not None]
     symbols = await evm.async_get_erc20s_symbols(
         ordered_assets,
-        provider={'chunk_size': 10, 'convert_reverts_to_none': True},
+        context=dict(
+            provider={'chunk_size': 10, 'convert_reverts_to_none': True}
+        ),
     )
 
     symbols = [symbol.replace('\x00', '') for symbol in symbols]
@@ -247,10 +251,7 @@ async def async_dex_pools_command(
         labels.append('age')
 
     if sort is not None:
-        sort_indices = [
-            labels.index(column)
-            for column in sort
-        ]
+        sort_indices = [labels.index(column) for column in sort]
     else:
         sort_indices = [
             labels.index('dex'),
@@ -303,3 +304,4 @@ async def async_dex_pools_command(
             'pools',
             style=styles['comment'],
         )
+

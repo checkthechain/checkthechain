@@ -26,8 +26,8 @@ async def async_get_pool_swaps(
     include_volumes: bool = False,
     label: Literal['index', 'symbol', 'address'] = 'index',
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
 
     from ctc.toolbox.defi_utils import dex_utils
@@ -43,8 +43,8 @@ async def async_get_pool_swaps(
         include_volumes=include_volumes,
         label=label,
         normalize=normalize,
-        provider=provider,
         verbose=verbose,
+        context=context,
     )
 
 
@@ -58,21 +58,21 @@ async def async_get_pool_mints(
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
 
     if normalize:
         decimals_task = asyncio.create_task(
             uniswap_v2_metadata.async_get_pool_decimals(
-                pool_address, provider=provider
+                pool_address, context=context
             )
         )
     if replace_symbols:
         symbols_task = asyncio.create_task(
             uniswap_v2_metadata.async_get_pool_symbols(
-                pool_address, provider=provider
+                pool_address, context=context
             )
         )
 
@@ -84,8 +84,8 @@ async def async_get_pool_mints(
         start_time=start_time,
         end_time=end_time,
         include_timestamps=include_timestamps,
-        provider=provider,
         verbose=verbose,
+        context=context,
     )
     mints['arg__amount0'] = mints['arg__amount0'].map(int)
     mints['arg__amount1'] = mints['arg__amount1'].map(int)
@@ -95,12 +95,12 @@ async def async_get_pool_mints(
         mints['arg__amount0'] = await evm.async_normalize_erc20_quantities(
             quantities=mints['arg__amount0'].astype(float),
             decimals=decimals0,
-            provider=provider,
+            context=context,
         )
         mints['arg__amount1'] = await evm.async_normalize_erc20_quantities(
             quantities=mints['arg__amount1'].astype(float),
             decimals=decimals1,
-            provider=provider,
+            context=context,
         )
 
     if replace_symbols:
@@ -124,21 +124,21 @@ async def async_get_pool_burns(
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
 
     if normalize:
         decimals_task = asyncio.create_task(
             uniswap_v2_metadata.async_get_pool_decimals(
-                pool_address, provider=provider
+                pool_address, context=context
             )
         )
     if replace_symbols:
         symbols_task = asyncio.create_task(
             uniswap_v2_metadata.async_get_pool_symbols(
-                pool_address, provider=provider
+                pool_address, context=context
             )
         )
 
@@ -150,7 +150,7 @@ async def async_get_pool_burns(
         start_time=start_time,
         end_time=end_time,
         include_timestamps=include_timestamps,
-        provider=provider,
+        context=context,
         verbose=verbose,
     )
     burns['arg__amount0'] = burns['arg__amount0'].map(int)
@@ -161,12 +161,12 @@ async def async_get_pool_burns(
         burns['arg__amount0'] = await evm.async_normalize_erc20_quantities(
             quantities=burns['arg__amount0'].astype(float),
             decimals=decimals0,
-            provider=provider,
+            context=context,
         )
         burns['arg__amount1'] = await evm.async_normalize_erc20_quantities(
             quantities=burns['arg__amount1'].astype(float),
             decimals=decimals1,
-            provider=provider,
+            context=context,
         )
 
     if replace_symbols:

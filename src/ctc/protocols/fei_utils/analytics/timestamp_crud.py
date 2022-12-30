@@ -19,7 +19,7 @@ async def async_get_time_data(
     end_time: analytics_spec.Timestamp | None = None,
     window_size: str | None = None,
     interval_size: str | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> analytics_spec.TimeData:
 
     if (
@@ -37,7 +37,7 @@ async def async_get_time_data(
             timestamps = get_timestamps(timescale=timescale, end_time=end_time)
         if blocks is None:
             blocks = await async_get_timestamps_blocks(
-                timestamps=timestamps, provider=provider
+                timestamps=timestamps, context=context
             )
         if interval_size is None:
             interval_size = timescale['interval_size']
@@ -46,7 +46,7 @@ async def async_get_time_data(
 
     timestamps = list(timestamps)
     blocks = await evm.async_block_numbers_to_int(
-        blocks=blocks, provider=provider
+        blocks=blocks, context=context
     )
 
     return {
@@ -96,14 +96,14 @@ def get_timestamps(
 async def async_get_timestamps_blocks(
     timestamps: typing.Sequence[analytics_spec.Timestamp],
     *,
-    provider: spec.ProviderReference,
+    context: spec.Context = None,
     block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
 ) -> list[int]:
 
     # use latest block if last timestamp is greater than latest block timestamp
-    latest_block = await evm.async_get_block('latest', provider=provider)
+    latest_block = await evm.async_get_block('latest', context=context)
     if latest_block['timestamp'] <= timestamps[-1]:
         timestamps = timestamps[:-1]
         latest_block_swapped = True
@@ -118,7 +118,7 @@ async def async_get_timestamps_blocks(
     # get blocks of timestamps
     blocks = await evm.async_get_blocks_of_timestamps(
         timestamps,
-        provider=provider,
+        context=context,
         block_timestamps=block_timestamps,
         block_number_array=block_number_array,
         block_timestamp_array=block_timestamp_array,

@@ -37,14 +37,13 @@ def get_default_config(use_env_variables: bool = True) -> spec.Config:
         'db_configs': get_default_db_configs(data_dir=data_dir),
         #
         # cache
-        'global_cache_override': {},
-        'schema_cache_configs': {},
-        'network_cache_configs': {},
-        'default_cache_config': {
-            'backend': 'main',
-            'read': True,
-            'write': True,
-        },
+        'context_cache_rules': [
+            {
+                'backend': 'main',
+                'read': True,
+                'write': True,
+            },
+        ],
         #
         # logging
         'log_rpc_calls': get_default_log_rpc_calls(),

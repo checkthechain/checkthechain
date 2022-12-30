@@ -16,22 +16,17 @@ R = TypeVar('R')
 def wrap_selector_with_connection(
     async_f: Callable[..., Coroutine[Any, Any, R | None]],
     schema_name: spec.SchemaName | Callable[..., spec.SchemaName | None],
-    *,
-    require_network: bool = True,
 ) -> Callable[..., Coroutine[Any, Any, R | None]]:
 
     # define new function
     @functools.wraps(async_f)
     async def async_connected_f(
         *args: Any,
-        network: spec.NetworkReference | None = None,
+        context: spec.Context,
         engine: toolsql.SAEngine | None = None,
         **kwargs: Any,
     ) -> R | None:
         # TODO: allow this function to accept a conn that already exists
-
-        if network is None and require_network:
-            raise Exception('must specify network')
 
         if not isinstance(schema_name, str) and hasattr(
             schema_name, '__call__'
@@ -48,7 +43,7 @@ def wrap_selector_with_connection(
         if engine is None:
             engine = connect_utils.create_engine(
                 schema_name=name,
-                network=network,
+                context=context,
             )
 
         # if cannot create engine, return None
@@ -56,12 +51,13 @@ def wrap_selector_with_connection(
             return None
 
         # connect and execute
-        if require_network:
-            kwargs['network'] = network
         try:
             with engine.connect() as conn:
-                return await async_f(*args, conn=conn, **kwargs)
+                return await async_f(
+                    *args, conn=conn, context=context, **kwargs
+                )
         except sqlalchemy.exc.OperationalError:
             return None
 
     return async_connected_f
+

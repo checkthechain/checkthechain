@@ -52,8 +52,7 @@ class DEX:
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
         raise NotImplementedError(cls.__name__ + '.async_get_new_pools')
 
@@ -62,9 +61,8 @@ class DEX:
         cls,
         pool: spec.Address,
         *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         block: spec.BlockNumberReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
         raise NotImplementedError(cls.__name__ + '.async_get_pool_assets')
 
@@ -78,9 +76,8 @@ class DEX:
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
         include_timestamps: bool = False,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         verbose: bool = False,
+        context: spec.Context = None,
     ) -> spec.RawDexTrades:
         raise NotImplementedError(cls.__name__ + '.async_get_pool_trades')
 
@@ -95,9 +92,11 @@ class DEX:
     @classmethod
     def get_pool_factories(
         cls,
-        network: spec.NetworkReference,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
-        chain_id = evm.get_network_chain_id(network)
+        from ctc import config
+
+        chain_id = config.get_context_chain_id(context)
         if cls._pool_factories is None:
             raise NotImplementedError(cls.__name__ + '._pool_factories')
         if chain_id not in cls._pool_factories:
@@ -120,16 +119,13 @@ class DEX:
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
         update: bool = False,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
         """return pools"""
 
-        network, provider = evm.get_network_and_provider(network, provider)
-
         factories: typing.Sequence[spec.Address] | None = None
         if all_dex_factories:
-            pool_factories = cls.get_pool_factories(network=network)
+            pool_factories = cls.get_pool_factories(context=context)
             if len(pool_factories) == 1:
                 factory = pool_factories[0]
                 factories = None
@@ -149,18 +145,18 @@ class DEX:
             start_time=start_time,
             end_time=end_time,
             allow_none=True,
-            provider=provider,
+            context=context,
         )
 
         if start_block is not None:
             start_block = await evm.async_block_number_to_int(
                 start_block,
-                provider=provider,
+                context=context,
             )
         if end_block is not None:
             end_block = await evm.async_block_number_to_int(
                 end_block,
-                provider=provider,
+                context=context,
             )
 
         pools = await cls.async_get_stored_dex_pools(
@@ -169,15 +165,14 @@ class DEX:
             assets=assets,
             start_block=start_block,
             end_block=end_block,
-            network=network,
+            context=context,
         )
 
         if update:
             new_pools = await cls.async_update_pools(
                 factory=factory,
                 factories=factories,
-                network=network,
-                provider=provider,
+                context=context,
             )
 
             # filter pools according to function inputs
@@ -198,10 +193,10 @@ class DEX:
         *,
         factory: spec.Address | None = None,
         factories: typing.Sequence[spec.Address] | None = None,
-        network: spec.NetworkReference,
         assets: typing.Sequence[spec.Address] | None = None,
         start_block: spec.BlockNumberReference | None = None,
         end_block: spec.BlockNumberReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
         """return pools"""
 
@@ -211,9 +206,9 @@ class DEX:
             factory=factory,
             factories=factories,
             assets=assets,
-            network=network,
             start_block=start_block,
             end_block=end_block,
+            context=context,
         )
         if pools is None:
             pools = []
@@ -230,18 +225,15 @@ class DEX:
         *,
         factory: spec.Address | None = None,
         factories: typing.Sequence[spec.Address] | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
         """update latest pools of factory"""
 
         from ctc import db
 
-        network, provider = evm.get_network_and_provider(network, provider)
-
         # if not factory or factories specified, use all
         if factories is None and factory is None:
-            factories = cls.get_pool_factories(network=network)
+            factories = cls.get_pool_factories(context=context)
 
         # if using multiple factories, call function separately for each
         if factories is not None:
@@ -249,8 +241,7 @@ class DEX:
             for factory in factories:
                 coroutine = cls.async_update_pools(
                     factory=factory,
-                    network=network,
-                    provider=provider,
+                    context=context,
                 )
                 coroutines.append(coroutine)
             results = await asyncio.gather(*coroutines)
@@ -263,7 +254,7 @@ class DEX:
         last_scanned_block = (
             await db.async_query_dex_pool_factory_last_scanned_block(
                 factory=factory,
-                network=network,
+                context=context,
             )
         )
         if last_scanned_block is None:
@@ -271,7 +262,8 @@ class DEX:
 
             try:
                 creation_block = await evm.async_get_contract_creation_block(
-                    factory
+                    factory,
+                    context=context,
                 )
                 if creation_block is None:
                     raise Exception(
@@ -281,7 +273,7 @@ class DEX:
             except search_utils.NoMatchFound:
                 last_scanned_block = -1
 
-        latest_block = await evm.async_get_latest_block_number()
+        latest_block = await evm.async_get_latest_block_number(context=context)
 
         if last_scanned_block + 1 <= latest_block:
 
@@ -289,12 +281,13 @@ class DEX:
                 factory=factory,
                 start_block=last_scanned_block + 1,
                 end_block=latest_block,
+                context=context,
             )
             await db.async_intake_dex_pools(
                 factory=factory,
                 dex_pools=new_pools,
-                network=network,
                 last_scanned_block=latest_block,
+                context=context,
             )
 
         else:
@@ -311,10 +304,9 @@ class DEX:
         cls,
         pool: spec.Address,
         *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         block: spec.BlockNumberReference | None = None,
         use_db: bool = True,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
 
         use_db = False
@@ -324,9 +316,8 @@ class DEX:
         else:
             return await cls._async_get_pool_assets_from_node(
                 pool=pool,
-                network=network,
-                provider=provider,
                 block=block,
+                context=context,
             )
 
     @classmethod
@@ -334,16 +325,10 @@ class DEX:
         cls,
         pool: spec.Address,
         *,
-        provider: spec.ProviderReference = None,
-        network: spec.NetworkReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[str]:
-        network, provider = evm.get_network_and_provider(network, provider)
-        assets = await cls.async_get_pool_assets(
-            pool=pool,
-            network=network,
-            provider=provider,
-        )
-        return await evm.async_get_erc20s_symbols(assets, provider=provider)
+        assets = await cls.async_get_pool_assets(pool=pool, context=context)
+        return await evm.async_get_erc20s_symbols(assets, context=context)
 
     #
     # # single pool balances
@@ -358,17 +343,15 @@ class DEX:
         factory: spec.Address | None = None,
         normalize: bool = True,
         block: spec.BlockNumberReference | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> int | float:
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         return await evm.async_get_erc20_balance(
             wallet=pool,
             token=asset,
             normalize=normalize,
             block=block,
+            context=context,
         )
 
     @classmethod
@@ -379,13 +362,10 @@ class DEX:
         factory: spec.Address | None = None,
         normalize: bool = True,
         block: spec.BlockNumberReference | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Mapping[spec.Address, int | float]:
 
-        network, provider = evm.get_network_and_provider(network, provider)
-
-        pool_tokens = await cls.async_get_pool_assets(pool=pool)
+        pool_tokens = await cls.async_get_pool_assets(pool=pool, context=context)
 
         if cls.async_get_pool_balance == DEX.async_get_pool_balance:
             balances = await evm.async_get_erc20s_balances(
@@ -393,7 +373,7 @@ class DEX:
                 tokens=pool_tokens,
                 normalize=normalize,
                 block=block,
-                provider=provider,
+                context=context,
             )
             return dict(zip(pool_tokens, balances))
         else:
@@ -404,7 +384,7 @@ class DEX:
                     asset=token,
                     normalize=normalize,
                     block=block,
-                    provider=provider,
+                    context=context,
                 )
                 coroutines.append(coroutine)
             results = await asyncio.gather(*coroutines)
@@ -419,17 +399,15 @@ class DEX:
         blocks: typing.Sequence[spec.BlockNumberReference],
         factory: spec.Address | None = None,
         normalize: bool = True,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[int | float]:
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         return await evm.async_get_erc20_balance_by_block(
             wallet=pool,
             token=asset,
             normalize=normalize,
             blocks=blocks,
+            context=context,
         )
 
     @classmethod
@@ -440,8 +418,7 @@ class DEX:
         blocks: typing.Sequence[spec.BlockNumberReference],
         factory: spec.Address | None = None,
         normalize: bool = True,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Mapping[str, typing.Sequence[int | float]]:
 
         if len(blocks) == 0:
@@ -453,8 +430,7 @@ class DEX:
                 factory=factory,
                 normalize=normalize,
                 block=block,
-                network=network,
-                provider=provider,
+                context=context,
             )
             for block in blocks
         ]
@@ -485,31 +461,26 @@ class DEX:
         label: Literal['index', 'symbol', 'address'] = 'index',
         include_timestamps: bool = False,
         normalize: bool = True,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         verbose: bool = False,
         remove_missing_fields: bool = True,
         include_prices: bool = False,
         include_volumes: bool = False,
+        context: spec.Context = None,
     ) -> spec.DataFrame:
 
         import pandas as pd
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         # queue relevant label data
         if label == 'symbol':
             symbols_coroutine = cls.async_get_pool_asset_symbols(
                 pool=pool,
-                provider=provider,
-                network=network,
+                context=context,
             )
             symbols_task = asyncio.create_task(symbols_coroutine)
         if normalize or label == 'address':
             assets_coroutine = cls.async_get_pool_assets(
                 pool=pool,
-                provider=provider,
-                network=network,
+                context=context,
             )
             assets_task = asyncio.create_task(assets_coroutine)
 
@@ -520,9 +491,8 @@ class DEX:
             start_time=start_time,
             end_time=end_time,
             include_timestamps=include_timestamps,
-            network=network,
-            provider=provider,
             verbose=verbose,
+            context=context,
         )
 
         if remove_missing_fields:
@@ -546,7 +516,7 @@ class DEX:
                 )
 
             decimals = await evm.async_get_erc20s_decimals(
-                assets, provider=provider
+                assets, context=context,
             )
 
             sold_decimals = output['sold_id'].map(lambda i: decimals[i])

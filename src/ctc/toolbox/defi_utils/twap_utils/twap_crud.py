@@ -26,20 +26,20 @@ async def async_get_twap(
     output_end_time: typing.Optional[tooltime.Timestamp] = None,
     #
     # # other
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Series:
 
     # get block numbers and timestamps
     start_coroutine = evm.async_get_block_number_and_time(
         block_number=output_start_block,
         block_timestamp=output_start_time,
-        provider=provider,
+        context=context,
     )
     start_task = asyncio.create_task(start_coroutine)
     end_coroutine = evm.async_get_block_number_and_time(
         block_number=output_end_block,
         block_timestamp=output_end_time,
-        provider=provider,
+        context=context,
     )
     end_task = asyncio.create_task(end_coroutine)
     start_block, start_time = await start_task
@@ -48,7 +48,7 @@ async def async_get_twap(
     # start block timestamp acquisition task
     blocks = list(range(start_block, end_block + 1))
     block_timestamps_task = asyncio.create_task(
-        evm.async_get_block_timestamps(blocks=blocks, provider=provider)
+        evm.async_get_block_timestamps(blocks=blocks, context=context)
     )
 
     # get data
@@ -80,7 +80,7 @@ async def async_get_twap_single_sample(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     timestamp: typing.Optional[tooltime.Timestamp] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> float:
 
     series = await async_get_twap(
@@ -90,7 +90,7 @@ async def async_get_twap_single_sample(
         output_end_block=block,
         output_start_time=timestamp,
         output_end_time=timestamp,
-        provider=provider,
+        context=context,
     )
 
     if len(series) == 0:

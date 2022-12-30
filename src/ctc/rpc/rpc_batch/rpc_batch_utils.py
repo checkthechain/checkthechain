@@ -78,7 +78,7 @@ def _get_batch_constructor_inputs(method: str) -> typing.Mapping[str, str]:
 async def async_batch_execute(
     method: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     """execute batch rpc call asynchronously"""
@@ -88,7 +88,7 @@ async def async_batch_execute(
         kwargs=kwargs,
     )
     request = batch_construct(method=method, **constructor_kwargs)
-    response = await rpc_request.async_send(request=request, provider=provider)
+    response = await rpc_request.async_send(request=request, context=context)
     return batch_digest(response=response, method=method, **digestor_kwargs)
 
 

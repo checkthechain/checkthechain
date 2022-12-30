@@ -10,7 +10,6 @@ these functions should
 
 from __future__ import annotations
 
-import functools
 import typing
 import os
 
@@ -179,62 +178,9 @@ def get_default_provider(
 # # caches
 #
 
-
-@functools.lru_cache()
-def get_all_cache_configs(
-    chain_id: spec.ChainId | None,
-) -> spec.MultiCacheContext:
-
-    from ctc import db
-
-    schema_names: tuple[spec.SchemaName] = db.get_generic_schema_names()
-    if chain_id is not None:
-        schema_names = schema_names + db.get_network_schema_names()  # type: ignore
-
-    cache_configs: spec.MutableMultiCacheContext = {}
-    for schema_name in schema_names:
-        cache_configs[schema_name] = get_schema_cache_config(
-            schema_name=schema_name,
-            chain_id=chain_id,
-        )
-
-    return cache_configs
-
-
-@functools.lru_cache()
-def get_schema_cache_config(
-    *,
-    schema_name: spec.SchemaName,
-    chain_id: spec.ChainId | None,
-) -> spec.SingleCacheContext:
-    """get cache config for a given network and schema
-
-    for network-specific schemas, must specify chain_id
-    """
-
-    import copy
-
+def get_context_cache_rules() -> typing.Sequence[spec.ContextCacheRule]:
     config = config_read.get_config()
-    cache_config = copy.copy(config['default_cache_config'])
-
-    # copy values form schema_cache_configs
-    schema_cache_configs = config['schema_cache_configs']
-    if schema_name in schema_cache_configs:
-        cache_config.update(schema_cache_configs[schema_name])
-
-    # copy values from network_cache_configs
-    if (
-        chain_id is not None
-        and chain_id in config['network_cache_configs']
-        and schema_name in config['network_cache_configs'][chain_id]
-    ):
-        values = config['network_cache_configs'][chain_id][schema_name]
-        cache_config.update(values)
-
-    # copy values from global_cache_override
-    cache_config.update(config['global_cache_override'])
-
-    return cache_config
+    return config['context_cache_rules']
 
 
 #
@@ -275,6 +221,11 @@ def get_db_config(
     if require and db_config is None:
         raise Exception('db not configured')
     return db_config
+
+
+def get_cache_backends() -> typing.Sequence[str]:
+    config = config_read.get_config()
+    return list(config['db_configs'].keys())
 
 
 #

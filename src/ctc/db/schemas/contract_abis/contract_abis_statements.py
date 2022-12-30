@@ -15,12 +15,12 @@ async def async_upsert_contract_abi(
     abi: spec.ContractABI,
     includes_proxy: bool,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     abi_text = json.dumps(abi)
 
-    table = schema_utils.get_table_name('contract_abis', network=network)
+    table = schema_utils.get_table_name('contract_abis', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -36,13 +36,13 @@ async def async_upsert_contract_abi(
 async def async_select_contract_abi(
     address: spec.Address,
     *,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     conn: toolsql.SAConnection,
 ) -> spec.ContractABI | None:
 
     table = schema_utils.get_table_name(
         'contract_abis',
-        network=network,
+        context=context,
     )
     abi_text = toolsql.select(
         conn=conn,
@@ -63,13 +63,13 @@ async def async_select_contract_abi(
 async def async_select_contract_abis(
     addresses: typing.Sequence[spec.Address] | None = None,
     *,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     conn: toolsql.SAConnection,
 ) -> typing.Mapping[spec.Address, spec.ContractABI] | None:
 
     table = schema_utils.get_table_name(
         'contract_abis',
-        network=network,
+        context=context,
     )
 
     if addresses is not None:
@@ -95,14 +95,15 @@ async def async_delete_contract_abi(
     address: spec.Address,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
     table = schema_utils.get_table_name(
         'contract_abis',
-        network=network,
+        context=context,
     )
     toolsql.delete(
         conn=conn,
         table=table,
         row_id=address.lower(),
     )
+

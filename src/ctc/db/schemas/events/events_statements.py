@@ -4,7 +4,6 @@ import typing
 
 import toolsql
 
-from ctc import config
 from ctc import evm
 from ctc import spec
 from ... import schema_utils
@@ -17,7 +16,7 @@ async def async_upsert_events(
     *,
     encoded_events: typing.Sequence[spec.EncodedEvent] | spec.DataFrame,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     if spec.is_dataframe(encoded_events):
@@ -49,7 +48,7 @@ async def async_upsert_events(
         )
         for encoded_event in encoded_events
     ]
-    table = schema_utils.get_table_name('events', network=network)
+    table = schema_utils.get_table_name('events', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -62,7 +61,7 @@ async def async_upsert_event_query(
     *,
     event_query: spec.EventQuery,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     # convert to binary as needed
@@ -71,7 +70,7 @@ async def async_upsert_event_query(
         events_schema_defs._event_query_binary_fields,
     )
 
-    table = schema_utils.get_table_name('event_queries', network=network)
+    table = schema_utils.get_table_name('event_queries', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -84,7 +83,7 @@ async def async_upsert_event_queries(
     *,
     event_queries: typing.Sequence[spec.EventQuery],
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     as_binary = [
@@ -95,7 +94,7 @@ async def async_upsert_event_queries(
         for event_query in event_queries
     ]
 
-    table = schema_utils.get_table_name('event_queries', network=network)
+    table = schema_utils.get_table_name('event_queries', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -107,7 +106,7 @@ async def async_upsert_event_queries(
 async def async_select_events(
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     contract_address: spec.Address | None = None,
     event_hash: typing.Any | None = None,
     topic1: typing.Any | None = None,
@@ -121,13 +120,13 @@ async def async_select_events(
 ) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     # get table
-    if network is None:
-        network = config.get_default_network()
-    table = schema_utils.get_table_name('events', network=network)
+    table = schema_utils.get_table_name('events', context=context)
 
     if backend == 'sqlalchemy':
 
-        raise NotImplementedError('deprecating soon, binary format args unsupported')
+        raise NotImplementedError(
+            'deprecating soon, binary format args unsupported'
+        )
 
         # create filters
         where_equals: typing.Mapping[str, typing.Any] | None
@@ -217,7 +216,9 @@ async def async_select_events(
                     '0x' || lower(hex(topic3)) as topic3,
                     '0x' || lower(hex(unindexed)) as unindexed"""
             else:
-                raise Exception('unknown binary_output_format: ' + str(binary_output_format))
+                raise Exception(
+                    'unknown binary_output_format: ' + str(binary_output_format)
+                )
         else:
             raw_sql = """SELECT block_number"""
 
@@ -229,9 +230,13 @@ async def async_select_events(
 
             # standard columns
             if 'transaction_hash' in only_columns:
-                raw_sql += ", '0x' || lower(hex(transaction_hash)) as transaction_hash"
+                raw_sql += (
+                    ", '0x' || lower(hex(transaction_hash)) as transaction_hash"
+                )
             if 'contract_address' in only_columns:
-                raw_sql += ", '0x' || lower(hex(contract_address)) as contract_address"
+                raw_sql += (
+                    ", '0x' || lower(hex(contract_address)) as contract_address"
+                )
             if 'event_hash' in only_columns:
                 raw_sql += ", '0x' || lower(hex(event_hash)) as event_hash"
 
@@ -255,7 +260,9 @@ async def async_select_events(
                 if 'unindexed' in only_columns:
                     raw_sql += ", '0x' || lower(hex(unindexed)) as unindexed"
             else:
-                raise Exception('unknown binary_output_format: ' + str(binary_output_format))
+                raise Exception(
+                    'unknown binary_output_format: ' + str(binary_output_format)
+                )
 
         # add table
         raw_sql += ' FROM ' + table
@@ -309,7 +316,7 @@ async def async_select_event_queries(
     *,
     conn: toolsql.SAConnection,
     query_type: int | None,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     contract_address: spec.Address | spec.BinaryData | None = None,
     event_hash: typing.Any | None = None,
     topic1: typing.Any | None = None,
@@ -327,9 +334,7 @@ async def async_select_event_queries(
     """
 
     # get table
-    if network is None:
-        network = config.get_default_network()
-    table = schema_utils.get_table_name('event_queries', network=network)
+    table = schema_utils.get_table_name('event_queries', context=context)
 
     # encode inputs
     if contract_address is not None:
@@ -393,10 +398,10 @@ async def async_delete_event_query(
     *,
     query_id: int,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('event_queries', network=network)
+    table = schema_utils.get_table_name('event_queries', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -409,13 +414,14 @@ async def async_delete_event_queries(
     *,
     query_ids: typing.Sequence[int],
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('event_queries', network=network)
+    table = schema_utils.get_table_name('event_queries', context=context)
 
     toolsql.delete(
         conn=conn,
         table=table,
         where_in={'query_id': query_ids},
     )
+

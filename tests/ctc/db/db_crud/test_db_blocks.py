@@ -88,7 +88,7 @@ async def test_blocks_crud():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='blocks',
-        network='mainnet',
+        context=dict(network='mainnet'),
     )
     toolsql.create_tables(
         db_config=db_config,
@@ -106,7 +106,7 @@ async def test_blocks_crud():
         with conn.begin():
             for block in example_data:
                 await db.async_upsert_block(
-                    conn=conn, block=block, network=network
+                    conn=conn, block=block, context=dict(network=network)
                 )
 
         # get data individually
@@ -115,7 +115,7 @@ async def test_blocks_crud():
                 db_block = await db.async_select_block(
                     conn=conn,
                     block_number=block['number'],
-                    network=network,
+                    context=dict(network=network),
                 )
                 for key, target_value in block.items():
                     assert target_value == db_block[key]
@@ -126,7 +126,7 @@ async def test_blocks_crud():
             db_blocks = await db.async_select_blocks(
                 conn=conn,
                 block_numbers=block_numbers,
-                network=network,
+                context=dict(network=network),
             )
             db_blocks = sorted(db_blocks, key=lambda block: block['number'])
             assert db_blocks == example_data
@@ -137,7 +137,7 @@ async def test_blocks_crud():
                 await db.async_delete_block(
                     conn=conn,
                     block_number=block['number'],
-                    network=network,
+                    context=dict(network=network),
                 )
 
         # ensure all entries deleted
@@ -145,6 +145,6 @@ async def test_blocks_crud():
             db_blocks = await db.async_select_blocks(
                 conn=conn,
                 block_numbers=block_numbers,
-                network=network,
+                context=dict(network=network),
             )
             assert all(item is None for item in db_blocks)

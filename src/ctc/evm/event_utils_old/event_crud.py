@@ -60,7 +60,7 @@ async def async_get_events(
     backend_order: typing.Sequence[str] | None = None,
     keep_multiindex: bool = True,
     verbose: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **query: typing.Any,
 ) -> spec.DataFrame:
     """get events matching given inputs"""
@@ -73,7 +73,7 @@ async def async_get_events(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
-        provider=provider,
+        context=context,
     )
     if start_block is None:
         start_block = await contract_utils.async_get_contract_creation_block(
@@ -97,7 +97,7 @@ async def async_get_events(
         end_block=end_block,
         backend_order=backend_order,
         verbose=verbose,
-        provider=provider,
+        context=context,
         **query,
     )
 
@@ -109,7 +109,7 @@ async def async_get_events(
         )
 
     if include_timestamps:
-        timestamps = await async_get_event_timestamps(events, provider=provider)
+        timestamps = await async_get_event_timestamps(events, context=context)
         events.insert(0, 'timestamp', timestamps)
 
     return events
@@ -165,11 +165,10 @@ async def async_download_events(
     event_abi: spec.EventABI | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     verbose: bool = True,
 ) -> spec.DataFrame:
 
-    from ctc import rpc
     from .event_backends import filesystem_events
 
     if event_hash is None and event_name is None and event_abi is None:
@@ -186,11 +185,6 @@ async def async_download_events(
     elif end_block is not None:
         end_block = await block_utils.async_block_number_to_int(end_block)
 
-    provider = rpc.get_provider(provider)
-    network = provider['network']
-    if network is None:
-        raise Exception('could not determine network')
-
     # get event hash
     if event_hash is None:
         if event_abi is None:
@@ -199,7 +193,7 @@ async def async_download_events(
             event_abi = await abi_utils.async_get_event_abi(
                 contract_address=contract_address,
                 event_name=event_name,
-                network=network,
+                context=context,
             )
 
         event_hash = evm.get_event_hash(event_abi)
@@ -242,7 +236,7 @@ async def async_download_events(
             event_hash=event_hash,
             event_abi=event_abi,
             contract_address=contract_address,
-            provider=provider,
+            context=context,
             **download,
         )
 
@@ -254,13 +248,13 @@ async def async_download_events(
         start_block=start_block,
         end_block=end_block,
         verbose=verbose,
-        provider=provider,
+        context=context,
     )
 
 
 async def async_get_event_timestamps(
     events: spec.DataFrame,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[int]:
 
     # get block_numbers
@@ -271,15 +265,8 @@ async def async_get_event_timestamps(
         block_numbers = events.index.values  # type: ignore
 
     # get timestamps
-    provider = rpc.get_provider(provider)
-    if typing.TYPE_CHECKING:
-        provider = typing.cast(
-            spec.ProviderReference, dict(provider, chunk_size=1)
-        )
-    else:
-        provider = dict(provider, chunk_size=1)
     return await block_utils.async_get_block_timestamps(
         block_numbers,  # type: ignore
-        provider=provider,
+        cntext=context,
     )
 

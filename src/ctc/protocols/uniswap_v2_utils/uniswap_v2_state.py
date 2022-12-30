@@ -15,14 +15,14 @@ async def async_replace_pool_state_symbols(
     *,
     pool: spec.Address | None = None,
     symbols: typing.Optional[typing.Sequence[str]] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[str, typing.Any]:
 
     if symbols is None:
         if pool is None:
             raise Exception('must specify pool or symbols')
         symbols = await uniswap_v2_metadata.async_get_pool_symbols(
-            pool=pool, provider=provider
+            pool=pool, context=context
         )
 
     x_symbol, y_symbol = symbols
@@ -38,16 +38,16 @@ async def async_get_pool_state(
     pool: spec.Address,
     *,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
     normalize: bool = True,
     fill_empty: bool = True,
+    context: spec.Context = None,
 ) -> uniswap_v2_spec.PoolState:
     import asyncio
 
     if block is None:
         block = 'latest'
 
-    block = await evm.async_block_number_to_int(block, provider=provider)
+    block = await evm.async_block_number_to_int(block, context=context)
 
     if fill_empty:
         empty_token = 0
@@ -56,13 +56,13 @@ async def async_get_pool_state(
 
     # reserves
     token_x, token_y = await uniswap_v2_metadata.async_get_pool_tokens(
-        pool=pool, provider=provider
+        pool=pool, context=context
     )
     reserves_coroutine = evm.async_get_erc20s_balances(
         wallet=pool,
         tokens=[token_x, token_y],
         block=block,
-        provider=provider,
+        context=context,
         normalize=normalize,
         fill_empty=fill_empty,
         empty_token=empty_token,
@@ -73,7 +73,7 @@ async def async_get_pool_state(
     lp_total_supply_coroutine = evm.async_get_erc20_total_supply(
         token=pool,
         block=block,
-        provider=provider,
+        context=context,
         normalize=normalize,
         fill_empty=fill_empty,
         empty_token=empty_token,
@@ -96,15 +96,15 @@ async def async_get_pool_state_by_block(
     pool: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> uniswap_v2_spec.PoolStateByBlock:
     import asyncio
 
     if normalize:
         decimals_coroutine = uniswap_v2_metadata.async_get_pool_decimals(
             pool=pool,
-            provider=provider,
+            context=context,
         )
         decimals_task = asyncio.create_task(decimals_coroutine)
 
@@ -112,8 +112,8 @@ async def async_get_pool_state_by_block(
         async_get_pool_state(
             pool=pool,
             block=block,
-            provider=provider,
             normalize=False,
+            context=context,
         )
         for block in blocks
     ]

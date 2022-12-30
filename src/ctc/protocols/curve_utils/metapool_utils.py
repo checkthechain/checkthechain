@@ -19,7 +19,7 @@ async def async_get_metapool_trade(
     amount_sold: typing.Union[int, float],
     input_normalized: bool = True,
     normalize_output: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     parent_pool: typing.Optional[spec.Address] = None,
     parent_lp: typing.Optional[spec.Address] = None,
     parent_coins: typing.Optional[list[str]] = None,
@@ -34,7 +34,7 @@ async def async_get_metapool_trade(
 
     metadata = await pool_metadata.async_get_pool_metadata(
         pool=metapool,
-        provider=provider,
+        context=context,
     )
 
     if token_bought in parent_coins:
@@ -79,21 +79,21 @@ async def async_get_metapool_trade(
             to_address=metapool,
             function_abi=function_abi,
             function_parameters=[sold_index, bought_index, amount_sold],
-            provider=provider,
+            context=context,
         )
 
         amount_bought = await pool_state.async_get_lp_withdrawal(
             pool=parent_pool,
             amount_lp=lp_bought,
             token_withdrawn=token_bought,
-            provider=provider,
+            context=context,
         )
 
         if normalize_output:
             # bought token can be different from lp token
             bought_decimals = await evm.async_get_erc20_decimals(
                 metadata['token_addresses'][bought_index],
-                provider=provider,
+                context=context,
             )
             amount_bought /= 10 ** bought_decimals
             amount_sold /= 10 ** metadata['token_decimals'][sold_index]

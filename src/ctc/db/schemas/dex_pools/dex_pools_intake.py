@@ -11,8 +11,8 @@ async def async_intake_dex_pools(
     *,
     factory: spec.Address,
     dex_pools: typing.Sequence[spec.DexPool],
-    network: spec.NetworkReference,
     last_scanned_block: int | None = None,
+    context: spec.Context = None,
 ) -> None:
     """intake dex pools into database
 
@@ -36,7 +36,7 @@ async def async_intake_dex_pools(
 
     engine = connect_utils.create_engine(
         schema_name='dex_pools',
-        network=network,
+        context=context,
     )
     if engine is None:
         return None
@@ -44,11 +44,11 @@ async def async_intake_dex_pools(
         await dex_pools_statements.async_upsert_dex_pools(
             dex_pools=dex_pools,
             conn=conn,
-            network=network,
+            context=context,
         )
         await dex_pools_statements.async_upsert_dex_pool_factory_query(
             factory=factory,
             last_scanned_block=last_scanned_block,
             conn=conn,
-            network=network,
+            context=context,
         )

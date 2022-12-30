@@ -25,7 +25,7 @@ async def _async_query_events_from_node(
     start_block: int,
     end_block: int,
     write_to_db: bool,
-    provider: spec.ProviderReference,
+    context: spec.Context = None,
     verbose: bool | int,
     output_format: Literal['dataframe', 'dict'] = 'dataframe',
     binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
@@ -47,8 +47,6 @@ async def _async_query_events_from_node(
             'querying only by non-event-type topics is unsupported by some providers'
         )
 
-    network = rpc.get_provider_network(provider)
-
     # break into chunks, each will be independently written to db
     chunk_size = 100000
     chunk_ranges = range_utils.range_to_chunks(
@@ -62,6 +60,7 @@ async def _async_query_events_from_node(
         print('fetching events from node over', n_blocks, 'blocks')
     if verbose >= 2:
         from ctc import cli
+        from ctc import config
 
         event_query_utils.print_event_query_summary(
             contract_address=contract_address,
@@ -72,6 +71,7 @@ async def _async_query_events_from_node(
             start_block=start_block,
             end_block=end_block,
         )
+        network = config.get_context_chain_id(context)
         cli.print_bullet(key='network', value=network)
         cli.print_bullet(key='chunk_size', value=chunk_size)
         cli.print_bullet(key='n_chunks', value=len(chunk_ranges))
@@ -90,8 +90,7 @@ async def _async_query_events_from_node(
             topic3=topic3,
             chunk_start=chunk_start,
             chunk_end=chunk_end,
-            provider=provider,
-            network=network,
+            context=context,
             write_to_db=write_to_db,
             latest_block_number=latest_block_number,
         )
@@ -154,8 +153,7 @@ async def _async_query_node_events_chunk(
     topic3: spec.BinaryData | None,
     chunk_start: int,
     chunk_end: int,
-    provider: spec.ProviderReference,
-    network: spec.NetworkReference,
+    context: spec.Context,
     write_to_db: bool,
     max_request_size: int = 2000,
     latest_block_number: int | None = None,
@@ -200,7 +198,7 @@ async def _async_query_node_events_chunk(
             topics=topics,
             start_block=request_start,
             end_block=request_end,
-            provider=provider,
+            context=context,
         )
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
@@ -234,7 +232,7 @@ async def _async_query_node_events_chunk(
         await db.async_intake_encoded_events(
             encoded_events=encoded_events,
             query=query,
-            network=network,
+            context=context,
             latest_block=latest_block_number,
         )
 

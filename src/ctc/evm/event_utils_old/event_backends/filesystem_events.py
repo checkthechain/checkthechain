@@ -41,14 +41,12 @@ filesystem_layout = {
 
 def get_events_root(
     network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> str:
 
     from ctc import config
 
-    if network is None:
-        network = config.get_default_network()
-        if network is None:
-            raise Exception('must specify network or configure default network')
+    network = config.get_context_chain_id(context)
     network_name = network_utils.get_network_name(network, require=True)
     return os.path.join(
         config.get_data_dir(), 'evm/networks', network_name, 'events'
@@ -57,11 +55,11 @@ def get_events_root(
 
 def get_events_contract_dir(
     contract_address: spec.Address,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> str:
     contract_address = contract_address.lower()
     return os.path.join(
-        get_events_root(network=network), 'contract__' + contract_address
+        get_events_root(context=context), 'contract__' + contract_address
     )
 
 
@@ -70,14 +68,14 @@ def get_events_event_dir(
     *,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> str:
     contract_address = contract_address.lower()
     if event_hash is None:
         if event_abi is None:
             raise Exception('must specify more event data')
         event_hash = abi_utils.get_event_hash(event_abi)
-    contract_dir = get_events_contract_dir(contract_address, network=network)
+    contract_dir = get_events_contract_dir(contract_address, context=context)
     return os.path.join(contract_dir, 'event__' + event_hash)
 
 
@@ -88,7 +86,7 @@ def get_events_filepath(
     end_block: int,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> str:
 
     from ctc import config
@@ -110,10 +108,7 @@ def get_events_filepath(
     )
 
     # add parent directory
-    if network is None:
-        network = config.get_default_network()
-        if network is None:
-            raise Exception('must specify network or configure default network')
+    network = config.get_context_chain_id(context)
     network_name = network_utils.get_network_name(network, require=True)
     return os.path.join(
         config.get_data_dir(), 'evm/networks', network_name, subpath
@@ -126,10 +121,10 @@ def get_events_filepath(
 
 
 def list_events_contracts(
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> list[str]:
     contracts = []
-    events_root = get_events_root(network=network)
+    events_root = get_events_root(context=context)
     if not os.path.isdir(events_root):
         return []
     for contract_dir in os.listdir(events_root):
@@ -144,7 +139,7 @@ def list_contract_events(
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     allow_missing_blocks: bool = False,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> dict[str, _ListEventsResult]:
 
     if event_hash is not None:
@@ -156,7 +151,7 @@ def list_contract_events(
 
     # compile path data
     contract_address = contract_address.lower()
-    contract_dir = get_events_contract_dir(contract_address, network=network)
+    contract_dir = get_events_contract_dir(contract_address, context=context)
     paths: dict[str, _PathEventsResult] = {}
     if not os.path.isdir(contract_dir):
         return {}
@@ -223,7 +218,7 @@ def list_events(
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     allow_missing_blocks: bool = False,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> typing.Optional[_ListEventsResult]:
 
     contract_events = list_contract_events(
@@ -231,7 +226,7 @@ def list_events(
         event_hash=event_hash,
         event_abi=event_abi,
         allow_missing_blocks=allow_missing_blocks,
-        network=network,
+        context=context,
     )
 
     if len(contract_events) == 1:
@@ -242,13 +237,13 @@ def list_events(
 
 
 def list_contracts_events(
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
     **kwargs: typing.Any,
 ) -> dict[str, dict[str, _ListEventsResult]]:
     contracts_events = {}
-    for contract_address in list_events_contracts(network=network):
+    for contract_address in list_events_contracts(context=context):
         contracts_events[contract_address] = list_contract_events(
-            contract_address=contract_address, network=network, **kwargs
+            contract_address=contract_address, context=context, **kwargs
         )
     return contracts_events
 
@@ -299,19 +294,8 @@ async def async_save_events_to_filesystem(
     event_name: typing.Optional[str] = None,
     overwrite: bool = False,
     verbose: bool = True,
-    provider: spec.ProviderReference = None,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
-
-    from ctc import rpc
-
-    if network is None:
-        provider = rpc.get_provider(provider)
-        network = provider['network']
-        if network is None:
-            raise Exception('could not determine network')
-    else:
-        network = network_utils.get_network_name(network)
 
     contract_address = contract_address.lower()
 
@@ -320,7 +304,7 @@ async def async_save_events_to_filesystem(
             contract_address=contract_address,
             event_name=event_name,
             event_hash=event_hash,
-            network=network,
+            context=context,
         )
 
     # compute path
@@ -330,7 +314,7 @@ async def async_save_events_to_filesystem(
         event_abi=event_abi,
         start_block=start_block,
         end_block=end_block,
-        network=network,
+        context=context,
     )
     if os.path.exists(path) and not overwrite:
         raise Exception('path already exists, use overwrite=True')
@@ -354,31 +338,19 @@ async def async_get_events_from_filesystem(
     verbose: bool = True,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
-
-    from ctc import rpc
-
-    # get network
-    if network is None:
-        provider = rpc.get_provider(provider)
-        network = provider['network']
-        if network is None:
-            raise Exception('could not determine network')
-    else:
-        network = network_utils.get_network_name(network)
 
     # resolve start_block and end_block
     if start_block is not None:
         start_block = await block_utils.async_block_number_to_int(
             start_block,
-            provider=provider,
+            context=context,
         )
     if end_block is not None:
         end_block = await block_utils.async_block_number_to_int(
             end_block,
-            provider=provider,
+            context=context,
         )
 
     # get event hash
@@ -389,7 +361,7 @@ async def async_get_events_from_filesystem(
             event_abi = await abi_utils.async_get_event_abi(
                 contract_address=contract_address,
                 event_name=event_name,
-                network=network,
+                context=context,
             )
 
         event_hash = abi_utils.get_event_hash(event_abi)
@@ -398,7 +370,7 @@ async def async_get_events_from_filesystem(
         contract_address=contract_address,
         event_abi=event_abi,
         event_hash=event_hash,
-        network=network,
+        context=context,
     )
     if event_hash not in events or len(events[event_hash]['paths']) == 0:
         raise backend_utils.DataNotFound('no files for event')
@@ -466,7 +438,7 @@ async def async_get_events_from_filesystem(
             contract_address=contract_address,
             event_name=event_name,
             event_hash=event_hash,
-            network=network,
+            context=context,
         )
     for arg in event_abi['inputs']:
         if arg['type'] in ['bytes32']:
@@ -478,3 +450,4 @@ async def async_get_events_from_filesystem(
             df[column] = df[column].map(ast.literal_eval).map(lam)
 
     return df
+

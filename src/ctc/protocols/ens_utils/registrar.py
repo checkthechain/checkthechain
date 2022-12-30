@@ -11,7 +11,7 @@ from . import resolver
 async def async_get_owner(
     name: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> str:
     node = resolver.hash_name(name)
@@ -24,7 +24,7 @@ async def async_get_owner(
         to_address=ens_directory.registry,
         function_abi=function_abi,
         function_parameters=[node],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, str):
@@ -35,7 +35,7 @@ async def async_get_owner(
 async def async_record_exists(
     name: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> bool:
     node = resolver.hash_name(name)
@@ -48,7 +48,7 @@ async def async_record_exists(
         to_address=ens_directory.registry,
         function_abi=function_abi,
         function_parameters=[node],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, bool):
@@ -59,7 +59,7 @@ async def async_record_exists(
 async def async_get_resolver(
     name: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     node = resolver.hash_name(name)
@@ -72,7 +72,7 @@ async def async_get_resolver(
         to_address=ens_directory.registry,
         function_abi=function_abi,
         function_parameters=[node],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     if not isinstance(result, str):

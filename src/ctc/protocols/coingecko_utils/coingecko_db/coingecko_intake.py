@@ -26,7 +26,7 @@ async def async_intake_tokens(
     # add to db
     engine = db.create_engine(
         schema_name='coingecko',
-        network=None,
+        context={},
     )
     if engine is None:
         return

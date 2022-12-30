@@ -80,7 +80,7 @@ async def async_get_contract_deployer(
 async def async_get_contract_creation_block(
     contract_address: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     use_db: bool = True,
     **search_kwargs: typing.Any,
 ) -> int | None:
@@ -90,23 +90,19 @@ async def async_get_contract_creation_block(
     - caches result in local database
     """
 
-    from ctc import rpc
-
-    network = rpc.get_provider_network(provider)
-
     if use_db:
         from ctc import db
 
         block = await db.async_query_contract_creation_block(
             address=contract_address,
-            network=network,
+            context=context,
         )
         if block is not None:
             return block
 
     block = await _async_get_contract_creation_block_from_node(
         contract_address=contract_address,
-        provider=provider,
+        context=context,
         **search_kwargs,
     )
 
@@ -114,7 +110,7 @@ async def async_get_contract_creation_block(
         await db.async_intake_contract_creation_block(
             contract_address=contract_address,
             block=block,
-            network=network,
+            context=context,
         )
 
     return block
@@ -123,7 +119,7 @@ async def async_get_contract_creation_block(
 async def async_get_contracts_creation_blocks(
     contract_addresses: typing.Sequence[spec.Address],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     use_db: bool = True,
     verbose: bool = False,
     **search_kwargs: typing.Any,
@@ -139,7 +135,7 @@ async def async_get_contracts_creation_blocks(
     coroutines = [
         async_get_contract_creation_block(
             contract_address=contract_address,
-            provider=provider,
+            context=context,
             use_db=use_db,
             verbose=verbose,
             **search_kwargs,
@@ -154,7 +150,7 @@ async def _async_get_contract_creation_block_from_node(
     *,
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     verbose: bool = True,
     nary: typing.Optional[int] = None,
 ) -> int | None:
@@ -171,7 +167,7 @@ async def _async_get_contract_creation_block_from_node(
         end_block = 'latest'
     if start_block == 'latest' or end_block == 'latest':
         latest_block = await block_utils.async_get_latest_block_number(
-            provider=provider
+            context=context
         )
         if start_block == 'latest':
             start_block = latest_block
@@ -192,7 +188,7 @@ async def _async_get_contract_creation_block_from_node(
         return await contract_tests.async_is_contract_address(
             address=contract_address,
             block=index,
-            provider=provider,
+            context=context,
         )
 
     if nary is None:

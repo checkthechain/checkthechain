@@ -10,7 +10,7 @@ from . import block_crud
 
 async def async_print_block_summary(
     block: spec.Block | spec.BlockNumberReference,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> None:
     """print summary of block"""
 
@@ -20,7 +20,7 @@ async def async_print_block_summary(
     from ctc import cli
 
     if not isinstance(block, dict):
-        block = await block_crud.async_get_block(block=block, provider=provider)
+        block = await block_crud.async_get_block(block=block, context=context)
 
     full_transactions = len(block['transactions']) > 0 and isinstance(
         block['transactions'][0], dict

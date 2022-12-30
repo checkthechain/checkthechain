@@ -20,7 +20,7 @@ async def async_get_block(
     block: spec.BlockReference,
     *,
     include_full_transactions: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     use_db: bool = True,
 ) -> spec.Block:
     """get block from local database or from RPC node"""
@@ -31,27 +31,26 @@ async def async_get_block(
 
         from ctc import db
 
-        network = rpc.get_provider_network(provider)
-
         if use_db and not include_full_transactions:
             db_block_data = await db.async_query_block(
                 block_number=block,
-                network=network,
+                context=context,
             )
             if db_block_data is not None:
                 return db_block_data
 
         block_data: spec.Block = await rpc.async_eth_get_block_by_number(
             block_number=evm.standardize_block_number(block),
-            provider=provider,
+            context=context,
             include_full_transactions=include_full_transactions,
         )
         block_data.setdefault('base_fee_per_gas', None)
 
-        await db.async_intake_block(
-            block=block_data,
-            network=network,
-        )
+        if use_db:
+            await db.async_intake_block(
+                block=block_data,
+                context=context,
+            )
 
         return block_data
 
@@ -59,7 +58,7 @@ async def async_get_block(
 
         block_data = await rpc.async_eth_get_block_by_hash(
             block_hash=block,
-            provider=provider,
+            context=context,
             include_full_transactions=include_full_transactions,
         )
         return block_data
@@ -72,19 +71,13 @@ async def async_get_blocks(
     blocks: typing.Sequence[spec.BlockReference],
     *,
     include_full_transactions: bool = False,
-    chunk_size: int = 500,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     use_db: bool = True,
     latest_block_number: int | None = None,
 ) -> list[spec.Block]:
     """get blocks from local database or from RPC node"""
 
     from ctc import rpc
-
-    if isinstance(provider, dict) and provider.get('chunk_size') is None:
-        provider = rpc.add_provider_parameters(
-            provider, {'chunk_size': chunk_size}
-        )
 
     if all(spec.is_block_number_reference(block) for block in blocks):
 
@@ -94,9 +87,8 @@ async def async_get_blocks(
         if use_db and not include_full_transactions:
             from ctc import db
 
-            network = rpc.get_provider_network(provider)
             db_block_datas = await db.async_query_blocks(
-                block_numbers=pending, network=network
+                block_numbers=pending, context=context
             )
             if db_block_datas is None:
                 block_data_map = {}
@@ -113,7 +105,7 @@ async def async_get_blocks(
         blocks_data = await rpc.async_batch_eth_get_block_by_number(
             block_numbers=pending,
             include_full_transactions=include_full_transactions,
-            provider=provider,
+            context=context,
         )
         for block_data in blocks_data:
             block_data.setdefault('base_fee_per_gas', None)
@@ -123,8 +115,8 @@ async def async_get_blocks(
         # intake rpc data to db
         await db.async_intake_blocks(
             blocks=blocks_data,
-            network=rpc.get_provider_network(provider),
             latest_block_number=latest_block_number,
+            context=context,
         )
 
         if use_db:
@@ -138,7 +130,7 @@ async def async_get_blocks(
         return await rpc.async_batch_eth_get_block_by_hash(
             block_hashes=blocks,
             include_full_transactions=include_full_transactions,
-            provider=provider,
+            context=context,
         )
 
     else:
@@ -154,17 +146,18 @@ _latest_block_lock: typing.MutableMapping[str, asyncio.Lock | None] = {
 
 
 async def async_get_latest_block_number(
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     *,
     use_cache: bool = True,
     cache_time: int | float = 1,
 ) -> int:
     """get latest block number"""
 
+    from ctc import config
     from ctc import rpc
 
     if not use_cache:
-        result = await rpc.async_eth_block_number(provider=provider)
+        result = await rpc.async_eth_block_number(context=context)
         if not isinstance(result, int):
             raise Exception('invalid rpc result')
         return result
@@ -182,7 +175,7 @@ async def async_get_latest_block_number(
 
         async with lock:
 
-            network = rpc.get_provider_network(provider)
+            network = config.get_context_chain_id(context)
             request_time = time.time()
             network_cache = _latest_block_cache.get(network)
             if (
@@ -191,7 +184,7 @@ async def async_get_latest_block_number(
             ):
                 return network_cache['block_number']
 
-            result = await rpc.async_eth_block_number(provider=provider)
+            result = await rpc.async_eth_block_number(context=context)
             if not isinstance(result, int):
                 raise Exception('invalid rpc result')
 

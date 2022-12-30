@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import typing
 
+from ctc import config
 from ctc import evm
 from ctc import spec
 from ctc import rpc
@@ -44,10 +45,11 @@ function_abis: typing.Mapping[str, spec.FunctionABI] = {
 
 def get_multicall_address(
     *,
-    network: spec.NetworkReference = 'mainnet',
+    context: spec.Context = None,
     version: str = 'maker',
 ) -> spec.Address:
 
+    network = config.get_context_chain_id(context)
     network_name = evm.get_network_name(network, require=True)
 
     if version.lower() == 'Maker'.lower():
@@ -73,19 +75,17 @@ async def async_multicall(
     calls: typing.Sequence[multicall_spec.Call],
     *,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.List[typing.Any]:
-
-    network = rpc.get_provider_network(provider)
 
     # encode calls
     coroutines = [
-        call_utils.async_encode_call(call, network=network) for call in calls
+        call_utils.async_encode_call(call, context=context) for call in calls
     ]
     encoded_calls = await asyncio.gather(*coroutines)
 
     # get multicall contract address
-    multicall_address = get_multicall_address(network=network)
+    multicall_address = get_multicall_address(context=context)
 
     # make call
     results = await rpc.async_eth_call(
@@ -93,7 +93,7 @@ async def async_multicall(
         function_abi=function_abis['aggregate'],
         function_parameters=[encoded_calls],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     block_number, encoded_outputs = results
 
@@ -102,7 +102,7 @@ async def async_multicall(
         call_utils.async_decode_call_output(
             call=call,
             encoded_output=encoded_output,
-            network=network,
+            context=context,
         )
         for call, encoded_output in zip(calls, encoded_outputs)
     ]
@@ -115,13 +115,13 @@ async def async_multicall_by_block(
     calls: typing.Sequence[multicall_spec.Call],
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[typing.Sequence[typing.Any]]:
     coroutines = [
         async_multicall(
             calls=calls,
             block=block,
-            provider=provider,
+            context=context,
         )
         for block in blocks
     ]

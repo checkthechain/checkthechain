@@ -21,7 +21,7 @@ async def async_get_lending_flows(
     wallet_withdrawals: spec.DataFrame | None = None,
     withdrawals: spec.DataFrame | None = None,
     include_latest: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     replace_symbols: bool = True,
     normalize: bool = True,
     include_rewards: bool = True,
@@ -49,12 +49,12 @@ async def async_get_lending_flows(
         wallet_withdrawals=wallet_withdrawals,
         withdrawals=withdrawals,
         include_latest=include_latest,
-        provider=provider,
+        context=context,
     )
 
     underlying = await protocol_module.async_get_underlying_asset(
         pool_token=pool_token,
-        provider=provider,
+        context=context,
     )
 
     # add time data
@@ -64,27 +64,23 @@ async def async_get_lending_flows(
     # queue tasks
     timestamps_coroutine = evm.async_get_block_timestamps(
         blocks=blocks,  # type: ignore
-        provider=provider,
+        context=context,
     )
     timestamps_task = asyncio.create_task(timestamps_coroutine)
-    pool_token_balances_before_coroutine = (
-        evm.async_get_erc20_balance_by_block(
-            token=pool_token,
-            wallet=wallet,
-            blocks=blocks_before,  # type: ignore
-            provider=provider,
-        )
+    pool_token_balances_before_coroutine = evm.async_get_erc20_balance_by_block(
+        token=pool_token,
+        wallet=wallet,
+        blocks=blocks_before,  # type: ignore
+        context=context,
     )
     pool_token_balances_before_task = asyncio.create_task(
         pool_token_balances_before_coroutine
     )
-    pool_token_balances_after_coroutine = (
-        evm.async_get_erc20_balance_by_block(
-            token=pool_token,
-            wallet=wallet,
-            blocks=blocks,  # type: ignore
-            provider=provider,
-        )
+    pool_token_balances_after_coroutine = evm.async_get_erc20_balance_by_block(
+        token=pool_token,
+        wallet=wallet,
+        blocks=blocks,  # type: ignore
+        context=context,
     )
     pool_token_balances_after_task = asyncio.create_task(
         pool_token_balances_after_coroutine
@@ -92,7 +88,7 @@ async def async_get_lending_flows(
     asset_prices_coroutine = protocol_module.async_get_asset_price_by_block(
         asset=underlying,
         blocks=blocks,
-        provider=provider,
+        context=context,
     )
     asset_prices_task = asyncio.create_task(asset_prices_coroutine)
 
@@ -101,35 +97,35 @@ async def async_get_lending_flows(
         reward_coroutine = protocol_module.async_compute_wallet_rewards(
             wallet=wallet,
             blocks=blocks,
-            provider=provider,
+            context=context,
             replace_symbol=replace_symbols,
         )
         reward_task = asyncio.create_task(reward_coroutine)
     if normalize:
         decimals_coroutine = evm.async_get_erc20_decimals(
             underlying,
-            provider=provider,
+            context=context,
         )
         decimals_task = asyncio.create_task(decimals_coroutine)
     if replace_symbols:
         underlying_symbol_coroutine = evm.async_get_erc20_symbol(
             underlying,
-            provider=provider,
+            context=context,
         )
         underlying_symbol_task = asyncio.create_task(
             underlying_symbol_coroutine
         )
         pool_token_coroutine = evm.async_get_erc20_symbol(
             pool_token,
-            provider=provider,
+            context=context,
         )
         pool_token_symbol_task = asyncio.create_task(pool_token_coroutine)
 
     # normalize deposits and withdrawals
     if normalize:
         decimals = await decimals_task
-        df['asset_deposit'] /= 10 ** decimals
-        df['asset_withdrawal'] /= 10 ** decimals
+        df['asset_deposit'] /= 10**decimals
+        df['asset_withdrawal'] /= 10**decimals
 
     # compute time columns
     timestamps = await timestamps_task
@@ -184,7 +180,7 @@ async def _async_create_raw_wallet_flows_df(
     wallet_withdrawals: spec.DataFrame | None = None,
     withdrawals: spec.DataFrame | None = None,
     include_latest: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
 
     from ctc.protocols import aave_v2_utils
@@ -197,8 +193,8 @@ async def _async_create_raw_wallet_flows_df(
         withdrawals = await aave_v2_utils.async_get_withdrawals()
     elif no_deposits and no_withdrawals:
         deposits, withdrawals = await asyncio.gather(
-            aave_v2_utils.async_get_deposits(provider=provider),
-            aave_v2_utils.async_get_withdrawals(provider=provider),
+            aave_v2_utils.async_get_deposits(context=context),
+            aave_v2_utils.async_get_withdrawals(context=context),
         )
 
     wallet = wallet.lower()
@@ -229,7 +225,8 @@ async def _async_create_raw_wallet_flows_df(
     raw_df = raw_df.fillna(0)
 
     if include_latest:
-        block = await evm.async_get_latest_block_number(provider=provider)
+        block = await evm.async_get_latest_block_number(context=context)
         raw_df.loc[block] = [0, 0]  # type: ignore
 
     return raw_df
+

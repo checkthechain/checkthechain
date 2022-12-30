@@ -104,7 +104,7 @@ async def async_populate_db_tables(
     print('Populating database with metadata of common ERC20 tokens...')
     print()
     await default_erc20s.async_intake_default_erc20s(
-        network='mainnet',
+        context=dict(network='mainnet'),
         engine=engine,
     )
 
@@ -134,14 +134,15 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
         return
     networks = list(config_defaults.get_default_networks_metadata().keys())
     for network in networks:
+        context: spec.Context = {'network': network}
         schema_version = db.get_schema_version(
             schema_name='chainlink',
-            network=network,
+            context=dict(network=network),
             db_config=db_config,
         )
         if schema_version is not None:
             schema = db.get_prepared_schema(
-                schema_name='chainlink', network=network
+                schema_name='chainlink', context=context
             )
             for table_name in schema['tables'].keys():
                 if table_name not in metadata.tables.keys():
@@ -149,7 +150,7 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
                         'missing chainlink_aggregator_updates table, rebuilding schema'
                     )
                     db.drop_schema(
-                        schema_name='chainlink', network=network, confirm=True
+                        schema_name='chainlink', context=context, confirm=True
                     )
 
 

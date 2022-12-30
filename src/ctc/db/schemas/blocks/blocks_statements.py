@@ -25,10 +25,10 @@ async def async_upsert_block(
     *,
     block: spec.Block,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
     block = _remove_block_transactions(block)
     toolsql.insert(
         conn=conn,
@@ -42,10 +42,10 @@ async def async_upsert_blocks(
     *,
     blocks: typing.Sequence[spec.Block],
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
     blocks = [_remove_block_transactions(block) for block in blocks]
     toolsql.insert(
         conn=conn,
@@ -59,10 +59,10 @@ async def async_select_block(
     block_number: int | str,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> spec.Block | None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
 
     block: spec.Block | None = toolsql.select(
         conn=conn,
@@ -87,10 +87,10 @@ async def async_select_blocks(
     start_block: int | None = None,
     end_block: int | None = None,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> typing.Sequence[spec.Block | None] | None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
 
     if block_numbers is not None:
         blocks = toolsql.select(
@@ -135,10 +135,10 @@ async def async_delete_block(
     block_number: int | str,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -153,10 +153,10 @@ async def async_delete_blocks(
     start_block: int | None = None,
     end_block: int | None = None,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
 
     if block_numbers is not None:
         toolsql.delete(
@@ -186,10 +186,10 @@ async def async_select_block_timestamp(
     block_number: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
 
     result = toolsql.select(
         conn=conn,
@@ -209,10 +209,10 @@ async def async_select_block_timestamps(
     block_numbers: typing.Sequence[typing.SupportsInt],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> list[int | None] | None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
 
     block_numbers_int = [int(item) for item in block_numbers]
 
@@ -238,10 +238,10 @@ async def async_select_block_timestamps(
 async def async_select_max_block_number(
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
     result = toolsql.select(
         conn=conn,
         table=table,
@@ -263,10 +263,10 @@ async def async_select_max_block_number(
 async def async_select_max_block_timestamp(
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('blocks', network=network)
+    table = schema_utils.get_table_name('blocks', context=context)
     result = toolsql.select(
         conn=conn,
         table=table,
@@ -293,3 +293,4 @@ __all__ = (
     'async_delete_block',
     'async_delete_blocks',
 )
+

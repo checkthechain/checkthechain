@@ -51,7 +51,7 @@ async def async_get_event_abi(
     event_name: typing.Optional[str] = None,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> spec.EventABI:
     """get event ABI from local database or block explorer"""
 
@@ -61,7 +61,7 @@ async def async_get_event_abi(
             raise Exception('must specify contract_abi or contract_address')
         contract_abi = await contract_abi_utils.async_get_contract_abi(
             contract_address=contract_address,
-            network=network,
+            context=context,
         )
 
     try:
@@ -74,12 +74,13 @@ async def async_get_event_abi(
 
     except LookupError as e:
 
+        from ctc import config
+
         # query contract_abi again if contract abi might have changed since db
         if contract_address is not None:
             contract_abi = await contract_abi_utils.async_get_contract_abi(
                 contract_address=contract_address,
-                network=network,
-                db_query=False,
+                context=config.update_context(context=context, cache=False)
             )
 
             return evm.get_event_abi(

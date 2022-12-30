@@ -23,12 +23,12 @@ def get_contract_type_guards() -> dict[
 
 async def async_get_contract_type(
     address: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> str:
 
     contract_guards = get_contract_type_guards()
     coroutines = [
-        contract_guard(address=address, provider=provider)
+        contract_guard(address=address, context=context)
         for contract_guard in contract_guards.values()
     ]
     tasks = [asyncio.create_task(coroutine) for coroutine in coroutines]
@@ -52,13 +52,13 @@ async def async_get_contract_type(
 
 
 async def async_is_chainlink_feed(
-    address: spec.Address, provider: spec.ProviderReference = None
+    address: spec.Address, context: spec.Context = None
 ) -> bool:
     try:
         await rpc.async_eth_call(
             to_address=address,
             function_abi={'name': 'aggregator', 'inputs': [], 'outputs': []},
-            provider=provider,
+            context=context,
         )
         return True
     except spec.RpcException:
@@ -66,7 +66,7 @@ async def async_is_chainlink_feed(
 
 
 async def async_is_uniswap_v2_pool(
-    address: spec.Address, provider: spec.ProviderReference = None
+    address: spec.Address, context: spec.Context = None
 ) -> bool:
     try:
         factory = await rpc.async_eth_call(
@@ -76,7 +76,7 @@ async def async_is_uniswap_v2_pool(
                 'inputs': [],
                 'outputs': [{'type': 'address'}],
             },
-            provider=provider,
+            context=context,
         )
         return bool(factory == '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f')
     except spec.RpcException:
@@ -84,7 +84,7 @@ async def async_is_uniswap_v2_pool(
 
 
 async def async_is_uniswap_v3_pool(
-    address: spec.Address, provider: spec.ProviderReference = None
+    address: spec.Address, context: spec.Context = None
 ) -> bool:
     try:
         factory = await rpc.async_eth_call(
@@ -94,7 +94,7 @@ async def async_is_uniswap_v3_pool(
                 'inputs': [],
                 'outputs': [{'type': 'address'}],
             },
-            provider=provider,
+            context=context,
         )
         return bool(factory == '0x1f98431c8ad98523631ae4a59f267346ea31f984')
     except spec.RpcException:
@@ -102,14 +102,14 @@ async def async_is_uniswap_v3_pool(
 
 
 async def async_is_curve_pool(
-    address: spec.Address, provider: spec.ProviderReference = None
+    address: spec.Address, context: spec.Context = None
 ) -> bool:
     # doesn't work for early pools
     try:
         await rpc.async_eth_call(
             to_address=address,
             function_abi={'name': 'A', 'inputs': [], 'outputs': []},
-            provider=provider,
+            context=context,
         )
         return True
     except spec.RpcException:
@@ -117,7 +117,7 @@ async def async_is_curve_pool(
 
 
 async def async_is_sushi_pool(
-    address: spec.Address, provider: spec.ProviderReference = None
+    address: spec.Address, context: spec.Context = None
 ) -> bool:
     try:
         factory = await rpc.async_eth_call(
@@ -127,7 +127,7 @@ async def async_is_sushi_pool(
                 'inputs': [],
                 'outputs': [{'type': 'address'}],
             },
-            provider=provider,
+            context=context,
         )
         return bool(factory == '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac')
     except spec.RpcException:
@@ -135,14 +135,15 @@ async def async_is_sushi_pool(
 
 
 async def async_is_balancer_v2_pool(
-    address: spec.Address, provider: spec.ProviderReference = None
+    address: spec.Address, context: spec.Context = None
 ) -> bool:
     try:
         await rpc.async_eth_call(
             to_address=address,
             function_abi={'name': 'getPoolId', 'inputs': [], 'outputs': []},
-            provider=provider,
+            context=context,
         )
         return True
     except spec.RpcException:
         return False
+

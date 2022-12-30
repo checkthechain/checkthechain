@@ -20,7 +20,7 @@ async def async_get_composite_feed_data(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     invert: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Series:
     # TODO: other ways of specifying composites
     import asyncio
@@ -31,7 +31,7 @@ async def async_get_composite_feed_data(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
-        provider=provider,
+        context=context,
     )
 
     # queue requests
@@ -45,6 +45,7 @@ async def async_get_composite_feed_data(
             invert=False,
             interpolate=True,
             fields='answer',
+            context=context,
         )
         coroutines.append(coroutine)
 
@@ -59,7 +60,7 @@ async def async_get_composite_feed_data(
     feeds_decimals_coroutines = [
         chainlink_feed_metadata.async_get_feed_decimals(
             feed=feed,
-            provider=provider,
+            context=context,
         )
         for feed in composite_feed
     ]

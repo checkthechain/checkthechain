@@ -58,7 +58,6 @@ async def async_get_transactions_from_address(
     blocks = await evm.async_get_blocks(
         blocks=count_data['blocks'],
         include_full_transactions=True,
-        provider={'chunk_size': 1},
     )
 
     transactions = []

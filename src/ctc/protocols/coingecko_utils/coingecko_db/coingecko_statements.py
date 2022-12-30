@@ -4,6 +4,7 @@ import typing
 
 import toolsql
 
+from ctc import spec
 from . import coingecko_schema_defs
 
 
@@ -11,6 +12,7 @@ async def async_upsert_tokens(
     *,
     tokens: typing.Sequence[coingecko_schema_defs.CoingeckoToken],
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> None:
 
     if len(tokens) == 0:
@@ -28,6 +30,7 @@ async def async_delete_tokens(
     *,
     ids: typing.Sequence[str],
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> None:
 
     if len(ids) == 0:
@@ -44,6 +47,7 @@ async def async_select_token(
     *,
     conn: toolsql.SAConnection,
     id: str | None = None,
+    context: spec.Context = None,
 ) -> coingecko_schema_defs.CoingeckoToken | None:
 
     if id is not None:
@@ -67,6 +71,7 @@ async def async_select_tokens(
     symbol_query: str | None = None,
     name_query: str | None = None,
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> typing.Sequence[coingecko_schema_defs.CoingeckoToken] | None:
 
     # get table object

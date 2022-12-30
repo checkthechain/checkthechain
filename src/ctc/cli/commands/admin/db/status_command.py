@@ -103,7 +103,7 @@ def status_command(verbose: bool) -> None:
 
                 for schema_network in schema_networks:
                     version = db.get_schema_version(
-                        schema_name, network=schema_network
+                        schema_name, context=dict(network=schema_network)
                     )
                     if version is None:
                         version = '[DNE]'

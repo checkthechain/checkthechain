@@ -69,7 +69,7 @@ async def async_call_all_command(
                     coroutine = rpc.async_eth_call(
                         to_address=contract_address,
                         function_abi=function_abi,
-                        provider={'convert_reverts_to_none': True},
+                        context=dict(provider={'convert_reverts_to_none': True}),
                         block_number=block_number,
                     )
                     coroutines.append(coroutine)

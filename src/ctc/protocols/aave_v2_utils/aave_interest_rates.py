@@ -62,7 +62,7 @@ async def async_get_reserve_data(
     asset: spec.Address,
     block: spec.BlockNumberReference | None = None,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> AaveV2ReserveData:
 
     result = await rpc.async_eth_call(
@@ -70,7 +70,7 @@ async def async_get_reserve_data(
         function_name='getReserveData',
         function_parameters=[asset],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     return {
@@ -93,11 +93,11 @@ async def async_get_reserve_data_by_block(
     asset: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> AaveV2ReserveListData:
 
     coroutines = [
-        async_get_reserve_data(asset, block=block, provider=provider)
+        async_get_reserve_data(asset, block=block, context=context)
         for block in blocks
     ]
 
@@ -233,3 +233,4 @@ async def async_get_interest_rates_by_block(
         'borrow_apr': list(borrow_apr),
         'borrow_apy': list(borrow_apy),
     }
+

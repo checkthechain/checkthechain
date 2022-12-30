@@ -18,7 +18,7 @@ async def async_get_blocks_of_timestamps(
     block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
     nary: typing.Optional[int] = None,
     cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     use_db: bool = True,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> list[int]:
@@ -58,11 +58,9 @@ async def async_get_blocks_of_timestamps(
         # get timestamps form db
         if use_db:
             from ctc import db
-            from ctc import rpc
 
-            network = rpc.get_provider_network(provider)
             db_blocks = await db.async_query_timestamps_blocks(
-                network=network,
+                context=context,
                 timestamps=timestamps,
                 mode=mode,
             )
@@ -90,7 +88,7 @@ async def async_get_blocks_of_timestamps(
                     verbose=False,
                     cache=cache,
                     nary=nary,
-                    provider=provider,
+                    context=context,
                     use_db=False,
                     mode=mode,
                 )

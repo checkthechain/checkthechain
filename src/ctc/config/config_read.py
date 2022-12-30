@@ -114,7 +114,7 @@ def get_config(
     # add config overrides
     overrides = config_overrides.get_config_overrides()
     if len(overrides) > 0:
-        config = config.copy()
+        config = dict(config)
         config.update(overrides)
 
     # validate
@@ -164,11 +164,7 @@ def reset_config_cache() -> None:
 def _get_config_cache_functions() -> typing.Sequence[
     functools._lru_cache_wrapper[typing.Any]
 ]:
-    from . import config_values
-
     return [
         get_config,  # type: ignore
-        config_values.get_all_cache_configs,
-        config_values.get_schema_cache_config,
     ]
 

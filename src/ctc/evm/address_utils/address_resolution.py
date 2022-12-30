@@ -20,8 +20,8 @@ if typing.TYPE_CHECKING:
 async def async_resolve_address(
     name_or_address: str,
     *,
-    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> str:
     """resolve alternate address formats (i.e. ENS) to standard address str"""
 
@@ -36,7 +36,7 @@ async def async_resolve_address(
 
     result = await ens_utils.async_resolve_name(
         name=name_or_address,
-        provider=provider,
+        context=context,
         block=block,
     )
     if result is not None:
@@ -48,8 +48,8 @@ async def async_resolve_address(
 async def async_resolve_addresses(
     names_or_addresses: typing.Sequence[str],
     *,
-    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[str]:
     """resolve alternate address formats (i.e. ENS) to standard address strs"""
 
@@ -67,8 +67,8 @@ async def async_resolve_addresses(
 
         results = await ens_utils.async_resolve_names(
             names=to_resolve,
-            provider=provider,
             block=block,
+            context=context,
         )
         resolved: typing.Mapping[str, str | None] = dict(
             zip(to_resolve, results)
@@ -89,7 +89,7 @@ async def async_resolve_address_by_block(
     name_or_address: str,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[str]:
     """return resolution history of address over multiple blocks"""
 
@@ -98,8 +98,8 @@ async def async_resolve_address_by_block(
     coroutines = [
         async_resolve_address(
             name_or_address=name_or_address,
-            provider=provider,
             block=block,
+            context=context,
         )
         for block in blocks
     ]

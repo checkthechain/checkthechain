@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import config
 from ctc import rpc
 from ctc import spec
 
@@ -105,16 +106,17 @@ async def async_get_registry_feed(
     base: str,
     quote: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
-    network = rpc.get_provider_network(provider)
+
+    network = config.get_context_chain_id(context)
     registry_address = feed_registry[network]
 
     result = await rpc.async_eth_call(
         to_address=registry_address,
         function_abi=registry_function_abis['getFeed'],
         function_parameters=[base, quote],
-        provider=provider,
+        context=context,
     )
 
     if not isinstance(result, str):
@@ -127,9 +129,10 @@ async def async_get_phase_range(
     base: str,
     quote: str,
     phase: int,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Tuple[int, ...]:
-    network = rpc.get_provider_network(provider)
+
+    network = config.get_context_chain_id(context)
     registry_address = feed_registry[network]
 
     result = await rpc.async_eth_call(
@@ -137,7 +140,7 @@ async def async_get_phase_range(
         # function_abi=registry_function_abis['getPhaseRange'],
         function_abi=registry_function_abis['getPhase'],
         function_parameters=[base, quote, phase],
-        provider=provider,
+        context=context,
     )
 
     if not isinstance(result, tuple) or not all(
@@ -145,3 +148,4 @@ async def async_get_phase_range(
     ):
         raise Exception('invalid rpc result')
     return result
+

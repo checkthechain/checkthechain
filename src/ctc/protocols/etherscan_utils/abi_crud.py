@@ -35,7 +35,7 @@ def set_etherscan_ratelimit(requests_per_second: int | float) -> None:
 
 async def async_get_contract_abi(
     contract_address: spec.Address,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     *,
     verbose: bool = True,
 ) -> spec.ContractABI:
@@ -43,11 +43,9 @@ async def async_get_contract_abi(
 
     import aiohttp
 
+    network = config.get_context_chain_id(context)
+
     # process inputs
-    if network is None:
-        network = config.get_default_network()
-    if network is None:
-        raise Exception('must specify network or configure default network')
     if not evm.is_address_str(contract_address):
         raise Exception('not a valid address: ' + str(contract_address))
 

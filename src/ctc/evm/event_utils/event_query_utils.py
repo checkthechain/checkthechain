@@ -57,7 +57,7 @@ async def _async_parse_event_query_args(
     encoded_topic1: spec.BinaryData | None = None,
     encoded_topic2: spec.BinaryData | None = None,
     encoded_topic3: spec.BinaryData | None = None,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> tuple[typing.Sequence[spec.BinaryData | None], spec.EventABI | None]:
     """compute encoded topics and event abi of query as needed
 
@@ -105,7 +105,7 @@ async def _async_parse_event_query_args(
             contract_address=contract_address,
             event_name=event_name,
             event_hash=event_hash,
-            network=network,
+            context=context,
         )
     if using_name_for_hash and event_abi is None:
         raise Exception('did not obtain proper event abi')
@@ -187,7 +187,7 @@ async def async_scrub_db_queries(
     encoded_topic3: spec.BinaryData | None = None,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     from ctc import db
@@ -203,7 +203,7 @@ async def async_scrub_db_queries(
         topic3=encoded_topic3,
         start_block=start_block,
         end_block=end_block,
-        network=network,
+        context=context,
     )
     if queries is None:
         queries = []
@@ -270,7 +270,7 @@ async def async_scrub_db_queries(
     # perform db operations
     engine = db.create_engine(
         schema_name='events',
-        network=network,
+        context=context,
     )
     if engine is None:
         raise Exception('could not connect to db')
@@ -278,12 +278,12 @@ async def async_scrub_db_queries(
         with engine.connect() as conn:
             await db.async_delete_event_queries(
                 query_ids=to_delete,
-                network=network,
+                context=context,
                 conn=conn,
             )
             await db.async_upsert_event_queries(
                 event_queries=to_insert,
-                network=network,
+                context=context,
                 conn=conn,
             )
     except sqlalchemy.exc.OperationalError:

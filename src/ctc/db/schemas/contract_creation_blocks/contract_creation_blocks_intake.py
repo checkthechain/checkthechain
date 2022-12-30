@@ -12,20 +12,20 @@ async def async_intake_contract_creation_block(
     contract_address: spec.Address,
     block: int,
     *,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
     if not management.get_active_schemas().get('contract_creation_blocks'):
         return
     confirmed = await intake_utils.async_is_block_fully_confirmed(
-        block=block, network=network
+        block=block, context=context
     )
     if not confirmed:
         return
 
     engine = connect_utils.create_engine(
         schema_name='contract_creation_blocks',
-        network=network,
+        context=context,
     )
     if engine is not None:
         with engine.begin() as conn:
@@ -33,5 +33,5 @@ async def async_intake_contract_creation_block(
                 conn=conn,
                 block_number=block,
                 address=contract_address,
-                network=network,
+                context=context,
             )

@@ -12,22 +12,22 @@ from ctc import spec
 async def async_predict_block_timestamp(
     block: typing.SupportsInt,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     window_size: int = 88295,
 ) -> int:
     """predict timestamp of future block number"""
 
     block = int(block)
 
-    latest_block = await evm.async_get_block('latest', provider=provider)
+    latest_block = await evm.async_get_block('latest', context=context)
     latest_number = latest_block['number']
     if block == latest_number:
         return latest_block['timestamp']
     elif block < latest_number:
-        return await evm.async_get_block_timestamp(block, provider=provider)
+        return await evm.async_get_block_timestamp(block, context=context)
     else:
         old_block = await evm.async_get_block(
-            latest_number - window_size, provider=provider
+            latest_number - window_size, context=context
         )
         mean_block_time = (
             latest_block['timestamp'] - old_block['timestamp']
@@ -41,7 +41,7 @@ async def async_predict_block_timestamp(
 async def async_predict_block_timestamps(
     blocks: typing.Sequence[typing.SupportsInt],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     window_size: int = 100000,
 ) -> typing.Sequence[int]:
     """predict timestamps of future block numbers"""
@@ -55,19 +55,19 @@ async def async_predict_block_timestamps(
     window_task = None
     new_blocks = []
 
-    latest_block = await evm.async_get_block('latest', provider=provider)
+    latest_block = await evm.async_get_block('latest', context=context)
     latest_number = latest_block['number']
 
     for block in int_blocks:
         if block == latest_number:
             predictions[block] = latest_block['timestamp']
         elif block < latest_number:
-            coroutine = evm.async_get_block_timestamp(block, provider=provider)
+            coroutine = evm.async_get_block_timestamp(block, context=context)
             old_block_tasks[block] = asyncio.create_task(coroutine)
         else:
             if window_task is None:
                 window_task = evm.async_get_block(
-                    latest_number - window_size, provider=provider
+                    latest_number - window_size, context=context
                 )
             new_blocks.append(block)
 
@@ -98,7 +98,7 @@ async def async_predict_block_timestamps(
 async def async_predict_timestamp_block(
     timestamp: tooltime.Timestamp,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     window_size: int = 86400 * 16,
 ) -> int:
     """predict block number of future timestamp"""
@@ -107,19 +107,19 @@ async def async_predict_timestamp_block(
 
     timestamp = tooltime.timestamp_to_seconds(timestamp)
 
-    latest_block = await evm.async_get_block('latest', provider=provider)
+    latest_block = await evm.async_get_block('latest', context=context)
     latest_timestamp = latest_block['timestamp']
 
     if timestamp == latest_timestamp:
         return latest_block['number']
     elif timestamp < latest_timestamp:
         return await evm.async_get_block_of_timestamp(
-            timestamp, provider=provider
+            timestamp, context=context
         )
     else:
         old_timestamp = latest_timestamp - window_size
         old_block = await evm.async_get_block_of_timestamp(
-            old_timestamp, provider=provider
+            old_timestamp, context=context
         )
         mean_blocks_per_time = (latest_block['number'] - old_block) / (
             latest_block['timestamp'] - old_timestamp
@@ -133,7 +133,7 @@ async def async_predict_timestamp_block(
 async def async_predict_timestamp_blocks(
     timestamps: typing.Sequence[tooltime.Timestamp],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     window_size: int = 86400 * 16,
 ) -> typing.Sequence[int]:
     """predict timestamps of future block numbers"""
@@ -145,7 +145,7 @@ async def async_predict_timestamp_blocks(
         tooltime.timestamp_to_seconds(timestamp) for timestamp in timestamps
     ]
 
-    latest_block = await evm.async_get_block('latest', provider=provider)
+    latest_block = await evm.async_get_block('latest', context=context)
     latest_timestamp = latest_block['timestamp']
     old_timestamp_tasks = {}
     new_timestamps = []
@@ -157,14 +157,14 @@ async def async_predict_timestamp_blocks(
             predictions[timestamp] = latest_block['number']
         elif timestamp < latest_timestamp:
             coroutine = evm.async_get_block_of_timestamp(
-                timestamp, provider=provider
+                timestamp, context=context
             )
             old_timestamp_tasks[timestamp] = asyncio.create_task(coroutine)
         else:
             if window_task is None:
                 window_timestamp = latest_timestamp - window_size
                 window_coroutine = evm.async_get_block_of_timestamp(
-                    window_timestamp, provider=provider
+                    window_timestamp, context=context
                 )
                 window_task = asyncio.create_task(window_coroutine)
             new_timestamps.append(timestamp)
@@ -185,3 +185,4 @@ async def async_predict_timestamp_blocks(
             predictions[timestamp] = result
 
     return [round(predictions[timestamp]) for timestamp in int_timestamps]
+

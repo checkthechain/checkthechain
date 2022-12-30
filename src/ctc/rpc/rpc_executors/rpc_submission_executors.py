@@ -8,10 +8,10 @@ from .. import rpc_request
 
 
 async def async_eth_gas_price(
-    *, provider: spec.ProviderReference = None, decode_response: bool = True
+    *, context: spec.Context = None, decode_response: bool = True
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_gas_price()
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_gas_price(
         response=response,
         decode_response=decode_response,
@@ -20,10 +20,10 @@ async def async_eth_gas_price(
 
 async def async_eth_accounts(
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_accounts()
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_accounts(response=response)
 
 
@@ -31,13 +31,13 @@ async def async_eth_sign(
     address: spec.Address,
     message: str,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_sign(
         address=address,
         message=message,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_sign(response=response)
 
 
@@ -50,7 +50,7 @@ async def async_eth_sign_transaction(
     gas_price: int | None = None,
     value: int | None = None,
     nonce: str | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_sign_transaction(
@@ -62,7 +62,7 @@ async def async_eth_sign_transaction(
         value=value,
         nonce=nonce,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_sign_transaction(
         response=response,
         snake_case_response=snake_case_response,
@@ -78,7 +78,7 @@ async def async_eth_send_transaction(
     gas_price: int | None = None,
     value: int | None = None,
     nonce: str | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_send_transaction(
@@ -90,7 +90,7 @@ async def async_eth_send_transaction(
         value=value,
         nonce=nonce,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_send_transaction(
         response=response,
         snake_case_response=snake_case_response,
@@ -98,8 +98,9 @@ async def async_eth_send_transaction(
 
 
 async def async_eth_send_raw_transaction(
-    data: str, *, provider: spec.ProviderReference = None
+    data: str, *, context: spec.Context = None
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_send_raw_transaction(data=data)
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_send_raw_transaction(response=response)
+

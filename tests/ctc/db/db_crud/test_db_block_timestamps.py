@@ -62,7 +62,7 @@ async def test_block_timestamps_db():
     db_config = get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='block_timestamps',
-        network='mainnet',
+        context=dict(network='mainnet'),
     )
     toolsql.create_tables(
         db_config=db_config,

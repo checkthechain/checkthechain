@@ -18,9 +18,9 @@ async def async_upsert_dex_pool(
     *,
     dex_pool: spec.DexPool,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
     dex_pool = _format_dex_pool(dex_pool)
     toolsql.insert(
         conn=conn,
@@ -34,11 +34,11 @@ async def async_upsert_dex_pools(
     *,
     dex_pools: typing.Sequence[spec.DexPool],
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
     if len(dex_pools) == 0:
         return
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
     dex_pools = [_format_dex_pool(dex_pool) for dex_pool in dex_pools]
     toolsql.insert(
         conn=conn,
@@ -53,11 +53,11 @@ async def async_upsert_dex_pool_factory_query(
     factory: spec.Address,
     last_scanned_block: int,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
     table = schema_utils.get_table_name(
         'dex_pool_factory_queries',
-        network=network,
+        context=context,
     )
     toolsql.insert(
         conn=conn,
@@ -74,10 +74,10 @@ async def async_delete_dex_pool(
     *,
     conn: toolsql.SAConnection,
     dex_pool: spec.Address,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -90,10 +90,10 @@ async def async_delete_dex_pools(
     *,
     conn: toolsql.SAConnection,
     dex_pools: typing.Sequence[spec.Address],
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -106,11 +106,11 @@ async def async_delete_dex_pool_factory_query(
     *,
     conn: toolsql.SAConnection,
     factory: spec.Address,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     table = schema_utils.get_table_name(
-        'dex_pool_factory_queries', network=network
+        'dex_pool_factory_queries', context=context
     )
 
     toolsql.delete(
@@ -124,10 +124,10 @@ async def async_select_dex_pool(
     address: spec.Address,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> spec.DexPool | None:
 
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
 
     where_equals = {'address': address.lower()}
 
@@ -145,14 +145,14 @@ async def async_select_dex_pools_by_id(
     addresses: typing.Sequence[spec.Address],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[spec.Address, spec.DexPool | None] | None:
     raise NotImplementedError()
 
     if len(addresses) == 0:
         return {}
 
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
 
     results = await toolsql.select(
         conn=conn,
@@ -174,12 +174,12 @@ async def async_select_dex_pools(
     factories: typing.Sequence[spec.Address] | None = None,
     assets: typing.Sequence[spec.Address] | None = None,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     start_block: int | None = None,
     end_block: int | None = None,
 ) -> typing.Sequence[spec.DexPool] | None:
 
-    table = schema_utils.get_table_name('dex_pools', network=network)
+    table = schema_utils.get_table_name('dex_pools', context=context)
 
     query: typing.MutableMapping[str, typing.Any] = {}
     if factory is not None:
@@ -226,11 +226,11 @@ async def async_select_dex_pool_factory_last_scanned_block(
     factory: spec.Address,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> int | None:
 
     table = schema_utils.get_table_name(
-        'dex_pool_factory_queries', network=network
+        'dex_pool_factory_queries', context=context
     )
 
     result = toolsql.select(
@@ -247,3 +247,4 @@ async def async_select_dex_pool_factory_last_scanned_block(
         return result
     else:
         raise Exception('bad data format received from db')
+

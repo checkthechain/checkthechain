@@ -13,7 +13,7 @@ fuse_directory = '0x835482fe0532f169024d5e9410199369aad5c77e'
 
 async def async_get_all_pools(
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[typing.Sequence[typing.Any]]:
 
     # TODO: convert output to dict
@@ -21,7 +21,7 @@ async def async_get_all_pools(
         to_address=fuse_directory,
         block_number=block,
         function_abi=rari_abis.pool_directory_function_abis['getAllPools'],
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, (list, tuple)) or not all(
         isinstance(item, (list, tuple)) for item in result

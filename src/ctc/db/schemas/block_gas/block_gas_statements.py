@@ -22,10 +22,10 @@ async def async_upsert_median_block_gas_fee(
     median_gas_fee: int | float | None,
     timestamp: int,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', network=network)
+    table = schema_utils.get_table_name('block_gas', context=context)
 
     row = {
         'block_number': block_number,
@@ -44,10 +44,10 @@ async def async_upsert_median_blocks_gas_fees(
     block_gas_data: typing.Sequence[BlockGasRow],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', network=network)
+    table = schema_utils.get_table_name('block_gas', context=context)
 
     toolsql.insert(
         conn=conn,
@@ -61,10 +61,10 @@ async def async_select_median_block_gas_fee(
     block_number: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> BlockGasRow | None:
 
-    table = schema_utils.get_table_name('block_gas', network=network)
+    table = schema_utils.get_table_name('block_gas', context=context)
 
     result: BlockGasRow = toolsql.select(
         conn=conn,
@@ -80,10 +80,10 @@ async def async_select_median_blocks_gas_fees(
     block_numbers: typing.Sequence[int],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> typing.Mapping[int, BlockGasRow] | None:
 
-    table = schema_utils.get_table_name('block_gas', network=network)
+    table = schema_utils.get_table_name('block_gas', context=context)
 
     results = toolsql.select(
         conn=conn,
@@ -101,10 +101,10 @@ async def async_delete_block_gas(
     block_number: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', network=network)
+    table = schema_utils.get_table_name('block_gas', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -117,10 +117,10 @@ async def async_delete_blocks_gasses(
     block_numbers: typing.Sequence[int],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', network=network)
+    table = schema_utils.get_table_name('block_gas', context=context)
 
     toolsql.delete(
         conn=conn,

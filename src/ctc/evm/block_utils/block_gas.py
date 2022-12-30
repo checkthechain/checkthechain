@@ -74,22 +74,20 @@ async def async_get_median_block_gas_fee(
     *,
     normalize: bool = True,
     use_db: bool = True,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> db.BlockGasRow:
     """get median gas fee for a given block"""
 
     from ctc import rpc
 
-    network, provider = evm.get_network_and_provider(network, provider)
-    block = await evm.async_block_number_to_int(block, provider=provider)
+    block = await evm.async_block_number_to_int(block, context=context)
 
     if use_db:
         from ctc import db
 
         try:
             result = await db.async_query_median_block_gas_fee(
-                block, network=network
+                block, context=context
             )
 
             if result is not None:
@@ -103,7 +101,7 @@ async def async_get_median_block_gas_fee(
 
     block_data = await rpc.async_eth_get_block_by_number(
         block,
-        provider=provider,
+        context=context,
         include_full_transactions=True,
     )
     return {
@@ -121,14 +119,12 @@ async def async_get_median_blocks_gas_fees(
     *,
     use_db: bool = True,
     normalize: bool = True,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     verbose: bool = True,
     latest_block_number: int | None = None,
 ) -> typing.Sequence[db.BlockGasRow]:
     """get median gas fees for multiple blocks"""
 
-    network, provider = evm.get_network_and_provider(network, provider)
     blocks = await evm.async_block_numbers_to_int(blocks)
 
     # get data from db
@@ -136,7 +132,7 @@ async def async_get_median_blocks_gas_fees(
         from ctc import db
 
         result = await db.async_query_median_blocks_gas_fees(
-            blocks, network=network
+            blocks, context=context
         )
 
         if result is None:
@@ -166,10 +162,14 @@ async def async_get_median_blocks_gas_fees(
                 + ' blocks',
             )
             print()
+
+        from ctc import config
+
+        context = config.update_context(context, merge_provider={'chunk_size': 1})
         blocks_data = await evm.async_get_blocks(
             blocks=missing,
             include_full_transactions=True,
-            provider={'chunk_size': 1},
+            context=context,
             latest_block_number=latest_block_number,
         )
 
@@ -196,14 +196,14 @@ async def async_get_block_gas_stats(
     block: spec.BlockNumberReference | spec.Block,
     *,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> BlockGasStats:
     """get gas usage statistics for a given block"""
     if isinstance(block, dict):
         block_data = block
     else:
         block_data = await block_crud.async_get_block(
-            block, include_full_transactions=True, provider=provider
+            block, include_full_transactions=True, context=context
         )
 
     return compute_block_gas_stats(block_data, normalize=normalize)
@@ -213,7 +213,7 @@ async def async_get_gas_stats_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference | spec.Block],
     *,
     normalize: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[BlockGasStats]:
     """get block gas usage statistics of multiple blocks"""
 
@@ -223,7 +223,7 @@ async def async_get_gas_stats_by_block(
         async_get_block_gas_stats(
             block=block,
             normalize=normalize,
-            provider=provider,
+            context=context,
         )
         for block in blocks
     ]
@@ -278,3 +278,4 @@ def compute_block_gas_stats(
         'gas_limit': block['gas_limit'],
         'n_transactions': len(block['transactions']),
     }
+

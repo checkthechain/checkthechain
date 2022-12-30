@@ -12,7 +12,7 @@ from . import erc20_spec
 
 async def async_get_erc20_address(
     token: spec.ERC20Reference,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     *,
     case_insensitive_query: bool = True,
 ) -> spec.ERC20Address:
@@ -23,21 +23,16 @@ async def async_get_erc20_address(
     elif isinstance(token, str):
         from ctc import db
 
-        if network is None:
-            from ctc import config
-
-            network = config.get_default_network()
-
         metadata = await db.async_query_erc20_metadata(
             symbol=token,
-            network=network,
+            context=context,
         )
 
         # if no result, try again case insensitive
         if metadata is None:
             metadata = await db.async_query_erc20_metadata(
                 symbol=token,
-                network=network,
+                context=context,
                 case_insensitive_symbol=case_insensitive_query,
             )
 
@@ -51,12 +46,15 @@ async def async_get_erc20_address(
 
 async def async_is_erc20(
     address_or_abi: spec.Address | spec.ContractABI,
+    context: spec.Context = None,
 ) -> bool:
     """return whether an address implements ERC20 spec in its abi"""
 
     # get contract abi
     if address_utils.is_address_str(address_or_abi):
-        contract_abi = await abi_utils.async_get_contract_abi(address_or_abi)
+        contract_abi = await abi_utils.async_get_contract_abi(
+            address_or_abi, context=context
+        )
     elif isinstance(address_or_abi, list):
         contract_abi = address_or_abi
     contract_abi_by_selectors = abi_utils.get_contract_abi_by_selectors(
@@ -93,24 +91,23 @@ async def async_get_erc20_metadata(
     token: spec.ERC20Reference,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> spec.ERC20Metadata:
     """get metadata for ERC20 token"""
 
     from ctc import rpc
 
-    network = rpc.get_provider_network(provider)
-    address = await async_get_erc20_address(token, network=network)
+    address = await async_get_erc20_address(token, context=context)
 
     symbol_coroutine = async_get_erc20_symbol(
-        token=token, block=block, provider=provider, **rpc_kwargs
+        token=token, block=block, context=context, **rpc_kwargs
     )
     decimals_coroutine = async_get_erc20_decimals(
-        token=token, block=block, provider=provider, **rpc_kwargs
+        token=token, block=block, context=context, **rpc_kwargs
     )
     name_coroutine = async_get_erc20_name(
-        token=token, block=block, provider=provider, **rpc_kwargs
+        token=token, block=block, context=context, **rpc_kwargs
     )
 
     import asyncio
@@ -139,7 +136,7 @@ async def async_get_erc20_decimals(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> int:
     """get decimals of an erc20"""
@@ -148,12 +145,10 @@ async def async_get_erc20_decimals(
 
     if use_db:
         from ctc import db
-        from ctc import rpc
 
-        network = rpc.get_provider_network(provider)
-        token = await async_get_erc20_address(token, network=network)
+        token = await async_get_erc20_address(token, context=context)
         result = await db.async_query_erc20_metadata(
-            address=token, network=network
+            address=token, context=context
         )
         if result is not None and result['decimals'] is not None:
             return result['decimals']
@@ -162,7 +157,7 @@ async def async_get_erc20_decimals(
         function_name='decimals',
         token=token,
         block=block,
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
     if not isinstance(decimals_result, int):
@@ -178,7 +173,7 @@ async def async_get_erc20_decimals(
                 result = typing.cast(spec.ERC20Metadata, data)
             else:
                 result = data
-        await db.async_intake_erc20_metadata(network=network, **result)
+        await db.async_intake_erc20_metadata(context=context, **result)
 
     return decimals
 
@@ -220,7 +215,7 @@ async def async_get_erc20_name(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get name of an erc20"""
@@ -228,12 +223,10 @@ async def async_get_erc20_name(
     result: spec.ERC20Metadata | None = None
     if use_db:
         from ctc import db
-        from ctc import rpc
 
-        network = rpc.get_provider_network(provider)
-        token = await async_get_erc20_address(token, network=network)
+        token = await async_get_erc20_address(token, context=context)
         result = await db.async_query_erc20_metadata(
-            address=token, network=network
+            address=token, context=context
         )
         if result is not None and result['name'] is not None:
             return result['name']
@@ -242,7 +235,7 @@ async def async_get_erc20_name(
         function_name='name',
         token=token,
         block=block,
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
     if not isinstance(rpc_result, str):
@@ -259,7 +252,7 @@ async def async_get_erc20_name(
             else:
                 result = data
 
-        await db.async_intake_erc20_metadata(network=network, **result)
+        await db.async_intake_erc20_metadata(context=context, **result)
 
     return name
 
@@ -310,19 +303,17 @@ async def async_get_erc20_symbol(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     use_db: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get symbol of an erc20"""
 
     if use_db:
         from ctc import db
-        from ctc import rpc
 
-        network = rpc.get_provider_network(provider)
-        token = await async_get_erc20_address(token, network=network)
+        token = await async_get_erc20_address(token, context=context)
         result: spec.ERC20Metadata | None = await db.async_query_erc20_metadata(
-            address=token, network=network
+            address=token, context=context
         )
         if result is not None and result['symbol'] is not None:
             return result['symbol']
@@ -332,7 +323,7 @@ async def async_get_erc20_symbol(
         token=token,
         block=block,
         decode_response=False,
-        provider=provider,
+        context=context,
         **rpc_kwargs,
     )
     symbol = _decode_raw_symbol(symbol_raw)
@@ -347,7 +338,7 @@ async def async_get_erc20_symbol(
             else:
                 result = data
 
-        await db.async_intake_erc20_metadata(network=network, **result)
+        await db.async_intake_erc20_metadata(context=context, **result)
 
     return symbol
 
@@ -384,3 +375,4 @@ async def async_get_erc20_symbol_by_block(
         **rpc_kwargs,
     )
     return [_decode_raw_symbol(result) for result in results]
+

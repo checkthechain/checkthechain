@@ -62,9 +62,10 @@ def digest(
 
 async def async_execute(
     request: spec.RpcRequest,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     *,
     digest_kwargs: typing.Optional[dict[typing.Any, typing.Any]] = None,
 ) -> spec.RpcResponse:
-    response = await rpc_request.async_send(request=request, provider=provider)
+    response = await rpc_request.async_send(request=request, context=context)
     return digest(response, request=request, digest_kwargs=digest_kwargs)
+

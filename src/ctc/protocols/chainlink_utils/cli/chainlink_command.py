@@ -7,6 +7,7 @@ import toolcli
 import toolstr
 import tooltime
 
+from ctc import config
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -78,22 +79,28 @@ async def async_chainlink_command(
     timelength: str,
     export: str,
     overwrite: bool,
-    provider: typing.Optional[str],
+    provider: str | None,
     network: spec.NetworkReference | None,
-    all_fields: typing.Optional[bool],
+    all_fields: bool | None,
     interpolate: bool,
     shell: bool,
 ) -> None:
 
+    context = config.create_user_input_context(
+        provider=provider,
+        network=network,
+    )
+
     feed_str = '_'.join(feed)
 
-    feed_str = await evm.async_resolve_address(feed_str)
+    feed_str = await evm.async_resolve_address(feed_str, context=context)
 
     if timelength is not None:
         timelength_seconds = tooltime.timelength_to_seconds(timelength)
         start_block: int | None = await evm.async_get_block_of_timestamp(
             time.time() - timelength_seconds,
             mode='<=',
+            context=context,
         )
     else:
         start_block = None
@@ -108,16 +115,17 @@ async def async_chainlink_command(
             feed=feed_str,
             verbose=verbose,
             start_block=start_block,
+            context=context,
         )
     else:
         feed_address = await chainlink_utils.async_resolve_feed_address(
             feed=feed_str,
-            network=network,
-            provider=provider,
+            context=context,
         )
         name = await rpc.async_eth_call(
             feed_address,
             function_abi=chainlink_utils.feed_function_abis['description'],
+            context=context,
         )
         toolstr.print_text_box('Chainlink Feed: ' + name)
         print('- feed address')
@@ -127,7 +135,8 @@ async def async_chainlink_command(
 
         if blocks is not None:
             start_block, end_block = await cli_utils.async_parse_block_range(
-                blocks
+                blocks,
+                context=context,
             )
         else:
             start_block = None
@@ -141,11 +150,11 @@ async def async_chainlink_command(
 
         feed_data = await chainlink_utils.async_get_feed_data(
             feed_str,
-            provider=provider,
             fields=fields,
             start_block=start_block,
             end_block=end_block,
             interpolate=interpolate,
+            context=context,
         )
         df = feed_data
 

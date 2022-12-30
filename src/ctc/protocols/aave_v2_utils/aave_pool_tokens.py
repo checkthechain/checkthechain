@@ -11,7 +11,7 @@ from . import aave_spec
 
 async def async_get_underlying_asset(
     pool_token: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
     function_abi: spec.FunctionABI = {
         'name': 'UNDERLYING_ASSET_ADDRESS',
@@ -21,7 +21,7 @@ async def async_get_underlying_asset(
     result = await rpc.async_eth_call(
         to_address=pool_token,
         function_abi=function_abi,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -31,11 +31,10 @@ async def async_get_underlying_asset(
 async def async_get_reserves_list(
     *,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.Address]:
 
-    network = rpc.get_provider_network(provider)
-    address = aave_spec.get_aave_address('LendingPool', network=network)
+    address = aave_spec.get_aave_address('LendingPool', context=context)
 
     if block is not None:
         block = evm.standardize_block_number(block)
@@ -43,8 +42,9 @@ async def async_get_reserves_list(
     reserves: typing.Sequence[spec.Address] = await rpc.async_eth_call(
         to_address=address,
         function_name='getReservesList',
-        provider=provider,
+        context=context,
         block_number=block,
     )
 
     return reserves
+

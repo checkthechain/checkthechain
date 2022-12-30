@@ -224,7 +224,9 @@ async def async_import_network_to_db(
     ]
 
     if engine is None:
-        engine = db.create_engine(schema_name='chainlink', network=network)
+        engine = db.create_engine(
+            schema_name='chainlink', context=dict(network=network)
+        )
 
     if engine is None:
         raise Exception('cannot find db table to import to')
@@ -233,7 +235,7 @@ async def async_import_network_to_db(
 
         await chainlink_statements.async_upsert_feeds(
             feeds=feeds,
-            network=network,
+            context=dict(network=network),
             conn=conn,
         )
 
@@ -277,7 +279,7 @@ async def async_intake_aggregator_update(
 
     engine = db.create_engine(
         schema_name='chainlink',
-        network=network,
+        context=dict(network=network),
     )
     if engine is not None:
         with engine.begin() as conn:
@@ -285,24 +287,25 @@ async def async_intake_aggregator_update(
                 feed=feed,
                 aggregator=aggregator,
                 block_number=block_number,
-                network=network,
+                context=dict(network=network),
                 conn=conn,
             )
 
 
 async def async_intake_aggregator_updates(
     updates: typing.Sequence[chainlink_schema_defs._FeedAggregatorUpdate],
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     engine = db.create_engine(
         schema_name='chainlink',
-        network=network,
+        context=context,
     )
     if engine is not None:
         with engine.begin() as conn:
             await chainlink_statements.async_upsert_aggregator_updates(
                 updates=updates,
-                network=network,
                 conn=conn,
+                context=context,
             )
+

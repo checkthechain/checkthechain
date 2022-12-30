@@ -15,14 +15,14 @@ async def async_get_pool_A(
     pool: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
 
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['A'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -33,13 +33,13 @@ async def async_get_pool_future_A_time(
     pool: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['future_A_time'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -50,13 +50,13 @@ async def async_get_pool_initial_A(
     pool: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['initial_A'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -67,13 +67,13 @@ async def async_get_pool_initial_A_time(
     pool: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['initial_A_time'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -84,13 +84,13 @@ async def async_get_pool_future_A(
     pool: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['future_A'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -109,7 +109,7 @@ async def async_get_A_history(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[float]:
     """get history of pool's A parameter"""
 
@@ -123,21 +123,21 @@ async def async_get_A_history(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
-        provider=provider,
+        context=context,
     )
 
     # get ramp events
     pool_start_block = await evm.async_get_contract_creation_block(
         pool,
         verbose=False,
-        provider=provider,
+        context=context,
     )
-    latest_block = await evm.async_get_latest_block_number(provider=provider)
+    latest_block = await evm.async_get_latest_block_number(context=context)
     blocks: spec.NumpyArray = np.arange(start_block, end_block, dtype=int)
     block_timestamps_task = asyncio.create_task(
         evm.async_get_block_timestamps(
             blocks=typing.cast(typing.Sequence[int], blocks),
-            provider=provider,
+            context=context,
         )
     )
 
@@ -174,13 +174,16 @@ async def async_get_A_history(
         event_abi=event_abi,
         start_block=pool_start_block,
         end_block=latest_block,
+        context=context,
     )
     events = events[
         ['arg__old_A', 'arg__new_A', 'arg__initial_time', 'arg__future_time']
     ]
 
     # initial deployment parameters
-    initial_A = await async_get_pool_initial_A(pool, block=pool_start_block)
+    initial_A = await async_get_pool_initial_A(
+        pool, block=pool_start_block, context=context
+    )
     initial_A_time = 0
     events.loc[start_block, 0, 0] = [initial_A, initial_A, initial_A_time, 0]  # type: ignore
     events = events.sort_index()
@@ -263,3 +266,4 @@ def _compute_A(
         return typing.cast(spec.NumpyArray, result)
     else:
         return result
+

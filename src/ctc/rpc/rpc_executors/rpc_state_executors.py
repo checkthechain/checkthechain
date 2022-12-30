@@ -8,7 +8,6 @@ from ctc import spec
 from .. import rpc_constructors
 from .. import rpc_digestors
 from .. import rpc_request
-from .. import rpc_provider
 
 
 async def async_eth_call(
@@ -23,7 +22,7 @@ async def async_eth_call(
     function_parameters: typing.Sequence[typing.Any]
     | typing.Mapping[str, typing.Any]
     | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     delist_single_outputs: bool = True,
     package_named_outputs: bool = False,
@@ -46,7 +45,7 @@ async def async_eth_call(
                 n_parameters=n_parameters,
                 parameter_types=parameter_types,
                 function_selector=function_selector,
-                network=rpc_provider.get_provider_network(provider),
+                context=context,
             )
 
     # construct request
@@ -63,7 +62,7 @@ async def async_eth_call(
     )
 
     # make request
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
 
     # digest response
     return rpc_digestors.digest_eth_call(
@@ -88,7 +87,7 @@ async def async_eth_estimate_gas(
     function_parameters: typing.Sequence[typing.Any]
     | typing.Mapping[str, typing.Any]
     | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
     function_abi: spec.FunctionABI | None = None,
     function_name: typing.Optional[str] = None,
@@ -106,7 +105,7 @@ async def async_eth_estimate_gas(
             n_parameters=n_parameters,
             parameter_types=parameter_types,
             function_selector=function_selector,
-            network=rpc_provider.get_provider_network(provider),
+            context=context,
         )
 
     request = rpc_constructors.construct_eth_estimate_gas(
@@ -119,7 +118,7 @@ async def async_eth_estimate_gas(
         function_parameters=function_parameters,
         function_abi=function_abi,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_estimate_gas(
         response,
         decode_response=decode_response,
@@ -130,7 +129,7 @@ async def async_eth_get_balance(
     address: spec.Address,
     *,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     decode_response: bool = True,
 ) -> spec.RpcSingularResponse:
     if block_number is None:
@@ -139,7 +138,7 @@ async def async_eth_get_balance(
         address=address,
         block_number=block_number,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_get_balance(
         response,
         decode_response=decode_response,
@@ -151,7 +150,7 @@ async def async_eth_get_storage_at(
     position: spec.BinaryData,
     *,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     if block_number is None:
         block_number = 'latest'
@@ -160,7 +159,7 @@ async def async_eth_get_storage_at(
         position=position,
         block_number=block_number,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_get_storage_at(response)
 
 
@@ -168,7 +167,7 @@ async def async_eth_get_code(
     address: spec.Address,
     *,
     block_number: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.RpcSingularResponse:
     if block_number is None:
         block_number = 'latest'
@@ -176,5 +175,6 @@ async def async_eth_get_code(
         address=address,
         block_number=block_number,
     )
-    response = await rpc_request.async_send(request, provider=provider)
+    response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_get_code(response)
+

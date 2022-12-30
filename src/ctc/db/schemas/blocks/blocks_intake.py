@@ -24,7 +24,7 @@ if typing.TYPE_CHECKING:
 
 async def async_intake_block(
     block: spec.Block,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
     """intake block and extract relevant information to db tables
 
@@ -40,7 +40,7 @@ async def async_intake_block(
     # check that block is confirmed
     if intake_block_object or intake_block_timestamp:
         if not await intake_utils.async_is_block_fully_confirmed(
-            block=block, network=network
+            block=block, context=context
         ):
             intake_block_object = False
             intake_block_timestamp = False
@@ -49,7 +49,7 @@ async def async_intake_block(
     if intake_block_object or intake_block_timestamp or intake_block_gas:
         engine = connect_utils.create_engine(
             schema_name='block_timestamps',
-            network=network,
+            context=context,
         )
         if engine is None:
             return
@@ -59,38 +59,38 @@ async def async_intake_block(
             await _async_intake_block_object(
                 block=block,
                 conn=conn,
-                network=network,
+                context=context,
             )
             await _async_intake_block_timestamp(
                 block=block,
                 conn=conn,
-                network=network,
+                context=context,
             )
             await _async_intake_block_gas(
                 block=block,
                 conn=conn,
-                network=network,
+                context=context,
             )
 
 
 async def _async_intake_block_object(
     block: spec.Block,
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
     await blocks_statements.async_upsert_block(
         block=block,
         conn=conn,
-        network=network,
+        context=context,
     )
 
 
 async def _async_intake_block_timestamp(
     block: spec.Block | None,
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
     block_number: int | None = None,
     timestamp: int | None = None,
@@ -108,7 +108,7 @@ async def _async_intake_block_timestamp(
         conn=conn,
         block_number=block_number,
         timestamp=timestamp,
-        network=network,
+        context=context,
     )
 
 
@@ -116,7 +116,7 @@ async def _async_intake_block_gas(
     block: spec.Block,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     if len(block['transactions']) == 0 or isinstance(
@@ -130,7 +130,7 @@ async def _async_intake_block_gas(
             ),
             timestamp=block['timestamp'],
             conn=conn,
-            network=network,
+            context=context,
         )
 
 
@@ -141,7 +141,7 @@ async def _async_intake_block_gas(
 
 async def async_intake_blocks(
     blocks: typing.Sequence[spec.Block],
-    network: spec.NetworkReference,
+    context: spec.Context,
     *,
     latest_block_number: int | None = None,
 ) -> None:
@@ -158,14 +158,14 @@ async def async_intake_blocks(
     # check which blocks are confirmed
     confirmed_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
         blocks=blocks,
-        network=network,
+        context=context,
         latest_block_number=latest_block_number,
     )
 
     if intake_block_objects or intake_block_timestamps or intake_block_gases:
         engine = connect_utils.create_engine(
             schema_name='block_timestamps',
-            network=network,
+            context=context,
         )
         if engine is None:
             return
@@ -174,25 +174,25 @@ async def async_intake_blocks(
             # do not perform these concurrently to prevent deadlocks
             await _async_intake_block_objects(
                 confirmed_blocks=confirmed_blocks,
-                network=network,
+                context=context,
                 conn=conn,
             )
             await _async_intake_block_timestamps(
                 confirmed_blocks=confirmed_blocks,
-                network=network,
+                context=context,
                 conn=conn,
             )
             await _async_intake_blocks_gas(
                 blocks=blocks,
                 conn=conn,
-                network=network,
+                context=context,
             )
 
 
 async def _async_intake_block_objects(
     confirmed_blocks: typing.Sequence[spec.Block],
     *,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
@@ -200,7 +200,7 @@ async def _async_intake_block_objects(
         await blocks_statements.async_upsert_blocks(
             conn=conn,
             blocks=confirmed_blocks,
-            network=network,
+            context=context,
         )
 
 
@@ -208,7 +208,7 @@ async def _async_intake_block_timestamps(
     confirmed_blocks: typing.Sequence[spec.Block] | None = None,
     *,
     confirmed_block_timestamps: typing.Mapping[int, int] | None = None,
-    network: spec.NetworkReference,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
 
@@ -235,7 +235,7 @@ async def _async_intake_blocks_gas(
     blocks: typing.Sequence[spec.Block],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
     # only perform on blocks that have full transactions included
@@ -260,5 +260,6 @@ async def _async_intake_blocks_gas(
         await block_gas_statements.async_upsert_median_blocks_gas_fees(
             block_gas_data=blocks_gas_data,
             conn=conn,
-            network=network,
+            context=context,
         )
+

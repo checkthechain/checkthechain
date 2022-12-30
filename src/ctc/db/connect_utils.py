@@ -15,14 +15,16 @@ from .management import version_utils
 def create_engine(
     schema_name: spec.SchemaName,
     *,
-    network: spec.NetworkReference | None,
+    context: spec.Context = None,
     create_missing_schema: bool = True,
 ) -> toolsql.SAEngine | None:
     """create sqlalchemy engine object"""
 
+    network = config.get_context_chain_id(context)
+
     # get db config
     data_source: spec.DataSource | spec.LeafDataSource = (
-        config.get_data_source(datatype=schema_name, network=network)
+        config.get_data_source(datatype=schema_name, context=context)
     )
     if data_source['backend'] == 'hybrid':
         if typing.TYPE_CHECKING:
@@ -56,14 +58,14 @@ def create_engine(
             # check if schema in database
             schema_version = version_utils.get_schema_version(
                 schema_name=schema_name,
-                network=network,
+                context=dict(network=network),
             )
 
             # create schema if missing
             if schema_version is None:
                 dba_utils.initialize_schema(
                     schema_name=schema_name,
-                    network=network,
+                    context=context,
                     conn=conn,
                 )
 

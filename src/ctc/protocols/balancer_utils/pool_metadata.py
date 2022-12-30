@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import typing
 
 from ctc import evm
@@ -17,7 +16,7 @@ async def async_get_pool_id(
     pool_address: spec.Address,
     block: spec.BlockNumberReference | None = None,
     *,
-    provider: spec.ProviderReference | None = None,
+    context: spec.Context = None,
 ) -> str:
 
     function_abi: spec.FunctionABI = {
@@ -38,7 +37,7 @@ async def async_get_pool_id(
         to_address=pool_address,
         function_abi=function_abi,
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -69,6 +68,7 @@ async def async_get_pool_tokens(
     pool_address: spec.Address | None = None,
     pool_id: str | None = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> list[spec.Address]:
 
     vault = balancer_spec.vault
@@ -83,6 +83,7 @@ async def async_get_pool_tokens(
         function_parameters=[pool_id],
         block_number=block,
         package_named_outputs=True,
+        context=context,
     )
     return list(pool_tokens['tokens'])
 
@@ -94,7 +95,7 @@ async def async_get_token_registrations(
     end_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[str, typing.Sequence[str]]:
 
     balancer_token_registrations = await evm.async_get_events(
@@ -105,7 +106,7 @@ async def async_get_token_registrations(
         end_block=end_block,
         start_time=start_time,
         end_time=end_time,
-        provider=provider,
+        context=context,
     )
 
     token_registrations_by_pool: typing.MutableMapping[
@@ -118,3 +119,4 @@ async def async_get_token_registrations(
         token_registrations_by_pool[pool].extend(row['arg__tokens'])
 
     return token_registrations_by_pool
+

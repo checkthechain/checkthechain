@@ -11,8 +11,7 @@ async def async_intake_contract_abi(
     abi: spec.ContractABI,
     contract_address: spec.Address,
     *,
-    network: spec.NetworkReference,
-    # block: int,
+    context: spec.Context = None,
     includes_proxy: bool,
 ) -> None:
     """block age not checked because abis are not usually acquired from reorg-ably young blocks"""
@@ -28,7 +27,7 @@ async def async_intake_contract_abi(
 
     engine = connect_utils.create_engine(
         schema_name='contract_abis',
-        network=network,
+        context=context,
     )
     if engine is not None:
         with engine.begin() as conn:
@@ -37,5 +36,5 @@ async def async_intake_contract_abi(
                 abi=abi,
                 includes_proxy=includes_proxy,
                 conn=conn,
-                network=network,
+                context=context,
             )

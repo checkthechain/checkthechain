@@ -88,7 +88,7 @@ def create_missing_tables(
             if schema_network is not None:
                 schema = schema_utils.get_prepared_schema(
                     schema_name=schema_name,
-                    network=schema_network,
+                    context=dict(network=schema_network),
                 )
             else:
                 schema = schema_utils.get_raw_schema(schema_name=schema_name)
@@ -134,7 +134,7 @@ def create_missing_tables(
         for schema_network, schema_name in schemas_to_create:
             initialize_schema(
                 schema_name=schema_name,
-                network=schema_network,
+                context=dict(network=schema_network),
                 conn=conn,
             )
 
@@ -146,7 +146,7 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
     """initialize the schema_versions schema which manages versions of schemas"""
     initialize_schema(
         'schema_versions',
-        network=None,
+        context=dict(network=None),
         conn=conn,
     )
 
@@ -154,7 +154,7 @@ def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
 def initialize_schema(
     schema_name: spec.SchemaName,
     *,
-    network: spec.NetworkReference | None,
+    context: spec.Context,
     conn: toolsql.SAConnection,
 ) -> None:
     """initialize schema by creating its table and other objects"""
@@ -170,7 +170,7 @@ def initialize_schema(
         # check that schema not already initialized
         schema_version = version_utils.get_schema_version(
             schema_name=schema_name,
-            network=network,
+            context=context,
             conn=conn,
         )
         if schema_version is not None:
@@ -180,7 +180,7 @@ def initialize_schema(
     if prepared_schema:
         schema = schema_utils.get_prepared_schema(
             schema_name=schema_name,
-            network=network,
+            context=context,
         )
     else:
         schema = schema_utils.get_raw_schema(schema_name=schema_name)
@@ -194,6 +194,10 @@ def initialize_schema(
         )
 
     # set version in schema version table
+    if schema_name not in schema_utils.get_network_schema_names():
+        network = -1
+    else:
+        network = config.get_context_chain_id(context)
     version_utils.set_schema_version(
         schema_name=schema_name,
         network=network,
@@ -205,7 +209,7 @@ def initialize_schema(
 
 def drop_schema(
     schema_name: str,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     *,
     confirm: bool = False,
 ) -> None:
@@ -214,6 +218,7 @@ def drop_schema(
         raise Exception('unknown schema name: ' + str(schema_name))
     schema = typing.cast(db_types.SchemaName, schema_name)
 
+    network: int | str | None = config.get_context_chain_id(context)
     if not confirm:
         if network is not None:
             answer = toolcli.input_yes_or_no(
@@ -247,8 +252,8 @@ def drop_schema(
         # determine tables in db
         engine = connect_utils.create_engine(
             schema_name=schema,
-            network=network,
             create_missing_schema=False,
+            context=context,
         )
         if engine is None:
             continue
@@ -258,7 +263,7 @@ def drop_schema(
         if network is not None:
             schema_data = schema_utils.get_prepared_schema(
                 schema_name=schema,
-                network=network,
+                context=context,
             )
         else:
             schema_data = schema_utils.get_raw_schema(schema_name=schema)
@@ -280,7 +285,7 @@ def drop_schema(
     # delete rows from schema_versions table
     schema_version_engine = connect_utils.create_engine(
         schema_name='schema_versions',
-        network=None,
+        context=dict(network=None),
         create_missing_schema=False,
     )
     if schema_version_engine is not None:

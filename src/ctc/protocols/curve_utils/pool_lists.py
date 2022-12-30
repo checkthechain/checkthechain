@@ -162,13 +162,16 @@ event_abis = {
 
 async def async_get_factory_pool_data(
     factory: spec.Address,
+    *,
     include_balances: bool = False,
+    context: spec.Context = None,
 ) -> list[CurvePoolData]:
     import asyncio
 
     n_pools = await rpc.async_eth_call(
         to_address=factory,
         function_abi=function_abis['pool_count'],
+        context=context,
     )
 
     coroutines = [
@@ -191,17 +194,20 @@ async def _async_get_pool_data(
     factory: spec.Address,
     *,
     include_balances: bool = False,
+    context: spec.Context = None,
 ) -> CurvePoolData:
     pool = await rpc.async_eth_call(
         to_address=factory,
         function_abi=function_abis['pool_list'],
         function_parameters=[p],
+        context=context,
     )
 
     coins = await rpc.async_eth_call(
         to_address=factory,
         function_name='get_coins',  # cannot inline because different new / old
         function_parameters=[pool],
+        context=context,
     )
     coins = [coin for coin in coins if coin not in [eth_address]]
 
@@ -213,6 +219,7 @@ async def _async_get_pool_data(
     ]
     symbols = await evm.async_get_erc20s_symbols(
         valid_coins,
+        context=context,
     )
 
     if eth_address in coins:
@@ -225,9 +232,10 @@ async def _async_get_pool_data(
         ] = await evm.async_get_erc20s_balance_of(  # type: ignore
             tokens=valid_coins,
             address=pool,
+            context=context,
         )
         if eth_address in coins:
-            eth_balance = await evm.async_get_eth_balance(pool)
+            eth_balance = await evm.async_get_eth_balance(pool, context=context)
             balances.insert(index, eth_balance)
     else:
         balances = [None for coin in coins]
@@ -252,7 +260,7 @@ async def async_get_base_pools(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     factory: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
     import asyncio
@@ -264,7 +272,7 @@ async def async_get_base_pools(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
-        provider=provider,
+        context=context,
     )
 
     if start_block is None:
@@ -289,7 +297,7 @@ async def async_get_base_pools(
             event_name='BasePoolAdded',
             start_block=factory_start_block,
             end_block=end_block,
-            provider=provider,
+            context=context,
             verbose=verbose,
         )
         coroutines.append(coroutine)
@@ -320,7 +328,7 @@ async def async_get_plain_pools(
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
 
@@ -337,7 +345,7 @@ async def async_get_plain_pools(
         end_block=end_block,
         start_time=start_time,
         end_time=end_time,
-        provider=provider,
+        context=context,
         verbose=verbose,
     )
     events = events[
@@ -369,7 +377,7 @@ async def async_get_meta_pools(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     factory: spec.Address | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     verbose: bool = False,
 ) -> spec.DataFrame:
 
@@ -388,7 +396,7 @@ async def async_get_meta_pools(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
-        provider=provider,
+        context=context,
     )
 
     # gather data
@@ -405,7 +413,7 @@ async def async_get_meta_pools(
             event_name='MetaPoolDeployed',
             start_block=factory_start_block,
             end_block=end_block,
-            provider=provider,
+            context=context,
             verbose=verbose,
         )
         coroutines.append(coroutine)

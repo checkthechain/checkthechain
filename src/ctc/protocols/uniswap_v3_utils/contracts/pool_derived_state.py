@@ -10,7 +10,7 @@ async def async_pool_observe(
     seconds_agos: list[int],
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -20,7 +20,7 @@ async def async_pool_observe(
         to_address=pool,
         function_abi=function_abi,
         function_parameters=[seconds_agos],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     return {
@@ -34,7 +34,7 @@ async def async_pool_snapshot_cumulatives_inside(
     tick_lower: int,
     tick_upper: int,
     pool: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> dict[str, int]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
@@ -45,7 +45,7 @@ async def async_pool_snapshot_cumulatives_inside(
         to_address=pool,
         function_abi=function_abi,
         function_parameters=[tick_lower, tick_upper],
-        provider=provider,
+        context=context,
         block_number=block,
     )
     return {

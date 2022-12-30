@@ -13,7 +13,9 @@ def parse_network(network: str) -> spec.NetworkReference:
         return network
 
 
-async def async_parse_block(block: str) -> spec.BlockNumberReference:
+async def async_parse_block(
+    block: str, context: spec.Context = None
+) -> spec.BlockNumberReference:
     if block.isnumeric():
         return int(block)
     elif block == 'latest':
@@ -27,6 +29,7 @@ async def async_parse_block_range(
     *,
     default_start: int | None = None,
     default_end: int | None = None,
+    context: spec.Context = None,
 ) -> tuple[int | None, int | None]:
     """convert a cli block range to its start and end bounds
 
@@ -45,12 +48,16 @@ async def async_parse_block_range(
     if raw_start_block == '':
         start_block = default_start
     else:
-        start_block = await _async_resolve_single_block(raw_start_block)
+        start_block = await _async_resolve_single_block(
+            raw_start_block, context=context
+        )
 
     if raw_end_block == '':
         end_block = default_end
     else:
-        end_block = await _async_resolve_single_block(raw_end_block)
+        end_block = await _async_resolve_single_block(
+            raw_end_block, context=context
+        )
 
     return start_block, end_block
 
@@ -58,6 +65,8 @@ async def async_parse_block_range(
 async def async_parse_block_slice(
     text: str | typing.Sequence[str],
     n: int | None = None,
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """convert a cli block slice to a list of integer block numbers
 
@@ -79,7 +88,9 @@ async def async_parse_block_slice(
 
         blocks: list[int] = []
         for subtext in text:
-            subblocks = await async_parse_block_slice(subtext, n=n)
+            subblocks = await async_parse_block_slice(
+                subtext, n=n, context=context
+            )
             blocks.extend(subblocks)
         return blocks
 
@@ -87,7 +98,7 @@ async def async_parse_block_slice(
 
         # single block
         if text == 'latest':
-            return [await evm.async_get_latest_block_number()]
+            return [await evm.async_get_latest_block_number(context=context)]
 
         elif text.isnumeric():
             return [int(text)]
@@ -97,7 +108,9 @@ async def async_parse_block_slice(
             pieces = text.split(' ')
             blocks = []
             for piece in pieces:
-                block = await _async_resolve_single_block(piece)
+                block = await _async_resolve_single_block(
+                    piece, context=context
+                )
                 blocks.append(block)
             return blocks
 
@@ -117,14 +130,22 @@ async def async_parse_block_slice(
                 raise Exception('invalid block slice specification')
 
             if raw_end_block[0] in ['+', '-']:
-                start_block = await _async_resolve_single_block(raw_start_block)
-                diff = await _async_resolve_single_block(raw_end_block)
+                start_block = await _async_resolve_single_block(
+                    raw_start_block, context=context
+                )
+                diff = await _async_resolve_single_block(
+                    raw_end_block, context=context
+                )
                 end_block = start_block + diff
                 if raw_end_block[0] == '-':
                     start_block, end_block = end_block, start_block
             else:
-                start_block = await _async_resolve_single_block(raw_start_block)
-                end_block = await _async_resolve_single_block(raw_end_block)
+                start_block = await _async_resolve_single_block(
+                    raw_start_block, context=context
+                )
+                end_block = await _async_resolve_single_block(
+                    raw_end_block, context=context
+                )
 
             if end_block < start_block:
                 raise Exception('invalid block slice specification')
@@ -144,11 +165,14 @@ async def async_parse_block_slice(
     raise Exception('invalid block slice specification')
 
 
-async def _async_resolve_single_block(text: str) -> int:
+async def _async_resolve_single_block(
+    text: str,
+    context: spec.Context = None,
+) -> int:
     if text.isnumeric():
         return int(text)
     elif text == 'latest':
-        return await evm.async_get_latest_block_number()
+        return await evm.async_get_latest_block_number(context=context)
     else:
         try:
             as_float = float(text)
@@ -158,3 +182,4 @@ async def _async_resolve_single_block(text: str) -> int:
             return as_int
         except ValueError:
             raise Exception('could not parse block: ' + str(text))
+

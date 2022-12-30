@@ -172,10 +172,7 @@ def upgrade__0_3_1__to__0_3_2(
         str, typing.Any
     ] = config_defaults.get_default_config()
     for key in [
-        'global_cache_override',
-        'schema_cache_configs',
-        'network_cache_configs',
-        'default_cache_config',
+        'context_cache_rules',
     ]:
         if key not in upgraded:
             upgraded[key] = default_config[key]

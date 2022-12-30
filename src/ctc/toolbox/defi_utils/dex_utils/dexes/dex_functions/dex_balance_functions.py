@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import evm
 from ctc import spec
 
 from .. import dex_class
@@ -17,22 +16,19 @@ async def async_get_pool_balance(
     factory: spec.Address | None = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int | float:
     """get balance of particular asset in pool"""
 
-    network, provider = evm.get_network_and_provider(network, provider)
     dex = dex_class_utils.get_dex_class(
-        dex=dex, factory=factory, network=network
+        dex=dex, factory=factory, context=context,
     )
     return await dex.async_get_pool_balance(
         pool=pool,
         asset=asset,
         block=block,
         normalize=normalize,
-        network=network,
-        provider=provider,
+        context=context,
     )
 
 
@@ -43,21 +39,18 @@ async def async_get_pool_balances(
     factory: spec.Address | None = None,
     normalize: bool = True,
     block: spec.BlockNumberReference | None = None,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[spec.Address, int | float]:
     """get balances of all assets in pool"""
 
-    network, provider = evm.get_network_and_provider(network, provider)
     dex = dex_class_utils.get_dex_class(
-        dex=dex, factory=factory, network=network
+        dex=dex, factory=factory, context=context
     )
     return await dex.async_get_pool_balances(
         pool=pool,
-        network=network,
         normalize=normalize,
         block=block,
-        provider=provider,
+        context=context,
     )
 
 
@@ -69,22 +62,19 @@ async def async_get_pool_balance_by_block(
     dex: typing.Type[dex_class.DEX] | str | None = None,
     factory: spec.Address | None = None,
     normalize: bool = True,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
     """get balances of particular asset in pool at specific blocks"""
 
-    network, provider = evm.get_network_and_provider(network, provider)
     dex = dex_class_utils.get_dex_class(
-        dex=dex, factory=factory, network=network
+        dex=dex, factory=factory, context=context,
     )
     return await dex.async_get_pool_balance_by_block(
         pool=pool,
         asset=asset,
         blocks=blocks,
         normalize=normalize,
-        network=network,
-        provider=provider,
+        context=context,
     )
 
 
@@ -95,19 +85,16 @@ async def async_get_pool_balances_by_block(
     dex: typing.Type[dex_class.DEX] | str | None = None,
     factory: spec.Address | None = None,
     normalize: bool = True,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[str, typing.Sequence[int | float]]:
     """get balances of all assets in pool at specific blocks"""
 
-    network, provider = evm.get_network_and_provider(network, provider)
     dex = dex_class_utils.get_dex_class(
-        dex=dex, factory=factory, network=network
+        dex=dex, factory=factory, context=context
     )
     return await dex.async_get_pool_balances_by_block(
         pool=pool,
         blocks=blocks,
         normalize=normalize,
-        network=network,
-        provider=provider,
+        context=context,
     )

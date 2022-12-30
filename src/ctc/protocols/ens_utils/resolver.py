@@ -25,8 +25,8 @@ def hash_name(name: str) -> spec.PrefixHexData:
 async def async_resolve_name(
     name: str,
     *,
-    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> spec.Address | None:
     name_hash = hash_name(name)
 
@@ -41,14 +41,14 @@ async def async_resolve_name(
         block_number=block,
         function_abi=function_abi,
         function_parameters=[name_hash],
-        provider=provider,
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
 
     if result == '0x0000000000000000000000000000000000000000':
         resolver = await registrar.async_get_resolver(
-            name=name, provider=provider, block=block
+            name=name, block=block, context=context
         )
         if resolver == '0x0000000000000000000000000000000000000000':
             return None
@@ -61,7 +61,7 @@ async def async_resolve_name(
                 'outputs': [{'type': 'address'}],
             },
             function_parameters=[name_hash],
-            provider=provider,
+            context=context,
         )
         if not isinstance(result, str):
             raise Exception('invalid rpc result')
@@ -72,14 +72,14 @@ async def async_resolve_name(
 async def async_resolve_names(
     names: typing.Sequence[str],
     *,
-    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.Address | None]:
 
     import asyncio
 
     coroutines = [
-        async_resolve_name(name=name, provider=provider, block=block)
+        async_resolve_name(name=name, block=block, context=context)
         for name in names
     ]
 
@@ -89,8 +89,8 @@ async def async_resolve_names(
 async def async_reverse_lookup(
     address: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> str:
     function_abi: spec.FunctionABI = {
         'name': 'getNames',
@@ -102,7 +102,7 @@ async def async_reverse_lookup(
         block_number=block,
         function_abi=function_abi,
         function_parameters=[[address]],
-        provider=provider,
+        context=context,
     )
     output = names[0]
     if not isinstance(output, str):
@@ -119,6 +119,7 @@ async def async_get_text_record(
     *,
     name: str | None = None,
     node: str | None = None,
+    context: spec.Context = None,
 ) -> str:
 
     if node is None:
@@ -139,6 +140,7 @@ async def async_get_text_record(
         to_address=ens_directory.resolver,
         function_abi=function_abi,
         function_parameters=[node, key],
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
@@ -150,6 +152,7 @@ async def async_get_text_records(
     name: str | None = None,
     node: str | None = None,
     keys: typing.Sequence[str] | None = None,
+    context: spec.Context = None,
 ) -> dict[str, str]:
     """
     https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records
@@ -162,10 +165,15 @@ async def async_get_text_records(
         node = hash_name(name)
 
     if keys is None:
-        text_changes = await async_get_text_changes(name=name, node=node)
+        text_changes = await async_get_text_changes(
+            name=name, node=node, context=context
+        )
         keys = list(text_changes['arg__key'].values)
 
-    coroutines = [async_get_text_record(key=key, node=node) for key in keys]
+    coroutines = [
+        async_get_text_record(key=key, node=node, context=context)
+        for key in keys
+    ]
     values = await asyncio.gather(*coroutines)
     return dict(zip(keys, values))
 
@@ -174,6 +182,7 @@ async def async_get_text_changes(
     *,
     name: str | None = None,
     node: str | None = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
 
     event_abi: spec.EventABI = {
@@ -206,6 +215,7 @@ async def async_get_text_changes(
         event_abi=event_abi,
         start_block=9000000,
         verbose=False,
+        context=context,
     )
 
     if node is None:
@@ -220,6 +230,8 @@ async def async_get_text_changes(
 async def async_get_content_hash(
     name: str | None = None,
     node: str | None = None,
+    *,
+    context: spec.Context = None,
 ) -> str:
 
     if node is None:
@@ -239,13 +251,17 @@ async def async_get_content_hash(
         to_address=ens_directory.resolver,
         function_abi=function_abi,
         function_parameters=[node],
+        context=context,
     )
     if not isinstance(result, str):
         raise Exception('invalid rpc result')
     return result
 
 
-async def async_get_expiration(name: str) -> int:
+async def async_get_expiration(
+    name: str,
+    context: spec.Context = None,
+) -> int:
 
     if not name.endswith('.eth'):
         raise NotImplementedError('only implemented for .eth domains')
@@ -263,7 +279,9 @@ async def async_get_expiration(name: str) -> int:
         to_address=ens_directory.base_registrar,
         function_abi=function_abi,
         function_parameters=[label_id],
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
     return result
+

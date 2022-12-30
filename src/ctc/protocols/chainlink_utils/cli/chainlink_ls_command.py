@@ -31,14 +31,18 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def async_chainlink_ls_command(query: str, network: str | int | None) -> None:
+async def async_chainlink_ls_command(
+    query: str, network: str | int | None
+) -> None:
 
     if network is None:
         network = config.get_default_network()
     if isinstance(network, str) and network.isnumeric():
         network = int(network)
 
-    oracle_feeds = await chainlink_db.async_query_feeds(network=network)
+    oracle_feeds = await chainlink_db.async_query_feeds(
+        context=dict(network=network)
+    )
     if oracle_feeds is None:
         return
     rows = []
@@ -80,3 +84,4 @@ async def async_chainlink_ls_command(query: str, network: str | int | None) -> N
         },
         max_column_widths={'name': 14},
     )
+

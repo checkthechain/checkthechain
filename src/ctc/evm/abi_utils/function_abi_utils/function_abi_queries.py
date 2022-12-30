@@ -54,7 +54,9 @@ def get_function_abi(
             item_selector = function_abi_parsing.get_function_selector(
                 function_abi
             )
-            item_selector = binary_utils.binary_convert(item_selector, 'prefix_hex')
+            item_selector = binary_utils.binary_convert(
+                item_selector, 'prefix_hex'
+            )
             if item_selector != function_selector:
                 continue
         candidates.append(function_abi)
@@ -83,7 +85,7 @@ async def async_get_function_abi(
     n_parameters: typing.Optional[int] = None,
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_selector: typing.Optional[spec.FunctionSelector] = None,
-    network: typing.Optional[spec.NetworkReference] = None,
+    context: spec.Context = None,
 ) -> spec.FunctionABI:
     """get function ABI from local database or block explorer"""
 
@@ -92,7 +94,7 @@ async def async_get_function_abi(
             raise Exception('must specify contract_abi or contract_address')
         contract_abi = await contract_abi_utils.async_get_contract_abi(
             contract_address=contract_address,
-            network=network,
+            context=context,
         )
 
     try:
@@ -108,10 +110,14 @@ async def async_get_function_abi(
 
         # query contract_abi again if contract abi might have changed since db
         if contract_address is not None:
+            from ctc import config
+
+            context = config.update_context(
+                context=context, cache={'read': False}
+            )
             contract_abi = await contract_abi_utils.async_get_contract_abi(
                 contract_address=contract_address,
-                network=network,
-                db_query=False,
+                context=context,
             )
 
             return get_function_abi(
@@ -131,3 +137,4 @@ def get_function_abis(
 ) -> typing.Sequence[spec.FunctionABI]:
     """get list of function ABI's in contract ABI"""
     return [item for item in contract_abi if item['type'] == 'function']
+

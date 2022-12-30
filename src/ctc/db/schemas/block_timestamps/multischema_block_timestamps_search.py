@@ -20,7 +20,7 @@ async def async_select_timestamp_block(
     timestamp: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> int | None:
     """
@@ -52,7 +52,7 @@ async def async_select_timestamp_block(
     timestamp_schema = management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', network=network)
+        table = schema_utils.get_table_name('block_timestamps', context=context)
         block_number: int = toolsql.select(
             conn=conn,
             table=table,
@@ -95,7 +95,7 @@ async def async_select_timestamps_blocks(
     timestamps: typing.Sequence[int],
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> list[int | None]:
 
@@ -106,7 +106,7 @@ async def async_select_timestamps_blocks(
             async_select_timestamp_block(
                 conn=conn,
                 timestamp=timestamp,
-                network=network,
+                context=context,
                 mode=mode,
             )
             for timestamp in timestamps
@@ -124,7 +124,7 @@ async def async_select_timestamp_block_range(
     timestamp: int,
     *,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> tuple[int | None, int | None]:
 
     timestamp_schema = management.get_active_timestamp_schema()
@@ -133,9 +133,10 @@ async def async_select_timestamp_block_range(
         return await block_timestamps_statements.async_select_timestamp_block_range(
             timestamp=timestamp,
             conn=conn,
-            network=network,
+            context=context,
         )
     elif timestamp_schema == 'blocks':
         raise NotImplementedError()
     else:
         raise Exception('unknown schema: ' + str(timestamp_schema))
+

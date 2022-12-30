@@ -35,16 +35,13 @@ async def async_get_erc20_transfers(
     normalize: bool = True,
     convert_from_str: bool = True,
     verbose: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     **event_kwargs: typing.Any,
 ) -> spec.DataFrame:
     """get transfer events of ERC20 token"""
 
-    from ctc import rpc
-
-    network = rpc.get_provider_network(provider)
     token_address = await erc20_metadata.async_get_erc20_address(
-        token, network=network
+        token, context=context
     )
 
     # use token's own abi if available, otherwise fallback to standard
@@ -65,7 +62,7 @@ async def async_get_erc20_transfers(
         end_time=end_time,
         include_timestamps=include_timestamps,
         verbose=verbose,
-        provider=provider,
+        context=context,
         **event_kwargs,
     )
 
@@ -137,7 +134,7 @@ async def async_get_erc20_balances_from_transfers(
         decimals = await erc20_metadata.async_get_erc20_decimals(
             typing.cast(str, transfers['contract_address'].values[0])
         )
-        balances /= 10 ** decimals
+        balances /= 10**decimals
 
     # sort
     balances = balances.sort_values(ascending=False)  # type: ignore
@@ -146,3 +143,4 @@ async def async_get_erc20_balances_from_transfers(
     balances.index.name = 'address'
 
     return balances
+

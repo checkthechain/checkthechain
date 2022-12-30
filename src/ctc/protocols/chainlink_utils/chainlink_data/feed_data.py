@@ -26,7 +26,7 @@ async def async_get_feed_data(
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     ...
 
@@ -42,7 +42,7 @@ async def async_get_feed_data(
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Series:
     ...
 
@@ -59,7 +59,7 @@ async def async_get_feed_data(
     invert: bool = False,
     normalize: bool = True,
     interpolate: bool = False,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[spec.DataFrame, spec.Series]:
 
     start_block, end_block = await evm.async_resolve_block_range(
@@ -68,7 +68,7 @@ async def async_get_feed_data(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
-        provider=provider,
+        context=context,
     )
 
     # determine blocks
@@ -79,7 +79,7 @@ async def async_get_feed_data(
             start_block = (
                 await chainlink_feed_metadata.async_get_feed_first_block(
                     feed=feed,
-                    provider=provider,
+                    context=context,
                 )
             )
         if end_block is None:
@@ -92,7 +92,7 @@ async def async_get_feed_data(
             return (
                 await feed_datum_by_block.async_get_feed_answer_datum_by_block(
                     feed,
-                    provider=provider,
+                    context=context,
                     blocks=blocks,
                     normalize=normalize,
                     interpolate=interpolate,
@@ -103,7 +103,7 @@ async def async_get_feed_data(
         else:
             return await feed_events.async_get_answer_feed_event_data(
                 feed,
-                provider=provider,
+                context=context,
                 normalize=normalize,
                 start_block=start_block,
                 end_block=end_block,
@@ -116,7 +116,7 @@ async def async_get_feed_data(
         if blocks is not None:
             return await feed_datum_by_block.async_get_feed_full_datum_by_block(
                 feed,
-                provider=provider,
+                context=context,
                 blocks=blocks,
                 normalize=normalize,
                 interpolate=interpolate,
@@ -126,7 +126,7 @@ async def async_get_feed_data(
         else:
             return await feed_events.async_get_full_feed_event_data(
                 feed,
-                provider=provider,
+                context=context,
                 normalize=normalize,
                 start_block=start_block,
                 end_block=end_block,

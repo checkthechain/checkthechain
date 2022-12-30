@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import typing
-
 import toolcli
 
+from ctc import config
 from ctc import db
 
 
@@ -40,8 +39,10 @@ def drop_command(
         if network.isdigit() or (network[0] == '-' and network[1:].isdigit()):
             network = int(network)
 
+    context = config.create_user_input_context(network=network)
+
     db.drop_schema(
         schema_name=schema_name,
-        network=network,
         confirm=confirm,
+        context=context,
     )

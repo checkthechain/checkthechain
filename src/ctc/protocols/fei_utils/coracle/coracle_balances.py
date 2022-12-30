@@ -51,14 +51,14 @@ async def async_get_deposit_balance(
     deposit: spec.ContractAddress,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[int, typing.Sequence[int]]:
     """get token balance of a particular deposit"""
     result = await rpc.async_eth_call(
         to_address=deposit,
         function_abi=function_abis['balance'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not (isinstance(result, int) or isinstance(result, list)):
         raise Exception('invalid rpc result')
@@ -69,13 +69,13 @@ async def async_get_deposits_balances(
     deposits: typing.Sequence[spec.ContractAddress],
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_addresses=deposits,
         function_abi=function_abis['balance'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
 
@@ -83,13 +83,13 @@ async def async_get_deposit_balance_by_block(
     deposit: spec.ContractAddress,
     *,
     blocks: typing.Sequence[spec.BlockReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_address=deposit,
         function_abi=function_abis['balance'],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
 
 
@@ -97,14 +97,14 @@ async def async_get_deposit_resistant_balance_and_fei(
     deposit: spec.ContractAddress,
     *,
     block: typing.Optional[spec.BlockReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[int, typing.Sequence[int]]:
     """get token balance of a particular deposit"""
     result = await rpc.async_eth_call(
         to_address=deposit,
         function_abi=function_abis['resistantBalanceAndFei'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if not (isinstance(result, int) or isinstance(result, list)):
         raise Exception('invalid rpc result')
@@ -115,13 +115,13 @@ async def async_get_deposits_resistant_balances_and_fei(
     deposits: typing.Sequence[spec.ContractAddress],
     *,
     block: typing.Optional[spec.BlockReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[tuple[int, int]]:
     return await rpc.async_batch_eth_call(
         to_addresses=deposits,
         function_abi=function_abis['resistantBalanceAndFei'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
 
@@ -129,13 +129,13 @@ async def async_get_deposit_resistant_balance_and_fei_by_block(
     deposit: spec.ContractAddress,
     *,
     blocks: typing.Sequence[spec.BlockReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> list[int]:
     return await rpc.async_batch_eth_call(
         to_address=deposit,
         function_abi=function_abis['resistantBalanceAndFei'],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
 
 
@@ -148,7 +148,7 @@ async def async_get_token_balance(
     token: spec.Address,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     usd: bool = False,
 ) -> typing.Union[int, float]:
@@ -157,13 +157,13 @@ async def async_get_token_balance(
         block = 'latest'
     if block is not None:
         block = await evm.async_block_number_to_int(
-            block=block, provider=provider
+            block=block, context=context
         )
     deposits = await coracle_deposits.async_get_token_deposits(
-        token=token, block=block, provider=provider
+        token=token, block=block, context=context
     )
     balances = await async_get_deposits_balances(
-        deposits=deposits, block=block, provider=provider
+        deposits=deposits, block=block, context=context
     )
     balance: typing.Union[int, float] = sum(balances)
 
@@ -175,7 +175,7 @@ async def async_get_token_balance(
         else:
             balance = await evm.async_normalize_erc20_quantity(
                 quantity=balance,
-                provider=provider,
+                context=context,
                 token=token,
             )
 
@@ -185,7 +185,7 @@ async def async_get_token_balance(
         token_price = await coracle_oracles.async_get_token_price(
             token=token,
             block=block,
-            provider=provider,
+            context=context,
             normalize=True,
         )
         balance = balance * token_price
@@ -197,7 +197,7 @@ async def async_get_token_balance_by_block(
     token: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     usd: bool = False,
 ) -> typing.Union[list[int], list[float]]:
@@ -206,7 +206,7 @@ async def async_get_token_balance_by_block(
     coroutines = [
         async_get_token_balance(
             token=token,
-            provider=provider,
+            context=context,
             normalize=normalize,
             block=block,
             usd=usd,
@@ -220,7 +220,7 @@ async def async_get_tokens_balances(
     *,
     tokens: typing.Sequence[spec.Address] | None = None,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     usd: bool = False,
     exclude_fei: bool = True,
@@ -228,12 +228,12 @@ async def async_get_tokens_balances(
 
     if block is None:
         block = 'latest'
-    block = await evm.async_block_number_to_int(block=block, provider=provider)
+    block = await evm.async_block_number_to_int(block=block, context=context)
 
     # use all tokens in pcv by default
     if tokens is None:
         tokens = await coracle_tokens.async_get_tokens_in_pcv(
-            block=block, provider=provider
+            block=block, context=context
         )
     if exclude_fei:
         FEI = '0x956f47f50a910163d8bf957cf5846d573e7f87ca'
@@ -241,7 +241,7 @@ async def async_get_tokens_balances(
 
     # get deposits for each token
     tokens_deposits = await coracle_deposits.async_get_tokens_deposits(
-        tokens=tokens, block=block, provider=provider
+        tokens=tokens, block=block, context=context
     )
 
     # get deposit balances
@@ -252,7 +252,7 @@ async def async_get_tokens_balances(
     ]
     all_balances = await async_get_deposits_balances(
         deposits=all_deposits,
-        provider=provider,
+        context=context,
         block=block,
     )
     all_balances_iter = iter(all_balances)
@@ -282,7 +282,7 @@ async def async_get_tokens_balances(
             quantities=[tokens_balances[token] for token in normalize_tokens],
             tokens=normalize_tokens,
             block=block,
-            provider=provider,
+            context=context,
         )
         for token, normalized_balance in zip(normalize_tokens, normalized):
             tokens_balances[token] = normalized_balance
@@ -297,7 +297,7 @@ async def async_get_tokens_balances(
         token_prices = await coracle_oracles.async_get_tokens_prices(
             tokens=tokens,
             block=block,
-            provider=provider,
+            context=context,
             normalize=True,
         )
         tokens_balances = {
@@ -312,7 +312,7 @@ async def async_get_tokens_balances_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     tokens: typing.Optional[typing.Sequence[spec.Address]] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
     usd: bool = False,
     exclude_fei: bool = True,
@@ -325,7 +325,7 @@ async def async_get_tokens_balances_by_block(
     coroutines = [
         async_get_tokens_balances(
             tokens=tokens,
-            provider=provider,
+            context=context,
             normalize=normalize,
             block=block,
             usd=usd,
@@ -355,3 +355,4 @@ async def async_get_tokens_balances_by_block(
             return nested_utils.list_of_dicts_to_dict_of_lists(
                 block_token_balances
             )
+

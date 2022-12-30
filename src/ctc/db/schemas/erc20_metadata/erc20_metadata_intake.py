@@ -7,7 +7,7 @@ from . import erc20_metadata_statements
 
 async def async_intake_erc20_metadata(
     address: spec.Address,
-    network: spec.NetworkReference,
+    context: spec.Context,
     *,
     decimals: int | None = None,
     symbol: str | None = None,
@@ -16,16 +16,16 @@ async def async_intake_erc20_metadata(
 
     engine = connect_utils.create_engine(
         schema_name='erc20_metadata',
-        network=network,
+        context=context,
     )
     if engine is None:
         return
     with engine.begin() as conn:
         await erc20_metadata_statements.async_upsert_erc20_metadata(
             conn=conn,
-            network=network,
             address=address,
             decimals=decimals,
             symbol=symbol,
             name=name,
+            context=context,
         )

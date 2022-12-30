@@ -5,17 +5,19 @@ import typing
 if typing.TYPE_CHECKING:
     import toolsql
 
-from ctc import spec
+from ctc import config
 from ctc import db
+from ctc import spec
 
 
 async def async_intake_default_erc20s(
-    network: spec.NetworkReference = 'mainnet',
+    context: spec.Context = None,
     verbose: bool = True,
     *,
     engine: toolsql.SAEngine | None = None,
 ) -> None:
 
+    network = config.get_context_chain_id(context)
     if network not in ['mainnet', 1]:
         print('No default tokens for network: ' + str(network))
         return
@@ -27,7 +29,7 @@ async def async_intake_default_erc20s(
     if engine is None:
         engine = db.create_engine(
             schema_name='erc20_metadata',
-            network=network,
+            context=context,
         )
     if engine is None:
         return
@@ -37,7 +39,7 @@ async def async_intake_default_erc20s(
         await db.async_upsert_erc20s_metadata(
             erc20s_metadata=data,
             conn=conn,
-            network=network,
+            context=context,
         )
 
     # print summary
@@ -57,7 +59,7 @@ def load_default_erc20s(
     network: spec.NetworkReference = 'mainnet',
 ) -> typing.Sequence[spec.ERC20Metadata]:
 
-    if network == 'mainnet':
+    if network in ('mainnet', 1):
         raw_csv_data = mainnet_erc20s_csv
     else:
         raise NotImplementedError(

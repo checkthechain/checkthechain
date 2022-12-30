@@ -18,7 +18,7 @@ async def async_get_feed_datum(
     normalize: bool = True,
     invert: bool = False,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> chainlink_spec.FeedRoundData:
     ...
 
@@ -31,7 +31,7 @@ async def async_get_feed_datum(
     normalize: bool = True,
     invert: bool = False,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[int, float]:
     ...
 
@@ -43,14 +43,16 @@ async def async_get_feed_datum(
     normalize: bool = True,
     invert: bool = False,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Union[int, float, chainlink_spec.FeedRoundData]:
     """get feed data for a single block"""
 
     if block is None:
         block = 'latest'
 
-    feed = await chainlink_feed_metadata.async_resolve_feed_address(feed)
+    feed = await chainlink_feed_metadata.async_resolve_feed_address(
+        feed, context=context
+    )
 
     if fields == 'answer':
 
@@ -58,9 +60,9 @@ async def async_get_feed_datum(
             to_address=feed,
             function_abi=chainlink_spec.feed_function_abis['latestAnswer'],
             block_number=block,
-            provider=provider,
             fill_empty=True,
             empty_token=None,
+            context=context,
         )
 
         if not isinstance(result, (int, float)):
@@ -69,9 +71,10 @@ async def async_get_feed_datum(
 
         if normalize:
             decimals = await chainlink_feed_metadata.async_get_feed_decimals(
-                feed
+                feed,
+                context=context,
             )
-            answer /= 10 ** decimals
+            answer /= 10**decimals
 
         if invert:
             answer = 1 / answer
@@ -84,9 +87,9 @@ async def async_get_feed_datum(
             to_address=feed,
             function_abi=chainlink_spec.feed_function_abis['latestRoundData'],
             block_number=block,
-            provider=provider,
             fill_empty=True,
             empty_token=None,
+            context=context,
         )
 
         round_id, answer, _started_at, updated_at, _answered_in_round_id = data
@@ -100,9 +103,11 @@ async def async_get_feed_datum(
         if answer is not None:
             if normalize:
                 decimals = (
-                    await chainlink_feed_metadata.async_get_feed_decimals(feed)
+                    await chainlink_feed_metadata.async_get_feed_decimals(
+                        feed, context=context
+                    )
                 )
-                full['answer'] /= 10 ** decimals
+                full['answer'] /= 10**decimals
 
             if invert:
                 full['answer'] = 1 / full['answer']
@@ -115,3 +120,4 @@ async def async_get_feed_datum(
 
     else:
         raise Exception('unknown fields type: ' + str(fields))
+

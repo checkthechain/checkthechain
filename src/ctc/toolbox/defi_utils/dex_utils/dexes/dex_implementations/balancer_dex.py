@@ -25,11 +25,8 @@ class BalancerDEX(dex_class.DEX):
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         balancer_pools = await evm.async_get_events(
             factory,
@@ -40,13 +37,14 @@ class BalancerDEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             keep_multiindex=False,
+            context=context,
         )
         token_registrations = (
             await balancer_utils.async_get_token_registrations(
                 factory=factory,
                 start_block=start_block,
                 end_block=end_block,
-                provider=provider,
+                context=context,
             )
         )
 
@@ -90,15 +88,12 @@ class BalancerDEX(dex_class.DEX):
         cls,
         pool: spec.Address,
         *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         block: spec.BlockNumberReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
 
-        network, provider = evm.get_network_and_provider(network, provider)
-
         result = await balancer_utils.async_get_pool_balances(
-            pool_address=pool, provider=provider, block=block
+            pool_address=pool, context=context, block=block
         )
 
         return list(result.keys())
@@ -113,19 +108,18 @@ class BalancerDEX(dex_class.DEX):
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
         include_timestamps: bool = False,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         verbose: bool = False,
+        context: spec.Context = None,
     ) -> spec.RawDexTrades:
 
-        network, provider = evm.get_network_and_provider(network, provider)
+        from ctc import config
 
-        network = evm.get_network_chain_id(network)
+        network = config.get_context_chain_id(context)
         vault = cls._pool_factories[network][0]
         if start_block is None:
             start_block = await evm.async_get_contract_creation_block(
                 pool,
-                provider=provider,
+                context=context,
             )
 
         trades = await evm.async_get_events(
@@ -143,7 +137,7 @@ class BalancerDEX(dex_class.DEX):
 
         # filter by pool
         pool_id = await balancer_utils.async_get_pool_id(
-            pool_address=pool, provider=provider
+            pool_address=pool, context=context
         )
         mask = trades['arg__poolId'] == pool_id
         trades = trades[mask]
@@ -174,7 +168,7 @@ class BalancerDEX(dex_class.DEX):
         if include_timestamps:
             output['timestamp'] = await evm.async_get_block_timestamps(
                 blocks=trades.index.values,  # type: ignore
-                provider=provider,
+                context=context,
             )
 
         return output
@@ -188,18 +182,16 @@ class BalancerDEX(dex_class.DEX):
         factory: spec.Address | None = None,
         normalize: bool = True,
         block: spec.BlockNumberReference | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> int | float:
 
         from ctc.protocols import balancer_utils
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         pool_balances = await balancer_utils.async_get_pool_balances(
             pool_address=pool,
             block=block,
             normalize=normalize,
-            provider=provider,
+            context=context,
         )
         return pool_balances[asset]
+

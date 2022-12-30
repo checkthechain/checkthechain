@@ -13,12 +13,12 @@ async def async_upsert_feed(
     feed: typing.Mapping[typing.Any, typing.Any],
     conn: toolsql.SAConnection,
     *,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     feed = dict(feed, address=feed['address'].lower())
 
-    table = db.get_table_name('chainlink_feeds', network=network)
+    table = db.get_table_name('chainlink_feeds', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -31,12 +31,12 @@ async def async_upsert_feeds(
     feeds: typing.Sequence[typing.Mapping[str, typing.Any]],
     conn: toolsql.SAConnection,
     *,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     feeds = [dict(feed, address=feed['address'].lower()) for feed in feeds]
 
-    table = db.get_table_name('chainlink_feeds', network=network)
+    table = db.get_table_name('chainlink_feeds', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -51,7 +51,7 @@ async def async_upsert_aggregator_update(
     aggregator: spec.Address,
     block_number: int,
     conn: toolsql.SAConnection,
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
     row = {
@@ -60,7 +60,7 @@ async def async_upsert_aggregator_update(
         'block_number': block_number,
     }
 
-    table = db.get_table_name('chainlink_aggregator_updates', network=network)
+    table = db.get_table_name('chainlink_aggregator_updates', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -72,7 +72,7 @@ async def async_upsert_aggregator_updates(
     *,
     conn: toolsql.SAConnection,
     updates: typing.Sequence[chainlink_schema_defs._FeedAggregatorUpdate],
-    network: spec.NetworkReference,
+    context: spec.Context = None,
 ) -> None:
 
     # convert to lower case
@@ -85,7 +85,7 @@ async def async_upsert_aggregator_updates(
         for u, update in list(enumerate(updates))
     ]
 
-    table = db.get_table_name('chainlink_aggregator_updates', network=network)
+    table = db.get_table_name('chainlink_aggregator_updates', context=context)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -95,13 +95,13 @@ async def async_upsert_aggregator_updates(
 
 async def async_select_feed(
     *,
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,
+    context: spec.Context = None,
 ) -> chainlink_schema_defs.ChainlinkFeed | None:
-    table = db.get_table_name('chainlink_feeds', network=network)
+    table = db.get_table_name('chainlink_feeds', context=context)
 
     where_equals = {
         'address': address,
@@ -123,7 +123,7 @@ async def async_select_feed(
 
 async def async_select_feeds(
     *,
-    network: spec.NetworkReference | None,
+    context: spec.Context = None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,
     name: str | None = None,
@@ -131,7 +131,7 @@ async def async_select_feeds(
     addresses: typing.Sequence[str] | None = None,
 ) -> typing.Sequence[chainlink_schema_defs.ChainlinkFeed | None] | None:
 
-    table = db.get_table_name('chainlink_feeds', network=network)
+    table = db.get_table_name('chainlink_feeds', context=context)
 
     where_equals = {
         'address': address,
@@ -163,11 +163,11 @@ async def async_select_aggregator_updates(
     feed: spec.Address,
     aggregator: spec.Address | None = None,
     block_number: int | None = None,
-    network: spec.NetworkReference | None,
+    context: spec.Context = None,
     conn: toolsql.SAConnection,
 ) -> typing.Sequence[chainlink_schema_defs._FeedAggregatorUpdate] | None:
 
-    table = db.get_table_name('chainlink_aggregator_updates', network=network)
+    table = db.get_table_name('chainlink_aggregator_updates', context=context)
 
     if feed is not None:
         feed = feed.lower()
@@ -194,9 +194,9 @@ async def async_select_aggregator_updates(
 
 
 async def async_delete_feed(
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     *,
+    context: spec.Context = None,
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,
@@ -213,7 +213,7 @@ async def async_delete_feed(
     if len(where_equals) == 0:
         raise Exception('must specify which feeds to delete')
 
-    table = db.get_table_name('chainlink_feeds', network=network)
+    table = db.get_table_name('chainlink_feeds', context=context)
 
     toolsql.delete(
         conn=conn,
@@ -223,9 +223,9 @@ async def async_delete_feed(
 
 
 async def async_delete_aggregator_updates(
-    network: spec.NetworkReference | None,
     conn: toolsql.SAConnection,
     *,
+    context: spec.Context = None,
     feed: spec.Address,
     aggregator: spec.Address,
     block_number: int,
@@ -242,7 +242,7 @@ async def async_delete_aggregator_updates(
     if len(where_equals) == 0:
         raise Exception('must specify which feeds to delete')
 
-    table = db.get_table_name('chainlink_aggregator_updates', network=network)
+    table = db.get_table_name('chainlink_aggregator_updates', context=context)
 
     toolsql.delete(
         conn=conn,

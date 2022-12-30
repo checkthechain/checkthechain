@@ -18,7 +18,7 @@ async def async_convert_to_erc4626_assets(
     token: spec.Address,
     shares: typing.SupportsInt,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """convert ERC-4626 vault shares to assets"""
@@ -27,7 +27,7 @@ async def async_convert_to_erc4626_assets(
         function_abi=erc4626_spec.erc4626_function_abis['convertToAssets'],
         function_parameters=[int(shares)],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return assets
 
@@ -36,7 +36,7 @@ async def async_convert_to_erc4626_assets_by_block(
     token: spec.Address,
     shares: typing.SupportsInt,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """convert ERC-4626 vault shares to assets"""
@@ -45,7 +45,7 @@ async def async_convert_to_erc4626_assets_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['convertToAssets'],
         function_parameters=[int(shares)],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     return assets
 
@@ -54,7 +54,7 @@ async def async_convert_to_erc4626s_assets(
     tokens: typing.Sequence[spec.Address],
     shares: typing.Sequence[typing.SupportsInt],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """convert ERC-4626 vault shares to assets"""
@@ -63,7 +63,7 @@ async def async_convert_to_erc4626s_assets(
 
     coroutines = [
         async_convert_to_erc4626_assets(
-            token=token, shares=subshares, provider=provider, block=block
+            token=token, shares=subshares, context=context, block=block
         )
         for token, subshares in zip(tokens, shares)
     ]
@@ -74,7 +74,7 @@ async def async_convert_to_erc4626_shares(
     token: spec.Address,
     assets: typing.SupportsInt,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """convert ERC-4626 vault assets to shares"""
@@ -84,7 +84,7 @@ async def async_convert_to_erc4626_shares(
         function_abi=erc4626_spec.erc4626_function_abis['convertToShares'],
         function_parameters=[int(assets)],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return shares
 
@@ -93,7 +93,7 @@ async def async_convert_to_erc4626_shares_by_block(
     token: spec.Address,
     assets: typing.SupportsInt,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """convert ERC-4626 vault assets to shares"""
@@ -103,7 +103,7 @@ async def async_convert_to_erc4626_shares_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['convertToShares'],
         function_parameters=[int(assets)],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     return shares
 
@@ -112,7 +112,7 @@ async def async_convert_to_erc4626s_shares(
     tokens: typing.Sequence[spec.Address],
     assets: typing.Sequence[typing.SupportsInt],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """convert ERC-4626 vault assets to shares"""
@@ -121,7 +121,7 @@ async def async_convert_to_erc4626s_shares(
 
     coroutines = [
         async_convert_to_erc4626_shares(
-            token=token, assets=subassets, provider=provider, block=block
+            token=token, assets=subassets, context=context, block=block
         )
         for token, subassets in zip(tokens, assets)
     ]
@@ -137,7 +137,7 @@ async def async_get_erc4626_max_deposit(
     token: spec.Address,
     receiver: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> int | float:
@@ -148,13 +148,13 @@ async def async_get_erc4626_max_deposit(
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
         function_parameters=[receiver],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=max_deposit,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -165,7 +165,7 @@ async def async_get_erc4626_max_deposit_by_block(
     token: spec.Address,
     receiver: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -176,13 +176,13 @@ async def async_get_erc4626_max_deposit_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
         function_parameters=[receiver],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=max_deposits,
-            provider=provider,
+            context=context,
             block=blocks[-1],
         )
     else:
@@ -193,7 +193,7 @@ async def async_get_erc4626s_max_deposits(
     tokens: typing.Sequence[spec.Address],
     receiver: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -204,13 +204,13 @@ async def async_get_erc4626s_max_deposits(
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
         function_parameters=[receiver],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626s_assets(
             tokens=tokens,
             assets=max_deposits,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -221,7 +221,7 @@ async def async_get_erc4626_max_mint(
     token: spec.Address,
     receiver: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> int | float:
@@ -232,13 +232,13 @@ async def async_get_erc4626_max_mint(
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
         function_parameters=[receiver],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
             shares=max_mint,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -249,7 +249,7 @@ async def async_get_erc4626_max_mint_by_block(
     token: spec.Address,
     receiver: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -260,13 +260,13 @@ async def async_get_erc4626_max_mint_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
         function_parameters=[receiver],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
             shares=max_mints,
-            provider=provider,
+            context=context,
             block=blocks[-1],
         )
     else:
@@ -277,7 +277,7 @@ async def async_get_erc4626s_max_mints(
     tokens: typing.Sequence[spec.Address],
     receiver: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -288,13 +288,13 @@ async def async_get_erc4626s_max_mints(
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
         function_parameters=[receiver],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626s_shares(
             tokens=tokens,
             shares=max_mints,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -305,7 +305,7 @@ async def async_get_erc4626_max_redeem(
     token: spec.Address,
     owner: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> int | float:
@@ -316,13 +316,13 @@ async def async_get_erc4626_max_redeem(
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
         function_parameters=[owner],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
             shares=max_redeem,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -333,7 +333,7 @@ async def async_get_erc4626_max_redeem_by_block(
     token: spec.Address,
     owner: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -344,13 +344,13 @@ async def async_get_erc4626_max_redeem_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
         function_parameters=[owner],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
             shares=max_redeems,
-            provider=provider,
+            context=context,
             block=blocks[-1],
         )
     else:
@@ -361,7 +361,7 @@ async def async_get_erc4626s_max_redeems(
     tokens: typing.Sequence[spec.Address],
     owner: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -372,13 +372,13 @@ async def async_get_erc4626s_max_redeems(
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
         function_parameters=[owner],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626s_shares(
             tokens=tokens,
             shares=max_redeems,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -389,7 +389,7 @@ async def async_get_erc4626_max_withdraw(
     token: spec.Address,
     owner: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> int | float:
@@ -400,13 +400,13 @@ async def async_get_erc4626_max_withdraw(
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
         function_parameters=[owner],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=max_withdraw,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -417,7 +417,7 @@ async def async_get_erc4626_max_withdraw_by_block(
     token: spec.Address,
     owner: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -428,13 +428,13 @@ async def async_get_erc4626_max_withdraw_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
         function_parameters=[owner],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=max_withdraws,
-            provider=provider,
+            context=context,
             block=blocks[-1],
         )
     else:
@@ -445,7 +445,7 @@ async def async_get_erc4626s_max_withdraws(
     tokens: typing.Sequence[spec.Address],
     owner: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -456,13 +456,13 @@ async def async_get_erc4626s_max_withdraws(
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
         function_parameters=[owner],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626s_assets(
             tokens=tokens,
             assets=max_withdraws,
-            provider=provider,
+            context=context,
             block=block,
         )
     else:
@@ -478,7 +478,7 @@ async def async_preview_erc4626_deposit(
     token: spec.Address,
     assets: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return shares received for assets deposited into ERC-4626 vault"""
@@ -487,7 +487,7 @@ async def async_preview_erc4626_deposit(
         function_abi=erc4626_spec.erc4626_function_abis['previewDeposit'],
         function_parameters=[assets],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return deposit
 
@@ -496,7 +496,7 @@ async def async_preview_erc4626_deposit_by_block(
     token: spec.Address,
     assets: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return shares received for assets deposited into ERC-4626 vault"""
@@ -505,7 +505,7 @@ async def async_preview_erc4626_deposit_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['previewDeposit'],
         function_parameters=[assets],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     return deposit
 
@@ -514,7 +514,7 @@ async def async_preview_erc4626s_deposits(
     tokens: typing.Sequence[spec.Address],
     assets: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return shares received for assets deposited into ERC-4626 vaults"""
@@ -523,7 +523,7 @@ async def async_preview_erc4626s_deposits(
         function_abi=erc4626_spec.erc4626_function_abis['previewDeposit'],
         function_parameters=[assets],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return deposits
 
@@ -532,7 +532,7 @@ async def async_preview_erc4626_mint(
     token: spec.Address,
     shares: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return assets needed for shared minted from ERC-4626 vault"""
@@ -541,7 +541,7 @@ async def async_preview_erc4626_mint(
         function_abi=erc4626_spec.erc4626_function_abis['previewMint'],
         function_parameters=[shares],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return mint
 
@@ -550,7 +550,7 @@ async def async_preview_erc4626_mint_by_block(
     token: spec.Address,
     shares: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return assets needed for shared minted from ERC-4626 vault"""
@@ -559,7 +559,7 @@ async def async_preview_erc4626_mint_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['previewMint'],
         function_parameters=[shares],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     return mint
 
@@ -568,7 +568,7 @@ async def async_preview_erc4626s_mints(
     tokens: typing.Sequence[spec.Address],
     shares: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return assets needed for shared minted from ERC-4626 vaults"""
@@ -577,7 +577,7 @@ async def async_preview_erc4626s_mints(
         function_abi=erc4626_spec.erc4626_function_abis['previewMint'],
         function_parameters=[shares],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return mints
 
@@ -586,7 +586,7 @@ async def async_preview_erc4626_redeem(
     token: spec.Address,
     shares: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return assets received for redeeming shares of ERC-4626 vault"""
@@ -595,7 +595,7 @@ async def async_preview_erc4626_redeem(
         function_abi=erc4626_spec.erc4626_function_abis['previewRedeem'],
         function_parameters=[shares],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return redeem
 
@@ -604,7 +604,7 @@ async def async_preview_erc4626_redeem_by_block(
     token: spec.Address,
     shares: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return assets received for redeeming shares of ERC-4626 vault"""
@@ -613,7 +613,7 @@ async def async_preview_erc4626_redeem_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['previewRedeem'],
         function_parameters=[shares],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     return redeem
 
@@ -622,7 +622,7 @@ async def async_preview_erc4626s_redeems(
     tokens: typing.Sequence[spec.Address],
     shares: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return assets received for redeeming shares of ERC-4626 vaults"""
@@ -631,7 +631,7 @@ async def async_preview_erc4626s_redeems(
         function_abi=erc4626_spec.erc4626_function_abis['previewRedeem'],
         function_parameters=[shares],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return redeems
 
@@ -640,7 +640,7 @@ async def async_preview_erc4626_withdraw(
     token: spec.Address,
     assets: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return shares needed for redeeming assets from ERC-4626 vault"""
@@ -649,7 +649,7 @@ async def async_preview_erc4626_withdraw(
         function_abi=erc4626_spec.erc4626_function_abis['previewWithdraw'],
         function_parameters=[assets],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return withdraw
 
@@ -658,7 +658,7 @@ async def async_preview_erc4626_withdraw_by_block(
     token: spec.Address,
     assets: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return shares needed for redeeming assets from ERC-4626 vault"""
@@ -667,7 +667,7 @@ async def async_preview_erc4626_withdraw_by_block(
         function_abi=erc4626_spec.erc4626_function_abis['previewWithdraw'],
         function_parameters=[assets],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     return withdraw
 
@@ -676,7 +676,7 @@ async def async_preview_erc4626s_withdraws(
     tokens: typing.Sequence[spec.Address],
     assets: float | int,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return shares needed for redeeming assets from ERC-4626 vaults"""
@@ -685,7 +685,7 @@ async def async_preview_erc4626s_withdraws(
         function_abi=erc4626_spec.erc4626_function_abis['previewWithdraw'],
         function_parameters=[assets],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     return withdraws
 
@@ -698,7 +698,7 @@ async def async_preview_erc4626s_withdraws(
 async def async_get_erc4626_total_assets(
     token: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> int | float:
@@ -707,13 +707,13 @@ async def async_get_erc4626_total_assets(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['totalAssets'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=assets,
-            provider=provider,
+            context=context,
             block=block,
         )
     return assets
@@ -722,7 +722,7 @@ async def async_get_erc4626_total_assets(
 async def async_get_erc4626_total_assets_by_block(
     token: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -731,13 +731,13 @@ async def async_get_erc4626_total_assets_by_block(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['totalAssets'],
         block_numbers=blocks,
-        provider=provider,
+        context=context,
     )
     if normalize and len(assets) > 0:
         return await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=assets,
-            provider=provider,
+            context=context,
             block=blocks[-1],
         )
     return assets
@@ -746,7 +746,7 @@ async def async_get_erc4626_total_assets_by_block(
 async def async_get_erc4626s_total_assets(
     tokens: typing.Sequence[spec.Address],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
@@ -755,13 +755,13 @@ async def async_get_erc4626s_total_assets(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['totalAssets'],
         block_number=block,
-        provider=provider,
+        context=context,
     )
     if normalize:
         return await erc4626_normalize.async_normalize_erc4626s_assets(
             tokens=tokens,
             assets=assets,
-            provider=provider,
+            context=context,
             block=block,
         )
     return assets

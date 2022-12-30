@@ -4,6 +4,7 @@ import typing
 
 import toolsql
 
+from ctc import spec
 from .. import fourbyte_spec
 
 
@@ -14,7 +15,9 @@ from .. import fourbyte_spec
 
 async def async_upsert_function_signature(
     function_signature: fourbyte_spec.PartialEntry,
+    *,
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> None:
 
     toolsql.insert(
@@ -27,7 +30,9 @@ async def async_upsert_function_signature(
 
 async def async_upsert_function_signatures(
     function_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
+    *,
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> None:
 
     if len(function_signatures) == 0:
@@ -47,6 +52,7 @@ async def async_select_function_signatures(
     text_signature: str | None = None,
     id: int | None = None,
     bytes_signature: str | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
     where_equals = {
@@ -72,6 +78,7 @@ async def async_delete_function_signatures(
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     where_equals = {
@@ -98,7 +105,9 @@ async def async_delete_function_signatures(
 
 async def async_upsert_event_signature(
     event_signature: fourbyte_spec.PartialEntry,
+    *,
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> None:
 
     toolsql.insert(
@@ -111,7 +120,9 @@ async def async_upsert_event_signature(
 
 async def async_upsert_event_signatures(
     event_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
+    *,
     conn: toolsql.SAConnection,
+    context: spec.Context = None,
 ) -> None:
 
     if len(event_signatures) == 0:
@@ -131,6 +142,7 @@ async def async_select_event_signatures(
     text_signature: str | None = None,
     id: int | None = None,
     bytes_signature: str | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[fourbyte_spec.Entry] | None:
 
     where_equals = {
@@ -156,6 +168,7 @@ async def async_delete_event_signatures(
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     where_equals = {

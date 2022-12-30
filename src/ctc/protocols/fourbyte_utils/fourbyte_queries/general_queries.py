@@ -27,6 +27,7 @@ async def async_query_function_signatures(
             bytes_signature=bytes_signature,
             hex_signature=hex_signature,
             text_signature=text_signature,
+            context={},
         )
         if result is not None and len(result) > 0:
             return result
@@ -68,6 +69,7 @@ async def async_query_event_signatures(
             bytes_signature=bytes_signature,
             hex_signature=hex_signature,
             text_signature=text_signature,
+            context={},
         )
         if result is not None and len(result) > 0:
             return result

@@ -15,11 +15,11 @@ async def async_get_unclaimed_rewards(
     wallet: spec.Address,
     *,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
     aave_incentives_controller = aave_spec.get_aave_address(
         'IncentivesController',
-        network=rpc.get_provider_network(provider),
+        context=context,
     )
 
     result = await rpc.async_eth_call(
@@ -27,7 +27,7 @@ async def async_get_unclaimed_rewards(
         function_name='getUserUnclaimedRewards',
         function_parameters=[wallet],
         block_number=block,
-        provider=provider,
+        context=context,
     )
 
     if not isinstance(result, int):
@@ -40,13 +40,13 @@ async def async_get_unclaimed_rewards_by_block(
     wallet: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[int]:
     coroutines = [
         async_get_unclaimed_rewards(
             wallet=wallet,
             block=block,
-            provider=provider,
+            context=context,
         )
         for block in blocks
     ]
@@ -57,7 +57,7 @@ async def async_compute_wallet_rewards(
     wallet: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     replace_symbol: bool = True,
 ) -> typing.Mapping[str, spec.NumpyArray]:
 
@@ -70,18 +70,18 @@ async def async_compute_wallet_rewards(
     reward_unclaimed_coroutine = async_get_unclaimed_rewards_by_block(
         wallet=wallet,
         blocks=blocks,
-        provider=provider,
+        context=context,
     )
     reward_in_wallet_coroutine = evm.async_get_erc20_balance_by_block(
         wallet=wallet,
         token=reward_token,
         blocks=blocks,
-        provider=provider,
+        context=context,
     )
     reward_price_coroutine = aave_oracle.async_get_asset_price_by_block(
         asset=reward_token_unstaked,
         blocks=blocks,
-        provider=provider,
+        context=context,
     )
 
     (reward_unclaimed, reward_in_wallet, reward_price,) = await asyncio.gather(

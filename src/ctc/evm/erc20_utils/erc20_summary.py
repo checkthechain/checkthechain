@@ -9,7 +9,9 @@ from . import erc20_state
 
 async def async_print_erc20_summary(
     erc20: spec.Address,
+    *,
     include_address: bool = True,
+    context: spec.Context = None,
 ) -> None:
     """print ERC20 summary"""
 
@@ -19,13 +21,21 @@ async def async_print_erc20_summary(
 
     name_coroutine = erc20_metadata.async_get_erc20_name(
         erc20,
+        context=context,
     )
     address_coroutine = erc20_metadata.async_get_erc20_address(
         erc20,
+        context=context,
     )
-    decimals_coroutine = erc20_metadata.async_get_erc20_decimals(erc20)
-    symbol_coroutine = erc20_metadata.async_get_erc20_symbol(erc20)
-    total_supply_coroutine = erc20_state.async_get_erc20_total_supply(erc20)
+    decimals_coroutine = erc20_metadata.async_get_erc20_decimals(
+        erc20, context=context
+    )
+    symbol_coroutine = erc20_metadata.async_get_erc20_symbol(
+        erc20, context=context
+    )
+    total_supply_coroutine = erc20_state.async_get_erc20_total_supply(
+        erc20, context=context
+    )
 
     name, address, decimals, symbol, total_supply = await asyncio.gather(
         name_coroutine,
@@ -62,3 +72,4 @@ async def async_print_erc20_summary(
     if include_address:
         print()
         toolstr.print(address, style=styles['metavar'])
+

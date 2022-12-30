@@ -21,10 +21,7 @@ def get_config_validators() -> typing.Mapping[
         'log_sql_queries': None,
         'cli_color_theme': None,
         'cli_chart_charset': None,
-        'global_cache_override': None,
-        'network_cache_configs': None,
-        'schema_cache_configs': None,
-        'default_cache_config': None,
+        'context_cache_rules': None,
     }
 
 
@@ -43,10 +40,7 @@ def get_config_base_types() -> typing.Mapping[
         'log_sql_queries': bool,
         'cli_color_theme': dict,
         'cli_chart_charset': str,
-        'global_cache_override': dict,
-        'network_cache_configs': dict,
-        'schema_cache_configs': dict,
-        'default_cache_config': dict,
+        'context_cache_rules': list,
     }
 
 

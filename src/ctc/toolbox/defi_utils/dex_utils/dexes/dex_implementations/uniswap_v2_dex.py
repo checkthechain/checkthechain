@@ -26,11 +26,8 @@ class UniswapV2DEX(dex_class.DEX):
         end_block: spec.BlockNumberReference | None = None,
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         df = await evm.async_get_events(
             factory,
@@ -41,7 +38,7 @@ class UniswapV2DEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             keep_multiindex=False,
-            provider=provider,
+            context=context,
         )
 
         dex_pools = []
@@ -66,27 +63,24 @@ class UniswapV2DEX(dex_class.DEX):
         cls,
         pool: spec.Address,
         *,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
         block: spec.BlockNumberReference | None = None,
+        context: spec.Context = None,
     ) -> tuple[str, str]:
 
         import asyncio
         from ctc.protocols import uniswap_v2_utils
 
-        network, provider = evm.get_network_and_provider(network, provider)
-
         token0 = rpc.async_eth_call(
             function_abi=uniswap_v2_utils.pool_function_abis['token0'],
             to_address=pool,
-            provider=provider,
             block_number=block,
+            context=context,
         )
         token1 = rpc.async_eth_call(
             function_abi=uniswap_v2_utils.pool_function_abis['token1'],
             to_address=pool,
-            provider=provider,
             block_number=block,
+            context=context,
         )
 
         return await asyncio.gather(token0, token1)
@@ -101,12 +95,9 @@ class UniswapV2DEX(dex_class.DEX):
         start_time: tooltime.Timestamp | None = None,
         end_time: tooltime.Timestamp | None = None,
         include_timestamps: bool = False,
-        network: spec.NetworkReference | None = None,
-        provider: spec.ProviderReference | None = None,
+        context: spec.Context = None,
         verbose: bool = False,
     ) -> spec.RawDexTrades:
-
-        network, provider = evm.get_network_and_provider(network, provider)
 
         trades = await evm.async_get_events(
             event_abi=uniswap_v2_utils.pool_event_abis['Swap'],
@@ -116,9 +107,9 @@ class UniswapV2DEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             include_timestamps=include_timestamps,
-            provider=provider,
             verbose=verbose,
             keep_multiindex=False,
+            context=context,
         )
 
         sold_id = (trades['arg__amount0Out'].map(int) > 0).astype(int)

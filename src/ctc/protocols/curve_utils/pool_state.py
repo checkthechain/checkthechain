@@ -14,14 +14,14 @@ from . import curve_spec
 async def async_get_virtual_price(
     pool: spec.Address,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['get_virtual_price'],
         function_parameters=[],
-        provider=provider,
+        context=context,
         block_number=block,
     )
 
@@ -36,20 +36,20 @@ async def async_get_lp_withdrawal(
     amount_lp: int,
     *,
     token_withdrawn: spec.Address,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> int:
 
     token_index = await pool_metadata.async_get_token_index(
         pool=pool,
         token=token_withdrawn,
-        provider=provider,
+        context=context,
     )
 
     result = await rpc.async_eth_call(
         to_address=pool,
         function_abi=curve_spec.pool_function_abis['calc_withdraw_one_coin'],
         function_parameters=[amount_lp, token_index],
-        provider=provider,
+        context=context,
     )
 
     if not isinstance(result, int):
@@ -63,32 +63,32 @@ async def async_get_pool_state(
     *,
     n_tokens: int | None = None,
     block: spec.BlockNumberReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
 ) -> dict[str, typing.Any]:
 
     total_supply = await evm.async_get_erc20_total_supply(
         token=pool,
         block=block,
-        provider=provider,
+        context=context,
         normalize=normalize,
     )
     token_addresses = await pool_metadata.async_get_pool_tokens(
         pool,
         n_tokens=n_tokens,
-        provider=provider,
+        context=context,
     )
     token_balances = await evm.async_get_erc20s_balances(
         wallet=pool,
         tokens=token_addresses,
         block=block,
-        provider=provider,
+        context=context,
         normalize=normalize,
     )
     A = await pool_parameters.async_get_pool_A(
         pool=pool,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     return {
@@ -106,14 +106,14 @@ async def async_get_trade(
     amount_in: typing.Union[int, float],
     input_normalized: bool = True,
     normalize_output: bool = True,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> typing.Union[int, float]:
 
     # get metadata
     metadata = await pool_metadata.async_get_pool_metadata(
         pool=pool,
-        provider=provider,
+        context=context,
     )
     in_index = await pool_metadata.async_get_token_index(
         pool=pool,
@@ -139,7 +139,7 @@ async def async_get_trade(
             out_index,
             amount_in,
         ],
-        provider=provider,
+        context=context,
         block_number=block,
     )
 
@@ -160,3 +160,4 @@ async def async_get_trade(
 #     - TokenExchangeUnderlying 0xd013ca23e77a65003c2c659c5442c00c805371b7fc1ebd4c206c41d1536bd90b
 #     """
 #     pass
+

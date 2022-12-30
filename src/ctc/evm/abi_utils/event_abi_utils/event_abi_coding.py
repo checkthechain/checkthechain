@@ -377,6 +377,7 @@ async def async_decode_events_dataframe(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     output_format: Literal['dict', 'dataframe'],
     share_abis_across_contracts: bool = True,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """encode the fields of an events dataframe
 
@@ -423,6 +424,7 @@ async def async_decode_events_dataframe(
                         event_abi = await event_abi_queries.async_get_event_abi(
                             event_hash=event_hash,
                             contract_address=contract_address,
+                            context=context,
                         )
 
                 # decode using event_abi
@@ -451,6 +453,7 @@ async def async_decode_events_dataframe(
                         ] = await event_abi_queries.async_get_event_abi(
                             event_hash=event_hash,
                             contract_address=contract_address,  # type: ignore
+                            context=context,
                         )
                     event_abi = event_abis[key]  # type: ignore
 

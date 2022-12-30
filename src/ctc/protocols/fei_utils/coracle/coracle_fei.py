@@ -18,7 +18,7 @@ from . import coracle_balances
 async def async_get_fei_deposit_balances(
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
     normalize: bool = True,
 ) -> dict[spec.ContractAddress, typing.Union[int, float]]:
 
@@ -26,17 +26,17 @@ async def async_get_fei_deposit_balances(
     fei_deposits = await coracle_deposits.async_get_token_deposits(
         token=FEI,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     fei_balances = await coracle_balances.async_get_deposits_balances(
         deposits=fei_deposits,
         block=block,
-        provider=provider,
+        context=context,
     )
 
     non_fei_balances = await _async_get_non_fei_deposits_fei_balances(
-        block=block, provider=provider
+        block=block, context=context
     )
     fei_deposits = fei_deposits + tuple(non_fei_balances.keys())
     fei_balances.extend(non_fei_balances.values())
@@ -53,7 +53,7 @@ async def async_get_fei_deposit_balances(
 async def _async_get_non_fei_deposits_fei_balances(
     block: spec.BlockNumberReference,
     *,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> dict[str, int]:
 
     tokens_deposits = await coracle_deposits.async_get_tokens_deposits(
@@ -79,12 +79,12 @@ async def _async_get_non_fei_deposits_fei_balances(
 async def async_get_fei_deposit_balances_by_block(
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> dict[spec.ContractAddress, list[typing.Union[int, float]]]:
     from ctc.toolbox import async_utils
 
     coroutines = [
-        async_get_fei_deposit_balances(block=block, provider=provider)
+        async_get_fei_deposit_balances(block=block, context=context)
         for block in blocks
     ]
     results = await async_utils.async_gather_coroutines(*coroutines)

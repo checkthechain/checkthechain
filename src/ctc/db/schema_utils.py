@@ -6,7 +6,6 @@ import typing
 import toolsql
 
 from ctc import config
-from ctc import evm
 from ctc import spec
 from ctc.spec.typedefs import db_types
 
@@ -78,19 +77,16 @@ def get_raw_schema(schema_name: str) -> toolsql.DBSchema:
 
 def get_prepared_schema(
     schema_name: str,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> toolsql.DBSchema:
 
     # get schema
     schema = get_raw_schema(schema_name)
     schema = copy.deepcopy(schema)
 
-    if network is None:
-        network = config.get_default_network()
-
     # add network to table name
     for table_name, table in list(schema['tables'].items()):
-        full_name = get_table_name(network=network, table_name=table_name)
+        full_name = get_table_name(context=context, table_name=table_name)
         if table.get('name') is not None:
             table['name'] = full_name
         schema['tables'][full_name] = schema['tables'].pop(table_name)  # type: ignore
@@ -100,14 +96,10 @@ def get_prepared_schema(
 
 def get_table_name(
     table_name: str,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> str:
     """get full table name, incorporating chain information"""
-    if network is None:
-        network = config.get_default_network()
-        if network is None:
-            raise Exception('must specify network or configure default network')
-    chain_id = evm.get_network_chain_id(network)
+    chain_id = config.get_context_chain_id(context)
     return 'network_' + str(chain_id) + '__' + table_name
 
 
@@ -123,7 +115,7 @@ def get_complete_prepared_schema(
     for network in networks:
         for schema_name in get_network_schema_names():
             schema = get_prepared_schema(
-                network=network, schema_name=schema_name
+                context=dict(network=network), schema_name=schema_name
             )
             all_schemas.append(schema)
 

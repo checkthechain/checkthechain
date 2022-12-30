@@ -28,13 +28,10 @@ def _build_feed_query(
 async def async_get_feed_metadata(
     feed: chainlink_spec._FeedReference,
     *,
-    network: spec.NetworkReference | None = None,
+    context: spec.Context = None,
 ) -> chainlink_db.ChainlinkFeed:
     query = _build_feed_query(feed)
-    if network is None:
-        network = config.get_default_network()
-
-    feed_data = await chainlink_db.async_query_feed(network=network, **query)
+    feed_data = await chainlink_db.async_query_feed(context=context, **query)
     if feed_data is None:
         raise Exception('could not find data for feed: ' + str(feed))
     return feed_data
@@ -43,34 +40,25 @@ async def async_get_feed_metadata(
 async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
     *,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
     use_db: bool = True,
+    context: spec.Context = None,
 ) -> int:
 
     # try database
     if use_db:
         query = _build_feed_query(feed)
-        if network is None:
-            if provider is not None:
-                network = rpc.get_provider_network(provider)
-            else:
-                network = config.get_default_network()
-
         feed_data = await chainlink_db.async_query_feed(
-            network=network, **query
+            context=context, **query
         )
         if feed_data is not None:
             return feed_data['decimals']
 
     # query rpc
     if evm.is_address_str(feed):
-        if provider is None and network is not None:
-            provider = {'network': network}
         result = await rpc.async_eth_call(
             feed,
-            provider=provider,
             function_abi=chainlink_spec.feed_function_abis['decimals'],
+            context=context,
         )
         if not isinstance(result, int):
             raise Exception('invalid rpc result')
@@ -83,21 +71,14 @@ async def async_get_feed_decimals(
 async def async_resolve_feed_address(
     feed: str,
     *,
-    network: spec.NetworkReference | None = None,
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> spec.Address:
 
     if evm.is_address_str(feed):
         return feed
 
     query = _build_feed_query(feed)
-    if network is None:
-        if provider is not None:
-            network = rpc.get_provider_network(provider)
-        else:
-            network = config.get_default_network()
-
-    feed_data = await chainlink_db.async_query_feed(network=network, **query)
+    feed_data = await chainlink_db.async_query_feed(context=context, **query)
     if feed_data is not None:
         return feed_data['address']
     else:
@@ -108,17 +89,18 @@ async def async_get_feed_aggregator(
     feed: chainlink_spec._FeedReference,
     *,
     block: spec.BlockNumberReference = 'latest',
-    provider: spec.ProviderReference = None,
     fill_empty: bool = True,
+    context: spec.Context = None,
 ) -> spec.Address:
 
-    feed = await async_resolve_feed_address(feed, provider=provider)
+    feed = await async_resolve_feed_address(feed, context=context)
 
     aggregator = await rpc.async_eth_call(
         to_address=feed,
         function_abi=chainlink_spec.feed_function_abis['aggregator'],
         block_number=block,
         fill_empty=fill_empty,
+        context=context,
     )
     if aggregator is None:
         raise Exception('aggregator not specified')
@@ -131,22 +113,24 @@ async def async_get_feed_aggregator(
 async def async_get_feed_first_block(
     feed: chainlink_spec._FeedReference,
     *,
-    provider: spec.ProviderReference = None,
     start_search: typing.Optional[spec.BlockNumberReference] = None,
     end_search: typing.Optional[spec.BlockNumberReference] = None,
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> int:
 
-    feed = await async_resolve_feed_address(feed, provider=provider)
+    feed = await async_resolve_feed_address(feed, context=context)
 
     creation_block = await evm.async_get_contract_creation_block(
         contract_address=feed,
         start_block=start_search,
         end_block=end_search,
         verbose=verbose,
+        context=context,
     )
 
     if creation_block is None:
         raise Exception('could not determine creation_block for feed')
 
     return creation_block
+

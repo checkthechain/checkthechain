@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-from typing_extensions import Literal
-
 
 config_keys = (
     'config_spec_version',
@@ -20,10 +18,7 @@ config_keys = (
     'log_sql_queries',
     'cli_color_theme',
     'cli_chart_charset',
-    'global_cache_override',
-    'network_cache_configs',
-    'schema_cache_configs',
-    'default_cache_config',
+    'context_cache_rules',
 )
 
 config_int_subkeys = (
@@ -38,11 +33,11 @@ context_keys = (
     'cache',
 )
 
-context_cache_keys: tuple[Literal['backend', 'read', 'write'], ...] = (
-    'backend',
-    'read',
-    'write',
-)
+# context_cache_keys: tuple[Literal['backend', 'read', 'write'], ...] = (
+#     'backend',
+#     'read',
+#     'write',
+# )
 
 block_keys = (
     'base_fee_per_gas',

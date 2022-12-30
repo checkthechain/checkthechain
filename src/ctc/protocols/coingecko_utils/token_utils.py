@@ -60,7 +60,7 @@ async def async_get_token_list(
 ) -> typing.Sequence[coingecko_db.CoingeckoToken]:
 
     if use_db and not update:
-        result = await coingecko_db.async_query_tokens()
+        result = await coingecko_db.async_query_tokens(context={})
         if isinstance(result, list) and len(result) > 0:
             return result
 
@@ -108,7 +108,9 @@ async def async_get_token_name(query: str, use_db: bool = True) -> str:
 
     if use_db:
         result = await coingecko_db.async_query_tokens(
-            symbol_query=query, name_query=query
+            symbol_query=query,
+            name_query=query,
+            context={},
         )
         if result is not None and len(result) > 0:
 
@@ -131,7 +133,7 @@ async def async_get_token_id(query: str, use_db: bool = True) -> str:
 
     if use_db:
         result = await coingecko_db.async_query_tokens(
-            symbol_query=query, name_query=query
+            symbol_query=query, name_query=query, context={}
         )
         if result is not None and len(result) > 0:
 
@@ -526,3 +528,4 @@ def _compute_token_quotient(
     comparison_prices = coin1_prices[nonzero_indices]
     coin1_over_coin2_prices = comparison_prices / coin2_prices[nonzero_mask]
     return coin2_times[nonzero_mask], coin1_over_coin2_prices
+
