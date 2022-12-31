@@ -49,7 +49,7 @@ def _get_context_cache_settings(
 
 def _extract_context_cache_rules(
     *,
-    context_cache: spec.CacheContextShorthand = None,
+    context_cache: spec.ContextCacheShorthand = None,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.ContextCacheRule]:
     """convert a context's cache to a list of cache rules

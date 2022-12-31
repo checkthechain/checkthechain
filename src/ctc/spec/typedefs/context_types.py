@@ -16,7 +16,7 @@ Context = typing.Union[None, int, str, 'ShorthandContext', 'NormalizedContext']
 class ShorthandContext(TypedDict, total=False):
     network: network_types.NetworkReference | None
     provider: rpc_types.ProviderReference | None
-    cache: CacheContextShorthand
+    cache: ContextCacheShorthand
 
 
 # NormalizedContext is a normalized context dict with all fields present
@@ -41,8 +41,8 @@ class ContextCacheFilter(TypedDict, total=False):
     backend: str
 
 
-# CacheContextShorthand is a maximally flexible cache specification
-CacheContextShorthand = typing.Union[
+# ContextCacheShorthand is a maximally flexible cache specification
+ContextCacheShorthand = typing.Union[
     None,
     bool,
     str,

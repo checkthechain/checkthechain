@@ -9,7 +9,7 @@ def create_user_input_context(
     *,
     provider: str | None = None,
     network: str | spec.NetworkReference | None = None,
-    cache: spec.CacheContextShorthand = None,
+    cache: spec.ContextCacheShorthand = None,
 ) -> spec.Context:
 
     if isinstance(network, str) and network.isnumeric():
@@ -42,7 +42,7 @@ def update_context(
     network: spec.NetworkReference | None = None,
     provider: spec.ProviderReference | None = None,
     merge_provider: spec.PartialProvider | None = None,
-    cache: spec.CacheContextShorthand = None,
+    cache: spec.ContextCacheShorthand = None,
 ) -> spec.NormalizedContext:
 
     new_context = normalize_context(context)
