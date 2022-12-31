@@ -33,6 +33,41 @@ context_keys = (
     'cache',
 )
 
+schema_names = (
+    #
+    # admin schemas
+    'schema_versions',
+    #
+    # generic schemas
+    '4byte',
+    'coingecko',
+    #
+    # network schemas
+    'block_timestamps',
+    'block_gas',
+    'blocks',
+    'contract_abis',
+    'contract_creation_blocks',
+    'dex_pools',
+    'erc20_metadata',
+    'events',
+    'transactions',
+    'chainlink',
+)
+
+network_schema_names = (
+    'block_timestamps',
+    'block_gas',
+    'blocks',
+    'contract_abis',
+    'contract_creation_blocks',
+    'dex_pools',
+    'erc20_metadata',
+    'events',
+    'transactions',
+    'chainlink',
+)
+
 # context_cache_keys: tuple[Literal['backend', 'read', 'write'], ...] = (
 #     'backend',
 #     'read',

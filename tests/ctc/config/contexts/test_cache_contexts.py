@@ -1,7 +1,5 @@
 import pytest
 
-import ctc.config
-
 
 example_context_config = {
     'global_cache_override': {},

@@ -27,10 +27,9 @@ def _get_context_cache_settings(
     """get settings (backend, read, write) of schema for a given context"""
 
     from ctc import config
-    from ctc import db
 
     # get chain id if schema is network-related
-    if schema_name in db.get_network_schema_names():
+    if schema_name in spec.network_schema_names:
         chain_id = context_sources.get_context_chain_id(context)
     else:
         chain_id = None
@@ -105,10 +104,9 @@ def _create_nested_cache_rule(
     """assemble a single cache rule from within a shorthand nested cache spec"""
 
     from ctc import config
-    from ctc import db
 
     # determine rule filter
-    if key in db.get_all_schema_names():
+    if key in spec.schema_names:
         filter: spec.ContextCacheFilter = {'schema': key}  # type: ignore
     elif isinstance(key, int):
         filter = {'chain_id': key}
