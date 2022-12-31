@@ -75,6 +75,8 @@ def validate_config(config: typing.Mapping[typing.Any, typing.Any]) -> None:
         if key_validator is not None:
             key_validator(value=value, config=config)
 
+    validate_non_overlapping_identifiers(config)
+
 
 def is_valid_config(config: typing.Mapping[typing.Any, typing.Any]) -> bool:
     try:
@@ -221,3 +223,37 @@ def validate_db_configs(
         )
     if set(value['main'].keys()) != {'dbms', 'path'}:
         raise spec.ConfigInvalid('db config should have keys dbms and path')
+
+
+def validate_non_overlapping_identifiers(
+    config: typing.Mapping[typing.Any, typing.Any]
+) -> None:
+
+    providers = config.get('providers')
+    if not isinstance(providers, dict):
+        raise Exception('invalid format for providers')
+    provider_names = {
+        provider['name']
+        for provider_name, provider in providers.items()
+    }
+    assert len(provider_names) == len(providers), 'non-unique provider names'
+
+    networks = config.get('networks', {})
+    if not isinstance(networks, dict):
+        raise Exception('invalid format for networks')
+    network_names = {metadata['name'] for metadata in networks.values()}
+    assert len(network_names) == len(networks), 'non-unique network names'
+
+    db_configs = config.get('db_configs', {})
+    if not isinstance(db_configs, dict):
+        raise Exception('invalid format for db_configs')
+    db_names = {db_name for db_name in db_configs.keys()}
+    assert len(db_names) == len(db_configs), 'non-unique database names'
+
+    if len(provider_names.intersection(network_names)) > 0:
+        raise Exception('naming conflict between providers and networks')
+    if len(provider_names.intersection(db_names)) > 0:
+        raise Exception('naming conflict between providers and databases')
+    if len(db_names.intersection(network_names)) > 0:
+        raise Exception('naming conflict between databases and networks')
+
