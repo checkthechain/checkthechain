@@ -21,7 +21,7 @@ def get_config_validators() -> typing.Mapping[
         'log_sql_queries': None,
         'cli_color_theme': None,
         'cli_chart_charset': None,
-        'context_cache_rules': None,
+        'context_cache_rules': validate_context_cache_rules,
     }
 
 
@@ -223,6 +223,41 @@ def validate_db_configs(
         )
     if set(value['main'].keys()) != {'dbms', 'path'}:
         raise spec.ConfigInvalid('db config should have keys dbms and path')
+
+
+def validate_context_cache_rules(
+    value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
+) -> None:
+
+    if not isinstance(value, list):
+        raise Exception('context_cache_rules must be a list of rules')
+
+    for rule in value:
+        if not isinstance(rule, dict):
+            raise Exception('context cache rule must be a dict')
+        keys = set(rule.keys())
+        extra_keys = keys.difference({'backend', 'read', 'write', 'filter'})
+        if len(extra_keys) > 0:
+            raise Exception('extra keys in rule: ' + str(extra_keys))
+
+        if 'backend' in rule:
+            backend = rule.get('backend')
+            assert backend in config['db_configs']
+        if 'read' in rule:
+            read = rule.get('read')
+            assert isinstance(read, bool)
+        if 'write' in rule:
+            write = rule.get('write')
+            assert isinstance(write, bool)
+        if 'filter' in rule:
+            filter = rule.get('filter')
+            assert isinstance(filter, dict)
+            if 'chain_id' in filter:
+                assert filter['chain_id'] in config['networks']
+            if 'schema' in filter:
+                assert filter['schema'] in spec.schema_names
+            if 'backend' in filter:
+                assert filter['backend'] in config['db_configs']
 
 
 def validate_non_overlapping_identifiers(
