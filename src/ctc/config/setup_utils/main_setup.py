@@ -45,6 +45,8 @@ async def async_setup_ctc(
         'Running setup process for ctc '
         + toolstr.add_style(ctc.__version__, styles['description'] + ' bold')
     )
+    if not ctc.__version__.split('.')[-1].isnumeric():
+        print('(this is not a stable release, use pypi for stable releases)')
     print()
     print('Each step is optional')
     print('- by default, setup process will leave existing settings unchanged')
