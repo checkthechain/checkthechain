@@ -24,6 +24,7 @@ async def async_sample_blocks(
     align_to: typing.Literal['start', 'end'] = 'start',
     include_misaligned_bound: bool = False,
     include_misaligned_overflow: bool = False,
+    context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """create sample of blocks matching input sampling parameters"""
 
@@ -31,10 +32,13 @@ async def async_sample_blocks(
 
     if start_block is not None:
         start_time = await block_to_timestamp.async_get_block_timestamp(
-            start_block
+            start_block,
+            context=context,
         )
     if end_block is not None:
-        end_time = await block_to_timestamp.async_get_block_timestamp(end_block)
+        end_time = await block_to_timestamp.async_get_block_timestamp(
+            end_block, context=context
+        )
 
     float_timestamps = tooltime.sample_timestamps(
         start_time=start_time,
@@ -51,7 +55,7 @@ async def async_sample_blocks(
     ]
 
     # time to latest block timestamp
-    latest_block = await block_crud.async_get_block('latest')
+    latest_block = await block_crud.async_get_block('latest', context=context)
     latest_block_timestamp = latest_block['timestamp']
     n_original_timestamps = len(timestamps)
     timestamps = [
@@ -63,7 +67,7 @@ async def async_sample_blocks(
 
     # get blocks of timestamps
     blocks = await timestamp_to_block.async_get_blocks_of_timestamps(
-        timestamps=timestamps,
+        timestamps=timestamps, context=context
     )
 
     # include latest if trimmed
@@ -73,3 +77,4 @@ async def async_sample_blocks(
             blocks.append(latest_block_number)
 
     return blocks
+

@@ -76,7 +76,9 @@ async def _async_query_events_from_node(
         cli.print_bullet(key='n_chunks', value=len(chunk_ranges))
 
     # TODO: make this async, store indirect reference in dict and pass dict
-    latest_block_number = await block_utils.async_get_latest_block_number()
+    latest_block_number = await block_utils.async_get_latest_block_number(
+        context=context
+    )
 
     # process each meta chunk
     coroutines = []
@@ -131,9 +133,11 @@ async def _async_query_events_from_node(
         elif binary_output_format == 'binary':
             for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
                 mask = ~pd.isnull(df[field])
-                df.loc[mask, field] = df[field][mask].map(
-                    lambda x: binary_utils.binary_convert(x, 'binary')
-                ).values
+                df.loc[mask, field] = (
+                    df[field][mask]
+                    .map(lambda x: binary_utils.binary_convert(x, 'binary'))
+                    .values
+                )
         else:
             raise Exception('unknown binary_output_format')
 
@@ -205,7 +209,9 @@ async def _async_query_node_events_chunk(
 
     # process raw events
     raw_logs = [event for result in results for event in result]
-    encoded_events = await _async_process_raw_node_logs(raw_logs)
+    encoded_events = await _async_process_raw_node_logs(
+        raw_logs,
+    )
 
     # write encoded events to database
     if write_to_db:
@@ -287,3 +293,4 @@ async def _async_process_raw_node_logs_dataframe(
         columns={'address': 'contract_address'}
     )
     return encoded_events
+

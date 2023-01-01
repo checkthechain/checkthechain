@@ -6,7 +6,6 @@ from ctc import spec
 from .. import abi_utils
 from .. import block_utils
 from .. import contract_utils
-from .. import network_utils
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -68,6 +67,7 @@ async def async_get_events(
         allow_none=True,
         to_int=True,
         end_none_means='latest',
+        context=context,
     )
     if start_block is None:
         if contract_address is None:

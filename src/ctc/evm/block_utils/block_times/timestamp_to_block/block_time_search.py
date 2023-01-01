@@ -40,7 +40,10 @@ async def _async_get_block_of_timestamp_from_node(
         cache = {'initializing': {timestamp: True}, 'timestamps': {}}
 
     async_is_match = functools.partial(
-        _async_is_match_block_of_timestamp, timestamp=timestamp, cache=cache
+        _async_is_match_block_of_timestamp,
+        timestamp=timestamp,
+        cache=cache,
+        context=context,
     )
     get_next_probes = functools.partial(
         _get_next_probes_block_of_timestamp,
@@ -87,7 +90,7 @@ async def _async_get_block_of_timestamp_from_node(
         raise Exception('could not find block for timestamp')
 
     if mode == '==':
-        block_data = await block_crud.async_get_block(block)
+        block_data = await block_crud.async_get_block(block, context=context)
         if block_data['timestamp'] == timestamp:
             return block
         else:
@@ -97,7 +100,7 @@ async def _async_get_block_of_timestamp_from_node(
     elif mode == '<=':
         if block == 0:
             raise Exception('no block exists <= timestamp')
-        block_data = await block_crud.async_get_block(block)
+        block_data = await block_crud.async_get_block(block, context=context)
         if block_data['timestamp'] == timestamp:
             return block
         else:
@@ -192,3 +195,4 @@ def _get_next_probes_block_of_timestamp(
             probes = [target_index + i for i in range(-half, n_probes - half)]
 
             return probes
+

@@ -65,7 +65,7 @@ async def async_print_address_summary(
     ]
     print()
 
-    if verbose:
+    if verbose and is_contract:
         creation_block = await evm.async_get_contract_creation_block(
             address,
             context=context,

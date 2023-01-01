@@ -39,7 +39,9 @@ async def async_import_events_dir_to_db(
 
     import toolstr
 
-    latest_block = await block_utils.async_get_latest_block_number()
+    latest_block = await block_utils.async_get_latest_block_number(
+        context=context
+    )
 
     total_bytes = 0
     csv_files = []
@@ -220,7 +222,9 @@ async def async_import_events_csv_file_to_db(
 
     # insert into database
     if latest_block is None:
-        latest_block = await block_utils.async_get_latest_block_number()
+        latest_block = await block_utils.async_get_latest_block_number(
+            context=context
+        )
     await db.async_intake_encoded_events(
         encoded_events=encoded_events,
         query=event_query,
@@ -230,3 +234,4 @@ async def async_import_events_csv_file_to_db(
 
     # validate result
     pass
+
