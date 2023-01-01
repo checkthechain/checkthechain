@@ -96,3 +96,4 @@ async def async_print_block_summary(
         else:
             message = message
     cli.print_bullet(key='message', value=message)
+
