@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import typing
 
-from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import block_utils

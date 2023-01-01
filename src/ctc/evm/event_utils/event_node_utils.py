@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 import typing
 
-from ctc import rpc
 from ctc import spec
 from .. import binary_utils
 from .. import block_utils
@@ -161,6 +160,7 @@ async def _async_query_node_events_chunk(
     """process a chunk of events from node"""
 
     import asyncio
+    from ctc import rpc
     from ctc.toolbox import range_utils
 
     # break each meta chunk into requests

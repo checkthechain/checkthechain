@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import spec
 
 
@@ -14,6 +13,7 @@ async def async_get_transaction(
     """get transaction"""
 
     import asyncio
+    from ctc import config
     from ctc import db
     from ctc import rpc
 

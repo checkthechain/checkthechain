@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from ctc import rpc
 from ctc import spec
 
 
@@ -8,6 +7,8 @@ async def async_get_transaction_trace(
     transaction_hash: spec.TransactionHash,
 ) -> spec.TraceList:
     """get list of call traces for transaction"""
+    from ctc import rpc
+
     result: spec.TraceList = await rpc.async_trace_transaction(transaction_hash)
     return result
 
@@ -16,6 +17,8 @@ async def async_get_transaction_state_diff(
     transaction_hash: spec.TransactionHash,
 ) -> spec.StateDiffTrace:
     """get state diff trace for transaction"""
+    from ctc import rpc
+
     result: spec.TraceReplayResult = await rpc.async_trace_replay_transaction(
         transaction_hash,
         trace_type=['stateDiff'],
@@ -31,6 +34,8 @@ async def async_get_transaction_vm_trace(
     transaction_hash: spec.TransactionHash,
 ) -> spec.VMTrace:
     """get vm trace for transaction"""
+    from ctc import rpc
+
     result: spec.TraceReplayResult = await rpc.async_trace_replay_transaction(
         transaction_hash,
         trace_type=['vmTrace'],

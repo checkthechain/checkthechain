@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 from . import erc4626_normalize
 from . import erc4626_spec
@@ -22,6 +21,8 @@ async def async_convert_to_erc4626_assets(
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """convert ERC-4626 vault shares to assets"""
+    from ctc import rpc
+
     assets: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['convertToAssets'],
@@ -40,6 +41,8 @@ async def async_convert_to_erc4626_assets_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """convert ERC-4626 vault shares to assets"""
+    from ctc import rpc
+
     assets: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['convertToAssets'],
@@ -79,6 +82,8 @@ async def async_convert_to_erc4626_shares(
 ) -> int:
     """convert ERC-4626 vault assets to shares"""
 
+    from ctc import rpc
+
     shares: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['convertToShares'],
@@ -97,6 +102,8 @@ async def async_convert_to_erc4626_shares_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """convert ERC-4626 vault assets to shares"""
+
+    from ctc import rpc
 
     shares: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
@@ -143,6 +150,8 @@ async def async_get_erc4626_max_deposit(
 ) -> int | float:
     """get max amount of assets that receiver can deposit in ERC-4626 vault"""
 
+    from ctc import rpc
+
     max_deposit: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
@@ -170,6 +179,8 @@ async def async_get_erc4626_max_deposit_by_block(
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
     """get max amount of assets that receiver can deposit in ERC-4626 vault"""
+
+    from ctc import rpc
 
     max_deposits: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
@@ -199,6 +210,8 @@ async def async_get_erc4626s_max_deposits(
 ) -> typing.Sequence[int | float]:
     """get max amount of assets that receiver can deposit in ERC-4626 vaults"""
 
+    from ctc import rpc
+
     max_deposits: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['maxDeposit'],
@@ -226,6 +239,8 @@ async def async_get_erc4626_max_mint(
     normalize: bool = True,
 ) -> int | float:
     """get max amount of shares that receiver can mint in ERC-4626 vault"""
+
+    from ctc import rpc
 
     max_mint: int = await rpc.async_eth_call(
         to_address=token,
@@ -255,6 +270,8 @@ async def async_get_erc4626_max_mint_by_block(
 ) -> typing.Sequence[int | float]:
     """get max amount of shares that receiver can mint in ERC-4626 vault"""
 
+    from ctc import rpc
+
     max_mints: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxMint'],
@@ -282,6 +299,8 @@ async def async_get_erc4626s_max_mints(
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
     """get max amount of shares that receiver can mint in ERC-4626 vaults"""
+
+    from ctc import rpc
 
     max_mints: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
@@ -311,6 +330,8 @@ async def async_get_erc4626_max_redeem(
 ) -> int | float:
     """get max amount of shares that owner can redeem from ERC-4626 vault"""
 
+    from ctc import rpc
+
     max_redeem: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
@@ -338,6 +359,8 @@ async def async_get_erc4626_max_redeem_by_block(
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
     """get max amount of shares that owner can redeem from ERC-4626 vault"""
+
+    from ctc import rpc
 
     max_redeems: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
@@ -367,6 +390,8 @@ async def async_get_erc4626s_max_redeems(
 ) -> typing.Sequence[int | float]:
     """get max amount of shares that owner can redeem from ERC-4626 vaults"""
 
+    from ctc import rpc
+
     max_redeems: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['maxRedeem'],
@@ -394,6 +419,8 @@ async def async_get_erc4626_max_withdraw(
     normalize: bool = True,
 ) -> int | float:
     """get max amount of shares that owner can withdraw from ERC-4626 vault"""
+
+    from ctc import rpc
 
     max_withdraw: int = await rpc.async_eth_call(
         to_address=token,
@@ -423,6 +450,8 @@ async def async_get_erc4626_max_withdraw_by_block(
 ) -> typing.Sequence[int | float]:
     """get max amount of shares that owner can withdraw from ERC-4626 vault"""
 
+    from ctc import rpc
+
     max_withdraws: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['maxWithdraw'],
@@ -450,6 +479,8 @@ async def async_get_erc4626s_max_withdraws(
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
     """get max amount of shares that owner can withdraw from ERC-4626 vaults"""
+
+    from ctc import rpc
 
     max_withdraws: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
@@ -482,6 +513,8 @@ async def async_preview_erc4626_deposit(
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return shares received for assets deposited into ERC-4626 vault"""
+    from ctc import rpc
+
     deposit: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewDeposit'],
@@ -500,6 +533,8 @@ async def async_preview_erc4626_deposit_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return shares received for assets deposited into ERC-4626 vault"""
+    from ctc import rpc
+
     deposit: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewDeposit'],
@@ -518,6 +553,8 @@ async def async_preview_erc4626s_deposits(
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return shares received for assets deposited into ERC-4626 vaults"""
+    from ctc import rpc
+
     deposits: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['previewDeposit'],
@@ -536,6 +573,8 @@ async def async_preview_erc4626_mint(
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return assets needed for shared minted from ERC-4626 vault"""
+    from ctc import rpc
+
     mint: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewMint'],
@@ -554,6 +593,8 @@ async def async_preview_erc4626_mint_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return assets needed for shared minted from ERC-4626 vault"""
+    from ctc import rpc
+
     mint: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewMint'],
@@ -572,6 +613,8 @@ async def async_preview_erc4626s_mints(
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return assets needed for shared minted from ERC-4626 vaults"""
+    from ctc import rpc
+
     mints: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['previewMint'],
@@ -590,6 +633,8 @@ async def async_preview_erc4626_redeem(
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return assets received for redeeming shares of ERC-4626 vault"""
+    from ctc import rpc
+
     redeem: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewRedeem'],
@@ -608,6 +653,8 @@ async def async_preview_erc4626_redeem_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return assets received for redeeming shares of ERC-4626 vault"""
+    from ctc import rpc
+
     redeem: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewRedeem'],
@@ -626,6 +673,8 @@ async def async_preview_erc4626s_redeems(
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return assets received for redeeming shares of ERC-4626 vaults"""
+    from ctc import rpc
+
     redeems: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['previewRedeem'],
@@ -644,6 +693,8 @@ async def async_preview_erc4626_withdraw(
     block: spec.BlockNumberReference | None = None,
 ) -> int:
     """return shares needed for redeeming assets from ERC-4626 vault"""
+    from ctc import rpc
+
     withdraw: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewWithdraw'],
@@ -662,6 +713,8 @@ async def async_preview_erc4626_withdraw_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
 ) -> typing.Sequence[int]:
     """return shares needed for redeeming assets from ERC-4626 vault"""
+    from ctc import rpc
+
     withdraw: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['previewWithdraw'],
@@ -680,6 +733,8 @@ async def async_preview_erc4626s_withdraws(
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[int]:
     """return shares needed for redeeming assets from ERC-4626 vaults"""
+    from ctc import rpc
+
     withdraws: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['previewWithdraw'],
@@ -703,6 +758,8 @@ async def async_get_erc4626_total_assets(
     normalize: bool = True,
 ) -> int | float:
     """return total amount of assets in ERC-4626 vault"""
+    from ctc import rpc
+
     assets: int = await rpc.async_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['totalAssets'],
@@ -727,6 +784,8 @@ async def async_get_erc4626_total_assets_by_block(
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
     """return total amount of assets in ERC-4626 vault"""
+    from ctc import rpc
+
     assets: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_address=token,
         function_abi=erc4626_spec.erc4626_function_abis['totalAssets'],
@@ -751,6 +810,8 @@ async def async_get_erc4626s_total_assets(
     normalize: bool = True,
 ) -> typing.Sequence[int | float]:
     """return total amount of assets in ERC-4626 vaults"""
+    from ctc import rpc
+
     assets: typing.Sequence[int] = await rpc.async_batch_eth_call(
         to_addresses=tokens,
         function_abi=erc4626_spec.erc4626_function_abis['totalAssets'],

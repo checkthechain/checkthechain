@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 from . import erc4626_spec
 
@@ -14,6 +13,7 @@ async def async_get_erc4626_asset(
     block: spec.BlockNumberReference | None = None,
 ) -> spec.Address:
     """get asset address of ERC-4626 vault"""
+    from ctc import rpc
 
     asset: spec.Address = await rpc.async_eth_call(
         to_address=token,
@@ -31,6 +31,7 @@ async def async_get_erc4626s_assets(
     block: spec.BlockNumberReference | None = None,
 ) -> typing.Sequence[spec.Address]:
     """get asset addresses of ERC-4626 vaults"""
+    from ctc import rpc
 
     assets: typing.Sequence[spec.Address] = await rpc.async_batch_eth_call(
         to_addresses=tokens,

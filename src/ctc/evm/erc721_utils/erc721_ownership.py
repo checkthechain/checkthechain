@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import rpc
 from ctc import spec
 from . import erc721_events
 from . import erc721_spec
@@ -71,6 +70,7 @@ async def _async_get_erc721_owners_from_calls(
     token: spec.Address,
     token_ids: typing.Sequence[int] | None = None,
 ) -> typing.Mapping[int, spec.Address]:
+    from ctc import rpc
 
     if token_ids is None:
         try:
