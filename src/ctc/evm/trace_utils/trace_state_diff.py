@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import typing
 
+if typing.TYPE_CHECKING:
+    import toolcli
+
 from ctc import spec
 from . import trace_crud
 
@@ -11,32 +14,43 @@ async def async_print_transaction_balance_diffs(
     *,
     normalize: bool = True,
     include_unchanged: bool = False,
+    styles: toolcli.StyleTheme | None = None,
+    context: spec.Context = None,
 ) -> None:
     """print balance of a transaction"""
     import toolstr
 
-    toolstr.print_text_box('Balance Diffs')
+    if styles is None:
+        styles = {}
+    toolstr.print_text_box('ETH Balance Diffs', style=styles.get('title'))
     state_diff = await trace_crud.async_get_transaction_state_diff(
-        transaction_hash
+        transaction_hash,
+        context=context,
     )
     _print_balance_storage_diffs(
         state_diff,
         include_unchanged=include_unchanged,
         normalize=normalize,
+        styles=styles,
     )
 
 
 async def async_print_transaction_storage_diffs(
     transaction_hash: spec.TransactionHash,
+    styles: toolcli.StyleTheme | None = None,
+    context: spec.Context = None,
 ) -> None:
     """print storage diffs of a transaction"""
     import toolstr
 
-    toolstr.print_text_box('Storage Diffs')
+    if styles is None:
+        styles = {}
+    toolstr.print_text_box('Storage Diffs', style=styles['title'])
     state_diff = await trace_crud.async_get_transaction_state_diff(
-        transaction_hash
+        transaction_hash,
+        context=context,
     )
-    _print_storage_diffs(state_diff)
+    _print_storage_diffs(state_diff, styles=styles)
 
 
 def _print_balance_storage_diffs(
@@ -44,6 +58,7 @@ def _print_balance_storage_diffs(
     *,
     normalize: bool = True,
     include_unchanged: bool = False,
+    styles: toolcli.StyleTheme,
 ) -> None:
 
     import toolstr
@@ -82,10 +97,25 @@ def _print_balance_storage_diffs(
                     row[i] /= 1e18
 
     labels = ['address', 'old', 'new', 'diff']
-    toolstr.print_table(rows, labels=labels, compact=2)
+    toolstr.print_table(
+        rows,
+        labels=labels,
+        compact=2,
+        label_style=styles['title'],
+        border=styles['comment'],
+        column_formats={'diff': {'signed': True, 'scientific': False}},
+        column_styles={
+            'address': styles['metavar'],
+            'old': styles['description'],
+            'new': styles['description'],
+            'diff': styles['content'],
+        },
+    )
 
 
-def _print_storage_diffs(state_diff: spec.StateDiffTrace) -> None:
+def _print_storage_diffs(
+    state_diff: spec.StateDiffTrace, styles: toolcli.StyleTheme
+) -> None:
     import toolstr
 
     rows: list[typing.Any] = []
@@ -110,7 +140,6 @@ def _print_storage_diffs(state_diff: spec.StateDiffTrace) -> None:
             ]
             rows.append(row)
             contract_address_label = ''
-        rows.append(None)
 
     labels = ['contract', 'slot', 'new value']
     toolstr.print_table(
@@ -118,6 +147,13 @@ def _print_storage_diffs(state_diff: spec.StateDiffTrace) -> None:
         labels=labels,
         label_justify='left',
         compact=2,
+        border=styles['comment'],
+        label_style=styles['title'],
+        column_styles={
+            'contract': styles['metavar'],
+            'slot': styles['description'],
+            'new value': styles['content'],
+        },
     )
 
 

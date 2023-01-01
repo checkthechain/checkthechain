@@ -6,11 +6,13 @@ from ctc import evm
 from ctc import spec
 from .. import binary_utils
 from .. import block_utils
+from .. import trace_utils
 from . import transaction_types
 
 
 async def async_print_transaction_summary(
     transaction_hash: str,
+    context: spec.Context = None,
     sort_logs_by: str | None = None,
 ) -> None:
     """print summary of transaction"""
@@ -23,20 +25,27 @@ async def async_print_transaction_summary(
     from ctc.protocols import chainlink_utils
 
     transaction_coroutine = rpc.async_eth_get_transaction_by_hash(
-        transaction_hash
+        transaction_hash,
+        context=context,
     )
     transaction_receipt_task = asyncio.create_task(
-        rpc.async_eth_get_transaction_receipt(transaction_hash=transaction_hash)
+        rpc.async_eth_get_transaction_receipt(
+            transaction_hash=transaction_hash, context=context
+        )
     )
 
     transaction = await transaction_coroutine
     block_task = asyncio.create_task(
         block_utils.async_get_block(
-            transaction['block_number'], include_full_transactions=False
+            transaction['block_number'],
+            include_full_transactions=False,
+            context=context,
         )
     )
     eth_usd_task = asyncio.create_task(
-        chainlink_utils.async_get_eth_price(block=transaction['block_number'])
+        chainlink_utils.async_get_eth_price(
+            block=transaction['block_number'], context=context
+        )
     )
 
     styles = cli.get_cli_styles()
@@ -113,6 +122,7 @@ async def async_print_transaction_summary(
                 evm.async_get_contract_abi(
                     contract_address=transaction['to'],
                     verbose=False,
+                    context=context,
                 )
             )
             contract_abi = await contract_abi_task
@@ -126,6 +136,7 @@ async def async_print_transaction_summary(
             function_abi = await evm.async_get_function_abi(
                 contract_address=transaction['to'],
                 function_selector=transaction['input'][:10],
+                context=context,
             )
         except Exception:
             print()
@@ -145,6 +156,7 @@ async def async_print_transaction_summary(
         await decode_call_command.async_decode_call_command(
             args=[transaction_hash],
             title='Call Data',
+            context=context,
         )
 
     print()
@@ -170,6 +182,7 @@ async def async_print_transaction_summary(
             event_abi = await evm.async_get_event_abi(
                 contract_address=log['address'],
                 event_hash=log['topics'][0],
+                context=context,
             )
             normalized_event = evm.normalize_event(
                 event=log,
@@ -210,3 +223,17 @@ async def async_print_transaction_summary(
                     number=e + 1,
                     indent=4,
                 )
+
+    print()
+    await trace_utils.async_print_transaction_balance_diffs(
+        transaction_hash,
+        styles=styles,
+        context=context,
+    )
+    print()
+    await trace_utils.async_print_transaction_storage_diffs(
+        transaction_hash,
+        styles=styles,
+        context=context,
+    )
+

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+from ctc import spec
 from .. import fourbyte_db
 from .. import fourbyte_spec
 from . import local_queries
@@ -16,6 +17,7 @@ async def async_query_function_signatures(
     text_signature: typing.Optional[str] = None,
     use_local: bool = True,
     use_remote: bool = True,
+    context: spec.Context = None,
 ) -> typing.Sequence[fourbyte_spec.Entry]:
 
     if not use_local and not use_remote:

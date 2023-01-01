@@ -51,6 +51,7 @@ async def async_decode_call_command(
     mention_nested: bool = True,
     send_value: int | None = None,
     explicit_signature: str | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     tx = len(args) == 1 and (
@@ -69,7 +70,7 @@ async def async_decode_call_command(
     if tx:
         if len(args) != 1:
             raise Exception('syntax is `ctc decode call TX_HASH --tx`')
-        transaction = await evm.async_get_transaction(args[0])
+        transaction = await evm.async_get_transaction(args[0], context=context)
         call_data = transaction['input']
         contract_address = transaction['to']
         contract_known = True
@@ -79,7 +80,7 @@ async def async_decode_call_command(
         contract_known = False
         call_data = args[0]
         signature = call_data[:10]
-        result = await fourbyte_utils.async_query_function_signatures(signature)
+        result = await fourbyte_utils.async_query_function_signatures(signature, context=context)
 
         for subresult in result:
             try:
@@ -108,7 +109,8 @@ async def async_decode_call_command(
     if contract_known:
         try:
             contract_abi = await evm.async_get_contract_abi(
-                contract_address=contract_address
+                contract_address=contract_address,
+                context=context,
             )
             if explicit_signature is not None:
                 function_selector = evm.get_function_selector(
@@ -359,6 +361,7 @@ async def async_decode_call_command(
                 mention_nested=False,
                 send_value=nested_call['value'],
                 explicit_signature=nested_call['signature'],
+                context=context,
             )
             if nc + 1 != len(nested_calls):
                 print()
