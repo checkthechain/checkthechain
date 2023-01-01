@@ -9,6 +9,7 @@ from ctc import spec
 
 async def async_get_event_timestamps(
     events: spec.DataFrame,
+    *,
     context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """get timestamps of an events dataframe"""

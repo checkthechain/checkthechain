@@ -7,8 +7,8 @@ from . import erc20_metadata_statements
 
 async def async_intake_erc20_metadata(
     address: spec.Address,
-    context: spec.Context,
     *,
+    context: spec.Context,
     decimals: int | None = None,
     symbol: str | None = None,
     name: str | None = None,

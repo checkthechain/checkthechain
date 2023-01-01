@@ -12,8 +12,8 @@ from . import erc20_spec
 
 async def async_get_erc20_address(
     token: spec.ERC20Reference,
-    context: spec.Context = None,
     *,
+    context: spec.Context = None,
     case_insensitive_query: bool = True,
 ) -> spec.ERC20Address:
     """return address of input token, input as either symbol or address"""

@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
 
 async def async_intake_block(
     block: spec.Block,
+    *,
     context: spec.Context,
 ) -> None:
     """intake block and extract relevant information to db tables
@@ -141,8 +142,8 @@ async def _async_intake_block_gas(
 
 async def async_intake_blocks(
     blocks: typing.Sequence[spec.Block],
-    context: spec.Context,
     *,
+    context: spec.Context,
     latest_block_number: int | None = None,
 ) -> None:
 

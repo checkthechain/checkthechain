@@ -361,3 +361,38 @@ def test_async_functions_take_context():
             + '\n- '.join(failures)
         )
 
+
+def test_async_functions_take_kw_only_context():
+    modules = [ctc, ctc.db, ctc.rpc]
+    exceptions = [
+        (ctc.rpc, 'async_send_raw'),
+        (ctc.rpc, 'async_close_http_session'),
+        (ctc, 'async_get_latest_block_number'),
+        (ctc, 'async_get_default_erc20_tokens'),
+    ]
+
+    failures = []
+    for module in modules:
+        for name, value in vars(module).items():
+            if name.startswith('async_') and isinstance(
+                value, types.FunctionType
+            ):
+
+                # try exception list first
+                if module == ctc.rpc and name.startswith('async_batch_'):
+                    continue
+                elif (module, name) in exceptions:
+                    continue
+
+                argspec = inspect.getfullargspec(value)
+                if (
+                    'context' in argspec.args
+                ):
+                    failures.append(name)
+    if len(failures) > 0:
+        raise Exception(
+            str(len(failures))
+            + ' functions that use context as a positional argument:\n- '
+            + '\n- '.join(failures)
+        )
+

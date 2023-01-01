@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
-from ctc import evm
 from ctc import rpc
 from ctc import spec
 
@@ -18,6 +16,7 @@ if typing.TYPE_CHECKING:
 
 async def async_is_block_fully_confirmed(
     block: int | spec.Block,
+    *,
     context: spec.Context = None,
 ) -> bool:
 
@@ -41,8 +40,8 @@ async def async_is_block_fully_confirmed(
 
 async def async_filter_fully_confirmed_blocks(
     blocks: typing.Sequence[T],
-    context: spec.Context,
     *,
+    context: spec.Context,
     latest_block_number: int | None = None,
 ) -> typing.Sequence[T]:
 

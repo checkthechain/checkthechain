@@ -9,6 +9,7 @@ from . import block_crud
 
 async def async_block_number_to_int(
     block: spec.BlockNumberReference,
+    *,
     context: spec.Context = None,
 ) -> int:
     """resolve block number reference to int (e.g. converting 'latest' to int)
@@ -25,6 +26,7 @@ async def async_block_number_to_int(
 
 async def async_block_numbers_to_int(
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
     context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """convert block numers to integer"""

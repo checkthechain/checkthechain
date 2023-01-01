@@ -69,6 +69,7 @@ async def async_get_transaction(
 
 async def async_get_transactions(
     transaction_hashes: typing.Sequence[str],
+    *,
     context: spec.Context = None,
 ) -> list[spec.DBTransaction]:
     """get transactions"""
@@ -89,6 +90,7 @@ async def async_get_transactions(
 
 async def async_get_transaction_logs(
     transaction_hash: str,
+    *,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.RawLog]:
     """get raw logs emitted by a transaction"""
@@ -106,6 +108,7 @@ async def async_get_transaction_logs(
 
 async def async_get_transactions_logs(
     transaction_hashes: typing.Sequence[str],
+    *,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.RawLog]:
     """get raw logs emitted by transactions"""
@@ -125,7 +128,7 @@ async def async_get_transactions_logs(
 
 
 async def async_get_transaction_count(
-    address: spec.Address, context: spec.Context = None
+    address: spec.Address, *, context: spec.Context = None
 ) -> int:
     """get transaction count of address"""
 

@@ -12,6 +12,7 @@ from . import transactions_statements
 
 async def _async_convert_rpc_transaction_to_db_transaction(
     transaction: str | spec.DBTransaction | spec.RPCTransaction,
+    *,
     context: spec.Context = None,
 ) -> spec.DBTransaction:
 
@@ -60,6 +61,7 @@ async def _async_convert_rpc_transactions_to_db_transactions(
     transactions: typing.Sequence[
         str | spec.DBTransaction | spec.RPCTransaction
     ],
+    *,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
 

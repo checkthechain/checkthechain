@@ -10,6 +10,7 @@ from . import block_crud
 
 async def async_print_block_summary(
     block: spec.Block | spec.BlockNumberReference,
+    *,
     context: spec.Context = None,
 ) -> None:
     """print summary of block"""

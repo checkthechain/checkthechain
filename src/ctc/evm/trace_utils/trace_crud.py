@@ -5,6 +5,7 @@ from ctc import spec
 
 async def async_get_transaction_trace(
     transaction_hash: spec.TransactionHash,
+    *,
     context: spec.Context = None,
 ) -> spec.TraceList:
     """get list of call traces for transaction"""
@@ -19,6 +20,7 @@ async def async_get_transaction_trace(
 
 async def async_get_transaction_state_diff(
     transaction_hash: spec.TransactionHash,
+    *,
     context: spec.Context = None,
 ) -> spec.StateDiffTrace:
     """get state diff trace for transaction"""
@@ -38,6 +40,7 @@ async def async_get_transaction_state_diff(
 
 async def async_get_transaction_vm_trace(
     transaction_hash: spec.TransactionHash,
+    *,
     context: spec.Context = None,
 ) -> spec.VMTrace:
     """get vm trace for transaction"""
