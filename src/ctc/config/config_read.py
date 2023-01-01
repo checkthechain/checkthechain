@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 
 import ctc
 from ctc import spec
+from . import config_env_vars
 from . import config_overrides
 from . import config_spec
 from . import config_validate
@@ -68,7 +69,7 @@ def get_config(
 
     # load from file
     try:
-        config_from_file = toolconfig.get_config(
+        raw_config = toolconfig.get_config(
             config_spec=None, validate=validate, **_kwargs
         )
     except toolconfig.ConfigDoesNotExist:
@@ -81,12 +82,12 @@ def get_config(
                 ' use `ctc setup` on command line to generate a config file',
                 file=sys.stderr,
             )
-        config_from_file = config_defaults.get_default_config(
+        raw_config = config_defaults.get_default_config(
             use_env_variables=True,
         )  # type: ignore
 
     # auto-upgrade config if need be
-    config_version = config_from_file.get('config_spec_version')
+    config_version = raw_config.get('config_spec_version')
     if config_version is not None:
         config_stable_version = upgrade_utils.get_stable_version(config_version)
     else:
@@ -98,35 +99,36 @@ def get_config(
                 '[WARNING] using outdated config -- run `ctc setup` on command line to update',
                 file=sys.stderr,
             )
-
-        config_from_file = upgrade_utils.upgrade_config(config_from_file)
+        raw_config = upgrade_utils.upgrade_config(raw_config)
 
     # convert int keys from str to int
     for key in spec.typedata.config_int_subkeys:
-        if config_from_file.get(key) is not None:
-            config_from_file[key] = {
+        if raw_config.get(key) is not None:
+            raw_config[key] = {
                 int(chain_id): network_metadata
-                for chain_id, network_metadata in config_from_file[key].items()
+                for chain_id, network_metadata in raw_config[key].items()
             }
 
-    config = config_from_file
+    # load settings from env vars
+    raw_config = config_env_vars._add_config_env_vars(raw_config)
 
     # add config overrides
+    raw_config = raw_config
     overrides = config_overrides.get_config_overrides()
     if len(overrides) > 0:
-        config = dict(config)
-        config.update(overrides)
+        raw_config = dict(raw_config)
+        raw_config.update(overrides)
 
     # validate
-    config_validate.validate_config(config)
+    config_validate.validate_config(raw_config)
 
     if validate == 'raise':
         if typing.TYPE_CHECKING:
-            return typing.cast(spec.Config, config)
+            return typing.cast(spec.Config, raw_config)
         else:
-            return config
+            return raw_config
     else:
-        return config
+        return raw_config
 
 
 def get_config_version_tuple(
