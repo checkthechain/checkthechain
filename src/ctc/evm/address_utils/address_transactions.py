@@ -18,6 +18,8 @@ if typing.TYPE_CHECKING:
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['dataframe'],
+    *,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     ...
 
@@ -26,6 +28,8 @@ async def async_get_transactions_from_address(
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['hashes'],
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[str]:
     ...
 
@@ -34,6 +38,8 @@ async def async_get_transactions_from_address(
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['full'] = 'full',
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
     ...
 
@@ -42,22 +48,33 @@ async def async_get_transactions_from_address(
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['full', 'dataframe', 'hashes'],
-) -> typing.Sequence[spec.DBTransaction] | spec.DataFrame | typing.Sequence[str]:
+    *,
+    context: spec.Context = None,
+) -> typing.Sequence[spec.DBTransaction] | spec.DataFrame | typing.Sequence[
+    str
+]:
     ...
 
 
 async def async_get_transactions_from_address(
     address: spec.Address,
     output_format: typing.Literal['full', 'dataframe', 'hashes'] = 'full',
-) -> typing.Sequence[spec.DBTransaction] | spec.DataFrame | typing.Sequence[str]:
+    *,
+    context: spec.Context = None,
+) -> typing.Sequence[spec.DBTransaction] | spec.DataFrame | typing.Sequence[
+    str
+]:
     """get all transactions from an address"""
 
     address = address.lower()
 
-    count_data = await async_get_address_transaction_counts_by_block(address)
+    count_data = await async_get_address_transaction_counts_by_block(
+        address, context=context
+    )
     blocks = await evm.async_get_blocks(
         blocks=count_data['blocks'],
         include_full_transactions=True,
+        context=context,
     )
 
     transactions = []
@@ -86,7 +103,9 @@ async def async_get_transactions_from_address(
 
 
 async def async_get_address_transaction_counts_by_block(
-    address: spec.Address, nary: int = 3
+    address: spec.Address, nary: int = 3,
+    *,
+    context: spec.Context = None,
 ) -> AddressTransactionCounts:
     """return historical transaction count of address by block"""
 
@@ -100,12 +119,14 @@ async def async_get_address_transaction_counts_by_block(
     min_count_coroutine = rpc.async_eth_get_transaction_count(
         from_address=address,
         block_number=0,
+        context=context,
     )
     min_count_task = asyncio.create_task(min_count_coroutine)
-    max_block = await rpc.async_eth_block_number()
+    max_block = await rpc.async_eth_block_number(context=context)
     max_count = await rpc.async_eth_get_transaction_count(
         from_address=address,
         block_number=max_block,
+        context=context,
     )
     min_count = await min_count_task
 
@@ -120,6 +141,7 @@ async def async_get_address_transaction_counts_by_block(
         max_block=max_block,
         block_counts=block_counts,
         nary=nary,
+        context=context,
     )
 
     # parse blocks that contain transactions
@@ -147,6 +169,7 @@ async def _async_get_block_range_transaction_counts(
     max_block: int,
     block_counts: dict[int, int],
     nary: int,
+    context: spec.Context = None,
 ) -> None:
 
     import asyncio
@@ -167,6 +190,7 @@ async def _async_get_block_range_transaction_counts(
         rpc.async_eth_get_transaction_count(
             from_address=address,
             block_number=block,
+            context=context,
         )
         for block in blocks
     ]
@@ -197,6 +221,8 @@ async def _async_get_block_range_transaction_counts(
                 max_block=range_max_block,
                 block_counts=block_counts,
                 nary=nary,
+                context=context,
             )
             recursive_coroutines.append(coroutine)
     await asyncio.gather(*recursive_coroutines)
+

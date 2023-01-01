@@ -10,6 +10,7 @@ async def async_get_erc721_transfers(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """get transfers of erc721 token"""
     return await event_utils.async_get_events(
@@ -18,6 +19,7 @@ async def async_get_erc721_transfers(
         verbose=False,
         start_block=start_block,
         end_block=end_block,
+        context=context,
     )
 
 
@@ -26,6 +28,7 @@ async def async_get_erc721_approvals(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """get approval of erc721 token"""
     return await event_utils.async_get_events(
@@ -34,6 +37,7 @@ async def async_get_erc721_approvals(
         verbose=False,
         start_block=start_block,
         end_block=end_block,
+        context=context,
     )
 
 
@@ -42,6 +46,7 @@ async def async_get_erc721_approvals_for_all(
     *,
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """get approvals for all of erc721 token"""
     return await event_utils.async_get_events(
@@ -50,4 +55,5 @@ async def async_get_erc721_approvals_for_all(
         verbose=False,
         start_block=start_block,
         end_block=end_block,
+        context=context,
     )

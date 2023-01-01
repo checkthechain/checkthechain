@@ -12,6 +12,7 @@ from . import transaction_types
 
 async def async_print_transaction_summary(
     transaction_hash: str,
+    *,
     context: spec.Context = None,
     sort_logs_by: str | None = None,
 ) -> None:

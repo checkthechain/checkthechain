@@ -29,6 +29,8 @@ def function_signature_to_abi(function_signature: str) -> spec.FunctionABI:
 async def async_parse_function_str_abi(
     function: str,
     contract_address: spec.Address | None = None,
+    *,
+    context: spec.Context = None,
 ) -> spec.FunctionABI:
     """parse a function str into a function ABI
 
@@ -63,6 +65,7 @@ async def async_parse_function_str_abi(
             contract_address=contract_address,
             function_name=function_name,
             function_selector=function_selector,
+            context=context,
         )
 
     return function_abi

@@ -12,17 +12,21 @@ async def async_erc20_eth_call(
     token: spec.ERC20Reference,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Any:
     """perform eth_call for an erc20"""
 
     from ctc import rpc
 
-    address = await erc20_metadata.async_get_erc20_address(token)
+    address = await erc20_metadata.async_get_erc20_address(
+        token, context=context
+    )
     return await rpc.async_eth_call(
         to_address=address,
         function_abi=erc20_spec.erc20_function_abis[function_name],
         block_number=block,
+        context=context,
         **rpc_kwargs,
     )
 
@@ -32,6 +36,7 @@ async def async_erc20s_eth_calls(
     tokens: typing.Iterable[spec.ERC20Reference],
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[typing.Any]:
     """perform eth_call for multiple erc20s"""
@@ -40,13 +45,15 @@ async def async_erc20s_eth_calls(
     from ctc import rpc
 
     coroutines = [
-        erc20_metadata.async_get_erc20_address(token) for token in tokens
+        erc20_metadata.async_get_erc20_address(token, context=context)
+        for token in tokens
     ]
     addresses = await asyncio.gather(*coroutines)
     return await rpc.async_batch_eth_call(
         to_addresses=addresses,
         function_abi=erc20_spec.erc20_function_abis[function_name],
         block_number=block,
+        context=context,
         **rpc_kwargs,
     )
 
@@ -56,16 +63,21 @@ async def async_erc20_eth_call_by_block(
     token: spec.ERC20Reference,
     *,
     blocks: typing.Iterable[spec.BlockNumberReference],
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[typing.Any]:
     """perform eth_call for an erc20 across multiple blocks"""
 
     from ctc import rpc
 
-    address = await erc20_metadata.async_get_erc20_address(token)
+    address = await erc20_metadata.async_get_erc20_address(
+        token, context=context
+    )
     return await rpc.async_batch_eth_call(
         to_address=address,
         function_abi=erc20_spec.erc20_function_abis[function_name],
         block_numbers=blocks,
+        context=context,
         **rpc_kwargs,
     )
+

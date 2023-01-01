@@ -18,6 +18,7 @@ import toolstr
 from ctc import cli
 from ctc import evm
 from ctc import rpc
+from ctc import spec
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -42,7 +43,10 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 async def async_decompile_command(
-    address_or_bytecode: str, verbose: bool
+    address_or_bytecode: str,
+    verbose: bool,
+    *,
+    context: spec.Context = None,
 ) -> None:
 
     address_or_bytecode = await evm.async_resolve_address(address_or_bytecode)
@@ -63,6 +67,7 @@ async def async_decompile_command(
     decompiled_function_abis = await evm.async_decompile_function_abis(
         bytecode,
         sort='hex_signature',
+        context=context,
     )
 
     styles = cli.get_cli_styles()
@@ -144,3 +149,4 @@ async def async_decompile_command(
     if len(decompiled_function_abis) == 0:
         print()
         print('could not detect any function signatures')
+

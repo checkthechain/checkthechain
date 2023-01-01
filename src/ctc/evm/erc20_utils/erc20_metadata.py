@@ -46,6 +46,7 @@ async def async_get_erc20_address(
 
 async def async_is_erc20(
     address_or_abi: spec.Address | spec.ContractABI,
+    *,
     context: spec.Context = None,
 ) -> bool:
     """return whether an address implements ERC20 spec in its abi"""
@@ -73,9 +74,9 @@ async def async_is_erc20(
     return True
 
 
-async def async_get_default_erc20_tokens() -> typing.Sequence[
-    spec.ERC20Metadata
-]:
+async def async_get_default_erc20_tokens(
+    context: spec.Context = None,
+) -> typing.Sequence[spec.ERC20Metadata]:
     """get list of default ERC20s
 
     TODO: add db table for tracking erc20 token lists
@@ -84,7 +85,7 @@ async def async_get_default_erc20_tokens() -> typing.Sequence[
     """
     from ctc.config.setup_utils.default_data import default_erc20s
 
-    return default_erc20s.load_default_erc20s()
+    return default_erc20s.load_default_erc20s(context=context)
 
 
 async def async_get_erc20_metadata(
@@ -95,8 +96,6 @@ async def async_get_erc20_metadata(
     **rpc_kwargs: typing.Any,
 ) -> spec.ERC20Metadata:
     """get metadata for ERC20 token"""
-
-    from ctc import rpc
 
     address = await async_get_erc20_address(token, context=context)
 
@@ -182,11 +181,16 @@ async def async_get_erc20s_decimals(
     tokens: typing.Iterable[spec.ERC20Reference],
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[int]:
     """get decimals of multiple erc20s"""
     return await erc20_generic.async_erc20s_eth_calls(
-        function_name='decimals', tokens=tokens, block=block, **rpc_kwargs
+        function_name='decimals',
+        tokens=tokens,
+        block=block,
+        context=context,
+        **rpc_kwargs,
     )
 
 
@@ -194,6 +198,7 @@ async def async_get_erc20_decimals_by_block(
     token: spec.ERC20Reference,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[int]:
     """get decimals of an erc20 across multiple blocks"""
@@ -201,6 +206,7 @@ async def async_get_erc20_decimals_by_block(
         function_name='decimals',
         token=token,
         blocks=blocks,
+        context=context,
         **rpc_kwargs,
     )
 
@@ -259,23 +265,35 @@ async def async_get_erc20_name(
 
 async def async_get_erc20s_names(
     tokens: typing.Iterable[spec.ERC20Reference],
+    *,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[str]:
     """get name of multiple erc20s"""
     return await erc20_generic.async_erc20s_eth_calls(
-        function_name='name', tokens=tokens, block=block, **rpc_kwargs
+        function_name='name',
+        tokens=tokens,
+        block=block,
+        context=context,
+        **rpc_kwargs,
     )
 
 
 async def async_get_erc20_name_by_block(
     token: spec.ERC20Reference,
+    *,
     blocks: typing.Iterable[spec.BlockNumberReference],
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[str]:
     """get name of an erc20 across multiple blocks"""
     return await erc20_generic.async_erc20_eth_call_by_block(
-        function_name='name', token=token, blocks=blocks, **rpc_kwargs
+        function_name='name',
+        token=token,
+        blocks=blocks,
+        context=context,
+        **rpc_kwargs,
     )
 
 
@@ -347,6 +365,7 @@ async def async_get_erc20s_symbols(
     tokens: typing.Iterable[spec.ERC20Reference],
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[str]:
     """get symbol of multiple erc20s"""
@@ -355,6 +374,7 @@ async def async_get_erc20s_symbols(
         tokens=tokens,
         block=block,
         decode_response=False,
+        context=context,
         **rpc_kwargs,
     )
     return [_decode_raw_symbol(result) for result in results]
@@ -364,6 +384,7 @@ async def async_get_erc20_symbol_by_block(
     token: spec.ERC20Reference,
     *,
     blocks: typing.Iterable[spec.BlockNumberReference],
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> list[str]:
     """get symbol of an erc20 across multiple blocks"""
@@ -372,6 +393,7 @@ async def async_get_erc20_symbol_by_block(
         token=token,
         blocks=blocks,
         decode_response=False,
+        context=context,
         **rpc_kwargs,
     )
     return [_decode_raw_symbol(result) for result in results]

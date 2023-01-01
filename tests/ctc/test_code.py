@@ -1,8 +1,11 @@
+import inspect
 import os
 import sys
 import types
 
 import ctc
+import ctc.db
+import ctc.rpc
 
 
 def test_ctc_functions_have_docstrings():
@@ -323,3 +326,38 @@ def iterate_package_classes(prefix, include_methods=True):
                         classes_to_name[module_attr] = name
 
     return classes
+
+
+def test_async_functions_take_context():
+    modules = [ctc, ctc.db, ctc.rpc]
+    exceptions = [
+        (ctc.rpc, 'async_send_raw'),
+        (ctc.rpc, 'async_close_http_session'),
+    ]
+
+    failures = []
+    for module in modules:
+        for name, value in vars(module).items():
+            if name.startswith('async_') and isinstance(
+                value, types.FunctionType
+            ):
+
+                # try exception list first
+                if module == ctc.rpc and name.startswith('async_batch_'):
+                    continue
+                elif (module, name) in exceptions:
+                    continue
+
+                argspec = inspect.getfullargspec(value)
+                if (
+                    'context' not in argspec.args
+                    and 'context' not in argspec.kwonlyargs
+                ):
+                    failures.append(name)
+    if len(failures) > 0:
+        raise Exception(
+            str(len(failures))
+            + ' functions missing context argument:\n- '
+            + '\n- '.join(failures)
+        )
+

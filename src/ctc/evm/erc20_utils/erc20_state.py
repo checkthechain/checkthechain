@@ -61,7 +61,7 @@ async def async_get_erc20s_total_supplies(
         block = 'latest'
 
     total_supplies = await erc20_generic.async_erc20s_eth_calls(
-        tokens=tokens, function_name='totalSupply', block=block, **rpc_kwargs
+        tokens=tokens, function_name='totalSupply', block=block, context=context, **rpc_kwargs
     )
 
     if normalize:

@@ -37,6 +37,7 @@ async def async_print_transaction_balance_diffs(
 
 async def async_print_transaction_storage_diffs(
     transaction_hash: spec.TransactionHash,
+    *,
     styles: toolcli.StyleTheme | None = None,
     context: spec.Context = None,
 ) -> None:
@@ -114,7 +115,7 @@ def _print_balance_storage_diffs(
 
 
 def _print_storage_diffs(
-    state_diff: spec.StateDiffTrace, styles: toolcli.StyleTheme
+    state_diff: spec.StateDiffTrace, *, styles: toolcli.StyleTheme
 ) -> None:
     import toolstr
 

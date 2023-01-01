@@ -217,6 +217,7 @@ async def async_encode_events_dataframe(
     event_abis: typing.Mapping[str, spec.EventABI] | None = None,
     *,
     sort_index: bool = True,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """encode the fields of an events dataframe"""
 
@@ -235,6 +236,7 @@ async def async_encode_events_dataframe(
                 event_abi = await event_abi_queries.async_get_event_abi(
                     event_hash=event_hash,
                     contract_address=sub_events['contract_address'].values[0],
+                    context=context,
                 )
 
         if len(set(sub_events['contract_address'])) > 1:

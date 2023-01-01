@@ -23,7 +23,7 @@ async def async_intake_default_erc20s(
         return
 
     # load data
-    data = load_default_erc20s(network=network)
+    data = load_default_erc20s(context=context)
 
     # create engine
     if engine is None:
@@ -56,8 +56,10 @@ async def async_intake_default_erc20s(
 
 
 def load_default_erc20s(
-    network: spec.NetworkReference = 'mainnet',
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.ERC20Metadata]:
+
+    network = config.get_context_chain_id(context)
 
     if network in ('mainnet', 1):
         raw_csv_data = mainnet_erc20s_csv

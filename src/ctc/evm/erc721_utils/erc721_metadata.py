@@ -8,13 +8,16 @@ async def async_is_erc721(
     contract_address: spec.Address | None,
     *,
     contract_abi: spec.ContractABI | None = None,
+    context: spec.Context = None,
 ) -> bool:
     """return whether contract at address implements erc721 standard"""
 
     if contract_abi is None:
         if contract_address is None:
             raise Exception('specify either contract_address or contract_abi')
-        contract_abi = await abi_utils.async_get_contract_abi(contract_address)
+        contract_abi = await abi_utils.async_get_contract_abi(
+            contract_address, context=context
+        )
 
     return _is_erc721_contract_abi(contract_abi)
 
@@ -53,3 +56,4 @@ def _is_erc721_contract_abi(contract_abi: spec.ContractABI) -> bool:
     missing_signatures = erc721_signatures - contract_signatures
 
     return len(missing_signatures) == 0
+

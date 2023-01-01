@@ -16,6 +16,7 @@ async def async_get_erc721_owners(
     *,
     method: Literal['transfers', 'calls'] | None = None,
     token_ids: typing.Sequence[int] | None = None,
+    context: spec.Context = None,
 ) -> typing.Mapping[int, spec.Address]:
     """return owners of erc721 token
 
@@ -31,12 +32,16 @@ async def async_get_erc721_owners(
             method = 'transfers'
 
     if method == 'transfers':
-        transfers = await erc721_events.async_get_erc721_transfers(token)
+        transfers = await erc721_events.async_get_erc721_transfers(
+            token, context=context
+        )
         return _get_erc721_owners_from_transfers(transfers, token_ids=token_ids)
 
     elif method == 'calls':
         return await _async_get_erc721_owners_from_calls(
-            token, token_ids=token_ids
+            token,
+            token_ids=token_ids,
+            context=context,
         )
 
     else:
@@ -69,13 +74,16 @@ def _get_erc721_owners_from_transfers(
 async def _async_get_erc721_owners_from_calls(
     token: spec.Address,
     token_ids: typing.Sequence[int] | None = None,
+    *,
+    context: spec.Context = None,
 ) -> typing.Mapping[int, spec.Address]:
     from ctc import rpc
 
     if token_ids is None:
         try:
             total_supply = await erc721_state.async_get_erc721_total_supply(
-                token
+                token,
+                context=context,
             )
             token_ids = list(range(total_supply))
         except spec.RpcException:
@@ -87,6 +95,8 @@ async def _async_get_erc721_owners_from_calls(
         to_address=token,
         function_abi=erc721_spec.erc721_function_abis['ownerOf'],
         function_parameter_list=[[token_id] for token_id in token_ids],
+        context=context,
     )
 
     return dict(zip(token_ids, results))
+

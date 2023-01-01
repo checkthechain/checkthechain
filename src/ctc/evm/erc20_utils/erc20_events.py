@@ -48,7 +48,9 @@ async def async_get_erc20_transfers(
     # do this because tokens sometimes have different values for event args
     try:
         event_abi = await abi_utils.async_get_event_abi(
-            contract_address=token, event_name='Transfer'
+            contract_address=token,
+            event_name='Transfer',
+            context=context,
         )
     except Exception:
         event_abi = erc20_spec.erc20_event_abis['Transfer']
@@ -87,6 +89,7 @@ async def async_get_erc20_transfers(
         decimals = await erc20_metadata.async_get_erc20_decimals(
             token=token_address,
             block=transfers.index.values[0][0],
+            context=context,
         )
         dtype = float
         transfers[column] = transfers[column] / dtype('1e' + str(decimals))
@@ -110,6 +113,7 @@ async def async_get_erc20_balances_from_transfers(
         typing.Union[typing.Type[int], typing.Type[float]]
     ] = None,
     normalize: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     """compute ERC20 balance of each wallet using Transfer events"""
 
@@ -132,7 +136,8 @@ async def async_get_erc20_balances_from_transfers(
 
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
-            typing.cast(str, transfers['contract_address'].values[0])
+            typing.cast(str, transfers['contract_address'].values[0]),
+            context=context,
         )
         balances /= 10**decimals
 

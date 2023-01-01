@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from ctc import spec
+
 
 def extract_bytecode_function_selectors(bytecode: str) -> typing.Sequence[str]:
     """extract solidity-style function selectors from contract bytecode"""
@@ -19,7 +21,9 @@ def extract_bytecode_function_selectors(bytecode: str) -> typing.Sequence[str]:
 
 async def async_decompile_function_abis(
     bytecode: str,
+    *,
     sort: str | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
     """decompile solidity-style function ABI's from contract bytecode"""
 
@@ -28,7 +32,9 @@ async def async_decompile_function_abis(
     function_selectors = extract_bytecode_function_selectors(bytecode)
 
     coroutines = [
-        fourbyte_utils.async_query_function_signatures(selector)
+        fourbyte_utils.async_query_function_signatures(
+            selector, context=context
+        )
         for selector in function_selectors
     ]
 
@@ -43,3 +49,4 @@ async def async_decompile_function_abis(
         abis = sorted(abis, key=lambda item: item[sort])  # type: ignore
 
     return abis
+
