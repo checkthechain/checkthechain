@@ -10,7 +10,7 @@ from . import address_data
 async def async_print_address_summary(
     address: spec.Address,
     *,
-    verbose: bool | int = False,
+    verbose: bool | int = True,
     max_width: int = 80,
     context: spec.Context = None,
     raw: bool = False,
@@ -64,24 +64,40 @@ async def async_print_address_summary(
         ('transaction count', transaction_count),
     ]
     print()
-    toolstr.print_table(
-        rows,
-        border=styles['comment'],
-        column_justify=['right', 'left'],
-        column_styles=[styles['option'], styles['description']],
-    )
 
     if verbose:
         creation_block = await evm.async_get_contract_creation_block(
-            address, context=context
+            address,
+            context=context,
+            verbose=False,
         )
         if creation_block is not None:
             block_timestamp = await evm.async_get_block_timestamp(
                 creation_block, context=context
             )
             age = tooltime.get_age(block_timestamp, 'TimelengthPhrase')
-            print('- creation block:', creation_block)
-            print('- age:', age)
+            creation_tx = await evm.async_get_contract_creation_transaction(
+                address,
+                context=context,
+                creation_block=creation_block,
+            )
+            deployer = await evm.async_get_contract_deployer(
+                address,
+                context=context,
+                creation_transaction=creation_tx,
+            )
+            rows += [
+                ('creation tx', creation_tx),
+                ('deployer', deployer),
+                ('creation block', creation_block),
+                ('age', age),
+            ]
+    toolstr.print_table(
+        rows,
+        border=styles['comment'],
+        column_justify=['right', 'left'],
+        column_styles=[styles['option'], styles['description']],
+    )
 
     if is_contract:
 

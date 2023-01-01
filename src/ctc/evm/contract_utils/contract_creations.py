@@ -50,14 +50,22 @@ def get_created_address(
 
 async def async_get_contract_creation_transaction(
     contract_address: spec.Address,
+    *,
+    context: spec.Context = None,
+    creation_block: int | None = None,
 ) -> spec.TransactionHash:
     """get hash of contract's creation transaction"""
     from ctc import rpc
 
-    creation_block = await async_get_contract_creation_block(contract_address)
+    if creation_block is None:
+        creation_block = await async_get_contract_creation_block(
+            contract_address, context=context
+        )
     if creation_block is None:
         raise Exception('could not determine creation block of contract')
-    trace_block: spec.TraceList = await rpc.async_trace_block(creation_block)
+    trace_block: spec.TraceList = await rpc.async_trace_block(
+        creation_block, context=context
+    )
     for item in trace_block:
         if (
             item['type'] == 'create'
@@ -70,10 +78,18 @@ async def async_get_contract_creation_transaction(
 
 async def async_get_contract_deployer(
     contract_address: spec.Address,
+    *,
+    creation_transaction: spec.TransactionHash | None = None,
+    context: spec.Context = None,
 ) -> spec.Address:
     """get EOA deployer of contract"""
-    tx_hash = await async_get_contract_creation_transaction(contract_address)
-    tx = await transaction_utils.async_get_transaction(tx_hash)
+    if creation_transaction is None:
+        creation_transaction = await async_get_contract_creation_transaction(
+            contract_address, context=context
+        )
+    tx = await transaction_utils.async_get_transaction(
+        creation_transaction, context=context
+    )
     return tx['from']
 
 

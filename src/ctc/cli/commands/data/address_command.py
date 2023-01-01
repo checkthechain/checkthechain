@@ -45,6 +45,7 @@ async def async_address_command(
 
     address = await evm.async_resolve_address(address)
 
+    verbose = 1
     if verbose:
         verbose = 2
     await evm.async_print_address_summary(

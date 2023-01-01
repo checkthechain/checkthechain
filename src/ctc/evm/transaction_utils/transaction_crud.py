@@ -54,7 +54,7 @@ async def async_get_transaction(
         'input': raw_tx['input'],
         'nonce': raw_tx['nonce'],
         'type': raw_tx['type'],
-        'access_list': raw_tx['access_list'],
+        'access_list': raw_tx.get('access_list'),
         #
         # receipt fields
         'gas_used': raw_receipt['gas_used'],
