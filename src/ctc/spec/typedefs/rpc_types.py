@@ -51,33 +51,35 @@ RpcDigestor = typing.Callable[..., RpcResponse]
 # # provider
 #
 
-ProviderName = str
+ProviderShortcut = str
 
 
 class PartialProvider(TypedDict, total=False):
     url: str
-    name: typing.Optional[ProviderName]
-    network: typing.Optional[network_types.NetworkReference]
+    name: str | None
+    network: network_types.NetworkReference | None
     protocol: Literal['http', 'wss', 'ipc']
-    session_kwargs: typing.Optional[dict[str, typing.Any]]
-    chunk_size: typing.Optional[int]
+    #
+    # query behaviors
+    session_kwargs: typing.Mapping[str, typing.Any] | None
+    chunk_size: int | None
     convert_reverts_to_none: bool
 
 
 class Provider(TypedDict, total=True):
     url: str
-    name: typing.Optional[ProviderName]
+    name: str | None
     network: network_types.ChainId
     protocol: Literal['http', 'wss', 'ipc']
-    session_kwargs: typing.Optional[dict[str, typing.Any]]
-    chunk_size: typing.Optional[int]
+    #
+    # query behaviors
+    session_kwargs: typing.Mapping[str, typing.Any] | None
+    chunk_size: int | None
     convert_reverts_to_none: bool
 
 
-ProviderShortcut = str
-ProviderReference = typing.Union[
-    ProviderShortcut, PartialProvider, Provider, None
-]
-ProviderKey = typing.Tuple[
+ProviderReference = typing.Union[ProviderShortcut, PartialProvider, Provider]
+ProviderId = typing.Tuple[
     int, str, typing.Tuple[typing.Tuple[typing.Any, typing.Any], ...]
 ]
+

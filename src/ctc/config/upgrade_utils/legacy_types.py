@@ -21,10 +21,10 @@ from ctc import spec
 class LegacyConfig__3_0_0(TypedDict):
     config_spec_version: str
     data_dir: str
-    providers: typing.Mapping[spec.ProviderName, LegacyProvider__0_3_0]
+    providers: typing.Mapping[str, LegacyProvider__0_3_0]
     networks: typing.Mapping[spec.ChainId, LegacyNetworkMetadata__0_3_0]
     default_network: spec.ChainId | None
-    default_providers: typing.Mapping[spec.ChainId, spec.ProviderName]
+    default_providers: typing.Mapping[spec.ChainId, str]
     db_configs: typing.Mapping[str, ToolsqlDBConfig]
     log_rpc_calls: bool
     log_sql_queries: bool
@@ -33,7 +33,7 @@ class LegacyConfig__3_0_0(TypedDict):
 class LegacyConfig__0_2_3(TypedDict):
     config_spec_version: str
     data_dir: str
-    providers: typing.Mapping[spec.ProviderName, LegacyProvider__0_2_1]
+    providers: typing.Mapping[str, LegacyProvider__0_2_1]
     networks: typing.Mapping[spec.NetworkName, LegacyNetworkMetadata__0_2_1]
     network_defaults: LegacyConfigNetworkDefaults
 
@@ -41,14 +41,14 @@ class LegacyConfig__0_2_3(TypedDict):
 class LegacyConfig__0_2_1(TypedDict):
     version: str
     data_dir: str
-    providers: typing.Mapping[spec.ProviderName, LegacyProvider__0_2_1]
+    providers: typing.Mapping[str, LegacyProvider__0_2_1]
     networks: typing.Mapping[spec.NetworkName, LegacyNetworkMetadata__0_2_1]
     network_defaults: LegacyConfigNetworkDefaults
 
 
 class LegacyConfigNetworkDefaults(TypedDict):
     default_network: spec.NetworkName
-    default_providers: typing.Mapping[spec.NetworkName, spec.ProviderName]
+    default_providers: typing.Mapping[spec.NetworkName, str]
 
 
 #

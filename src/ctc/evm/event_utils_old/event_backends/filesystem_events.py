@@ -47,7 +47,7 @@ def get_events_root(
     from ctc import config
 
     network = config.get_context_chain_id(context)
-    network_name = network_utils.get_network_name(network, require=True)
+    network_name = network_utils.get_network_name(network)
     return os.path.join(
         config.get_data_dir(), 'evm/networks', network_name, 'events'
     )
@@ -109,7 +109,7 @@ def get_events_filepath(
 
     # add parent directory
     network = config.get_context_chain_id(context)
-    network_name = network_utils.get_network_name(network, require=True)
+    network_name = network_utils.get_network_name(network)
     return os.path.join(
         config.get_data_dir(), 'evm/networks', network_name, subpath
     )

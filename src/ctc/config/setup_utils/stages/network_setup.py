@@ -32,11 +32,18 @@ async def async_setup_networks(
             networks = config_defaults.get_default_networks_metadata()
 
         default_network = old_config.get('default_network')
+        if not isinstance(default_network, int):
+            default_network = None
 
         default_providers = old_config.get('default_providers')
         if default_providers is None:
             default_providers = {}
 
+        if default_network is None:
+            if len(default_providers) > 0:
+                default_netork = min(default_providers.keys())
+            else:
+                default_network = 1
         return {
             'providers': providers,
             'networks': networks,
@@ -488,7 +495,7 @@ def specify_default_providers(
     providers: typing.Mapping[str, spec.Provider],
     styles: toolcli.StyleTheme,
     headless: bool,
-) -> typing.Mapping[spec.ChainId, spec.ProviderName]:
+) -> typing.Mapping[spec.ChainId, str]:
 
     # compile providers for each network
     providers_per_network: dict[int, list[str]] = {}
@@ -520,15 +527,16 @@ def specify_default_providers(
             prompt = (
                 'Which provider to use as default for '
                 + str(networks[network]['name'])
-                + ' (chain_id = '
+                + ', chain_id = '
                 + str(network)
-                + ')?'
+                + '?'
             )
             answer = toolcli.input_number_choice(
                 prompt=prompt,
                 choices=providers_per_network[network],
                 style=styles['metavar'],
                 headless=headless,
+                default=providers_per_network[network][0],
             )
             default_providers[network] = providers_per_network[network][answer]
 

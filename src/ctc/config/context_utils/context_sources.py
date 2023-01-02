@@ -1,111 +1,94 @@
 from __future__ import annotations
 
+from ctc import evm
 from ctc import spec
 
+from .. import config_values
 from . import context_validate
 
 
 def get_context_chain_id(context: spec.Context) -> spec.ChainId:
     """get chain_id of a given context"""
+
     context_validate._validate_context(context)
-    chain_id, provider = _get_context_network_and_provider(context=context)
+    chain_id, provider = _get_context_chain_id_and_provider(context=context)
     return chain_id
 
 
-def get_context_provider(context: spec.Context) -> spec.Provider:
+def get_context_provider(context: spec.Context) -> spec.Provider | None:
     """get provider of a given context"""
+
     context_validate._validate_context(context)
-    chain_id, provider = _get_context_network_and_provider(context=context)
-    if provider is None:
-        raise Exception('context does not specify any possible provider')
+    chain_id, provider = get_context_chain_id_and_provider(context=context)
     return provider
 
 
-def _get_context_network_and_provider(
+def get_context_chain_id_and_provider(
+    context: spec.Context,
+) -> tuple[spec.ChainId, spec.Provider | None]:
+    """get chain_id and provider of a given context"""
+
+    from ctc import rpc
+
+    context_validate._validate_context(context)
+    chain_id, provider = _get_context_chain_id_and_provider(context=context)
+
+    if provider is not None:
+        return chain_id, provider
+    else:
+        try:
+            provider = rpc.find_provider(network=chain_id)
+            return chain_id, provider
+        except LookupError:
+            raise Exception('no provider available for given context')
+
+
+def _get_context_chain_id_and_provider(
     context: spec.Context,
 ) -> tuple[spec.ChainId, spec.Provider | None]:
 
-    from ctc import config
     from ctc import rpc
 
     if context is None:
         # case: no context provided
-        default_network = config.get_default_network()
-        if default_network is None:
-            raise Exception('no default network specified')
-        else:
-            chain_id = default_network
-
-        provider = _chain_id_to_provider(chain_id)
+        return config_values.get_default_network(), None
 
     elif isinstance(context, int):
-        # case: context is only a chain_id
-        for chain_id in config.get_config_networks().keys():
-            if chain_id == context:
-                break
-        else:
-            raise Exception(
-                'could not find provider for chain_id = ' + str(context)
-            )
-        provider = _chain_id_to_provider(chain_id)
+        # case: context is a chain_id
+        return context, None
 
     elif isinstance(context, str):
         # case: context is a network name, provider name, or provider url
-        for chain_id, network_metadata in config.get_config_networks().items():
-            if network_metadata.get('name') == context:
-                provider = rpc.get_provider({'network': chain_id})
-                break
-        else:
-            provider = rpc.get_provider(context)
-        chain_id = provider['network']
+        try:
+            # try to resolve as network name
+            return evm.get_network_chain_id(context), None
+        except LookupError:
+            # try to resolve as provider
+            provider = rpc.resolve_provider(context)
+            return provider['network'], provider
 
     elif isinstance(context, dict):
         # case: context is a dict
+        context_network = context.get('network')
+        context_provider = context.get('provider')
 
-        if context.get('provider') is not None:
+        if context_provider is not None:
             # subcase: provider is given
-            provider = rpc.get_provider(context['provider'])
-            chain_id = provider['network']
+            provider = rpc.resolve_provider(context_provider)
+            if (
+                context_network is not None
+                and context_network != provider['network']
+            ):
+                raise Exception('context provider does not match network')
+            return provider['network'], provider
 
-        elif context.get('network') is not None:
+        elif context_network is not None:
             # subcase: network is given
-            context_network = context['network']
-            for (
-                chain_id,
-                network_metadata,
-            ) in config.get_config_networks().items():
-                if isinstance(context_network, int):
-                    if context_network == chain_id:
-                        break
-                elif isinstance(context_network, str):
-                    if context_network == network_metadata['name']:
-                        break
-                else:
-                    raise Exception(
-                        'unknown network format: ' + str(context_network)
-                    )
-            provider = _chain_id_to_provider(chain_id)
+            return evm.get_network_chain_id(context_network), None
 
         else:
             # subcase: neither provider nor network are given
-            default_network = config.get_default_network()
-            if default_network is None:
-                raise Exception('no default network specified')
-            else:
-                chain_id = default_network
-            provider = _chain_id_to_provider(chain_id)
+            return config_values.get_default_network(), None
 
-    else:
-        raise Exception('unknown context format: ' + str(type(context)))
-
-    return chain_id, provider
-
-
-def _chain_id_to_provider(chain_id: spec.ChainId) -> spec.Provider | None:
-    from ctc import rpc
-
-    try:
-        return rpc.get_provider({'network': chain_id})
-    except LookupError:
-        return None
+    raise Exception('unknown context format: ' + str(type(context)))
 

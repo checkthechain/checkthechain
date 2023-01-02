@@ -29,7 +29,7 @@ class DataSource(TypedDict, total=False):
     db_config: toolsql.DBConfig
     rest_endpoint: dict[str, typing.Any]
     filesystem_root: str
-    provider: rpc_types.ProviderReference
+    provider: rpc_types.ProviderReference | None
 
     # hybrid parameters
     hybrid_order: typing.Sequence['LeafDataSource']

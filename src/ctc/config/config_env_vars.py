@@ -64,17 +64,16 @@ def parse_env_network_and_provider(
                     provider_shorthand = {'url': env_provider}
 
                 try:
-                    provider = rpc.get_provider(provider_shorthand)
-                except Exception:
+                    provider = rpc.resolve_provider(provider_shorthand)
+                    env_provider_name = provider['name']
+                    env_provider_chain_id = provider['network']
+
+                except LookupError:
                     import warnings
 
                     warnings.warn(
-                        'invalid provider specified in CTC_PROVIDER environment variable'
+                        'invalid provider specified in CTC_PROVIDER environment variable, skipping'
                     )
-
-                config['providers'][provider['name']] = provider
-                env_provider_name = provider['name']
-                env_provider_chain_id = provider['network']
 
     # set default provider
     if env_chain_id is not None and env_provider_chain_id is not None:

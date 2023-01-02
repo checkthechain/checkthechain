@@ -43,8 +43,8 @@ def get_data_dir() -> str:
 #
 
 
-def get_default_network() -> spec.ChainId | None:
-    return config_read.get_config().get('default_network')
+def get_default_network() -> spec.ChainId:
+    return config_read.get_config()['default_network']
 
 
 def get_config_networks() -> typing.Mapping[spec.ChainId, spec.NetworkMetadata]:
@@ -91,67 +91,10 @@ def get_providers() -> typing.Mapping[spec.NetworkName, spec.Provider]:
     return config_read.get_config()['providers']
 
 
-def has_provider(
-    *,
-    name: str | None = None,
-    network: str | None = None,
-    url: str | None = None,
-) -> bool:
-    try:
-        get_provider(name=name, network=network, url=url)
-        return True
-    except LookupError:
-        return False
-
-
-def get_provider(
-    *,
-    name: str | None = None,
-    network: str | int | None = None,
-    protocol: str | None = None,
-    url: str | None = None,
-) -> spec.Provider:
-
-    from ctc.toolbox import search_utils
-
-    providers = list(get_providers().values())
-
-    # build query
-    query: typing.MutableMapping[str, str | int] = {}
-    if name is None and network is None and url is None:
-        raise Exception('specify network name or network or url')
-    if name is not None:
-        query['name'] = name
-    if network is not None:
-        if isinstance(network, str):
-            from ctc import evm
-
-            network = evm.get_network_chain_id(network)
-        query['network'] = network
-    if protocol is not None:
-        query['protocol'] = protocol
-    if url is not None:
-        query['url'] = url
-
-    entries = search_utils.get_matching_entries(sequence=providers, query=query)
-    if len(entries) == 1:
-        return entries[0]
-    elif len(entries) > 1:
-        return get_default_provider(network)
-    else:
-        raise LookupError('could not detect suitable RPC provider')
-
-
-def get_default_provider(
-    network: spec.NetworkName | spec.ChainId | None = None,
-) -> spec.Provider:
+def get_network_default_provider(
+    network: spec.NetworkName | spec.ChainId,
+) -> spec.Provider | None:
     """get default provider for network"""
-
-    # if network not specified use default
-    if network is None:
-        network = get_default_network()
-    if network is None:
-        raise Exception('no default network specified')
 
     if not isinstance(network, int):
         if isinstance(network, str):
@@ -168,7 +111,8 @@ def get_default_provider(
     config = config_read.get_config()
     default_providers = config.get('default_providers', {})
     if network in default_providers:
-        return get_provider(name=default_providers[network])
+        provider_name = default_providers[network]
+        return config['providers'][provider_name]
     else:
         message = 'no default provider specified for network ' + str(network)
         raise Exception(message)

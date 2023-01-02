@@ -50,7 +50,7 @@ def get_multicall_address(
 ) -> spec.Address:
 
     network = config.get_context_chain_id(context)
-    network_name = evm.get_network_name(network, require=True)
+    network_name = evm.get_network_name(network)
 
     if version.lower() == 'Maker'.lower():
         multicall = {

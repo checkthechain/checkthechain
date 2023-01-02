@@ -16,14 +16,12 @@ if typing.TYPE_CHECKING:
 class PartialConfig(TypedDict, total=False):
     config_spec_version: str
     data_dir: str
-    providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
+    providers: typing.Mapping[str, rpc_types.Provider]
     networks: typing.Mapping[
         network_types.ChainId, network_types.NetworkMetadata
     ]
-    default_network: network_types.ChainId | None
-    default_providers: typing.Mapping[
-        network_types.ChainId, rpc_types.ProviderName
-    ]
+    default_network: network_types.ChainId
+    default_providers: typing.Mapping[network_types.ChainId, str]
     db_configs: typing.Mapping[str, toolsql.DBConfig]
     context_cache_rules: typing.Sequence[context_types.ContextCacheRule]
 
@@ -37,14 +35,12 @@ class PartialConfig(TypedDict, total=False):
 class Config(TypedDict):
     config_spec_version: str
     data_dir: str
-    providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
+    providers: typing.Mapping[str, rpc_types.Provider]
     networks: typing.Mapping[
         network_types.ChainId, network_types.NetworkMetadata
     ]
-    default_network: network_types.ChainId | None
-    default_providers: typing.Mapping[
-        network_types.ChainId, rpc_types.ProviderName
-    ]
+    default_network: network_types.ChainId
+    default_providers: typing.Mapping[network_types.ChainId, str]
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]
     context_cache_rules: typing.Sequence[context_types.ContextCacheRule]
@@ -59,10 +55,10 @@ class Config(TypedDict):
 class JsonConfig(TypedDict):
     config_spec_version: str
     data_dir: str
-    providers: typing.Mapping[rpc_types.ProviderName, rpc_types.Provider]
+    providers: typing.Mapping[str, rpc_types.Provider]
     networks: typing.Mapping[str, network_types.NetworkMetadata]
-    default_network: network_types.ChainId | None
-    default_providers: typing.Mapping[str, rpc_types.ProviderName]
+    default_network: network_types.ChainId
+    default_providers: typing.Mapping[str, str]
 
     db_configs: typing.Mapping[str, toolsql.DBConfig]
     context_cache_rules: typing.Sequence[context_types.ContextCacheRule]

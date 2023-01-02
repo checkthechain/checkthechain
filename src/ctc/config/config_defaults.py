@@ -26,7 +26,7 @@ def get_default_config(use_env_variables: bool = True) -> spec.Config:
         'data_dir': data_dir,
         #
         # networks
-        'default_network': None,
+        'default_network': 1,
         'networks': get_default_networks_metadata(),
         #
         # providers

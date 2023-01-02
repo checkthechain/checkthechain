@@ -32,10 +32,11 @@ async def async_get_all_safes__1_1(
     *,
     start_block: spec.BlockReference | None = None,
     end_block: spec.BlockReference | None = None,
+    context: spec.Context | None = None,
 ) -> typing.Sequence[safe_spec.GnosisSafeCreation]:
 
+    chain_id = config.get_context_chain_id(context)
     if factory is None:
-        chain_id = config.get_default_network()
         if (
             chain_id not in safe_spec.deployments
             or 'factory__1.1.1' not in safe_spec.deployments[chain_id]
@@ -53,6 +54,7 @@ async def async_get_all_safes__1_1(
         start_block=start_block,
         end_block=end_block,
         keep_multiindex=False,
+        context=context,
     )
     df = df.reset_index()
     old_columns = [
@@ -63,7 +65,6 @@ async def async_get_all_safes__1_1(
     ]
     df = df[old_columns]
 
-    chain_id = config.get_default_network()
     if chain_id not in safe_spec.deployments:
         raise Exception('safe 1.1.1 deployment unknown for ' + str(chain_id))
     df['implementation'] = safe_spec.deployments[chain_id]['safe__1.1.1']
@@ -84,10 +85,11 @@ async def async_get_all_safes__1_3(
     *,
     start_block: spec.BlockReference | None = None,
     end_block: spec.BlockReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[safe_spec.GnosisSafeCreation]:
 
     if factory is None:
-        chain_id = config.get_default_network()
+        chain_id = config.get_context_chain_id(context)
         if (
             chain_id not in safe_spec.deployments
             or 'factory__1.3.0' not in safe_spec.deployments[chain_id]
@@ -105,6 +107,7 @@ async def async_get_all_safes__1_3(
         start_block=start_block,
         end_block=end_block,
         keep_multiindex=False,
+        context=context,
     )
     df = df.reset_index()
     old_columns = [

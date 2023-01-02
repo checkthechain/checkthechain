@@ -6,20 +6,20 @@ import warnings
 if typing.TYPE_CHECKING:
     import aiohttp
 
+from ctc import config
 from ctc import spec
 from .. import rpc_provider
 
 
-_http_sessions: dict[spec.ProviderKey, aiohttp.ClientSession] = {}
+_http_sessions: dict[spec.ProviderId, aiohttp.ClientSession] = {}
 
 
 async def async_send_http(
     request: spec.RpcRequest,
-    provider: spec.ProviderReference,
+    provider: spec.Provider,
     *,
     n_attempts: int = 8,
 ) -> spec.RpcResponse:
-    provider = rpc_provider.get_provider(provider)
     session = get_async_http_session(provider=provider)
 
     headers = {'User-Agent': 'ctc'}
@@ -61,22 +61,22 @@ def get_async_http_session(
     provider: spec.Provider, create: bool = True
 ) -> aiohttp.ClientSession:
 
-    key = rpc_provider.get_provider_key(provider)
-    if key not in _http_sessions:
+    provider_id = rpc_provider._get_provider_id(provider)
+    if provider_id not in _http_sessions:
         if create:
             import aiohttp
 
             kwargs = provider['session_kwargs']
             if kwargs is None:
                 kwargs = {}
-            _http_sessions[key] = aiohttp.ClientSession(**kwargs)
+            _http_sessions[provider_id] = aiohttp.ClientSession(**kwargs)
         else:
             raise Exception('no session, must create')
-    return _http_sessions[key]
+    return _http_sessions[provider_id]
 
 
 async def async_close_http_session(
-    provider: spec.ProviderReference = None,
+    context: spec.Context = None,
 ) -> None:
 
     import asyncio
@@ -84,13 +84,15 @@ async def async_close_http_session(
     if len(_http_sessions) == 0:
         return
 
-    if provider is None:
+    if context is None:
         for session in _http_sessions.values():
             await asyncio.sleep(0)
             await session.close()
 
     else:
-        provider = rpc_provider.get_provider(provider)
+        provider = config.get_context_provider(context)
+        if provider is None:
+            raise Exception('no provider available for given context')
         session = get_async_http_session(provider=provider)
         await asyncio.sleep(0)
         await session.close()

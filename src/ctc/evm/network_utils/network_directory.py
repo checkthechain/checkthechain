@@ -12,23 +12,7 @@ import typing
 from ctc import spec
 
 
-@typing.overload
-def get_network_name(
-    network: spec.NetworkName | int, require: typing.Literal[True]
-) -> spec.NetworkName:
-    ...
-
-
-@typing.overload
-def get_network_name(
-    network: spec.NetworkName | int, require: bool = True
-) -> spec.NetworkName | None:
-    ...
-
-
-def get_network_name(
-    network: spec.NetworkName | int, require: bool = True
-) -> spec.NetworkName | None:
+def get_network_name(network: spec.NetworkName | int) -> spec.NetworkName:
     """get name of network"""
 
     if isinstance(network, str):
@@ -38,16 +22,13 @@ def get_network_name(
     if network in config_network_names_by_id:
         name = config_network_names_by_id[network]
         if name is None:
-            if require:
-                raise Exception('network name is not known')
-            else:
-                return name
+            raise LookupError('network name is not known')
         elif isinstance(name, str):
             return name
         else:
             raise Exception('bad type for name: ' + str(type(name)))
     else:
-        raise Exception('unknown network: ' + str(network))
+        raise LookupError('unknown network: ' + str(network))
 
 
 def get_network_chain_id(network: spec.NetworkName | int) -> spec.ChainId:
@@ -60,7 +41,7 @@ def get_network_chain_id(network: spec.NetworkName | int) -> spec.ChainId:
     if network in config_chain_ids_by_network_name:
         return config_chain_ids_by_network_name[network]
     else:
-        raise Exception('unknown network: ' + str(network))
+        raise LookupError('unknown network: ' + str(network))
 
 
 def _get_chain_ids_by_network_name() -> typing.Mapping[spec.NetworkName, int]:
@@ -100,7 +81,7 @@ def get_network_metadata(
     if network in networks:
         return networks[network]
     else:
-        raise Exception('unknown network: ' + str(network))
+        raise LookupError('unknown network: ' + str(network))
 
 
 def get_network_block_explorer(network: spec.NetworkReference) -> str | None:

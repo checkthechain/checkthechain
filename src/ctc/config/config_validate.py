@@ -33,7 +33,7 @@ def get_config_base_types() -> typing.Mapping[
         'data_dir': str,
         'networks': dict,
         'providers': dict,
-        'default_network': (int, type(None)),
+        'default_network': int,
         'default_providers': dict,
         'db_configs': dict,
         'log_rpc_calls': bool,
@@ -143,44 +143,55 @@ def validate_providers(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
 
-    provider_keys = set(spec.provider_keys)
     for provider_name, provider in value.items():
         if not isinstance(provider_name, str):
             raise spec.ConfigInvalid('provider name should be a str')
-
-        if set(provider.keys()) != provider_keys:
-            raise spec.ConfigInvalid(
-                'provider should have keys: ' + str(provider_keys)
-            )
-
-        url = provider['url']
-        name = provider['name']
-        network = provider['network']
-        protocol = provider['protocol']
-        session_kwargs = provider['session_kwargs']
-        chunk_size = provider['chunk_size']
-
-        if not isinstance(url, str):
-            raise spec.ConfigInvalid('provider url must be a str')
-        if name != provider_name:
+        if 'name' not in provider or provider_name != provider['name']:
             raise spec.ConfigInvalid('provider name does not match')
-        if not isinstance(network, int):
-            raise spec.ConfigInvalid(
-                'provider networks should be an int chain_id'
-            )
-        if network not in config['networks']:
-            raise spec.ConfigInvalid('provider network not in network entries')
-        if protocol != 'http':
-            raise spec.ConfigInvalid('only http supported')
-        if not isinstance(session_kwargs, dict):
-            raise spec.ConfigInvalid('session_kwargs must be a dict')
-        if chunk_size is not None and not isinstance(chunk_size, int):
-            raise spec.ConfigInvalid('chunk_size is not int')
+        validate_provider(provider, config)
 
-        if not url.startswith('http'):
-            raise spec.ConfigInvalid(
-                'http provider url must start with "http://" or "https://"'
-            )
+
+def validate_provider(
+    provider: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
+) -> None:
+
+    if not isinstance(provider, dict):
+        raise Exception('provider is not a dict')
+
+    provider_keys = set(spec.provider_keys)
+    if set(provider.keys()) != provider_keys:
+        raise spec.ConfigInvalid(
+            'provider should have keys: ' + str(provider_keys)
+        )
+
+    url = provider['url']
+    name = provider['name']
+    network = provider['network']
+    protocol = provider['protocol']
+    session_kwargs = provider['session_kwargs']
+    chunk_size = provider['chunk_size']
+
+    if not isinstance(url, str):
+        raise spec.ConfigInvalid('provider url must be a str')
+    if not isinstance(name, str):
+        raise spec.ConfigInvalid('provider name must be a str')
+    if not isinstance(network, int):
+        raise spec.ConfigInvalid(
+            'provider networks should be an int chain_id'
+        )
+    if network not in config['networks']:
+        raise spec.ConfigInvalid('provider network not in network entries')
+    if protocol != 'http':
+        raise spec.ConfigInvalid('only http supported')
+    if not isinstance(session_kwargs, dict):
+        raise spec.ConfigInvalid('session_kwargs must be a dict')
+    if chunk_size is not None and not isinstance(chunk_size, int):
+        raise spec.ConfigInvalid('chunk_size is not int')
+
+    if not url.startswith('http'):
+        raise spec.ConfigInvalid(
+            'http provider url must start with "http://" or "https://"'
+        )
 
 
 def validate_default_network(

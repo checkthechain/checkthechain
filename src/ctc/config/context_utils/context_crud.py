@@ -25,7 +25,7 @@ def create_user_input_context(
 
 
 def normalize_context(context: spec.Context) -> spec.NormalizedContext:
-    network, provider = context_sources._get_context_network_and_provider(
+    network, provider = context_sources._get_context_chain_id_and_provider(
         context
     )
     cache_rules = context_caches._extract_context_cache_rules(context=context)
@@ -54,8 +54,11 @@ def update_context(
     if merge_provider is not None:
         from ctc import rpc
 
-        provider = rpc.get_provider(provider)
-        new_context['provider'] = dict(provider, **merge_provider)  # type: ignore
+        if provider is None:
+            new_context['provider'] = rpc.resolve_provider(merge_provider)
+        else:
+            provider = rpc.resolve_provider(provider)
+            new_context['provider'] = dict(provider, **merge_provider)  # type: ignore
 
     if cache is not None:
         cache_rules = context_caches._extract_context_cache_rules(

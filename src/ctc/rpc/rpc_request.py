@@ -32,6 +32,8 @@ async def async_send(
     from ctc import config
 
     provider = config.get_context_provider(context)
+    if provider is None:
+        raise Exception('no provider available for given context')
 
     try:
         logging_rpc_calls = config.get_log_rpc_calls()

@@ -35,14 +35,9 @@ async def async_chainlink_ls_command(
     query: str, network: str | int | None
 ) -> None:
 
-    if network is None:
-        network = config.get_default_network()
-    if isinstance(network, str) and network.isnumeric():
-        network = int(network)
+    context = config.create_user_input_context(network=network)
 
-    oracle_feeds = await chainlink_db.async_query_feeds(
-        context=dict(network=network)
-    )
+    oracle_feeds = await chainlink_db.async_query_feeds(context=context)
     if oracle_feeds is None:
         return
     rows = []
@@ -60,12 +55,7 @@ async def async_chainlink_ls_command(
         rows.append(row)
     labels = ['name', 'delta', 'rate', 'address']
     styles = cli.get_cli_styles()
-    if network is None:
-        network_name = None
-    else:
-        network_name = evm.get_network_name(network)
-    if network_name is None:
-        network_name = 'Unknown Network'
+    network_name = evm.get_network_name(config.get_context_chain_id(context))
     toolstr.print_text_box(
         'Chainlink feeds on ' + network_name.title(),
         style=styles['title'],
