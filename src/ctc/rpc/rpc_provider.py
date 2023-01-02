@@ -9,21 +9,30 @@ from ctc import evm
 from ctc import spec
 
 
-def resolve_provider(provider: spec.ProviderReference) -> spec.Provider:
+def resolve_provider(
+    provider: spec.ProviderReference,
+    other_providers: typing.Mapping[str, spec.Provider] | None = None,
+) -> spec.Provider:
     """try to lookup existing provider, and if it does not exist, create one"""
     if isinstance(provider, str):
+        if other_providers is not None:
+            candidates = list(other_providers.values())
+        else:
+            candidates = list(config.get_providers().values())
         try:
             # try provider name
-            return find_provider(name=provider)
+            return find_provider(name=provider, candidates=candidates)
         except LookupError:
             try:
                 # try provider url
-                return find_provider(url=provider)
+                return find_provider(url=provider, candidates=candidates)
             except LookupError:
                 # create new provider
-                return create_provider(url=provider)
+                return create_provider(
+                    url=provider, other_providers=other_providers
+                )
     elif isinstance(provider, dict):
-        return create_provider(**provider)
+        return create_provider(other_providers=other_providers, **provider)
     else:
         raise Exception('unknown provider format: ' + str(type(provider)))
 
@@ -38,6 +47,7 @@ def create_provider(
     chunk_size: int | None = None,
     convert_reverts_to_none: bool = True,
     validate_chain_id: bool = True,
+    other_providers: typing.Mapping[str, spec.Provider] | None = None,
 ) -> spec.Provider:
     """create provider"""
 
@@ -81,17 +91,24 @@ def create_provider(
             raise Exception('provider network does not match given network')
 
     # name
-    other_providers = config.get_providers()
+    if other_providers is None:
+        other_providers = config.get_providers()
     if name is not None:
         if name in other_providers:
-            raise Exception('provider with this name already exists, simply use provider=<provider_name> in arg or context')
+            raise Exception(
+                'provider with this name already exists, simply use provider=<provider_name> in arg or context'
+            )
     if name is None:
         try:
             name = url.split('://')[1].split('/')[0] + '__' + str(network)
         except Exception:
-            raise Exception('could not determine name for provider, make sure url is formatted properly')
+            raise Exception(
+                'could not determine name for provider, make sure url is formatted properly'
+            )
         if name in other_providers:
-            raise Exception('could not determine unique name for new provider, specify a name argument')
+            raise Exception(
+                'could not determine unique name for new provider, specify a name argument'
+            )
 
     # protocol
     if protocol is None:
@@ -116,8 +133,6 @@ def create_provider(
         'chunk_size': chunk_size,
         'convert_reverts_to_none': convert_reverts_to_none,
     }
-
-    config.config_validate.validate_provider(provider, config.get_config())
 
     return provider
 
@@ -265,7 +280,7 @@ def _sync_get_chain_id(provider_url: str) -> int:
             'Content-Type': 'application/json',
         },
     )
-    response = urllib.request.urlopen(request)
+    response = urllib.request.urlopen(request, timeout=5)
     response_data = json.loads(response.read().decode())
     raw_chain_id = response_data['result']
     return evm.binary_convert(raw_chain_id, 'integer')

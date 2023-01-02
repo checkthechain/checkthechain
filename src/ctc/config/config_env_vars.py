@@ -49,11 +49,13 @@ def parse_env_network_and_provider(
             env_provider_chain_id = config['providers'][env_provider]['network']
         else:
             for provider_name, provider in config['providers'].items():
+                # if env_provider already in config, use it
                 if provider['url'] == env_provider:
                     env_provider_name = provider_name
                     env_provider_chain_id = provider['network']
                     break
             else:
+                # if env_provider not in config, make new provider
                 from ctc import rpc
 
                 if env_provider.startswith('{'):
@@ -64,9 +66,13 @@ def parse_env_network_and_provider(
                     provider_shorthand = {'url': env_provider}
 
                 try:
-                    provider = rpc.resolve_provider(provider_shorthand)
+                    provider = rpc.resolve_provider(
+                        provider_shorthand,
+                        other_providers=config.get('providers'),
+                    )
                     env_provider_name = provider['name']
                     env_provider_chain_id = provider['network']
+                    config['providers'][env_provider_name] = provider
 
                 except LookupError:
                     import warnings

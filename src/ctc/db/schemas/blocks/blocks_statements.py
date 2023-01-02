@@ -8,7 +8,17 @@ from ctc import spec
 from ... import schema_utils
 
 
-def _remove_block_transactions(block: spec.Block) -> spec.Block:
+def _prepare_block_for_db(block: spec.Block) -> spec.Block:
+
+    # remove extra keys
+    extra_keys = ['send_root', 'l1_block_number', 'send_count']
+    if any(key in block for key in extra_keys):
+        block = block.copy()
+        for key in extra_keys:
+            if key in block:
+                del block[key]  # type: ignore
+
+    # remove transactions
     txs = block['transactions']
     if len(txs) > 0 and isinstance(txs[0], dict):
         if typing.TYPE_CHECKING:
@@ -29,7 +39,7 @@ async def async_upsert_block(
 ) -> None:
 
     table = schema_utils.get_table_name('blocks', context=context)
-    block = _remove_block_transactions(block)
+    block = _prepare_block_for_db(block)
     toolsql.insert(
         conn=conn,
         table=table,
@@ -46,7 +56,7 @@ async def async_upsert_blocks(
 ) -> None:
 
     table = schema_utils.get_table_name('blocks', context=context)
-    blocks = [_remove_block_transactions(block) for block in blocks]
+    blocks = [_prepare_block_for_db(block) for block in blocks]
     toolsql.insert(
         conn=conn,
         table=table,
