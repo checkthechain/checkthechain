@@ -41,6 +41,11 @@ def get_schema_version(
         chain_id = config.get_context_chain_id(context)
 
     if conn is None:
+        if db_config is None:
+            db_config = config.get_context_db_config(
+                schema_name='schema_versions',
+                context=context,
+            )
         engine = _get_schema_version_engine(db_config=db_config)
         with engine.begin() as conn:
             result = toolsql.select(
@@ -66,14 +71,10 @@ def get_schema_version(
     return result
 
 
-def _get_schema_version_engine(
-    db_config: toolsql.DBConfig | None = None,
-) -> toolsql.SAEngine:
+def _get_schema_version_engine(db_config: toolsql.DBConfig) -> toolsql.SAEngine:
     lock = typing.cast(threading.Lock, _schema_version_cache['lock'])
     with lock:
         if _schema_version_cache.get('engine') is None:
-            if db_config is None:
-                db_config = config.get_db_config()
             _schema_version_cache['engine'] = toolsql.create_engine(
                 db_config=db_config
             )

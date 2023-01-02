@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import os
-import typing
 
 import toolsql
 
 from ctc import config
 from ctc import spec
-
 from .management import dba_utils
 from .management import version_utils
 
@@ -23,21 +21,9 @@ def create_engine(
     network = config.get_context_chain_id(context)
 
     # get db config
-    data_source: spec.DataSource | spec.LeafDataSource = (
-        config.get_data_source(datatype=schema_name, context=context)
+    db_config = config.get_context_db_config(
+        context=context, schema_name=schema_name
     )
-    if data_source['backend'] == 'hybrid':
-        if typing.TYPE_CHECKING:
-            data_source = typing.cast(spec.DataSource, data_source)[
-                'hybrid_order'
-            ][0]
-        else:
-            data_source = data_source['hybrid_order'][0]
-    if data_source.get('backend') != 'db' or 'db_config' not in data_source:
-        raise Exception('not using database for this type of data')
-    db_config = data_source['db_config']
-    if db_config is None:
-        raise Exception('invalid db_config')
 
     # create directory if need be
     if db_config['dbms'] == 'sqlite':
@@ -70,3 +56,4 @@ def create_engine(
                 )
 
     return engine
+

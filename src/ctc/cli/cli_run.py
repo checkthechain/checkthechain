@@ -175,7 +175,9 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
     },
 }
 
-command_index: typing.MutableMapping[toolcli.CommandSequence, toolcli.CommandSpecReference] = {}
+command_index: typing.MutableMapping[
+    toolcli.CommandSequence, toolcli.CommandSpecReference
+] = {}
 help_subcommand_categories = {}
 for category, category_command_index in command_index_by_category.items():
     command_index.update(category_command_index)
@@ -260,7 +262,13 @@ else:
 def _db_config_getter() -> toolsql.DBConfig | None:
     import ctc.config
 
-    return ctc.config.get_db_config()
+    import warnings
+
+    warnings.warn('full context not given for db_config')
+
+    return ctc.config.get_context_db_config(
+        context={}, schema_name='schema_versions'
+    )
 
 
 # def _is_root_help(raw_command):
@@ -358,3 +366,4 @@ def run_cli(
         command_index=command_index,
         **toolcli_kwargs,
     )
+

@@ -131,39 +131,11 @@ def get_context_cache_rules() -> typing.Sequence[spec.ContextCacheRule]:
 # # db
 #
 
-
-@typing.overload
-def get_db_config(
-    *,
-    schema_name: str | None = None,
-    network: spec.NetworkReference | None = None,
-    require: Literal[True],
-) -> 'toolsql.DBConfig':
-    ...
-
-
-@typing.overload
-def get_db_config(
-    *,
-    schema_name: str | None = None,
-    network: spec.NetworkReference | None = None,
-    require: bool = False,
-) -> 'toolsql.DBConfig' | None:
-    ...
-
-
-def get_db_config(
-    *,
-    schema_name: str | None = None,
-    network: spec.NetworkReference | None = None,
-    require: bool = False,
-) -> 'toolsql.DBConfig' | None:
-
-    # for now, use same database for all schema_names and networks
+def get_db_config(backend_name: str) -> toolsql.DBConfig:
     config = config_read.get_config()
-    db_config = config.get('db_configs', {}).get('main')
-    if require and db_config is None:
-        raise Exception('db not configured')
+    db_config = config['db_configs'].get(backend_name)
+    if db_config is None:
+        raise Exception('no valid db_config for ' + str(backend_name))
     return db_config
 
 

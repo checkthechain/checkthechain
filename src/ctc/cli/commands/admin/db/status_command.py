@@ -32,7 +32,10 @@ def status_command(verbose: bool) -> None:
 
     toolstr.print_text_box('Database Status', style=styles['title'])
     print()
-    db_config = config.get_db_config()
+    context: spec.Context = {}
+    db_config = config.get_context_db_config(
+        context=context, schema_name='schema_versions'
+    )
     if db_config is None:
         print('[no db configured]')
         return
@@ -140,3 +143,4 @@ def status_command(verbose: bool) -> None:
     else:
         toolstr.print_text_box('Schema Summary', style=styles['title'])
         print('- db does not exist')
+

@@ -1,12 +1,41 @@
 from __future__ import annotations
 
 import typing
+if typing.TYPE_CHECKING:
+    import toolsql
 
 from ctc import spec
+from .. import config_values
 from . import context_sources
 
 
+def get_context_cache_backend(
+    *,
+    schema_name: spec.db_types.SchemaName,
+    context: spec.Context,
+) -> str | None:
+    backend, _read, _write = _get_context_cache_settings(
+        schema_name=schema_name,
+        context=context,
+    )
+    return backend
+
+
+def get_context_db_config(
+    *,
+    schema_name: spec.db_types.SchemaName,
+    context: spec.Context,
+) -> toolsql.DBConfig:
+    backend = get_context_cache_backend(
+        schema_name=schema_name, context=context
+    )
+    if backend is None:
+        raise Exception('no backend active for current context, cannot retrieve db_config')
+    return config_values.get_db_config(backend)
+
+
 def get_context_cache_read_write(
+    *,
     schema_name: spec.db_types.SchemaName,
     context: spec.Context,
 ) -> tuple[bool, bool]:

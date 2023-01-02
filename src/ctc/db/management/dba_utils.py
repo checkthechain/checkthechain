@@ -58,10 +58,9 @@ def create_missing_tables(
 
     # using single db config for all schemas
     if db_config is None:
-        db_config = config.get_db_config(
+        db_config = config.get_context_db_config(
             schema_name='schema_versions',
-            network=None,
-            require=True,
+            context={},
         )
 
     # get missing tables
