@@ -3,6 +3,7 @@ CHANGELOG.md
 ROADMAP.md
 TODO.md
 pytestdebug.log
+tuna.log
 
 # filetypes
 *.egg-info
@@ -10,13 +11,11 @@ pytestdebug.log
 
 # folders
 */.hypothesis
-.coverage
 .coverage_html/*
 .hypothesis/
 .tox/*
 __pycache__/*
 build/*
 dist/*
-notebooks
 notebooks/*
-tuna.log
+roadmap/*
