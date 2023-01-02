@@ -20,6 +20,7 @@ async def async_get_pool_trades(
     end_time: tooltime.Timestamp | None = None,
     label: Literal['index', 'symbol', 'address'] = 'index',
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
 
     return await uniswap_v2_utils.async_get_pool_swaps(
@@ -30,4 +31,5 @@ async def async_get_pool_trades(
         end_time=end_time,
         label=label,
         normalize=normalize,
+        context=context,
     )

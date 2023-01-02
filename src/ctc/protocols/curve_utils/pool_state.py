@@ -106,8 +106,8 @@ async def async_get_trade(
     amount_in: typing.Union[int, float],
     input_normalized: bool = True,
     normalize_output: bool = True,
-    context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
 ) -> typing.Union[int, float]:
 
     # get metadata
@@ -119,11 +119,13 @@ async def async_get_trade(
         pool=pool,
         token=token_in,
         metadata=metadata,
+        context=context,
     )
     out_index = await pool_metadata.async_get_token_index(
         pool=pool,
         token=token_out,
         metadata=metadata,
+        context=context,
     )
 
     # denormalize input
@@ -139,8 +141,8 @@ async def async_get_trade(
             out_index,
             amount_in,
         ],
-        context=context,
         block_number=block,
+        context=context,
     )
 
     # normalize output

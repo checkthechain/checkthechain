@@ -11,11 +11,13 @@ async def async_get_safe_owners(
     address: spec.Address,
     *,
     block: spec.BlockReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.Address]:
     result = await rpc.async_eth_call(
         to_address=address,
         function_abi=safe_spec.function_abis['getOwners'],
         block_number=block,
+        context=context,
     )
     if not isinstance(result, (tuple, list)) or not all(
         isinstance(item, str) for item in result
@@ -28,11 +30,13 @@ async def async_get_safe_threshold(
     address: spec.Address,
     *,
     block: spec.BlockReference | None = None,
+    context: spec.Context = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=address,
         function_abi=safe_spec.function_abis['getThreshold'],
         block_number=block,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -43,11 +47,13 @@ async def async_get_safe_nonce(
     address: spec.Address,
     *,
     block: spec.BlockReference | None = None,
+    context: spec.Context = None,
 ) -> int:
     result = await rpc.async_eth_call(
         to_address=address,
         function_abi=safe_spec.function_abis['nonce'],
         block_number=block,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')

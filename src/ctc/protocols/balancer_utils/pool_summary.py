@@ -32,25 +32,31 @@ class BalancerPoolState(TypedDict):
 async def async_summarize_pool_state(
     pool_address: spec.Address,
     block: spec.BlockNumberReference = 'latest',
+    *,
+    context: spec.Context = None,
 ) -> BalancerPoolState:
 
-    block = await evm.async_block_number_to_int(block)
+    block = await evm.async_block_number_to_int(block, context=context)
 
     pool_tokens_coroutine = await pool_metadata.async_get_pool_tokens(
         pool_address=pool_address,
         block=block,
+        context=context,
     )
     pool_fees_coroutine = await pool_state.async_get_pool_fees(
         pool_address=pool_address,
         block=block,
+        context=context,
     )
     pool_weights_coroutine = await pool_state.async_get_pool_weights(
         pool_address=pool_address,
         block=block,
+        context=context,
     )
     pool_balances_coroutine = await pool_state.async_get_pool_balances(
         pool_address=pool_address,
         block=block,
+        context=context,
     )
 
     return {
@@ -70,6 +76,7 @@ async def async_get_pool_swaps(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
 
     event_abi: spec.EventABI = {
@@ -118,10 +125,13 @@ async def async_get_pool_swaps(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
+        context=context,
     )
 
     if start_block is None:
-        start_block = await evm.async_get_contract_creation_block(vault)
+        start_block = await evm.async_get_contract_creation_block(
+            vault, context=context
+        )
 
     swaps = await evm.async_get_events(
         contract_address=vault,
@@ -130,6 +140,7 @@ async def async_get_pool_swaps(
         end_block=end_block,
         include_timestamps=include_timestamps,
         verbose=False,
+        context=context,
     )
 
     if pool_address is not None:
@@ -198,3 +209,4 @@ def summarize_pool_swaps(
         pair_data[(token_in, token_out)] = df
 
     return pair_data
+

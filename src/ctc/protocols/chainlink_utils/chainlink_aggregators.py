@@ -38,6 +38,7 @@ async def async_get_aggregator_description(
 
 async def async_get_aggregator_base_quote(
     aggregator: spec.Address,
+    *,
     context: spec.Context = None,
 ) -> dict[str, str]:
     description = await async_get_aggregator_description(
@@ -202,6 +203,7 @@ async def _async_aggregator_transition(
 
 async def async_get_feed_previous_aggregators(
     feed: str,
+    *,
     context: spec.Context = None,
 ) -> list[spec.Address]:
 

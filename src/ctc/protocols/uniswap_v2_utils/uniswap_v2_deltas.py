@@ -20,6 +20,7 @@ async def async_get_pool_log_deltas(
     end_time: tooltime.Timestamp | None = None,
     normalize: bool = True,
     include_initial_state: bool = True,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
     import pandas as pd
@@ -31,9 +32,12 @@ async def async_get_pool_log_deltas(
         start_time=start_time,
         end_time=end_time,
         allow_none=True,
+        context=context,
     )
     if start_block is None:
-        start_block = await evm.async_get_contract_creation_block(pool)
+        start_block = await evm.async_get_contract_creation_block(
+            pool, context=context
+        )
         initial_point_task = None
     else:
         if include_initial_state:
@@ -41,6 +45,7 @@ async def async_get_pool_log_deltas(
                 pool,
                 block=start_block,
                 normalize=normalize,
+                context=context,
             )
             initial_point_task = asyncio.create_task(coroutine)
         else:
@@ -52,18 +57,21 @@ async def async_get_pool_log_deltas(
         start_block=start_block,
         end_block=end_block,
         normalize=normalize,
+        context=context,
     )
     burns_task = uniswap_v2_events.async_get_pool_burns(
         pool,
         start_block=start_block,
         end_block=end_block,
         normalize=normalize,
+        context=context,
     )
     swaps_task = uniswap_v2_events.async_get_pool_swaps(
         pool,
         start_block=start_block,
         end_block=end_block,
         normalize=normalize,
+        context=context,
     )
     mints, burns, swaps = await asyncio.gather(
         mints_task, burns_task, swaps_task
@@ -115,13 +123,17 @@ async def async_get_pool_log_deltas(
 async def async_get_pool_transaction_deltas(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
+    *,
+    context: spec.Context = None,
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
-        log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
+        log_deltas = await async_get_pool_log_deltas(
+            pool, context=context, **log_delta_kwargs
+        )
 
     transaction_deltas: spec.DataFrame = log_deltas.groupby(
         ['block_number', 'transaction_index']
@@ -133,13 +145,17 @@ async def async_get_pool_transaction_deltas(
 async def async_get_pool_block_deltas(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
+    *,
+    context: spec.Context = None,
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
-        log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
+        log_deltas = await async_get_pool_log_deltas(
+            pool, context=context, **log_delta_kwargs
+        )
 
     block_deltas: spec.DataFrame = log_deltas.groupby(['block_number']).sum()
 
@@ -149,13 +165,17 @@ async def async_get_pool_block_deltas(
 async def async_get_pool_state_per_log(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
+    *,
+    context: spec.Context = None,
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
-        log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
+        log_deltas = await async_get_pool_log_deltas(
+            pool, context=context, **log_delta_kwargs
+        )
 
     state_per_log: spec.DataFrame = log_deltas[
         ['delta_token0', 'delta_token1']
@@ -170,16 +190,20 @@ async def async_get_pool_state_per_log(
 async def async_get_pool_state_per_transaction(
     pool: typing.Optional[spec.Address] = None,
     log_deltas: typing.Optional[spec.DataFrame] = None,
+    *,
+    context: spec.Context = None,
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
-        log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
+        log_deltas = await async_get_pool_log_deltas(
+            pool, context=context, **log_delta_kwargs
+        )
 
     transaction_deltas = await async_get_pool_transaction_deltas(
-        log_deltas=log_deltas, **log_delta_kwargs
+        log_deltas=log_deltas, context=context, **log_delta_kwargs
     )
 
     state_per_transaction: spec.DataFrame = transaction_deltas[
@@ -197,16 +221,19 @@ async def async_integrate_pool_deltas(
     *,
     interpolate: bool = False,
     log_deltas: typing.Optional[spec.DataFrame] = None,
+    context: spec.Context = None,
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
-        log_deltas = await async_get_pool_log_deltas(pool, **log_delta_kwargs)
+        log_deltas = await async_get_pool_log_deltas(
+            pool, context=context, **log_delta_kwargs
+        )
 
     block_deltas = await async_get_pool_block_deltas(
-        log_deltas=log_deltas, **log_delta_kwargs
+        log_deltas=log_deltas, context=context, **log_delta_kwargs
     )
 
     state_per_block: spec.DataFrame = block_deltas[
@@ -227,3 +254,4 @@ async def async_integrate_pool_deltas(
 def _put_price_in_state(state: spec.DataFrame) -> None:
     state['price_0_per_1'] = state['token0_reserves'] / state['token1_reserves']
     state['price_1_per_0'] = state['token1_reserves'] / state['token0_reserves']
+

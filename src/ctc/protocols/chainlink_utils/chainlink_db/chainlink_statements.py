@@ -123,12 +123,12 @@ async def async_select_feed(
 
 async def async_select_feeds(
     *,
-    context: spec.Context = None,
     conn: toolsql.SAConnection,
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,
     addresses: typing.Sequence[str] | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[chainlink_schema_defs.ChainlinkFeed | None] | None:
 
     table = db.get_table_name('chainlink_feeds', context=context)
@@ -160,11 +160,11 @@ async def async_select_feeds(
 
 async def async_select_aggregator_updates(
     *,
+    conn: toolsql.SAConnection,
     feed: spec.Address,
     aggregator: spec.Address | None = None,
     block_number: int | None = None,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
 ) -> typing.Sequence[chainlink_schema_defs._FeedAggregatorUpdate] | None:
 
     table = db.get_table_name('chainlink_aggregator_updates', context=context)
@@ -196,10 +196,10 @@ async def async_select_aggregator_updates(
 async def async_delete_feed(
     conn: toolsql.SAConnection,
     *,
-    context: spec.Context = None,
     address: spec.Address | None = None,
     name: str | None = None,
     asset: str | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     where_equals = {
@@ -225,10 +225,10 @@ async def async_delete_feed(
 async def async_delete_aggregator_updates(
     conn: toolsql.SAConnection,
     *,
-    context: spec.Context = None,
     feed: spec.Address,
     aggregator: spec.Address,
     block_number: int,
+    context: spec.Context = None,
 ) -> None:
 
     where_equals = {

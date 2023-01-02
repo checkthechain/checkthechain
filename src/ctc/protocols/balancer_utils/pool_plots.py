@@ -18,6 +18,7 @@ async def async_plot_lbp_summary(
     price_range: typing.Sequence[int | float] | None = None,
     premium_range: typing.Sequence[int | float] | None = None,
     oracle_data: spec.DataFrame | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     summary = pool_summary.summarize_pool_swaps(swaps=swaps, weights=weights)
@@ -26,7 +27,9 @@ async def async_plot_lbp_summary(
 
         blocks = summary[pair].index.get_level_values('block_number')
 
-        token_0, token_1 = await evm.async_get_erc20s_symbols(pool_tokens)
+        token_0, token_1 = await evm.async_get_erc20s_symbols(
+            pool_tokens, context=context
+        )
         in_address, out_address = pair
         if in_address == pool_tokens[0]:
             in_token = token_0
@@ -122,3 +125,4 @@ async def async_plot_lbp_summary(
         import toolplot  # type: ignore
 
         toolplot.plot_subplots(plot_data)
+

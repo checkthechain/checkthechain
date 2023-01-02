@@ -22,7 +22,9 @@ async def async_get_feed_answer_datum_by_block(
     import pandas as pd
     from ctc.toolbox import pd_utils
 
-    int_blocks = await evm.async_block_numbers_to_int(blocks=blocks, context=context)
+    int_blocks = await evm.async_block_numbers_to_int(
+        blocks=blocks, context=context
+    )
 
     # query data
     coroutines = []
@@ -64,7 +66,9 @@ async def async_get_feed_full_datum_by_block(
     import pandas as pd
     from ctc.toolbox import pd_utils
 
-    int_blocks = await evm.async_block_numbers_to_int(blocks=blocks, context=context)
+    int_blocks = await evm.async_block_numbers_to_int(
+        blocks=blocks, context=context
+    )
 
     # query data
     coroutines = []
@@ -88,3 +92,4 @@ async def async_get_feed_full_datum_by_block(
         df = pd_utils.interpolate_dataframe(df=df)
 
     return df
+

@@ -112,11 +112,13 @@ async def async_get_reserves_data(
     *,
     reserves_list: typing.Sequence[spec.Address] | None = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[AaveV2ReserveData]:
 
     if reserves_list is None:
         reserves_list = await aave_pool_tokens.async_get_reserves_list(
-            block=block
+            block=block,
+            context=context,
         )
 
     results = await rpc.async_batch_eth_call(
@@ -124,6 +126,7 @@ async def async_get_reserves_data(
         function_name='getReserveData',
         function_parameter_list=[[asset] for asset in reserves_list],
         block_number=block,
+        context=context,
     )
 
     return [
@@ -149,18 +152,21 @@ async def async_get_token_markets(
     *,
     reserves_list: typing.Sequence[spec.Address] | None = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[AaveV2TokenMarket]:
 
     if reserves_list is None:
         reserves_list = await aave_pool_tokens.async_get_reserves_list(
-            block=block
+            block=block, context=context
         )
 
     reserves_data_task = asyncio.create_task(
-        async_get_reserves_data(reserves_list=reserves_list, block=block)
+        async_get_reserves_data(
+            reserves_list=reserves_list, block=block, context=context
+        )
     )
     symbols_task = asyncio.create_task(
-        evm.async_get_erc20s_symbols(reserves_list)
+        evm.async_get_erc20s_symbols(reserves_list, context=context)
     )
 
     reserves_data = await reserves_data_task
@@ -182,12 +188,15 @@ async def async_get_interest_rates(
     token: spec.Address | None = None,
     block: spec.BlockNumberReference | None = None,
     reserve_data: AaveV2ReserveData | None = None,
+    context: spec.Context = None,
 ) -> dict[str, float]:
 
     if reserve_data is None:
         if token is None:
             raise Exception('must specify token or reserve_data')
-        reserve_data = await async_get_reserve_data(asset=token, block=block)
+        reserve_data = await async_get_reserve_data(
+            asset=token, block=block, context=context
+        )
 
     supply_apr = reserve_data['current_liquidity_rate'] / ray
     supply_apy = (1 + supply_apr / seconds_per_year) ** seconds_per_year - 1
@@ -207,12 +216,13 @@ async def async_get_interest_rates_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     reserve_data_by_block: AaveV2ReserveListData | None = None,
+    context: spec.Context = None,
 ) -> dict[str, list[float]]:
     import numpy as np
 
     if reserve_data_by_block is None:
         reserve_data_by_block = await async_get_reserve_data_by_block(
-            asset=token, blocks=blocks
+            asset=token, blocks=blocks, context=context
         )
 
     currrent_liquidity_rate: spec.NumpyArray = np.array(

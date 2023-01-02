@@ -328,12 +328,69 @@ def iterate_package_classes(prefix, include_methods=True):
     return classes
 
 
-def test_async_functions_take_context():
-    modules = [ctc, ctc.db, ctc.rpc]
-    exceptions = [
+def _get_tested_modules():
+    from ctc.protocols import (
+        aave_v2_utils,
+        balancer_utils,
+        chainlink_utils,
+        coingecko_utils,
+        compound_utils,
+        curve_utils,
+        ens_utils,
+        etherscan_utils,
+        fei_utils,
+        fourbyte_utils,
+        g_uni_utils,
+        gnosis_utils,
+        llama_utils,
+        multicall_utils,
+        rari_utils,
+        sushi_utils,
+        uniswap_v2_utils,
+        uniswap_v3_utils,
+        yearn_utils,
+    )
+
+    return [
+        ctc,
+        ctc.db,
+        ctc.rpc,
+        aave_v2_utils,
+        balancer_utils,
+        chainlink_utils,
+        coingecko_utils,
+        compound_utils,
+        curve_utils,
+        ens_utils,
+        etherscan_utils,
+        fei_utils,
+        fourbyte_utils,
+        g_uni_utils,
+        gnosis_utils,
+        llama_utils,
+        multicall_utils,
+        rari_utils,
+        sushi_utils,
+        uniswap_v2_utils,
+        uniswap_v3_utils,
+        yearn_utils,
+    ]
+
+
+def _get_take_context_exceptions():
+    from ctc.protocols import uniswap_v3_utils
+
+    return [
         (ctc.rpc, 'async_send_raw'),
         (ctc.rpc, 'async_close_http_session'),
+        (uniswap_v3_utils, 'async_get_function_abi'),
+        (uniswap_v3_utils, 'async_get_event_abi'),
     ]
+
+
+def test_async_functions_take_context():
+    modules = _get_tested_modules()
+    exceptions = _get_take_context_exceptions()
 
     failures = []
     for module in modules:
@@ -344,6 +401,15 @@ def test_async_functions_take_context():
 
                 # try exception list first
                 if module == ctc.rpc and name.startswith('async_batch_'):
+                    continue
+                elif module.__name__ in (
+                    'ctc.protocols.coingecko_utils',
+                    'ctc.protocols.fei_utils',
+                    'ctc.protocols.fourbyte_utils',
+                    'ctc.protocols.llama_utils',
+                    'ctc.protocols.rari_utils',
+                    'ctc.protocols.yearn_utils',
+                ):
                     continue
                 elif (module, name) in exceptions:
                     continue
@@ -353,7 +419,7 @@ def test_async_functions_take_context():
                     'context' not in argspec.args
                     and 'context' not in argspec.kwonlyargs
                 ):
-                    failures.append(name)
+                    failures.append(value.__module__ + '.' + name)
     if len(failures) > 0:
         raise Exception(
             str(len(failures))
@@ -362,14 +428,18 @@ def test_async_functions_take_context():
         )
 
 
-def test_async_functions_take_kw_only_context():
-    modules = [ctc, ctc.db, ctc.rpc]
-    exceptions = [
+def _get_take_kw_only_context_exceptions():
+    return [
         (ctc.rpc, 'async_send_raw'),
         (ctc.rpc, 'async_close_http_session'),
         (ctc, 'async_get_latest_block_number'),
         (ctc, 'async_get_default_erc20_tokens'),
     ]
+
+
+def test_async_functions_take_kw_only_context():
+    modules = _get_tested_modules()
+    exceptions = _get_take_kw_only_context_exceptions()
 
     failures = []
     for module in modules:
@@ -381,14 +451,20 @@ def test_async_functions_take_kw_only_context():
                 # try exception list first
                 if module == ctc.rpc and name.startswith('async_batch_'):
                     continue
+                elif module.__name__ in (
+                    'ctc.protocols.coingecko_utils',
+                    'ctc.protocols.fei_utils',
+                    'ctc.protocols.fourbyte_utils',
+                    'ctc.protocols.llama_utils',
+                    'ctc.protocols.rari_utils',
+                ):
+                    continue
                 elif (module, name) in exceptions:
                     continue
 
                 argspec = inspect.getfullargspec(value)
-                if (
-                    'context' in argspec.args
-                ):
-                    failures.append(name)
+                if 'context' in argspec.args:
+                    failures.append(value.__module__ + '.' + name)
     if len(failures) > 0:
         raise Exception(
             str(len(failures))

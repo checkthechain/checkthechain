@@ -110,7 +110,10 @@ async def async_reverse_lookup(
     return output
 
 
-async def async_name_history() -> None:
+async def async_name_history(
+    *,
+    context: spec.Context = None,
+) -> None:
     raise NotImplementedError()
 
 
@@ -260,6 +263,7 @@ async def async_get_content_hash(
 
 async def async_get_expiration(
     name: str,
+    *,
     context: spec.Context = None,
 ) -> int:
 

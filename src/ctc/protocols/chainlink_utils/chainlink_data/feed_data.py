@@ -92,23 +92,23 @@ async def async_get_feed_data(
             return (
                 await feed_datum_by_block.async_get_feed_answer_datum_by_block(
                     feed,
-                    context=context,
                     blocks=blocks,
                     normalize=normalize,
                     interpolate=interpolate,
                     invert=invert,
+                    context=context,
                 )
             )
 
         else:
             return await feed_events.async_get_answer_feed_event_data(
                 feed,
-                context=context,
                 normalize=normalize,
                 start_block=start_block,
                 end_block=end_block,
                 interpolate=interpolate,
                 invert=invert,
+                context=context,
             )
 
     elif fields == 'full':
@@ -116,22 +116,22 @@ async def async_get_feed_data(
         if blocks is not None:
             return await feed_datum_by_block.async_get_feed_full_datum_by_block(
                 feed,
-                context=context,
                 blocks=blocks,
                 normalize=normalize,
                 interpolate=interpolate,
                 invert=invert,
+                context=context,
             )
 
         else:
             return await feed_events.async_get_full_feed_event_data(
                 feed,
-                context=context,
                 normalize=normalize,
                 start_block=start_block,
                 end_block=end_block,
                 interpolate=interpolate,
                 invert=invert,
+                context=context,
             )
 
     else:

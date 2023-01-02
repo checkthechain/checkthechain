@@ -13,18 +13,19 @@ async def async_get_all_safes(
     *,
     start_block: spec.BlockReference | None = None,
     end_block: spec.BlockReference | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[safe_spec.GnosisSafeCreation]:
 
     safes__1_1, safes__1_3 = await asyncio.gather(
-        async_get_all_safes__1_1(start_block=start_block, end_block=end_block),
-        async_get_all_safes__1_3(start_block=start_block, end_block=end_block),
+        async_get_all_safes__1_1(
+            start_block=start_block, end_block=end_block, context=context
+        ),
+        async_get_all_safes__1_3(
+            start_block=start_block, end_block=end_block, context=context
+        ),
     )
 
-    return [
-        item
-        for safes in [safes__1_1, safes__1_3]
-        for item in safes
-    ]
+    return [item for safes in [safes__1_1, safes__1_3] for item in safes]
 
 
 async def async_get_all_safes__1_1(
@@ -128,3 +129,4 @@ async def async_get_all_safes__1_3(
     }
     df = df.rename(columns=new_columns)
     return df.to_dict(orient='records')  # type: ignore
+

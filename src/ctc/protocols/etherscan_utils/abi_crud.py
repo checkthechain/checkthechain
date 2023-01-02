@@ -35,8 +35,8 @@ def set_etherscan_ratelimit(requests_per_second: int | float) -> None:
 
 async def async_get_contract_abi(
     contract_address: spec.Address,
-    context: spec.Context = None,
     *,
+    context: spec.Context = None,
     verbose: bool = True,
 ) -> spec.ContractABI:
     """fetch contract abi using etherscan"""

@@ -10,23 +10,29 @@ from . import yearn_spec
 
 async def async_get_tvl_adapter_assets(
     adapter: spec.Address,
+    *,
+    context: spec.Context = None
 ) -> typing.Sequence[spec.Address]:
 
     addresses: typing.Sequence[spec.Address] = await rpc.async_eth_call(
         to_address=adapter,
         function_name='assetsAddresses',
         n_parameters=0,
+        context=context,
     )
     return addresses
 
 
 async def async_get_tvl_adapter_assets_data(
     adapter: spec.Address,
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[yearn_spec.AssetTvlBreakdown]:
     data = await rpc.async_eth_call(
         to_address=adapter,
         function_name='assetsTvlBreakdown',
         n_parameters=0,
+        context=context,
     )
 
     tvls: typing.Sequence[yearn_spec.AssetTvlBreakdown] = [

@@ -17,7 +17,10 @@ import numpy as np
 
 
 async def async_get_harvests(
-    strategy: spec.Address, include_aprs: bool = True
+    strategy: spec.Address,
+    *,
+    include_aprs: bool = True,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     harvests = await evm.async_get_events(
         contract_address=strategy,
@@ -25,26 +28,34 @@ async def async_get_harvests(
         include_timestamps=True,
         keep_multiindex=False,
         verbose=False,
+        context=context,
     )
     harvests['arg__profit'] = harvests['arg__profit'].map(int)
 
     if include_aprs:
         harvests['apr'] = await async_get_harvest_aprs(
-            strategy=strategy, harvests=harvests
+            strategy=strategy, harvests=harvests, context=context
         )
 
     return harvests
 
 
 async def async_get_harvest_aprs(
-    strategy: spec.Address, harvests: spec.DataFrame | None = None
+    strategy: spec.Address,
+    *,
+    harvests: spec.DataFrame | None = None,
+    context: spec.Context = None,
 ) -> spec.NumpyArray:
 
     if harvests is None:
-        harvests = await async_get_harvests(strategy)
+        harvests = await async_get_harvests(strategy, context=context)
 
-    durations_task = asyncio.create_task(async_get_harvest_durations(harvests))
-    total_debts = await async_get_harvest_total_debts(strategy, harvests)
+    durations_task = asyncio.create_task(
+        async_get_harvest_durations(harvests, context=context)
+    )
+    total_debts = await async_get_harvest_total_debts(
+        strategy, harvests, context=context
+    )
     total_debts = [debt if debt != 0 else float('-inf') for debt in total_debts]
     durations = await durations_task
 
@@ -63,9 +74,11 @@ async def async_get_harvest_aprs(
 
 async def async_get_harvest_durations(
     harvests: spec.DataFrame,
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
     blocks = harvests.index.values
-    timestamps = await evm.async_get_block_timestamps(blocks)  # type: ignore
+    timestamps = await evm.async_get_block_timestamps(blocks, context=context)  # type: ignore
     durations = [float('inf')] + [
         after - before for after, before in zip(timestamps[1:], timestamps[:-1])
     ]
@@ -73,7 +86,10 @@ async def async_get_harvest_durations(
 
 
 async def async_get_harvest_total_debts(
-    strategy: spec.Address, harvests: spec.DataFrame
+    strategy: spec.Address,
+    harvests: spec.DataFrame,
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
 
     function_abi: spec.FunctionABI = {
@@ -94,5 +110,7 @@ async def async_get_harvest_total_debts(
         to_address=strategy,
         function_abi=function_abi,
         block_numbers=harvests.index.values,
+        context=context,
     )
     return [float('inf')] + total_debts[:-1]
+

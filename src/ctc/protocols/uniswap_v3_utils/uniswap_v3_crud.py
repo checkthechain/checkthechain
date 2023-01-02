@@ -29,13 +29,15 @@ class UniswapV3PoolMetadata(TypedDict):
 
 async def async_get_pool_tokens(
     pool_address: spec.Address,
+    *,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> tuple[spec.Address, spec.Address]:
     import asyncio
 
     token0_abi = await uniswap_v3_spec.async_get_function_abi('token0', 'pool')
     token1_abi = await uniswap_v3_spec.async_get_function_abi('token1', 'pool')
-    kwargs = dict(rpc_kwargs, to_address=pool_address)
+    kwargs = dict(rpc_kwargs, to_address=pool_address, context=context)
     return await asyncio.gather(
         rpc.async_eth_call(function_abi=token0_abi, **kwargs),
         rpc.async_eth_call(function_abi=token1_abi, **kwargs),
@@ -44,15 +46,17 @@ async def async_get_pool_tokens(
 
 async def async_get_pool_metadata(
     pool_address: spec.Address,
+    *,
+    context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> UniswapV3PoolMetadata:
     x_address, y_address = await async_get_pool_tokens(
-        pool_address=pool_address
+        pool_address=pool_address, context=context
     )
     x_symbol, y_symbol = await evm.async_get_erc20s_symbols(
-        tokens=[x_address, y_address], **rpc_kwargs
+        tokens=[x_address, y_address], context=context, **rpc_kwargs
     )
-    fee = await contracts.async_pool_fee(pool_address)
+    fee = await contracts.async_pool_fee(pool_address, context=context)
     return {
         'x_symbol': x_symbol,
         'y_symbol': y_symbol,
@@ -77,13 +81,14 @@ async def async_get_pool_swaps(
     include_timestamps: bool = False,
     replace_symbols: bool = False,
     normalize: bool = True,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
 
     import asyncio
 
     if normalize or replace_symbols:
         metadata_task = asyncio.create_task(
-            async_get_pool_metadata(pool_address)
+            async_get_pool_metadata(pool_address, context=context)
         )
 
     event_abi = await uniswap_v3_spec.async_get_event_abi('Swap', 'pool')
@@ -96,6 +101,7 @@ async def async_get_pool_swaps(
         start_time=start_time,
         end_time=end_time,
         include_timestamps=include_timestamps,
+        context=context,
     )
 
     if normalize or replace_symbols:
@@ -118,6 +124,7 @@ async def async_get_pool_swaps(
     if normalize:
         x_decimals, y_decimals = await evm.async_get_erc20s_decimals(
             tokens=[metadata['x_address'], metadata['y_address']],
+            context=context,
         )
         swaps[columns['arg__amount0']] = swaps[columns['arg__amount0']].astype(
             float
@@ -127,3 +134,4 @@ async def async_get_pool_swaps(
         ) / (10**y_decimals)
 
     return swaps
+

@@ -78,8 +78,12 @@ async def async_get_full_feed_event_data(
         )
         aggregator_starts = list(history.values())
         aggregator_ends = [block - 1 for block in aggregator_starts[1:]]
-        start_block = await evm.async_block_number_to_int(start_block, context=context)
-        end_block = await evm.async_block_number_to_int(end_block, context=context)
+        start_block = await evm.async_block_number_to_int(
+            start_block, context=context
+        )
+        end_block = await evm.async_block_number_to_int(
+            end_block, context=context
+        )
         aggregator_ends.append(end_block)
         coroutines = []
         for aggregator, aggregator_start, aggregator_end in zip(
@@ -145,7 +149,9 @@ async def async_get_full_feed_event_data(
 
         # TODO: better detection of initial feed data point
         first_feed_block = (
-            await chainlink_feed_metadata.async_get_feed_first_block(feed)
+            await chainlink_feed_metadata.async_get_feed_first_block(
+                feed, context=context
+            )
         )
         if start_block == first_feed_block:
             pass
@@ -207,3 +213,4 @@ async def async_get_answer_feed_event_data(
     )
 
     return df['answer']
+

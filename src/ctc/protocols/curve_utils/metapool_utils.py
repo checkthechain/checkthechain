@@ -19,10 +19,10 @@ async def async_get_metapool_trade(
     amount_sold: typing.Union[int, float],
     input_normalized: bool = True,
     normalize_output: bool = True,
-    context: spec.Context = None,
     parent_pool: typing.Optional[spec.Address] = None,
     parent_lp: typing.Optional[spec.Address] = None,
     parent_coins: typing.Optional[list[str]] = None,
+    context: spec.Context = None,
 ) -> curve_spec.CurveTrade:
 
     if parent_pool is None and parent_lp is None:
@@ -40,10 +40,10 @@ async def async_get_metapool_trade(
     if token_bought in parent_coins:
 
         sold_index = await pool_metadata.async_get_token_index(
-            pool=metapool, token=token_sold, metadata=metadata
+            pool=metapool, token=token_sold, metadata=metadata, context=context,
         )
         bought_index = await pool_metadata.async_get_token_index(
-            pool=metapool, token=parent_lp, metadata=metadata
+            pool=metapool, token=parent_lp, metadata=metadata, context=context,
         )
 
         if input_normalized:
@@ -101,10 +101,10 @@ async def async_get_metapool_trade(
     elif token_sold in parent_coins:
 
         sold_index = await pool_metadata.async_get_token_index(
-            pool=metapool, token=parent_lp, metadata=metadata
+            pool=metapool, token=parent_lp, metadata=metadata, context=context
         )
         bought_index = await pool_metadata.async_get_token_index(
-            pool=metapool, token=token_bought, metadata=metadata
+            pool=metapool, token=token_bought, metadata=metadata, context=context
         )
 
         raise NotImplementedError()

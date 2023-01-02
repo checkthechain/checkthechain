@@ -5,6 +5,7 @@ from ctc import spec
 
 
 async def async_get_eth_total_supply(
+    *,
     context: spec.Context = None,
 ) -> int | float:
     import aiohttp

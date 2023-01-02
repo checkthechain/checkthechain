@@ -21,6 +21,7 @@ def get_call_contract(call: multicall_spec.Call) -> spec.Address:
 
 async def async_encode_call(
     call: multicall_spec.Call,
+    *,
     context: spec.Context = None,
 ) -> tuple[spec.Address, spec.BinaryData]:
     contract = get_call_contract(call)
@@ -30,6 +31,7 @@ async def async_encode_call(
 
 async def async_encode_call_data(
     call: multicall_spec.Call,
+    *,
     context: spec.Context = None,
 ) -> spec.BinaryData:
 
@@ -83,7 +85,7 @@ async def async_decode_call_output(
     *,
     context: spec.Context = None,
 ) -> typing.Any:
-    function_abi = await async_get_call_function_abi(call)
+    function_abi = await async_get_call_function_abi(call, context=context)
     return evm.decode_function_output(
         encoded_output=encoded_output,
         function_abi=function_abi,
@@ -92,6 +94,7 @@ async def async_decode_call_output(
 
 async def async_get_call_function_abi(
     call: multicall_spec.Call,
+    *,
     context: spec.Context = None,
 ) -> spec.FunctionABI:
 

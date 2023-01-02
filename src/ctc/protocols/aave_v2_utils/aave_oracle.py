@@ -57,10 +57,10 @@ async def async_get_asset_price(
 async def async_get_asset_prices(
     assets: typing.Sequence[spec.Address],
     *,
-    context: spec.Context = None,
     block: spec.BlockNumberReference = 'latest',
     normalize: bool = True,
     units: typing.Literal['usd', 'eth'] = 'usd',
+    context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
 
     oracle = aave_spec.get_aave_address('PriceOracle', context=context)
@@ -77,7 +77,7 @@ async def async_get_asset_prices(
 
     elif units == 'usd':
         eth_usd_coroutine = chainlink_utils.async_get_eth_price(
-            block=block, normalize=True
+            block=block, normalize=True, context=context,
         )
         asset_prices, eth_usd = await asyncio.gather(
             price_coroutine, eth_usd_coroutine
@@ -97,9 +97,9 @@ async def async_get_asset_price_by_block(
     asset: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
-    context: spec.Context = None,
     normalize: bool = True,
     units: typing.Literal['usd', 'eth'] = 'usd',
+    context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
     coroutines = [
         async_get_asset_price(

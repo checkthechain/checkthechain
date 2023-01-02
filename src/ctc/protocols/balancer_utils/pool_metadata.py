@@ -47,6 +47,8 @@ async def async_get_pool_id(
 async def async_get_pool_address(
     pool_id: str,
     block: spec.BlockNumberReference | None = None,
+    *,
+    context: spec.Context = None,
 ) -> spec.Address:
 
     vault = balancer_spec.vault
@@ -56,6 +58,7 @@ async def async_get_pool_address(
         function_abi=balancer_spec.vault_function_abis['getPool'],
         function_parameters=[pool_id],
         block_number=block,
+        context=context,
     )
     address = pool[0]
     if not isinstance(address, str):
@@ -75,7 +78,7 @@ async def async_get_pool_tokens(
     if pool_id is None:
         if pool_address is None:
             raise Exception('must specify pool_id or pool_address')
-        pool_id = await async_get_pool_id(pool_address)
+        pool_id = await async_get_pool_id(pool_address, context=context)
 
     pool_tokens = await rpc.async_eth_call(
         to_address=vault,

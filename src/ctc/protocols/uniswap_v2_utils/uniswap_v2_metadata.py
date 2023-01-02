@@ -9,6 +9,7 @@ from . import uniswap_v2_spec
 
 async def async_get_pool_tokens(
     pool: spec.Address,
+    *,
     context: spec.Context = None,
 ) -> tuple[spec.Address, spec.Address]:
     import asyncio
@@ -71,6 +72,7 @@ async def async_get_pool_decimals(
 
 async def async_get_pool_tokens_metadata(
     pool: spec.Address,
+    *,
     context: spec.Context = None,
 ) -> uniswap_v2_spec.PoolTokensMetadata:
     import asyncio

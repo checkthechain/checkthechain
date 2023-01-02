@@ -12,12 +12,15 @@ days_per_year = 365
 
 async def async_get_supply_apy(
     ctoken: spec.Address,
+    *,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> float:
     result = await rpc.async_eth_call(
         to_address=ctoken,
         function_name='supplyRatePerBlock',
         block_number=block,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -28,12 +31,15 @@ async def async_get_supply_apy(
 
 async def async_get_borrow_apy(
     ctoken: spec.Address,
+    *,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> float:
     result = await rpc.async_eth_call(
         to_address=ctoken,
         function_name='borrowRatePerBlock',
         block_number=block,
+        context=context,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -45,6 +51,8 @@ async def async_get_borrow_apy(
 async def async_get_supply_apy_by_block(
     ctoken: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
+    context: spec.Context = None,
 ) -> list[float]:
 
     import numpy as np
@@ -53,6 +61,7 @@ async def async_get_supply_apy_by_block(
         to_address=ctoken,
         function_name='supplyRatePerBlock',
         block_numbers=blocks,
+        context=context,
     )
     as_array: spec.NumpyArray = np.array(supply_rate_per_block)
     supply_apy = (1 + as_array / 1e18 * blocks_per_day) ** 365 - 1
@@ -62,6 +71,8 @@ async def async_get_supply_apy_by_block(
 async def async_get_borrow_apy_by_block(
     ctoken: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
+    context: spec.Context = None,
 ) -> list[float]:
 
     import numpy as np
@@ -70,6 +81,7 @@ async def async_get_borrow_apy_by_block(
         to_address=ctoken,
         function_name='borrowRatePerBlock',
         block_numbers=blocks,
+        context=context,
     )
     as_array: spec.NumpyArray = np.array(borrow_rate_per_block)
     borrow_apy = (1 + as_array / 1e18 * blocks_per_day) ** 365 - 1

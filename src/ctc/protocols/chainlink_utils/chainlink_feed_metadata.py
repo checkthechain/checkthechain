@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import evm
 from ctc import rpc
 from ctc import spec

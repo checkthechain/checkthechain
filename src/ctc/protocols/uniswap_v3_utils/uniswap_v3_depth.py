@@ -8,6 +8,7 @@ import typing
 
 from ctc.toolbox import optimize_utils
 from ctc import evm
+from ctc import spec
 
 from . import contracts
 
@@ -26,13 +27,18 @@ async def async_get_liquidity_depth(
     max_iterations: int = 50,
     token_in_decimals: int | None = None,
     token_out_decimals: int | None = None,
+    context: spec.Context = None,
 ) -> float:
     """return amount of token sold needed to reach new price"""
 
     if token_in_decimals is None:
-        token_in_decimals = await evm.async_get_erc20_decimals(token_in)
+        token_in_decimals = await evm.async_get_erc20_decimals(
+            token_in, context=context
+        )
     if token_out_decimals is None:
-        token_out_decimals = await evm.async_get_erc20_decimals(token_out)
+        token_out_decimals = await evm.async_get_erc20_decimals(
+            token_out, context=context
+        )
 
     if input_tol is None:
         input_tol = 10 ** (token_in_decimals - 2)
@@ -69,9 +75,10 @@ async def _async_new_price_distance(
     *,
     target_new_price: float,
     swap_kwargs: typing.Any,
+    context: spec.Context = None,
 ) -> float:
     actual_new_price = await async_get_new_price(
-        amount_sold=amount_sold, **swap_kwargs
+        amount_sold=amount_sold, context=context, **swap_kwargs
     )
     return actual_new_price - target_new_price
 
@@ -85,13 +92,14 @@ async def async_get_new_price(
     token_in_decimals: int,
     token_out_decimals: int,
     probe_amount_sold: int | None = None,
+    context: spec.Context = None,
 ) -> float:
     """return new price in pool after a given amount of a token is sold
 
     - does this by computing a trade and an additional probe trade
     """
     if probe_amount_sold is None:
-        probe_amount_sold = 10 ** token_in_decimals
+        probe_amount_sold = 10**token_in_decimals
 
     out_to_in = typing.cast(int, 10 ** (token_in_decimals - token_out_decimals))
 
@@ -104,6 +112,7 @@ async def async_get_new_price(
         fee=fee,
         amount_in=amount_sold,
         sqrt_price_limit_x96=0,
+        context=context,
     )
     probe_amount_bought = await contracts.async_quote_exact_input_single(
         token_in=token_in,
@@ -111,6 +120,7 @@ async def async_get_new_price(
         fee=fee,
         amount_in=total_input_probe,
         sqrt_price_limit_x96=0,
+        context=context,
     )
 
     if not isinstance(bought_amount, int):
@@ -123,3 +133,4 @@ async def async_get_new_price(
     )
 
     return probe_price
+

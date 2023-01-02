@@ -175,7 +175,9 @@ async def async_get_factory_pool_data(
     )
 
     coroutines = [
-        _async_get_pool_data(p, factory, include_balances=include_balances)
+        _async_get_pool_data(
+            p, factory, include_balances=include_balances, context=context
+        )
         for p in range(n_pools)
     ]
 
@@ -260,8 +262,8 @@ async def async_get_base_pools(
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
     factory: spec.Address | None = None,
-    context: spec.Context = None,
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
     import pandas as pd
@@ -449,3 +451,4 @@ async def async_get_meta_pools(
     )
 
     return events
+

@@ -11,8 +11,8 @@ from . import resolver
 async def async_get_owner(
     name: str,
     *,
-    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> str:
     node = resolver.hash_name(name)
     function_abi: spec.FunctionABI = {
@@ -35,8 +35,8 @@ async def async_get_owner(
 async def async_record_exists(
     name: str,
     *,
-    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> bool:
     node = resolver.hash_name(name)
     function_abi: spec.FunctionABI = {
@@ -59,8 +59,8 @@ async def async_record_exists(
 async def async_get_resolver(
     name: str,
     *,
-    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
+    context: spec.Context = None,
 ) -> spec.Address:
     node = resolver.hash_name(name)
     function_abi: spec.FunctionABI = {
@@ -80,7 +80,9 @@ async def async_get_resolver(
     return result
 
 
-async def async_get_registration_block(name: str) -> int:
+async def async_get_registration_block(
+    name: str, *, context: spec.Context = None
+) -> int:
 
     if not name.endswith('.eth'):
         raise NotImplementedError()
@@ -88,7 +90,9 @@ async def async_get_registration_block(name: str) -> int:
     label, *parent = name.split('.')
     parent_node = resolver.hash_name('.'.join(parent))
 
-    registrations: spec.DataFrame = await async_get_registrations()
+    registrations: spec.DataFrame = await async_get_registrations(
+        context=context
+    )
     mask = (registrations['arg__label'] == evm.keccak_text(label)) & (
         registrations['arg__parent_node'] == parent_node
     )
@@ -106,7 +110,10 @@ async def async_get_registration_block(name: str) -> int:
     return block
 
 
-async def async_get_registrations() -> spec.DataFrame:
+async def async_get_registrations(
+    *,
+    context: spec.Context = None,
+) -> spec.DataFrame:
     event_abi: spec.EventABI = {
         'name': 'NewOwner',
         'inputs': [
@@ -133,6 +140,8 @@ async def async_get_registrations() -> spec.DataFrame:
         event_abi=event_abi,
         start_block=9000000,
         verbose=False,
+        context=context,
     )
     new_owners['arg__parent_node'] = new_owners.pop('arg__node')
     return new_owners
+

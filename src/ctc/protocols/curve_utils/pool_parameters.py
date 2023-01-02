@@ -97,7 +97,10 @@ async def async_get_pool_future_A(
     return result
 
 
-async def async_get_pool_ramps() -> spec.DataFrame:
+async def async_get_pool_ramps(
+    *,
+    context: spec.Context = None,
+) -> spec.DataFrame:
     """get Ramp events"""
     raise NotImplementedError()
 

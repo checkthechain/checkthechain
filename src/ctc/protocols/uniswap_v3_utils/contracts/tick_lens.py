@@ -11,6 +11,8 @@ from .. import uniswap_v3_spec
 async def async_get_populated_ticks(
     pool: spec.Address,
     tick_bitmap_index: int,
+    *,
+    context: spec.Context = None,
 ) -> tuple[typing.Mapping[str, int], ...]:
     function_abi = await uniswap_v3_spec.async_get_function_abi(
         'getPopulatedTicksInWord',
@@ -20,6 +22,7 @@ async def async_get_populated_ticks(
         to_address=uniswap_v3_spec.tick_lens,
         function_abi=function_abi,
         function_parameters=[pool, tick_bitmap_index],
+        context=context,
     )
     if not isinstance(result, tuple) or not all(
         isinstance(item, dict) for item in result

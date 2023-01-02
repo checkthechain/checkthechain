@@ -11,6 +11,7 @@ from . import aave_spec
 
 async def async_get_underlying_asset(
     pool_token: spec.Address,
+    *,
     context: spec.Context = None,
 ) -> spec.Address:
     function_abi: spec.FunctionABI = {
@@ -42,8 +43,8 @@ async def async_get_reserves_list(
     reserves: typing.Sequence[spec.Address] = await rpc.async_eth_call(
         to_address=address,
         function_name='getReservesList',
-        context=context,
         block_number=block,
+        context=context,
     )
 
     return reserves

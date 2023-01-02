@@ -6,7 +6,7 @@ import typing
 import toolstr
 import numpy as np
 
-import ctc.config
+from ctc import config
 from ctc import evm
 from ctc import spec
 from . import aave_spec
@@ -19,6 +19,7 @@ async def async_print_aave_addresses(
     verbose: bool = False,
     block: spec.BlockNumberReference | None = None,
     max_width: int | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     from ctc import cli
@@ -29,7 +30,7 @@ async def async_print_aave_addresses(
 
     toolstr.print_text_box('Aave V2 Addresses', style=styles['title'])
 
-    network = 'mainnet'
+    network = config.get_context_chain_id(context)
     toolstr.print('network = ' + str(network), style=styles['comment'])
 
     # print general contracts
@@ -42,9 +43,7 @@ async def async_print_aave_addresses(
     ]
     rows = []
     for contract in contracts:
-        address = aave_spec.get_aave_address(
-            contract, context=dict(network=network)
-        )
+        address = aave_spec.get_aave_address(contract, context=context)
         row = [contract, address]
         rows.append(row)
     print()
@@ -62,7 +61,7 @@ async def async_print_aave_addresses(
 
     # print token markets
     token_markets = await aave_interest_rates.async_get_token_markets(
-        block=block
+        block=block, context=context
     )
 
     print()
@@ -149,6 +148,7 @@ async def async_print_token_markets_summary(
     verbose: bool = False,
     block: spec.BlockNumberReference | None = None,
     max_width: int | None = None,
+    context: spec.Context = None,
 ) -> None:
 
     from ctc import cli
@@ -157,7 +157,7 @@ async def async_print_token_markets_summary(
         block = 'latest'
 
     token_markets = await aave_interest_rates.async_get_token_markets(
-        block=block
+        block=block, context=context
     )
 
     total_supplies_coroutine = evm.async_get_erc20s_total_supplies(
@@ -166,6 +166,7 @@ async def async_print_token_markets_summary(
             for token_market in token_markets
         ],
         block=block,
+        context=context,
     )
     total_supplies_task = asyncio.create_task(total_supplies_coroutine)
 
@@ -173,6 +174,7 @@ async def async_print_token_markets_summary(
         aave_interest_rates.async_get_interest_rates(
             reserve_data=token_market['reserve_data'],
             block=block,
+            context=context,
         )
         for token_market in token_markets
     ]
@@ -182,7 +184,7 @@ async def async_print_token_markets_summary(
         token_market['underlying'] for token_market in token_markets
     ]
     prices_coroutine = aave_oracle.async_get_asset_prices(
-        reserves_list, block=block
+        reserves_list, block=block, context=context
     )
     prices_task = asyncio.create_task(prices_coroutine)
 
@@ -191,6 +193,7 @@ async def async_print_token_markets_summary(
             wallet=token_market['reserve_data']['atoken_address'],
             token=token_market['underlying'],
             block=block,
+            context=context,
         )
         for token_market in token_markets
     ]
@@ -350,10 +353,13 @@ async def async_get_token_market_summary(
     *,
     blocks: typing.Sequence[int],
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> typing.Mapping[str, typing.Any]:
 
     if not evm.is_address_str(token):
-        token_address = await evm.async_get_erc20_address(token)
+        token_address = await evm.async_get_erc20_address(
+            token, context=context
+        )
     else:
         token_address = token
 
@@ -361,7 +367,9 @@ async def async_get_token_market_summary(
         await aave_interest_rates.async_get_reserve_data_by_block(
             asset=token_address,
             blocks=blocks,
-            context=dict(provider={'chunk_size': 1}),
+            context=config.update_context(
+                context, merge_provider={'chunk_size': 1}
+            ),
         )
     )
 
@@ -380,6 +388,7 @@ async def async_get_token_market_summary(
         evm.async_get_erc20_total_supply_by_block(
             atoken_address,
             blocks=blocks,
+            context=context,
         )
     )
 
@@ -389,6 +398,7 @@ async def async_get_token_market_summary(
             wallet=atoken_address,
             token=token,
             blocks=blocks,
+            context=context,
         )
     )
 
@@ -398,6 +408,7 @@ async def async_get_token_market_summary(
         aave_oracle.async_get_asset_price_by_block(
             token_address,
             blocks=blocks,
+            context=context,
         )
     )
 
@@ -434,12 +445,13 @@ async def async_print_token_market_summary(
     *,
     blocks: typing.Sequence[int],
     verbose: bool = False,
+    context: spec.Context = None,
 ) -> None:
 
     from ctc import cli
 
     summary = await async_get_token_market_summary(
-        token=token, blocks=blocks, verbose=verbose
+        token=token, blocks=blocks, verbose=verbose, context=context
     )
     prices_array = summary['prices']
     tvls = summary['tvl']
@@ -449,7 +461,7 @@ async def async_print_token_market_summary(
     utilization = summary['utilization']
 
     timestamps_task = asyncio.create_task(
-        evm.async_get_block_timestamps(blocks)
+        evm.async_get_block_timestamps(blocks, context=context)
     )
 
     styles = cli.get_cli_styles()
@@ -487,7 +499,7 @@ async def async_print_token_market_summary(
             line_style=styles['description'],
             chrome_style=styles['comment'],
             tick_label_style=styles['metavar'],
-            char_dict=ctc.config.get_cli_chart_charset(),
+            char_dict=config.get_cli_chart_charset(),
             **plot_kwargs,  # type: ignore
         )
         toolstr.print(
