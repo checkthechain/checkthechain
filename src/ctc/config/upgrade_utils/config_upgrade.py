@@ -176,6 +176,10 @@ def upgrade__0_3_1__to__0_3_2(
     ]:
         if key not in upgraded:
             upgraded[key] = default_config[key]
+
+    if old_config.get('default_network') is None:
+        old_config['default_network'] = 1
+
     upgraded['config_spec_version'] = '0.3.2'
 
     return upgraded

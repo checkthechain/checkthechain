@@ -41,7 +41,7 @@ async def async_setup_networks(
 
         if default_network is None:
             if len(default_providers) > 0:
-                default_netork = min(default_providers.keys())
+                default_network = min(default_providers.keys())
             else:
                 default_network = 1
         return {
