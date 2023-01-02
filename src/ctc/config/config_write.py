@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from . import config_validate
 
 if typing.TYPE_CHECKING:
     import toolconfig
@@ -17,6 +18,8 @@ def write_config_file(
     headless: bool = False,
 ) -> None:
     import toolconfig
+
+    config_validate.validate_config(config_data)
 
     toolconfig.write_config_file(
         config_data=typing.cast(

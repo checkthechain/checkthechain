@@ -77,7 +77,7 @@ def create_provider(
                 url = https_url
             except Exception:
                 raise Exception(
-                    'provider url does not specify http or https and provider not responding to requests'
+                    'provider url does not specify http or https and provider not responding to requests. make sure the url includes any relevant port numbers and http/https prefixes'
                 )
 
     # network

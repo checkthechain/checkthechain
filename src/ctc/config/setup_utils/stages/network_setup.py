@@ -243,10 +243,12 @@ async def async_collect_provider_metadata(
     if url.startswith('ws://'):
         # TODO: take new input instead of raising exception
         raise NotImplementedError('websockets not supported')
-    elif not url.startswith('https://') and not url.startswith('http://'):
-        print()
-        print('No prefix for url. Adding `https://`')
-        url = 'https://' + url
+    if not (url.startswith('http://') or url.startswith('https://')):
+        check_provider = rpc.resolve_provider(url)
+        if check_provider['url'] != url:
+            print()
+            print('added prefix to url: ' + str(check_provider['url']))
+            url = check_provider['url']
 
     if (
         chain_id is None
@@ -263,19 +265,8 @@ async def async_collect_provider_metadata(
 
     if chain_id is None:
         try:
-            temporary_provider: spec.Provider = {
-                'name': None,
-                'network': -2,
-                'protocol': 'http',
-                'session_kwargs': {},
-                'chunk_size': None,
-                'url': url,
-                'convert_reverts_to_none': False,
-            }
             try:
-                chain_id = await rpc.async_eth_chain_id(
-                    context=dict(provider=temporary_provider),
-                )
+                chain_id = rpc.rpc_provider._sync_get_chain_id(url)
             except Exception:
                 chain_id = toolcli.input_int(
                     'Could not connect to RPC provider. What is this provider\'s chain_id? ',
@@ -337,6 +328,9 @@ async def async_collect_provider_metadata(
 
 
 def create_default_provider_name(url: str, network: int) -> str:
+    if all(c.isnumeric() or c in ['.', ':'] for c in url.split('://')[1]):
+        return url.split('://')[1].split('/')[0] + '__' + str(network)
+
     hostname = urllib.parse.urlparse(url).hostname
     if hostname is not None:
         hostname_pieces = hostname.split('.')
