@@ -134,15 +134,20 @@ async def async_get_erc20_decimals(
     token: spec.ERC20Reference,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    use_db: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> int:
     """get decimals of an erc20"""
 
+    from ctc import config
+
     result: spec.ERC20Metadata | None = None
 
-    if use_db:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='erc20_metadata', context=context
+    )
+
+    if read_cache:
         from ctc import db
 
         token = await async_get_erc20_address(token, context=context)
@@ -163,7 +168,7 @@ async def async_get_erc20_decimals(
         raise Exception('invalid rpc result')
     decimals = decimals_result
 
-    if use_db:
+    if write_cache:
         if result is not None:
             result['decimals'] = decimals
         else:
@@ -220,14 +225,19 @@ async def async_get_erc20_name(
     token: spec.ERC20Reference,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    use_db: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get name of an erc20"""
 
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='erc20_metadata', context=context
+    )
+
     result: spec.ERC20Metadata | None = None
-    if use_db:
+    if read_cache:
         from ctc import db
 
         token = await async_get_erc20_address(token, context=context)
@@ -248,7 +258,7 @@ async def async_get_erc20_name(
         raise Exception('invalid rpc result')
     name = rpc_result
 
-    if use_db:
+    if write_cache:
         if result is not None:
             result['name'] = name
         else:
@@ -320,13 +330,18 @@ async def async_get_erc20_symbol(
     token: spec.ERC20Reference,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    use_db: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get symbol of an erc20"""
 
-    if use_db:
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='erc20_metadata', context=context
+    )
+
+    if read_cache:
         from ctc import db
 
         token = await async_get_erc20_address(token, context=context)
@@ -346,7 +361,7 @@ async def async_get_erc20_symbol(
     )
     symbol = _decode_raw_symbol(symbol_raw)
 
-    if use_db:
+    if write_cache:
         if result is not None:
             result['symbol'] = symbol
         else:

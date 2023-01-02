@@ -20,8 +20,6 @@ async def async_get_block_of_timestamp(
     block_number_array: typing.Optional[spec.NumpyArray] = None,
     verbose: bool = False,
     context: spec.Context = None,
-    use_db: bool = True,
-    use_db_assist: bool = True,
     mode: typing.Literal['<=', '>=', '=='] = '>=',
 ) -> int:
     """search for the block that corresponds to a given timestamp"""
@@ -43,8 +41,13 @@ async def async_get_block_of_timestamp(
         )
     else:
 
+        from ctc import config
+
         # db
-        if use_db:
+        read_cache, write_cache = config.get_context_cache_read_write(
+            schema_name='block_timestamps', context=context
+        )
+        if read_cache:
             from ctc import db
 
             block = await db.async_query_timestamp_block(
@@ -63,7 +66,6 @@ async def async_get_block_of_timestamp(
             verbose=verbose,
             context=context,
             mode=mode,
-            use_db_assist=use_db_assist,
         )
 
 

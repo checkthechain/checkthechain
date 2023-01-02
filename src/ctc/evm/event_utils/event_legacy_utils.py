@@ -1,4 +1,5 @@
-"""functions for importing legacy ctc event csv's to db"""
+"""functions for importing legacy ctc event csv's to db
+"""
 
 from __future__ import annotations
 
@@ -8,6 +9,10 @@ import typing
 from ctc import spec
 from .. import abi_utils
 from .. import block_utils
+
+import warnings
+
+warnings.warn('legacy event utils are experimental and will be removed in future ctc versions')
 
 if typing.TYPE_CHECKING:
 

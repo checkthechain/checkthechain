@@ -12,13 +12,18 @@ async def async_get_pool_assets(
     pool: spec.Address,
     *,
     context: spec.Context = None,
-    use_db: bool = True,
     factory: spec.Address | None = None,
 ) -> typing.Sequence[spec.Address]:
     """get assets of a given DEX pool"""
 
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='dex_pools', context=context
+    )
+
     # try obtaining pool from db
-    if use_db:
+    if read_cache:
         from ctc import db
 
         pool_data = await db.async_query_dex_pool(address=pool, context=context)

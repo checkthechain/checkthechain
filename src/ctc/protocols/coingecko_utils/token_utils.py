@@ -56,10 +56,18 @@ async def _async_sleep_for_cg_ratelimit() -> None:
 
 
 async def async_get_token_list(
-    use_db: bool = True, update: bool | None = None
+    *,
+    context: spec.Context | None = None,
+    update: bool | None = None
 ) -> typing.Sequence[coingecko_db.CoingeckoToken]:
 
-    if use_db and not update:
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='coingecko', context=context
+    )
+
+    if read_cache and not update:
         result = await coingecko_db.async_query_tokens(context={})
         if isinstance(result, list) and len(result) > 0:
             return result
@@ -103,10 +111,16 @@ async def _async_get_token_list_from_server(
 #
 
 
-async def async_get_token_name(query: str, use_db: bool = True) -> str:
+async def async_get_token_name(query: str, *, context: spec.Context = None) -> str:
     """given a token symbol query top token id"""
 
-    if use_db:
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='coingecko', context=context
+    )
+
+    if read_cache:
         result = await coingecko_db.async_query_tokens(
             symbol_query=query,
             name_query=query,
@@ -128,10 +142,18 @@ async def async_get_token_name(query: str, use_db: bool = True) -> str:
     # return await async_get_token_id_from_server(query)
 
 
-async def async_get_token_id(query: str, use_db: bool = True) -> str:
+async def async_get_token_id(
+    query: str, *, context: spec.Context = None
+) -> str:
     """given a token symbol query top token id"""
 
-    if use_db:
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='coingecko', context=context
+    )
+
+    if read_cache:
         result = await coingecko_db.async_query_tokens(
             symbol_query=query, name_query=query, context={}
         )

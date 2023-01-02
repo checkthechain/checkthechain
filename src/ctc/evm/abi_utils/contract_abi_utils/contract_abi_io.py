@@ -9,10 +9,10 @@ from . import contract_abi_modification
 async def async_get_contract_abi(
     contract_address: spec.Address,
     *,
-    context: spec.Context = None,
     block: spec.BlockNumberReference | None = None,
     proxy_implementation: spec.Address | None = None,
     verbose: bool = True,
+    context: spec.Context = None,
 ) -> spec.ContractABI:
     """retrieve abi of contract either from local database or block explorer
 

@@ -155,7 +155,7 @@ async def test_get_events_from_node(test):
     actual_result = await event_utils.async_get_events(
         verbose=2,
         decode=False,
-        use_db=False,
+        context={'cache': False},
         **query,
     )
 
@@ -175,7 +175,7 @@ async def test_get_events_from_db(test):
     actual_result = await event_utils.async_get_events(
         verbose=2,
         decode=False,
-        use_db=True,
+        context={'cache': True},
         **query,
     )
 
@@ -195,7 +195,7 @@ async def test_get_events_from_db_to_dict(test):
     actual_result = await event_utils.async_get_events(
         verbose=2,
         decode=False,
-        use_db=True,
+        context={'cache': True},
         output_format='dict',
         **query,
     )
@@ -217,7 +217,7 @@ async def test_get_events_and_decode(test):
     actual_result = await event_utils.async_get_events(
         verbose=2,
         decode=True,
-        use_db=True,
+        context={'cache': True},
         **query,
     )
 
@@ -247,7 +247,7 @@ async def test_get_events_and_decode_empty(test):
     actual_result = await event_utils.async_get_events(
         verbose=2,
         decode=True,
-        use_db=True,
+        context={'cache': True},
         **query,
     )
 

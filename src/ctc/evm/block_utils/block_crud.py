@@ -21,17 +21,21 @@ async def async_get_block(
     *,
     include_full_transactions: bool = False,
     context: spec.Context = None,
-    use_db: bool = True,
 ) -> spec.Block:
     """get block from local database or from RPC node"""
 
+    from ctc import config
     from ctc import rpc
 
     if spec.is_block_number_reference(block):
 
         from ctc import db
 
-        if use_db and not include_full_transactions:
+        read_cache, write_cache = config.get_context_cache_read_write(
+            schema_name='blocks', context=context
+        )
+
+        if read_cache and not include_full_transactions:
             db_block_data = await db.async_query_block(
                 block_number=block,
                 context=context,
@@ -46,7 +50,7 @@ async def async_get_block(
         )
         block_data.setdefault('base_fee_per_gas', None)
 
-        if use_db:
+        if write_cache:
             await db.async_intake_block(
                 block=block_data,
                 context=context,
@@ -71,12 +75,12 @@ async def async_get_blocks(
     blocks: typing.Sequence[spec.BlockReference],
     *,
     include_full_transactions: bool = False,
-    context: spec.Context = None,
-    use_db: bool = True,
     latest_block_number: int | None = None,
+    context: spec.Context = None,
 ) -> list[spec.Block]:
     """get blocks from local database or from RPC node"""
 
+    from ctc import config
     from ctc import rpc
 
     if all(spec.is_block_number_reference(block) for block in blocks):
@@ -84,7 +88,11 @@ async def async_get_blocks(
         standardized = [evm.standardize_block_number(block) for block in blocks]
         pending = standardized
 
-        if use_db and not include_full_transactions:
+        read_cache, write_cache = config.get_context_cache_read_write(
+            schema_name='blocks', context=context
+        )
+
+        if read_cache and not include_full_transactions:
             from ctc import db
 
             db_block_datas = await db.async_query_blocks(
@@ -119,7 +127,7 @@ async def async_get_blocks(
             context=context,
         )
 
-        if use_db:
+        if write_cache:
             block_data_map.update(dict(zip(pending, blocks_data)))
             blocks_data = [block_data_map[block] for block in standardized]
 
@@ -146,12 +154,15 @@ _latest_block_lock: typing.MutableMapping[str, asyncio.Lock | None] = {
 
 
 async def async_get_latest_block_number(
-    context: spec.Context = None,
     *,
+    context: spec.Context = None,
     use_cache: bool = True,
     cache_time: int | float = 1,
 ) -> int:
-    """get latest block number"""
+    """get latest block number
+
+    uses a per-network in-memory cache with a ttl of cache_time
+    """
 
     from ctc import config
     from ctc import rpc

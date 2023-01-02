@@ -23,7 +23,6 @@ async def _async_get_block_of_timestamp_from_node(
     context: spec.Context = None,
     mode: Literal['<=', '>=', '=='] = '>=',
     verbose: bool = True,
-    use_db_assist: bool = True,
 ) -> int:
     """
 
@@ -31,6 +30,7 @@ async def _async_get_block_of_timestamp_from_node(
         - would need to remove the initializing key from the shared cache
     """
 
+    from ctc import config
     from ctc.toolbox import search_utils
 
     if nary is None:
@@ -55,7 +55,10 @@ async def _async_get_block_of_timestamp_from_node(
     # determine search range
     start_index: int | None = None
     end_index: int | None = None
-    if use_db_assist:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='block_timestamps', context=context
+    )
+    if read_cache:
         from ctc import db
 
         result = await db.async_query_timestamp_block_range(

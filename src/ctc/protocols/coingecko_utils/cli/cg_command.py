@@ -59,7 +59,9 @@ async def async_cg_command(
 ) -> None:
 
     if update:
-        await coingecko_utils.async_get_token_list(use_db=False, update=True)
+        await coingecko_utils.async_get_token_list(
+            context={'cache': False}, update=True
+        )
         return
 
     if height is None:
@@ -138,3 +140,4 @@ async def async_cg_command(
 
     else:
         raise Exception('could not parse inputs, use --help for details')
+

@@ -13,16 +13,21 @@ if typing.TYPE_CHECKING:
 async def async_get_blocks_of_timestamps(
     timestamps: typing.Sequence[int],
     *,
-    block_timestamps: typing.Optional[typing.Mapping[int, int]] = None,
-    block_number_array: typing.Optional[spec.NumpyArray] = None,
-    block_timestamp_array: typing.Optional[spec.NumpyArray] = None,
-    nary: typing.Optional[int] = None,
-    cache: typing.Optional[block_time_search.BlockTimestampSearchCache] = None,
-    context: spec.Context = None,
-    use_db: bool = True,
+    block_timestamps: typing.Mapping[int, int] | None = None,
+    block_number_array: spec.NumpyArray | None = None,
+    block_timestamp_array: spec.NumpyArray | None = None,
+    nary: int | None = None,
+    cache: block_time_search.BlockTimestampSearchCache | None = None,
     mode: Literal['<=', '>=', '=='] = '>=',
+    context: spec.Context = None,
 ) -> list[int]:
     """search for blocks corresponding to list of timestamps"""
+
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='block_timestamps', context=context
+    )
 
     if block_timestamps is not None or (
         block_number_array is not None and block_timestamp_array is not None
@@ -56,7 +61,7 @@ async def async_get_blocks_of_timestamps(
     else:
 
         # get timestamps form db
-        if use_db:
+        if read_cache:
             from ctc import db
 
             db_blocks = await db.async_query_timestamps_blocks(
@@ -88,8 +93,7 @@ async def async_get_blocks_of_timestamps(
                     verbose=False,
                     cache=cache,
                     nary=nary,
-                    context=context,
-                    use_db=False,
+                    context=config.update_context(context=context, cache=False),
                     mode=mode,
                 )
                 coroutines.append(coroutine)

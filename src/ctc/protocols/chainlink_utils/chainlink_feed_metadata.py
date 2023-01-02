@@ -39,12 +39,17 @@ async def async_get_feed_metadata(
 async def async_get_feed_decimals(
     feed: chainlink_spec._FeedReference,
     *,
-    use_db: bool = True,
     context: spec.Context = None,
 ) -> int:
 
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='chainlink', context=context
+    )
+
     # try database
-    if use_db:
+    if read_cache:
         query = _build_feed_query(feed)
         feed_data = await chainlink_db.async_query_feed(
             context=context, **query

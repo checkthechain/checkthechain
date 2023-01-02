@@ -34,17 +34,14 @@ block_timestamps = {
 async def test_get_block_of_timestamp(block_timestamp):
     block, timestamp = block_timestamp
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp, use_db=False, use_db_assist=False
+        timestamp,
+        context={'cache': True},
     )
     assert block == obtained_block
 
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp, use_db=False, use_db_assist=True
-    )
-    assert block == obtained_block
-
-    obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp, use_db=True
+        timestamp,
+        context={'cache': False},
     )
     assert block == obtained_block
 
@@ -57,6 +54,7 @@ async def test_get_block_of_timestamp(block_timestamp):
 async def test_block_of_timestamp_modes(block_timestamp, db_settings):
     block, _ = block_timestamp
     use_db, use_db_assist = db_settings
+    context = {'cache': use_db}
 
     block_data = await evm.async_get_block(block)
 
@@ -66,17 +64,17 @@ async def test_block_of_timestamp_modes(block_timestamp, db_settings):
     # test using exact timestamp
 
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp, mode='==', use_db=use_db, use_db_assist=use_db_assist
+        timestamp, mode='==', context=context
     )
     assert obtained_block == block
 
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp, mode='<=', use_db=use_db, use_db_assist=use_db_assist
+        timestamp, mode='<=', context=context
     )
     assert obtained_block == block
 
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp, mode='>=', use_db=use_db, use_db_assist=use_db_assist
+        timestamp, mode='>=', context=context
     )
     assert obtained_block == block
 
@@ -85,16 +83,15 @@ async def test_block_of_timestamp_modes(block_timestamp, db_settings):
         obtained_block = await evm.async_get_block_of_timestamp(
             timestamp_after,
             mode='==',
-            use_db=use_db,
-            use_db_assist=use_db_assist,
+            context=context
         )
 
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp_after, mode='<=', use_db=use_db, use_db_assist=use_db_assist
+        timestamp_after, mode='<=', context=context
     )
     assert obtained_block == block
 
     obtained_block = await evm.async_get_block_of_timestamp(
-        timestamp_after, mode='>=', use_db=use_db, use_db_assist=use_db_assist
+        timestamp_after, mode='>=', context=context
     )
     assert obtained_block == block + 1

@@ -115,7 +115,6 @@ async def _async_query_events_from_node_and_db(
     topic3: typing.Any | None,
     start_block: int,
     end_block: int,
-    write_to_db: bool,
     context: spec.Context,
     verbose: bool | int,
     columns_to_load: set[str],
@@ -163,7 +162,6 @@ async def _async_query_events_from_node_and_db(
         import pandas as pd
 
         result = await event_node_utils._async_query_events_from_node(
-            write_to_db=write_to_db,
             context=context,
             verbose=verbose,
             output_format='dataframe',

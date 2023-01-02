@@ -97,7 +97,6 @@ async def async_get_contract_creation_block(
     contract_address: spec.Address,
     *,
     context: spec.Context = None,
-    use_db: bool = True,
     **search_kwargs: typing.Any,
 ) -> int | None:
     """get block number of when contract was created
@@ -106,7 +105,12 @@ async def async_get_contract_creation_block(
     - caches result in local database
     """
 
-    if use_db:
+    from ctc import config
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='contract_creation_blocks', context=context
+    )
+    if read_cache:
         from ctc import db
 
         block = await db.async_query_contract_creation_block(
@@ -122,7 +126,7 @@ async def async_get_contract_creation_block(
         **search_kwargs,
     )
 
-    if use_db and block is not None:
+    if write_cache and block is not None:
         await db.async_intake_contract_creation_block(
             contract_address=contract_address,
             block=block,
@@ -135,9 +139,8 @@ async def async_get_contract_creation_block(
 async def async_get_contracts_creation_blocks(
     contract_addresses: typing.Sequence[spec.Address],
     *,
-    context: spec.Context = None,
-    use_db: bool = True,
     verbose: bool = False,
+    context: spec.Context = None,
     **search_kwargs: typing.Any,
 ) -> typing.Sequence[int | None]:
     """get creation blocks of mutliple contracts
@@ -152,7 +155,6 @@ async def async_get_contracts_creation_blocks(
         async_get_contract_creation_block(
             contract_address=contract_address,
             context=context,
-            use_db=use_db,
             verbose=verbose,
             **search_kwargs,
         )

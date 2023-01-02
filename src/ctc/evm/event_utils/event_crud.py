@@ -23,9 +23,6 @@ async def async_get_events(
     end_block: spec.BlockNumberReference | None = None,
     start_time: tooltime.Timestamp | None = None,
     end_time: tooltime.Timestamp | None = None,
-    use_db: bool = True,
-    read_from_db: bool | None = None,
-    write_to_db: bool | None = None,
     context: spec.Context = None,
     named_topics: typing.Mapping[str, typing.Any] | None = None,
     decoded_topic1: typing.Any | None = None,
@@ -47,16 +44,11 @@ async def async_get_events(
 ) -> spec.DataFrame:
     """get events"""
 
+    from ctc import config
     from . import event_hybrid_queries
     from . import event_node_utils
     from . import event_query_utils
     from . import event_metadata
-
-    # determine how much to use db
-    if read_from_db is None:
-        read_from_db = use_db
-    if write_to_db is None:
-        write_to_db = use_db
 
     # determine start and end block
     start_block, end_block = await block_utils.async_resolve_block_range(
@@ -112,7 +104,10 @@ async def async_get_events(
 
     # query data from db and/or node
     events: typing.Union[spec.DataFrame, typing.Sequence[spec.EncodedEvent]]
-    if read_from_db:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='events', context=context
+    )
+    if read_cache:
         events = (
             await event_hybrid_queries._async_query_events_from_node_and_db(
                 contract_address=contract_address,
@@ -122,7 +117,6 @@ async def async_get_events(
                 topic3=encoded_topics[3],
                 start_block=start_block,
                 end_block=end_block,
-                write_to_db=write_to_db,
                 verbose=verbose,
                 binary_output_format=binary_output_format,
                 columns_to_load=columns_to_load,
@@ -138,7 +132,6 @@ async def async_get_events(
             topic3=encoded_topics[3],
             start_block=start_block,
             end_block=end_block,
-            write_to_db=write_to_db,
             verbose=verbose,
             binary_output_format=binary_output_format,
             context=context,

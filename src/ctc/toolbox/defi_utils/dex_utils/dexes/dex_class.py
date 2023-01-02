@@ -305,20 +305,14 @@ class DEX:
         pool: spec.Address,
         *,
         block: spec.BlockNumberReference | None = None,
-        use_db: bool = True,
         context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
 
-        use_db = False
-        if use_db:
-            raise NotImplementedError()
-
-        else:
-            return await cls._async_get_pool_assets_from_node(
-                pool=pool,
-                block=block,
-                context=context,
-            )
+        return await cls._async_get_pool_assets_from_node(
+            pool=pool,
+            block=block,
+            context=context,
+        )
 
     @classmethod
     async def async_get_pool_asset_symbols(

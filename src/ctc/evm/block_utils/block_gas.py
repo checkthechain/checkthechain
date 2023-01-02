@@ -73,16 +73,19 @@ async def async_get_median_block_gas_fee(
     block: spec.BlockNumberReference,
     *,
     normalize: bool = True,
-    use_db: bool = True,
     context: spec.Context = None,
 ) -> db.BlockGasRow:
     """get median gas fee for a given block"""
 
+    from ctc import config
     from ctc import rpc
 
     block = await evm.async_block_number_to_int(block, context=context)
 
-    if use_db:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='block_gas', context=context
+    )
+    if read_cache:
         from ctc import db
 
         try:
@@ -117,18 +120,22 @@ async def async_get_median_block_gas_fee(
 async def async_get_median_blocks_gas_fees(
     blocks: typing.Sequence[spec.BlockNumberReference],
     *,
-    use_db: bool = True,
     normalize: bool = True,
-    context: spec.Context = None,
     verbose: bool = True,
     latest_block_number: int | None = None,
+    context: spec.Context = None,
 ) -> typing.Sequence[db.BlockGasRow]:
     """get median gas fees for multiple blocks"""
+
+    from ctc import config
 
     blocks = await evm.async_block_numbers_to_int(blocks)
 
     # get data from db
-    if use_db:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='block_gas', context=context
+    )
+    if read_cache:
         from ctc import db
 
         result = await db.async_query_median_blocks_gas_fees(

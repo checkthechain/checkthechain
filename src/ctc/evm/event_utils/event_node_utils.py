@@ -23,7 +23,6 @@ async def _async_query_events_from_node(
     topic3: typing.Any | None,
     start_block: int,
     end_block: int,
-    write_to_db: bool,
     context: spec.Context = None,
     verbose: bool | int,
     output_format: Literal['dataframe', 'dict'] = 'dataframe',
@@ -92,7 +91,6 @@ async def _async_query_events_from_node(
             chunk_start=chunk_start,
             chunk_end=chunk_end,
             context=context,
-            write_to_db=write_to_db,
             latest_block_number=latest_block_number,
         )
         coroutines.append(coroutine)
@@ -157,13 +155,13 @@ async def _async_query_node_events_chunk(
     chunk_start: int,
     chunk_end: int,
     context: spec.Context,
-    write_to_db: bool,
     max_request_size: int = 2000,
     latest_block_number: int | None = None,
 ) -> typing.Sequence[spec.EncodedEvent]:
     """process a chunk of events from node"""
 
     import asyncio
+    from ctc import config
     from ctc import rpc
     from ctc.toolbox import range_utils
 
@@ -214,7 +212,10 @@ async def _async_query_node_events_chunk(
     )
 
     # write encoded events to database
-    if write_to_db:
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='events', context=context
+    )
+    if write_cache:
         from ctc import db
 
         query_type = event_query_utils._parse_event_query_type(
