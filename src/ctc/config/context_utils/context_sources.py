@@ -38,9 +38,9 @@ def get_context_chain_id_and_provider(
     else:
         try:
             provider = rpc.find_provider(network=chain_id)
-            return chain_id, provider
         except LookupError:
-            raise Exception('no provider available for given context')
+            pass
+        return chain_id, provider
 
 
 def _get_context_chain_id_and_provider(

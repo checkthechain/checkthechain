@@ -1,15 +1,20 @@
 import pytest
 
+import ctc
+
 
 example_context_config = {
-    'global_cache_override': {},
-    'network_cache_configs': {},
-    'schema_cache_configs': {},
-    'default_cache_config': {
-        'backend': 'local_sqlite',
-        'read': True,
-        'write': True,
+    'db_configs': {
+        'local_sqlite': {'dbms': 'sqlite', 'path': ''},
+        'local_postgres': {'dbms': 'sqlite', 'path': ''},
     },
+    'context_cache_rules': [
+        {
+            'backend': 'local_sqlite',
+            'read': True,
+            'write': True,
+        },
+    ],
 }
 
 context_tests = [
@@ -426,7 +431,7 @@ context_tests = [
 
 
 # add double nested tests
-default_cache_config = example_context_config['default_cache_config']
+default_cache_config = example_context_config['context_cache_rules'][-1]
 default_tuple = (
     default_cache_config['backend'],
     default_cache_config['read'],
@@ -519,18 +524,29 @@ def set_example_context_config():
     for key, value in example_context_config.items():
         ctc.config.set_config_override(key=key, value=value)
 
+    yield
 
-# @pytest.mark.parametrize('test', context_tests)
-# def test_get_context_schema_cache(test, set_example_context_config):
-#     context = test['context']
+    ctc.config.clear_all_config_overrides()
 
-#     schema_caches = test.get('schema_caches')
-#     if schema_caches is not None:
-#         for schema_name, target_schema_cache in schema_caches.items():
-#             actual_schema_cache = ctc.config.get_context_schema_cache(
-#                 schema_name=schema_name, context=context
-#             )
-#             assert actual_schema_cache == target_schema_cache
+
+@pytest.mark.parametrize('test', context_tests)
+def test_get_context_schema_cache(test, set_example_context_config):
+    context = test['context']
+
+    schema_caches = test.get('schema_caches')
+    if schema_caches is not None:
+        for schema_name, target_schema_cache in schema_caches.items():
+            actual_backend = ctc.config.get_context_cache_backend(
+                schema_name=schema_name, context=context
+            )
+            read_cache, write_cache = ctc.config.get_context_cache_read_write(
+                schema_name=schema_name, context=context
+            )
+            assert (
+                actual_backend,
+                read_cache,
+                write_cache,
+            ) == target_schema_cache
 
 
 #

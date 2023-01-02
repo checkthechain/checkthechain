@@ -92,7 +92,7 @@ async def async_close_http_session(
     else:
         provider = config.get_context_provider(context)
         if provider is None:
-            raise Exception('no provider available for given context')
+            raise Exception('no provider available')
         session = get_async_http_session(provider=provider)
         await asyncio.sleep(0)
         await session.close()

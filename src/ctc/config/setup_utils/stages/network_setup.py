@@ -453,7 +453,7 @@ def specify_default_network(
         }
 
     # determine default choice
-    default: str | None = None
+    default = 'mainnet (chain_id = 1)'
     if len(providers) == 1:
         provider = list(providers.values())[0]
         network = provider.get('network')

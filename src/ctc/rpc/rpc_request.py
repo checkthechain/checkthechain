@@ -33,7 +33,7 @@ async def async_send(
 
     provider = config.get_context_provider(context)
     if provider is None:
-        raise Exception('no provider available for given context')
+        raise Exception('no provider available')
 
     try:
         logging_rpc_calls = config.get_log_rpc_calls()

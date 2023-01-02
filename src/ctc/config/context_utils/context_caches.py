@@ -14,6 +14,7 @@ def get_context_cache_backend(
     schema_name: spec.db_types.SchemaName,
     context: spec.Context,
 ) -> str | None:
+    """get backend schema cache for a given context"""
     backend, _read, _write = _get_context_cache_settings(
         schema_name=schema_name,
         context=context,
@@ -26,6 +27,7 @@ def get_context_db_config(
     schema_name: spec.db_types.SchemaName,
     context: spec.Context,
 ) -> toolsql.DBConfig:
+    """get db_config of backend schema cache for a given context"""
     backend = get_context_cache_backend(
         schema_name=schema_name, context=context
     )
@@ -66,7 +68,7 @@ def _get_context_cache_settings(
     # assemble rules from context and config
     config_rules = config.get_context_cache_rules()
     context_rules = _extract_context_cache_rules(context=context)
-    rules = [rule for rl in [config_rules, context_rules] for rule in rl]
+    rules = [rule for rl in [context_rules, config_rules] for rule in rl]
 
     return _resolve_context_cache_rules(
         rules=rules,
@@ -153,7 +155,7 @@ def _create_nested_cache_rule(
     if value is None:
         return None
     elif isinstance(value, bool):
-        return {'filter': filter, 'read': True, 'write': True}
+        return {'filter': filter, 'read': value, 'write': value}
     elif isinstance(value, str):
         return {'filter': filter, 'backend': value}
     elif isinstance(value, dict):
@@ -180,7 +182,7 @@ def _resolve_context_cache_rules(
 
     # perform first pass to determine backend
     for rule in rules:
-        if _test_context_cache_rule(
+        if _does_cache_rule_apply(
             rule=rule, chain_id=chain_id, schema_name=schema_name
         ):
             if rule.get('backend') is not None:
@@ -191,7 +193,7 @@ def _resolve_context_cache_rules(
 
     # perform second pass to determine read+write settings
     for rule in rules:
-        if _test_context_cache_rule(
+        if _does_cache_rule_apply(
             rule=rule,
             chain_id=chain_id,
             schema_name=schema_name,
@@ -209,7 +211,7 @@ def _resolve_context_cache_rules(
     return backend, read, write
 
 
-def _test_context_cache_rule(
+def _does_cache_rule_apply(
     rule: spec.ContextCacheRule,
     *,
     chain_id: spec.ChainId | None,

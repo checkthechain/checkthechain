@@ -176,9 +176,7 @@ def validate_provider(
     if not isinstance(name, str):
         raise spec.ConfigInvalid('provider name must be a str')
     if not isinstance(network, int):
-        raise spec.ConfigInvalid(
-            'provider networks should be an int chain_id'
-        )
+        raise spec.ConfigInvalid('provider networks should be an int chain_id')
     if network not in config['networks']:
         raise spec.ConfigInvalid('provider network not in network entries')
     if protocol != 'http':
@@ -228,12 +226,20 @@ def validate_db_configs(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
 
-    if set(value.keys()) != {'main'}:
-        raise spec.ConfigInvalid(
-            'db_configs should only have main entry for now'
-        )
-    if set(value['main'].keys()) != {'dbms', 'path'}:
-        raise spec.ConfigInvalid('db config should have keys dbms and path')
+    if not isinstance(value, dict):
+        raise spec.ConfigInvalid('invalid format for db_config')
+    if len(value) == 0:
+        raise spec.ConfigInvalid('no db specified')
+    for db_name, db_config in value.items():
+        if 'dbms' not in db_config:
+            raise Exception('dbms not specified for db_name')
+        if db_config['dbms'] == 'sqlite':
+            if set(db_config.keys()) != {'dbms', 'path'}:
+                raise spec.ConfigInvalid(
+                    'db config should have keys dbms and path'
+                )
+        else:
+            raise spec.ConfigInvalid('unrecognized dbms: ' + str(db_config['dbms']))
 
 
 def validate_context_cache_rules(
@@ -279,8 +285,7 @@ def validate_non_overlapping_identifiers(
     if not isinstance(providers, dict):
         raise Exception('invalid format for providers')
     provider_names = {
-        provider['name']
-        for provider_name, provider in providers.items()
+        provider['name'] for provider_name, provider in providers.items()
     }
     assert len(provider_names) == len(providers), 'non-unique provider names'
 

@@ -107,7 +107,6 @@ invalid_values = {
     'default_providers': [{888: None}, {'mainnet': None}],
     'db_configs': [
         {},
-        dict(default_db_configs, main2=default_db_configs['main']),
     ],
     'log_rpc_calls': [None, 'a', 2],
     'log_sql_queries': [None, 'a', 2],
