@@ -30,21 +30,21 @@ color_themes: typing.Mapping[str, toolcli.StyleTheme] = {
     'nord': {
         # https://www.nordtheme.com/docs/colors-and-palettes
         'title': 'bold #88c0d0',
-        'metavar': '#d8dee9',
+        'metavar': '#e5e9f0',
         'description': '#8fbcbb',
         'content': '#81a1c1',
         'option': '#5e81ac',
-        'comment': '#e5e9f0',
+        'comment': '#aaaaaa',
     },
-    'solarized': {
-        # https://en.wikipedia.org/wiki/Solarized#Colors
-        'title': 'bold #cb4b16',
-        'metavar': '#268bd2',
-        'description': '#859900',
-        'content': '#6c71c4',
-        'option': '#2aa198',
-        'comment': '#657b83',
-    },
+    # 'solarized': {
+    #     # https://en.wikipedia.org/wiki/Solarized#Colors
+    #     'title': 'bold #cb4b16',
+    #     'metavar': '#268bd2',
+    #     'description': '#859900',
+    #     'content': '#6c71c4',
+    #     'option': '#2aa198',
+    #     'comment': '#657b83',
+    # },
     'neonwolf': {
         # https://github.com/h3xx/tig-colors-neonwolf/blob/flair/screenshots/sample.png
         'title': 'bold #afff00',
@@ -55,25 +55,31 @@ color_themes: typing.Mapping[str, toolcli.StyleTheme] = {
         'comment': '#b2b2b2',
     },
     'monokai': {
-        'title': 'bold #66d9ef',
+        'title': 'bold #f92672',
         'metavar': '#a6e22e',
-        'option': '#e87d3e',
-        'description': '#f92672',
+        'option': '#66d9ef',
+        'description': '#fc9867',
         'content': '#ae81ff',
-        'comment': '',
+        'comment': '#88846f',
+        # 'title': 'bold #66d9ef',
+        # 'metavar': '#a6e22e',
+        # 'option': '#e87d3e',
+        # 'description': '#f92672',
+        # 'content': '#ae81ff',
+        # 'comment': '',
     },
-    'oceanic': {
-        # https://github.com/mhartington/oceanic-next
-        'title': 'bold #fac863',
-        'metavar': '#fac863',
-        'option': '#fac863',
-        'description': '#99c794',
-        'content': '#c594c5',
-        'comment': '#c594c5',
-        # 'comment': '#6090c0',
-        # 'metavar': '#ec5f67',
-        # palenight seems similar https://github.com/drewtempelmeyer/palenight.vim/blob/master/images/screenshot.png
-    },
+    # 'oceanic': {
+    #     # https://github.com/mhartington/oceanic-next
+    #     'title': 'bold #fac863',
+    #     'metavar': '#fac863',
+    #     'option': '#fac863',
+    #     'description': '#99c794',
+    #     'content': '#c594c5',
+    #     'comment': '#c594c5',
+    #     # 'comment': '#6090c0',
+    #     # 'metavar': '#ec5f67',
+    #     # palenight seems similar https://github.com/drewtempelmeyer/palenight.vim/blob/master/images/screenshot.png
+    # },
     # tokyo night https://github.com/folke/tokyonight.nvim
     # sonokai https://github.com/sainnhe/sonokai
     # '': {
@@ -135,6 +141,15 @@ def get_cli_styles(color: bool | None = None) -> toolcli.StyleTheme:
             'option': '',
             'comment': '',
         }
+
+
+def get_color_theme_name() -> str:
+    config_theme = ctc.config.get_cli_color_theme()
+    for other_name, other_theme in color_themes.items():
+        if other_theme == config_theme:
+            return other_name
+    else:
+        return 'custom'
 
 
 def _is_jupyter_notebook() -> bool:
