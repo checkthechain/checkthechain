@@ -52,8 +52,6 @@ async def async_send_http(
             + ' retries, status_code = '
             + str(response.status)
         )
-        # logger = logging.getLogger()
-        # logger.info(message)
         raise Exception(message)
 
 
