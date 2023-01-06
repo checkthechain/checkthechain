@@ -118,16 +118,16 @@ async def async_get_blocks(
         for block_data in blocks_data:
             block_data.setdefault('base_fee_per_gas', None)
 
-        from ctc import db
-
         # intake rpc data to db
-        await db.async_intake_blocks(
-            blocks=blocks_data,
-            latest_block_number=latest_block_number,
-            context=context,
-        )
-
         if write_cache:
+            from ctc import db
+
+            await db.async_intake_blocks(
+                blocks=blocks_data,
+                latest_block_number=latest_block_number,
+                context=context,
+            )
+
             block_data_map.update(dict(zip(pending, blocks_data)))
             blocks_data = [block_data_map[block] for block in standardized]
 
