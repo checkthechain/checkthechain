@@ -100,7 +100,9 @@ async def async_intake_transactions(
 
     if latest_block is None:
         latest_block = await evm.async_get_latest_block_number(context=context)
-    required_confirmations = management.get_required_confirmations(context=context)
+    required_confirmations = management.get_required_confirmations(
+        context=context
+    )
     latest_allowed_block = latest_block - required_confirmations
     confirmed_txs = [
         transaction
@@ -132,65 +134,85 @@ async def async_intake_transactions(
         )
 
 
-async def async_intake_block_transaction_query(
-    block: spec.Block | spec.RPCBlock,
+async def async_intake_block_transactions(
+    block_number: int,
+    transactions: typing.Sequence[spec.RPCTransaction],
     *,
-    latest_block: int | None = None,
-    context: spec.Context = None,
+    context: spec.Context,
 ) -> None:
-
-    await async_intake_block_transaction_queries(
-        blocks=[block],
-        latest_block=latest_block,
+    await async_intake_blocks_transactions(
+        blocks_transactions={block_number: transactions},
         context=context,
     )
 
 
-async def async_intake_block_transaction_queries(
-    blocks: typing.Sequence[spec.Block | spec.RPCBlock],
+async def async_intake_blocks_transactions(
+    blocks_transactions: typing.Mapping[int, typing.Sequence[spec.RPCTransaction]],
     *,
-    latest_block: int | None = None,
-    context: spec.Context = None,
+    context: spec.Context,
 ) -> None:
+    raise NotImplementedError()
 
-    import sqlalchemy.exc  # type: ignore
 
-    if latest_block is None:
-        latest_block = await evm.async_get_latest_block_number(context=context)
+# async def async_intake_block_transaction_query(
+#     block: spec. | spec.RPCBlock,
+#     *,
+#     latest_block: int | None = None,
+#     context: spec.Context = None,
+# ) -> None:
 
-    required_confirmations = management.get_required_confirmations(context=context)
-    latest_allowed_block = latest_block - required_confirmations
-    confirmed_blocks = [
-        block for block in blocks if block['number'] > latest_allowed_block
-    ]
+#     await async_intake_block_transaction_queries(
+#         blocks=[block],
+#         latest_block=latest_block,
+#         context=context,
+#     )
 
-    engine = connect_utils.create_engine(schema_name='events', context=context)
-    if engine is None:
-        return None
 
-    if len(confirmed_blocks) == 0:
-        return
+# async def async_intake_block_transaction_queries(
+#     blocks: typing.Sequence[spec.DBBlockFullTxs | spec.RPCBlock],
+#     *,
+#     latest_block: int | None = None,
+#     context: spec.Context = None,
+# ) -> None:
 
-    block_numbers = [block['number'] for block in confirmed_blocks]
-    transactions = await _async_convert_rpc_transactions_to_db_transactions(
-        [tx for block in confirmed_blocks for tx in block['transactions']],
-        context=context,
-    )
+#     import sqlalchemy.exc  # type: ignore
 
-    try:
-        with engine.begin() as conn:
+#     if latest_block is None:
+#         latest_block = await evm.async_get_latest_block_number(context=context)
 
-            await transactions_statements.async_upsert_block_transaction_queries(
-                block_numbers=block_numbers,
-                conn=conn,
-                context=context,
-            )
-            await transactions_statements.async_upsert_transactions(
-                transactions=transactions,
-                conn=conn,
-                context=context,
-            )
+#     required_confirmations = management.get_required_confirmations(context=context)
+#     latest_allowed_block = latest_block - required_confirmations
+#     confirmed_blocks = [
+#         block for block in blocks if block['number'] > latest_allowed_block
+#     ]
 
-    except sqlalchemy.exc.OperationalError:
-        pass
+#     engine = connect_utils.create_engine(schema_name='events', context=context)
+#     if engine is None:
+#         return None
+
+#     if len(confirmed_blocks) == 0:
+#         return
+
+#     block_numbers = [block['number'] for block in confirmed_blocks]
+#     transactions = await _async_convert_rpc_transactions_to_db_transactions(
+#         [tx for block in confirmed_blocks for tx in block['transactions']],
+#         context=context,
+#     )
+
+#     try:
+#         with engine.begin() as conn:
+
+#             await transactions_statements.async_upsert_block_transaction_queries(
+#                 block_numbers=block_numbers,
+#                 conn=conn,
+#                 context=context,
+#             )
+#             await transactions_statements.async_upsert_transactions(
+#                 transactions=transactions,
+#                 conn=conn,
+#                 context=context,
+#             )
+
+#     except sqlalchemy.exc.OperationalError:
+#         pass
 

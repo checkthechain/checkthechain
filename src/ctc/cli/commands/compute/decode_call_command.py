@@ -72,7 +72,7 @@ async def async_decode_call_command(
             raise Exception('syntax is `ctc decode call TX_HASH --tx`')
         transaction = await evm.async_get_transaction(args[0], context=context)
         call_data = transaction['input']
-        contract_address = transaction['to']
+        contract_address = transaction['to_address']
         contract_known = True
     elif len(args) == 1:
         from ctc.protocols import fourbyte_utils

@@ -37,7 +37,7 @@ def sort_nested_by(
 
 
 def print_fuse_pool_summary(
-    block: spec.Block,
+    block: spec.DBBlock,
     *,
     tokens_data: typing.Mapping[str, typing.Any],
     pool_name: str,

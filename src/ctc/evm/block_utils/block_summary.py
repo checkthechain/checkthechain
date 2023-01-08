@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-import typing
 import time
 
 from ctc import spec
 from .. import binary_utils
+from .. import transaction_utils
 from . import block_crud
 
 
 async def async_print_block_summary(
-    block: spec.Block | spec.BlockNumberReference,
+    block: spec.DBBlock | spec.BlockNumberReference,
     *,
     context: spec.Context = None,
 ) -> None:
@@ -21,10 +21,12 @@ async def async_print_block_summary(
     from ctc import cli
 
     if not isinstance(block, dict):
-        block = await block_crud.async_get_block(block=block, context=context)
+        block = await block_crud.async_get_block(
+            block=block, context=context
+        )
 
-    full_transactions = len(block['transactions']) > 0 and isinstance(
-        block['transactions'][0], dict
+    block_transactions = await transaction_utils.async_get_block_transactions(
+        block['number'], context=context
     )
     percentiles = [
         0,
@@ -34,18 +36,15 @@ async def async_print_block_summary(
         100,
     ]
 
-    if full_transactions:
-        gas_prices = []
-        for transaction in block['transactions']:
-            if typing.TYPE_CHECKING:
-                transaction = typing.cast(spec.DBTransaction, transaction)
-            gas_prices.append(transaction['gas_price'] / 1e9)
-        import numpy as np
+    gas_prices = []
+    for transaction in block_transactions:
+        gas_prices.append(transaction['gas_price'] / 1e9)
+    import numpy as np
 
-        gas_percentiles = np.percentile(
-            gas_prices,
-            percentiles,
-        )
+    gas_percentiles = np.percentile(
+        gas_prices,
+        percentiles,
+    )
 
     title = 'Block ' + str(block['number'])
     styles = cli.get_cli_styles()
@@ -61,7 +60,7 @@ async def async_print_block_summary(
         ),
     )
     cli.print_bullet(key='block_hash', value=block['hash'])
-    cli.print_bullet(key='n_transactions', value=len(block['transactions']))
+    cli.print_bullet(key='n_transactions', value=len(block_transactions))
     cli.print_bullet(
         key='gas used',
         value=(
@@ -70,7 +69,8 @@ async def async_print_block_summary(
             + toolstr.format(block['gas_limit'])
         ),
     )
-    if full_transactions:
+
+    if block_transactions is not None:
         percentile_label = (
             '('
             + ', '.join([str(percentile) + '%' for percentile in percentiles])

@@ -119,8 +119,8 @@ async def async_blocks_command(
                     age = ', '.join(age.split(', ')[:2])
                     row.append(age)
                 elif attribute == 'median_gas':
-                    median_gas = evm.compute_median_block_gas_fee(
-                        block, normalize=True
+                    median_gas = evm.compute_transactions_gas_stats(
+                        block['transactions'], normalize=True
                     )
                     row.append(median_gas)
                 else:

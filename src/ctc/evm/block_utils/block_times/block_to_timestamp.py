@@ -37,7 +37,6 @@ async def async_get_block_timestamp(
 async def async_get_block_timestamps(
     blocks: typing.Sequence[spec.BlockReference],
     *,
-    include_full_transactions: bool = False,
     context: spec.Context = None,
 ) -> list[int]:
     """get timestamps of blocks"""
@@ -76,7 +75,6 @@ async def async_get_block_timestamps(
     if len(remaining_blocks) > 0:
         node_blocks = await block_crud.async_get_blocks(
             blocks=remaining_blocks,
-            include_full_transactions=include_full_transactions,
             context=context,
         )
         for block_data in node_blocks:

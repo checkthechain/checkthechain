@@ -39,3 +39,37 @@ async def async_block_numbers_to_int(
     ]
     return await asyncio.gather(*coroutines)
 
+
+async def async_block_reference_to_int(
+    block: spec.BlockReference,
+    *,
+    context: spec.Context,
+) -> int:
+    """convert block number, block hash, or block name to int"""
+    if spec.is_block_number_reference(block):
+        return await async_block_number_to_int(block, context=context)
+    elif spec.is_block_hash(block):
+        import ctc.rpc
+
+        block_data: spec.RPCBlock = await ctc.rpc.async_eth_get_block_by_hash(
+            block, context=context
+        )
+        return block_data['number']
+    else:
+        raise Exception('unknown block format: ' + str(block))
+
+
+async def async_block_references_to_int(
+    blocks: typing.Sequence[spec.BlockReference],
+    *,
+    context: spec.Context,
+) -> typing.Sequence[int]:
+    """convert block number, block hash, or block name to int"""
+    import asyncio
+
+    coroutines = [
+        async_block_reference_to_int(block=block, context=context)
+        for block in blocks
+    ]
+    return await asyncio.gather(*coroutines)
+

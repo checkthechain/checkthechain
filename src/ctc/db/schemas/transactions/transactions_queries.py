@@ -26,3 +26,13 @@ async_query_block_transaction_queries = (
     )
 )
 
+async_query_block_transactions = query_utils.wrap_selector_with_connection(
+    transactions_statements.async_select_block_transactions,
+    'transactions',
+)
+
+async_query_blocks_transactions = query_utils.wrap_selector_with_connection(
+    transactions_statements.async_select_blocks_transactions,
+    'transactions',
+)
+

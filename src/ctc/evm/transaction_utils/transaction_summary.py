@@ -39,7 +39,6 @@ async def async_print_transaction_summary(
     block_task = asyncio.create_task(
         block_utils.async_get_block(
             transaction['block_number'],
-            include_full_transactions=False,
             context=context,
         )
     )
@@ -80,9 +79,7 @@ async def async_print_transaction_summary(
     cli.print_bullet(key='success', value=bool(transaction_receipt['status']))
     cli.print_bullet(
         key='transaction index',
-        value=str(transaction_receipt['transaction_index'])
-        + ' / '
-        + str(len(block['transactions'])),
+        value=str(transaction_receipt['transaction_index']),
     )
     cli.print_bullet(
         key='gas used',

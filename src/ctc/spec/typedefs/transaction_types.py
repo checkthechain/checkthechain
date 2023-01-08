@@ -11,6 +11,7 @@ from . import binary_types
 TransactionHash = binary_types.PrefixHexData
 
 TransactionAccessList = typing.Sequence[
+    # tuples describe accessed data as (contract, memory_slot)
     typing.Tuple[
         address_types.Address,
         typing.Sequence[binary_types.PrefixHexData],
@@ -114,7 +115,7 @@ RPCTransaction = TypedDict(
         'to': address_types.Address,
         'transaction_index': int,
         'value': int,
-        'type': binary_types.PrefixHexData,
+        'type': int,
         'chain_id': binary_types.PrefixHexData,
         'v': int,
         'r': binary_types.PrefixHexData,
@@ -154,21 +155,21 @@ RPCTransactionReceipt = TypedDict(
 
 # these transaction types are stored in the ctc DB
 
-DBTransaction = TypedDict(
-    'DBTransaction',
-    {
-        'hash': TransactionHash,
-        'block_number': int,
-        'transaction_index': int,
-        'to': address_types.Address,
-        'from': address_types.Address,
-        'value': int,
-        'input': str,
-        'nonce': int,
-        'type': int,
-        'access_list': typing.Sequence[str],
-        'gas_used': int,
-        'gas_price': int,
-    },
-)
+class DBTransaction(TypedDict):
+    hash: TransactionHash
+    block_number: int
+    transaction_index: int
+    to_address: address_types.Address
+    from_address: address_types.Address
+    value: int
+    input: str
+    nonce: int
+    transaction_type: int
+    status: int
+    gas_used: int
+    gas_limit: int
+    gas_priority: int | None
+    gas_price: int
+    gas_price_max: int | None
+    access_list: TransactionAccessList | None
 

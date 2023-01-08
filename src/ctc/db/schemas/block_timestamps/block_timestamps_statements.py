@@ -29,7 +29,7 @@ async def async_upsert_block_timestamps(
     *,
     conn: toolsql.SAConnection,
     block_timestamps: typing.Mapping[int, int] | None = None,
-    blocks: typing.Sequence[spec.Block] | None = None,
+    blocks: typing.Sequence[spec.DBBlock] | None = None,
     context: spec.Context = None,
 ) -> None:
 

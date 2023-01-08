@@ -19,133 +19,173 @@ if typing.TYPE_CHECKING:
 async def async_get_block(
     block: spec.BlockReference,
     *,
-    include_full_transactions: bool = False,
     context: spec.Context = None,
-) -> spec.Block:
+) -> spec.DBBlock:
     """get block from local database or from RPC node"""
 
-    from ctc import config
-    from ctc import rpc
-
     if spec.is_block_number_reference(block):
-
-        from ctc import db
-
-        read_cache, write_cache = config.get_context_cache_read_write(
-            schema_name='blocks', context=context
+        return await _async_get_block_by_number(
+            block=block, context=context
         )
-
-        if read_cache and not include_full_transactions:
-            db_block_data = await db.async_query_block(
-                block_number=block,
-                context=context,
-            )
-            if db_block_data is not None:
-                return db_block_data
-
-        block_data: spec.Block = await rpc.async_eth_get_block_by_number(
-            block_number=evm.standardize_block_number(block),
-            context=context,
-            include_full_transactions=include_full_transactions,
-        )
-        block_data.setdefault('base_fee_per_gas', None)
-
-        if write_cache:
-            await db.async_intake_block(
-                block=block_data,
-                context=context,
-            )
-
-        return block_data
-
     elif spec.is_block_hash(block):
+        from ctc import rpc
 
-        block_data = await rpc.async_eth_get_block_by_hash(
+        rpc_block_data = await rpc.async_eth_get_block_by_hash(
             block_hash=block,
             context=context,
-            include_full_transactions=include_full_transactions,
+            include_full_transactions=False,
         )
-        return block_data
-
+        return _rpc_block_to_db_block(rpc_block_data)
     else:
         raise Exception('unknown block specifier: ' + str(block))
 
 
+async def _async_get_block_by_number(
+    block: spec.BlockNumberReference,
+    *,
+    context: spec.Context = None,
+) -> spec.DBBlock:
+
+    from ctc import config
+    from ctc import db
+    from ctc import rpc
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='blocks', context=context
+    )
+
+    if read_cache:
+        db_block_data = await db.async_query_block(
+            block_number=block,
+            context=context,
+        )
+        if db_block_data is not None:
+            return db_block_data
+
+    rpc_block_data: spec.RPCBlock = await rpc.async_eth_get_block_by_number(
+        block_number=evm.standardize_block_number(block),
+        context=context,
+        include_full_transactions=False,
+    )
+    db_block = _rpc_block_to_db_block(rpc_block_data)
+
+    if write_cache:
+        await db.async_intake_block(
+            db_block=db_block,
+            context=context,
+        )
+
+    return db_block
+
+
+def _rpc_block_to_db_block(
+    rpc_block: spec.RPCBlock | spec.DBBlock,
+) -> spec.DBBlock:
+    return {
+        'number': rpc_block['number'],
+        'hash': rpc_block['hash'],
+        'timestamp': rpc_block['timestamp'],
+        'miner': rpc_block['miner'],
+        'extra_data': rpc_block['extra_data'],
+        'base_fee_per_gas': rpc_block['base_fee_per_gas'],
+        'gas_limit': rpc_block['gas_limit'],
+        'gas_used': rpc_block['gas_used'],
+    }
+
+
+#
+# # plural
+#
+
 async def async_get_blocks(
     blocks: typing.Sequence[spec.BlockReference],
     *,
-    include_full_transactions: bool = False,
     latest_block_number: int | None = None,
     context: spec.Context = None,
-) -> list[spec.Block]:
+) -> typing.Sequence[spec.DBBlock]:
     """get blocks from local database or from RPC node"""
 
-    from ctc import config
     from ctc import rpc
 
     if all(spec.is_block_number_reference(block) for block in blocks):
-
-        standardized = [evm.standardize_block_number(block) for block in blocks]
-        pending = standardized
-
-        read_cache, write_cache = config.get_context_cache_read_write(
-            schema_name='blocks', context=context
-        )
-
-        if read_cache and not include_full_transactions:
-            from ctc import db
-
-            db_block_datas = await db.async_query_blocks(
-                block_numbers=pending, context=context
-            )
-            if db_block_datas is None:
-                block_data_map = {}
-            else:
-                block_data_map = dict(zip(pending, db_block_datas))
-                pending = [
-                    block
-                    for block, db_block_data in block_data_map.items()
-                    if db_block_data is None
-                ]
-        else:
-            block_data_map = {}
-
-        blocks_data = await rpc.async_batch_eth_get_block_by_number(
-            block_numbers=pending,
-            include_full_transactions=include_full_transactions,
+        return await _async_get_blocks_by_numbers(
+            blocks=blocks,
+            latest_block_number=latest_block_number,
             context=context,
         )
-        for block_data in blocks_data:
-            block_data.setdefault('base_fee_per_gas', None)
-
-        # intake rpc data to db
-        if write_cache:
-            from ctc import db
-
-            await db.async_intake_blocks(
-                blocks=blocks_data,
-                latest_block_number=latest_block_number,
-                context=context,
-            )
-
-            block_data_map.update(dict(zip(pending, blocks_data)))
-            blocks_data = [block_data_map[block] for block in standardized]
-
-        return blocks_data
-
     elif all(spec.is_block_hash(block) for block in blocks):
-
         return await rpc.async_batch_eth_get_block_by_hash(
             block_hashes=blocks,
-            include_full_transactions=include_full_transactions,
+            include_full_transactions=False,
             context=context,
         )
-
     else:
         raise Exception(
             'blocks should be all block number references or all block hashes'
         )
 
+
+async def _async_get_blocks_by_numbers(
+    blocks: typing.Sequence[spec.BlockReference],
+    *,
+    latest_block_number: int | None = None,
+    context: spec.Context = None,
+) -> typing.Sequence[spec.DBBlock]:
+
+    from ctc import config
+    from ctc import rpc
+
+    standardized = [evm.standardize_block_number(block) for block in blocks]
+    pending = standardized
+
+    read_cache, write_cache = config.get_context_cache_read_write(
+        schema_name='blocks', context=context
+    )
+
+    if read_cache:
+        from ctc import db
+
+        db_block_datas = await db.async_query_blocks(
+            block_numbers=pending, context=context
+        )
+        if db_block_datas is None:
+            block_data_map = {}
+        else:
+            block_data_map = dict(zip(pending, db_block_datas))
+            pending = [
+                block
+                for block, db_block_data in block_data_map.items()
+                if db_block_data is None
+            ]
+    else:
+        block_data_map = {}
+
+    rpc_blocks = await rpc.async_batch_eth_get_block_by_number(
+        block_numbers=pending,
+        include_full_transactions=False,
+        context=context,
+    )
+    db_blocks = [_rpc_block_to_db_block(block) for block in rpc_blocks]
+
+    # intake rpc data to db
+    if write_cache:
+        from ctc import db
+
+        await db.async_intake_blocks(
+            db_blocks=db_blocks,
+            latest_block_number=latest_block_number,
+            context=context,
+        )
+
+        block_data_map.update(dict(zip(pending, db_blocks)))
+        blocks_data = [block_data_map[block] for block in standardized]
+
+    return blocks_data  # type: ignore
+
+
+#
+# # latest block number
+#
 
 _latest_block_cache: typing.MutableMapping[int, LatestBlockCacheEntry] = {}
 _latest_block_lock: typing.MutableMapping[str, asyncio.Lock | None] = {
@@ -207,3 +247,4 @@ async def async_get_latest_block_number(
             }
 
             return result
+

@@ -11,23 +11,18 @@ from . import schemas
 
 
 if typing.TYPE_CHECKING:
-    T = typing.TypeVar('T', int, spec.Block)
+    T = typing.TypeVar('T', int, spec.RPCBlock, spec.DBBlock)
 
 
 async def async_is_block_fully_confirmed(
-    block: int | spec.Block,
+    block: int,
     *,
     context: spec.Context = None,
 ) -> bool:
 
-    if isinstance(block, int):
-        block_number = block
-    else:
-        block_number = block['number']
-
     # check whether block is older than newest block in db
     max_db_block = await _async_get_max_block_number_in_db(context=context)
-    if max_db_block is not None and block_number < max_db_block:
+    if max_db_block is not None and block < max_db_block:
         return True
 
     # check whether block has enough confirmations
@@ -35,7 +30,7 @@ async def async_is_block_fully_confirmed(
     required_confirmations = management.get_required_confirmations(
         context=context
     )
-    return bool(block_number <= rpc_latest_block - required_confirmations)
+    return bool(block <= rpc_latest_block - required_confirmations)
 
 
 async def async_filter_fully_confirmed_blocks(

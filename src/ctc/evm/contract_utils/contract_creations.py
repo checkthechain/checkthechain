@@ -90,7 +90,7 @@ async def async_get_contract_deployer(
     tx = await transaction_utils.async_get_transaction(
         creation_transaction, context=context
     )
-    return tx['from']
+    return tx['from_address']
 
 
 async def async_get_contract_creation_block(

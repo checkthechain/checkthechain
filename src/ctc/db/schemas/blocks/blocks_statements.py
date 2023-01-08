@@ -8,59 +8,48 @@ from ctc import spec
 from ... import schema_utils
 
 
-def _prepare_block_for_db(block: spec.Block) -> spec.Block:
+def _prepare_block_for_db(block: spec.DBBlock) -> typing.Mapping[str, typing.Any]:
 
     # remove extra keys
-    extra_keys = ['send_root', 'l1_block_number', 'send_count']
+    extra_keys = ['send_root', 'l1_block_number', 'send_count', 'transactions']
     if any(key in block for key in extra_keys):
         block = block.copy()
         for key in extra_keys:
             if key in block:
                 del block[key]  # type: ignore
-
-    # remove transactions
-    txs = block['transactions']
-    if len(txs) > 0 and isinstance(txs[0], dict):
-        if typing.TYPE_CHECKING:
-            full_txs = typing.cast(list[spec.RPCTransaction], txs)
-        else:
-            full_txs = txs
-        tx_hashes = [tx['hash'] for tx in full_txs]
-        return dict(block, transactions=tx_hashes)  # type: ignore
-    else:
-        return block
+    return block
 
 
 async def async_upsert_block(
     *,
-    block: spec.Block,
+    block: spec.DBBlock,
     conn: toolsql.SAConnection,
     context: spec.Context,
 ) -> None:
 
     table = schema_utils.get_table_name('blocks', context=context)
-    block = _prepare_block_for_db(block)
+    ready_block = _prepare_block_for_db(block)
     toolsql.insert(
         conn=conn,
         table=table,
-        row=block,
+        row=ready_block,
         upsert='do_update',
     )
 
 
 async def async_upsert_blocks(
     *,
-    blocks: typing.Sequence[spec.Block],
+    blocks: typing.Sequence[spec.DBBlock],
     conn: toolsql.SAConnection,
     context: spec.Context,
 ) -> None:
 
     table = schema_utils.get_table_name('blocks', context=context)
-    blocks = [_prepare_block_for_db(block) for block in blocks]
+    ready_blocks = [_prepare_block_for_db(block) for block in blocks]
     toolsql.insert(
         conn=conn,
         table=table,
-        rows=blocks,
+        rows=ready_blocks,
         upsert='do_update',
     )
 
@@ -70,23 +59,17 @@ async def async_select_block(
     *,
     conn: toolsql.SAConnection,
     context: spec.Context,
-) -> spec.Block | None:
+) -> spec.DBBlock | None:
 
     table = schema_utils.get_table_name('blocks', context=context)
 
-    block: spec.Block | None = toolsql.select(
+    block: spec.DBBlock | None = toolsql.select(
         conn=conn,
         table=table,
         where_equals={'number': block_number},
         return_count='one',
         raise_if_table_dne=False,
     )
-
-    if block is not None and block['base_fee_per_gas'] is None:
-        del block['base_fee_per_gas']
-    else:
-        if block is not None and block['base_fee_per_gas'] is not None:
-            block['base_fee_per_gas'] = int(block['base_fee_per_gas'])
 
     return block
 
@@ -98,7 +81,7 @@ async def async_select_blocks(
     end_block: int | None = None,
     conn: toolsql.SAConnection,
     context: spec.Context,
-) -> typing.Sequence[spec.Block | None] | None:
+) -> typing.Sequence[spec.DBBlock | None] | None:
 
     table = schema_utils.get_table_name('blocks', context=context)
 

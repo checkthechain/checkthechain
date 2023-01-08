@@ -8,6 +8,10 @@ from . import binary_types
 from . import transaction_types
 
 
+#
+# # block references
+#
+
 BlockHash = binary_types.PrefixHexData
 
 BlockNumberName = typing.Union[
@@ -49,32 +53,9 @@ class BlockSample(TypedDict):
     open_end: bool
 
 
-class Block(TypedDict):
-    base_fee_per_gas: NotRequired[int | None]
-    difficulty: int
-    extra_data: binary_types.PrefixHexData
-    gas_limit: int
-    gas_used: int
-    hash: BlockHash
-    logs_bloom: binary_types.PrefixHexData
-    miner: address_types.Address
-    mix_hash: BlockHash
-    nonce: binary_types.PrefixHexData
-    number: int
-    parent_hash: BlockHash
-    receipts_root: binary_types.PrefixHexData
-    sha3_uncles: binary_types.PrefixHexData
-    size: int
-    state_root: binary_types.PrefixHexData
-    timestamp: int
-    total_difficulty: str
-    transactions: typing.Union[
-        typing.List[transaction_types.TransactionHash],
-        typing.List[transaction_types.DBTransaction],
-    ]
-    transactions_root: binary_types.PrefixHexData
-    uncles: typing.List[BlockHash]
-
+#
+# # block data
+#
 
 # block returned from RPC request
 class RPCBlock(TypedDict):
@@ -102,4 +83,15 @@ class RPCBlock(TypedDict):
     ]
     transactions_root: binary_types.PrefixHexData
     uncles: typing.List[BlockHash]
+
+
+class DBBlock(TypedDict):
+    number: int
+    hash: str
+    timestamp: int
+    miner: str
+    extra_data: str
+    base_fee_per_gas: int | None
+    gas_limit: int
+    gas_used: int
 

@@ -10,17 +10,19 @@ transactions_schema: toolsql.DBSchema = {
                 {'name': 'hash', 'type': 'Text', 'primary': True},
                 {'name': 'block_number', 'type': 'Integer'},
                 {'name': 'transaction_index', 'type': 'Integer'},
-                {'name': 'to', 'type': 'Text'},
-                {'name': 'from', 'type': 'Text'},
+                {'name': 'to_address', 'type': 'Text'},
+                {'name': 'from_address', 'type': 'Text'},
                 {'name': 'value', 'type': 'Text'},  # int <-> str
                 {'name': 'input', 'type': 'Text'},
                 {'name': 'nonce', 'type': 'Integer'},
-                {'name': 'type', 'type': 'Integer'},
-                {'name': 'access_list', 'type': 'JSON'},
-
-                # receipt related
-                {'name': 'gas_used', 'type': 'Integer'},
-                {'name': 'gas_price', 'type': 'Text'},  # int <-> str
+                {'name': 'transaction_type', 'type': 'Integer'},
+                {'name': 'status', 'type': 'Boolean'},  # from receipt
+                {'name': 'gas_used', 'type': 'Integer'},  # from receipt
+                {'name': 'gas_limit', 'type': 'Integer'},
+                {'name': 'gas_priority', 'type': 'Integer', 'null': True},  # eip1559
+                {'name': 'gas_price', 'type': 'Integer'},
+                {'name': 'gas_price_max', 'type': 'Integer', 'null': True},  # eip1559
+                {'name': 'access_list', 'type': 'JSON', 'null': True},  # type 1 and eip1559 tx
             ],
         },
         'block_transaction_queries': {

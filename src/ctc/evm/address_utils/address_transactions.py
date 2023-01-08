@@ -71,21 +71,20 @@ async def async_get_transactions_from_address(
     count_data = await async_get_address_transaction_counts_by_block(
         address, context=context
     )
-    blocks = await evm.async_get_blocks(
-        blocks=count_data['blocks'],
-        include_full_transactions=True,
-        context=context,
-    )
 
+    # note: this can be made much more efficient with proper queries
     transactions = []
-    for block, block_count in zip(blocks, count_data['diffs']):
+    for block_number, block_count in zip(
+        count_data['blocks'],
+        count_data['diffs'],
+    ):
+        block_transactions = await evm.async_get_block_transactions(
+            block=block_number,
+            context=context,
+        )
         n_block_transactions = 0
-        for transaction_data in block['transactions']:
-            if typing.TYPE_CHECKING:
-                transaction = typing.cast(spec.DBTransaction, transaction_data)
-            else:
-                transaction = transaction_data
-            if transaction['from'] == address:
+        for transaction in block_transactions:
+            if transaction['from_address'] == address:
                 transactions.append(transaction)
                 n_block_transactions += 1
                 if n_block_transactions == block_count:
@@ -103,7 +102,8 @@ async def async_get_transactions_from_address(
 
 
 async def async_get_address_transaction_counts_by_block(
-    address: spec.Address, nary: int = 3,
+    address: spec.Address,
+    nary: int = 3,
     *,
     context: spec.Context = None,
 ) -> AddressTransactionCounts:

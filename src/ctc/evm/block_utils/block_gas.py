@@ -3,7 +3,9 @@ from __future__ import annotations
 import os
 import typing
 
-from . import block_crud
+from .. import transaction_utils
+from . import block_times
+from . import block_normalize
 from ctc import evm
 from ctc import spec
 
@@ -13,60 +15,19 @@ if typing.TYPE_CHECKING or os.environ.get('BUILDING_SPHINX') == '1':
     from ctc import db
 
     class BlockGasStats(TypedDict):
-        base_fee: int | float | None
         min_gas_price: int | float | None
         median_gas_price: int | float | None
         mean_gas_price: float | None
         max_gas_price: int | float | None
-        gas_used: int
-        gas_limit: int
         n_transactions: int
+        # base_fee: int | float | None
+        # gas_used: int
+        # gas_limit: int
 
 
-def compute_median_block_gas_fee(
-    block: spec.Block,
-    *,
-    normalize: bool,
-) -> int | float | None:
-    """compute median gas fee of transactions in block"""
-
-    import numpy as np
-
-    # get transactions
-    transactions = block['transactions']
-    if len(transactions) == 0:
-        return None
-
-    # gather gas fees
-    gas_fees = []
-    for transaction in transactions:
-        if isinstance(transaction, str):
-            raise Exception(
-                'must use a block with include_full_transactions=True'
-            )
-        gas_fees.append(transaction['gas_price'])
-
-    # compute median
-    median = float(np.median(gas_fees))
-
-    # normalize
-    if normalize:
-        median = median / 1e9
-
-    return median
-
-
-def compute_median_blocks_gas_fees(
-    blocks: typing.Sequence[spec.Block],
-    *,
-    normalize: bool = True,
-) -> typing.Sequence[int | float | None]:
-    """compute median gas fees of transactionss in multiple blocks"""
-
-    return [
-        compute_median_block_gas_fee(block, normalize=normalize)
-        for block in blocks
-    ]
+#
+# # query median gas fees
+#
 
 
 async def async_get_median_block_gas_fee(
@@ -102,16 +63,17 @@ async def async_get_median_block_gas_fee(
         except Exception:
             pass
 
-    block_data = await rpc.async_eth_get_block_by_number(
-        block,
-        context=context,
-        include_full_transactions=True,
+    block_timestamp = await block_times.async_get_block_timestamp(
+        block=block, context=context
+    )
+    txs = await transaction_utils.async_get_block_transactions(
+        block, context=context
     )
     return {
         'block_number': block,
-        'timestamp': block_data['timestamp'],
-        'median_gas_fee': compute_median_block_gas_fee(
-            block_data,
+        'timestamp': block_timestamp,
+        'median_gas_fee': compute_transactions_median_gas_fee(
+            txs,
             normalize=normalize,
         ),
     }
@@ -144,7 +106,7 @@ async def async_get_median_blocks_gas_fees(
 
         if result is None:
             fee_map: typing.MutableMapping[int, db.BlockGasRow] = {}
-            missing = blocks
+            missing: typing.Sequence[int] = blocks
         else:
             fee_map = dict(result)
             missing = []
@@ -172,23 +134,32 @@ async def async_get_median_blocks_gas_fees(
 
         from ctc import config
 
-        context = config.update_context(context, merge_provider={'chunk_size': 1})
-        blocks_data = await evm.async_get_blocks(
-            blocks=missing,
-            include_full_transactions=True,
-            context=context,
-            latest_block_number=latest_block_number,
+        context = config.update_context(
+            context, merge_provider={'chunk_size': 1}
         )
 
-        missing_fees = compute_median_blocks_gas_fees(
-            blocks_data,
-            normalize=False,
+        # get txs by block
+        txs = await transaction_utils.async_get_blocks_transactions(
+            blocks=missing,
+            context=context,
         )
-        for block, block_data, fee in zip(missing, blocks_data, missing_fees):
+        blocks_timestamps = await block_times.async_get_block_timestamps(
+            blocks=blocks, context=context
+        )
+        txs_by_block: dict[int, list[spec.DBTransaction]] = {}
+        for tx in txs:
+            block = tx['block_number']
+            txs_by_block.setdefault(block, [])
+            txs_by_block[block].append(tx)
+
+        for block, timestamp in zip(missing, blocks_timestamps):
+            fee = compute_transactions_median_gas_fee(
+                txs_by_block[block], normalize=normalize
+            )
             fee_map[block] = {
                 'block_number': block,
                 'median_gas_fee': fee,
-                'timestamp': block_data['timestamp'],
+                'timestamp': timestamp,
             }
 
     if normalize:
@@ -199,70 +170,110 @@ async def async_get_median_blocks_gas_fees(
     return [fee_map[block] for block in blocks]
 
 
+#
+# # query gas stats
+#
+
+
 async def async_get_block_gas_stats(
-    block: spec.BlockNumberReference | spec.Block,
+    block: spec.BlockNumberReference,
     *,
     normalize: bool = True,
     context: spec.Context = None,
 ) -> BlockGasStats:
     """get gas usage statistics for a given block"""
-    if isinstance(block, dict):
-        block_data = block
-    else:
-        block_data = await block_crud.async_get_block(
-            block, include_full_transactions=True, context=context
-        )
 
-    return compute_block_gas_stats(block_data, normalize=normalize)
+    block_number = await block_normalize.async_block_reference_to_int(
+        block=block, context=context
+    )
+    txs = await transaction_utils.async_get_block_transactions(
+        block=block_number, context=context
+    )
+    return compute_transactions_gas_stats(txs, normalize=normalize)
 
 
 async def async_get_gas_stats_by_block(
-    blocks: typing.Sequence[spec.BlockNumberReference | spec.Block],
+    blocks: typing.Sequence[spec.BlockNumberReference],
     *,
     normalize: bool = True,
     context: spec.Context = None,
 ) -> list[BlockGasStats]:
     """get block gas usage statistics of multiple blocks"""
 
-    import asyncio
+    # get txs of blocks
+    int_blocks = await block_normalize.async_block_numbers_to_int(
+        blocks=blocks, context=context
+    )
+    txs = await transaction_utils.async_get_blocks_transactions(
+        blocks=int_blocks, context=context
+    )
 
-    coroutines = [
-        async_get_block_gas_stats(
-            block=block,
-            normalize=normalize,
-            context=context,
+    # sort txs by block
+    txs_by_block: dict[int, list[spec.DBTransaction]] = {}
+    for tx in txs:
+        block = tx['block_number']
+        txs_by_block.setdefault(block, [])
+        txs_by_block[block].append(tx)
+
+    # compute stats per block
+    return [
+        compute_transactions_gas_stats(
+            txs_by_block[int_block], normalize=normalize
         )
-        for block in blocks
+        for int_block in int_blocks
     ]
 
-    return await asyncio.gather(*coroutines)
+
+#
+# # compute gas stats
+#
 
 
-def compute_block_gas_stats(
-    block: spec.Block,
+def compute_transactions_median_gas_fee(
+    transactions: typing.Sequence[spec.DBTransaction],
+    *,
+    normalize: bool,
+) -> int | float | None:
+    """compute median gas fee of transactions in block"""
+
+    import numpy as np
+
+    # gather gas fees
+    gas_fees = []
+    for transaction in transactions:
+        if isinstance(transaction, str):
+            raise Exception(
+                'must use a block with include_full_transactions=True'
+            )
+        gas_fees.append(transaction['gas_price'])
+
+    # compute median
+    median = float(np.median(gas_fees))
+
+    # normalize
+    if normalize:
+        median = median / 1e9
+
+    return median
+
+
+def compute_transactions_gas_stats(
+    transactions: typing.Sequence[spec.DBTransaction],
     *,
     normalize: bool = True,
 ) -> BlockGasStats:
     """compute gas usage statistics for given block"""
+
     import numpy as np
 
-    base_fee: int | float | None = block.get('base_fee_per_gas')
-
-    if len(block['transactions']) > 0:
-        if isinstance(block['transactions'][0], str):
-            raise Exception(
-                'transaction data not in block, use include_full_transactions=True when retrieving block'
-            )
+    if len(transactions) > 0:
 
         gas_prices: list[int | float] = [
-            transaction['gas_price']  # type: ignore
-            for transaction in block['transactions']
+            transaction['gas_price'] for transaction in transactions
         ]
 
         if normalize:
             gas_prices = [gas_price / 1e9 for gas_price in gas_prices]
-            if base_fee is not None:
-                base_fee = base_fee / 1e9
 
         min_gas_price = min(gas_prices)
         median_gas_price = float(np.median(gas_prices))
@@ -276,13 +287,22 @@ def compute_block_gas_stats(
         max_gas_price = None
 
     return {
-        'base_fee': base_fee,
         'min_gas_price': min_gas_price,
         'median_gas_price': median_gas_price,
         'mean_gas_price': mean_gas_price,
         'max_gas_price': max_gas_price,
-        'gas_used': block['gas_used'],
-        'gas_limit': block['gas_limit'],
-        'n_transactions': len(block['transactions']),
+        'n_transactions': len(transactions),
     }
+
+
+# def compute_block_gas_stats(block: spec.DBBlock, normalize: bool = False):
+#     base_fee: int | float | None = block.get('base_fee_per_gas')
+#     if normalize:
+#         if base_fee is not None:
+#             base_fee = base_fee / 1e9
+#     return {
+#         'base_fee': base_fee,
+#         'gas_used': block['gas_used'],
+#         'gas_limit': block['gas_limit'],
+#     }
 

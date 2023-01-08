@@ -4,7 +4,7 @@ from .. import binary_utils
 from ctc import spec
 
 
-def serialize_block(block: spec.Block) -> spec.PrefixHexData:
+def serialize_block(block: spec.RPCBlock) -> spec.PrefixHexData:
     """serialize block in preparation for hashing"""
 
     if block.get('base_fee_per_gas') is not None:
@@ -36,7 +36,7 @@ def serialize_block(block: spec.Block) -> spec.PrefixHexData:
     return binary_utils.rlp_encode(as_list)
 
 
-def hash_block(block: spec.Block) -> spec.PrefixHexData:
+def hash_block(block: spec.RPCBlock) -> spec.PrefixHexData:
     """compute hash of block"""
 
     serialized = serialize_block(block)
