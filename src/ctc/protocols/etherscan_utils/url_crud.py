@@ -153,3 +153,4 @@ def create_transaction_state_changes_url(
     hostname = get_hostname(network)
     template = url_templates['transaction_state_changes']
     return template.format(hostname=hostname, transaction_hash=transaction_hash)
+

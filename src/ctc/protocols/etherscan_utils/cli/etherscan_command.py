@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import subprocess
-
 import toolcli
 
-from ctc import evm
 from ctc.protocols import etherscan_utils
 
 
@@ -80,57 +77,14 @@ async def async_etherscan_command(
     abi: bool,
 ) -> None:
 
-    is_address = False
-    if query.startswith('0x') and len(query) == 42:
-        url = etherscan_utils.create_address_url(query)
-        address = query
-        is_address = True
-    elif query.startswith('0x') and len(query) == 66:
-        if logs:
-            url = etherscan_utils.create_transaction_logs_url(query)
-        elif changes:
-            url = etherscan_utils.create_transaction_state_changes_url(query)
-        else:
-            url = etherscan_utils.create_transaction_url(query)
-    elif query.isnumeric():
-        url = etherscan_utils.create_block_url(int(query))
-    elif query.endswith('.eth'):
-        from ctc.protocols import ens_utils
+    await etherscan_utils.async_open_etherscan_in_browser(
+        query=query,
+        logs=logs,
+        changes=changes,
+        holdings=holdings,
+        erc20_transfers=erc20_transfers,
+        internal=internal,
+        holders=holders,
+        abi=abi,
+    )
 
-        resolved_address = await ens_utils.async_resolve_name(query)
-        if resolved_address is None:
-            print('[name does not resolve to an address]')
-        else:
-            address = resolved_address
-            url = etherscan_utils.create_address_url(address)
-            is_address = True
-    else:
-        try:
-            address = await evm.async_get_erc20_address(query)
-            url = etherscan_utils.create_address_url(address)
-            is_address = True
-        except Exception:
-            raise Exception('unknown query: ' + str(query))
-
-    if is_address:
-        if holdings:
-            url = etherscan_utils.create_address_holdings_url(address)
-        elif erc20_transfers:
-            url = etherscan_utils.create_address_erc20_transfers_url(address)
-        elif internal:
-            url = etherscan_utils.create_address_internal_txs_url(address)
-        elif holders:
-            url = etherscan_utils.create_token_holders_url(address)
-
-    if abi:
-        if is_address:
-            import json
-
-            raw_abi = await etherscan_utils.async_get_contract_abi(
-                address, verbose=False
-            )
-            print(json.dumps(raw_abi, sort_keys=True, indent=4))
-        else:
-            raise Exception('can only use --abi for addresses')
-    else:
-        subprocess.call(['xdg-open', url])
