@@ -103,6 +103,23 @@ def get_table_name(
     return 'network_' + str(chain_id) + '__' + table_name
 
 
+def get_schema_of_raw_table(table: str) -> spec.SchemaName:
+
+    candidates = []
+    for schema_name in get_all_schema_names():
+        raw_schema = get_raw_schema(schema_name)
+        for schema_table in raw_schema['tables'].keys():
+            if table == schema_table:
+                candidates.append(schema_name)
+
+    if len(candidates) == 1:
+        return candidates[0]
+    elif len(candidates) == 0:
+        raise Exception('could not find any schema containing table ' + str(table))
+    else:
+        raise Exception('found multiple schemas containing table ' + str(table))
+
+
 def get_complete_prepared_schema(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
 ) -> toolsql.DBSchema:
