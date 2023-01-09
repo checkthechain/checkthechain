@@ -67,6 +67,8 @@ def get_async_http_session(
             kwargs = provider['session_kwargs']
             if kwargs is None:
                 kwargs = {}
+            kwargs = dict(kwargs)
+            kwargs.setdefault('timeout', aiohttp.ClientTimeout(60))
             _http_sessions[provider_id] = aiohttp.ClientSession(**kwargs)
         else:
             raise Exception('no session, must create')
