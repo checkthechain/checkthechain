@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import os
 import typing
 from typing_extensions import Literal
@@ -265,6 +266,7 @@ def _get_provider_id(provider: spec.Provider) -> spec.ProviderId:
     return (os.getpid(), provider['url'], tuple(session_kwargs.items()))
 
 
+@functools.lru_cache()
 def _sync_get_chain_id(provider_url: str) -> int:
     """synchronously obtain chain_id of provider"""
     import json
