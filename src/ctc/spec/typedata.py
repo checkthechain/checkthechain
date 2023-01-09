@@ -157,34 +157,40 @@ transaction_keys_eip1559 = (
     's',
 )
 
-transaction_keys_standardized = {
-    'chainId': 'chain_id',
-    'start_gas': 'gas',
-    'maxPriorityFeePerGas': 'max_priority_fee_per_gas',
-    'maxFeePerGas': 'max_fee_per_gas',
-    'gas_limit': 'gas',
-    'destination': 'to',
-    'amount': 'value',
-    'data': 'input',
-    'accessList': 'access_list',
-    'signature_y_parity': 'v',
-    'signature_r': 'r',
-    'signature_s': 's',
+rpc_transaction_keys = {
+    'block_hash',
+    'block_number',
+    'contract_address',
+    'cumulative_gas_used',
+    'effective_gas_price',
+    'from',
+    'gas_used',
+    'logs',
+    'logs_bloom',
+    'status',
+    'to',
+    'transaction_hash',
+    'transaction_index',
+    'type',
 }
 
-transaction_keys_db = {
+db_transaction_keys = {
     'hash',
     'block_number',
     'transaction_index',
-    'to',
-    'from',
+    'to_address',
+    'from_address',
     'value',
     'input',
     'nonce',
-    'type',
-    'access_list',
+    'transaction_type',
+    'status',
     'gas_used',
+    'gas_limit',
+    'gas_priority',
     'gas_price',
+    'gas_price_max',
+    'access_list',
 }
 
 # removed_rpc_keys = {'v', 'r', 's', 'chain_id'}

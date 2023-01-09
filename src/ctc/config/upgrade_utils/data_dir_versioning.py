@@ -29,59 +29,29 @@ data_spec_order = [
     '0.3.0',
     '0.3.1',
     '0.3.2',
+    '0.3.3',
 ]
+
+_0_3_0_spec: DataDirSpec = {
+    'directory_tree': {
+        'dbs': {},
+        'logs': {'rpc': {}, 'db': {}},
+        'evm': {},
+    },
+    'files': [
+        './directory_version',
+    ],
+}
 
 data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
     '0.2.0': {
         'files': [],
         'directory_tree': {},
     },
-    '0.3.0': {
-        # 'files': [
-        #     'directory_version',
-        # ],
-        # 'directories': [
-        #     'dbs',
-        #     'logs',
-        #     'evm',
-        # ],
-        # 'directory_subdirs': {
-        #     'logs': ['rpc', 'db'],
-        # },
-        # 'move_items': {
-        #     'mainnet/events': 'evm/networks/mainnet/events',
-        # },
-        #
-        # newer version
-        'directory_tree': {
-            'dbs': {},
-            'logs': {'rpc': {}, 'db': {}},
-            'evm': {},
-        },
-        'files': [
-            './directory_version',
-        ],
-    },
-    '0.3.1': {
-        'directory_tree': {
-            'dbs': {},
-            'logs': {'rpc': {}, 'db': {}},
-            'evm': {},
-        },
-        'files': [
-            './directory_version',
-        ],
-    },
-    '0.3.2': {
-        'directory_tree': {
-            'dbs': {},
-            'logs': {'rpc': {}, 'db': {}},
-            'evm': {},
-        },
-        'files': [
-            './directory_version',
-        ],
-    },
+    '0.3.0': _0_3_0_spec,
+    '0.3.1': _0_3_0_spec,
+    '0.3.2': _0_3_0_spec,
+    '0.3.3': _0_3_0_spec,
 }
 
 

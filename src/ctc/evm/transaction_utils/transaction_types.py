@@ -6,32 +6,6 @@ from ctc import spec
 from .. import binary_utils
 
 
-def standardize_transaction(
-    transaction: typing.Mapping[str, typing.Any]
-) -> typing.Mapping[str, typing.Any]:
-    """return standardized version of transaction
-
-    - convert any camelcase keys or non-standard keys to single format
-    - fill in missing keys
-    """
-
-    standardized = {}
-    for key, value in transaction.items():
-        if key in spec.transaction_keys_standardized:
-            key = spec.transaction_keys_standardized[key]
-        standardized[key] = value
-
-    if 'input' not in standardized:
-        standardized['input'] = bytes()
-    if (
-        'max_priority_fee_per_gas' in standardized
-        and 'access_list' not in standardized
-    ):
-        standardized['access_list'] = []
-
-    return standardized
-
-
 def get_transaction_type(
     transaction_or_type: spec.Data | typing.Mapping[str, typing.Any]
 ) -> int:

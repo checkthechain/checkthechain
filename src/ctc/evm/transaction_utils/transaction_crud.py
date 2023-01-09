@@ -4,36 +4,7 @@ import typing
 
 from ctc import spec
 from .. import block_utils
-
-
-def _rpc_tx_to_db_tx(
-    transaction: spec.RPCTransaction,
-    receipt: spec.RPCTransactionReceipt,
-) -> spec.DBTransaction:
-    """convert transaction data from rpc call into db transaction format"""
-    tx: spec.DBTransaction = {
-        #
-        # tx fields
-        'hash': transaction['hash'],
-        'block_number': transaction['block_number'],
-        'transaction_index': transaction['transaction_index'],
-        'to_address': transaction['to'],
-        'from_address': transaction['from'],
-        'value': transaction['value'],
-        'input': transaction['input'],
-        'nonce': transaction['nonce'],
-        'transaction_type': transaction['type'],
-        'access_list': transaction.get('access_list'),
-        #
-        # receipt fields
-        'gas_used': receipt['gas_used'],
-        'gas_price': receipt['effective_gas_price'],
-        'gas_limit': transaction['gas'],
-        'gas_priority': transaction['max_priority_fee_per_gas'],
-        'gas_price_max': transaction['max_fee_per_gas'],
-        'status': receipt['status'],
-    }
-    return tx
+from . import transaction_convert
 
 
 async def async_get_transaction(
@@ -72,7 +43,11 @@ async def async_get_transaction(
         ),
     )
 
-    db_transaction = _rpc_tx_to_db_tx(transaction=raw_tx, receipt=raw_receipt)
+    db_transaction = (
+        transaction_convert.convert_rpc_transaction_to_db_transaction(
+            transaction=raw_tx, receipt=raw_receipt
+        )
+    )
 
     # remove fields
     if write_cache:
@@ -103,8 +78,11 @@ async def async_get_transactions(
 # # block transactions
 #
 
+
 async def async_get_block_transactions(
-    block: int, *, context: spec.Context,
+    block: int,
+    *,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
     return await async_get_blocks_transactions(blocks=[block], context=context)
 
@@ -112,21 +90,21 @@ async def async_get_block_transactions(
 async def async_get_blocks_transactions(
     blocks: typing.Sequence[spec.BlockReference],
     *,
-    context: spec.Context,
+    context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
 
     import ctc.config
     import ctc.db
 
-    read_cache, write_cache = ctc.config.get_context_cache_read_write(
-        context=context,
-        schema_name='transactions',
-    )
-
     block_numbers = await block_utils.async_block_references_to_int(
         blocks=blocks, context=context
     )
 
+    # get from db
+    read_cache, write_cache = ctc.config.get_context_cache_read_write(
+        context=context,
+        schema_name='transactions',
+    )
     db_txs: typing.Sequence[spec.DBTransaction] = []
     if read_cache:
 
@@ -146,21 +124,26 @@ async def async_get_blocks_transactions(
 
     from ctc import rpc
 
+    # get blocks from node
     rpc_blocks = await rpc.async_batch_eth_get_block_by_number(
         block_numbers=block_numbers,
         include_full_transactions=True,
         context=context,
     )
+
+    # convert rpc txs to db txs
     rpc_transactions = [
         tx for rpc_block in rpc_blocks for tx in rpc_block['transactions']
     ]
     tx_hashes = [tx['hash'] for tx in rpc_transactions]
     rpc_receipts = await rpc.async_batch_eth_get_transaction_receipt(
-        transaction_receipts=tx_hashes,
+        transaction_hashes=tx_hashes,
         context=context,
     )
     new_db_txs = [
-        _rpc_tx_to_db_tx(transaction=rpc_transaction, receipt=rpc_receipt)
+        transaction_convert.convert_rpc_transaction_to_db_transaction(
+            transaction=rpc_transaction, receipt=rpc_receipt
+        )
         for rpc_transaction, rpc_receipt in zip(rpc_transactions, rpc_receipts)
     ]
     new_db_txs.extend(db_txs)
@@ -169,17 +152,10 @@ async def async_get_blocks_transactions(
         await ctc.db.async_intake_blocks(
             rpc_blocks=rpc_blocks,
             context=context,
-        )
-        rpc_transactions_by_block = {
-            rpc_block['number']: rpc_block['transactions']
-            for rpc_block in rpc_blocks
-        }
-        await ctc.db.async_intake_blocks_transactions(
-            blocks_transactions=rpc_transactions_by_block,
-            context=context,
+            blocks_db_transactions=new_db_txs,
         )
 
-    return db_txs
+    return new_db_txs
 
 
 #

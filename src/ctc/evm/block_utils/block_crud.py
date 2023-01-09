@@ -5,6 +5,7 @@ import typing
 
 from ctc import evm
 from ctc import spec
+from . import block_convert
 
 if typing.TYPE_CHECKING:
     import asyncio
@@ -24,9 +25,7 @@ async def async_get_block(
     """get block from local database or from RPC node"""
 
     if spec.is_block_number_reference(block):
-        return await _async_get_block_by_number(
-            block=block, context=context
-        )
+        return await _async_get_block_by_number(block=block, context=context)
     elif spec.is_block_hash(block):
         from ctc import rpc
 
@@ -35,7 +34,7 @@ async def async_get_block(
             context=context,
             include_full_transactions=False,
         )
-        return _rpc_block_to_db_block(rpc_block_data)
+        return block_convert.convert_rpc_block_to_db_block(rpc_block_data)
     else:
         raise Exception('unknown block specifier: ' + str(block))
 
@@ -67,7 +66,7 @@ async def _async_get_block_by_number(
         context=context,
         include_full_transactions=False,
     )
-    db_block = _rpc_block_to_db_block(rpc_block_data)
+    db_block = block_convert.convert_rpc_block_to_db_block(rpc_block_data)
 
     if write_cache:
         await db.async_intake_block(
@@ -78,24 +77,10 @@ async def _async_get_block_by_number(
     return db_block
 
 
-def _rpc_block_to_db_block(
-    rpc_block: spec.RPCBlock | spec.DBBlock,
-) -> spec.DBBlock:
-    return {
-        'number': rpc_block['number'],
-        'hash': rpc_block['hash'],
-        'timestamp': rpc_block['timestamp'],
-        'miner': rpc_block['miner'],
-        'extra_data': rpc_block['extra_data'],
-        'base_fee_per_gas': rpc_block['base_fee_per_gas'],
-        'gas_limit': rpc_block['gas_limit'],
-        'gas_used': rpc_block['gas_used'],
-    }
-
-
 #
 # # plural
 #
+
 
 async def async_get_blocks(
     blocks: typing.Sequence[spec.BlockReference],
@@ -165,7 +150,10 @@ async def _async_get_blocks_by_numbers(
         include_full_transactions=False,
         context=context,
     )
-    db_blocks = [_rpc_block_to_db_block(block) for block in rpc_blocks]
+    db_blocks = [
+        block_convert.convert_rpc_block_to_db_block(block)
+        for block in rpc_blocks
+    ]
 
     # intake rpc data to db
     if write_cache:

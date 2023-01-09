@@ -36,51 +36,14 @@ async def async_intake_blocks(
     *,
     db_blocks: typing.Sequence[spec.DBBlock] | None = None,
     rpc_blocks: typing.Sequence[spec.RPCBlock] | None = None,
-    context: spec.Context,
     latest_block_number: int | None = None,
+    blocks_db_transactions: typing.Sequence[spec.DBTransaction] | None = None,
+    context: spec.Context,
 ) -> None:
     """intake block and extract relevant information to db tables
 
     under normal operation should store raw block or block timestamp, noth both
     """
-
-    if rpc_blocks is not None and db_blocks is not None:
-        raise Exception('should specify only rpc_blocks or db_blocks')
-    if db_blocks is not None:
-        blocks_transactions: typing.Mapping[int, typing.Sequence[spec.RPCTransaction]] | None = None
-    else:
-        if rpc_blocks is not None:
-            db_blocks = [
-                evm.block_utils.block_crud._rpc_block_to_db_block(rpc_block)
-                for rpc_block in rpc_blocks
-            ]
-            blocks_transactions = {
-                rpc_block['number']: rpc_block['transactions']  # type: ignore
-                for rpc_block in rpc_blocks
-                if len(rpc_block['transactions']) > 0
-                and isinstance(rpc_block['transactions'][0], dict)
-            }
-        else:
-            raise Exception('must specify rpc_blocks or db_blocks')
-
-    # filter unconfirmed blocks
-    filtered_db_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
-        db_blocks, context=context, latest_block_number=latest_block_number
-    )
-    if len(filtered_db_blocks) == 0:
-        return
-    if blocks_transactions is not None and len(db_blocks) != len(
-        filtered_db_blocks
-    ):
-        filtered_block_numbers = [
-            block['number'] for block in filtered_db_blocks
-        ]
-        blocks_transactions = {
-            block_number: block_transactions
-            for block_number, block_transactions in blocks_transactions.items()
-            if block_number in filtered_block_numbers
-        }
-    db_blocks = filtered_db_blocks
 
     # check whether to intake
     active_schemas = management.get_active_schemas()
@@ -88,10 +51,54 @@ async def async_intake_blocks(
     intake_transactions = active_schemas.get('transactions')
     intake_block_timestamps = active_schemas.get('block_timestamps')
 
-    # insert into databases
+    # get db blocks
+    if rpc_blocks is not None and db_blocks is not None:
+        raise Exception('should specify only rpc_blocks or db_blocks')
+    if db_blocks is None:
+        if rpc_blocks is None:
+            raise Exception('must specify rpc_blocks or db_blocks')
+        db_blocks = [
+            evm.convert_rpc_block_to_db_block(rpc_block)
+            for rpc_block in rpc_blocks
+        ]
+
+    # filter unconfirmed blocks
+    filtered_db_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
+        db_blocks, context=context, latest_block_number=latest_block_number
+    )
+    if len(filtered_db_blocks) == 0:
+        return
+    db_blocks = filtered_db_blocks
+    block_numbers = [block['number'] for block in db_blocks]
+
+    # get db_block_transactions
+    if (
+        intake_transactions
+        and blocks_db_transactions is None
+        and rpc_blocks is not None
+    ):
+        import asyncio
+
+        blocks_rpc_transactions: typing.Sequence[spec.RPCTransaction] = [
+            tx  # type: ignore
+            for rpc_block in rpc_blocks
+            for tx in rpc_block['transactions']
+            if rpc_block['number'] in block_numbers
+            and len(rpc_block['transactions']) > 0
+            and isinstance(rpc_block['transactions'][0], dict)
+        ]
+        coroutines = [
+            evm.async_convert_rpc_transaction_to_db_transaction(
+                transaction=tx, context=context
+            )
+            for tx in blocks_rpc_transactions
+        ]
+        blocks_db_transactions = await asyncio.gather(*coroutines)
+
+    # insert into database
     if intake_blocks or intake_transactions:
         engine = connect_utils.create_engine(
-            schema_name='block_timestamps',
+            schema_names=['blocks', 'block_timestamps', 'transactions'],
             context=context,
         )
         if engine is None:
@@ -111,9 +118,10 @@ async def async_intake_blocks(
                     context=context,
                     conn=conn,
                 )
-        if blocks_transactions is not None and intake_transactions:
+        if blocks_db_transactions is not None and intake_transactions:
             await transactions_intake.async_intake_blocks_transactions(
-                blocks_transactions=blocks_transactions,
+                block_numbers=block_numbers,
+                transactions=blocks_db_transactions,
                 context=context,
             )
 

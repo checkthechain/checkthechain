@@ -23,7 +23,7 @@ async def async_upsert_block_transaction_query(
         conn=conn,
         table=table,
         row={'block_number': block_number},
-        upsert='do_update',
+        # upsert='do_update',
     )
 
 
@@ -46,7 +46,7 @@ async def async_upsert_block_transaction_queries(
         conn=conn,
         table=table,
         rows=rows,
-        upsert='do_update',
+        # upsert='do_update',
     )
 
 
@@ -55,9 +55,9 @@ async def async_select_block_transaction_queries(
     block_numbers: typing.Sequence[int] | None = None,
     start_block: int | None = None,
     end_block: int | None = None,
-    context: spec.Context,
     conn: toolsql.SAConnection,
-) -> typing.Mapping[int, bool] | None:
+    context: spec.Context,
+) -> typing.Sequence[int] | None:
 
     table = schema_utils.get_table_name(
         'block_transaction_queries',
@@ -65,11 +65,13 @@ async def async_select_block_transaction_queries(
     )
 
     if block_numbers is not None:
-        queries = toolsql.select(
+        queries: typing.Sequence[int] = toolsql.select(
             conn=conn,
             table=table,
             where_in={'block_number': block_numbers},
             raise_if_table_dne=True,
+            only_columns=['block_number'],
+            row_format='only_column',
         )
 
     else:
@@ -87,23 +89,11 @@ async def async_select_block_transaction_queries(
             where_lte=where_lte,
             where_gte=where_gte,
             raise_if_table_dne=True,
+            only_columns=['block_number'],
+            row_format='only_column',
         )
 
-    if queries is None:
-        return None
-
-    # process queries
-    output = {query: True for query in queries}
-    query_set = set(queries)
-
-    if start_block is not None and end_block is not None:
-        block_numbers = range(start_block, end_block + 1)
-    if block_numbers is not None:
-        for block_number in block_numbers:
-            if block_number not in query_set:
-                output[block_number] = False
-
-    return output
+    return queries
 
 
 async def async_select_block_transaction_query(
@@ -122,7 +112,7 @@ async def async_select_block_transaction_query(
     result = toolsql.select(
         conn=conn,
         table=table,
-        where_in={'block_number': block_number},
+        where_equals={'block_number': block_number},
         return_count='one',
         raise_if_table_dne=True,
     )

@@ -4,12 +4,13 @@ import typing
 
 import toolsql
 
+from ctc import evm
 from ctc import spec
 from ... import schema_utils
 
 
 async def async_upsert_transaction(
-    transaction: spec.DBTransaction,
+    db_transaction: spec.DBTransaction,
     *,
     conn: toolsql.SAConnection,
     context: spec.Context,
@@ -17,10 +18,12 @@ async def async_upsert_transaction(
 
     table = schema_utils.get_table_name('transactions', context=context)
 
+    tx = evm.convert_db_transaction_fields_to_text(db_transaction)
+
     toolsql.insert(
         conn=conn,
         table=table,
-        row=transaction,
+        row=tx,
         upsert='do_update',
     )
 
@@ -37,10 +40,12 @@ async def async_upsert_transactions(
     if len(transactions) == 0:
         return
 
+    txs = [evm.convert_db_transaction_fields_to_text(tx) for tx in transactions]
+
     toolsql.insert(
         conn=conn,
         table=table,
-        rows=transactions,
+        rows=txs,
         upsert='do_update',
     )
 
@@ -54,7 +59,7 @@ async def async_select_transaction(
 
     table = schema_utils.get_table_name('transactions', context=context)
 
-    tx: spec.DBTransaction | None = toolsql.select(
+    tx: spec.DBTransactionText | None = toolsql.select(
         conn=conn,
         table=table,
         where_equals={'hash': hash},
@@ -62,7 +67,10 @@ async def async_select_transaction(
         raise_if_table_dne=False,
     )
 
-    return tx
+    if tx is None:
+        return None
+    else:
+        return evm.convert_db_transaction_fields_to_int(tx)
 
 
 async def async_select_transactions(
@@ -74,7 +82,7 @@ async def async_select_transactions(
 
     table = schema_utils.get_table_name('transactions', context=context)
 
-    transactions = toolsql.select(
+    transactions: typing.Sequence[spec.DBTransaction] = toolsql.select(
         conn=conn,
         table=table,
         where_in={'hash': hashes},

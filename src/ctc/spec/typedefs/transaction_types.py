@@ -1,3 +1,10 @@
+"""
+
+## Transaction Types
+0. legacy
+1. [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559)
+2. [EIP-2930](https://eips.ethereum.org/EIPS/eip-2930)
+"""
 from __future__ import annotations
 
 import typing
@@ -162,6 +169,26 @@ class DBTransaction(TypedDict):
     to_address: address_types.Address
     from_address: address_types.Address
     value: int
+    input: str
+    nonce: int
+    transaction_type: int
+    status: int
+    gas_used: int
+    gas_limit: int
+    gas_priority: int | None
+    gas_price: int
+    gas_price_max: int | None
+    access_list: TransactionAccessList | None
+
+
+# convert large fields to str
+class DBTransactionText(TypedDict):
+    hash: TransactionHash
+    block_number: int
+    transaction_index: int
+    to_address: address_types.Address
+    from_address: address_types.Address
+    value: str
     input: str
     nonce: int
     transaction_type: int
