@@ -48,6 +48,7 @@ async def async_convert_rpc_transaction_to_db_transaction(
     *,
     context: spec.Context = None,
 ) -> spec.DBTransaction:
+    """convert transaction to standard form, fetching receipts as necessary"""
 
     from ctc import rpc
 
@@ -69,6 +70,7 @@ async def async_convert_rpc_transactions_to_db_transactions(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
+    """convert transactions to standard form, fetching receipts as necessary"""
 
     import asyncio
 
@@ -91,6 +93,7 @@ def convert_db_transaction_fields_to_text(
     *,
     inplace: bool = False,
 ) -> spec.DBTransactionText:
+    """convert large integer transaction fields from int to text"""
     if not inplace:
         transaction = transaction.copy()
     field: typing.Literal['value']
@@ -104,6 +107,7 @@ def convert_db_transaction_fields_to_int(
     *,
     inplace: bool = False,
 ) -> spec.DBTransaction:
+    """convert large integer transaction fields from text to int"""
     if not inplace:
         transaction = transaction.copy()
     field: typing.Literal['value']

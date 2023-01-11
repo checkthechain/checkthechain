@@ -84,6 +84,7 @@ async def async_get_block_transactions(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
+    """get all transactions in a block"""
     return await async_get_blocks_transactions(blocks=[block], context=context)
 
 
@@ -92,6 +93,7 @@ async def async_get_blocks_transactions(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
+    """get all transactions in collection of blocks"""
 
     import ctc.config
     import ctc.db
