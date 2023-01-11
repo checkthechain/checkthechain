@@ -87,6 +87,7 @@ async def async_setup_networks(
         networks=networks,
         styles=styles,
         headless=headless,
+        old_config=old_config,
     )
 
     print()
@@ -489,6 +490,7 @@ def specify_default_providers(
     providers: typing.Mapping[str, spec.Provider],
     styles: toolcli.StyleTheme,
     headless: bool,
+    old_config: typing.Mapping[typing.Any, typing.Any],
 ) -> typing.Mapping[spec.ChainId, str]:
 
     # compile providers for each network
@@ -525,13 +527,24 @@ def specify_default_providers(
                 + str(network)
                 + '?'
             )
+
+            default_choice = old_config.get('default_providers', {}).get(
+                str(network)
+            )
+            if (
+                default_choice is None
+                or default_choice not in providers_per_network[network]
+            ):
+                default_choice = providers_per_network[network][0]
+
             answer = toolcli.input_number_choice(
                 prompt=prompt,
                 choices=providers_per_network[network],
                 style=styles['metavar'],
                 headless=headless,
-                default=providers_per_network[network][0],
+                default=default_choice,
             )
             default_providers[network] = providers_per_network[network][answer]
 
     return default_providers
+
