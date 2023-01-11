@@ -3,13 +3,13 @@ from __future__ import annotations
 import os
 import typing
 
-import ctc
-from ctc import spec
-
 import toolcli
 import toolconfig
 import toolstr
 
+import ctc
+from ctc import spec
+from ctc.cli import cli_utils
 from .. import config_spec
 from .. import config_read
 from .. import upgrade_utils
@@ -143,7 +143,46 @@ def write_new_config(
             else:
                 print('Updated keys:')
                 for key in sorted(changed_keys):
-                    print('-', key)
+                    cli_utils.print_bullet(
+                        value=key, key_style=styles['description']
+                    )
+                    old_value = old_config_raw.get(key)
+                    new_value = config.get(key)
+                    if isinstance(old_value, dict) and isinstance(
+                        new_value, dict
+                    ):
+                        changed_values = {}
+                        for k, v in new_value.items():
+                            if v != old_value.get(k):
+                                changed_values[k] = (old_value.get(k), v)
+                        if len(changed_values) > 0:
+                            for k, (old_v, new_v) in changed_values.items():
+                                cli_utils.print_bullet(
+                                    key='subkey', value=k, indent=4
+                                )
+                                cli_utils.print_bullet(
+                                    key='old', value=old_v, indent=8
+                                )
+                                cli_utils.print_bullet(
+                                    key='new', value=new_v, indent=8
+                                )
+
+                        # print deleted keys
+                        deleted_keys = [
+                            k for k in old_value if k not in new_value
+                        ]
+                        if len(deleted_keys) > 0:
+                            print('    - deleted subkeys:', deleted_keys)
+
+                    else:
+                        cli_utils.print_bullet(
+                            key='old value',
+                            value=old_config_raw.get(key),
+                            indent=4,
+                        )
+                        cli_utils.print_bullet(
+                            key='new value', value=config.get(key), indent=4
+                        )
 
         # make sure file overwrite is confirmed
         if write_new and not overwrite:
@@ -168,3 +207,4 @@ def write_new_config(
         )
     else:
         print('Config unchanged')
+
