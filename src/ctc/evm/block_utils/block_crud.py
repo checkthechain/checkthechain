@@ -165,8 +165,8 @@ async def _async_get_blocks_by_numbers(
             context=context,
         )
 
-        block_data_map.update(dict(zip(pending, db_blocks)))
-        blocks_data = [block_data_map[block] for block in standardized]
+    block_data_map.update(dict(zip(pending, db_blocks)))
+    blocks_data = [block_data_map[block] for block in standardized]
 
     return blocks_data  # type: ignore
 

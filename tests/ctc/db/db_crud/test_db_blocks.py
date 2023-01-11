@@ -2,6 +2,7 @@ import os
 import tempfile
 import toolsql
 
+import ctc
 from ctc import db
 
 
@@ -72,6 +73,10 @@ example_data = [
         'transactions_root': '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421',
         'uncles': [],
     },
+]
+
+example_data = [
+    ctc.convert_rpc_block_to_db_block(block) for block in example_data
 ]
 
 

@@ -74,7 +74,7 @@ network_schema_names = (
 #     'write',
 # )
 
-block_keys = (
+rpc_block_keys = (
     'base_fee_per_gas',
     'difficulty',
     'extra_data',
@@ -96,6 +96,17 @@ block_keys = (
     'transactions',
     'transactions_root',
     'uncles',
+)
+
+db_block_keys = (
+    'number',
+    'hash',
+    'timestamp',
+    'miner',
+    'extra_data',
+    'base_fee_per_gas',
+    'gas_limit',
+    'gas_used',
 )
 
 block_number_names = ['latest', 'earliest', 'pending']
@@ -158,20 +169,25 @@ transaction_keys_eip1559 = (
 )
 
 rpc_transaction_keys = {
+    'access_list',
     'block_hash',
     'block_number',
-    'contract_address',
-    'cumulative_gas_used',
-    'effective_gas_price',
+    'chain_id',
     'from',
-    'gas_used',
-    'logs',
-    'logs_bloom',
-    'status',
+    'gas',
+    'gas_price',
+    'hash',
+    'input',
+    'max_fee_per_gas',
+    'max_priority_fee_per_gas',
+    'nonce',
+    'r',
+    's',
     'to',
-    'transaction_hash',
     'transaction_index',
     'type',
+    'v',
+    'value',
 }
 
 db_transaction_keys = {

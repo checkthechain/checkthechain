@@ -34,6 +34,7 @@ async def test_verify_transaction_signature(test):
         signature=signature,
         transaction=transaction,
         address=transaction['from'],
+        chain_id=1,
     )
 
 
@@ -87,7 +88,8 @@ example_transactions = [
             'max_priority_fee_per_gas': 1000000000,
             'nonce': 0,
             'to': '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359',
-            'data': '0xa9059cbb000000000000000000000000fb6916095ca1df60bb79ce92ce3ea74c37c5d3590000000000000000000000000000000000000000000000000000000000000001',
+            'input': '0xa9059cbb000000000000000000000000fb6916095ca1df60bb79ce92ce3ea74c37c5d3590000000000000000000000000000000000000000000000000000000000000001',
+            'access_list': [],
         },
     },
 ]
@@ -100,7 +102,7 @@ def test_sign_transaction(test):
     transaction = test['transaction']
     target_signature = test['signature']
 
-    transaction = evm.standardize_transaction(transaction)
+    # transaction = evm.standardize_transaction(transaction)
 
     actual_signature = evm.sign_transaction(
         transaction=transaction,

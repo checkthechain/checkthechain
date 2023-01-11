@@ -71,7 +71,7 @@ async def async_blocks_command(
             'median_gas',
         ]
     elif attributes == ['all']:
-        attributes = list(spec.block_keys)
+        attributes = list(spec.db_block_keys)
     else:
         attributes = [
             attribute for token in attributes for attribute in token.split(',')

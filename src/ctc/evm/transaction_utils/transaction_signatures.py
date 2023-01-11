@@ -39,6 +39,7 @@ def verify_transaction_signature(
     signature: spec.Signature | None = None,
     public_key: spec.Data | None = None,
     address: spec.Data | None = None,
+    chain_id: int | None = None,
 ) -> bool:
     """verify that transaction was signed by given public key"""
 
@@ -54,7 +55,9 @@ def verify_transaction_signature(
             raise Exception('must provide signature for transaction')
 
     # get transaction hash
-    transaction_hash = transaction_hashes.hash_unsigned_transaction(transaction)
+    transaction_hash = transaction_hashes.hash_unsigned_transaction(
+        transaction, chain_id=chain_id
+    )
 
     # process signature
     v, r, s = binary_utils.unpack_signature_vrs(signature)
@@ -131,3 +134,4 @@ def is_transaction_signed(transaction: typing.Mapping[str, typing.Any]) -> bool:
         and transaction.get('r') is not None
         and transaction.get('s') is not None
     )
+

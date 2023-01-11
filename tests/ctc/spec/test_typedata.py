@@ -29,11 +29,11 @@ def test_block_keys_match_types():
 def test_transaction_keys_match_types():
     assert (
         set(spec.rpc_transaction_keys)
-        == transaction_types.RPCTransaction.__annotations__.keys()
+        == set(transaction_types.RPCTransaction.__annotations__.keys())
     )
     assert (
         set(spec.db_transaction_keys)
-        == transaction_types.DBTransaction.__annotations__.keys()
+        == set(transaction_types.DBTransaction.__annotations__.keys())
     )
 
 

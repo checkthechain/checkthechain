@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ctc import evm
+from ctc import spec
 from . import abi_crud
 from . import url_crud
 
@@ -15,9 +16,14 @@ async def async_open_etherscan_in_browser(
     internal: bool | None = None,
     holders: bool | None = None,
     abi: bool | None = None,
+    context: spec.Context | None = None,
 ) -> None:
 
     import toolcli
+    import ctc.config
+
+    if ctc.config.get_context_chain_id(context) != 1:
+        raise NotImplementedError('only currently implemented for mainnet')
 
     is_address = False
     if query.startswith('0x') and len(query) == 42:

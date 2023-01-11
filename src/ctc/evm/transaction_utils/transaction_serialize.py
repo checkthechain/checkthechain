@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import spec
 from .. import binary_utils
 from . import transaction_types
@@ -17,7 +19,19 @@ def serialize_unsigned_transaction(
     keys = transaction_types.get_transaction_type_keys(type, signed=False)
 
     # represent as list
-    as_list = [transaction[key] for key in keys]  # type: ignore
+    as_list: list[typing.Any] = []
+    for key in keys:
+        if key == 'chain_id':
+            if transaction.get('chain_id') is not None:
+                as_list.append(transaction.get('chain_id'))
+            if transaction.get('chainId') is not None:
+                as_list.append(transaction.get('chainId'))
+            elif chain_id is not None:
+                as_list.append(chain_id)
+            else:
+                raise Exception('must specify chain_id')
+        else:
+            as_list.append(transaction[key])
 
     # add EIP-155 chain_id
     if type == 0:

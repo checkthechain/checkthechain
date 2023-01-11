@@ -111,27 +111,25 @@ PrechainTransaction = typing.Union[
 RPCTransaction = TypedDict(
     'RPCTransaction',
     {
+        'access_list': NotRequired[TransactionAccessList],
         'block_hash': binary_types.PrefixHexData,
         'block_number': int,
+        'chain_id': binary_types.PrefixHexData,
         'from': address_types.Address,
         'gas': int,
         'gas_price': int,
         'hash': TransactionHash,
         'input': binary_types.PrefixHexData,
+        'max_fee_per_gas': NotRequired[int],
+        'max_priority_fee_per_gas': NotRequired[int],
         'nonce': int,
-        'to': address_types.Address,
-        'transaction_index': int,
-        'value': int,
-        'type': int,
-        'chain_id': binary_types.PrefixHexData,
-        'v': int,
         'r': binary_types.PrefixHexData,
         's': binary_types.PrefixHexData,
-        #
-        # newer attributes that may or may not be present
-        'max_priority_fee_per_gas': NotRequired[int],
-        'max_fee_per_gas': NotRequired[int],
-        'access_list': NotRequired[TransactionAccessList],
+        'to': address_types.Address,
+        'transaction_index': int,
+        'type': int,
+        'v': int,
+        'value': int,
     },
 )
 
