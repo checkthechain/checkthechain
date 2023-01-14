@@ -89,8 +89,10 @@ async def async_get_block_transactions(
 
 
 async def async_get_blocks_transactions(
-    blocks: typing.Sequence[spec.BlockReference],
+    blocks: typing.Sequence[spec.BlockReference] | None = None,
     *,
+    start_block: spec.BlockReference | None = None,
+    end_block: spec.BlockReference | None = None,
     context: spec.Context = None,
 ) -> typing.Sequence[spec.DBTransaction]:
     """get all transactions in collection of blocks"""
@@ -98,9 +100,19 @@ async def async_get_blocks_transactions(
     import ctc.config
     import ctc.db
 
-    block_numbers = await block_utils.async_block_references_to_int(
-        blocks=blocks, context=context
-    )
+    if blocks is not None and (
+        start_block is not None or end_block is not None
+    ):
+        raise Exception('cannot specify both blocks and start_block/end_block')
+    if blocks is None and (start_block is None or end_block is None):
+        raise Exception('must specify blocks or start_block+end_block')
+
+    if blocks is not None:
+        block_numbers = await block_utils.async_block_references_to_int(
+            blocks=blocks, context=context
+        )
+    else:
+        block_numbers = None
 
     # get from db
     read_cache, write_cache = ctc.config.get_context_cache_read_write(
@@ -111,11 +123,18 @@ async def async_get_blocks_transactions(
     if read_cache:
 
         result = await ctc.db.async_query_blocks_transactions(
-            block_numbers=block_numbers, context=context
+            block_numbers=block_numbers,
+            start_block=start_block,
+            end_block=end_block,
+            context=context,
         )
         if result is not None:
             db_txs, manifest = result
             missing_blocks = []
+
+            if block_numbers is None:
+                block_numbers = list(range(start_block, end_block + 1))
+
             for block_number in block_numbers:
                 if block_number not in manifest:
                     missing_blocks.append(block_number)
