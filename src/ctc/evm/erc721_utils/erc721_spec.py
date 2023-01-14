@@ -17,6 +17,8 @@ erc721_collections = {
     'coolcats': '0x1a92f7381b9f03921564a437210bb9396471050c',
     'uniswapv3position': '0xc36442b4a4522e871399cd717abdd847ab11fe88',
     'loot': '0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7',
+    'nouns': '0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03',
+    'pudgypenguins': '0xbd3531da5cf5857e7cfaa92426877b022e612cf8',
 }
 
 
