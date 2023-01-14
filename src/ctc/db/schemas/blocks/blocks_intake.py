@@ -62,6 +62,9 @@ async def async_intake_blocks(
             for rpc_block in rpc_blocks
         ]
 
+    if len(db_blocks) == 0:
+        return
+
     # filter unconfirmed blocks
     filtered_db_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
         db_blocks, context=context, latest_block_number=latest_block_number

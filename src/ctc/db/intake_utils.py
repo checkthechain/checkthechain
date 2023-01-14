@@ -40,6 +40,9 @@ async def async_filter_fully_confirmed_blocks(
     latest_block_number: int | None = None,
 ) -> typing.Sequence[T]:
 
+    if len(blocks) == 0:
+        return []
+
     block_numbers = []
     for block in blocks:
         if isinstance(block, dict):
