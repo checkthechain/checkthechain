@@ -7,6 +7,7 @@ if typing.TYPE_CHECKING or os.environ.get('BUILDING_SPHINX') == '1':
     from .binary_types import *
     from .block_types import *
     from .config_types import *
+    from .consensus_types import *
     from .context_types import *
     from .data_source_types import *
     from .db_types import *
