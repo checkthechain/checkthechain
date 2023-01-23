@@ -78,6 +78,10 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 're-import ABI from etherscan (e.g. if proxy has changed)',
                 'action': 'store_true',
             },
+            {
+                'name': '--network',
+                'help': 'network of context',
+            },
         ],
         'examples': [
             '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
@@ -105,6 +109,7 @@ async def async_abi_command(
     map_selectors: bool,
     python: bool,
     update: bool,
+    network: spec.NetworkReference,
 ) -> None:
 
     if map_names and map_selectors:
@@ -116,7 +121,7 @@ async def async_abi_command(
     address = await evm.async_resolve_address(address)
     contract_abi = await evm.async_get_contract_abi(
         contract_address=address,
-        context={'cache': (not update)},
+        context={'network': network, 'cache': (not update)},
     )
 
     # filter by name
