@@ -37,5 +37,8 @@ def bin_data(
         return groups.count()
     elif f == 'mean':
         return groups.mean()
+    elif f == 'nunique':
+        return groups.nunique()
     else:
         raise Exception('unknown function: ' + str(f))
+
