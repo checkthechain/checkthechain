@@ -57,6 +57,8 @@ async def async_get_contract_creation_transaction(
     """get hash of contract's creation transaction"""
     from ctc import rpc
 
+    contract_address = contract_address.lower()
+
     if creation_block is None:
         creation_block = await async_get_contract_creation_block(
             contract_address, context=context
