@@ -15,12 +15,14 @@ async def async_intake_transaction(
     *,
     context: spec.Context = None,
     latest_block: int | None = None,
+    already_converted: bool = False
 ) -> None:
 
     await async_intake_transactions(
         transactions=[transaction],
         latest_block=latest_block,
         context=context,
+        already_converted=already_converted,
     )
 
 
@@ -29,6 +31,7 @@ async def async_intake_transactions(
     *,
     latest_block: int | None = None,
     context: spec.Context = None,
+    already_converted: bool = False
 ) -> None:
 
     if latest_block is None:
@@ -46,10 +49,13 @@ async def async_intake_transactions(
     if len(confirmed_txs) == 0:
         return
 
-    db_txs = await evm.async_convert_rpc_transactions_to_db_transactions(
-        confirmed_txs,
-        context=context,
-    )
+    if not already_converted:
+        db_txs = await evm.async_convert_rpc_transactions_to_db_transactions(
+            confirmed_txs,
+            context=context,
+        )
+    else:
+        db_txs = confirmed_txs  # type: ignore
 
     engine = connect_utils.create_engine(
         schema_name='transactions',

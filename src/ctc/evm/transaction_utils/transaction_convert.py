@@ -14,13 +14,17 @@ def convert_rpc_transaction_to_db_transaction(
     receipt: spec.RPCTransactionReceipt,
 ) -> spec.DBTransaction:
     """convert transaction data from rpc call into db transaction format"""
+
+    if set(transaction.keys()) == spec.db_transaction_keys:
+        return transaction  # type: ignore
+
     tx: spec.DBTransaction = {
         #
         # tx fields
         'hash': transaction['hash'],
         'block_number': transaction['block_number'],
         'transaction_index': transaction['transaction_index'],
-        'to_address': transaction['to'],
+        'to_address': transaction.get('to'),
         'from_address': transaction['from'],
         'value': transaction['value'],
         'input': transaction['input'],

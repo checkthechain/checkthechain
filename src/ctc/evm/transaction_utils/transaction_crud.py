@@ -52,7 +52,9 @@ async def async_get_transaction(
     # remove fields
     if write_cache:
         await db.async_intake_transaction(
-            transaction=db_transaction, context=context
+            transaction=db_transaction,
+            context=context,
+            already_converted=True,
         )
 
     return db_transaction
