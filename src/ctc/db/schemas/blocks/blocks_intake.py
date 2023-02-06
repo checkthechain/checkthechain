@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import typing
 
+from ctc import config
 from ctc import evm
 from ctc import spec
 
 from ... import management
-from ... import connect_utils
 from ... import intake_utils
 from ..block_timestamps import block_timestamps_statements
 from ..transactions import transactions_intake
@@ -100,15 +100,12 @@ async def async_intake_blocks(
 
     # insert into database
     if intake_blocks or intake_transactions:
-        engine = connect_utils.create_engine(
-            schema_names=['blocks', 'block_timestamps', 'transactions'],
+        # do not perform these inserts concurrently to prevent deadlocks
+        db_config = config.get_context_db_config(
+            schema_names=['blocks', 'block_timestmaps', 'transactions'],
             context=context,
         )
-        if engine is None:
-            return
-
-        # do not perform these inserts concurrently to prevent deadlocks
-        with engine.begin() as conn:
+        async with toolsql.async_connect(db_config) as conn:
             if intake_blocks:
                 await blocks_statements.async_upsert_blocks(
                     blocks=db_blocks,

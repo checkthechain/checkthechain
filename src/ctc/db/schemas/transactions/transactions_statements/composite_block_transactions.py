@@ -12,7 +12,7 @@ from . import table_block_transaction_queries
 async def async_select_block_transactions(
     block_number: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> typing.Sequence[spec.DBTransaction] | None:
     result = await async_select_blocks_transactions(
@@ -34,7 +34,7 @@ async def async_select_blocks_transactions(
     block_numbers: typing.Sequence[int] | None = None,
     start_block: int | None = None,
     end_block: int | None = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> tuple[typing.Sequence[spec.DBTransaction], typing.Sequence[int]] | None:
 
@@ -48,13 +48,12 @@ async def async_select_blocks_transactions(
     if blocks_present is None:
         return None
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
     if block_numbers is not None:
-        transactions = toolsql.select(
+        transactions = await toolsql.async_select(
             conn=conn,
             table=table,
             where_in={'block_number': blocks_present},
-            raise_if_table_dne=True,
         )
 
     else:
@@ -66,12 +65,11 @@ async def async_select_blocks_transactions(
             where_lte = {'block_number': end_block}
         else:
             where_lte = None
-        transactions = toolsql.select(
+        transactions = await toolsql.async_select(
             conn=conn,
             table=table,
             where_lte=where_lte,
             where_gte=where_gte,
-            raise_if_table_dne=True,
         )
 
     return transactions, blocks_present

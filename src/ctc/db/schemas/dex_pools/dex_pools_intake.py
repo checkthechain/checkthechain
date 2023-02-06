@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import typing
 
+import toolsql
+
+from ctc import config
 from ctc import spec
-from ... import connect_utils
 from . import dex_pools_statements
 
 
@@ -34,13 +36,11 @@ async def async_intake_dex_pools(
             dex_pool['creation_block'] for dex_pool in dex_pools
         )
 
-    engine = connect_utils.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='dex_pools',
         context=context,
     )
-    if engine is None:
-        return None
-    with engine.begin() as conn:
+    async with toolsql.async_connect(db_config) as conn:
         await dex_pools_statements.async_upsert_dex_pools(
             dex_pools=dex_pools,
             conn=conn,

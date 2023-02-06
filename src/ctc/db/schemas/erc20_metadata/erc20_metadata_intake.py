@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import toolsql
+
 from ctc import spec
-from .. import connect_utils
 from . import erc20_metadata_statements
 
 
@@ -14,13 +15,13 @@ async def async_intake_erc20_metadata(
     name: str | None = None,
 ) -> None:
 
-    engine = connect_utils.create_engine(
+    from ctc import config
+
+    db_config = config.get_context_db_config(
         schema_name='erc20_metadata',
         context=context,
     )
-    if engine is None:
-        return
-    with engine.begin() as conn:
+    async with toolsql.async_connect(db_config) as conn:
         await erc20_metadata_statements.async_upsert_erc20_metadata(
             conn=conn,
             address=address,

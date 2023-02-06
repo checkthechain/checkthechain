@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import typing
 
+import toolsql
+
+from ctc import config
 from ctc import evm
 from ctc import spec
 
-from ... import connect_utils
 from ... import management
 from . import transactions_statements
 
@@ -57,15 +59,11 @@ async def async_intake_transactions(
     else:
         db_txs = confirmed_txs  # type: ignore
 
-    engine = connect_utils.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='transactions',
         context=context,
     )
-
-    if engine is None:
-        return
-
-    with engine.connect() as conn:
+    async with toolsql.async_connect(db_config) as conn:
         await transactions_statements.async_upsert_transactions(
             transactions=db_txs,
             conn=conn,
@@ -98,14 +96,11 @@ async def async_intake_blocks_transactions(
             raise Exception('must specify block_numbers alongside transactions')
         return
 
-    engine = connect_utils.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='transactions',
         context=context,
     )
-    if engine is None:
-        return
-
-    with engine.connect() as conn:
+    async with toolsql.async_connect(db_config) as conn:
         await transactions_statements.async_upsert_block_transaction_queries(
             block_numbers=block_numbers,
             conn=conn,

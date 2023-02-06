@@ -10,24 +10,24 @@ from ... import schema_utils
 
 async def async_upsert_block_timestamp(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     block_number: int,
     timestamp: int,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
-    toolsql.insert(
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row={'block_number': block_number, 'timestamp': timestamp},
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_block_timestamps(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     block_timestamps: typing.Mapping[int, int] | None = None,
     blocks: typing.Sequence[spec.DBBlock] | None = None,
     context: spec.Context = None,
@@ -44,25 +44,25 @@ async def async_upsert_block_timestamps(
         {'block_number': block_number, 'timestamp': timestamp}
         for block_number, timestamp in block_timestamps.items()
     ]
-    table = schema_utils.get_table_name('block_timestamps', context=context)
-    toolsql.insert(
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=rows,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_delete_block_timestamp(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     block_number: typing.Sequence[int],
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
@@ -71,14 +71,14 @@ async def async_delete_block_timestamp(
 
 async def async_delete_block_timestamps(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     block_numbers: typing.Sequence[int],
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_in={'block_number': block_numbers},
@@ -93,20 +93,18 @@ async def async_delete_block_timestamps(
 async def async_select_block_timestamp(
     block_number: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
 
-    result = toolsql.select(
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
-        row_format='only_column',
-        only_columns=['timestamp'],
-        return_count='one',
-        raise_if_table_dne=False,
+        columns=['timestamp'],
+        output_format='cell_or_none',
     )
     if result is not None and not isinstance(result, int):
         raise Exception('invalid db result')
@@ -116,19 +114,18 @@ async def async_select_block_timestamp(
 async def async_select_block_timestamps(
     block_numbers: typing.Sequence[typing.SupportsInt],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> list[int | None] | None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
 
     block_numbers_int = [int(item) for item in block_numbers]
 
-    results = toolsql.select(
+    results = await toolsql.async_select(
         conn=conn,
         table=table,
         where_in={'block_number': block_numbers_int},
-        raise_if_table_dne=False,
     )
 
     if results is None:
@@ -145,57 +142,50 @@ async def async_select_block_timestamps(
 
 async def async_select_max_block_number(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
-    result = toolsql.select(
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
-        sql_functions=[
-            ['max', 'block_number'],
-        ],
-        return_count='one',
-        raise_if_table_dne=False,
+        columns=['MAX(block_number)'],
+        output_format='cell_or_none',
     )
     if result is None:
         return None
-    subresult = result['max__block_number']
-    if subresult is not None and not isinstance(subresult, int):
+    elif isinstance(result, int):
+        return result
+    else:
         raise Exception('invalid db result')
-    return subresult
 
 
 async def async_select_max_block_timestamp(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> int | None:
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
-    result = toolsql.select(
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
-        sql_functions=[
-            ['max', 'timestamp'],
-        ],
-        return_count='one',
-        raise_if_table_dne=False,
+        columns=['MAX(timestamp)'],
+        output_format='cell_or_none',
     )
     if result is None:
         return None
-
-    subresult = result['max__timestamp']
-    if subresult is not None and not isinstance(subresult, int):
+    elif isinstance(result, int):
+        return result
+    else:
         raise Exception('invalid db result')
-    return subresult
 
 
 async def async_select_timestamp_block_range(
     timestamp: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> tuple[int | None, int | None]:
     """return block range that must contain timestamp
@@ -207,29 +197,23 @@ async def async_select_timestamp_block_range(
     if type(timestamp).__name__.startswith('int'):
         timestamp = int(timestamp)
 
-    table = schema_utils.get_table_name('block_timestamps', context=context)
-    lower_bound = toolsql.select(
+    table = schema_utils.get_table_schema('block_timestamps', context=context)
+    lower_bound = await toolsql.async_select(
         conn=conn,
         table=table,
         where_lte={'timestamp': timestamp},
-        sql_functions=[
-            ['max', 'block_number'],
-        ],
-        return_count='one',
-        raise_if_table_dne=False,
+        columns=['MAX(block_number)'],
+        output_format='cell_or_none',
     )
     upper_bound = toolsql.select(
         conn=conn,
         table=table,
         where_gte={'timestamp': timestamp},
-        sql_functions=[
-            ['min', 'block_number'],
-        ],
-        return_count='one',
-        raise_if_table_dne=False,
+        columns=['MIN(block_number)'],
+        output_format='cell_or_none',
     )
 
-    return lower_bound['max__block_number'], upper_bound['min__block_number']
+    return lower_bound, upper_bound
 
 
 __all__ = (

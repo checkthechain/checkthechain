@@ -12,59 +12,58 @@ from ... import schema_utils
 async def async_upsert_transaction(
     db_transaction: spec.DBTransaction,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
 
     tx = evm.convert_db_transaction_fields_to_text(db_transaction)
 
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row=tx,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_transactions(
     transactions: typing.Sequence[spec.DBTransaction],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
 
     if len(transactions) == 0:
         return
 
     txs = [evm.convert_db_transaction_fields_to_text(tx) for tx in transactions]
 
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=txs,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_select_transaction(
     hash: str,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> spec.DBTransaction | None:
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
 
-    tx: spec.DBTransactionText | None = toolsql.select(
+    tx: spec.DBTransactionText | None = await toolsql.async_select(
         conn=conn,
         table=table,
         where_equals={'hash': hash},
         return_count='one',
-        raise_if_table_dne=False,
     )
 
     if tx is None:
@@ -76,17 +75,18 @@ async def async_select_transaction(
 async def async_select_transactions(
     hashes: typing.Sequence[str],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> typing.Sequence[spec.DBTransaction | None] | None:
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
 
-    transactions: typing.Sequence[spec.DBTransaction] = toolsql.select(
+    transactions: typing.Sequence[
+        spec.DBTransaction
+    ] = await toolsql.async_select(
         conn=conn,
         table=table,
         where_in={'hash': hashes},
-        raise_if_table_dne=False,
     )
 
     if transactions is None:
@@ -101,12 +101,12 @@ async def async_delete_transaction(
     hash: str,
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'hash': hash},
@@ -117,15 +117,15 @@ async def async_delete_transactions(
     hashes: typing.Sequence[str],
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
 
     if len(hashes) == 0:
         return
 
-    table = schema_utils.get_table_name('transactions', context=context)
+    table = schema_utils.get_table_schema('transactions', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_in={'hash': hashes},

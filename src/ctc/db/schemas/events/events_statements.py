@@ -15,7 +15,7 @@ from typing_extensions import Literal
 async def async_upsert_events(
     *,
     encoded_events: typing.Sequence[spec.EncodedEvent] | spec.DataFrame,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
 
@@ -48,19 +48,19 @@ async def async_upsert_events(
         )
         for encoded_event in encoded_events
     ]
-    table = schema_utils.get_table_name('events', context=context)
-    toolsql.insert(
+    table = schema_utils.get_table_schema('events', context=context)
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=as_binary,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_event_query(
     *,
     event_query: spec.EventQuery,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
 
@@ -70,19 +70,19 @@ async def async_upsert_event_query(
         events_schema_defs._event_query_binary_fields,
     )
 
-    table = schema_utils.get_table_name('event_queries', context=context)
-    toolsql.insert(
+    table = schema_utils.get_table_schema('event_queries', context=context)
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row=as_binary,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_event_queries(
     *,
     event_queries: typing.Sequence[spec.EventQuery],
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
 
@@ -94,18 +94,18 @@ async def async_upsert_event_queries(
         for event_query in event_queries
     ]
 
-    table = schema_utils.get_table_name('event_queries', context=context)
-    toolsql.insert(
+    table = schema_utils.get_table_schema('event_queries', context=context)
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=as_binary,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_select_events(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
     contract_address: spec.Address | None = None,
     event_hash: typing.Any | None = None,
@@ -120,7 +120,7 @@ async def async_select_events(
 ) -> typing.Sequence[spec.EncodedEvent] | spec.DataFrame:
 
     # get table
-    table = schema_utils.get_table_name('events', context=context)
+    table = schema_utils.get_table_schema('events', context=context)
 
     if backend == 'sqlalchemy':
 
@@ -164,8 +164,7 @@ async def async_select_events(
             where_equals=where_equals,
             where_lte=where_lte,
             where_gte=where_gte,
-            only_columns=only_columns,
-            raise_if_table_dne=False,
+            columns=only_columns,
         )
 
         if results is None:
@@ -314,7 +313,7 @@ async def async_select_events(
 
 async def async_select_event_queries(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     query_type: int | None,
     context: spec.Context = None,
     contract_address: spec.Address | spec.BinaryData | None = None,
@@ -334,7 +333,7 @@ async def async_select_event_queries(
     """
 
     # get table
-    table = schema_utils.get_table_name('event_queries', context=context)
+    table = schema_utils.get_table_schema('event_queries', context=context)
 
     # encode inputs
     if contract_address is not None:
@@ -379,13 +378,12 @@ async def async_select_event_queries(
             where_equals = {'end_block': end_block}
 
     # dispatch query
-    results: typing.Sequence[spec.DBEventQuery] = toolsql.select(
+    results: typing.Sequence[spec.DBEventQuery] = await toolsql.async_select(
         conn=conn,
         table=table,
         where_equals=where_equals,
         where_lte=where_lte,
         where_gte=where_gte,
-        raise_if_table_dne=False,
     )
 
     if results is None:
@@ -397,13 +395,13 @@ async def async_select_event_queries(
 async def async_delete_event_query(
     *,
     query_id: int,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('event_queries', context=context)
+    table = schema_utils.get_table_schema('event_queries', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'query_id': query_id},
@@ -413,13 +411,13 @@ async def async_delete_event_query(
 async def async_delete_event_queries(
     *,
     query_ids: typing.Sequence[int],
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('event_queries', context=context)
+    table = schema_utils.get_table_schema('event_queries', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_in={'query_id': query_ids},

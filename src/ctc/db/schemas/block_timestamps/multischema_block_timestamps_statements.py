@@ -13,7 +13,7 @@ from ..blocks import blocks_statements
 async def async_select_block_timestamp(
     block_number: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> int | None:
 
@@ -40,7 +40,7 @@ async def async_select_block_timestamp(
 async def async_select_block_timestamps(
     block_numbers: typing.Sequence[typing.SupportsInt],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> list[int | None] | None:
 
@@ -66,7 +66,7 @@ async def async_select_block_timestamps(
 
 async def async_select_max_block_number(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> int | None:
 
@@ -90,7 +90,7 @@ async def async_select_max_block_number(
 
 async def async_select_max_block_timestamp(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> int | None:
     timestamp_schema = management.get_active_timestamp_schema()

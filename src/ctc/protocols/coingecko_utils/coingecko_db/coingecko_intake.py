@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import typing
 
-from ctc import db
+import toolsql
+
+from ctc import config
 from .. import market_utils
 from . import coingecko_schema_defs
 from . import coingecko_statements
@@ -24,14 +26,13 @@ async def async_intake_tokens(
             token['market_cap_rank'] = rank
 
     # add to db
-    engine = db.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='coingecko',
         context={},
     )
-    if engine is None:
-        return
-    with engine.begin() as conn:
+    async with toolsql.async_connect(db_config=db_config) as conn:
         await coingecko_statements.async_upsert_tokens(
             tokens=tokens,
             conn=conn,
         )
+

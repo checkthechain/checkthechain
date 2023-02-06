@@ -6,8 +6,8 @@ import typing
 import aiohttp
 import toolcli
 import toolstr
-import toolsql
 
+import toolsql
 from ctc import db
 from ctc import spec
 from ... import config_defaults
@@ -87,13 +87,11 @@ def setup_dbs(
 
 
 async def async_populate_db_tables(
-    db_config: toolsql.SAEngine,
+    db_config: toolsql.DBConfig,
     styles: toolcli.StyleTheme,
 ) -> None:
     from ctc.protocols.chainlink_utils import chainlink_db
     from ..default_data import default_erc20s
-
-    engine = toolsql.create_engine(db_config=db_config)
 
     print()
     print()
@@ -105,7 +103,6 @@ async def async_populate_db_tables(
     print()
     await default_erc20s.async_intake_default_erc20s(
         context=dict(network='mainnet'),
-        engine=engine,
     )
 
     # populate data: chainlink

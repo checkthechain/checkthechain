@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import typing
 
-if typing.TYPE_CHECKING:
-    import toolsql
+import toolsql
 
 from ctc import config
 from ctc import db
@@ -13,8 +12,6 @@ from ctc import spec
 async def async_intake_default_erc20s(
     context: spec.Context = None,
     verbose: bool = True,
-    *,
-    engine: toolsql.SAEngine | None = None,
 ) -> None:
 
     network = config.get_context_chain_id(context)
@@ -25,17 +22,12 @@ async def async_intake_default_erc20s(
     # load data
     data = load_default_erc20s(context=context)
 
-    # create engine
-    if engine is None:
-        engine = db.create_engine(
-            schema_name='erc20_metadata',
-            context=context,
-        )
-    if engine is None:
-        return
-
     # write to db
-    with engine.begin() as conn:
+    db_config = config.get_context_db_config(
+        schema_name='erc20_metadata',
+        context=context,
+    )
+    async with toolsql.async_connect(db_config) as conn:
         await db.async_upsert_erc20s_metadata(
             erc20s_metadata=data,
             conn=conn,

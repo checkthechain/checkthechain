@@ -189,27 +189,15 @@ async def async_select_dex_pools(
         query.setdefault('where_in', {})
         query['where_in']['factory'] = factories
     if assets is not None:
-        import sqlalchemy  # type: ignore
-
-        # get table object
-        try:
-            sqla_table = toolsql.create_table_object_from_db(
-                table_name=table,
-                conn=conn,
-            )
-        except toolsql.TableNotFound:
-            return None
-
         query.setdefault('filters', [])
         for asset in assets:
             asset = asset.lower()
-            asset_filter = sqlalchemy.or_(
-                sqla_table.c['asset0'] == asset,
-                sqla_table.c['asset1'] == asset,
-                sqla_table.c['asset2'] == asset,
-                sqla_table.c['asset3'] == asset,
-            )
-            query['filters'].append(asset_filter)
+            query['where_or'] = [
+                {'where_equals': {'asset0': asset}},
+                {'where_equals': {'asset1': asset}},
+                {'where_equals': {'asset2': asset}},
+                {'where_equals': {'asset3': asset}},
+            ]
     if start_block is not None:
         query.setdefault('where_gte', {})
         query['where_gte']['creation_block'] = start_block

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import typing
 
+import toolsql
+
+from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import binary_utils
@@ -96,9 +99,7 @@ async def _async_parse_event_query_args(
             raise Exception('conflicting event hashes for given inputs')
     using_name_for_hash = event_hash is None and event_name is not None
     need_event_abi = (
-        using_named_topics
-        or using_decoded_topics
-        or using_name_for_hash
+        using_named_topics or using_decoded_topics or using_name_for_hash
     )
     if need_event_abi and event_abi is None:
         event_abi = await abi_utils.async_get_event_abi(
@@ -191,7 +192,6 @@ async def async_scrub_db_queries(
 ) -> None:
 
     from ctc import db
-    import sqlalchemy.exc  # type: ignore
     from ctc.toolbox import range_utils
 
     # query queries
@@ -268,26 +268,21 @@ async def async_scrub_db_queries(
                     to_insert.append(new_query)
 
     # perform db operations
-    engine = db.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='events',
         context=context,
     )
-    if engine is None:
-        raise Exception('could not connect to db')
-    try:
-        with engine.connect() as conn:
-            await db.async_delete_event_queries(
-                query_ids=to_delete,
-                context=context,
-                conn=conn,
-            )
-            await db.async_upsert_event_queries(
-                event_queries=to_insert,
-                context=context,
-                conn=conn,
-            )
-    except sqlalchemy.exc.OperationalError:
-        raise Exception('could not connect to db')
+    async with toolsql.async_connect(db_config) as conn:
+        await db.async_delete_event_queries(
+            query_ids=to_delete,
+            context=context,
+            conn=conn,
+        )
+        await db.async_upsert_event_queries(
+            event_queries=to_insert,
+            context=context,
+            conn=conn,
+        )
 
 
 def print_event_query_summary(
@@ -310,3 +305,4 @@ def print_event_query_summary(
     cli.print_bullet(key='topic3', value=topic3)
     cli.print_bullet(key='start_block', value=start_block)
     cli.print_bullet(key='end_block', value=end_block)
+

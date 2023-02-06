@@ -94,6 +94,15 @@ def get_prepared_schema(
     return schema
 
 
+def get_table_schema(
+    table_name: str,
+    context: spec.Context = None,
+) -> toolsql.TableSchema:
+    schema_name = get_schema_of_raw_table(talbe_name)
+    schema = get_prepared_schema(schema_name=schema_name, context=context)
+    return schema['tables'][table_name]
+
+
 def get_table_name(
     table_name: str,
     context: spec.Context = None,
@@ -115,7 +124,9 @@ def get_schema_of_raw_table(table: str) -> spec.SchemaName:
     if len(candidates) == 1:
         return candidates[0]
     elif len(candidates) == 0:
-        raise Exception('could not find any schema containing table ' + str(table))
+        raise Exception(
+            'could not find any schema containing table ' + str(table)
+        )
     else:
         raise Exception('found multiple schemas containing table ' + str(table))
 
