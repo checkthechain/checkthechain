@@ -33,8 +33,8 @@ def _build_consensus_url(
 
 
 async def async_beacon_request(
-    *,
     endpoint: str,
+    *,
     params: typing.Mapping[str, typing.Any] | None = None,
     context: spec.Context = None,
 ) -> typing.Any:
