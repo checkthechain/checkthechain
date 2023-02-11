@@ -85,9 +85,10 @@ async def async_close_http_session(
         return
 
     if context is None:
-        for session in _http_sessions.values():
+        for key, session in list(_http_sessions.items()):
             await asyncio.sleep(0)
             await session.close()
+            del _http_sessions[key]
 
     else:
         provider = config.get_context_provider(context)
