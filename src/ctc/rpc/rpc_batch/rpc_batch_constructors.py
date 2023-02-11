@@ -486,3 +486,116 @@ def batch_construct_web3_sha3(
     return rpc_batch_utils.batch_construct(
         method='web3_sha3', **constructor_kwargs
     )
+
+
+def batch_construct_trace_transaction(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_transaction', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_replay_transaction(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_replay_transaction', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_raw_transaction(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_raw_transaction', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_call(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_call', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_call_many(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_call_many', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_get(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_get', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_filter(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_filter', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_block(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_block', **constructor_kwargs
+    )
+
+
+def batch_construct_trace_replay_block_transactions(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_replay_block_transactions', **constructor_kwargs
+    )
+
+
+def batch_construct_debug_trace_call(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_call', **constructor_kwargs
+    )
+
+
+def batch_construct_debug_trace_call_many(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_call_many', **constructor_kwargs
+    )
+
+
+def batch_construct_debug_trace_transaction(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_transaction', **constructor_kwargs
+    )
+
+
+def batch_construct_debug_trace_block_by_number(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_block_by_number', **constructor_kwargs
+    )
+
+
+def batch_construct_debug_trace_block_by_hash(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='trace_block_by_hash', **constructor_kwargs
+    )
+

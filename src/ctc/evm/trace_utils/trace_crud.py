@@ -3,6 +3,35 @@ from __future__ import annotations
 from ctc import spec
 
 
+async def async_get_block_trace(
+    block: spec.BlockNumberReference,
+    *,
+    context: spec.Context = None,
+) -> spec.TraceList:
+    """get list of call traces for block"""
+    from ctc import rpc
+
+    result: spec.TraceList = await rpc.async_trace_block(
+        block,
+        context=context,
+    )
+    return result
+
+
+async def async_get_blocks_trace(
+    blocks: typing.Sequence[spec.BlockNumberReference],
+    *,
+    context: spec.Context = None,
+) -> typing.Sequence[spec.TraceList]:
+    """get list of call traces for block"""
+    from ctc import rpc
+    coroutines = [
+        rpc.async_trace_block(block, context=context)
+        for block in blocks
+    ]
+    return await asyncio.gather(*coroutines)
+
+
 async def async_get_transaction_trace(
     transaction_hash: spec.TransactionHash,
     *,
