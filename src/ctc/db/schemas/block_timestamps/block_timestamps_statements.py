@@ -205,7 +205,7 @@ async def async_select_timestamp_block_range(
         columns=['MAX(block_number)'],
         output_format='cell_or_none',
     )
-    upper_bound = toolsql.select(
+    upper_bound = await toolsql.async_select(
         conn=conn,
         table=table,
         where_gte={'timestamp': timestamp},

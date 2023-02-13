@@ -135,6 +135,14 @@ async def async_get_blocks_transactions(
             missing_blocks = []
 
             if block_numbers is None:
+                if start_block is None or end_block is None:
+                    raise Exception('must specify more information about block range')
+                start_block = await block_utils.async_block_number_to_int(
+                    start_block, context=context
+                )
+                end_block = await block_utils.async_block_number_to_int(
+                    end_block, context=context
+                )
                 block_numbers = list(range(start_block, end_block + 1))
 
             for block_number in block_numbers:

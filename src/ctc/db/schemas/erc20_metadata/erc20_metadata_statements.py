@@ -75,7 +75,7 @@ async def async_select_erc20_metadata(
     else:
         raise Exception('must specify address or symbol')
 
-    erc20_metadata: spec.ERC20Metadata = await toolsql.async_select(
+    erc20_metadata: spec.ERC20Metadata = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
         output_format='single_dict',
@@ -93,11 +93,10 @@ async def async_select_erc20s_metadata(
 ) -> typing.Sequence[spec.ERC20Metadata | None] | None:
 
     table = schema_utils.get_table_schema('erc20_metadata', context=context)
-    results = await toolsql.async_select(
+    results: typing.Sequence[spec.ERC20Metadata] = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
         where_in={'address': [address.lower() for address in addresses]},
-        raise_if_table_dne=False,
     )
 
     if results is None:

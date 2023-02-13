@@ -46,9 +46,12 @@ def status_command(verbose: bool) -> None:
         toolstr.add_style(db_config['dbms'], styles['description']),
     )
     if db_config['dbms'] == 'sqlite':
+        path = db_config['path']
+        if path is None:
+            raise Exception('sqlite path not specified')
         toolstr.print(
             toolstr.add_style('- path:', styles['option']),
-            toolstr.add_style(db_config['path'], styles['metavar'] + ' bold'),
+            toolstr.add_style(path, styles['metavar'] + ' bold'),
         )
     else:
         raise NotImplementedError()
@@ -80,16 +83,13 @@ def status_command(verbose: bool) -> None:
         toolstr.print('    -', network, style=styles['description'])
 
     print()
-    db_exists = toolsql.does_db_exist(db_config=db_config)
+    db_exists = toolsql.does_db_exist(db_config)
     if db_exists:
 
-        db_schema = db.get_complete_prepared_schema()
+        with toolsql.connect(db_config) as conn:
+            db_schema = toolsql.get_db_schema(conn)
         if verbose:
-            toolsql.print_schema(
-                db_config=db_config,
-                db_schema=db_schema,
-                styles=styles,
-            )
+            toolsql.print_db_schema(db_schema=db_schema, styles=styles)
 
             print()
             toolstr.print_header('Schema Versions', style=styles['title'])
@@ -133,12 +133,8 @@ def status_command(verbose: bool) -> None:
 
             print()
             print()
-            toolsql.print_db_usage(
-                db_config=db_config,
-                db_schema=db_schema,
-                full=False,
-                styles=styles,
-            )
+            with toolsql.connect(db_config) as conn:
+                toolsql.print_db_usage(conn=conn, styles=styles)
 
     else:
         toolstr.print_text_box('Schema Summary', style=styles['title'])

@@ -34,45 +34,48 @@ def get_all_schema_names() -> typing.Sequence[db_types.SchemaName]:
 
 
 def get_raw_schema(schema_name: str) -> toolsql.DBSchema:
+    schema: toolsql.DBSchemaShorthand
     if schema_name == 'block_timestamps':
-        return schemas.block_timestamps_schema
+        schema = schemas.block_timestamps_schema
     elif schema_name == 'block_gas':
-        return schemas.block_gas_schema
+        schema = schemas.block_gas_schema
     elif schema_name == 'blocks':
-        return schemas.blocks_schema
+        schema = schemas.blocks_schema
     elif schema_name == 'contract_abis':
-        return schemas.contract_abis_schema
+        schema = schemas.contract_abis_schema
     elif schema_name == 'contract_creation_blocks':
-        return schemas.contract_creation_blocks_schema
+        schema = schemas.contract_creation_blocks_schema
     elif schema_name == 'dex_pools':
-        return schemas.dex_pools_schema
+        schema = schemas.dex_pools_schema
     elif schema_name == 'erc20_metadata':
-        return schemas.erc20_metadata_schema
+        schema = schemas.erc20_metadata_schema
     elif schema_name == 'events':
-        return schemas.events_schema
+        schema = schemas.events_schema
     # elif schema_name == 'erc20_state':
-    #     return schemas.erc20_state_schema
+    #     schema = schemas.erc20_state_schema
     elif schema_name == 'schema_versions':
-        return schemas.schema_versions_schema
+        schema = schemas.schema_versions_schema
     elif schema_name == 'transactions':
-        return schemas.transactions_schema
+        schema = schemas.transactions_schema
     #
     # # protocols
     #
     elif schema_name == '4byte':
         from ctc.protocols import fourbyte_utils
 
-        return fourbyte_utils.fourbyte_schema
+        schema = fourbyte_utils.fourbyte_schema
     elif schema_name == 'chainlink':
         from ctc.protocols.chainlink_utils import chainlink_db
 
-        return chainlink_db.chainlink_schema
+        schema = chainlink_db.chainlink_schema
     elif schema_name == 'coingecko':
         from ctc.protocols.coingecko_utils import coingecko_db
 
-        return coingecko_db.coingecko_schema
+        schema = coingecko_db.coingecko_schema
     else:
         raise Exception('unknown schema: ' + str(schema_name))
+
+    return toolsql.normalize_shorthand_db_schema(schema)
 
 
 def get_prepared_schema(
@@ -98,7 +101,7 @@ def get_table_schema(
     table_name: str,
     context: spec.Context = None,
 ) -> toolsql.TableSchema:
-    schema_name = get_schema_of_raw_table(talbe_name)
+    schema_name = get_schema_of_raw_table(table_name)
     schema = get_prepared_schema(schema_name=schema_name, context=context)
     return schema['tables'][table_name]
 
@@ -163,7 +166,7 @@ def get_complete_prepared_schema(
 def _combine_db_schemas(
     db_schemas: typing.Sequence[toolsql.DBSchema],
 ) -> toolsql.DBSchema:
-    tables: typing.MutableMapping[str, toolsql.TableSpec] = {}
+    tables: typing.MutableMapping[str, toolsql.TableSchema] = {}
     for db_schema in db_schemas:
         for table_name, table_spec in db_schema.get('tables', {}).items():
             if table_name in tables:

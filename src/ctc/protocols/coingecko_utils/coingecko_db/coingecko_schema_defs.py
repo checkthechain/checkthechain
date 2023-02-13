@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
         market_cap_rank: int
 
 
-coingecko_schema: toolsql.DBSchema = {
+coingecko_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'coingecko_tokens': {
             'columns': [

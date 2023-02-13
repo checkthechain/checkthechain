@@ -13,20 +13,20 @@ async def async_upsert_contract_creation_block(
     address: spec.Address,
     block_number: int,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
 
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'contract_creation_blocks', context=context
     )
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row={
             'address': address.lower(),
             'block_number': block_number,
         },
-        upsert='do_update',
+        upsert=True,
     )
 
 
@@ -34,21 +34,19 @@ async def async_select_contract_creation_block(
     address: spec.Address,
     *,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> int | None:
 
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'contract_creation_blocks',
         context=context,
     )
-    result = toolsql.select(
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
         row_id=address.lower(),
-        return_count='one',
-        only_columns=['block_number'],
-        row_format='only_column',
-        raise_if_table_dne=False,
+        columns=['block_number'],
+        output_format='cell',
     )
 
     if result is not None and not isinstance(result, int):
@@ -60,19 +58,15 @@ async def async_select_contract_creation_block(
 async def async_select_contract_creation_blocks(
     *,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> typing.Sequence[typing.Mapping[str, typing.Any]] | None:
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'contract_creation_blocks',
         context=context,
     )
-    result: typing.Sequence[
-        typing.Mapping[str, typing.Any]
-    ] | None = toolsql.select(
-        conn=conn,
-        table=table,
-        raise_if_table_dne=False,
-    )
+    result: typing.Sequence[typing.Mapping[str, typing.Any]] | None
+    result = await toolsql.async_select(conn=conn, table=table)
+
     return result
 
 
@@ -80,15 +74,15 @@ async def async_delete_contract_creation_block(
     address: spec.Address,
     *,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'contract_creation_blocks',
         context=context,
     )
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
-        row_id=address.lower(),
+        where_equals={'address': address.lower()},
     )
 

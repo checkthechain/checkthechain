@@ -11,32 +11,32 @@ from . import coingecko_schema_defs
 async def async_upsert_tokens(
     *,
     tokens: typing.Sequence[coingecko_schema_defs.CoingeckoToken],
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
     if len(tokens) == 0:
         return
 
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table='coingecko_tokens',
         rows=tokens,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_delete_tokens(
     *,
     ids: typing.Sequence[str],
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
     if len(ids) == 0:
         return
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table='coingecko_tokens',
         where_in={'id': ids},
@@ -45,7 +45,7 @@ async def async_delete_tokens(
 
 async def async_select_token(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     id: str | None = None,
     context: spec.Context = None,
 ) -> coingecko_schema_defs.CoingeckoToken | None:
@@ -55,12 +55,11 @@ async def async_select_token(
     else:
         raise Exception('must specify id')
 
-    result: coingecko_schema_defs.CoingeckoToken = toolsql.select(
+    result: coingecko_schema_defs.CoingeckoToken = await toolsql.async_select(  # type: ignore
         conn=conn,
         table='coingecko_tokens',
         where_equals=where_equals,
-        return_count='one',
-        raise_if_table_dne=False,
+        output_format='single_dict',
     )
 
     return result
@@ -70,13 +69,13 @@ async def async_select_tokens(
     *,
     symbol_query: str | None = None,
     name_query: str | None = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> typing.Sequence[coingecko_schema_defs.CoingeckoToken] | None:
 
     # symbol query
     if symbol_query is not None:
-        symbol_filter = {
+        symbol_filter: toolsql.WhereGroup | None = {
             'where_ilike': {'symbol': {'%' + symbol_query.lower() + '%'}}
         }
     else:
@@ -84,7 +83,7 @@ async def async_select_tokens(
 
     # name query
     if name_query is not None:
-        name_filter = {
+        name_filter: toolsql.WhereGroup | None = {
             'where_ilike': {'symbol': {'%' + name_query.lower() + '%'}}
         }
     else:
@@ -92,20 +91,19 @@ async def async_select_tokens(
 
     # combine filters
     if symbol_filter is not None and name_filter is not None:
-        select_kwargs = {'where_or': [symbol_filter, name_filter]}
+        select_kwargs: toolsql.SelectKwargs = {'where_or': [symbol_filter, name_filter]}
     elif symbol_filter is not None:
-        select_kwargs = symbol_filter
+        select_kwargs = symbol_filter  # type: ignore
     elif name_filter is not None:
-        select_kwargs = name_filter
+        select_kwargs = name_filter  # type: ignore
     else:
         select_kwargs = {}
 
     result: typing.Sequence[
         coingecko_schema_defs.CoingeckoToken
-    ] = toolsql.select(
+    ] = await toolsql.async_select(  # type: ignore
         conn=conn,
         table='coingecko_tokens',
-        raise_if_table_dne=False,
         order_by='market_cap_rank',
         **select_kwargs,
     )

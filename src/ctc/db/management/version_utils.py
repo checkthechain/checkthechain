@@ -20,7 +20,7 @@ def get_schema_version(
     schema_name: str,
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection | None = None,
+    conn: toolsql.Connection | None = None,
 ) -> str | None:
 
     # use chain_id = -1 for dbs that have no network association
@@ -47,7 +47,7 @@ def set_schema_version(
     schema_name: str,
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.Connection,
     version: str | None = None,
 ) -> None:
 
@@ -68,7 +68,7 @@ def delete_schema_version(
     schema_name: str | None,
     *,
     network: spec.NetworkReference | None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.Connection,
     confirm_delete_row: bool = False,
     confirm_delete_network: bool = False,
     confirm_delete_schema: bool = False,

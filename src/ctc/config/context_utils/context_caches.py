@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+
 if typing.TYPE_CHECKING:
     import toolsql
 
@@ -24,25 +25,32 @@ def get_context_cache_backend(
 
 def get_context_db_config(
     *,
-    schema_name: spec.db_types.SchemaName,
+    schema_name: str,
     context: spec.Context,
 ) -> toolsql.DBConfig:
     """get db_config of backend schema cache for a given context"""
+
+    if not spec.is_schema_name(schema_name):
+        raise Exception('not a valid schema name: ' + str(schema_name))
     backend = get_context_cache_backend(
         schema_name=schema_name, context=context
     )
     if backend is None:
-        raise Exception('no backend active for current context, cannot retrieve db_config')
+        raise Exception(
+            'no backend active for current context, cannot retrieve db_config'
+        )
     return config_values.get_db_config(backend)
 
 
 def get_context_cache_read_write(
     *,
-    schema_name: spec.db_types.SchemaName,
+    schema_name: str,
     context: spec.Context,
 ) -> tuple[bool, bool]:
     """get settings (read, write) of schema for a given context"""
 
+    if not spec.is_schema_name(schema_name):
+        raise Exception('not a valid schema name: ' + str(schema_name))
     _backend, read, write = _get_context_cache_settings(
         schema_name=schema_name,
         context=context,

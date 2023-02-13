@@ -19,11 +19,11 @@ async def async_upsert_block_transaction_query(
         'block_transaction_queries',
         context=context,
     )
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row={'block_number': block_number},
-        # upsert='do_update',
+        upsert=True,
     )
 
 
@@ -42,11 +42,11 @@ async def async_upsert_block_transaction_queries(
         context=context,
     )
     rows = [{'block_number': block_number} for block_number in block_numbers]
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=rows,
-        # upsert='do_update',
+        upsert=True,
     )
 
 
@@ -65,13 +65,12 @@ async def async_select_block_transaction_queries(
     )
 
     if block_numbers is not None:
-        queries: typing.Sequence[int] = toolsql.select(
+        queries: typing.Sequence[int] = await toolsql.async_select(
             conn=conn,
             table=table,
             where_in={'block_number': block_numbers},
-            raise_if_table_dne=True,
-            only_columns=['block_number'],
-            row_format='only_column',
+            columns=['block_number'],
+            output_format='single_column',
         )
 
     else:
@@ -83,14 +82,13 @@ async def async_select_block_transaction_queries(
             where_lte = {'block_number': end_block}
         else:
             where_lte = None
-        queries = toolsql.select(
+        queries = await toolsql.async_select(
             conn=conn,
             table=table,
             where_lte=where_lte,
             where_gte=where_gte,
-            raise_if_table_dne=True,
-            only_columns=['block_number'],
-            row_format='only_column',
+            columns=['block_number'],
+            output_format='single_column',
         )
 
     return queries
@@ -109,12 +107,11 @@ async def async_select_block_transaction_query(
         context=context,
     )
 
-    result = toolsql.select(
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
         return_count='one',
-        raise_if_table_dne=True,
     )
 
     return result is not None
@@ -131,7 +128,7 @@ async def async_delete_block_transaction_query(
         'block_transaction_queries', context=context
     )
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
@@ -152,7 +149,7 @@ async def async_delete_block_transaction_queries(
         'block_transaction_queries', context=context
     )
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_in={'block_number': block_numbers},

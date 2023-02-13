@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-schema_versions_schema: toolsql.DBSchema = {
+schema_versions_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'schema_versions': {
             'columns': [

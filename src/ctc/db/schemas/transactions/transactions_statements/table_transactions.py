@@ -59,7 +59,7 @@ async def async_select_transaction(
 
     table = schema_utils.get_table_schema('transactions', context=context)
 
-    tx: spec.DBTransactionText | None = await toolsql.async_select(
+    tx: spec.DBTransactionText | None = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
         where_equals={'hash': hash},
@@ -83,7 +83,7 @@ async def async_select_transactions(
 
     transactions: typing.Sequence[
         spec.DBTransaction
-    ] = await toolsql.async_select(
+    ] = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
         where_in={'hash': hashes},

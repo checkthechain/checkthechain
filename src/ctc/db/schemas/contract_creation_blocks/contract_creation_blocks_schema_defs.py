@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-contract_creation_blocks_schema: toolsql.DBSchema = {
+contract_creation_blocks_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'contract_creation_blocks': {
             'columns': [

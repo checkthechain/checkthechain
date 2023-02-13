@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import toolcli
+import toolsql
 
 from ctc import config
 from ctc import db
@@ -41,8 +42,14 @@ def drop_command(
 
     context = config.create_user_input_context(network=network)
 
-    db.drop_schema(
-        schema_name=schema_name,
-        confirm=confirm,
-        context=context,
+    db_config = config.get_context_db_config(
+        context=context, schema_name=schema_name
     )
+    with toolsql.connect(db_config) as conn:
+        db.drop_schema(
+            schema_name=schema_name,
+            confirm=confirm,
+            context=context,
+            conn=conn,
+        )
+

@@ -31,7 +31,7 @@ def serialize_unsigned_transaction(
             else:
                 raise Exception('must specify chain_id')
         else:
-            as_list.append(transaction[key])
+            as_list.append(transaction[key])  # type: ignore
 
     # add EIP-155 chain_id
     if type == 0:

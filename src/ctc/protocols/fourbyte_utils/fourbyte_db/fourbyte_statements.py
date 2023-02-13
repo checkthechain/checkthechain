@@ -16,37 +16,37 @@ from .. import fourbyte_spec
 async def async_upsert_function_signature(
     function_signature: fourbyte_spec.PartialEntry,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table='function_signatures',
         row=function_signature,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_function_signatures(
     function_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
     if len(function_signatures) == 0:
         return
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table='function_signatures',
         rows=function_signatures,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_select_function_signatures(
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
@@ -65,16 +65,15 @@ async def async_select_function_signatures(
         key: value for key, value in where_equals.items() if value is not None
     }
 
-    return toolsql.select(  # type: ignore
+    return await toolsql.async_select(  # type: ignore
         conn=conn,
         table='function_signatures',
         where_equals=where_equals,
-        raise_if_table_dne=False,
     )
 
 
 async def async_delete_function_signatures(
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
@@ -91,7 +90,7 @@ async def async_delete_function_signatures(
     if len(where_equals) == 0:
         raise Exception('must specify which feeds to delete')
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table='function_signatures',
         where_equals=where_equals,
@@ -106,37 +105,37 @@ async def async_delete_function_signatures(
 async def async_upsert_event_signature(
     event_signature: fourbyte_spec.PartialEntry,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table='event_signatures',
         row=event_signature,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_event_signatures(
     event_signatures: typing.Sequence[fourbyte_spec.PartialEntry],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
     if len(event_signatures) == 0:
         return
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table='event_signatures',
         rows=event_signatures,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_select_event_signatures(
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
@@ -155,16 +154,15 @@ async def async_select_event_signatures(
         key: value for key, value in where_equals.items() if value is not None
     }
 
-    return toolsql.select(  # type: ignore
+    return await toolsql.async_select(  # type: ignore
         conn=conn,
         table='event_signatures',
         where_equals=where_equals,
-        raise_if_table_dne=False,
     )
 
 
 async def async_delete_event_signatures(
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     *,
     hex_signature: str | None = None,
     text_signature: str | None = None,
@@ -181,8 +179,9 @@ async def async_delete_event_signatures(
     if len(where_equals) == 0:
         raise Exception('must specify which feeds to delete')
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table='event_signatures',
         where_equals=where_equals,
     )
+

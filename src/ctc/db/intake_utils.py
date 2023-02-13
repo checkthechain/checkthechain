@@ -25,11 +25,12 @@ async def async_is_block_fully_confirmed(
     """must pass conn=None if not planning on using db"""
 
     # check whether block is older than newest block in db
-    max_db_block = await _async_get_max_block_number_in_db(
-        conn=conn, context=context
-    )
-    if max_db_block is not None and block < max_db_block:
-        return True
+    if conn is not None:
+        max_db_block = await _async_get_max_block_number_in_db(
+            conn=conn, context=context
+        )
+        if max_db_block is not None and block < max_db_block:
+            return True
 
     # check whether block has enough confirmations
     rpc_latest_block = await rpc.async_eth_block_number(context=context)
@@ -64,6 +65,8 @@ async def async_filter_fully_confirmed_blocks(
     if latest_block_number is not None:
         max_db_block: int | None = latest_block_number
     else:
+        if conn is None:
+            raise Exception('must provide conn or latest block number')
         max_db_block = await _async_get_max_block_number_in_db(
             context=context, conn=conn
         )
@@ -89,7 +92,7 @@ async def async_filter_fully_confirmed_blocks(
 async def _async_get_max_block_number_in_db(
     *,
     context: spec.Context = None,
-    conn: toolsql.AsyncConnection | None,
+    conn: toolsql.AsyncConnection,
 ) -> int | None:
     return await schemas.async_select_max_block_number(
         conn=conn, context=context

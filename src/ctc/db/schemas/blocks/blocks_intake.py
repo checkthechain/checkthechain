@@ -22,6 +22,7 @@ async def async_intake_block(
     rpc_block: spec.RPCBlock | None = None,
     context: spec.Context,
 ) -> None:
+
     if rpc_block is not None and db_block is not None:
         raise Exception('cannot specify rpc_block and db_block')
     elif rpc_block is not None:
@@ -66,9 +67,19 @@ async def async_intake_blocks(
         return
 
     # filter unconfirmed blocks
-    filtered_db_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
-        db_blocks, context=context, latest_block_number=latest_block_number
+    db_config = config.get_context_db_config(
+        schema_name='blocks',
+        context=context,
     )
+    async with toolsql.async_connect(db_config) as conn:
+        filtered_db_blocks = (
+            await intake_utils.async_filter_fully_confirmed_blocks(
+                db_blocks,
+                context=context,
+                latest_block_number=latest_block_number,
+                conn=conn,
+            )
+        )
     if len(filtered_db_blocks) == 0:
         return
     db_blocks = filtered_db_blocks
@@ -102,7 +113,7 @@ async def async_intake_blocks(
     if intake_blocks or intake_transactions:
         # do not perform these inserts concurrently to prevent deadlocks
         db_config = config.get_context_db_config(
-            schema_names=['blocks', 'block_timestmaps', 'transactions'],
+            schema_name='blocks',
             context=context,
         )
         async with toolsql.async_connect(db_config) as conn:
@@ -131,7 +142,7 @@ async def _async_intake_blocks_timestamps(
     *,
     confirmed_block_timestamps: typing.Mapping[int, int] | None = None,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
 
     if confirmed_blocks is not None and confirmed_block_timestamps is not None:

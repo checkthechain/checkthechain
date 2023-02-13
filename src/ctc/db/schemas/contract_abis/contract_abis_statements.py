@@ -14,14 +14,14 @@ async def async_upsert_contract_abi(
     address: spec.Address,
     abi: spec.ContractABI,
     includes_proxy: bool,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
     abi_text = json.dumps(abi)
 
-    table = schema_utils.get_table_name('contract_abis', context=context)
-    toolsql.insert(
+    table = schema_utils.get_table_schema('contract_abis', context=context)
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row={
@@ -29,7 +29,7 @@ async def async_upsert_contract_abi(
             'abi_text': abi_text,
             'includes_proxy': includes_proxy,
         },
-        upsert='do_update',
+        upsert=True,
     )
 
 
@@ -37,21 +37,19 @@ async def async_select_contract_abi(
     address: spec.Address,
     *,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> spec.ContractABI | None:
 
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'contract_abis',
         context=context,
     )
-    abi_text = toolsql.select(
+    abi_text = await toolsql.async_select(
         conn=conn,
         table=table,
         row_id=address.lower(),
-        return_count='one',
-        only_columns=['abi_text'],
-        row_format='only_column',
-        raise_if_table_dne=False,
+        columns=['abi_text'],
+        output_format='cell',
     )
     if abi_text is not None:
         contract_abi: spec.ContractABI = json.loads(abi_text)
@@ -64,10 +62,10 @@ async def async_select_contract_abis(
     addresses: typing.Sequence[spec.Address] | None = None,
     *,
     context: spec.Context = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> typing.Mapping[spec.Address, spec.ContractABI] | None:
 
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'contract_abis',
         context=context,
     )
@@ -76,11 +74,10 @@ async def async_select_contract_abis(
         where_in = {'address': addresses}
     else:
         where_in = None
-    results = toolsql.select(
+    results = await toolsql.async_select(
         conn=conn,
         table=table,
         where_in=where_in,
-        raise_if_table_dne=False,
     )
 
     if results is None:
@@ -94,16 +91,17 @@ async def async_select_contract_abis(
 async def async_delete_contract_abi(
     address: spec.Address,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
-    table = schema_utils.get_table_name(
+
+    table = schema_utils.get_table_schema(
         'contract_abis',
         context=context,
     )
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
-        row_id=address.lower(),
+        where_equals={'address': address.lower()},
     )
 

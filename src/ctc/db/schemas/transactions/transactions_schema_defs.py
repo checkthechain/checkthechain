@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-transactions_schema: toolsql.DBSchema = {
+transactions_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'transactions': {
             'columns': [
@@ -19,10 +19,10 @@ transactions_schema: toolsql.DBSchema = {
                 {'name': 'status', 'type': 'Boolean'},  # from receipt
                 {'name': 'gas_used', 'type': 'Integer'},  # from receipt
                 {'name': 'gas_limit', 'type': 'Integer'},
-                {'name': 'gas_priority', 'type': 'Integer', 'null': True},  # eip1559
+                {'name': 'gas_priority', 'type': 'Integer', 'nullable': True},  # eip1559
                 {'name': 'gas_price', 'type': 'Integer'},
-                {'name': 'gas_price_max', 'type': 'Integer', 'null': True},  # eip1559
-                {'name': 'access_list', 'type': 'JSON', 'null': True},  # type 1 and eip1559 tx
+                {'name': 'gas_price_max', 'type': 'Integer', 'nullable': True},  # eip1559
+                {'name': 'access_list', 'type': 'JSON', 'nullable': True},  # type 1 and eip1559 tx
             ],
         },
         'block_transaction_queries': {

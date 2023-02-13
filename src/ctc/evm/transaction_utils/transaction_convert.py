@@ -18,13 +18,17 @@ def convert_rpc_transaction_to_db_transaction(
     if set(transaction.keys()) == spec.db_transaction_keys:
         return transaction  # type: ignore
 
+    to = transaction.get('to')
+    if to is None:
+        to = '0x0000000000000000000000000000000000000000'
+
     tx: spec.DBTransaction = {
         #
         # tx fields
         'hash': transaction['hash'],
         'block_number': transaction['block_number'],
         'transaction_index': transaction['transaction_index'],
-        'to_address': transaction.get('to'),
+        'to_address': to,
         'from_address': transaction['from'],
         'value': transaction['value'],
         'input': transaction['input'],

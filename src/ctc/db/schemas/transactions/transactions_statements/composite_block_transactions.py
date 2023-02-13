@@ -50,7 +50,9 @@ async def async_select_blocks_transactions(
 
     table = schema_utils.get_table_schema('transactions', context=context)
     if block_numbers is not None:
-        transactions = await toolsql.async_select(
+        transactions: typing.Sequence[
+            spec.DBTransaction
+        ] = await toolsql.async_select(  # type: ignore
             conn=conn,
             table=table,
             where_in={'block_number': blocks_present},
@@ -65,7 +67,7 @@ async def async_select_blocks_transactions(
             where_lte = {'block_number': end_block}
         else:
             where_lte = None
-        transactions = await toolsql.async_select(
+        transactions = await toolsql.async_select(  # type: ignore
             conn=conn,
             table=table,
             where_lte=where_lte,

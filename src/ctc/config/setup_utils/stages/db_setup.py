@@ -6,8 +6,8 @@ import typing
 import aiohttp
 import toolcli
 import toolstr
-
 import toolsql
+
 from ctc import db
 from ctc import spec
 from ... import config_defaults
@@ -35,31 +35,31 @@ def setup_dbs(
     # create db
     print()
     for db_config in db_configs.values():
-        if 'path' in db_config:
-            db_path = db_config['path']
+        db_path = db_config.get('path')
+        if db_path is not None:
             db_dirpath = os.path.dirname(db_path)
             os.makedirs(db_dirpath, exist_ok=True)
 
-        if not os.path.isfile(db_path):
-            toolstr.print(
-                'Creating database at path ['
-                + styles['description']
-                + ']'
-                + db_path
-                + '[/'
-                + styles['description']
-                + ']'
-            )
-        else:
-            toolstr.print(
-                'Existing database detected at path ['
-                + styles['description']
-                + ']'
-                + db_path
-                + '[/'
-                + styles['description']
-                + ']'
-            )
+            if not os.path.isfile(db_path):
+                toolstr.print(
+                    'Creating database at path ['
+                    + styles['description']
+                    + ']'
+                    + db_path
+                    + '[/'
+                    + styles['description']
+                    + ']'
+                )
+            else:
+                toolstr.print(
+                    'Existing database detected at path ['
+                    + styles['description']
+                    + ']'
+                    + db_path
+                    + '[/'
+                    + styles['description']
+                    + ']'
+                )
 
     print()
     _delete_incomplete_chainlink_schemas(db_configs['main'])
@@ -77,11 +77,13 @@ def setup_dbs(
         network for network in used_networks if network is not None
     }
     print()
-    db.create_missing_tables(
-        networks=list(used_networks),
-        db_config=db_configs['main'],
-        confirm=True,
-    )
+
+    with toolsql.connect(db_configs['main']) as conn:
+        db.create_missing_tables(
+            networks=list(used_networks),
+            conn=conn,
+            confirm=True,
+        )
 
     return {'db_configs': db_configs}
 
@@ -110,7 +112,8 @@ async def async_populate_db_tables(
     print('Populating database with latest Chainlink oracle feeds...')
     print()
     try:
-        await chainlink_db.async_import_networks_to_db()
+        async with toolsql.async_connect(db_config) as conn:
+            await chainlink_db.async_import_networks_to_db(conn=conn)
     except aiohttp.client_exceptions.ClientConnectorError:
         print('Could not connect to Chainlink server, skipping')
     except Exception:
@@ -126,29 +129,33 @@ def _delete_incomplete_chainlink_schemas(db_config: toolsql.DBConfig) -> None:
     from ctc import db
 
     # looking for schemas that have already been created, but are missing tables
-    metadata = toolsql.create_metadata_object_from_db(db_config=db_config)
-    if 'schema_versions' not in metadata.tables.keys():
-        return
     networks = list(config_defaults.get_default_networks_metadata().keys())
-    for network in networks:
-        context: spec.Context = {'network': network}
-        schema_version = db.get_schema_version(
-            schema_name='chainlink',
-            context=dict(network=network),
-            db_config=db_config,
-        )
-        if schema_version is not None:
-            schema = db.get_prepared_schema(
-                schema_name='chainlink', context=context
+    with toolsql.connect(db_config) as conn:
+        table_names = toolsql.get_table_names(conn)
+        if 'schema_versions' not in table_names:
+            return
+        for network in networks:
+            context: spec.Context = {'network': network}
+            schema_version = db.get_schema_version(
+                schema_name='chainlink',
+                context=dict(network=network),
+                conn=conn,
             )
-            for table_name in schema['tables'].keys():
-                if table_name not in metadata.tables.keys():
-                    print(
-                        'missing chainlink_aggregator_updates table, rebuilding schema'
-                    )
-                    db.drop_schema(
-                        schema_name='chainlink', context=context, confirm=True
-                    )
+            if schema_version is not None:
+                schema = db.get_prepared_schema(
+                    schema_name='chainlink', context=context
+                )
+                for table_name in schema['tables'].keys():
+                    if table_name not in table_names:
+                        print(
+                            'missing chainlink_aggregator_updates table, rebuilding schema'
+                        )
+                        db.drop_schema(
+                            schema_name='chainlink',
+                            context=context,
+                            confirm=True,
+                            conn=conn,
+                        )
 
 
 def check_db_versions(db_configs: typing.Sequence[toolsql.DBConfig]) -> None:
@@ -180,3 +187,4 @@ def check_db_versions(db_configs: typing.Sequence[toolsql.DBConfig]) -> None:
 
         else:
             raise Exception('dbms not supported: ' + str(dbms))
+

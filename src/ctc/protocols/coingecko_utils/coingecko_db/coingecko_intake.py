@@ -30,7 +30,7 @@ async def async_intake_tokens(
         schema_name='coingecko',
         context={},
     )
-    async with toolsql.async_connect(db_config=db_config) as conn:
+    async with toolsql.async_connect(db_config) as conn:
         await coingecko_statements.async_upsert_tokens(
             tokens=tokens,
             conn=conn,

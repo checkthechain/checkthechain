@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolsql
 
-dex_pools_schema: toolsql.DBSchema = {
+dex_pools_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'dex_pools': {
             'columns': [

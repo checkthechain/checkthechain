@@ -1,3 +1,5 @@
+# MOVE create_missing_schemas TO dba_utils
+
 from __future__ import annotations
 
 import os
@@ -16,7 +18,7 @@ def create_missing_schemas(
     *,
     schema_names: typing.Sequence[spec.SchemaName] | None = None,
     context: spec.Context = None,
-):
+) -> None:
 
     if schema_name is not None and schema_names is not None:
         raise Exception('specify only one of schema_name or schema_names')
@@ -38,7 +40,12 @@ def create_missing_schemas(
 
     # create directory if need be
     if db_config['dbms'] == 'sqlite':
-        pathdir = os.path.dirname(os.path.abspath(db_config['path']))
+        path = db_config['path']
+        if path is None:
+            raise Exception('sqlite path not specified')
+        pathdir = os.path.dirname(os.path.abspath(path))
+        if pathdir is None:
+            raise Exception('invalid path dir')
         os.makedirs(pathdir, exist_ok=True)
 
     # create missing tables

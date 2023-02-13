@@ -16,7 +16,7 @@ def create_missing_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[str] | None = None,
     *,
-    conn: spec.Connection,
+    conn: toolsql.Connection,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
@@ -38,8 +38,10 @@ def create_missing_tables(
             print('    - schemas:')
             for schema_name in schema_names:
                 print('        -', schema_name)
+        elif len(schema_names) == 1:
+            print('    - schema:', schema_names[0])
         else:
-            print('    - schema:', schema_name)
+            print('    - schema: [none specified]')
         if len(networks) > 1:
             print('    - networks:')
             for network in networks:
@@ -86,7 +88,7 @@ def create_missing_tables(
                 for table in schema['tables'].keys()
                 if table not in tables_in_db
             ]
-            if len(missing_tables['missing_from_db']) > 0:
+            if len(missing_tables) > 0:
                 schemas_to_create.append((schema_network, schema_name))
 
     # print missing tables
@@ -167,11 +169,7 @@ def initialize_schema(
 
     # create tables
     for table_name, table_schema in schema['tables'].items():
-        toolsql.create_table(
-            table_name,
-            table_schema=table_schema,
-            conn=conn,
-        )
+        toolsql.create_table(table_schema, conn=conn, confirm=True)
 
     version_utils.set_schema_version(
         schema_name=schema_name,
@@ -248,7 +246,7 @@ def drop_schema(
     for network in networks:
         version_utils.delete_schema_version(
             schema_name=schema,
-            context=context,
+            network=network,
             conn=conn,
             confirm_delete_row=True,
             confirm_delete_schema=True,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-fourbyte_schema: toolsql.DBSchema = {
+fourbyte_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'function_signatures': {
             'columns': [
