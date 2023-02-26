@@ -471,3 +471,12 @@ async def async_batch_web3_client_version(
 
 async def async_batch_web3_sha3(**kwargs: typing.Any) -> spec.RpcPluralResponse:
     return await rpc_batch_utils.async_batch_execute('web3_sha3', **kwargs)
+
+
+async def async_batch_trace_block(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
+    return await rpc_batch_utils.async_batch_execute(
+        'trace_block', **kwargs
+    )
+
