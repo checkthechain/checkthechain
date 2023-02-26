@@ -233,19 +233,21 @@ def construct_debug_trace_call_many(
 
 def construct_debug_trace_transaction(
     transaction_hash: str,
+    trace_type: spec.TraceOutputType | None = None,
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'debug_traceTransaction',
-        [transaction_hash],
+        [transaction_hash, trace_type],
     )
 
 
 def construct_debug_trace_block_by_number(
     block_number: spec.BlockNumberReference,
+    trace_type: spec.TraceOutputType | None = None,
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'debug_traceBlockByNumber',
-        [block_number],
+        [block_number, trace_type],
     )
 
 

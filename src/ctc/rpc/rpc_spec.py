@@ -132,4 +132,7 @@ rpc_constructor_batch_inputs = {
     'eth_get_block_transaction_count_by_number': {
         'block_numbers': 'block_number'
     },
+    'trace_block': {
+        'block_numbers': 'block_number',
+    },
 }
