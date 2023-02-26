@@ -4,10 +4,63 @@ range bounds are **inclusive** by default
 """
 from __future__ import annotations
 
+import math
 import typing
 
 if typing.TYPE_CHECKING:
     Range = typing.Sequence[int]
+
+    T = typing.TypeVar('T')
+
+
+def split(
+    items: typing.Sequence[T],
+    n_splits: int | None = None,
+    *,
+    items_per_split: int | None = None,
+    exact: bool = False,
+) -> typing.Sequence[typing.Sequence[T]]:
+
+    if n_splits is not None and items_per_split is not None:
+        raise Exception('specify either n_splits or items_per_split')
+
+    elif n_splits is not None:
+
+        n_items = len(items)
+        items_per_split = math.floor(n_items / n_splits)
+
+        if exact and n_items != n_splits * items_per_split:
+            raise Exception('n_splits does not exactly divide items')
+
+        sizes = [items_per_split] * n_splits
+
+        remaining = n_items - items_per_split * n_splits
+        for r in range(remaining):
+            sizes[r] += 1
+
+        splits = []
+        current = 0
+        for size in sizes:
+            next = current + size
+            sl = slice(current, next)
+            splits.append(items[sl])
+            current = next
+
+        return splits
+
+    elif items_per_split is not None:
+        n_items = len(items)
+        n_splits = math.ceil(n_items / items_per_split)
+        if exact and n_items != n_splits * items_per_split:
+            raise Exception('n_splits does not exactly divide items')
+        splits = []
+        for s in range(n_splits):
+            sl = slice(s * items_per_split, (s + 1) * items_per_split)
+            splits.append(items[sl])
+        return splits
+
+    else:
+        raise Exception('specify either n_splits or items_per_split')
 
 
 def get_range_gaps(
@@ -235,3 +288,4 @@ def range_to_chunks(
                 chunks[-1] = [chunks[-1][0], last_value]
 
     return chunks
+
