@@ -1,0 +1,74 @@
+from __future__ import annotations
+
+import typing
+
+import polars as pl
+
+
+def prefix_hex_series_to_binary(series: pl.Series) -> pl.Series:
+    return series.str.slice(2).apply(bytes.fromhex)
+
+
+def raw_hex_series_to_binary(series: pl.Series) -> pl.Series:
+    return series.str.slice(2).apply(bytes.fromhex)
+
+
+def binary_series_to_prefix_hex(series: pl.Series) -> pl.Series:
+    return "0x" + binary_series_to_raw_hex(series)
+
+
+def binary_series_to_raw_hex(series: pl.Series) -> pl.Series:
+    return "0x" + pl.Series(series.name, [x.hex() for x in series.to_list()])
+
+
+def binary_columns_to_prefix_hex(
+    df: pl.DataFrame, columns: typing.Sequence[str] | None = None
+) -> pl.DataFrame:
+    return df.with_columns(
+        [binary_series_to_prefix_hex(df[column]) for column in columns]
+    )
+
+
+def binary_columns_to_raw_hex(
+    df: pl.DataFrame, columns: typing.Sequence[str] | None = None
+) -> pl.DataFrame:
+    if columns is None:
+        columns = df.select(pl.col(pl.datatypes.Binary)).columns
+    return df.with_columns(
+        [binary_series_to_raw_hex(df[column]) for column in columns]
+    )
+
+
+def prefix_hex_columns_to_binary(
+    df: pl.DataFrame, columns: typing.Sequence[str] | None = None
+) -> pl.DataFrame:
+    if columns is None:
+        columns = []
+        for column, dtype in zip(df.columns, df.dtypes):
+            if dtype == pl.datatypes.Utf8:
+                try:
+                    bytes.fromhex(df[column][0][2:])
+                    columns.append(column)
+                except Exception:
+                    continue
+    return df.with_columns(
+        [prefix_hex_series_to_binary(df[column]) for column in columns]
+    )
+
+
+def raw_hex_columns_to_binary(
+    df: pl.DataFrame, columns: typing.Sequence[str] | None = None
+) -> pl.DataFrame:
+    if columns is None:
+        columns = []
+        for column, dtype in zip(df.columns, df.dtypes):
+            if dtype == pl.datatypes.Utf8:
+                try:
+                    bytes.fromhex(df[column][0])
+                    columns.append(column)
+                except Exception:
+                    continue
+    return df.with_columns(
+        [prefix_hex_series_to_binary(df[column]) for column in columns]
+    )
+
