@@ -66,7 +66,9 @@ async def async_select_erc20_metadata(
     table = schema_utils.get_table_schema('erc20_metadata', context=context)
 
     if address is not None:
-        query: typing.Mapping[str, typing.Any] = {'row_id': address.lower()}
+        query: typing.Mapping[str, typing.Any] = {
+            'where_equals': {'address': address.lower()}
+        }
     elif symbol is not None:
         if case_insensitive_symbol:
             query = {'where_ilike': {'symbol': symbol}}

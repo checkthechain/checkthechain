@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import typing
 
+import toolsql
+
 from ctc import config
 from ctc import evm
 from ctc import spec
+from ctc import db
 
 from . import chainlink_schema_defs
 from . import chainlink_statements
@@ -128,7 +131,7 @@ async def async_get_network_feed_data(
 async def async_import_networks_to_db(
     networks: typing.Sequence[ChainlinkNetworkName] | None = None,
     *,
-    conn: toolsql.AsyncConnection,
+    db_config: toolsql.DBConfig = None,
     payload: ChainlinkFeedPayload | None = None,
     verbose: bool = True,
 ) -> None:
@@ -185,13 +188,28 @@ async def async_import_networks_to_db(
 
     # add each network
     for network in networks:
-        await async_import_network_to_db(
-            network=network,
-            payload=payload,
-            conn=conn,
-            verbose=verbose,
-            indent=4,
+
+        # create table
+        table_schema = db.get_table_schema(
+            'chainlink_feeds', context={'network': network}
         )
+        with toolsql.connect(db_config) as conn:
+            toolsql.create_table(
+                table_schema,
+                if_not_exists=True,
+                conn=conn,
+                confirm=True,
+            )
+
+        # insert feed rows
+        async with toolsql.async_connect(db_config) as conn:
+            await async_import_network_to_db(
+                network=network,
+                payload=payload,
+                conn=conn,
+                verbose=verbose,
+                indent=4,
+            )
 
 
 async def async_import_network_to_db(

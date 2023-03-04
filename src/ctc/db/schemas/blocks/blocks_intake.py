@@ -46,6 +46,8 @@ async def async_intake_blocks(
     under normal operation should store raw block or block timestamp, noth both
     """
 
+    import toolsql
+
     # check whether to intake
     active_schemas = management.get_active_schemas()
     intake_blocks = active_schemas.get('blocks')

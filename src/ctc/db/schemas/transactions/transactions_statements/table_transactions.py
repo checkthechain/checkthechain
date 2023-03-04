@@ -63,7 +63,7 @@ async def async_select_transaction(
         conn=conn,
         table=table,
         where_equals={'hash': hash},
-        return_count='one',
+        output_format='single_dict_or_none',
     )
 
     if tx is None:

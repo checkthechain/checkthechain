@@ -10,7 +10,7 @@ import ctc.config
 
 def get_command_spec() -> toolcli.CommandSpec:
     return {
-        'f': create_tables_command,
+        'f': async_create_tables_command,
         'help': 'create tables for database',
         'args': [
             {
@@ -29,7 +29,7 @@ def get_command_spec() -> toolcli.CommandSpec:
     }
 
 
-async def create_tables_command(
+async def async_create_tables_command(
     schema_names: typing.Sequence[str],
     networks: typing.Sequence[str],
 ) -> None:

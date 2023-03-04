@@ -44,7 +44,7 @@ async def async_select_contract_creation_block(
     result = await toolsql.async_select(
         conn=conn,
         table=table,
-        row_id=address.lower(),
+        where_equals={'address': address.lower()},
         columns=['block_number'],
         output_format='cell',
     )

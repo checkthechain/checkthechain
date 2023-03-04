@@ -121,7 +121,7 @@ async def async_select_feed(
         conn=conn,
         table=table,
         where_equals=where_equals,
-        return_count='one',
+        output_format='single_dict_or_none',
     )
 
 

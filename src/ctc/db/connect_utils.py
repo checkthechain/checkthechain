@@ -13,6 +13,26 @@ from .management import dba_utils
 from .management import version_utils
 
 
+def connect(
+    context: spec.Context,
+    schema: spec.SchemaName | None = None,
+) -> toolsql.Connection:
+    db_config = config.get_context_db_config(
+        context=context, schema_name=schema
+    )
+    return toolsql.connect(db_config)
+
+
+def async_connect(
+    context: spec.Context,
+    schema: spec.SchemaName | None = None,
+) -> toolsql.AsyncConnection:
+    db_config = config.get_context_db_config(
+        context=context, schema_name=schema
+    )
+    return toolsql.async_connect(db_config)
+
+
 def create_missing_schemas(
     schema_name: spec.SchemaName | None = None,
     *,

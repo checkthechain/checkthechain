@@ -135,7 +135,7 @@ async def async_select_dex_pool(
         conn=conn,
         table=table,
         where_equals=where_equals,
-        return_count='one',
+        output_format='single_dict_or_none',
     )
     return result  # type: ignore
 
@@ -224,9 +224,8 @@ async def async_select_dex_pool_factory_last_scanned_block(
     result = await toolsql.async_select(
         conn=conn,
         table=table,
-        row_format='only_column',
-        only_columns=['last_scanned_block'],
-        return_count='one',
+        columns=['last_scanned_block'],
+        output_format='cell_or_none',
         where_equals={'factory': factory.lower()},
     )
 

@@ -20,7 +20,7 @@ def get_schema_version(
     schema_name: str,
     *,
     context: spec.Context,
-    conn: toolsql.Connection | None = None,
+    conn: toolsql.Connection,
 ) -> str | None:
 
     # use chain_id = -1 for dbs that have no network association
@@ -34,7 +34,7 @@ def get_schema_version(
         table='schema_versions',
         where_equals={'chain_id': chain_id, 'schema_name': schema_name},
         columns=['version'],
-        output_format='single_cell_or_none',
+        output_format='cell_or_none',
     )
 
     if result is not None and not isinstance(result, str):

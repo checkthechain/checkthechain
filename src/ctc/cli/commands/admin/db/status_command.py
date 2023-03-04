@@ -88,53 +88,56 @@ def status_command(verbose: bool) -> None:
 
         with toolsql.connect(db_config) as conn:
             db_schema = toolsql.get_db_schema(conn)
-        if verbose:
-            toolsql.print_db_schema(db_schema=db_schema, styles=styles)
 
-            print()
-            toolstr.print_header('Schema Versions', style=styles['title'])
-            rows = []
-            for schema_name in active_schemas:
-                if schema_name in network_schemas:
-                    schema_networks: typing.Sequence[
-                        spec.NetworkReference
-                    ] | typing.Sequence[
-                        None
-                    ] = config.get_networks_that_have_providers()
-                else:
-                    schema_networks = [None]
+        with toolsql.connect(db_config) as conn:
+            if verbose:
+                # toolsql.print_db_schema(db_schema=db_schema, styles=styles)
 
-                for schema_network in schema_networks:
-                    version = db.get_schema_version(
-                        schema_name, context=dict(network=schema_network)
-                    )
-                    if version is None:
-                        version = '[DNE]'
-
-                    if schema_network is None:
-                        network_str = ''
+                print()
+                toolstr.print_header('Schema Versions', style=styles['title'])
+                rows = []
+                for schema_name in active_schemas:
+                    if schema_name in network_schemas:
+                        schema_networks: typing.Sequence[
+                            spec.NetworkReference
+                        ] | typing.Sequence[
+                            None
+                        ] = config.get_networks_that_have_providers()
                     else:
-                        network_str = str(schema_network)
-                    row = [schema_name, network_str, version]
-                    rows.append(row)
-                rows = sorted(rows, key=lambda row: tuple(row))
-            toolstr.print_table(
-                rows,
-                labels=['schema', 'network', 'version'],
-                indent=4,
-                border=styles['comment'],
-                label_style=styles['title'],
-                column_styles={
-                    'schema': styles['description'],
-                    'network': 'bold',
-                    'version': 'bold',
-                },
-            )
+                        schema_networks = [None]
+                    for schema_network in schema_networks:
+                        version = db.get_schema_version(
+                            schema_name,
+                            context=dict(network=schema_network),
+                            conn=conn,
+                        )
+                        if version is None:
+                            version = '[DNE]'
 
-            print()
-            print()
-            with toolsql.connect(db_config) as conn:
-                toolsql.print_db_usage(conn=conn, styles=styles)
+                        if schema_network is None:
+                            network_str = ''
+                        else:
+                            network_str = str(schema_network)
+                        row = [schema_name, network_str, version]
+                        rows.append(row)
+                    rows = sorted(rows, key=lambda row: tuple(row))
+                toolstr.print_table(
+                    rows,
+                    labels=['schema', 'network', 'version'],
+                    indent=4,
+                    border=styles['comment'],
+                    label_style=styles['title'],
+                    column_styles={
+                        'schema': styles['description'],
+                        'network': 'bold',
+                        'version': 'bold',
+                    },
+                )
+
+                print()
+                print()
+                toolstr.print_header('Table Usage', style=styles['title'])
+                toolsql.print_db_usage(conn=conn, styles=styles['title'])
 
     else:
         toolstr.print_text_box('Schema Summary', style=styles['title'])

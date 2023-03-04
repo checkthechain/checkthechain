@@ -112,8 +112,7 @@ async def async_populate_db_tables(
     print('Populating database with latest Chainlink oracle feeds...')
     print()
     try:
-        async with toolsql.async_connect(db_config) as conn:
-            await chainlink_db.async_import_networks_to_db(conn=conn)
+        await chainlink_db.async_import_networks_to_db(db_config=db_config)
     except aiohttp.client_exceptions.ClientConnectorError:
         print('Could not connect to Chainlink server, skipping')
     except Exception:

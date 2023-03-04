@@ -47,9 +47,9 @@ async def async_select_contract_abi(
     abi_text = await toolsql.async_select(
         conn=conn,
         table=table,
-        row_id=address.lower(),
+        where_equals={'address': address.lower()},
         columns=['abi_text'],
-        output_format='cell',
+        output_format='cell_or_none',
     )
     if abi_text is not None:
         contract_abi: spec.ContractABI = json.loads(abi_text)

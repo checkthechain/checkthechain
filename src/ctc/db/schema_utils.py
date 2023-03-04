@@ -103,7 +103,8 @@ def get_table_schema(
 ) -> toolsql.TableSchema:
     schema_name = get_schema_of_raw_table(table_name)
     schema = get_prepared_schema(schema_name=schema_name, context=context)
-    return schema['tables'][table_name]
+    prepared_name = get_table_name(context=context, table_name=table_name)
+    return schema['tables'][prepared_name]
 
 
 def get_table_name(
@@ -172,6 +173,6 @@ def _combine_db_schemas(
             if table_name in tables:
                 raise Exception('table name collision')
             tables[table_name] = table_spec
-    combined_schema: toolsql.DBSchema = {'tables': tables}
+    combined_schema: toolsql.DBSchema = {'name': 'ctc', 'tables': tables}
     return combined_schema
 

@@ -111,7 +111,7 @@ async def async_select_block_transaction_query(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
-        return_count='one',
+        output_format='single_dict_or_none',
     )
 
     return result is not None

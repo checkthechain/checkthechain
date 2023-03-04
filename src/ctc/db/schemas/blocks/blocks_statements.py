@@ -185,9 +185,8 @@ async def async_select_block_timestamp(
         conn=conn,
         table=table,
         where_equals={'number': block_number},
-        row_format='only_column',
-        only_columns=['timestamp'],
-        return_count='one',
+        columns=['timestamp'],
+        output_format='cell_or_none',
     )
     if result is not None and not isinstance(result, int):
         raise Exception('invalid db result')
