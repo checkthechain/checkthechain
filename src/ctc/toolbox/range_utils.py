@@ -48,7 +48,11 @@ def get_range_gaps(
     if current_start < end:
         gap_ranges.append([current_start, end])
 
-    if len(gap_ranges) > 0 and gap_ranges[-1][-1] < end:
+    if (
+        len(gap_ranges) > 0
+        and gap_ranges[-1][-1] < end
+        and subranges[-1][-1] < end
+    ):
         gap_range = [subend + 1, end]
         gap_ranges.append(gap_range)
 
@@ -235,3 +239,4 @@ def range_to_chunks(
                 chunks[-1] = [chunks[-1][0], last_value]
 
     return chunks
+

@@ -11,7 +11,7 @@ async def async_get_erc721_transfers(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     context: spec.Context = None,
-) -> spec.DataFrame:
+) -> spec.PolarsDataFrame:
     """get transfers of erc721 token"""
     return await event_utils.async_get_events(
         contract_address=token,
@@ -29,7 +29,7 @@ async def async_get_erc721_approvals(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     context: spec.Context = None,
-) -> spec.DataFrame:
+) -> spec.PolarsDataFrame:
     """get approval of erc721 token"""
     return await event_utils.async_get_events(
         contract_address=token,
@@ -47,7 +47,7 @@ async def async_get_erc721_approvals_for_all(
     start_block: spec.BlockNumberReference | None = None,
     end_block: spec.BlockNumberReference | None = None,
     context: spec.Context = None,
-) -> spec.DataFrame:
+) -> spec.PolarsDataFrame:
     """get approvals for all of erc721 token"""
     return await event_utils.async_get_events(
         contract_address=token,

@@ -93,7 +93,7 @@ async def async_dex_chart_command(
     x_volumes = swaps['volume__0'].values
     if invert:
         prices = 1 / prices  # type: ignore
-    block_numbers = list(swaps.index.get_level_values('block_number'))
+    block_numbers = swaps['block_number'].to_list()
     block_timestamps = await evm.async_get_block_timestamps(
         block_numbers,
         context={'provider': {'chunk_size': 1}},

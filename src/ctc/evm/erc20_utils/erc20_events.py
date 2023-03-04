@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
     import tooltime
 
 
-def _get_token_amount_column(df: spec.DataFrame) -> str:
+def _get_token_amount_column(df: spec.PolarsDataFrame) -> str:
     if 'arg__amount' in df:
         return 'arg__amount'
     elif 'arg__value' in df:
@@ -37,7 +37,7 @@ async def async_get_erc20_transfers(
     verbose: bool = False,
     context: spec.Context = None,
     **event_kwargs: typing.Any,
-) -> spec.DataFrame:
+) -> spec.PolarsDataFrame:
     """get transfer events of ERC20 token"""
 
     token_address = await erc20_metadata.async_get_erc20_address(
@@ -71,11 +71,11 @@ async def async_get_erc20_transfers(
     # make amount column name the same across all tokens
     old_column = 'arg__' + event_abi['inputs'][2]['name']
     column = 'arg__amount'
-    transfers = transfers.rename(columns={old_column: column})
+    transfers = transfers.rename({old_column: column})
 
     # convert from str amounts to int amounts
     if convert_from_str:
-        transfers[column] = transfers[column].map(int)
+        transfers[column] = transfers[column].apply(int)
 
     # normalize
     if normalize and len(transfers) > 0:
@@ -88,7 +88,7 @@ async def async_get_erc20_transfers(
 
         decimals = await erc20_metadata.async_get_erc20_decimals(
             token=token_address,
-            block=transfers.index.values[0][0],
+            block=transfers['block_number'][0],
             context=context,
         )
         dtype = float
@@ -106,7 +106,7 @@ async def async_get_erc20_transfers(
 
 
 async def async_get_erc20_balances_from_transfers(
-    transfers: spec.DataFrame,
+    transfers: spec.PolarsDataFrame,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     dtype: typing.Optional[
@@ -114,12 +114,12 @@ async def async_get_erc20_balances_from_transfers(
     ] = None,
     normalize: bool = False,
     context: spec.Context = None,
-) -> spec.DataFrame:
+) -> spec.PolarsDataFrame:
     """compute ERC20 balance of each wallet using Transfer events"""
 
     # filter block
     if block is not None:
-        blocks = transfers.index.get_level_values('block_number').values
+        blocks = transfers['block_number'].to_list()
         mask = blocks <= block
         transfers = transfers[mask]
 
@@ -132,7 +132,7 @@ async def async_get_erc20_balances_from_transfers(
     # subtract transfers out from transfers in
     from_transfers = transfers.groupby('arg__from')[amount_key].sum()
     to_transfers = transfers.groupby('arg__to')[amount_key].sum()
-    balances: spec.DataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
+    balances: spec.PolarsDataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
 
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
