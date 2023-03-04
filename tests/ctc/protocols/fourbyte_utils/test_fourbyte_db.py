@@ -1,10 +1,10 @@
-import os
-import tempfile
 
 import toolsql
 
 from ctc import db
 from ctc.protocols import fourbyte_utils
+
+import conftest
 
 
 example_data = [
@@ -46,69 +46,58 @@ example_data = [
 ]
 
 
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
-
-
 async def test_fourbyte_crud():
 
-    db_config = get_test_db_config()
+    db_config = conftest.get_test_db_config()
     db_schema = db.get_raw_schema(schema_name='4byte')
-    toolsql.create_tables(
+    toolsql.create_db(
         db_config=db_config,
         db_schema=db_schema,
+        if_not_exists=True,
+        confirm=True,
     )
 
-    engine = toolsql.create_engine(**db_config)
-
     # insert data
-    with engine.connect() as conn:
-
-        # insert data
-        with conn.begin():
-            for datum in example_data:
-                await fourbyte_utils.async_upsert_function_signature(
-                    conn=conn,
-                    function_signature=datum,
-                )
-
-        # get data individually
-        with conn.begin():
-            for datum in example_data:
-                db_data = await fourbyte_utils.async_select_function_signatures(
-                    conn=conn,
-                    id=datum['id'],
-                )
-                db_datum = db_data[0]
-                for key, target_value in datum.items():
-                    assert target_value == db_datum[key]
-
-        # get data collectively
-        with conn.begin():
-            for datum in example_data:
-                db_datas = (
-                    await fourbyte_utils.async_select_function_signatures(
-                        conn=conn,
-                        hex_signature=datum['hex_signature'],
-                    )
-                )
-                assert len(db_datas) > 0
-
-        # delete entries one by one
-        with conn.begin():
-            for datum in example_data:
-                await fourbyte_utils.async_delete_function_signatures(
-                    conn=conn,
-                    text_signature=datum['text_signature'],
-                )
-
-        # ensure all entries deleted
-        with conn.begin():
-            db_datas = await fourbyte_utils.async_select_function_signatures(
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await fourbyte_utils.async_upsert_function_signature(
                 conn=conn,
+                function_signature=datum,
             )
-            assert len(db_datas) == 0
+
+    # get data individually
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            db_data = await fourbyte_utils.async_select_function_signatures(
+                conn=conn,
+                id=datum['id'],
+            )
+            db_datum = db_data[0]
+            for key, target_value in datum.items():
+                assert target_value == db_datum[key]
+
+    # get data collectively
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            db_datas = (
+                await fourbyte_utils.async_select_function_signatures(
+                    conn=conn,
+                    hex_signature=datum['hex_signature'],
+                )
+            )
+            assert len(db_datas) > 0
+
+    # delete entries one by one
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await fourbyte_utils.async_delete_function_signatures(
+                conn=conn,
+                text_signature=datum['text_signature'],
+            )
+
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        db_datas = await fourbyte_utils.async_select_function_signatures(
+            conn=conn,
+        )
+        assert len(db_datas) == 0

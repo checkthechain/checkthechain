@@ -1,18 +1,10 @@
-import os
-import tempfile
 
 import toolsql
 
 from ctc import db
 from ctc.protocols.chainlink_utils import chainlink_db
 
-
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
+import conftest
 
 
 async def test_get_chainlink_feed_payload():
@@ -20,15 +12,18 @@ async def test_get_chainlink_feed_payload():
 
 
 async def test_populate_feeds():
-    db_config = get_test_db_config()
-    engine = toolsql.create_engine(db_config=db_config)
-    with engine.begin() as conn:
+    db_config = conftest.get_test_db_config()
+    with toolsql.connect(db_config) as conn:
         db.initialize_schema(
-            schema_name='chainlink', context=dict(network='mainnet'), conn=conn
+            schema_name='chainlink',
+            context=dict(network='mainnet'),
+            conn=conn,
         )
-    await chainlink_db.async_import_network_to_db(
-        network='mainnet', engine=engine
-    )
+    async with toolsql.async_connect(db_config) as conn:
+        await chainlink_db.async_import_network_to_db(
+            network='mainnet',
+            conn=conn,
+        )
 
 
 example_data = [
@@ -57,69 +52,66 @@ example_data = [
 
 async def test_chainlink_crud():
 
-    db_config = get_test_db_config()
+    db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='chainlink',
         context=dict(network='mainnet'),
     )
-    toolsql.create_tables(
+    toolsql.create_db(
         db_config=db_config,
         db_schema=db_schema,
+        if_not_exists=True,
+        confirm=True,
     )
-
-    engine = toolsql.create_engine(**db_config)
 
     network = 1
 
     # insert data
-    with engine.connect() as conn:
-
-        # insert data
-        with conn.begin():
-            for feed_data in example_data:
-                await chainlink_db.async_upsert_feed(
-                    conn=conn,
-                    feed=feed_data,
-                    context=dict(network=network),
-                )
-
-        # get data individually
-        with conn.begin():
-            for feed_data in example_data:
-                db_feed = await chainlink_db.async_select_feed(
-                    conn=conn,
-                    address=feed_data['address'],
-                    context=dict(network=network),
-                )
-                for key, target_value in feed_data.items():
-                    assert target_value == db_feed[key]
-
-        # get data collectively
-        with conn.begin():
-            addresses = [feed_data['address'] for feed_data in example_data]
-            db_feeds = await chainlink_db.async_select_feeds(
+    async with toolsql.async_connect(db_config) as conn:
+        for feed_data in example_data:
+            await chainlink_db.async_upsert_feed(
                 conn=conn,
-                addresses=addresses,
+                feed=feed_data,
                 context=dict(network=network),
             )
-            db_feeds = sorted(db_feeds, key=lambda feed: feed['address'])
-            assert db_feeds == example_data
 
-        # delete entries one by one
-        with conn.begin():
-            for feed_data in example_data:
-                await chainlink_db.async_delete_feed(
-                    conn=conn,
-                    address=feed_data['address'],
-                    context=dict(network=network),
-                )
-
-        # ensure all entries deleted
-        with conn.begin():
-            db_feeds = await chainlink_db.async_select_feeds(
+    # get data individually
+    async with toolsql.async_connect(db_config) as conn:
+        for feed_data in example_data:
+            db_feed = await chainlink_db.async_select_feed(
                 conn=conn,
-                addresses=addresses,
+                address=feed_data['address'],
                 context=dict(network=network),
             )
-            assert all(item is None for item in db_feeds)
+            for key, target_value in feed_data.items():
+                assert target_value == db_feed[key]
+
+    # get data collectively
+    async with toolsql.async_connect(db_config) as conn:
+        addresses = [feed_data['address'] for feed_data in example_data]
+        db_feeds = await chainlink_db.async_select_feeds(
+            conn=conn,
+            addresses=addresses,
+            context=dict(network=network),
+        )
+        db_feeds = sorted(db_feeds, key=lambda feed: feed['address'])
+        assert db_feeds == example_data
+
+    # delete entries one by one
+    async with toolsql.async_connect(db_config) as conn:
+        for feed_data in example_data:
+            await chainlink_db.async_delete_feed(
+                conn=conn,
+                address=feed_data['address'],
+                context=dict(network=network),
+            )
+
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        db_feeds = await chainlink_db.async_select_feeds(
+            conn=conn,
+            addresses=addresses,
+            context=dict(network=network),
+        )
+        assert all(item is None for item in db_feeds)
 

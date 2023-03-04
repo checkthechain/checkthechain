@@ -1,8 +1,8 @@
-import os
-import tempfile
 import toolsql
 
 from ctc import db
+
+import conftest
 
 
 example_data = [
@@ -21,59 +21,49 @@ example_data = [
 ]
 
 
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
-
-
 async def test_create_creation_blocks_crud():
-    db_config = get_test_db_config()
+    db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='contract_creation_blocks',
         context=dict(network='mainnet'),
     )
-    toolsql.create_tables(
+    toolsql.create_db(
         db_config=db_config,
         db_schema=db_schema,
+        if_not_exists=True,
+        confirm=True,
     )
 
-    engine = toolsql.create_engine(**db_config)
-
     # insert data
-    with engine.connect() as conn:
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_upsert_contract_creation_block(
+                conn=conn, **datum
+            )
 
-        # insert data
-        with conn.begin():
-            for datum in example_data:
-                await db.async_upsert_contract_creation_block(
-                    conn=conn, **datum
-                )
+    # get data individually
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            stored_block = await db.async_select_contract_creation_block(
+                conn=conn,
+                address=datum['address'],
+            )
+            assert stored_block == datum['block_number']
 
-        # get data individually
-        with conn.begin():
-            for datum in example_data:
-                stored_block = await db.async_select_contract_creation_block(
-                    conn=conn,
-                    address=datum['address'],
-                )
-                assert stored_block == datum['block_number']
+    # delete entries one by one
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_delete_contract_creation_block(
+                conn=conn,
+                address=datum['address'],
+            )
 
-        # delete entries one by one
-        with conn.begin():
-            for datum in example_data:
-                await db.async_delete_contract_creation_block(
-                    conn=conn,
-                    address=datum['address'],
-                )
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            block = await db.async_select_contract_creation_block(
+                conn=conn,
+                address=datum['address'],
+            )
+            assert block is None
 
-        # ensure all entries deleted
-        with conn.begin():
-            for datum in example_data:
-                block = await db.async_select_contract_creation_block(
-                    conn=conn,
-                    address=datum['address'],
-                )
-                assert block is None

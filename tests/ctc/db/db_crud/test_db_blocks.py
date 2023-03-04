@@ -1,9 +1,9 @@
-import os
-import tempfile
 import toolsql
 
 import ctc
 from ctc import db
+
+import conftest
 
 
 example_data = [
@@ -80,76 +80,66 @@ example_data = [
 ]
 
 
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
-
-
 async def test_blocks_crud():
 
-    db_config = get_test_db_config()
+    db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='blocks',
         context=dict(network='mainnet'),
     )
-    toolsql.create_tables(
+    toolsql.create_db(
         db_config=db_config,
         db_schema=db_schema,
+        if_not_exists=True,
+        confirm=True,
     )
-
-    engine = toolsql.create_engine(**db_config)
 
     network = 1
 
     # insert data
-    with engine.connect() as conn:
+    async with toolsql.async_connect(db_config) as conn:
+        for block in example_data:
+            await db.async_upsert_block(
+                conn=conn, block=block, context=dict(network=network)
+            )
 
-        # insert data
-        with conn.begin():
-            for block in example_data:
-                await db.async_upsert_block(
-                    conn=conn, block=block, context=dict(network=network)
-                )
-
-        # get data individually
-        with conn.begin():
-            for block in example_data:
-                db_block = await db.async_select_block(
-                    conn=conn,
-                    block_number=block['number'],
-                    context=dict(network=network),
-                )
-                for key, target_value in block.items():
-                    assert target_value == db_block[key]
-
-        # get data collectively
-        with conn.begin():
-            block_numbers = [block['number'] for block in example_data]
-            db_blocks = await db.async_select_blocks(
+    # get data individually
+    async with toolsql.async_connect(db_config) as conn:
+        for block in example_data:
+            db_block = await db.async_select_block(
                 conn=conn,
-                block_numbers=block_numbers,
+                block_number=block['number'],
                 context=dict(network=network),
             )
-            db_blocks = sorted(db_blocks, key=lambda block: block['number'])
-            assert db_blocks == example_data
+            for key, target_value in block.items():
+                assert target_value == db_block[key]
 
-        # delete entries one by one
-        with conn.begin():
-            for block in example_data:
-                await db.async_delete_block(
-                    conn=conn,
-                    block_number=block['number'],
-                    context=dict(network=network),
-                )
+    # get data collectively
+    async with toolsql.async_connect(db_config) as conn:
+        block_numbers = [block['number'] for block in example_data]
+        db_blocks = await db.async_select_blocks(
+            conn=conn,
+            block_numbers=block_numbers,
+            context=dict(network=network),
+        )
+        db_blocks = sorted(db_blocks, key=lambda block: block['number'])
+        assert db_blocks == example_data
 
-        # ensure all entries deleted
-        with conn.begin():
-            db_blocks = await db.async_select_blocks(
+    # delete entries one by one
+    async with toolsql.async_connect(db_config) as conn:
+        for block in example_data:
+            await db.async_delete_block(
                 conn=conn,
-                block_numbers=block_numbers,
+                block_number=block['number'],
                 context=dict(network=network),
             )
-            assert all(item is None for item in db_blocks)
+
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        db_blocks = await db.async_select_blocks(
+            conn=conn,
+            block_numbers=block_numbers,
+            context=dict(network=network),
+        )
+        assert all(item is None for item in db_blocks)
+

@@ -1,9 +1,8 @@
-import os
-import tempfile
-
 import toolsql
 
 from ctc import db
+
+import conftest
 
 
 example_data = [
@@ -50,97 +49,75 @@ example_data = [
 ]
 
 
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
-
-
 async def test_block_timestamps_db():
-    db_config = get_test_db_config()
+    db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='block_timestamps',
         context=dict(network='mainnet'),
     )
-    toolsql.create_tables(
+    toolsql.create_db(
         db_config=db_config,
         db_schema=db_schema,
+        if_not_exists=True,
+        confirm=True,
     )
 
-    engine = toolsql.create_engine(**db_config)
+    # insert data one-by-one
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_upsert_block_timestamp(conn=conn, **datum)
 
-    # insert data
-    with engine.connect() as conn:
-
-        #         # insert data in bulk
-        #         with conn.begin():
-        #             data = {
-        #                 datum['block_number']: datum['timestamp']
-        #                 for datum in example_data
-        #             }
-        #             db.set_blocks_timestamps(
-        #                 conn=conn,
-        #                 blocks_timestamps=data,
-        #             )
-
-        # insert data one-by-one
-        with conn.begin():
-            for datum in example_data:
-                await db.async_upsert_block_timestamp(conn=conn, **datum)
-
-        # get data individually
-        with conn.begin():
-            for datum in example_data:
-                timestamp = await db.async_select_block_timestamp(
-                    conn=conn,
-                    block_number=datum['block_number'],
-                )
-                assert timestamp == datum['timestamp']
-
-        # get data collectively
-        all_blocks = [datum['block_number'] for datum in example_data]
-        all_timestamps = [datum['timestamp'] for datum in example_data]
-        with conn.begin():
-            stored_timestamps = await db.async_select_block_timestamps(
+    # get data individually
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            timestamp = await db.async_select_block_timestamp(
                 conn=conn,
-                block_numbers=all_blocks,
+                block_number=datum['block_number'],
             )
-            assert set(stored_timestamps) == set(all_timestamps)
+            assert timestamp == datum['timestamp']
 
-        # delete entries one by one
-        with conn.begin():
-            for datum in example_data:
-                await db.async_delete_block_timestamp(
-                    conn=conn,
-                    block_number=datum['block_number'],
-                )
+    # get data collectively
+    all_blocks = [datum['block_number'] for datum in example_data]
+    all_timestamps = [datum['timestamp'] for datum in example_data]
+    async with toolsql.async_connect(db_config) as conn:
+        stored_timestamps = await db.async_select_block_timestamps(
+            conn=conn,
+            block_numbers=all_blocks,
+        )
+        assert set(stored_timestamps) == set(all_timestamps)
 
-        # ensure all entries deleted
-        with conn.begin():
-            stored_timestamps = await db.async_select_block_timestamps(
+    # delete entries one by one
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_delete_block_timestamp(
                 conn=conn,
-                block_numbers=all_blocks,
-            )
-            assert set(stored_timestamps) == {None}
-
-        # insert data again
-        with conn.begin():
-            for datum in example_data:
-                await db.async_upsert_block_timestamp(conn=conn, **datum)
-
-        # delete entries all at once
-        with conn.begin():
-            await db.async_delete_block_timestamps(
-                conn=conn,
-                block_numbers=all_blocks,
+                block_number=datum['block_number'],
             )
 
-        # ensure all entries deleted
-        with conn.begin():
-            stored_timestamps = await db.async_select_block_timestamps(
-                conn=conn,
-                block_numbers=all_blocks,
-            )
-            assert set(stored_timestamps) == {None}
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        stored_timestamps = await db.async_select_block_timestamps(
+            conn=conn,
+            block_numbers=all_blocks,
+        )
+        assert set(stored_timestamps) == {None}
+
+    # insert data again
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_upsert_block_timestamp(conn=conn, **datum)
+
+    # delete entries all at once
+    async with toolsql.async_connect(db_config) as conn:
+        await db.async_delete_block_timestamps(
+            conn=conn,
+            block_numbers=all_blocks,
+        )
+
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        stored_timestamps = await db.async_select_block_timestamps(
+            conn=conn,
+            block_numbers=all_blocks,
+        )
+        assert set(stored_timestamps) == {None}
