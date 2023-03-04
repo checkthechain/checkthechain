@@ -9,6 +9,8 @@ from ctc.protocols.chainlink_utils import chainlink_db
 from ctc.protocols import fourbyte_utils
 from ctc.protocols.coingecko_utils import coingecko_db
 
+import conftest
+
 
 schema_datas = [
     {
@@ -164,14 +166,6 @@ non_network_schemas = (
 )
 
 
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
-
-
 def test_all_evm_schemas_tested_for_problems():
     tested = {schema_datum['schema_name'] for schema_datum in schema_datas}
     assert tested == set(
@@ -185,15 +179,9 @@ async def test_select_when_db_folder_does_not_exist(schema_data):
     dne_dir = os.path.join(tempfile.mkdtemp(), 'does', 'not', 'exist')
     assert not os.path.isdir(dne_dir)
 
-    db_config = {
-        'dbms': 'sqlite',
-        'path': dne_dir,
-    }
-    engine = toolsql.create_engine(**db_config)
-
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
-            context=dict(network=1), engine=engine
+            context=dict(network=1),
         )
 
         assert result is None
@@ -202,12 +190,9 @@ async def test_select_when_db_folder_does_not_exist(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_db_file_does_not_exist(schema_data):
 
-    db_config = get_test_db_config()
-    engine = toolsql.create_engine(**db_config)
-
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
-            context=dict(network=1), engine=engine, **schema_data['query']
+            context=dict(network=1), **schema_data['query']
         )
 
         assert result is None
@@ -216,9 +201,8 @@ async def test_select_when_db_file_does_not_exist(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_schema_not_initialized(schema_data):
 
-    db_config = get_test_db_config()
-    engine = toolsql.create_engine(**db_config)
-    with engine.begin() as conn:
+    db_config = conftest.get_test_db_config()
+    with toolsql.connect(db_config) as conn:
         db.initialize_schema_versions(conn=conn)
 
     if schema_data['schema_name'] not in non_network_schemas:
@@ -227,7 +211,7 @@ async def test_select_when_schema_not_initialized(schema_data):
         network_kwargs = {}
 
     if schema_data.get('selector') is not None:
-        with engine.begin() as conn:
+        async with toolsql.async_connect(db_config) as conn:
             result = await schema_data['selector'](
                 conn=conn, **schema_data['query'], **network_kwargs
             )
@@ -235,7 +219,7 @@ async def test_select_when_schema_not_initialized(schema_data):
         assert result is None
 
     if 'plural_selector' in schema_data:
-        with engine.begin() as conn:
+        async with toolsql.async_connect(db_config) as conn:
             result = await schema_data['plural_selector'](
                 conn=conn,
                 **schema_data['plural_query'],
@@ -248,9 +232,8 @@ async def test_select_when_schema_not_initialized(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_query_when_schema_not_initialized(schema_data):
 
-    db_config = get_test_db_config()
-    engine = toolsql.create_engine(**db_config)
-    with engine.begin() as conn:
+    db_config = conftest.get_test_db_config()
+    with toolsql.connect(db_config) as conn:
         db.initialize_schema_versions(conn=conn)
 
     if schema_data['schema_name'] not in non_network_schemas:
@@ -260,7 +243,8 @@ async def test_query_when_schema_not_initialized(schema_data):
 
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
-            engine=engine, **schema_data['query'], **network_kwargs
+            **schema_data['query'],
+            **network_kwargs,
         )
 
         assert result is None
@@ -269,9 +253,8 @@ async def test_query_when_schema_not_initialized(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_row_does_not_exist(schema_data):
 
-    db_config = get_test_db_config()
-    engine = toolsql.create_engine(**db_config)
-    with engine.begin() as conn:
+    db_config = conftest.get_test_db_config()
+    with toolsql.connect(db_config) as conn:
         if schema_data['schema_name'] not in non_network_schemas:
             network_kwargs = {'context': {'network': 1}}
         else:
@@ -287,7 +270,7 @@ async def test_select_when_row_does_not_exist(schema_data):
         network_kwargs = {}
 
     if schema_data.get('selector') is not None:
-        with engine.begin() as conn:
+        async with toolsql.async_connect(db_config) as conn:
             result = await schema_data['selector'](
                 conn=conn, **schema_data['query'], **network_kwargs
             )
@@ -295,7 +278,7 @@ async def test_select_when_row_does_not_exist(schema_data):
         assert result is None
 
     if 'plural_selector' in schema_data:
-        with engine.begin() as conn:
+        async with toolsql.async_connect(db_config) as conn:
             result = await schema_data['plural_selector'](
                 conn=conn,
                 **schema_data['plural_query'],
@@ -308,16 +291,17 @@ async def test_select_when_row_does_not_exist(schema_data):
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_query_when_row_does_not_exist(schema_data):
 
-    db_config = get_test_db_config()
-    engine = toolsql.create_engine(**db_config)
-    with engine.begin() as conn:
+    db_config = conftest.get_test_db_config()
+    with toolsql.connect(db_config) as conn:
         if schema_data['schema_name'] not in non_network_schemas:
             network_kwargs = {'context': {'network': 1}}
         else:
             network_kwargs = {'context': {'network': None}}
 
         db.initialize_schema(
-            schema_name=schema_data['schema_name'], conn=conn, **network_kwargs
+            schema_name=schema_data['schema_name'],
+            conn=conn,
+            **network_kwargs,
         )
 
     if schema_data.get('queryer') is not None:
@@ -327,7 +311,8 @@ async def test_query_when_row_does_not_exist(schema_data):
             network_kwargs = {'context': None}
 
         result = await schema_data['queryer'](
-            engine=engine, **schema_data['query'], **network_kwargs
+            **schema_data['query'],
+            **network_kwargs,
         )
 
         assert result is None

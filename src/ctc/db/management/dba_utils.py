@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import typing
 
-import sqlalchemy  # type: ignore
 import toolcli
 import toolsql
 
 from ctc import config
 from ctc import spec
 from ctc.spec.typedefs import db_types
-from .. import connect_utils
 from .. import schema_utils
 from . import version_utils
 
@@ -18,14 +16,14 @@ def create_missing_tables(
     networks: typing.Sequence[spec.NetworkReference] | None = None,
     schema_names: typing.Sequence[str] | None = None,
     *,
-    db_config: toolsql.DBConfig | None = None,
+    conn: toolsql.Connection,
     verbose: bool = True,
     confirm: bool = False,
 ) -> None:
-    network_schema_names = schema_utils.get_network_schema_names()
-    generic_schema_names = schema_utils.get_generic_schema_names()
 
     # get netowrks and schemas
+    network_schema_names = schema_utils.get_network_schema_names()
+    generic_schema_names = schema_utils.get_generic_schema_names()
     if networks is None:
         networks = config.get_networks_that_have_providers()
     if schema_names is None:
@@ -33,19 +31,17 @@ def create_missing_tables(
 
     # get preamble
     if verbose or not confirm:
-        print(
-            'Actively using',
-            len(schema_names),
-            'schema(s) across',
-            len(networks),
-            'network(s)',
-        )
+        n_schemas = len(schema_names)
+        n_networks = len(networks)
+        print('Using', n_schemas, 'schema(s) over', n_networks, 'network(s)')
         if len(schema_names) > 1:
             print('    - schemas:')
             for schema_name in schema_names:
                 print('        -', schema_name)
+        elif len(schema_names) == 1:
+            print('    - schema:', schema_names[0])
         else:
-            print('    - schema:', schema_name)
+            print('    - schema: [none specified]')
         if len(networks) > 1:
             print('    - networks:')
             for network in networks:
@@ -55,13 +51,6 @@ def create_missing_tables(
         else:
             print()
             print('No networks specified, creating no tables')
-
-    # using single db config for all schemas
-    if db_config is None:
-        db_config = config.get_context_db_config(
-            schema_name='schema_versions',
-            context={},
-        )
 
     # get missing tables
     schemas_to_create: list[
@@ -92,11 +81,14 @@ def create_missing_tables(
             else:
                 schema = schema_utils.get_raw_schema(schema_name=schema_name)
 
-            missing_tables = toolsql.get_missing_tables(
-                db_schema=schema,
-                db_config=db_config,
-            )
-            if len(missing_tables['missing_from_db']) > 0:
+            # if any tables missing, mark schema for creation
+            tables_in_db = toolsql.get_table_names(conn=conn)
+            missing_tables = [
+                table
+                for table in schema['tables'].keys()
+                if table not in tables_in_db
+            ]
+            if len(missing_tables) > 0:
                 schemas_to_create.append((schema_network, schema_name))
 
     # print missing tables
@@ -118,43 +110,34 @@ def create_missing_tables(
 
     # create tables
     # (for now, use same database for all tables)
-    engine = toolsql.create_engine(db_config=db_config)
-    if engine is None:
-        raise Exception('Could not create engine for database')
 
     # initialize schema versions schema if need be
-    with engine.begin() as conn:
-        if not version_utils.is_schema_versions_initialized(engine=engine):
-            initialize_schema_versions(conn=conn)
+    if not version_utils.is_schema_versions_initialized(conn=conn):
+        initialize_schema_versions(conn=conn)
 
-    with engine.begin() as conn:
-
-        # create each schema for each used network
-        for schema_network, schema_name in schemas_to_create:
-            initialize_schema(
-                schema_name=schema_name,
-                context=dict(network=schema_network),
-                conn=conn,
-            )
+    # create each schema for each used network
+    for schema_network, schema_name in schemas_to_create:
+        initialize_schema(
+            schema_name=schema_name,
+            context=dict(network=schema_network),
+            conn=conn,
+        )
 
     print()
     print('All tables created')
 
 
-def initialize_schema_versions(conn: toolsql.SAConnection) -> None:
+def initialize_schema_versions(conn: toolsql.Connection) -> None:
     """initialize the schema_versions schema which manages versions of schemas"""
-    initialize_schema(
-        'schema_versions',
-        context=dict(network=None),
-        conn=conn,
-    )
+
+    initialize_schema('schema_versions', context=dict(network=None), conn=conn)
 
 
 def initialize_schema(
     schema_name: spec.SchemaName,
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.Connection,
 ) -> None:
     """initialize schema by creating its table and other objects"""
 
@@ -162,7 +145,7 @@ def initialize_schema(
     prepared_schema = schema_name in network_schema_names
 
     # check that schema versions are being tracked
-    if not version_utils.is_schema_versions_initialized(engine=conn.engine):
+    if not version_utils.is_schema_versions_initialized(conn=conn):
         if schema_name != 'schema_versions':
             initialize_schema_versions(conn=conn)
     else:
@@ -186,30 +169,20 @@ def initialize_schema(
 
     # create tables
     for table_name, table_schema in schema['tables'].items():
-        toolsql.create_table(
-            table_name,
-            table_schema=table_schema,
-            conn=conn,
-        )
+        toolsql.create_table(table_schema, conn=conn, confirm=True)
 
-    # set version in schema version table
-    if schema_name not in schema_utils.get_network_schema_names():
-        network = -1
-    else:
-        network = config.get_context_chain_id(context)
     version_utils.set_schema_version(
         schema_name=schema_name,
-        network=network,
+        context=context,
         conn=conn,
     )
-
-    toolsql.clear_table_caches(conn=conn)
 
 
 def drop_schema(
     schema_name: str,
-    context: spec.Context = None,
     *,
+    context: spec.Context = None,
+    conn: toolsql.Connection,
     confirm: bool = False,
 ) -> None:
 
@@ -249,14 +222,7 @@ def drop_schema(
     for network in networks:
 
         # determine tables in db
-        engine = connect_utils.create_engine(
-            schema_name=schema,
-            create_missing_schema=False,
-            context=context,
-        )
-        if engine is None:
-            continue
-        db_table_names = sqlalchemy.inspect(engine).get_table_names()
+        db_table_names = toolsql.get_table_names(conn=conn)
 
         # determine tables in schema
         if network is not None:
@@ -272,29 +238,17 @@ def drop_schema(
         drop_table_names = set(db_table_names) & set(schema_table_names)
 
         # drop schema tables
-        with engine.begin() as conn:
-            for table_name in drop_table_names:
-                print('Dropping table', table_name)
-                table_object = toolsql.create_table_object_from_db(
-                    engine=engine,
-                    table_name=table_name,
-                )
-                table_object.drop(bind=engine)
+        for table_name in drop_table_names:
+            print('Dropping table', table_name)
+            toolsql.drop_table(table=table_name, conn=conn, confirm=True)
 
     # delete rows from schema_versions table
-    schema_version_engine = connect_utils.create_engine(
-        schema_name='schema_versions',
-        context=dict(network=None),
-        create_missing_schema=False,
-    )
-    if schema_version_engine is not None:
-        with schema_version_engine.begin() as conn:
-            for network in networks:
-                version_utils.delete_schema_version(
-                    schema_name=schema,
-                    network=network,
-                    conn=conn,
-                    confirm_delete_row=True,
-                    confirm_delete_schema=True,
-                )
+    for network in networks:
+        version_utils.delete_schema_version(
+            schema_name=schema,
+            network=network,
+            conn=conn,
+            confirm_delete_row=True,
+            confirm_delete_schema=True,
+        )
 

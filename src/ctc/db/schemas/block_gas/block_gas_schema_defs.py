@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-block_gas_schema: toolsql.DBSchema = {
+block_gas_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'block_gas': {
             'columns': [

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import typing
 
 from ctc import spec
@@ -25,14 +24,17 @@ async def _async_query_events_from_node(
     end_block: int,
     context: spec.Context = None,
     verbose: bool | int,
-    output_format: Literal['dataframe', 'dict'] = 'dataframe',
     binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
-) -> spec.DataFrame | typing.Sequence[spec.EncodedEvent]:
+    chunk_size: int = 100000,
+) -> spec.DataFrame:
     """query events from node and cache results in db if desired"""
 
     import asyncio
+    import polars as pl
+    from ctc.toolbox import pl_utils
     from ctc.toolbox import range_utils
 
+    # parse query type
     query_type = event_query_utils._parse_event_query_type(
         contract_address=contract_address,
         event_hash=event_hash,
@@ -46,7 +48,6 @@ async def _async_query_events_from_node(
         )
 
     # break into chunks, each will be independently written to db
-    chunk_size = 100000
     chunk_ranges = range_utils.range_to_chunks(
         start=start_block,
         end=end_block,
@@ -94,64 +95,37 @@ async def _async_query_events_from_node(
             latest_block_number=latest_block_number,
         )
         coroutines.append(coroutine)
-
     chunks = await asyncio.gather(*coroutines)
 
+    # package result in dataframe
     result = [response for chunk in chunks for response in chunk]
+    columns = event_query_utils.get_event_df_columns(binary_format='prefix_hex')
+    df = pl.DataFrame(result, columns=columns)
+    if 'removed' in df.columns:
+        del df['removed']
 
-    if output_format == 'dict':
-
-        if binary_output_format == 'prefix_hex':
-            # already in prefix hex
-            pass
-        elif binary_output_format == 'binary':
-            for event in result:
-                for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
-                    value = event[field]
-                    if not (isinstance(value, float) and math.isnan(value)):
-                        event[field] = binary_utils.binary_convert(
-                            value, 'binary'
-                        )
-        else:
-            raise Exception('unknown binary_output_format')
-
-        return result
-
-    elif output_format == 'dataframe':
-        import pandas as pd
-
-        columns = spec.event_index_fields + spec.encoded_event_fields
-        df = pd.DataFrame(result, columns=columns)
-        if 'removed' in df.columns:
-            del df['removed']
-
-        if binary_output_format == 'prefix_hex':
-            # already in prefix hex
-            pass
-        elif binary_output_format == 'binary':
-            for field in ['topic1', 'topic2', 'topic3', 'unindexed']:
-                mask = ~pd.isnull(df[field])
-                df.loc[mask, field] = (
-                    df[field][mask]
-                    .map(lambda x: binary_utils.binary_convert(x, 'binary'))
-                    .values
-                )
-        else:
-            raise Exception('unknown binary_output_format')
-
-        return df
-
+    # convert binary output columns
+    if binary_output_format == 'prefix_hex':
+        # already in prefix hex
+        pass
+    elif binary_output_format == 'binary':
+        df = pl_utils.prefix_hex_columns_to_binary(
+            df=df,
+            columns=['topic1', 'topic2', 'topic3', 'unindexed'],
+        )
     else:
-        raise Exception('unknown output_format: ' + str(output_format))
+        raise Exception('unknown binary_output_format')
+
+    return df
 
 
 async def _async_query_node_events_chunk(
     *,
     contract_address: spec.Address | None,
-    event_hash: spec.BinaryData | None,
-    topic1: spec.BinaryData | None,
-    topic2: spec.BinaryData | None,
-    topic3: spec.BinaryData | None,
+    event_hash: bytes | None,
+    topic1: bytes | None,
+    topic2: bytes | None,
+    topic3: bytes | None,
     chunk_start: int,
     chunk_end: int,
     context: spec.Context,
@@ -193,6 +167,8 @@ async def _async_query_node_events_chunk(
         topics = [event_hash]
 
     # request from node
+    import time
+    start = time.time()
     coroutines = []
     for request_start, request_end in chunk_requests:
         coroutine = rpc.async_eth_get_logs(
@@ -204,12 +180,16 @@ async def _async_query_node_events_chunk(
         )
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
+    end_node = time.time()
+    print('inner node took', end_node - start)
 
     # process raw events
     raw_logs = [event for result in results for event in result]
     encoded_events = await _async_process_raw_node_logs(
         raw_logs,
     )
+    end_process = time.time()
+    print('inner process took', end_process - end_node)
 
     # write encoded events to database
     read_cache, write_cache = config.get_context_cache_read_write(
@@ -242,6 +222,8 @@ async def _async_query_node_events_chunk(
             context=context,
             latest_block=latest_block_number,
         )
+    end_write = time.time()
+    print('inner db write took', end_write - end_process)
 
     return encoded_events
 
@@ -280,18 +262,18 @@ async def _async_process_raw_node_logs_list(
     return raw_logs  # type: ignore
 
 
-async def _async_process_raw_node_logs_dataframe(
-    raw_logs: spec.DataFrame,
-) -> spec.DataFrame:
-    import pandas as pd
+# async def _async_process_raw_node_logs_dataframe(
+#     raw_logs: spec.DataFrame,
+# ) -> spec.DataFrame:
+#     import pandas as pd
 
-    split_topics = pd.DataFrame(
-        raw_logs['topics'].to_list(),
-        columns=['event_hash', 'topic1', 'topic2', 'topic3'],
-    )
-    encoded_events = pd.concat([raw_logs, split_topics], axis=1)
-    encoded_events = encoded_events.rename(
-        columns={'address': 'contract_address'}
-    )
-    return encoded_events
+#     split_topics = pd.DataFrame(
+#         raw_logs['topics'].to_list(),
+#         columns=['event_hash', 'topic1', 'topic2', 'topic3'],
+#     )
+#     encoded_events = pd.concat([raw_logs, split_topics], axis=1)
+#     encoded_events = encoded_events.rename(
+#         columns={'address': 'contract_address'}
+#     )
+#     return encoded_events
 

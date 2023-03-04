@@ -3,9 +3,6 @@ from __future__ import annotations
 import functools
 from typing import Callable, Coroutine, Any, TypeVar
 
-import sqlalchemy  # type: ignore
-import toolsql
-
 from ctc import spec
 from . import connect_utils
 
@@ -23,11 +20,10 @@ def wrap_selector_with_connection(
     async def async_connected_f(
         *args: Any,
         context: spec.Context,
-        engine: toolsql.SAEngine | None = None,
         **kwargs: Any,
     ) -> R | None:
-        # TODO: allow this function to accept a conn that already exists
 
+        # determine schema_name
         if not isinstance(schema_name, str) and hasattr(
             schema_name, '__call__'
         ):
@@ -39,25 +35,10 @@ def wrap_selector_with_connection(
         else:
             raise Exception('unknown schema_name format')
 
-        # create engine
-        if engine is None:
-            engine = connect_utils.create_engine(
-                schema_name=name,
-                context=context,
-            )
-
-        # if cannot create engine, return None
-        if engine is None:
-            return None
-
-        # connect and execute
-        try:
-            with engine.connect() as conn:
-                return await async_f(
-                    *args, conn=conn, context=context, **kwargs
-                )
-        except sqlalchemy.exc.OperationalError:
-            return None
+        async with connect_utils.async_connect(
+            context=context, schema=name
+        ) as conn:
+            return await async_f(*args, conn=conn, context=context, **kwargs)
 
     return async_connected_f
 

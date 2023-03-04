@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 import polars as pl
 
 
@@ -7,7 +9,8 @@ def set_column_display_width(width: int = 70) -> None:
     pl.Config.set_fmt_str_lengths(width)
 
 
-def create_series_summary(series):
+
+def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
 
     import toolstr
 
@@ -16,7 +19,7 @@ def create_series_summary(series):
     n_null = series.is_null().sum()
 
     # bytes
-    n_bytes = 0
+    n_bytes: int | None = 0
     if series.dtype == pl.datatypes.Int8:
         bytes_per_row = 1
     elif series.dtype == pl.datatypes.Int16:
@@ -32,18 +35,19 @@ def create_series_summary(series):
     elif series.dtype == pl.datatypes.Utf8:
         bytes_per_row = 8
         str_lengths = series.str.lengths()
-        str_lengths_sum = str_lengths.sum()
+        str_lengths_sum = typing.cast(int, str_lengths.sum())
         if str_lengths_sum is not None:
             n_bytes += str_lengths_sum
     elif series.dtype == pl.datatypes.Categorical:
         bytes_per_row = 4
         str_lengths = series.unique().str.lengths()
-        str_lengths_sum = str_lengths.sum()
+        str_lengths_sum = typing.cast(int, str_lengths.sum())
         if str_lengths_sum is not None:
-            n_bytes += str_lengths.sum()
+            n_bytes += str_lengths_sum
     else:
         n_bytes = None
-    n_bytes += bytes_per_row * n_rows
+    if n_bytes is not None:
+        n_bytes += bytes_per_row * n_rows
 
     # human-readable bytes
     if n_bytes is not None:
@@ -61,17 +65,19 @@ def create_series_summary(series):
     if series.dtype == pl.datatypes.Utf8:
         unique_lengths = series.unique().str.lengths()
         unique_compress_bytes = (
-            unique_key_bytes * n_rows
-            + (unique_key_bytes + 8) * n_unique
+            unique_key_bytes * n_rows + (unique_key_bytes + 8) * n_unique
         )
-        unique_lengths_sum = unique_lengths.sum()
+        unique_lengths_sum = typing.cast(int, unique_lengths.sum())
         if unique_lengths_sum is not None:
             unique_compress_bytes += unique_lengths_sum
     else:
         unique_compress_bytes = (
             unique_key_bytes + bytes_per_row
         ) * n_unique + unique_key_bytes * n_rows
-    unique_compression_factor = unique_compress_bytes / n_bytes
+    if n_bytes is not None:
+        unique_compression_factor = unique_compress_bytes / n_bytes
+    else:
+        unique_compression_factor = None
 
     # binary compress size
     binary_n_bytes = None
@@ -87,21 +93,26 @@ def create_series_summary(series):
         if is_hex:
             binary_lengths = (str_lengths - 2) / 2
             binary_n_bytes = 8 * n_rows
-            binary_lengths_sum = binary_lengths.ceil().sum()
+            binary_lengths_sum = typing.cast(int, binary_lengths.ceil().sum())
             if binary_lengths_sum is not None:
                 binary_n_bytes += binary_lengths_sum
             binary_h_bytes = toolstr.format_nbytes(binary_n_bytes)
 
             binary_unique_n_bytes = (
-                unique_key_bytes * n_rows
-                + (unique_key_bytes + 8) * n_unique
+                unique_key_bytes * n_rows + (unique_key_bytes + 8) * n_unique
             )
-            unique_lengths_sum = ((unique_lengths - 2) / 2).ceil().sum()
+            unique_lengths_sum = typing.cast(
+                int, ((unique_lengths - 2) / 2).ceil().sum()
+            )
             if unique_lengths_sum is not None:
                 binary_unique_n_bytes += unique_lengths_sum
 
             binary_unique_h_bytes = toolstr.format_nbytes(binary_unique_n_bytes)
-            binary_unique_compression = binary_unique_n_bytes / n_bytes
+
+            if n_bytes is not None:
+                binary_unique_compression = binary_unique_n_bytes / n_bytes
+            else:
+                binary_unique_compression = None
 
     return {
         "column": series.name,
@@ -129,14 +140,14 @@ def create_dataframe_summary(df: pl.DataFrame) -> pl.DataFrame:
     return pl.DataFrame(summary)
 
 
-def print_dataframe_summary(df: pl.DataFrame) -> pl.DataFrame:
+def print_dataframe_summary(df: pl.DataFrame) -> None:
 
     import toolstr
 
     summary = create_dataframe_summary(df)
 
     toolstr.print_text_box('Dataframe summary')
-    rows = [
+    rows: typing.Sequence[typing.Sequence[typing.Any]] = [
         ['n_rows', len(df)],
         ['n_columns', len(df.columns)],
         ['estimate_bytes()', toolstr.format_nbytes(df.estimated_size())],
@@ -145,7 +156,7 @@ def print_dataframe_summary(df: pl.DataFrame) -> pl.DataFrame:
     print()
 
     labels = summary.columns
-    column_formats = {
+    column_formats: typing.Mapping[str, typing.Mapping[str, typing.Any]] = {
         "%_unique": {"percentage": True, "decimals": 1},
         "%_null": {"percentage": True, "decimals": 1},
         "unique_compression": {"percentage": True, "decimals": 1},
@@ -173,6 +184,9 @@ def print_dataframe_summary(df: pl.DataFrame) -> pl.DataFrame:
     labels = ["name", "n_bytes", "%"]
     column_formats = {'%': {'percentage': True, 'decimals': 1}}
     toolstr.print_table(
-        rows, labels=labels, column_formats=column_formats, indent=4
+        rows,
+        labels=labels,
+        column_formats=column_formats,  # type: ignore
+        indent=4,
     )
 

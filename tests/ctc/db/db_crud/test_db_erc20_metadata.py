@@ -1,8 +1,8 @@
-import os
-import tempfile
 import toolsql
 
 from ctc import db
+
+import conftest
 
 
 example_data = [
@@ -21,100 +21,88 @@ example_data = [
 ]
 
 
-def get_test_db_config():
-    tempdir = tempfile.mkdtemp()
-    return {
-        'dbms': 'sqlite',
-        'path': os.path.join(tempdir, 'example.db'),
-    }
-
-
 async def test_erc20_metadata_crud():
-    db_config = get_test_db_config()
+    db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='erc20_metadata',
         context=dict(network='mainnet'),
     )
-    toolsql.create_tables(
+    toolsql.create_db(
         db_config=db_config,
         db_schema=db_schema,
+        if_not_exists=True,
+        confirm=True,
     )
 
-    engine = toolsql.create_engine(**db_config)
-
     # insert data
-    with engine.connect() as conn:
+    async with toolsql.async_connect(db_config) as conn:
+        await db.async_upsert_erc20s_metadata(
+            conn=conn,
+            erc20s_metadata=example_data,
+            context=dict(network=1),
+        )
 
-        # insert data
-        with conn.begin():
-            await db.async_upsert_erc20s_metadata(
+    # get data individually
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            actual_metadata = await db.async_select_erc20_metadata(
                 conn=conn,
-                erc20s_metadata=example_data,
+                address=datum['address'],
+            )
+            for key, target_value in datum.items():
+                assert target_value == actual_metadata[key]
+
+    # get data collectively
+    all_addresses = [datum['address'] for datum in example_data]
+    async with toolsql.async_connect(db_config) as conn:
+        actual_metadatas = await db.async_select_erc20s_metadata(
+            conn=conn,
+            addresses=all_addresses,
+        )
+        sorted_example_data = sorted(example_data, key=lambda x: x['address'])
+        sorted_actual_data = sorted(
+            actual_metadatas, key=lambda x: x['address']
+        )
+        for target, actual in zip(sorted_example_data, sorted_actual_data):
+            assert target == actual
+
+    # delete entries one by one
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_delete_erc20_metadata(
+                conn=conn,
+                address=datum['address'],
                 context=dict(network=1),
             )
 
-        # get data individually
-        with conn.begin():
-            for datum in example_data:
-                actual_metadata = await db.async_select_erc20_metadata(
-                    conn=conn,
-                    address=datum['address'],
-                )
-                for key, target_value in datum.items():
-                    assert target_value == actual_metadata[key]
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        actual_metadatas = await db.async_select_erc20s_metadata(
+            conn=conn,
+            addresses=all_addresses,
+        )
+        assert all(item is None for item in actual_metadatas)
 
-        # get data collectively
-        all_addresses = [datum['address'] for datum in example_data]
-        with conn.begin():
-            actual_metadatas = await db.async_select_erc20s_metadata(
-                conn=conn,
-                addresses=all_addresses,
-            )
-            sorted_example_data = sorted(
-                example_data, key=lambda x: x['address']
-            )
-            sorted_actual_data = sorted(
-                actual_metadatas, key=lambda x: x['address']
-            )
-            for target, actual in zip(sorted_example_data, sorted_actual_data):
-                assert target == actual
-
-        # delete entries one by one
-        with conn.begin():
-            for datum in example_data:
-                await db.async_delete_erc20_metadata(
-                    conn=conn,
-                    address=datum['address'],
-                    context=dict(network=1),
-                )
-
-        # ensure all entries deleted
-        with conn.begin():
-            actual_metadatas = await db.async_select_erc20s_metadata(
-                conn=conn,
-                addresses=all_addresses,
-            )
-            assert all(item is None for item in actual_metadatas)
-
-        # insert data again
-        with conn.begin():
-            for datum in example_data:
-                await db.async_upsert_erc20_metadata(
-                    conn=conn, context=dict(network=1), **datum
-                )
-
-        # delete entries all at once
-        with conn.begin():
-            await db.async_delete_erc20s_metadata(
-                conn=conn,
-                addresses=all_addresses,
-                context=dict(network=1),
+    # insert data again
+    async with toolsql.async_connect(db_config) as conn:
+        for datum in example_data:
+            await db.async_upsert_erc20_metadata(
+                conn=conn, context=dict(network=1), **datum
             )
 
-        # ensure all entries deleted
-        with conn.begin():
-            actual_metadatas = await db.async_select_erc20s_metadata(
-                conn=conn,
-                addresses=all_addresses,
-            )
-            assert all(item is None for item in actual_metadatas)
+    # delete entries all at once
+    async with toolsql.async_connect(db_config) as conn:
+        await db.async_delete_erc20s_metadata(
+            conn=conn,
+            addresses=all_addresses,
+            context=dict(network=1),
+        )
+
+    # ensure all entries deleted
+    async with toolsql.async_connect(db_config) as conn:
+        actual_metadatas = await db.async_select_erc20s_metadata(
+            conn=conn,
+            addresses=all_addresses,
+        )
+        assert all(item is None for item in actual_metadatas)
+

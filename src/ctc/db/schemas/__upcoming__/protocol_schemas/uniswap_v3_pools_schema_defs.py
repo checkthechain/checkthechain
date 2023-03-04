@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolsql
 
-uniswap_v3_pools_schema: toolsql.DBSchema = {
+uniswap_v3_pools_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'uniswap_v3_pools': {
             'columns': [

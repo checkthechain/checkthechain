@@ -25,7 +25,7 @@ async def async_plot_lbp_summary(
 
     for pair in summary.keys():
 
-        blocks = summary[pair].index.get_level_values('block_number')
+        blocks = summary[pair]['block_number'].to_list()
 
         token_0, token_1 = await evm.async_get_erc20s_symbols(
             pool_tokens, context=context

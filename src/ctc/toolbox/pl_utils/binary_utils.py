@@ -10,20 +10,22 @@ def prefix_hex_series_to_binary(series: pl.Series) -> pl.Series:
 
 
 def raw_hex_series_to_binary(series: pl.Series) -> pl.Series:
-    return series.str.slice(2).apply(bytes.fromhex)
+    return series.apply(bytes.fromhex)
 
 
 def binary_series_to_prefix_hex(series: pl.Series) -> pl.Series:
-    return "0x" + binary_series_to_raw_hex(series)
+    return '0x' + binary_series_to_raw_hex(series)
 
 
 def binary_series_to_raw_hex(series: pl.Series) -> pl.Series:
-    return "0x" + pl.Series(series.name, [x.hex() for x in series.to_list()])
+    return pl.Series(series.name, [x.hex() for x in series.to_list()])  # type: ignore
 
 
 def binary_columns_to_prefix_hex(
     df: pl.DataFrame, columns: typing.Sequence[str] | None = None
 ) -> pl.DataFrame:
+    if columns is None:
+        columns = df.select(pl.col(pl.datatypes.Binary)).columns
     return df.with_columns(
         [binary_series_to_prefix_hex(df[column]) for column in columns]
     )

@@ -107,15 +107,15 @@ class UniswapV3DEX(dex_class.DEX):
             context=context,
         )
 
-        bool_bought_id = trades['arg__amount0'].map(int) > 0
-        bought_id = bool_bought_id.map(int)
-        sold_id = (bought_id == 0).map(int)
-        sold_amount = sold_id * trades['arg__amount1'].map(
+        bool_bought_id = trades['arg__amount0'].apply(int) > 0
+        bought_id = bool_bought_id.apply(int)
+        sold_id = (bought_id == 0).apply(int)
+        sold_amount = sold_id * trades['arg__amount1'].apply(
             int
-        ) + bought_id * trades['arg__amount0'].map(int)
+        ) + bought_id * trades['arg__amount0'].apply(int)
         bought_amount = -(
-            bought_id * trades['arg__amount1'].map(int)
-            + sold_id * trades['arg__amount0'].map(int)
+            bought_id * trades['arg__amount1'].apply(int)
+            + sold_id * trades['arg__amount0'].apply(int)
         )
 
         output: spec.RawDexTrades = {

@@ -21,8 +21,8 @@ def _get_consensus_node_host(context: spec.Context) -> str:
 
 
 def _build_consensus_url(
-    *,
     endpoint: str,
+    *,
     context: spec.Context,
     params: typing.Mapping[str, typing.Any] | None = None,
 ) -> str:
@@ -50,8 +50,8 @@ async def async_beacon_request(
 
 
 def _sync_beacon_request(
-    *,
     endpoint: str,
+    *,
     params: typing.Mapping[str, typing.Any] | None = None,
     context: spec.Context = None,
 ) -> typing.Any:

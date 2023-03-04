@@ -338,7 +338,6 @@ def _get_tested_modules():
         curve_utils,
         ens_utils,
         etherscan_utils,
-        fei_utils,
         fourbyte_utils,
         g_uni_utils,
         gnosis_utils,
@@ -363,7 +362,6 @@ def _get_tested_modules():
         curve_utils,
         ens_utils,
         etherscan_utils,
-        fei_utils,
         fourbyte_utils,
         g_uni_utils,
         gnosis_utils,
@@ -404,7 +402,6 @@ def test_async_functions_take_context():
                     continue
                 elif module.__name__ in (
                     'ctc.protocols.coingecko_utils',
-                    'ctc.protocols.fei_utils',
                     'ctc.protocols.fourbyte_utils',
                     'ctc.protocols.llama_utils',
                     'ctc.protocols.rari_utils',
@@ -453,7 +450,6 @@ def test_async_functions_take_kw_only_context():
                     continue
                 elif module.__name__ in (
                     'ctc.protocols.coingecko_utils',
-                    'ctc.protocols.fei_utils',
                     'ctc.protocols.fourbyte_utils',
                     'ctc.protocols.llama_utils',
                     'ctc.protocols.rari_utils',

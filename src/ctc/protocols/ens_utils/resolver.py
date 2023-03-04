@@ -217,7 +217,7 @@ async def async_get_text_changes(
         contract_address=ens_directory.resolver,
         event_abi=event_abi,
         start_block=9000000,
-        verbose=False,
+        verbose=2,
         context=context,
     )
 

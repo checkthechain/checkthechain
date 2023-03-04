@@ -105,10 +105,7 @@ async def async_events_command(
 
         # output
         if not verbose:
-            data = [
-                str(value)
-                for value in events.index.get_level_values('block_number')
-            ]
+            data = [str(value) for value in events['block_number'].to_list()]
             if typing.TYPE_CHECKING:
                 events.index = typing.cast(spec.PandasIndex, data)
             else:

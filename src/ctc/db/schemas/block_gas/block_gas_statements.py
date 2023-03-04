@@ -21,57 +21,56 @@ async def async_upsert_median_block_gas_fee(
     *,
     median_gas_fee: int | float | None,
     timestamp: int,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', context=context)
+    table = schema_utils.get_table_schema('block_gas', context=context)
 
     row = {
         'block_number': block_number,
         'median_gas_fee': median_gas_fee,
         'timestamp': timestamp,
     }
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row=row,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_median_blocks_gas_fees(
     block_gas_data: typing.Sequence[BlockGasRow],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', context=context)
+    table = schema_utils.get_table_schema('block_gas', context=context)
 
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=block_gas_data,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_select_median_block_gas_fee(
     block_number: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> BlockGasRow | None:
 
-    table = schema_utils.get_table_name('block_gas', context=context)
+    table = schema_utils.get_table_schema('block_gas', context=context)
 
-    result: BlockGasRow = toolsql.select(
+    result: BlockGasRow = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
-        return_count='one',
-        raise_if_table_dne=False,
+        output_format='single_dict',
     )
     return result
 
@@ -79,34 +78,33 @@ async def async_select_median_block_gas_fee(
 async def async_select_median_blocks_gas_fees(
     block_numbers: typing.Sequence[int],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> typing.Mapping[int, BlockGasRow] | None:
 
-    table = schema_utils.get_table_name('block_gas', context=context)
+    table = schema_utils.get_table_schema('block_gas', context=context)
 
-    results = toolsql.select(
+    results = await toolsql.async_select(
         conn=conn,
         table=table,
         where_in={'block_number': block_numbers},
-        raise_if_table_dne=False,
     )
     if results is None:
         return None
     else:
-        return {result['block_number']: result for result in results}
+        return {result['block_number']: result for result in results}  # type: ignore
 
 
 async def async_delete_block_gas(
     block_number: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', context=context)
+    table = schema_utils.get_table_schema('block_gas', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
@@ -116,13 +114,13 @@ async def async_delete_block_gas(
 async def async_delete_blocks_gasses(
     block_numbers: typing.Sequence[int],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('block_gas', context=context)
+    table = schema_utils.get_table_schema('block_gas', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_in={'block_number': block_numbers},

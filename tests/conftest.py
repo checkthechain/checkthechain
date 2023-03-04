@@ -1,4 +1,6 @@
 import asyncio
+import os
+import tempfile
 
 import pytest
 
@@ -27,3 +29,12 @@ async def setup_teardown():
 
     # teardown
     await rpc.async_close_http_session()
+
+
+def get_test_db_config():
+    tempdir = tempfile.mkdtemp()
+    return {
+        'dbms': 'sqlite',
+        'path': os.path.join(tempdir, 'example.db'),
+    }
+

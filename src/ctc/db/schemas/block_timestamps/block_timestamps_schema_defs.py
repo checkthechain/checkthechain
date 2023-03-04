@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-block_timestamps_schema: toolsql.DBSchema = {
+block_timestamps_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'block_timestamps': {
             'columns': [
@@ -16,7 +16,7 @@ block_timestamps_schema: toolsql.DBSchema = {
                     'name': 'timestamp',
                     'type': 'Integer',
                     'index': True,
-                    'null': False,
+                    'nullable': False,
                 },
             ],
         },

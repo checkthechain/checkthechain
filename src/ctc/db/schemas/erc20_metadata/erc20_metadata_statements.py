@@ -5,7 +5,6 @@ import typing
 
 import toolsql
 
-from ctc import config
 from ctc import spec
 from ... import schema_utils
 
@@ -18,7 +17,7 @@ async def async_upsert_erc20_metadata(
     decimals: int | None = None,
     name: str | None = None,
     upsert: bool = True,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
 
     # construct row
@@ -30,21 +29,15 @@ async def async_upsert_erc20_metadata(
     }
     row = {k: v for k, v in row.items() if v is not None}
 
-    # get upsert option
-    if upsert:
-        upsert_option: toolsql.ConflictOption | None = 'do_update'
-    else:
-        upsert_option = None
-
     # get table name
-    table = schema_utils.get_table_name('erc20_metadata', context=context)
+    table = schema_utils.get_table_schema('erc20_metadata', context=context)
 
     # insert data
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row=row,
-        upsert=upsert_option,
+        upsert=upsert,
     )
 
 
@@ -52,7 +45,7 @@ async def async_upsert_erc20s_metadata(
     *,
     erc20s_metadata: typing.Sequence[spec.ERC20Metadata],
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
     coroutines = [
         async_upsert_erc20_metadata(conn=conn, context=context, **metadata)
@@ -67,13 +60,15 @@ async def async_select_erc20_metadata(
     symbol: str | None = None,
     case_insensitive_symbol: bool = False,
     context: spec.Context | None = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> spec.ERC20Metadata | None:
 
-    table = schema_utils.get_table_name('erc20_metadata', context=context)
+    table = schema_utils.get_table_schema('erc20_metadata', context=context)
 
     if address is not None:
-        query: typing.Mapping[str, typing.Any] = {'row_id': address.lower()}
+        query: typing.Mapping[str, typing.Any] = {
+            'where_equals': {'address': address.lower()}
+        }
     elif symbol is not None:
         if case_insensitive_symbol:
             query = {'where_ilike': {'symbol': symbol}}
@@ -82,13 +77,10 @@ async def async_select_erc20_metadata(
     else:
         raise Exception('must specify address or symbol')
 
-    erc20_metadata: spec.ERC20Metadata = toolsql.select(
+    erc20_metadata: spec.ERC20Metadata = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
-        row_count='at_most_one',
-        row_format='dict',
-        return_count='one',
-        raise_if_table_dne=False,
+        output_format='single_dict',
         **query,
     )
 
@@ -99,15 +91,14 @@ async def async_select_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
     *,
     context: spec.Context | None = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> typing.Sequence[spec.ERC20Metadata | None] | None:
 
-    table = schema_utils.get_table_name('erc20_metadata', context=context)
-    results = toolsql.select(
+    table = schema_utils.get_table_schema('erc20_metadata', context=context)
+    results: typing.Sequence[spec.ERC20Metadata] = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
-        row_ids=[address.lower() for address in addresses],
-        raise_if_table_dne=False,
+        where_in={'address': [address.lower() for address in addresses]},
     )
 
     if results is None:
@@ -123,22 +114,28 @@ async def async_delete_erc20_metadata(
     address: spec.Address,
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
-    table = schema_utils.get_table_name('erc20_metadata', context=context)
-    toolsql.delete(table=table, conn=conn, row_id=address.lower())
+
+    table = schema_utils.get_table_schema('erc20_metadata', context=context)
+    await toolsql.async_delete(
+        table=table,
+        conn=conn,
+        where_equals={'address': address.lower()},
+    )
 
 
 async def async_delete_erc20s_metadata(
     addresses: typing.Sequence[spec.Address],
     *,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
-    table = schema_utils.get_table_name('erc20_metadata', context=context)
-    toolsql.delete(
+
+    table = schema_utils.get_table_schema('erc20_metadata', context=context)
+    await toolsql.async_delete(
         table=table,
         conn=conn,
-        row_ids=[address.lower() for address in addresses],
+        where_in={'address': [address.lower() for address in addresses]},
     )
 

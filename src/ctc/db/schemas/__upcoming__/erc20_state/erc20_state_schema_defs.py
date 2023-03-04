@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-erc20_state_schema: toolsql.DBSchema = {
+erc20_state_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'erc20_balances': {
             'columns': [

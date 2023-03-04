@@ -26,7 +26,7 @@ if typing.TYPE_CHECKING:
         block_number: int
 
 
-chainlink_schema: toolsql.DBSchema = {
+chainlink_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'chainlink_feeds': {
             'columns': [

@@ -8,24 +8,32 @@ from ctc import spec
 
 
 async def async_get_event_timestamps(
-    events: spec.DataFrame,
+    events: spec.PolarsDataFrame | spec.PandasDataFrame,
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """get timestamps of an events dataframe"""
 
     # get block_numbers
-    multi_index = 'block_number' in events.index.names
-    if multi_index:
-        block_numbers: typing.Sequence[int] = typing.cast(
-            typing.Sequence[int],
-            events.index.get_level_values('block_number'),
-        )
-    else:
+    if spec.is_polars_dataframe(events):
         block_numbers = typing.cast(
             typing.Sequence[int],
-            events.index.values,
+            events['block_number'].to_list(),
         )
+    elif spec.is_pandas_dataframe(events):
+        multi_index = 'block_number' in events.index.names
+        if multi_index:
+            block_numbers = typing.cast(
+                typing.Sequence[int],
+                events.index.get_level_values('block_number'),
+            )
+        else:
+            block_numbers = typing.cast(
+                typing.Sequence[int],
+                events.index.values,
+            )
+    else:
+        raise Exception('unknown dataframe format')
 
     # get timestamps
     return await block_utils.async_get_block_timestamps(
@@ -35,17 +43,18 @@ async def async_get_event_timestamps(
 
 
 async def _async_get_event_names_column(
-    events: spec.DataFrame,
+    events: spec.PolarsDataFrame,
     *,
     share_abis_across_contracts: bool = True,
     context: spec.Context = None,
 ) -> typing.Sequence[str]:
 
+    contract_addresses = events['contract_addresses'].to_list()
+    event_hashes = events['event_hash'].to_list()
+
     # compile which event abis are needed
     event_abi_queries = {}
-    for contract_address, event_hash in zip(
-        events['contract_address'], events['event_hash']
-    ):
+    for contract_address, event_hash in zip(contract_addresses, event_hashes):
 
         if share_abis_across_contracts:
             key = event_hash
@@ -67,10 +76,7 @@ async def _async_get_event_names_column(
 
     # construct column
     event_abi_column = []
-    for contract_address, event_hash in zip(
-        events['contract_address'].values,
-        events['event_hash'].values,
-    ):
+    for contract_address, event_hash in zip(contract_addresses, event_hashes):
 
         if share_abis_across_contracts:
             key = event_hash

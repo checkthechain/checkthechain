@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import toolsql
 
-fuse_pools_schema: toolsql.DBSchema = {
+fuse_pools_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'fuse_pools': {
             'columns': [

@@ -82,7 +82,7 @@ def _print_balance_storage_diffs(
                     ]
                 )
             elif '-' in balance:
-                row.extend([balance['-'], 0, -balance['-']])  # type: ignore
+                row.extend([balance['-'], 0, -balance['-']])
             else:
                 raise Exception('unknown balance format')
         else:

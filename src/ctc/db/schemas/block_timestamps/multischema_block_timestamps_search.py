@@ -19,7 +19,7 @@ from .multischema_block_timestamps_statements import (
 async def async_select_timestamp_block(
     timestamp: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> int | None:
@@ -52,13 +52,14 @@ async def async_select_timestamp_block(
     timestamp_schema = management.get_active_timestamp_schema()
 
     if timestamp_schema == 'block_timestamps':
-        table = schema_utils.get_table_name('block_timestamps', context=context)
-        block_number: int = toolsql.select(
+        table = schema_utils.get_table_schema(
+            'block_timestamps', context=context
+        )
+        block_number: int = await toolsql.async_select(
             conn=conn,
             table=table,
-            return_count='one',
-            only_columns=['block_number'],
-            row_format='only_column',
+            columns=['block_number'],
+            output_format='cell',
             **query,
         )
     elif timestamp_schema == 'blocks':
@@ -94,7 +95,7 @@ async def async_select_timestamp_block(
 async def async_select_timestamps_blocks(
     timestamps: typing.Sequence[int],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
     mode: Literal['<=', '>=', '=='] = '>=',
 ) -> list[int | None]:
@@ -123,7 +124,7 @@ async def async_select_timestamps_blocks(
 async def async_select_timestamp_block_range(
     timestamp: int,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> tuple[int | None, int | None]:
 

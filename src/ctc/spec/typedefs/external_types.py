@@ -5,11 +5,14 @@ import typing
 
 if typing.TYPE_CHECKING:
     import numpy
-    import pandas
+    import polars as pl
+    import pandas as pd
 
-    DataFrame = pandas.core.frame.DataFrame
-    Series = pandas.core.series.Series[typing.Any]
-    PandasIndex = pandas.core.indexes.base.Index
+    PolarsDataFrame = pl.DataFrame
+    PandasDataFrame = pd.DataFrame
+    DataFrame = pd.core.frame.DataFrame
+    Series = pd.core.series.Series[typing.Any]
+    PandasIndex = pd.core.indexes.base.Index
     DType = numpy.typing.DTypeLike
     NumpyArray = numpy.typing.NDArray  # type: ignore
 

@@ -180,7 +180,8 @@ async def async_get_token_id_from_server(symbol: str) -> str:
     if len(token_ids) == 0:
         raise Exception('cannot find token_id')
     elif len(token_ids) > 1:
-        raise Exception('too many token_ids for symbol')
+        # raise Exception('too many token_ids for symbol')
+        return token_ids[0]
     else:
         return token_ids[0]
 

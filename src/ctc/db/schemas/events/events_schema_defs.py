@@ -21,20 +21,34 @@ _event_query_binary_fields = [
     'topic3',
 ]
 
-events_schema: toolsql.DBSchema = {
+events_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'events': {
             'columns': [
-                {'name': 'block_number', 'type': 'Integer', 'primary': True, 'null': False},
+                {
+                    'name': 'block_number',
+                    'type': 'Integer',
+                    'primary': True,
+                    'nullable': False,
+                },
                 {
                     'name': 'transaction_index',
                     'type': 'Integer',
                     'primary': True,
-                    'null': False,
+                    'nullable': False,
                 },
-                {'name': 'log_index', 'type': 'Integer', 'primary': True, 'null': False},
+                {
+                    'name': 'log_index',
+                    'type': 'Integer',
+                    'primary': True,
+                    'nullable': False,
+                },
+                {
+                    'name': 'transaction_hash',
+                    'type': 'Binary',
+                    'nullable': False,
+                },
                 {'name': 'contract_address', 'type': 'Binary', 'index': True},
-                {'name': 'transaction_hash', 'type': 'Binary', 'null': False},
                 {'name': 'event_hash', 'type': 'Binary', 'index': True},
                 {'name': 'topic1', 'type': 'Binary', 'index': True},
                 {'name': 'topic2', 'type': 'Binary', 'index': True},
@@ -50,13 +64,13 @@ events_schema: toolsql.DBSchema = {
                     'name': 'start_block',
                     'type': 'Integer',
                     'index': True,
-                    'null': False,
+                    'nullable': False,
                 },
                 {
                     'name': 'end_block',
                     'type': 'Integer',
                     'index': True,
-                    'null': False,
+                    'nullable': False,
                 },
                 {'name': 'event_hash', 'type': 'Binary', 'index': True},
                 {'name': 'topic1', 'type': 'Binary', 'index': True},
@@ -66,9 +80,10 @@ events_schema: toolsql.DBSchema = {
                     'name': 'query_type',
                     'type': 'Integer',
                     'index': True,
-                    'null': False,
+                    'nullable': False,
                 },
             ],
         },
     },
 }
+

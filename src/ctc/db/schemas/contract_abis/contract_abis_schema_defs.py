@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-contract_abis_schema: toolsql.DBSchema = {
+contract_abis_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'contract_abis': {
             'columns': [

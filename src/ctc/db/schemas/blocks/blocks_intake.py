@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import typing
 
+from ctc import config
 from ctc import evm
 from ctc import spec
 
 from ... import management
-from ... import connect_utils
 from ... import intake_utils
 from ..block_timestamps import block_timestamps_statements
 from ..transactions import transactions_intake
@@ -22,6 +22,7 @@ async def async_intake_block(
     rpc_block: spec.RPCBlock | None = None,
     context: spec.Context,
 ) -> None:
+
     if rpc_block is not None and db_block is not None:
         raise Exception('cannot specify rpc_block and db_block')
     elif rpc_block is not None:
@@ -45,6 +46,8 @@ async def async_intake_blocks(
     under normal operation should store raw block or block timestamp, noth both
     """
 
+    import toolsql
+
     # check whether to intake
     active_schemas = management.get_active_schemas()
     intake_blocks = active_schemas.get('blocks')
@@ -66,9 +69,19 @@ async def async_intake_blocks(
         return
 
     # filter unconfirmed blocks
-    filtered_db_blocks = await intake_utils.async_filter_fully_confirmed_blocks(
-        db_blocks, context=context, latest_block_number=latest_block_number
+    db_config = config.get_context_db_config(
+        schema_name='blocks',
+        context=context,
     )
+    async with toolsql.async_connect(db_config) as conn:
+        filtered_db_blocks = (
+            await intake_utils.async_filter_fully_confirmed_blocks(
+                db_blocks,
+                context=context,
+                latest_block_number=latest_block_number,
+                conn=conn,
+            )
+        )
     if len(filtered_db_blocks) == 0:
         return
     db_blocks = filtered_db_blocks
@@ -100,15 +113,12 @@ async def async_intake_blocks(
 
     # insert into database
     if intake_blocks or intake_transactions:
-        engine = connect_utils.create_engine(
-            schema_names=['blocks', 'block_timestamps', 'transactions'],
+        # do not perform these inserts concurrently to prevent deadlocks
+        db_config = config.get_context_db_config(
+            schema_name='blocks',
             context=context,
         )
-        if engine is None:
-            return
-
-        # do not perform these inserts concurrently to prevent deadlocks
-        with engine.begin() as conn:
+        async with toolsql.async_connect(db_config) as conn:
             if intake_blocks:
                 await blocks_statements.async_upsert_blocks(
                     blocks=db_blocks,
@@ -134,7 +144,7 @@ async def _async_intake_blocks_timestamps(
     *,
     confirmed_block_timestamps: typing.Mapping[int, int] | None = None,
     context: spec.Context,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
 ) -> None:
 
     if confirmed_blocks is not None and confirmed_block_timestamps is not None:

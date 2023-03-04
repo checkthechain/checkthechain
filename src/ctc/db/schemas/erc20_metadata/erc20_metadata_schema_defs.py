@@ -3,7 +3,7 @@ from __future__ import annotations
 import toolsql
 
 
-erc20_metadata_schema: toolsql.DBSchema = {
+erc20_metadata_schema: toolsql.DBSchemaShorthand = {
     'tables': {
         'erc20_metadata': {
             'columns': [

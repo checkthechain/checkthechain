@@ -17,34 +17,34 @@ def _format_dex_pool(dex_pool: spec.DexPool) -> spec.DexPool:
 async def async_upsert_dex_pool(
     *,
     dex_pool: spec.DexPool,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
     dex_pool = _format_dex_pool(dex_pool)
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row=dex_pool,
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_upsert_dex_pools(
     *,
     dex_pools: typing.Sequence[spec.DexPool],
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
     if len(dex_pools) == 0:
         return
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
     dex_pools = [_format_dex_pool(dex_pool) for dex_pool in dex_pools]
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         rows=dex_pools,
-        upsert='do_update',
+        upsert=True,
     )
 
 
@@ -52,34 +52,34 @@ async def async_upsert_dex_pool_factory_query(
     *,
     factory: spec.Address,
     last_scanned_block: int,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'dex_pool_factory_queries',
         context=context,
     )
-    toolsql.insert(
+    await toolsql.async_insert(
         conn=conn,
         table=table,
         row={
             'factory': factory.lower(),
             'last_scanned_block': last_scanned_block,
         },
-        upsert='do_update',
+        upsert=True,
     )
 
 
 async def async_delete_dex_pool(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     dex_pool: spec.Address,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'address': dex_pool.lower()},
@@ -88,14 +88,14 @@ async def async_delete_dex_pool(
 
 async def async_delete_dex_pools(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     dex_pools: typing.Sequence[spec.Address],
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_in={'address': [dex_pool.lower() for dex_pool in dex_pools]},
@@ -104,16 +104,16 @@ async def async_delete_dex_pools(
 
 async def async_delete_dex_pool_factory_query(
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     factory: spec.Address,
     context: spec.Context = None,
 ) -> None:
 
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'dex_pool_factory_queries', context=context
     )
 
-    toolsql.delete(
+    await toolsql.async_delete(
         conn=conn,
         table=table,
         where_equals={'factory': factory.lower()},
@@ -123,20 +123,19 @@ async def async_delete_dex_pool_factory_query(
 async def async_select_dex_pool(
     address: spec.Address,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> spec.DexPool | None:
 
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
 
     where_equals = {'address': address.lower()}
 
-    result = toolsql.select(
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
         where_equals=where_equals,
-        return_count='one',
-        raise_if_table_dne=False,
+        output_format='single_dict_or_none',
     )
     return result  # type: ignore
 
@@ -144,7 +143,7 @@ async def async_select_dex_pool(
 async def async_select_dex_pools_by_id(
     addresses: typing.Sequence[spec.Address],
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> typing.Mapping[spec.Address, spec.DexPool | None] | None:
     raise NotImplementedError()
@@ -152,12 +151,11 @@ async def async_select_dex_pools_by_id(
     if len(addresses) == 0:
         return {}
 
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
 
-    results = await toolsql.select(
+    results = await toolsql.async_select(
         conn=conn,
         table=table,
-        raise_if_table_dne=False,
         where_in={'address': addresses},
     )
 
@@ -173,13 +171,13 @@ async def async_select_dex_pools(
     factory: spec.Address | None = None,
     factories: typing.Sequence[spec.Address] | None = None,
     assets: typing.Sequence[spec.Address] | None = None,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context = None,
     start_block: int | None = None,
     end_block: int | None = None,
 ) -> typing.Sequence[spec.DexPool] | None:
 
-    table = schema_utils.get_table_name('dex_pools', context=context)
+    table = schema_utils.get_table_schema('dex_pools', context=context)
 
     query: typing.MutableMapping[str, typing.Any] = {}
     if factory is not None:
@@ -189,27 +187,15 @@ async def async_select_dex_pools(
         query.setdefault('where_in', {})
         query['where_in']['factory'] = factories
     if assets is not None:
-        import sqlalchemy  # type: ignore
-
-        # get table object
-        try:
-            sqla_table = toolsql.create_table_object_from_db(
-                table_name=table,
-                conn=conn,
-            )
-        except toolsql.TableNotFound:
-            return None
-
         query.setdefault('filters', [])
         for asset in assets:
             asset = asset.lower()
-            asset_filter = sqlalchemy.or_(
-                sqla_table.c['asset0'] == asset,
-                sqla_table.c['asset1'] == asset,
-                sqla_table.c['asset2'] == asset,
-                sqla_table.c['asset3'] == asset,
-            )
-            query['filters'].append(asset_filter)
+            query['where_or'] = [
+                {'where_equals': {'asset0': asset}},
+                {'where_equals': {'asset1': asset}},
+                {'where_equals': {'asset2': asset}},
+                {'where_equals': {'asset3': asset}},
+            ]
     if start_block is not None:
         query.setdefault('where_gte', {})
         query['where_gte']['creation_block'] = start_block
@@ -217,29 +203,29 @@ async def async_select_dex_pools(
         query.setdefault('where_lte', {})
         query['where_lte']['creation_block'] = end_block
 
-    return toolsql.select(  # type: ignore
-        conn=conn, table=table, raise_if_table_dne=False, **query
+    return await toolsql.async_select(  # type: ignore
+        conn=conn,
+        table=table,
+        **query,
     )
 
 
 async def async_select_dex_pool_factory_last_scanned_block(
     factory: spec.Address,
     *,
-    conn: toolsql.SAConnection,
+    conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> int | None:
 
-    table = schema_utils.get_table_name(
+    table = schema_utils.get_table_schema(
         'dex_pool_factory_queries', context=context
     )
 
-    result = toolsql.select(
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
-        raise_if_table_dne=False,
-        row_format='only_column',
-        only_columns=['last_scanned_block'],
-        return_count='one',
+        columns=['last_scanned_block'],
+        output_format='cell_or_none',
         where_equals={'factory': factory.lower()},
     )
 

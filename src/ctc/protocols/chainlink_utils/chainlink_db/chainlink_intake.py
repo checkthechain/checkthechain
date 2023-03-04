@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import typing
 
-from ctc import db
+import toolsql
+
+from ctc import config
 from ctc import evm
 from ctc import spec
+from ctc import db
 
 from . import chainlink_schema_defs
 from . import chainlink_statements
@@ -128,8 +131,8 @@ async def async_get_network_feed_data(
 async def async_import_networks_to_db(
     networks: typing.Sequence[ChainlinkNetworkName] | None = None,
     *,
+    db_config: toolsql.DBConfig = None,
     payload: ChainlinkFeedPayload | None = None,
-    engine: toolsql.SAEngine | None = None,
     verbose: bool = True,
 ) -> None:
     """import multiple networks of feeds to db
@@ -185,20 +188,35 @@ async def async_import_networks_to_db(
 
     # add each network
     for network in networks:
-        await async_import_network_to_db(
-            network=network,
-            payload=payload,
-            engine=engine,
-            verbose=verbose,
-            indent=4,
+
+        # create table
+        table_schema = db.get_table_schema(
+            'chainlink_feeds', context={'network': network}
         )
+        with toolsql.connect(db_config) as conn:
+            toolsql.create_table(
+                table_schema,
+                if_not_exists=True,
+                conn=conn,
+                confirm=True,
+            )
+
+        # insert feed rows
+        async with toolsql.async_connect(db_config) as conn:
+            await async_import_network_to_db(
+                network=network,
+                payload=payload,
+                conn=conn,
+                verbose=verbose,
+                indent=4,
+            )
 
 
 async def async_import_network_to_db(
     network: ChainlinkNetworkName,
     *,
     payload: ChainlinkFeedPayload | None = None,
-    engine: toolsql.SAEngine | None = None,
+    conn: toolsql.AsyncConnection,
     verbose: bool = True,
     indent: int | str | None = None,
 ) -> None:
@@ -223,21 +241,11 @@ async def async_import_network_to_db(
         for raw_feed in raw_feeds
     ]
 
-    if engine is None:
-        engine = db.create_engine(
-            schema_name='chainlink', context=dict(network=network)
-        )
-
-    if engine is None:
-        raise Exception('cannot find db table to import to')
-
-    with engine.begin() as conn:
-
-        await chainlink_statements.async_upsert_feeds(
-            feeds=feeds,
-            context=dict(network=network),
-            conn=conn,
-        )
+    await chainlink_statements.async_upsert_feeds(
+        feeds=feeds,
+        context=dict(network=network),
+        conn=conn,
+    )
 
     if verbose:
         import toolstr
@@ -274,22 +282,21 @@ async def async_intake_aggregator_update(
     feed: spec.Address,
     aggregator: spec.Address,
     block_number: int,
-    network: spec.NetworkReference,
+    context: spec.Context,
 ) -> None:
 
-    engine = db.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='chainlink',
-        context=dict(network=network),
+        context=context,
     )
-    if engine is not None:
-        with engine.begin() as conn:
-            await chainlink_statements.async_upsert_aggregator_update(
-                feed=feed,
-                aggregator=aggregator,
-                block_number=block_number,
-                context=dict(network=network),
-                conn=conn,
-            )
+    async with toolsql.async_connect(db_config) as conn:
+        await chainlink_statements.async_upsert_aggregator_update(
+            feed=feed,
+            aggregator=aggregator,
+            block_number=block_number,
+            context=context,
+            conn=conn,
+        )
 
 
 async def async_intake_aggregator_updates(
@@ -297,15 +304,14 @@ async def async_intake_aggregator_updates(
     context: spec.Context,
 ) -> None:
 
-    engine = db.create_engine(
+    db_config = config.get_context_db_config(
         schema_name='chainlink',
         context=context,
     )
-    if engine is not None:
-        with engine.begin() as conn:
-            await chainlink_statements.async_upsert_aggregator_updates(
-                updates=updates,
-                conn=conn,
-                context=context,
-            )
+    async with toolsql.async_connect(db_config) as conn:
+        await chainlink_statements.async_upsert_aggregator_updates(
+            updates=updates,
+            conn=conn,
+            context=context,
+        )
 
