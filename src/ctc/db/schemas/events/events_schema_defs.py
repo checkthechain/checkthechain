@@ -43,12 +43,12 @@ events_schema: toolsql.DBSchemaShorthand = {
                     'primary': True,
                     'nullable': False,
                 },
-                {'name': 'contract_address', 'type': 'Binary', 'index': True},
                 {
                     'name': 'transaction_hash',
                     'type': 'Binary',
                     'nullable': False,
                 },
+                {'name': 'contract_address', 'type': 'Binary', 'index': True},
                 {'name': 'event_hash', 'type': 'Binary', 'index': True},
                 {'name': 'topic1', 'type': 'Binary', 'index': True},
                 {'name': 'topic2', 'type': 'Binary', 'index': True},

@@ -48,12 +48,29 @@ async def async_get_event_abi(
     *,
     contract_abi: typing.Optional[spec.ContractABI] = None,
     contract_address: typing.Optional[spec.Address] = None,
+    contract_addresses: typing.Sequence[spec.Address] | None = None,
     event_name: typing.Optional[str] = None,
     event_hash: typing.Optional[str] = None,
     event_abi: typing.Optional[spec.EventABI] = None,
     context: spec.Context = None,
 ) -> spec.EventABI:
     """get event ABI from local database or block explorer"""
+
+    if contract_addresses is not None:
+        for contract_address in contract_addresses:
+            try:
+                return await async_get_event_abi(
+                    contract_abi=contract_abi,
+                    contract_address=contract_address,
+                    event_name=event_name,
+                    event_hash=event_hash,
+                    event_abi=event_abi,
+                    context=context,
+                )
+            except Exception:
+                pass
+        else:
+            raise Exception('could not find event abi')
 
     # get contract abi
     if contract_abi is None:
@@ -64,6 +81,7 @@ async def async_get_event_abi(
             context=context,
         )
 
+    # get event abi
     try:
         return evm.get_event_abi(
             contract_abi=contract_abi,

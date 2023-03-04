@@ -6,6 +6,8 @@ from ctc import spec
 from .. import abi_utils
 from .. import block_utils
 from .. import contract_utils
+from . import event_metadata
+from . import event_query_utils
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -25,15 +27,14 @@ async def async_get_events(
     end_time: tooltime.Timestamp | None = None,
     context: spec.Context = None,
     named_topics: typing.Mapping[str, typing.Any] | None = None,
-    decoded_topic1: typing.Any | None = None,
-    decoded_topic2: typing.Any | None = None,
-    decoded_topic3: typing.Any | None = None,
-    encoded_topic1: spec.BinaryData | None = None,
-    encoded_topic2: spec.BinaryData | None = None,
-    encoded_topic3: spec.BinaryData | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
+    topic1_is_binary: bool | None = None,
+    topic2_is_binary: bool | None = None,
+    topic3_is_binary: bool | None = None,
     verbose: int | bool = 1,
     decode: bool = True,
-    keep_multiindex: bool = True,
     share_abis_across_contracts: bool = True,
     include_timestamps: bool = False,
     include_event_names: bool = False,
@@ -41,14 +42,169 @@ async def async_get_events(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
-) -> spec.DataFrame:
+) -> spec.PolarsDataFrame:
     """get events"""
 
-    from ctc import config
     from . import event_hybrid_queries
-    from . import event_node_utils
-    from . import event_query_utils
-    from . import event_metadata
+
+    # get query inputs
+    (
+        start_block,
+        end_block,
+        encoded_topics,
+        event_abi,
+        columns_to_load,
+    ) = await _async_get_query_inputs(
+        contract_address=contract_address,
+        event_name=event_name,
+        event_abi=event_abi,
+        event_hash=event_hash,
+        start_block=start_block,
+        end_block=end_block,
+        start_time=start_time,
+        end_time=end_time,
+        context=context,
+        named_topics=named_topics,
+        topic1=topic1,
+        topic2=topic2,
+        topic3=topic3,
+        topic1_is_binary=topic1_is_binary,
+        topic2_is_binary=topic2_is_binary,
+        topic3_is_binary=topic3_is_binary,
+        decode=decode,
+        only_columns=only_columns,
+        exclude_columns=exclude_columns,
+        include_event_names=include_event_names,
+    )
+
+    # query data from db and/or node
+    df = await event_hybrid_queries._async_query_events_from_node_and_db(
+        contract_address=contract_address,
+        event_hash=encoded_topics[0],
+        topic1=encoded_topics[1],
+        topic2=encoded_topics[2],
+        topic3=encoded_topics[3],
+        start_block=start_block,
+        end_block=end_block,
+        verbose=verbose,
+        binary_output_format=binary_output_format,
+        columns_to_load=columns_to_load,
+        context=context,
+    )
+
+    # post-process result
+    return await _async_postprocess_query_result(
+        df=df,
+        event_abi=event_abi,
+        verbose=bool(verbose),
+        columns_to_load=columns_to_load,
+        decode=decode,
+        context=context,
+        share_abis_across_contracts=share_abis_across_contracts,
+        include_timestamps=include_timestamps,
+        include_event_names=include_event_names,
+        output_format=output_format,
+        binary_output_format=binary_output_format,
+    )
+
+
+async def _async_postprocess_query_result(
+    *,
+    df: spec.PolarsDataFrame,
+    event_abi: spec.EventABI | None,
+    verbose: bool,
+    columns_to_load: set[str],
+    decode: bool = True,
+    context: spec.Context,
+    share_abis_across_contracts: bool = True,
+    include_timestamps: bool = False,
+    include_event_names: bool = False,
+    output_format: Literal['dataframe', 'dict'] = 'dataframe',
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+) -> spec.PolarsDataFrame:
+
+    # summarize output
+    if verbose >= 2:
+        from ctc import cli
+
+        print()
+        print('events gathered')
+        cli.print_bullet(key='n_events', value=len(df))
+        if 'contract_address' in columns_to_load:
+            n_contracts = df['contract_address'].n_unique()
+            cli.print_bullet(key='n_contracts', value=n_contracts)
+        if 'event_hash' in columns_to_load:
+            n_event_types = df['event_hash'].n_unique()
+            cli.print_bullet(key='n_event_types', value=n_event_types)
+
+    # insert metadata columns
+    if include_timestamps:
+        import polars as pl
+
+        timestamps = await event_metadata.async_get_event_timestamps(
+            df,
+            context=context,
+        )
+        df = df.with_column(pl.Series(name='timestamp', values=timestamps))
+    if include_event_names:
+        event_names = await event_metadata._async_get_event_names_column(
+            events=df,
+            share_abis_across_contracts=share_abis_across_contracts,
+            context=context,
+        )
+        df = df.with_column(pl.Series(name='event_name', values=event_names))
+
+    # format data
+    if decode:
+
+        import polars as pl
+        from ctc.toolbox import pl_utils
+
+        raw_decoded = await abi_utils.async_decode_events_dataframe(
+            df,
+            event_abis=([event_abi] if event_abi is not None else None),
+            context=context,
+        )
+        decoded = pl.DataFrame(raw_decoded)
+        decoded = decoded.rename(
+            {column: 'arg__' + column for column in decoded.columns}
+        )
+        decoded = pl_utils.binary_columns_to_prefix_hex(decoded)
+        df = df.with_columns(decoded)
+        df = df.drop(['topic1', 'topic2', 'topic3', 'unindexed'])
+
+    # convert to output format
+    if output_format == 'dataframe':
+        return df
+    elif output_format == 'dict':
+        return df.to_dicts()
+    else:
+        raise Exception('unknown output format: ' + str(output_format))
+
+
+async def _async_get_query_inputs(
+    contract_address: spec.Address | None = None,
+    *,
+    event_name: str | None = None,
+    event_abi: spec.EventABI | None = None,
+    event_hash: str | None = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
+    context: spec.Context = None,
+    named_topics: typing.Mapping[str, typing.Any] | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
+    topic1_is_binary: bool | None = None,
+    topic2_is_binary: bool | None = None,
+    topic3_is_binary: bool | None = None,
+    decode: bool = True,
+    only_columns: typing.Sequence[str] | None = None,
+    exclude_columns: typing.Sequence[str] | None = None,
+    include_event_names: bool = False,
+) -> tuple[int, int, typing.Sequence[bytes], spec.EventABI, set[str]]:
 
     # determine start and end block
     start_block, end_block = await block_utils.async_resolve_block_range(
@@ -83,12 +239,12 @@ async def async_get_events(
         event_hash=event_hash,
         event_abi=event_abi,
         named_topics=named_topics,
-        decoded_topic1=decoded_topic1,
-        decoded_topic2=decoded_topic2,
-        decoded_topic3=decoded_topic3,
-        encoded_topic1=encoded_topic1,
-        encoded_topic2=encoded_topic2,
-        encoded_topic3=encoded_topic3,
+        topic1=topic1,
+        topic2=topic2,
+        topic3=topic3,
+        topic1_is_binary=topic1_is_binary,
+        topic2_is_binary=topic2_is_binary,
+        topic3_is_binary=topic3_is_binary,
         context=context,
     )
 
@@ -98,117 +254,16 @@ async def async_get_events(
         event_abi=event_abi,
         only_columns=only_columns,
         exclude_columns=exclude_columns,
-        keep_multiindex=keep_multiindex,
         include_event_names=include_event_names,
     )
 
-    # query data from db and/or node
-    events: typing.Union[spec.DataFrame, typing.Sequence[spec.EncodedEvent]]
-    read_cache, write_cache = config.get_context_cache_read_write(
-        schema_name='events', context=context
+    return (
+        start_block,
+        end_block,
+        encoded_topics,
+        event_abi,
+        columns_to_load,
     )
-    if read_cache:
-        events = (
-            await event_hybrid_queries._async_query_events_from_node_and_db(
-                contract_address=contract_address,
-                event_hash=encoded_topics[0],
-                topic1=encoded_topics[1],
-                topic2=encoded_topics[2],
-                topic3=encoded_topics[3],
-                start_block=start_block,
-                end_block=end_block,
-                verbose=verbose,
-                binary_output_format=binary_output_format,
-                columns_to_load=columns_to_load,
-                context=context,
-            )
-        )
-    else:
-        events = await event_node_utils._async_query_events_from_node(
-            contract_address=contract_address,
-            event_hash=encoded_topics[0],
-            topic1=encoded_topics[1],
-            topic2=encoded_topics[2],
-            topic3=encoded_topics[3],
-            start_block=start_block,
-            end_block=end_block,
-            verbose=verbose,
-            binary_output_format=binary_output_format,
-            context=context,
-        )
-
-    # convert to dataframe as needed
-    if isinstance(events, list):
-        import pandas as pd
-
-        df = pd.DataFrame(events)
-    elif spec.is_dataframe(events):
-        df = events
-    else:
-        raise Exception('unknown events format: ' + str(events))
-
-    # summarize output
-    if verbose >= 2:
-        from ctc import cli
-
-        print()
-        print('events gathered')
-        cli.print_bullet(key='n_events', value=len(df))
-        if 'contract_address' in columns_to_load:
-            n_contracts = len(set(df['contract_address'].values))
-            cli.print_bullet(key='n_contracts', value=n_contracts)
-        if 'event_hash' in columns_to_load:
-            n_event_types = len(set(df['event_hash'].values))
-            cli.print_bullet(key='n_event_types', value=n_event_types)
-
-    # set index
-    if keep_multiindex:
-        index_fields = [
-            'block_number',
-            'transaction_index',
-            'log_index',
-        ]
-        df = df.set_index(index_fields)
-    else:
-        df = df.set_index('block_number')
-
-    # insert metadata columns
-    if include_timestamps:
-        timestamps = await event_metadata.async_get_event_timestamps(
-            df,
-            context=context,
-        )
-        df.insert(0, 'timestamp', timestamps)
-    if include_event_names:
-        df['event_name'] = await event_metadata._async_get_event_names_column(
-            events=df,
-            share_abis_across_contracts=share_abis_across_contracts,
-            context=context,
-        )
-
-    # format data
-    if decode:
-
-        df = await abi_utils.async_decode_events_dataframe(
-            df,
-            decode_metadata=False,
-            single_event_abi=event_abi,
-            share_abis_across_contracts=share_abis_across_contracts,
-            output_format=output_format,
-            binary_output_format=binary_output_format,
-            context=context,
-        )
-        return df
-
-    else:
-
-        # convert to output format
-        if output_format == 'dataframe':
-            return df
-        elif output_format == 'dict':
-            return df.reset_index().to_dict(orient='records')  # type: ignore
-        else:
-            raise Exception('unknown output format: ' + str(output_format))
 
 
 def _get_columns_to_load(
@@ -217,105 +272,86 @@ def _get_columns_to_load(
     exclude_columns: typing.Sequence[str] | None,
     decode: bool,
     event_abi: spec.EventABI | None,
-    keep_multiindex: bool,
     include_event_names: bool,
-) -> set[str]:
-    """specify which columns to use for partial loading"""
+) -> typing.Sequence[str]:
+    """specify which columns to use for partial loading
+
+    need to account for dependencies
+    - .e.g. if want to decode an indexed topic, need to load raw binary column
+    """
 
     if only_columns is None and exclude_columns is None:
         exclude_columns = []
     if only_columns is not None and exclude_columns is not None:
-        raise Exception(
-            'can only specify one of only_columns or exclude_columns'
+        raise Exception('can only specify only_columns or exclude_columns')
+
+    def adding(column: str) -> bool:
+        return (only_columns is not None and column in only_columns) or (
+            exclude_columns is not None and column not in exclude_columns
         )
 
     # index columns
-    columns = set()
-    if keep_multiindex:
-        columns.update({'block_number', 'transaction_index', 'log_index'})
-    else:
-        columns.update({'block_number'})
+    columns = []
+    for column in [
+        'block_number',
+        'transaction_index',
+        'log_index',
+        'transaction_hash',
+        'contract_address',
+        'event_hash',
+    ]:
+        if adding(column):
+            columns.append(column)
 
-    # standard columns
-    standard_columns = {'transaction_hash', 'contract_address', 'event_hash'}
-    for column in standard_columns:
-        if (only_columns is not None and column in only_columns) or (
-            exclude_columns is not None and column not in exclude_columns
-        ):
-            columns.add(column)
-
-    # arg columns
     if decode:
+        # fetch topic and data columns if need to decode topics
 
         if event_abi is None:
-            columns.update({'topic1', 'topic2', 'topic3', 'unindexed'})
+            for column in ['topic1', 'topic2', 'topic3', 'unindexed']:
+                if adding(column):
+                    columns.append(column)
 
         else:
+
             # indexed names
             indexed = abi_utils.get_event_indexed_names(event_abi)
-            if len(indexed) >= 1:
+            n_indexed = len(indexed)
+            if n_indexed >= 1:
                 name = 'arg__' + indexed[0]
-                if (only_columns is not None and name in only_columns) or (
-                    exclude_columns is not None and name not in exclude_columns
-                ):
-                    columns.add('topic1')
-            if len(indexed) >= 2:
+                if adding(name):
+                    columns.append('topic1')
+            if n_indexed >= 2:
                 name = 'arg__' + indexed[1]
-                if (only_columns is not None and name in only_columns) or (
-                    exclude_columns is not None and name not in exclude_columns
-                ):
-                    columns.add('topic2')
-            if len(indexed) >= 3:
+                if adding(name):
+                    columns.append('topic2')
+            if n_indexed >= 3:
                 name = 'arg__' + indexed[2]
-                if (only_columns is not None and name in only_columns) or (
-                    exclude_columns is not None and name not in exclude_columns
-                ):
-                    columns.add('topic3')
+                if adding(name):
+                    columns.append('topic3')
 
             # unindexed names
             unindexed = abi_utils.get_event_unindexed_names(event_abi)
-            if only_columns is not None:
-                if any('arg__' + name in only_columns for name in unindexed):
-                    columns.add('unindexed')
-            elif exclude_columns is not None:
-                if any('arg__' + name not in exclude_columns for name in unindexed):
-                    columns.add('unindexed')
-            else:
-                raise Exception('both only_columns and exclude_columns are None')
+            if any(adding('arg__' + name) for name in unindexed):
+                columns.append('unindexed')
 
     else:
+        # fetch topic and data columns if emitted by abi
 
         if event_abi is not None:
-            abi_has_indexed = len(abi_utils.get_event_indexed_names(event_abi))
-            abi_has_unindexed = (
-                len(abi_utils.get_event_unindexed_names(event_abi)) > 0
-            )
+            n_indexed = len(abi_utils.get_event_indexed_names(event_abi))
+            n_unindexed = len(abi_utils.get_event_unindexed_names(event_abi))
         else:
-            abi_has_indexed = 3
-            abi_has_unindexed = True
+            n_indexed = 3
+            n_unindexed = 1
 
-        if only_columns is not None:
-            if abi_has_indexed >= 1 and 'topic1' in only_columns:
-                columns.add('topic1')
-            if abi_has_indexed >= 2 and 'topic2' in only_columns:
-                columns.add('topic2')
-            if abi_has_indexed >= 3 and 'topic3' in only_columns:
-                columns.add('topic3')
-            if abi_has_unindexed and 'unindexed' in only_columns:
-                columns.add('unindexed')
-
-        elif exclude_columns is not None:
-            if abi_has_indexed >= 1 and 'topic1' not in exclude_columns:
-                columns.add('topic1')
-            if abi_has_indexed >= 2 and 'topic2' not in exclude_columns:
-                columns.add('topic2')
-            if abi_has_indexed >= 3 and 'topic3' not in exclude_columns:
-                columns.add('topic3')
-            if abi_has_unindexed and 'unindexed' not in exclude_columns:
-                columns.add('unindexed')
-
-        else:
-            raise Exception('exclude_columns should have been []')
+        if n_indexed >= 1 and adding('topic1'):
+            columns.append('topic1')
+        if n_indexed >= 2 and adding('topic2'):
+            columns.append('topic2')
+        if n_indexed >= 3 and adding('topic3'):
+            columns.append('topic3')
+        if n_unindexed >= 1 and adding('unindexed'):
+            columns.append('unindexed')
 
     # validate
     if only_columns is not None:
@@ -361,10 +397,6 @@ def _get_columns_to_load(
             if column in columns:
                 if column == 'block_number':
                     message = 'cannot exclude block_number'
-                elif column in ['transaction_index', 'log_index']:
-                    message = (
-                        'to exclude index columns, use keep_multiindex=False'
-                    )
                 else:
                     message = 'cannot exclude column: ' + str(column)
                 raise Exception(message)
@@ -376,3 +408,4 @@ def _get_columns_to_load(
         )
 
     return columns
+

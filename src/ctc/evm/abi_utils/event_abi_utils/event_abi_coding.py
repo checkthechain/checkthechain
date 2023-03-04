@@ -366,7 +366,7 @@ def _get_decoded_event_column_names(
     return spec.decoded_event_fields + ['arg__' + name for name in arg_names]
 
 
-async def async_decode_events_dataframe(
+async def _async_decode_events_dataframe_old(
     events: spec.DataFrame,
     *,
     event_abis: typing.Mapping[str | tuple[str, str], spec.EventABI]

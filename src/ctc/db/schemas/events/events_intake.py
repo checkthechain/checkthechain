@@ -13,8 +13,7 @@ from . import events_statements
 
 async def async_intake_encoded_events(
     *,
-    encoded_events: typing.Sequence[spec.EncodedEvent] | spec.DataFrame,
-    # encoded_events: spec.DataFrame,
+    encoded_events: typing.Sequence[spec.EncodedEvent],
     query: spec.DBEventQuery,
     context: spec.Context,
     latest_block: int | None = None,
@@ -22,11 +21,7 @@ async def async_intake_encoded_events(
 
     import numpy as np
 
-    if spec.is_dataframe(encoded_events):
-        blocks = encoded_events.index.get_level_values('block_number')
-        encoded_events = encoded_events.reset_index().to_dict(orient='records')  # type: ignore
-    else:
-        blocks = np.array([event['block_number'] for event in encoded_events])  # type: ignore
+    blocks = np.array([event['block_number'] for event in encoded_events])  # type: ignore
 
     # only insert blocks after a given number of confirmations
     if latest_block is None:
@@ -45,11 +40,13 @@ async def async_intake_encoded_events(
                 for event, confirmed in zip(encoded_events, confirmed_mask)
                 if confirmed
             ]
-        query['end_block'] = latest_allowed_block
+        query = dict(query, end_block=latest_allowed_block)
 
+    # return early if no events to intake
     if len(encoded_events) == 0:
         return
 
+    # insert into database
     db_config = config.get_context_db_config(
         schema_name='events',
         context=context,

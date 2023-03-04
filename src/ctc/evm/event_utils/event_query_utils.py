@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from typing_extensions import Literal
 
 import toolsql
 
@@ -10,13 +11,37 @@ from .. import abi_utils
 from .. import binary_utils
 
 
+def get_event_df_columns(binary_format: Literal['binary', 'prefix_hex']):
+    import polars as pl
+
+    if binary_format == 'binary':
+        binary = pl.datatypes.Binary
+    elif binary_format in ['prefix_hex', 'raw_hex']:
+        binary = pl.datatypes.Utf8
+    else:
+        raise Exception('unknown binary format: ' + str(binary_format))
+
+    return [
+        ['block_number', pl.datatypes.Int64],
+        ['transaction_index', pl.datatypes.Int64],
+        ['log_index', pl.datatypes.Int64],
+        ['transaction_hash', binary],
+        ['contract_address', binary],
+        ['event_hash', binary],
+        ['topic1', binary],
+        ['topic2', binary],
+        ['topic3', binary],
+        ['unindexed', binary],
+    ]
+
+
 def _parse_event_query_type(
     *,
-    contract_address: spec.Address | None,
-    event_hash: typing.Any | None,
-    topic1: spec.BinaryData | None,
-    topic2: spec.BinaryData | None,
-    topic3: spec.BinaryData | None,
+    contract_address: spec.Address | None = None,
+    event_hash: typing.Any | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
 ) -> int:
 
     # parse input flags
@@ -47,6 +72,10 @@ def _parse_event_query_type(
         raise Exception('could not parse query type')
 
 
+def _is_topic_binary(topic: typing.Any) -> bool:
+    return isinstance(topic, bytes) or spec.is_hex_data(topic)
+
+
 async def _async_parse_event_query_args(
     contract_address: spec.Address | None,
     *,
@@ -54,115 +83,42 @@ async def _async_parse_event_query_args(
     event_abi: spec.EventABI | None,
     event_hash: str | None,
     named_topics: typing.Mapping[str, typing.Any] | None,
-    decoded_topic1: typing.Any | None = None,
-    decoded_topic2: typing.Any | None = None,
-    decoded_topic3: typing.Any | None = None,
-    encoded_topic1: spec.BinaryData | None = None,
-    encoded_topic2: spec.BinaryData | None = None,
-    encoded_topic3: spec.BinaryData | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
+    topic1_is_binary: bool | None = None,
+    topic2_is_binary: bool | None = None,
+    topic3_is_binary: bool | None = None,
     context: spec.Context,
 ) -> tuple[typing.Sequence[spec.BinaryData | None], spec.EventABI | None]:
-    """compute encoded topics and event abi of query as needed
-
-    ## Topic Encoding
-    - topics are assumed to be encoded if they are of type str and begin wit
-
-    Event hash can be specified by 5 different argument combinations
-    - event_hash
-    - event_abi
-    - encoded_topics
-    - contract_address + event_name
-    """
-
-    # determine how topics are being specified
-    using_encoded_topics = (
-        encoded_topic1 is not None
-        or encoded_topic2 is not None
-        or encoded_topic3 is not None
-    )
-    using_decoded_topics = (
-        decoded_topic1 is not None
-        or decoded_topic2 is not None
-        or decoded_topic3 is not None
-    )
-    using_named_topics = named_topics is not None
-    if (
-        (using_encoded_topics and using_decoded_topics)
-        or (using_encoded_topics and using_named_topics)
-        or (using_decoded_topics and using_named_topics)
-    ):
-        raise Exception('should specify topics using only one method')
+    """compute encoded topics and event abi of query as needed"""
 
     # obtain event abi if needed
     if event_hash is not None and event_abi is not None:
         if event_hash != abi_utils.get_event_hash(event_abi):
             raise Exception('conflicting event hashes for given inputs')
-    using_name_for_hash = event_hash is None and event_name is not None
-    need_event_abi = (
-        using_named_topics or using_decoded_topics or using_name_for_hash
+    if topic1_is_binary is None:
+        topic1_is_binary = _is_topic_binary(topic1)
+    if topic2_is_binary is None:
+        topic2_is_binary = _is_topic_binary(topic2)
+    if topic3_is_binary is None:
+        topic3_is_binary = _is_topic_binary(topic3)
+    topics_decoded = (
+        (topic1 is not None and not topic1_is_binary)
+        or (topic2 is not None and not topic1_is_binary)
+        or (topic3 is not None and not topic1_is_binary)
     )
-    if need_event_abi and event_abi is None:
-        event_abi = await abi_utils.async_get_event_abi(
-            contract_address=contract_address,
-            event_name=event_name,
-            event_hash=event_hash,
-            context=context,
-        )
-    if using_name_for_hash and event_abi is None:
-        raise Exception('did not obtain proper event abi')
-
-    # parse named event topics
-    if named_topics is not None:
-        if event_abi is None:
-            raise Exception('could not obtain event_abi')
-        names = abi_utils.get_event_indexed_names(event_abi)
-        if len(names) >= 1 and names[0] in named_topics:
-            decoded_topic1 = named_topics[names[0]]
-        if len(names) >= 2 and names[1] in named_topics:
-            decoded_topic2 = named_topics[names[1]]
-        if len(names) >= 3 and names[2] in named_topics:
-            decoded_topic3 = named_topics[names[2]]
-        for name in named_topics.keys():
-            if name not in names:
-                raise Exception('unknown topic name: ' + str(name))
-
-    if encoded_topic1 is not None:
-        encoded_topic1 = binary_utils.binary_convert(
-            encoded_topic1, 'binary', n_bytes=32
-        )
-    if encoded_topic2 is not None:
-        encoded_topic2 = binary_utils.binary_convert(
-            encoded_topic2, 'binary', n_bytes=32
-        )
-    if encoded_topic3 is not None:
-        encoded_topic3 = binary_utils.binary_convert(
-            encoded_topic3, 'binary', n_bytes=32
-        )
-
-    # encode decoded event topics
-    if using_decoded_topics or using_named_topics:
-        if event_abi is None:
-            raise Exception('could not obtain event_abi')
-        if decoded_topic1 is not None:
-            if len(event_abi['inputs']) < 1:
-                raise Exception()
-            encoded_topic1 = abi_utils.abi_encode(
-                decoded_topic1, event_abi['inputs'][0]['type']
-            )
-        if decoded_topic2 is not None:
-            if len(event_abi['inputs']) < 2:
-                raise Exception()
-            encoded_topic2 = abi_utils.abi_encode(
-                decoded_topic2, event_abi['inputs'][1]['type']
-            )
-        if decoded_topic3 is not None:
-            if len(event_abi['inputs']) < 3:
-                raise Exception()
-            encoded_topic3 = abi_utils.abi_encode(
-                decoded_topic3, event_abi['inputs'][2]['type']
+    using_event_name = event_hash is None and event_name is not None
+    if event_abi is None:
+        if named_topics is not None or topics_decoded or using_event_name:
+            event_abi = await abi_utils.async_get_event_abi(
+                contract_address=contract_address,
+                event_name=event_name,
+                event_hash=event_hash,
+                context=context,
             )
 
-    # return result
+    # get encoded event_abi_hash
     if event_abi is not None:
         event_hash = abi_utils.get_event_hash(event_abi)
     if event_hash is not None:
@@ -170,13 +126,45 @@ async def _async_parse_event_query_args(
     else:
         encoded_event_hash = None
 
-    encoded_topics = (
-        encoded_event_hash,
-        encoded_topic1,
-        encoded_topic2,
-        encoded_topic3,
-    )
-    return encoded_topics, event_abi
+    # parse named event topics
+    if named_topics is not None:
+        if event_abi is None:
+            raise Exception('could not obtain event_abi')
+        names = abi_utils.get_event_indexed_names(event_abi)
+        if len(names) >= 1 and names[0] in named_topics:
+            topic1 = named_topics[names[0]]
+            topic1_is_binary = False
+        if len(names) >= 2 and names[1] in named_topics:
+            topic2 = named_topics[names[1]]
+            topic2_is_binary = False
+        if len(names) >= 3 and names[2] in named_topics:
+            topic3 = named_topics[names[2]]
+            topic3_is_binary = False
+        for name in named_topics.keys():
+            if name not in names:
+                raise Exception('unknown topic name: ' + str(name))
+
+    # encode events
+    if event_abi is not None:
+        indexed_types = abi_utils.get_event_indexed_types(event_abi)
+    if topic1 is not None:
+        if not topic1_is_binary:
+            topic1 = abi_utils.abi_encode(topic1, indexed_types[0])
+        else:
+            topic1 = binary_utils.binary_convert(topic1, 'binary', n_bytes=32)
+    if topic2 is not None:
+        if not topic2_is_binary:
+            topic2 = abi_utils.abi_encode(topic2, indexed_types[1])
+        else:
+            topic2 = binary_utils.binary_convert(topic2, 'binary', n_bytes=32)
+    if topic3 is not None:
+        if not topic3_is_binary:
+            topic3 = abi_utils.abi_encode(topic3, indexed_types[2])
+        else:
+            topic3 = binary_utils.binary_convert(topic3, 'binary', n_bytes=32)
+
+    # return result
+    return (encoded_event_hash, topic1, topic2, topic3), event_abi
 
 
 async def async_scrub_db_queries(
@@ -190,6 +178,7 @@ async def async_scrub_db_queries(
     end_block: spec.BlockNumberReference | None = None,
     context: spec.Context,
 ) -> None:
+    """join contiguous and overlapping event query records together"""
 
     from ctc import db
     from ctc.toolbox import range_utils
@@ -299,6 +288,8 @@ def print_event_query_summary(
     from ctc import cli
 
     cli.print_bullet(key='contract_address', value=contract_address)
+    if event_hash is not None:
+        event_hash = binary_utils.binary_convert(event_hash, 'prefix_hex')
     cli.print_bullet(key='event_hash', value=event_hash)
     cli.print_bullet(key='topic1', value=topic1)
     cli.print_bullet(key='topic2', value=topic2)
