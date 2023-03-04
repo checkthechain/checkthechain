@@ -25,25 +25,33 @@ async def async_send_http(
     headers = {'User-Agent': 'ctc'}
     for attempt in range(n_attempts):
 
-        async with session.post(
-            provider['url'], json=request, headers=headers
-        ) as response:
-            if response.status != 200:
-                import random
+        try:
+            async with session.post(
+                provider['url'], json=request, headers=headers
+            ) as response:
+                if response.status != 200:
+                    import random
 
-                t_sleep = 2 ** attempt + random.random()
-                warnings.warn(
-                    'request failed with code '
-                    + str(response.status)
-                    + ' retrying in '
-                    + str(t_sleep)
-                    + 's'
-                )
-                import asyncio
+                    t_sleep = 2**attempt + random.random()
+                    warnings.warn(
+                        'request failed with code '
+                        + str(response.status)
+                        + ' retrying in '
+                        + str(t_sleep)
+                        + 's'
+                    )
+                    import asyncio
 
-                await asyncio.sleep(t_sleep)
-                continue
-            return await response.json()
+                    await asyncio.sleep(t_sleep)
+                    continue
+                as_text = await response.text()
+                return as_text
+        except Exception:
+
+            # connection failure
+            import asyncio
+
+            await asyncio.sleep(0.1)
 
     else:
         message = (
@@ -69,7 +77,9 @@ def get_async_http_session(
                 kwargs = {}
             kwargs = dict(kwargs)
             kwargs.setdefault('timeout', aiohttp.ClientTimeout(300))
-            _http_sessions[provider_id] = aiohttp.ClientSession(**kwargs)
+            _http_sessions[provider_id] = aiohttp.ClientSession(
+                trust_env=True, **kwargs
+            )
         else:
             raise Exception('no session, must create')
     return _http_sessions[provider_id]
@@ -85,9 +95,10 @@ async def async_close_http_session(
         return
 
     if context is None:
-        for session in _http_sessions.values():
+        for key, session in list(_http_sessions.items()):
             await asyncio.sleep(0)
             await session.close()
+            del _http_sessions[key]
 
     else:
         provider = config.get_context_provider(context)

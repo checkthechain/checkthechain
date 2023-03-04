@@ -26,6 +26,7 @@ async def async_send(
     request: spec.RpcRequest,
     *,
     context: spec.Context = None,
+    raw_output: bool = False,
 ) -> spec.RpcResponse:
     """send RPC request to RPC provider"""
 
@@ -45,7 +46,15 @@ async def async_send(
         if logging_rpc_calls:
             rpc_logging.log_rpc_request(request=request, provider=provider)
 
-        response = await async_send_raw(request=request, provider=provider)
+        raw_response = await async_send_raw(request=request, provider=provider)
+
+        if raw_output:
+            return raw_response
+        else:
+            import orjson
+
+            response = orjson.loads(raw_response)
+
         if 'result' not in response and 'error' in response:
             if provider['convert_reverts_to_none']:
                 output = None
@@ -96,7 +105,16 @@ async def async_send(
 
         import asyncio
 
-        response_chunks = await asyncio.gather(*coroutines)
+        raw_response_chunks = await asyncio.gather(*coroutines)
+        if raw_output:
+            return raw_response_chunks
+        else:
+            import orjson
+
+            response_chunks = [
+                orjson.loads(raw_response_chunk)
+                for raw_response_chunk in raw_response_chunks
+            ]
 
         if logging_rpc_calls:
             for request_chunk, response_chunk in zip(

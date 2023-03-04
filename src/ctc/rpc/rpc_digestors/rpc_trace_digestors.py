@@ -66,10 +66,7 @@ def _snake_case_single_trace(trace: typing.Any) -> typing.Any:
 
 def _snake_case_trace_list(traces: typing.Any) -> typing.Any:
     traces = [rpc_format.keys_to_snake_case(trace) for trace in traces]
-    return [
-        _snake_case_single_trace(trace)
-        for trace in traces
-    ]
+    return [_snake_case_single_trace(trace) for trace in traces]
 
 
 def _snake_case_trace_collection(traces: typing.Any) -> None:
@@ -83,6 +80,29 @@ def _snake_case_trace_collection(traces: typing.Any) -> None:
 
     if traces['trace'] is not None:
         traces['trace'] = _snake_case_trace_list(traces['trace'])
+
+
+def _snake_case_debug_block_trace(trace: typing.Any) -> spec.DebugBlockTrace:
+    return [_snake_case_debug_transaction_trace(tx_trace) for tx_trace in trace]
+
+
+def _snake_case_debug_transaction_trace(
+    trace: typing.Any,
+) -> spec.DebugTransactionTrace:
+    return {
+        'struct_logs': _snake_case_debug_struct_log_traces(trace['structLogs']),
+        'gas': trace['gas'],
+        'failed': trace['failed'],
+        'return_value': trace['returnValue'],
+    }
+
+
+def _snake_case_debug_struct_log_traces(
+    traces: typing.Any,
+) -> typing.Sequence[spec.DebugTraceStructLog]:
+    for trace in traces:
+        trace['gas_cost'] = trace.pop('gasCost')
+    return traces  # type: ignore
 
 
 #
@@ -237,6 +257,74 @@ def digest_trace_replay_block_transactions(
     if snake_case_response:
         for subtrace in response:
             _snake_case_trace_collection(subtrace)
+
+    return response
+
+
+#
+# # debug
+#
+
+
+def digest_debug_trace_call(
+    response: spec.RpcSingularResponse,
+    *,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+
+    if snake_case_response:
+        response = _snake_case_debug_transaction_trace(response)
+
+    return response
+
+
+def digest_debug_trace_call_many(
+    response: spec.RpcSingularResponse,
+    *,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+
+    if snake_case_response:
+        response = [
+            _snake_case_debug_transaction_trace(subresponse)
+            for subresponse in response
+        ]
+
+    return response
+
+
+def digest_debug_trace_transaction(
+    response: spec.RpcSingularResponse,
+    *,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+
+    if snake_case_response:
+        response = _snake_case_debug_transaction_trace(response)
+
+    return response
+
+
+def digest_debug_trace_block_by_number(
+    response: spec.RpcSingularResponse,
+    *,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+
+    if snake_case_response:
+        response = _snake_case_debug_block_trace(response)
+
+    return response
+
+
+def digest_debug_trace_block_by_hash(
+    response: spec.RpcSingularResponse,
+    *,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+
+    if snake_case_response:
+        response = _snake_case_debug_block_trace(response)
 
     return response
 

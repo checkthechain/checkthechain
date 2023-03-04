@@ -160,3 +160,102 @@ def construct_trace_replay_block_transactions(
         [block_number, trace_type],
     )
 
+
+#
+# # debug traces
+#
+
+
+def construct_debug_trace_call(
+    to_address: spec.BinaryData,
+    *,
+    from_address: spec.BinaryData | None = None,
+    gas: spec.BinaryData | None = None,
+    gas_price: spec.BinaryData | None = None,
+    value_sent: spec.BinaryData | None = None,
+    call_data: spec.BinaryData | None = None,
+    function_parameters: typing.Sequence[typing.Any]
+    | typing.Mapping[str, typing.Any]
+    | None = None,
+    function_abi: spec.FunctionABI | None = None,
+    block_number: spec.BlockNumberReference | None = None,
+    trace_type: spec.TraceOutputType | None,
+) -> spec.RpcSingularRequest:
+
+    from . import rpc_state_constructors
+
+    call = rpc_state_constructors.construct_eth_call(
+        to_address=to_address,
+        from_address=from_address,
+        gas=gas,
+        gas_price=gas_price,
+        value_sent=value_sent,
+        block_number=block_number,
+        call_data=call_data,
+        function_parameters=function_parameters,
+        function_abi=function_abi,
+    )
+    call['method'] = 'debug_traceCall'
+    tx, block_number = call['params']
+    call['params'] = [tx, block_number, trace_type]
+    return call
+
+
+def construct_debug_trace_call_many(
+    calls: typing.Sequence[typing.Mapping[str, typing.Any]],
+    trace_type: spec.TraceOutputType | None,
+    *,
+    block_number: spec.BlockNumberReference | None = None,
+) -> spec.RpcSingularRequest:
+    """not an efficient implementation"""
+
+    subrequests = []
+    for call in calls:
+
+        if 'block_number' in call:
+            raise Exception('specify block_number as a top-level parameter')
+
+        if call.get('trace_type') is not None:
+            subrequest = construct_debug_trace_call(**call)
+        subrequest = construct_debug_trace_call(
+            trace_type=trace_type, **call
+        )
+
+        # parse out call
+        sub_call, block_number, sub_trace_type = subrequest['params']
+        subrequests.append([sub_call, sub_trace_type])
+
+    return rpc_request.create(
+        'debug_traceCallMany',
+        [subrequests, block_number],
+    )
+
+
+def construct_debug_trace_transaction(
+    transaction_hash: str,
+    trace_type: spec.TraceOutputType | None = None,
+) -> spec.RpcSingularRequest:
+    return rpc_request.create(
+        'debug_traceTransaction',
+        [transaction_hash, trace_type],
+    )
+
+
+def construct_debug_trace_block_by_number(
+    block_number: spec.BlockNumberReference,
+    trace_type: spec.TraceOutputType | None = None,
+) -> spec.RpcSingularRequest:
+    return rpc_request.create(
+        'debug_traceBlockByNumber',
+        [block_number, trace_type],
+    )
+
+
+def construct_debug_trace_block_by_hash(
+    block_hash: str,
+) -> spec.RpcSingularRequest:
+    return rpc_request.create(
+        'debug_traceBlockByHash',
+        [block_hash],
+    )
+

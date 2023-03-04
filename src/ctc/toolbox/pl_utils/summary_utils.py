@@ -9,6 +9,7 @@ def set_column_display_width(width: int = 70) -> None:
     pl.Config.set_fmt_str_lengths(width)
 
 
+
 def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
 
     import toolstr
@@ -18,8 +19,7 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
     n_null = series.is_null().sum()
 
     # bytes
-    n_bytes: int | None
-    n_bytes = 0
+    n_bytes: int | None = 0
     if series.dtype == pl.datatypes.Int8:
         bytes_per_row = 1
     elif series.dtype == pl.datatypes.Int16:
@@ -108,6 +108,7 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
                 binary_unique_n_bytes += unique_lengths_sum
 
             binary_unique_h_bytes = toolstr.format_nbytes(binary_unique_n_bytes)
+
             if n_bytes is not None:
                 binary_unique_compression = binary_unique_n_bytes / n_bytes
             else:

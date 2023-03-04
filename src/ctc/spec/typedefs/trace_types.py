@@ -201,3 +201,28 @@ class TraceReplayResult(TypedDict):
     state_diff: StateDiffTrace | None
     vm_trace: VMTrace | None
 
+
+#
+# # debug traces
+#
+
+
+class DebugTransactionTrace(TypedDict):
+    gas: int
+    failed: bool
+    return_value: str
+    struct_logs: typing.Sequence[DebugTraceStructLog]
+
+
+class DebugTraceStructLog(TypedDict):
+    pc: int
+    op: Opcode
+    gas: int
+    gas_cost: int
+    depth: int
+    stack: typing.Sequence[binary_types.PrefixHexData]
+    memory: typing.Sequence[binary_types.RawHexData]
+
+
+DebugBlockTrace = typing.Sequence[DebugTransactionTrace]
+
