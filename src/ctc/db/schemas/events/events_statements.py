@@ -19,27 +19,46 @@ async def async_upsert_events(
     context: spec.Context,
 ) -> None:
 
+    if len(encoded_events) == 0:
+        return
+
     # fill missing rows
-    for event in encoded_events:
-        event.setdefault('topic1', None)
-        event.setdefault('topic2', None)
-        event.setdefault('topic3', None)
-        event.setdefault('unindexed', None)
+    if isinstance(encoded_events[0], dict):
+        for event in encoded_events:
+            event.setdefault('topic1', None)
+            event.setdefault('topic2', None)
+            event.setdefault('topic3', None)
+            event.setdefault('unindexed', None)
 
-        if (
-            event.get('block_number') is None
-            or event.get('transaction_index') is None
-            or event.get('log_index') is None
-        ):
-            raise Exception('must specify full index for event')
+            if (
+                event.get('block_number') is None
+                or event.get('transaction_index') is None
+                or event.get('log_index') is None
+            ):
+                raise Exception('must specify full index for event')
 
-    as_binary = [
-        evm.binarize_fields(
-            encoded_event,
-            events_schema_defs._event_binary_fields,
-        )
-        for encoded_event in encoded_events
-    ]
+        as_binary = [
+            evm.binarize_fields(
+                encoded_event,
+                events_schema_defs._event_binary_fields,
+            )
+            for encoded_event in encoded_events
+        ]
+
+    elif isinstance(encoded_events[0], tuple):
+        as_binary = [
+            event[:3]
+            + tuple(
+                (bytes.fromhex(value[2:]) if value is not None else None)
+                for value in event[3:]
+            )
+            + (None,)
+            for event in encoded_events
+        ]
+
+    else:
+        raise Exception('invalid format for encoded_events')
+
     table = schema_utils.get_table_schema('events', context=context)
     await toolsql.async_insert(
         conn=conn,

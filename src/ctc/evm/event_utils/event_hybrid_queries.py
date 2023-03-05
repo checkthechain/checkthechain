@@ -108,7 +108,6 @@ async def _async_plan_event_query(
         }
         for node_start, node_end in node_ranges
     ]
-    raise Exception()
 
     return {
         'node': node_queries,
@@ -151,7 +150,6 @@ async def _async_query_events_from_node_and_db(
         print('Query Plan:')
         print('- db queries:', len(queries['db']))
         print('- node queries:', len(queries['node']))
-        raise Exception()
 
     results: typing.MutableMapping[int, spec.PolarsDataFrame] = {}
 

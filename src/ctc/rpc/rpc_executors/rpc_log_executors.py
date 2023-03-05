@@ -129,11 +129,28 @@ async def async_eth_get_logs(
         end_block=end_block,
         block_hash=block_hash,
     )
-    response = await rpc_request.async_send(request, context=context)
-    return rpc_digestors.digest_eth_get_logs(
-        response=response,
-        decode_response=decode_response,
-        snake_case_response=snake_case_response,
-        include_removed=include_removed,
-    )
+
+    import sys
+
+    if (sys.version_info.major, sys.version_info.minor) >= (3, 8):
+        from ctc.rpc.rpc_decoders import log_decoder
+
+        raw_response = await rpc_request.async_send(
+            request,
+            context=context,
+            raw_output=True,
+        )
+        return log_decoder.decode_logs(
+            raw_response,
+            include_removed=include_removed,
+        )
+
+    else:
+        response = await rpc_request.async_send(request, context=context)
+        return rpc_digestors.digest_eth_get_logs(
+            response=response,
+            decode_response=decode_response,
+            snake_case_response=snake_case_response,
+            include_removed=include_removed,
+        )
 

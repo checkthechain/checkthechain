@@ -54,6 +54,7 @@ events_schema: toolsql.DBSchemaShorthand = {
                 {'name': 'topic2', 'type': 'Binary', 'index': True},
                 {'name': 'topic3', 'type': 'Binary', 'index': True},
                 {'name': 'unindexed', 'type': 'Binary'},
+                {'name': 'decoded', 'type': 'JSON'},
             ],
         },
         'event_queries': {

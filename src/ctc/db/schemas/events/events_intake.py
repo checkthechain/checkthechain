@@ -21,7 +21,8 @@ async def async_intake_encoded_events(
 
     import numpy as np
 
-    blocks = np.array([event['block_number'] for event in encoded_events])  # type: ignore
+    if len(encoded_events) == 0:
+        return
 
     # only insert blocks after a given number of confirmations
     if latest_block is None:
@@ -33,13 +34,22 @@ async def async_intake_encoded_events(
     if query['start_block'] > latest_allowed_block:
         return
     if query['end_block'] > latest_allowed_block:
-        if len(blocks) > 0:
+        if isinstance(encoded_events[0], dict):
+            blocks = np.array([event['block_number'] for event in encoded_events])  # type: ignore
             confirmed_mask = blocks <= latest_allowed_block
             encoded_events = [
                 event  # type: ignore
                 for event, confirmed in zip(encoded_events, confirmed_mask)
                 if confirmed
             ]
+        elif isinstance(encoded_events[0], tuple):
+            encoded_events = [
+                event
+                for event in encoded_events
+                if event[0] <= latest_allowed_block
+            ]
+        else:
+            raise Exception()
         query = dict(query, end_block=latest_allowed_block)
 
     # return early if no events to intake

@@ -8,8 +8,6 @@ from .. import block_utils
 from . import event_query_utils
 
 if typing.TYPE_CHECKING:
-    T = typing.TypeVar('T', typing.Sequence[spec.RawLog], spec.DataFrame)
-
     from typing_extensions import Literal
 
 
@@ -101,8 +99,6 @@ async def _async_query_events_from_node(
     result = [response for chunk in chunks for response in chunk]
     columns = event_query_utils.get_event_df_columns(binary_format='prefix_hex')
     df = pl.DataFrame(result, columns=columns)
-    if 'removed' in df.columns:
-        del df['removed']
 
     # convert binary output columns
     if binary_output_format == 'prefix_hex':
@@ -185,9 +181,10 @@ async def _async_query_node_events_chunk(
 
     # process raw events
     raw_logs = [event for result in results for event in result]
-    encoded_events = await _async_process_raw_node_logs(
-        raw_logs,
-    )
+    encoded_events = [
+        log[:5] + log[5] + ((None,) * (4 - len(log[5]))) + (log[6],)
+        for log in raw_logs
+    ]
     end_process = time.time()
     print('inner process took', end_process - end_node)
 
@@ -228,52 +225,24 @@ async def _async_query_node_events_chunk(
     return encoded_events
 
 
-async def _async_process_raw_node_logs(
-    raw_logs: T,
-) -> typing.Sequence[spec.EncodedEvent]:
-    """convert from raw logs from node into encoded events for db"""
-    if isinstance(raw_logs, list):
-        return await _async_process_raw_node_logs_list(raw_logs)
-    # elif type(raw_logs).__mro__[0].__name__ == 'DataFrame':
-    #     return await _async_process_raw_node_logs_dataframe(raw_logs)
-    else:
-        raise Exception('unknown raw logs format')
-
-
-async def _async_process_raw_node_logs_list(
-    raw_logs: typing.Sequence[spec.RawLog],
-) -> typing.Sequence[spec.EncodedEvent]:
-    """modified in-place for performance"""
-    for log in raw_logs:
-        event: spec.EncodedEvent = log  # type: ignore
-        event['contract_address'] = log.pop('address')  # type: ignore
-        event['unindexed'] = log.pop('data')  # type: ignore
-        topics = log.pop('topics')  # type: ignore
-        if topics is not None and len(topics) > 0:
-            topic_iter = iter(topics)
-            if len(topics) >= 1:
-                event['event_hash'] = next(topic_iter)
-            if len(topics) >= 2:
-                event['topic1'] = next(topic_iter)
-            if len(topics) >= 3:
-                event['topic2'] = next(topic_iter)
-            if len(topics) >= 4:
-                event['topic3'] = next(topic_iter)
-    return raw_logs  # type: ignore
-
-
-# async def _async_process_raw_node_logs_dataframe(
-#     raw_logs: spec.DataFrame,
-# ) -> spec.DataFrame:
-#     import pandas as pd
-
-#     split_topics = pd.DataFrame(
-#         raw_logs['topics'].to_list(),
-#         columns=['event_hash', 'topic1', 'topic2', 'topic3'],
-#     )
-#     encoded_events = pd.concat([raw_logs, split_topics], axis=1)
-#     encoded_events = encoded_events.rename(
-#         columns={'address': 'contract_address'}
-#     )
-#     return encoded_events
+# async def _async_process_raw_node_logs(
+#     raw_logs: typing.Sequence[spec.RawLog],
+# ) -> typing.Sequence[spec.EncodedEvent]:
+#     """convert from raw logs from node into encoded events for db"""
+#     for log in raw_logs:
+#         event: spec.EncodedEvent = log  # type: ignore
+#         event['contract_address'] = log.pop('address')  # type: ignore
+#         event['unindexed'] = log.pop('data')  # type: ignore
+#         topics = log.pop('topics')  # type: ignore
+#         if topics is not None and len(topics) > 0:
+#             topic_iter = iter(topics)
+#             if len(topics) >= 1:
+#                 event['event_hash'] = next(topic_iter)
+#             if len(topics) >= 2:
+#                 event['topic1'] = next(topic_iter)
+#             if len(topics) >= 3:
+#                 event['topic2'] = next(topic_iter)
+#             if len(topics) >= 4:
+#                 event['topic3'] = next(topic_iter)
+#     return raw_logs  # type: ignore
 
