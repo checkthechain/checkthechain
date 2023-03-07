@@ -27,12 +27,12 @@ decoder = msgspec.json.Decoder(RpcResult)
 def decode_logs(
     raw_response: str,
     include_removed: bool = False,
-) -> typing.Sequence[Log]:
+) -> typing.Sequence[tuple[int, int, int, str, str, tuple[str, ...], str, str]]:
 
     response = decoder.decode(raw_response)
     logs = response.result
 
-    logs = [
+    return [
         (
             int(log.block_number, 16),
             int(log.transaction_index, 16),
@@ -46,6 +46,4 @@ def decode_logs(
         for log in logs
         if (not log.removed or include_removed)
     ]
-
-    return logs
 

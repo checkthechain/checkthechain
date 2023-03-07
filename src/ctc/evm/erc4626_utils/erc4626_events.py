@@ -58,7 +58,7 @@ async def async_get_erc4626_deposits(
             block=last_block,
             context=context,
         )
-        deposits = deposits.with_column(pl.Series('arg__assets', assets))
+        deposits = deposits.with_columns(pl.Series('arg__assets', assets))
 
         shares = await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
@@ -66,7 +66,7 @@ async def async_get_erc4626_deposits(
             block=last_block,
             context=context,
         )
-        deposits = deposits.with_column(pl.Series('arg__shares', shares))
+        deposits = deposits.with_columns(pl.Series('arg__shares', shares))
 
     return deposits
 
@@ -114,16 +114,16 @@ async def async_get_erc4626_withdraws(
             'arg__assets'
         ] = await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
-            assets=withdraws['arg__assets'].values,  # type: ignore
-            block=blocks[-1],  # type: ignore
+            assets=withdraws['arg__assets'].to_list(),
+            block=blocks[-1],
             context=context,
         )
         withdraws[
             'arg__shares'
         ] = await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
-            shares=withdraws['arg__shares'].values,  # type: ignore
-            block=blocks[-1],  # type: ignore
+            shares=withdraws['arg__shares'].to_list(),
+            block=blocks[-1],
             context=context,
         )
 

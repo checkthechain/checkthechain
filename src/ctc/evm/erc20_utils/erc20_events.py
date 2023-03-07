@@ -33,7 +33,6 @@ async def async_get_erc20_transfers(
     end_time: tooltime.Timestamp | None = None,
     include_timestamps: bool = False,
     normalize: bool = True,
-    convert_from_str: bool = True,
     verbose: bool = False,
     context: spec.Context = None,
     **event_kwargs: typing.Any,
@@ -73,34 +72,20 @@ async def async_get_erc20_transfers(
     column = 'arg__amount'
     transfers = transfers.rename({old_column: column})
 
-    # convert from str amounts to int amounts
-    if convert_from_str:
-        transfers[column] = transfers[column].apply(int)
-
     # normalize
     if normalize and len(transfers) > 0:
 
-        if not convert_from_str:
-            raise Exception(
-                'cannot normalize without str conversion'
-                ', use normalize=False or convert_from_str=True'
-            )
+        import polars as pl
+        import numpy as np
 
         decimals = await erc20_metadata.async_get_erc20_decimals(
             token=token_address,
             block=transfers['block_number'][0],
             context=context,
         )
-        dtype = float
-        transfers[column] = transfers[column] / dtype('1e' + str(decimals))
-
-    else:
-
-        # prevent implicit conversion to int64
-        # - this happens to ERC20's that use small number of decimals
-        # - keep all quantities as native python ints for consistency
-        if transfers[column].dtype.name != 'object':
-            transfers[column] = transfers[column].astype(object)
+        factor = float('1e' + str(decimals))
+        normalized = np.array(transfers[column].to_list(), dtype=float) / factor
+        transfers = transfers.with_columns(pl.Series(column, normalized))
 
     return transfers
 
@@ -109,29 +94,22 @@ async def async_get_erc20_balances_from_transfers(
     transfers: spec.PolarsDataFrame,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
-    dtype: typing.Optional[
-        typing.Union[typing.Type[int], typing.Type[float]]
-    ] = None,
     normalize: bool = False,
     context: spec.Context = None,
 ) -> spec.PolarsDataFrame:
     """compute ERC20 balance of each wallet using Transfer events"""
 
+    import polars as pl
+
     # filter block
     if block is not None:
-        blocks = transfers['block_number'].to_list()
-        mask = blocks <= block
-        transfers = transfers[mask]
+        transfers = transfers.filter(pl.col('block_number') <= block)
 
     amount_key = _get_token_amount_column(transfers)
 
-    # convert to float
-    if dtype is not None:
-        transfers[amount_key] = transfers[amount_key].map(dtype)
-
     # subtract transfers out from transfers in
-    from_transfers = transfers.groupby('arg__from')[amount_key].sum()
-    to_transfers = transfers.groupby('arg__to')[amount_key].sum()
+    from_transfers = transfers.groupby('arg__from').agg(pl.sum(amount_key))
+    to_transfers = transfers.groupby('arg__to').agg(pl.sum(amount_key))
     balances: spec.PolarsDataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
 
     if normalize:

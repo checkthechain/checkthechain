@@ -36,7 +36,9 @@ def wrap_selector_with_connection(
             raise Exception('unknown schema_name format')
 
         async with connect_utils.async_connect(
-            context=context, schema=name
+            context=context,
+            schema=name,
+            read_only=True,
         ) as conn:
             return await async_f(*args, conn=conn, context=context, **kwargs)
 

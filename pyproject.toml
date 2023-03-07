@@ -45,7 +45,7 @@ dependencies = [
     #
     # data science
     'numpy >=1.19.0, <1.24',
-    'pandas >=1.2.0, <1.5',
+    'polars >=0.16.10, <0.17',
     #
     # io dependencies
     'aiohttp >=3.7.4, <4',

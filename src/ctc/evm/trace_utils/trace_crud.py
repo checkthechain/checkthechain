@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import spec
 
 
@@ -24,6 +26,7 @@ async def async_get_blocks_trace(
     context: spec.Context = None,
 ) -> typing.Sequence[spec.TraceList]:
     """get list of call traces for block"""
+    import asyncio
     from ctc import rpc
     coroutines = [
         rpc.async_trace_block(block, context=context)

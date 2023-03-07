@@ -36,13 +36,13 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
         bytes_per_row = 8
         str_lengths = series.str.lengths()
         str_lengths_sum = typing.cast(int, str_lengths.sum())
-        if str_lengths_sum is not None:
+        if str_lengths_sum is not None and n_bytes is not None:
             n_bytes += str_lengths_sum
     elif series.dtype == pl.datatypes.Categorical:
         bytes_per_row = 4
         str_lengths = series.unique().str.lengths()
         str_lengths_sum = typing.cast(int, str_lengths.sum())
-        if str_lengths_sum is not None:
+        if str_lengths_sum is not None and n_bytes is not None:
             n_bytes += str_lengths_sum
     else:
         n_bytes = None
@@ -118,7 +118,7 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
         "column": series.name,
         "n_unique": n_unique,
         "%_unique": n_unique / n_rows,
-        "dtype": series.dtype.string_repr(),
+        "dtype": str(series.dtype),
         "n_null": n_null,
         "%_null": n_null / n_rows,
         "n_bytes": n_bytes,

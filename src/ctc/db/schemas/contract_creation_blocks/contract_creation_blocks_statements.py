@@ -46,7 +46,7 @@ async def async_select_contract_creation_block(
         table=table,
         where_equals={'address': address.lower()},
         columns=['block_number'],
-        output_format='cell',
+        output_format='cell_or_none',
     )
 
     if result is not None and not isinstance(result, int):

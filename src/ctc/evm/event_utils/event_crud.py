@@ -38,7 +38,6 @@ async def async_get_events(
     share_abis_across_contracts: bool = True,
     include_timestamps: bool = False,
     include_event_names: bool = False,
-    output_format: Literal['dataframe', 'dict'] = 'dataframe',
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
@@ -103,7 +102,6 @@ async def async_get_events(
         share_abis_across_contracts=share_abis_across_contracts,
         include_timestamps=include_timestamps,
         include_event_names=include_event_names,
-        output_format=output_format,
         binary_output_format=binary_output_format,
     )
 
@@ -113,15 +111,16 @@ async def _async_postprocess_query_result(
     df: spec.PolarsDataFrame,
     event_abi: spec.EventABI | None,
     verbose: bool,
-    columns_to_load: set[str],
+    columns_to_load: typing.Sequence[str],
     decode: bool = True,
     context: spec.Context,
     share_abis_across_contracts: bool = True,
     include_timestamps: bool = False,
     include_event_names: bool = False,
-    output_format: Literal['dataframe', 'dict'] = 'dataframe',
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
 ) -> spec.PolarsDataFrame:
+
+    import polars as pl
 
     # summarize output
     if verbose >= 2:
@@ -139,47 +138,42 @@ async def _async_postprocess_query_result(
 
     # insert metadata columns
     if include_timestamps:
-        import polars as pl
 
         timestamps = await event_metadata.async_get_event_timestamps(
             df,
             context=context,
         )
-        df = df.with_column(pl.Series(name='timestamp', values=timestamps))
+        df = df.with_columns(pl.Series(name='timestamp', values=timestamps))
     if include_event_names:
         event_names = await event_metadata._async_get_event_names_column(
             events=df,
             share_abis_across_contracts=share_abis_across_contracts,
             context=context,
         )
-        df = df.with_column(pl.Series(name='event_name', values=event_names))
+        df = df.with_columns(pl.Series(name='event_name', values=event_names))
 
     # format data
     if decode:
-
-        import polars as pl
-        from ctc.toolbox import pl_utils
-
-        raw_decoded = await abi_utils.async_decode_events_dataframe(
+        decoded = await abi_utils.async_decode_events_dataframe(
             df,
             event_abis=([event_abi] if event_abi is not None else None),
             context=context,
+            binary_output_format=binary_output_format,
         )
-        decoded = pl.DataFrame(raw_decoded)
-        decoded = decoded.rename(
-            {column: 'arg__' + column for column in decoded.columns}
-        )
-        decoded = pl_utils.binary_columns_to_prefix_hex(decoded)
         df = df.with_columns(decoded)
-        df = df.drop(['topic1', 'topic2', 'topic3', 'unindexed'])
+        encoded_columns = ['topic1', 'topic2', 'topic3', 'unindexed']
+        to_drop = [column for column in encoded_columns if column in df]
+        df = df.drop(to_drop)
 
-    # convert to output format
-    if output_format == 'dataframe':
-        return df
-    elif output_format == 'dict':
-        return df.to_dicts()
-    else:
-        raise Exception('unknown output format: ' + str(output_format))
+    return df
+
+    # # convert to output format
+    # if output_format == 'dataframe':
+    #     return df
+    # elif output_format == 'dict':
+    #     return df.to_dicts()
+    # else:
+    #     raise Exception('unknown output format: ' + str(output_format))
 
 
 async def _async_get_query_inputs(
@@ -204,7 +198,9 @@ async def _async_get_query_inputs(
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
     include_event_names: bool = False,
-) -> tuple[int, int, typing.Sequence[bytes], spec.EventABI, set[str]]:
+) -> tuple[
+    int, int, typing.Sequence[bytes | None], spec.EventABI | None, typing.Sequence[str]
+]:
 
     # determine start and end block
     start_block, end_block = await block_utils.async_resolve_block_range(

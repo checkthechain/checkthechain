@@ -49,15 +49,17 @@ async def async_get_erc721_owners(
 
 
 def _get_erc721_owners_from_transfers(
-    transfers: spec.DataFrame,
+    transfers: spec.PolarsDataFrame,
     *,
     token_ids: typing.Sequence[int] | None = None,
 ) -> typing.Mapping[int, spec.Address]:
 
-    owner_transfers = transfers.groupby('arg__tokenId').last()
-    owner_dict: typing.Mapping[int, spec.Address] = typing.cast(
-        typing.Mapping[int, spec.Address],
-        owner_transfers['arg__to'].to_dict(),
+    owner_transfers = (
+        transfers[['arg__tokenId', 'arg__to']].groupby('arg__tokenId').last()
+    )
+    owner_dict = typing.cast(
+        typing.Mapping[int, str],
+        dict(owner_transfers.rows()),  # type: ignore
     )
 
     if token_ids is not None:

@@ -5,33 +5,38 @@ from typing_extensions import Literal
 
 import toolsql
 
+if typing.TYPE_CHECKING:
+    import polars as pl
+
 from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import binary_utils
 
 
-def get_event_df_columns(binary_format: Literal['binary', 'prefix_hex']):
+def get_event_df_columns(
+    binary_format: Literal['binary', 'prefix_hex']
+) -> typing.Sequence[tuple[str, pl.datatypes.DataTypeClass]]:
     import polars as pl
 
     if binary_format == 'binary':
-        binary = pl.datatypes.Binary
+        binary: pl.datatypes.DataTypeClass = pl.datatypes.Binary
     elif binary_format in ['prefix_hex', 'raw_hex']:
         binary = pl.datatypes.Utf8
     else:
         raise Exception('unknown binary format: ' + str(binary_format))
 
     return [
-        ['block_number', pl.datatypes.Int64],
-        ['transaction_index', pl.datatypes.Int64],
-        ['log_index', pl.datatypes.Int64],
-        ['transaction_hash', binary],
-        ['contract_address', binary],
-        ['event_hash', binary],
-        ['topic1', binary],
-        ['topic2', binary],
-        ['topic3', binary],
-        ['unindexed', binary],
+        ('block_number', pl.datatypes.Int64),
+        ('transaction_index', pl.datatypes.Int64),
+        ('log_index', pl.datatypes.Int64),
+        ('transaction_hash', binary),
+        ('contract_address', binary),
+        ('event_hash', binary),
+        ('topic1', binary),
+        ('topic2', binary),
+        ('topic3', binary),
+        ('unindexed', binary),
     ]
 
 
@@ -90,7 +95,7 @@ async def _async_parse_event_query_args(
     topic2_is_binary: bool | None = None,
     topic3_is_binary: bool | None = None,
     context: spec.Context,
-) -> tuple[typing.Sequence[spec.BinaryData | None], spec.EventABI | None]:
+) -> tuple[typing.Sequence[bytes | None], spec.EventABI | None]:
     """compute encoded topics and event abi of query as needed"""
 
     # obtain event abi if needed

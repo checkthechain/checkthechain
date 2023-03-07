@@ -18,7 +18,8 @@ def binary_series_to_prefix_hex(series: pl.Series) -> pl.Series:
 
 
 def binary_series_to_raw_hex(series: pl.Series) -> pl.Series:
-    return pl.Series(series.name, [x.hex() for x in series.to_list()])  # type: ignore
+    as_hex = [(x.hex() if x is not None else None) for x in series.to_list()]
+    return pl.Series(series.name, as_hex)
 
 
 def binary_columns_to_prefix_hex(

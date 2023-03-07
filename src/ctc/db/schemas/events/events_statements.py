@@ -173,7 +173,7 @@ async def async_select_events(
     )
 
     # dispatch query
-    return await toolsql.async_select(  # type: ignore
+    result = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
         where_equals=where_equals,
@@ -183,6 +183,8 @@ async def async_select_events(
         order_by=['block_number', 'transaction_index', 'log_index'],
         output_format=output_format,
     )
+
+    return result
 
 
 def _get_columns(

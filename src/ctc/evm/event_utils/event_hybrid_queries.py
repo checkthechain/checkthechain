@@ -203,7 +203,7 @@ async def _async_query_events_from_node_and_db(
             'unindexed',
         }:
             if key not in columns_to_load:
-                del result[key]
+                result = result.drop(key)
 
         if binary_output_format == 'binary':
             result = pl_utils.prefix_hex_columns_to_binary(result)

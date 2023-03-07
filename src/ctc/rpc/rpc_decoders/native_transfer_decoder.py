@@ -35,9 +35,9 @@ CallResult = msgspec.defstruct(
 
 class CallTrace(msgspec.Struct):
     type: str
-    action: CallAction
+    action: CallAction  # type: ignore
     subtraces: int
-    result: typing.Optional[CallResult] = None
+    result: typing.Optional[CallResult] = None  # type: ignore
     error: typing.Optional[str] = None
 
 
@@ -79,7 +79,7 @@ def decode_native_transfers(
     return transfers
 
 
-def filter_failed_traces(traces):
+def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
     i = 0
     while i < len(traces):
         if traces[i].error is not None:
@@ -92,23 +92,23 @@ def filter_failed_traces(traces):
 
 
 def native_transfers_from_call_trace(
-    trace, block_number, transfer_index, tx_hash
-):
+    trace: CallTrace, block_number: int, transfer_index: int, tx_hash: str
+) -> typing.Sequence[typing.Any] | None:
 
     ttype = trace.type
 
     # parse value
     if ttype == 'suicide':
-        value = trace.action.balance
+        value = trace.action.balance  # type: ignore
     else:
-        value = trace.action.value
+        value = trace.action.value  # type: ignore
     if value == '0x0':
         return None
 
     # parse from address and to address
     if ttype == 'reward':
         from_address = '0x0000000000000000000000000000000000000000'
-        to_address = trace.action.author
+        to_address = trace.action.author  # type: ignore
     elif ttype == 'create':
         if trace.result is None:
             return None
@@ -116,10 +116,10 @@ def native_transfers_from_call_trace(
         to_address = trace.result.address
     elif ttype == 'call':
         from_address = getattr(trace.action, 'from')
-        to_address = trace.action.to
+        to_address = trace.action.to  # type: ignore
     elif ttype == 'suicide':
-        from_address = trace.action.address
-        to_address = trace.action.refundAddress
+        from_address = trace.action.address  # type: ignore
+        to_address = trace.action.refundAddress  # type: ignore
     else:
         raise Exception(ttype)
 

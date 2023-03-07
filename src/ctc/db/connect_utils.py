@@ -16,20 +16,30 @@ from .management import version_utils
 def connect(
     context: spec.Context,
     schema: spec.SchemaName | None = None,
+    *,
+    read_only: bool = False,
 ) -> toolsql.Connection:
     db_config = config.get_context_db_config(
         context=context, schema_name=schema
     )
+    if read_only:
+        db_config = db_config.copy()
+        db_config['driver'] = 'connectorx'
     return toolsql.connect(db_config)
 
 
 def async_connect(
     context: spec.Context,
     schema: spec.SchemaName | None = None,
+    *,
+    read_only: bool = False,
 ) -> toolsql.AsyncConnection:
     db_config = config.get_context_db_config(
         context=context, schema_name=schema
     )
+    if read_only:
+        db_config = db_config.copy()
+        db_config['driver'] = 'connectorx'
     return toolsql.async_connect(db_config)
 
 
