@@ -9,17 +9,20 @@ def set_column_display_width(width: int = 70) -> None:
     pl.Config.set_fmt_str_lengths(width)
 
 
-
 def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
 
     import toolstr
 
-    n_unique = series.n_unique()
+    if series.dtype == pl.datatypes.Object:
+        n_unique = len(set(series.to_list()))
+    else:
+        n_unique = series.n_unique()
     n_rows = len(series)
     n_null = series.is_null().sum()
 
     # bytes
     n_bytes: int | None = 0
+    bytes_per_row = 0
     if series.dtype == pl.datatypes.Int8:
         bytes_per_row = 1
     elif series.dtype == pl.datatypes.Int16:
@@ -74,7 +77,7 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
         unique_compress_bytes = (
             unique_key_bytes + bytes_per_row
         ) * n_unique + unique_key_bytes * n_rows
-    if n_bytes is not None:
+    if n_bytes is not None and n_bytes != 0:
         unique_compression_factor = unique_compress_bytes / n_bytes
     else:
         unique_compression_factor = None
@@ -109,7 +112,7 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
 
             binary_unique_h_bytes = toolstr.format_nbytes(binary_unique_n_bytes)
 
-            if n_bytes is not None:
+            if n_bytes is not None and n_bytes != 0:
                 binary_unique_compression = binary_unique_n_bytes / n_bytes
             else:
                 binary_unique_compression = None
@@ -117,10 +120,10 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
     return {
         "column": series.name,
         "n_unique": n_unique,
-        "%_unique": n_unique / n_rows,
+        "%_unique": n_unique / n_rows if n_rows > 0 else None,
         "dtype": str(series.dtype),
         "n_null": n_null,
-        "%_null": n_null / n_rows,
+        "%_null": n_null / n_rows if n_rows > 0 else None,
         "n_bytes": n_bytes,
         "h_bytes": h_bytes,
         'binary_n_bytes': binary_n_bytes,
@@ -140,17 +143,28 @@ def create_dataframe_summary(df: pl.DataFrame) -> pl.DataFrame:
     return pl.DataFrame(summary)
 
 
-def print_dataframe_summary(df: pl.DataFrame) -> None:
+def print_dataframe_summary(df: pl.DataFrame, title: str | None = None) -> None:
 
     import toolstr
 
     summary = create_dataframe_summary(df)
 
-    toolstr.print_text_box('Dataframe summary')
+    if title is None:
+        title = 'Dataframe Summary'
+
+    toolstr.print_text_box(title)
+    non_object_df = df.select(
+        column
+        for column in df.columns
+        if column not in df.select(pl.col(pl.Object))
+    )
     rows: typing.Sequence[typing.Sequence[typing.Any]] = [
         ['n_rows', len(df)],
         ['n_columns', len(df.columns)],
-        ['estimate_bytes()', toolstr.format_nbytes(df.estimated_size())],
+        [
+            'estimate_bytes()',
+            toolstr.format_nbytes(non_object_df.estimated_size()),
+        ],
     ]
     toolstr.print_table(rows, indent=4)
     print()
