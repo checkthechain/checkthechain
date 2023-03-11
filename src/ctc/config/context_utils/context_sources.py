@@ -77,7 +77,7 @@ def _get_context_chain_id_and_provider(
             provider = rpc.resolve_provider(context_provider)
             if (
                 context_network is not None
-                and context_network != provider['network']
+                and evm.get_network_chain_id(context_network) != provider['network']
             ):
                 raise Exception('context provider does not match network')
             return provider['network'], provider
