@@ -130,15 +130,23 @@ async def async_get_full_feed_event_data(
         'arg__updatedAt': 'timestamp',
         'arg__roundId': 'round_id',
     }
-    df = df.rename(columns=new_columns)
+    df = df.rename(new_columns)
     df = df[['answer', 'timestamp', 'round_id']]
 
     # normalize
     if normalize:
+        import polars as pl
+        import numpy as np
+
         decimals = await chainlink_feed_metadata.async_get_feed_decimals(
             feed=feed, context=context
         )
-        df['answer'] /= 10**decimals
+        df = df.with_columns(
+            pl.Series(
+                'answer',
+                np.array(df['answer'].to_list(), dtype=float) / (10**decimals),
+            )
+        )
 
     # interpolate
     if interpolate:
@@ -176,11 +184,8 @@ async def async_get_full_feed_event_data(
         )
         df = pd_utils.interpolate_dataframe(df, end_index=end_block)
 
-    elif not keep_multiindex:
-        df.index = pd_utils.keep_level(df.index, level='block_number')  # type: ignore
-
     if invert:
-        df['answer'] = 1 / df['answer']
+        df = df.with_columns(1 / df['answer'])
 
     return df
 

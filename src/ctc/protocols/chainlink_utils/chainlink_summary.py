@@ -65,11 +65,10 @@ async def async_print_feed_summary(
         start_block=start_block,
         context=context,
     )
-    most_recent = data.iloc[-1]
-    timestamp = most_recent['timestamp']
+    timestamp = data['timestamp'][-1]
 
     updates = []
-    for i, row in data.iterrows():
+    for i, row in enumerate(data.to_dicts()):
         timestamp = int(row['timestamp'])
         age = tooltime.timelength_to_phrase(int(time.time() - timestamp))
         age = ' '.join(age.split(' ')[:2]).strip(',')
@@ -182,8 +181,8 @@ async def async_print_feed_summary(
         },
     )
 
-    xvals = data['timestamp'].values.astype(float)
-    yvals = data['answer'].values.astype(float)
+    xvals = data['timestamp'].to_list()
+    yvals = data['answer'].to_list()
     plot = toolstr.render_line_plot(
         xvals=xvals,  # type: ignore
         yvals=yvals,  # type: ignore
