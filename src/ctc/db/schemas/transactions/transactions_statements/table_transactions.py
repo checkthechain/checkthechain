@@ -59,9 +59,16 @@ async def async_select_transaction(
 
     table = schema_utils.get_table_schema('transactions', context=context)
 
+    columns = [
+        column['name']
+        for column in table['columns']
+        if column['name'] != 'access_list'
+    ]
+
     tx: spec.DBTransactionText | None = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
+        columns=columns,
         where_equals={'hash': hash},
         output_format='single_dict_or_none',
     )
@@ -81,11 +88,18 @@ async def async_select_transactions(
 
     table = schema_utils.get_table_schema('transactions', context=context)
 
+    columns = [
+        column['name']
+        for column in table['columns']
+        if column['name'] != 'access_list'
+    ]
+
     transactions: typing.Sequence[
         spec.DBTransaction
     ] = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
+        columns=columns,
         where_in={'hash': hashes},
     )
 
