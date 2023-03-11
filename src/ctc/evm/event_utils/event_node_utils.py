@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+import toolstr
+
 from ctc import spec
 from .. import binary_utils
 from .. import block_utils
@@ -24,6 +26,7 @@ async def _async_query_events_from_node(
     verbose: bool | int,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
     chunk_size: int = 100000,
+    max_blocks_per_request: int = 2000,
 ) -> spec.DataFrame:
     """query events from node and cache results in db if desired"""
 
@@ -54,7 +57,7 @@ async def _async_query_events_from_node(
 
     if verbose >= 1:
         n_blocks = end_block - start_block + 1
-        print('fetching events from node over', n_blocks, 'blocks')
+        print('fetching events from node over', toolstr.format(n_blocks), 'blocks')
     if verbose >= 2:
         from ctc import cli
         from ctc import config
@@ -91,6 +94,7 @@ async def _async_query_events_from_node(
             chunk_end=chunk_end,
             context=context,
             latest_block_number=latest_block_number,
+            max_blocks_per_request=max_blocks_per_request,
         )
         coroutines.append(coroutine)
     chunks = await asyncio.gather(*coroutines)
@@ -125,7 +129,7 @@ async def _async_query_node_events_chunk(
     chunk_start: int,
     chunk_end: int,
     context: spec.Context,
-    max_request_size: int = 2000,
+    max_blocks_per_request: int = 2000,
     latest_block_number: int | None = None,
 ) -> typing.Sequence[spec.EncodedEvent]:
     """process a chunk of events from node"""
@@ -139,7 +143,7 @@ async def _async_query_node_events_chunk(
     chunk_requests = range_utils.range_to_chunks(
         start=chunk_start,
         end=chunk_end,
-        chunk_size=max_request_size,
+        chunk_size=max_blocks_per_request,
     )
 
     # encode topics

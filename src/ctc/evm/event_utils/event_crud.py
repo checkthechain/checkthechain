@@ -10,6 +10,7 @@ from . import event_metadata
 from . import event_query_utils
 
 if typing.TYPE_CHECKING:
+    import types
     import tooltime
 
     from typing_extensions import Literal
@@ -41,6 +42,8 @@ async def async_get_events(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
+    convert_ints: types.Type | bool = False,
+    max_blocks_per_request: int = 2000,
 ) -> spec.PolarsDataFrame:
     """get events"""
 
@@ -89,6 +92,7 @@ async def async_get_events(
         binary_output_format=binary_output_format,
         columns_to_load=columns_to_load,
         context=context,
+        max_blocks_per_request=max_blocks_per_request,
     )
 
     # post-process result
@@ -103,6 +107,7 @@ async def async_get_events(
         include_timestamps=include_timestamps,
         include_event_names=include_event_names,
         binary_output_format=binary_output_format,
+        convert_ints=convert_ints,
     )
 
 
@@ -118,6 +123,7 @@ async def _async_postprocess_query_result(
     include_timestamps: bool = False,
     include_event_names: bool = False,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    convert_ints: types.Type | bool = False,
 ) -> spec.PolarsDataFrame:
 
     import polars as pl
@@ -165,15 +171,44 @@ async def _async_postprocess_query_result(
         to_drop = [column for column in encoded_columns if column in df]
         df = df.drop(to_drop)
 
-    return df
+    if convert_ints:
+        int_columns = df.select(pl.col(pl.Object)).columns
+        if isinstance(convert_ints, bool):
+            import numpy as np
 
-    # # convert to output format
-    # if output_format == 'dataframe':
-    #     return df
-    # elif output_format == 'dict':
-    #     return df.to_dicts()
-    # else:
-    #     raise Exception('unknown output format: ' + str(output_format))
+            converted = []
+            for column in int_columns:
+                as_array = np.array(df[column].to_list())
+                max_value = as_array.max()
+                min_value = as_array.min()
+                if max_value > 2 ** 32 - 1 and min_value < 2 ** 32 + 1:
+                    as_array = as_array.astype(float)
+                    dtype = pl.Float64
+                else:
+                    dtype = pl.Int64
+                converted.append(pl.Series(column, as_array, dtype=dtype))
+            df = df.with_columns(converted)
+        elif isinstance(convert_ints, pl.datatypes.DataTypeClass):
+            converted = []
+            for column in int_columns:
+                new_column = pl.Series(column, df[column].to_list(), dtype=convert_ints)
+                converted.append(new_column)
+            df = df.with_columns(converted)
+        elif isinstance(convert_ints, type):
+            return_dtypes = {
+                int: pl.datatypes.Int64,
+                float: pl.datatypes.Float64,
+            }
+            return_dtype = return_dtypes.get(convert_ints)
+            converted = [
+                df[column].apply(convert_ints, return_dtype=return_dtype)
+                for column in int_columns
+            ]
+            df = df.with_columns(converted)
+        else:
+            raise Exception('unknown format for convert ints')
+
+    return df
 
 
 async def _async_get_query_inputs(

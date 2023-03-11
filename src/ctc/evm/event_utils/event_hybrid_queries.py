@@ -128,6 +128,7 @@ async def _async_query_events_from_node_and_db(
     verbose: bool | int,
     columns_to_load: typing.Sequence[str],
     binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
+    max_blocks_per_request: int = 2000,
 ) -> spec.PolarsDataFrame:
 
     import polars as pl
@@ -187,6 +188,7 @@ async def _async_query_events_from_node_and_db(
             context=context,
             verbose=verbose,
             binary_output_format=binary_output_format,
+            max_blocks_per_request=max_blocks_per_request,
             **query,
         )
 

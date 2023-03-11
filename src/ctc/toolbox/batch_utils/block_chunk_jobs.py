@@ -11,7 +11,7 @@ from ctc import spec
 
 
 class BlockChunkJobs(toolbatch.Batch):
-    """split a block interval into chunks, one job for each chunk"""
+    """create jobs by splitting a block interval into chunks, one job for each chunk"""
 
     start_block: int
     end_block: int

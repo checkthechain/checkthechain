@@ -124,9 +124,11 @@ async def async_decode_events_dataframe(
     else:
         if column_prefix is None:
             column_prefix = ''
+    event_hashes = list(all_indexed_types.keys())
     schema = []
     used_names = []
-    for event_hash in all_indexed_types.keys():
+    offsets = [0]
+    for event_hash in event_hashes:
         types = all_indexed_types[event_hash] + all_unindexed_types[event_hash]
         names = all_indexed_names[event_hash] + all_unindexed_names[event_hash]
         if '{event_name}' in column_prefix:
@@ -147,6 +149,8 @@ async def async_decode_events_dataframe(
             pl_type = _abi_type_to_polars_dtype(abi_type)
             schema.append((name, pl_type))
             used_names.append(name)
+        offsets.append(len(schema))
+    event_hash_offsets = dict(zip(event_hashes, offsets))
 
     # create iterators for relevant columns
     if n_decode_topics >= 1:
@@ -171,7 +175,10 @@ async def async_decode_events_dataframe(
     ]
     for e, event_hash in enumerate(events['event_hash'].to_list()):
 
-        i = 0
+        i = event_hash_offsets[event_hash]
+
+        for c in range(i):
+            decoded_events[c].append(None)
 
         # decode indexed data
         indexed_types = all_indexed_types[event_hash]
@@ -191,7 +198,7 @@ async def async_decode_events_dataframe(
             i = i + 1
 
         # decode unindexed data
-        if len(unindexed_types) > 0:
+        if len(all_unindexed_types[event_hash]) > 0:
             unindexed_types = all_unindexed_types[event_hash]
             unindexed_names = all_unindexed_names[event_hash]
             unindexed_decoded = abi_coding_utils.abi_decode(
@@ -201,6 +208,9 @@ async def async_decode_events_dataframe(
             for value in unindexed_decoded:
                 decoded_events[i].append(value)
                 i = i + 1
+
+        for c in range(i, len(schema)):
+            decoded_events[c].append(None)
 
     # convert to dataframe
     decoded = pl.DataFrame(decoded_events, schema=schema, orient='col')
