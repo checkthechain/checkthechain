@@ -66,7 +66,7 @@ def decode_native_transfers(
         transfer_index = 0
         for tx_replay in block_replay:
             for trace in filter_failed_traces(tx_replay.trace):
-                transfer = native_transfers_from_call_trace(
+                transfer = native_transfer_from_call_trace(
                     trace,
                     block_number,
                     transfer_index,
@@ -91,7 +91,7 @@ def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
     return traces
 
 
-def native_transfers_from_call_trace(
+def native_transfer_from_call_trace(
     trace: CallTrace, block_number: int, transfer_index: int, tx_hash: str
 ) -> typing.Sequence[typing.Any] | None:
 
@@ -130,6 +130,5 @@ def native_transfers_from_call_trace(
         to_address,
         from_address,
         value,
-        trace.error,
     ]
 

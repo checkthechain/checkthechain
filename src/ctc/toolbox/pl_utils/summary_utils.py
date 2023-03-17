@@ -9,6 +9,16 @@ def set_column_display_width(width: int = 70) -> None:
     pl.Config.set_fmt_str_lengths(width)
 
 
+def get_glob_total_bytes(path_template: str) -> int:
+    import glob
+    import os
+
+    total_size = 0
+    for path in glob.glob(path_template):
+        total_size += os.path.getsize(path)
+    return total_size
+
+
 def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
 
     import toolstr

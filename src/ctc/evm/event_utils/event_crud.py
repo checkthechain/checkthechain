@@ -42,7 +42,7 @@ async def async_get_events(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
-    convert_ints: types.Type | bool = False,
+    convert_ints: type | bool = False,
     max_blocks_per_request: int = 2000,
 ) -> spec.PolarsDataFrame:
     """get events"""
@@ -123,7 +123,7 @@ async def _async_postprocess_query_result(
     include_timestamps: bool = False,
     include_event_names: bool = False,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
-    convert_ints: types.Type | bool = False,
+    convert_ints: type | bool = False,
 ) -> spec.PolarsDataFrame:
 
     import polars as pl
@@ -183,7 +183,7 @@ async def _async_postprocess_query_result(
                 min_value = as_array.min()
                 if max_value > 2 ** 32 - 1 and min_value < 2 ** 32 + 1:
                     as_array = as_array.astype(float)
-                    dtype = pl.Float64
+                    dtype: pl.datatypes.DataTypeClass = pl.Float64
                 else:
                     dtype = pl.Int64
                 converted.append(pl.Series(column, as_array, dtype=dtype))

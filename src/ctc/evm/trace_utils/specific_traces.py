@@ -31,9 +31,11 @@ async def async_trace_contract_creations(
     result = await asyncio.gather(*coroutines)
 
     create_traces: typing.Sequence[typing.Any] = [
-        dict(trace, block_number=block_number)  # type: ignore
+        trace
         for block_number, subresult in zip(blocks, result)
-        for trace in create_trace_decoder.decode_create_traces(subresult)
+        for trace in create_trace_decoder.decode_create_traces(
+            subresult, block_number=block_number
+        )
     ]
 
     return create_traces
@@ -70,4 +72,53 @@ async def async_trace_native_transfers(
     )
 
     return native_transfers
+
+
+async def async_trace_slot_stats(
+    start_block: spec.BlockNumberReference,
+    end_block: spec.BlockNumberReference,
+    *,
+    context: spec.Context = None,
+) -> spec.PolarsDataFrame:
+
+    # extract block replays from server
+    import asyncio
+    import polars as pl
+    import ctc.rpc
+    from ctc.rpc.rpc_decoders import slot_diff_decoder
+
+    block_numbers = list(range(start_block, end_block + 1))
+    coroutines = [
+        ctc.rpc.async_trace_replay_block_transactions(
+            block,
+            trace_type=['stateDiff'],
+            decode_response=False,
+            snake_case_response=False,
+            raw_output=True,
+            context=context,
+        )
+        for block in block_numbers
+    ]
+    responses = await asyncio.gather(*coroutines)
+
+    # parse into slots data
+    slot_data = slot_diff_decoder.decode_slot_stats(
+        raw_responses=responses,
+        block_numbers=block_numbers,
+    )
+    flat_slot_data = slot_diff_decoder.flatten_slots_data(slot_data)
+
+    # convert to dataframe
+    columns = [
+        ('contract_address', pl.datatypes.Utf8),
+        ('slot', pl.datatypes.Utf8),
+        ('value', pl.datatypes.Utf8),
+        ('first_nonzero_block', pl.datatypes.Int32),
+        ('last_zero_block', pl.datatypes.Int32),
+        ('last_updated_block', pl.datatypes.Int32),
+        ('n_tx_updates', pl.datatypes.Int32),
+    ]
+    df = pl.DataFrame(flat_slot_data, schema=columns)
+
+    return df
 

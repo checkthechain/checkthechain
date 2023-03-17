@@ -5,12 +5,12 @@ import typing
 
 import polars as pl
 import toolstr
-import toolbatch
+import tooljob
 
 from ctc import spec
 
 
-class BlockChunkJobs(toolbatch.Batch):
+class BlockChunkJobs(tooljob.Batch):
     """create jobs by splitting a block interval into chunks, one job for each chunk"""
 
     start_block: int
@@ -26,6 +26,8 @@ class BlockChunkJobs(toolbatch.Batch):
         context: spec.Context | None = None,
         **kwargs,
     ):
+        if end_block < start_block:
+            raise Exception('start_block must be less than end_block')
         self.start_block = start_block
         self.end_block = end_block
         self.chunk_size = chunk_size
@@ -40,7 +42,7 @@ class BlockChunkJobs(toolbatch.Batch):
         n_blocks = self.end_block - self.start_block + 1
         return math.floor(n_blocks / self.chunk_size)
 
-    def get_job_data(self, i: int) -> toolbatch.JobData:
+    def get_job_data(self, i: int) -> tooljob.JobData:
         n_jobs = self.get_n_jobs()
         if i < 0 or i >= n_jobs:
             raise Exception('job index too high, max is ' + str(n_jobs - 1))
@@ -56,7 +58,16 @@ class BlockChunkJobs(toolbatch.Batch):
     # # names
     #
 
-    def get_job_name(self, i: int) -> str:
+    def get_job_name(
+        self,
+        i: int,
+        *,
+        job_data: spec.JobData | None = None,
+    ) -> str:
+        if job_data is None:
+            if i is None:
+                raise Exception('must specify job_data or i')
+            job_data = self.get_job_data(i)
         return self.get_job_list_name() + '__' + self.get_block_range_str(i)
 
     def parse_job_name(self, name: str) -> typing.Mapping[str, typing.Any]:

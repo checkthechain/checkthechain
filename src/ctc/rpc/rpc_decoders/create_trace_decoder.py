@@ -47,7 +47,7 @@ decoder = msgspec.json.Decoder(RpcResult)
 #
 
 
-def decode_create_traces(raw_block_trace: str) -> typing.Sequence[CreateTrace]:
+def decode_create_traces(raw_block_trace: str, block_number: int) -> typing.Sequence[CreateTrace]:
 
     response = decoder.decode(raw_block_trace)
     call_traces = response.result
@@ -55,20 +55,27 @@ def decode_create_traces(raw_block_trace: str) -> typing.Sequence[CreateTrace]:
     create_traces: list[CreateTrace] = []
     for t, trace in enumerate(call_traces):
         if trace.type == 'create' and trace.result is not None:
-            create_trace = {
-                'transaction_hash': trace.transaction_hash,
-                'contract_address': trace.result.address,
-                'from': getattr(trace.action, 'from'),
-                'init_code': trace.action.init,
-                'code': trace.result.code,
-            }
 
+            # identify root trace for deployer
             d = t
             while call_traces[d].trace_address != []:
                 d = d - 1
                 if d < 0:
                     raise Exception('could not find deployer of trace')
-            create_trace['deployer'] = getattr(call_traces[d].action, 'from')
+
+            # create trace
+            create_trace = {
+                'block_number': block_number,
+                'create_index': len(create_traces),
+                'transaction_hash': trace.transaction_hash,
+                'contract_address': trace.result.address,
+                'deployer': getattr(call_traces[d].action, 'from'),
+                'factory': getattr(trace.action, 'from'),
+                'init_code': trace.action.init,
+                'code': trace.result.code,
+            }
+
             create_traces.append(create_trace)
+
     return create_traces
 

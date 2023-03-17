@@ -38,11 +38,11 @@ async def async_decode_events_dataframe(
 
     # package input abi's
     if isinstance(event_abis, dict):
-        abis = event_abis
+        abis: typing.MutableMapping[str, spec.EventABI] = event_abis
     elif event_abis is None:
         abis = {}
     elif isinstance(event_abis, list):
-        abis: typing.Mapping[str, spec.Event] = {}
+        abis = {}
         for event_abi in event_abis:
             event_hash = event_abi_parsing.get_event_hash(event_abi)
             abis[event_hash] = event_abi
@@ -77,7 +77,7 @@ async def async_decode_events_dataframe(
     # parse abi information
     all_indexed_types = {}
     all_indexed_names = {}
-    all_unindexed_types = {}
+    all_unindexed_types: typing.Mapping[str, list[str]] = {}
     all_unindexed_types = {}
     all_unindexed_names = {}
     all_names = []
@@ -170,7 +170,7 @@ async def async_decode_events_dataframe(
     topics = [topic1, topic2, topic3]
 
     # decode
-    decoded_events: typing.Sequence[typing.Sequence[typing.Any]] = [
+    decoded_events: typing.Sequence[typing.MutableSequence[typing.Any]] = [
         [] for i in range(len(schema))
     ]
     for e, event_hash in enumerate(events['event_hash'].to_list()):
