@@ -75,6 +75,6 @@ def raw_hex_columns_to_binary(
                 except Exception:
                     continue
     return df.with_columns(
-        [prefix_hex_series_to_binary(df[column]) for column in columns]
+        [raw_hex_series_to_binary(df[column]) for column in columns]
     )
 
