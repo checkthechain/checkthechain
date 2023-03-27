@@ -18,6 +18,9 @@ async def async_get_erc20_address(
 ) -> spec.ERC20Address:
     """return address of input token, input as either symbol or address"""
 
+    if isinstance(token, bytes):
+        token = binary_utils.binary_convert(token, 'prefix_hex')
+
     if address_utils.is_address_str(token):
         return token
     elif isinstance(token, str):
