@@ -147,10 +147,23 @@ async def async_eth_get_logs(
 
     else:
         response = await rpc_request.async_send(request, context=context)
-        return rpc_digestors.digest_eth_get_logs(
+        logs = rpc_digestors.digest_eth_get_logs(
             response=response,
             decode_response=decode_response,
             snake_case_response=snake_case_response,
             include_removed=include_removed,
         )
+        return [
+            (
+                log['block_number'],
+                log['transaction_index'],
+                log['log_index'],
+                log['transaction_hash'],
+                log['address'],
+                tuple(log['topics']),
+                log['data'],
+                log['block_hash'],
+            )
+            for log in logs
+        ]
 
