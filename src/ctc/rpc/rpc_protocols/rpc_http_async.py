@@ -23,6 +23,7 @@ async def async_send_http(
     session = get_async_http_session(provider=provider)
 
     headers = {'User-Agent': 'ctc'}
+    response = None
     for attempt in range(n_attempts):
 
         try:
@@ -47,18 +48,21 @@ async def async_send_http(
                 as_text = await response.text()
                 return as_text
         except Exception:
-
             # connection failure
             import asyncio
 
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.250)
 
     else:
+        if response is None:
+            status = 'None'
+        else:
+            status = response.status
         message = (
             'http rpc request failed after '
             + str(n_attempts)
             + ' retries, status_code = '
-            + str(response.status)
+            + str(status)
         )
         raise Exception(message)
 
@@ -105,6 +109,12 @@ async def async_close_http_session(
         if provider is None:
             raise Exception('no provider available')
         session = get_async_http_session(provider=provider)
+        session_keys = [key for key, value in _http_sessions.items() if id(session) == id(value)]
+        if len(session_keys) != 1:
+            raise Exception('unknown session')
+        else:
+            session_key = session_keys[0]
         await asyncio.sleep(0)
         await session.close()
+        del _http_sessions[session_key]
 
