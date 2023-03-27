@@ -157,8 +157,6 @@ async def _async_query_events_from_node_and_db(
     # TODO: query from db and node in parallel
 
     # send db queries to db
-    import time
-    start = time.time()
     for query in queries['db']:
         db_result = await db.async_query_events(
             context=context,
@@ -178,8 +176,6 @@ async def _async_query_events_from_node_and_db(
             db_result = pl_utils.binary_columns_to_prefix_hex(db_result)
 
         results[query['start_block']] = db_result
-    end_db = time.time()
-    print('db took', end_db - start)
 
     # send node queries to node
     for query in queries['node']:
@@ -211,8 +207,6 @@ async def _async_query_events_from_node_and_db(
             result = pl_utils.prefix_hex_columns_to_binary(result)
 
         results[query['start_block']] = result
-
-    print('node took', time.time() - end_db)
 
     sorted_results = [results[key] for key in sorted(results.keys())]
     events = pl.concat(sorted_results)

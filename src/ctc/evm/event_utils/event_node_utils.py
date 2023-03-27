@@ -167,8 +167,6 @@ async def _async_query_node_events_chunk(
         topics = [event_hash]
 
     # request from node
-    import time
-    start = time.time()
     coroutines = []
     for request_start, request_end in chunk_requests:
         coroutine = rpc.async_eth_get_logs(
@@ -180,8 +178,6 @@ async def _async_query_node_events_chunk(
         )
         coroutines.append(coroutine)
     results = await asyncio.gather(*coroutines)
-    end_node = time.time()
-    print('inner node took', end_node - start)
 
     # process raw events
     raw_logs = [event for result in results for event in result]
@@ -189,8 +185,6 @@ async def _async_query_node_events_chunk(
         log[:5] + log[5] + ((None,) * (4 - len(log[5]))) + (log[6],)
         for log in raw_logs
     ]
-    end_process = time.time()
-    print('inner process took', end_process - end_node)
 
     # write encoded events to database
     read_cache, write_cache = config.get_context_cache_read_write(
@@ -223,8 +217,6 @@ async def _async_query_node_events_chunk(
             context=context,
             latest_block=latest_block_number,
         )
-    end_write = time.time()
-    print('inner db write took', end_write - end_process)
 
     return encoded_events
 
