@@ -10,6 +10,7 @@ from . import erc20_metadata
 from . import erc20_spec
 
 if typing.TYPE_CHECKING:
+    import polars as pl
     import tooltime
 
 
@@ -126,4 +127,77 @@ async def async_get_erc20_balances_from_transfers(
     balances.index.name = 'address'
 
     return balances
+
+
+def _decode_erc20_transfers(transfers: pl.DataFrame) -> pl.DataFrame:
+
+    import polars as pl
+    from ctc.toolbox import pl_utils
+
+    # filter ERC721 based on whether topic3 is indexed
+    decoded = transfers.filter(pl.col('topic3').is_null())
+
+    # filter transfers that do not conform to ERC20 specification
+    decoded = decoded.filter(
+        (~pl.col('topic1').is_null()) & (~pl.col('topic2').is_null())
+    )
+
+    if len(decoded) == 0:
+        return pl.DataFrame(
+            [],
+            schema={
+                'block_number': pl.Int64,
+                'transaction_index': pl.Int64,
+                'log_index': pl.Int64,
+                'transaction_hash': pl.Binary,
+                'contract_address': pl.Binary,
+                'from': pl.Binary,
+                'to': pl.Binary,
+                'value_binary': pl.Binary,
+                'value_float': pl.Float64,
+            },
+        )
+
+    # drop extra columns
+    decoded = decoded.drop(['event_hash', 'topic3'])
+
+    # slice topic1 and topic2 to address width
+    decoded = decoded.with_columns(
+        '0x' + decoded['topic1'].str.slice(-40),
+        '0x' + decoded['topic2'].str.slice(-40),
+    )
+
+    # strip zeros on unindexed data
+    decoded = decoded.with_columns(
+        pl.when(pl.col('unindexed').str.lstrip('0x').str.lengths() % 2 == 0)
+        .then(pl.col('unindexed').str.lstrip('0x'))
+        .otherwise('0' + pl.col('unindexed').str.lstrip('0x'))
+    )
+
+    # create value_float column
+    decoded = decoded.with_columns(
+        decoded['unindexed']
+        .apply(lambda x: 0.0 if x == '' else float(int(x, 16)))
+        .alias('value_float')
+    )
+
+    # convert binary fields
+    decoded = pl_utils.prefix_hex_columns_to_binary(
+        decoded,
+        columns=['transaction_hash', 'contract_address', 'topic1', 'topic2'],
+    )
+    decoded = pl_utils.raw_hex_columns_to_binary(
+        decoded,
+        columns=['unindexed'],
+    )
+
+    # rename according to ERC20 conventions
+    rename = {
+        'topic1': 'from',
+        'topic2': 'to',
+        'unindexed': 'value_binary',
+    }
+    decoded = decoded.rename(rename)
+
+    return decoded
 
