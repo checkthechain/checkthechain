@@ -102,7 +102,10 @@ async def async_call_all_command(
                 clipped = True
             else:
                 clipped = False
-            str_result = json.dumps(result, sort_keys=True, indent=2)
+            try:
+                str_result = json.dumps(result, sort_keys=True, indent=2)
+            except TypeError:
+                str_result = str(result)
             if clipped:
                 str_result = str_result[: str_result.rindex('\n')]
                 str_result = str_result + ',\n...'
