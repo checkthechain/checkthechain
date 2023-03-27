@@ -85,6 +85,15 @@ async def async_send(
         if len(request) == 0:
             return []
 
+        if provider.get('disable_batch_requests'):
+            import asyncio
+
+            coroutines = [
+                async_send(subrequest, context=context, raw_output=raw_output)
+                for subrequest in request
+            ]
+            return await asyncio.gather(*coroutines)
+
         # chunk request
         request_chunks = _chunk_request(request=request, provider=provider)
 

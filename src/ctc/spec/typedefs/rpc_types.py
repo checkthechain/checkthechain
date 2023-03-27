@@ -64,6 +64,7 @@ class PartialProvider(TypedDict, total=False):
     session_kwargs: typing.Mapping[str, typing.Any] | None
     chunk_size: int | None
     convert_reverts_to_none: bool
+    disable_batch_requests: bool
 
 
 class Provider(TypedDict, total=True):
@@ -76,6 +77,7 @@ class Provider(TypedDict, total=True):
     session_kwargs: typing.Mapping[str, typing.Any] | None
     chunk_size: int | None
     convert_reverts_to_none: bool
+    disable_batch_requests: bool
 
 
 ProviderReference = typing.Union[ProviderShortcut, PartialProvider, Provider]

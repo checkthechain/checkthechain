@@ -48,6 +48,7 @@ def create_provider(
     chunk_size: int | None = None,
     convert_reverts_to_none: bool = True,
     validate_chain_id: bool = True,
+    disable_batch_requests: bool = False,
     other_providers: typing.Mapping[str, spec.Provider] | None = None,
 ) -> spec.Provider:
     """create provider"""
@@ -133,6 +134,7 @@ def create_provider(
         'session_kwargs': session_kwargs,
         'chunk_size': chunk_size,
         'convert_reverts_to_none': convert_reverts_to_none,
+        'disable_batch_requests': disable_batch_requests,
     }
 
     return provider
