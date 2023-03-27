@@ -169,7 +169,12 @@ def initialize_schema(
 
     # create tables
     for table_name, table_schema in schema['tables'].items():
-        toolsql.create_table(table_schema, conn=conn, confirm=True)
+        toolsql.create_table(
+            table_schema,
+            conn=conn,
+            if_not_exists=True,
+            confirm=True,
+        )
 
     version_utils.set_schema_version(
         schema_name=schema_name,
