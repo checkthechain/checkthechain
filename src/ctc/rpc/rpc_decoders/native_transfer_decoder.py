@@ -37,8 +37,9 @@ class CallTrace(msgspec.Struct):
     type: str
     action: CallAction  # type: ignore
     subtraces: int
+    trace_address: typing.Sequence[int]
     result: typing.Optional[CallResult] = None  # type: ignore
-    error: typing.Optional[str] = None
+    error: typing.Union[str, None] = None
 
 
 class TransactionReplay(msgspec.Struct, rename='camel'):
@@ -80,15 +81,38 @@ def decode_native_transfers(
 
 
 def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
-    i = 0
-    while i < len(traces):
-        if traces[i].error is not None:
-            n_skip = 1 + traces[i].subtraces
-            i_skip = i + n_skip
-            traces = traces[:i] + traces[i_skip:]
+
+    keep = []
+    in_error = False
+    error_address = None
+    for t, trace in enumerate(traces):
+
+        # restart fro each transaction
+        if trace.trace_address == []:
+            in_error = False
+            error_address = None
+
+        # if in an error, check if next trace is still in error
+        if in_error:
+            if (
+                len(trace.trace_address) >= len(error_address)
+                and trace.trace_address[: len(error_address)] == error_address
+            ):
+                keep.append(False)
+                continue
+            else:
+                in_error = False
+                error_address = None
+
+        # check if current trace is start of an error
+        if trace.error not in [None, '', 'None']:
+            in_error = True
+            error_address = trace.trace_address
+            keep.append(False)
         else:
-            i = i + 1
-    return traces
+            keep.append(True)
+
+    return [trace for trace, keep_trace in zip(traces, keep) if keep_trace]
 
 
 def native_transfer_from_call_trace(

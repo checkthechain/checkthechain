@@ -30,9 +30,11 @@ CreateResult = msgspec.defstruct(
 class CreateTrace(msgspec.Struct, omit_defaults=True, rename='camel'):
     type: str
     trace_address: list[int]
+    subtraces: int
     action: typing.Optional[CreateAction] = None  # type: ignore
     result: typing.Optional[CreateResult] = None  # type: ignore
     transaction_hash: typing.Optional[str] = None
+    error: typing.Optional[str] = None
 
 
 class RpcResult(msgspec.Struct):
@@ -51,6 +53,9 @@ def decode_create_traces(raw_block_trace: str, block_number: int) -> typing.Sequ
 
     response = decoder.decode(raw_block_trace)
     call_traces = response.result
+
+    from . import native_transfer_decoder
+    call_traces = native_transfer_decoder.filter_failed_traces(call_traces)
 
     create_traces: list[CreateTrace] = []
     for t, trace in enumerate(call_traces):
