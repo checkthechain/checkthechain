@@ -55,13 +55,17 @@ async def async_select_timestamp_block(
         table = schema_utils.get_table_schema(
             'block_timestamps', context=context
         )
-        block_number: int = await toolsql.async_select(
+        block_numbers: typing.Sequence[int] = await toolsql.async_select(
             conn=conn,
             table=table,
             columns=['block_number'],
-            output_format='cell',
+            output_format='single_column',
             **query,
         )
+        if block_numbers is not None and len(block_numbers) > 0:
+            block_number = block_numbers[0]
+        else:
+            block_number = None
     elif timestamp_schema == 'blocks':
         raise NotImplementedError()
     else:
