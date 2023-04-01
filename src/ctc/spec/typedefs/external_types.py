@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from typing import Literal
 
 
 if typing.TYPE_CHECKING:
@@ -15,6 +16,12 @@ if typing.TYPE_CHECKING:
     PandasIndex = pd.core.indexes.base.Index
     DType = numpy.typing.DTypeLike
     NumpyArray = numpy.typing.NDArray  # type: ignore
+
+    IntegerOutputFormatScalar = Literal[int, object, pl.datatypes.DataTypeClass]
+    IntegerOutputFormat = typing.Union[
+        IntegerOutputFormatScalar,
+        typing.Mapping[str, IntegerOutputFormatScalar],
+    ]
 
 else:
 

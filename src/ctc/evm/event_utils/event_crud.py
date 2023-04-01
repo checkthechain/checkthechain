@@ -10,7 +10,6 @@ from . import event_metadata
 from . import event_query_utils
 
 if typing.TYPE_CHECKING:
-    import types
     import tooltime
 
     from typing_extensions import Literal
@@ -40,6 +39,7 @@ async def async_get_events(
     include_timestamps: bool = False,
     include_event_names: bool = False,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    integer_output_format: spec.IntegerOutputFormat | None = None,
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
     convert_ints: type | bool = False,
@@ -107,6 +107,7 @@ async def async_get_events(
         include_timestamps=include_timestamps,
         include_event_names=include_event_names,
         binary_output_format=binary_output_format,
+        integer_output_format=integer_output_format,
         convert_ints=convert_ints,
     )
 
@@ -123,6 +124,7 @@ async def _async_postprocess_query_result(
     include_timestamps: bool = False,
     include_event_names: bool = False,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    integer_output_format: spec.IntegerOutputFormat | None = None,
     convert_ints: type | bool = False,
 ) -> spec.PolarsDataFrame:
 
@@ -165,6 +167,7 @@ async def _async_postprocess_query_result(
             event_abis=([event_abi] if event_abi is not None else None),
             context=context,
             binary_output_format=binary_output_format,
+            integer_output_format=integer_output_format,
         )
         df = df.with_columns(decoded)
         encoded_columns = ['topic1', 'topic2', 'topic3', 'unindexed']

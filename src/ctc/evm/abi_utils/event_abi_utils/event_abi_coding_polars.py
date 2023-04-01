@@ -23,6 +23,7 @@ async def async_decode_events_dataframe(
     | None = None,
     column_prefix: str | None = None,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    integer_output_format: spec.IntegerOutputFormat | None = None,
 ) -> spec.PolarsDataFrame:
     """
 
@@ -143,10 +144,15 @@ async def async_decode_events_dataframe(
         else:
             used_column_prefix = column_prefix.format(event_hash=event_hash)
         for abi_type, name in zip(types, names):
+            pl_type = _abi_type_to_polars_dtype(
+                abi_type,
+                name=name,
+                integer_output_format=integer_output_format,
+            )
             name = used_column_prefix + name
             if name in used_names:
                 raise Exception('naming conflict ' + str(name))
-            pl_type = _abi_type_to_polars_dtype(abi_type)
+
             schema.append((name, pl_type))
             used_names.append(name)
         offsets.append(len(schema))
@@ -222,8 +228,25 @@ async def async_decode_events_dataframe(
     return decoded
 
 
-def _abi_type_to_polars_dtype(abi_type: str) -> pl.datatypes.DataTypeClass:
+def _abi_type_to_polars_dtype(
+    abi_type: str,
+    name: str,
+    integer_output_format: spec.IntegerOutputFormat | None = None,
+) -> pl.datatypes.DataTypeClass:
     import polars as pl
+
+    if (
+        (abi_type.startswith('int') or abi_type.startswith('uint'))
+        and integer_output_format is not None
+    ):
+        if isinstance(integer_output_format, dict) and name in integer_output_format:
+            return integer_output_format[name]
+        elif integer_output_format == int:
+            return int
+        elif integer_output_format == object:
+            return pl.Object
+        elif isinstance(integer_output_format, pl.datatypes.DataTypeClass):
+            return integer_output_format
 
     if abi_type == 'bool':
         return pl.datatypes.Boolean
