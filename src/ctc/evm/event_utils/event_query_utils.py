@@ -3,8 +3,6 @@ from __future__ import annotations
 import typing
 from typing_extensions import Literal
 
-import toolsql
-
 if typing.TYPE_CHECKING:
     import polars as pl
 
@@ -184,6 +182,8 @@ async def async_scrub_db_queries(
     context: spec.Context,
 ) -> None:
     """join contiguous and overlapping event query records together"""
+
+    import toolsql
 
     from ctc import db
     from ctc.toolbox import range_utils
