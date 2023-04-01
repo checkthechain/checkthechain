@@ -13,6 +13,7 @@ from . import feed_datum
 
 if typing.TYPE_CHECKING:
     import tooltime
+    import polars as pl
 
 
 async def async_get_full_feed_event_data(
@@ -25,14 +26,14 @@ async def async_get_full_feed_event_data(
     normalize: bool = True,
     interpolate: bool = False,
     context: spec.Context = None,
-    keep_multiindex: bool = False,
     invert: bool = False,
-) -> spec.DataFrame:
+) -> pl.DataFrame:
     """
     TODO: be able to gather data across multiple aggregator changes
     """
-    import pandas as pd
-    from ctc.toolbox import pd_utils
+
+    from ctc.toolbox import pl_utils
+    import polars as pl
 
     # get feed address
     feed = await chainlink_feed_metadata.async_resolve_feed_address(
@@ -109,12 +110,14 @@ async def async_get_full_feed_event_data(
                 end_block=use_end,
                 verbose=False,
                 context=context,
+                integer_output_format={'updatedAt': int},
             )
             coroutines.append(coroutine)
         results = await asyncio.gather(*coroutines)
-        df: spec.DataFrame = pd.concat(results)
+        df: pl.DataFrame = pl_utils.concat(results)
 
     else:
+
         df = await evm.async_get_events(
             contract_address=aggregator_address,
             event_abi=chainlink_spec.aggregator_event_abis['AnswerUpdated'],
@@ -131,11 +134,10 @@ async def async_get_full_feed_event_data(
         'arg__roundId': 'round_id',
     }
     df = df.rename(new_columns)
-    df = df[['answer', 'timestamp', 'round_id']]
+    df = df[['block_number', 'answer', 'timestamp', 'round_id']]
 
     # normalize
     if normalize:
-        import polars as pl
         import numpy as np
 
         decimals = await chainlink_feed_metadata.async_get_feed_decimals(
@@ -151,10 +153,6 @@ async def async_get_full_feed_event_data(
     # interpolate
     if interpolate:
 
-        if keep_multiindex:
-            raise Exception('cannot use keep_multiindex and interpolate')
-        df.index = pd_utils.keep_level(df.index, level='block_number')  # type: ignore
-
         # TODO: better detection of initial feed data point
         first_feed_block = (
             await chainlink_feed_metadata.async_get_feed_first_block(
@@ -167,8 +165,6 @@ async def async_get_full_feed_event_data(
 
             # add initial data
             if start_block < df.index.values[0]:
-                import pandas as pd
-
                 initial_data = await feed_datum.async_get_feed_datum(
                     feed=feed,
                     block=start_block,
@@ -176,13 +172,15 @@ async def async_get_full_feed_event_data(
                     fields='full',
                     context=context,
                 )
-                initial_df = pd.DataFrame(initial_data, index=[start_block])
-                df = pd.concat([initial_df, df])
+                initial_df = pl.DataFrame(initial_data)
+                df = pl_utils.concat([initial_df, df])
 
         end_block = await evm.async_block_number_to_int(
             end_block, context=context
         )
-        df = pd_utils.interpolate_dataframe(df, end_index=end_block)
+        df = pl_utils.interpolate_dataframe(
+            df, index_column='block_number', end_index=end_block
+        )
 
     if invert:
         df = df.with_columns(1 / df['answer'])
@@ -199,7 +197,6 @@ async def async_get_answer_feed_event_data(
     end_time: tooltime.Timestamp | None = None,
     normalize: bool = True,
     interpolate: bool = False,
-    keep_multiindex: bool = False,
     invert: bool = False,
     context: spec.Context = None,
 ) -> spec.Series:
@@ -213,9 +210,8 @@ async def async_get_answer_feed_event_data(
         normalize=normalize,
         interpolate=interpolate,
         context=context,
-        keep_multiindex=keep_multiindex,
         invert=invert,
     )
 
-    return df['answer']
+    return df[['block_number', 'answer']]
 

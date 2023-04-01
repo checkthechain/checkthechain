@@ -8,6 +8,9 @@ from ctc import evm
 from .. import chainlink_spec
 from . import feed_datum
 
+if typing.TYPE_CHECKING:
+    import polars as pl
+
 
 async def async_get_feed_answer_datum_by_block(
     feed: chainlink_spec._FeedReference,
@@ -17,10 +20,10 @@ async def async_get_feed_answer_datum_by_block(
     normalize: bool = True,
     interpolate: bool = True,
     invert: bool = False,
-) -> spec.Series:
+) -> pl.DataFrame:
     import asyncio
-    import pandas as pd
-    from ctc.toolbox import pd_utils
+    from ctc.toolbox import pl_utils
+    import polars as pl
 
     int_blocks = await evm.async_block_numbers_to_int(
         blocks=blocks, context=context
@@ -41,11 +44,11 @@ async def async_get_feed_answer_datum_by_block(
     result = await asyncio.gather(*coroutines)
 
     # create series
-    series = pd.Series(data=result, index=int_blocks)  # type: ignore
+    df = pl.DataFrame({'block_number': int_blocks, 'answer': result})
 
     # interpolate blocks
     if interpolate:
-        series = pd_utils.interpolate_series(series=series)
+        series = pl_utils.interpolate(df, index_column='block_number')
 
     if typing.TYPE_CHECKING:
         return typing.cast(spec.Series, series)
@@ -63,8 +66,8 @@ async def async_get_feed_full_datum_by_block(
     invert: bool = False,
 ) -> spec.DataFrame:
     import asyncio
-    import pandas as pd
-    from ctc.toolbox import pd_utils
+    import polars as pl
+    from ctc.toolbox import pl_utils
 
     int_blocks = await evm.async_block_numbers_to_int(
         blocks=blocks, context=context
@@ -85,11 +88,11 @@ async def async_get_feed_full_datum_by_block(
     result = await asyncio.gather(*coroutines)
 
     # create series
-    df: spec.DataFrame = pd.DataFrame(result, index=int_blocks)  # type: ignore
+    df = pl.DataFrame({'block_number': int_blocks, 'answer': result})
 
     # interpolate blocks
     if interpolate:
-        df = pd_utils.interpolate_dataframe(df=df)
+        df = pl_utils.interpolate(df, index_column='block_number')
 
     return df
 
