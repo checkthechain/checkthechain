@@ -16,6 +16,8 @@ async def async_get_all_safes(
     context: spec.Context = None,
 ) -> typing.Sequence[safe_spec.GnosisSafeCreation]:
 
+    import polars as pl
+
     safes__1_1, safes__1_3 = await asyncio.gather(
         async_get_all_safes__1_1(
             start_block=start_block, end_block=end_block, context=context
@@ -25,7 +27,7 @@ async def async_get_all_safes(
         ),
     )
 
-    return [item for safes in [safes__1_1, safes__1_3] for item in safes]
+    return pl.concat([safes__1_1, safes__1_3])
 
 
 async def async_get_all_safes__1_1(
@@ -35,6 +37,8 @@ async def async_get_all_safes__1_1(
     end_block: spec.BlockReference | None = None,
     context: spec.Context | None = None,
 ) -> typing.Sequence[safe_spec.GnosisSafeCreation]:
+
+    import polars as pl
 
     chain_id = config.get_context_chain_id(context)
     if factory is None:
@@ -54,10 +58,8 @@ async def async_get_all_safes__1_1(
         event_name='ProxyCreation',
         start_block=start_block,
         end_block=end_block,
-        keep_multiindex=False,
         context=context,
     )
-    df = df.reset_index()
     old_columns = [
         'arg__proxy',
         'contract_address',
@@ -68,17 +70,18 @@ async def async_get_all_safes__1_1(
 
     if chain_id not in safe_spec.deployments:
         raise Exception('safe 1.1.1 deployment unknown for ' + str(chain_id))
-    df['implementation'] = safe_spec.deployments[chain_id]['safe__1.1.1']
-
-    df['version'] = '1.1'
+    df = df.with_columns(
+        pl.lit(safe_spec.deployments[chain_id]['safe__1.1.1']).alias('implementation'),
+        pl.lit('1.1').alias('version'),
+    )
     new_columns = {
         'arg__proxy': 'address',
         'contract_address': 'factory',
         'block_number': 'creation_block',
         'transaction_hash': 'creation_transaction',
     }
-    df = df.rename(columns=new_columns)
-    return df.to_dict(orient='records')  # type: ignore
+    df = df.rename(new_columns)
+    return df
 
 
 async def async_get_all_safes__1_3(
@@ -88,6 +91,8 @@ async def async_get_all_safes__1_3(
     end_block: spec.BlockReference | None = None,
     context: spec.Context = None,
 ) -> typing.Sequence[safe_spec.GnosisSafeCreation]:
+
+    import polars as pl
 
     if factory is None:
         chain_id = config.get_context_chain_id(context)
@@ -107,10 +112,8 @@ async def async_get_all_safes__1_3(
         event_name='ProxyCreation',
         start_block=start_block,
         end_block=end_block,
-        keep_multiindex=False,
         context=context,
     )
-    df = df.reset_index()
     old_columns = [
         'arg__proxy',
         'contract_address',
@@ -119,7 +122,9 @@ async def async_get_all_safes__1_3(
         'arg__singleton',
     ]
     df = df[old_columns]
-    df['version'] = '1.3'
+    df = df.with_columns(
+        pl.lit('1.3').alias('version'),
+    )
     new_columns = {
         'arg__proxy': 'address',
         'contract_address': 'factory',
@@ -127,6 +132,6 @@ async def async_get_all_safes__1_3(
         'transaction_hash': 'creation_transaction',
         'arg__singleton': 'implementation',
     }
-    df = df.rename(columns=new_columns)
-    return df.to_dict(orient='records')  # type: ignore
+    df = df.rename(new_columns)
+    return df
 

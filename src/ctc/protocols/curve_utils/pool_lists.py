@@ -266,7 +266,7 @@ async def async_get_base_pools(
     context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
-    import pandas as pd
+    from ctc.toolbox import pl_utils
 
     start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
@@ -305,16 +305,18 @@ async def async_get_base_pools(
         coroutines.append(coroutine)
     dfs = await asyncio.gather(*coroutines)
 
-    if typing.TYPE_CHECKING:
-        events = typing.cast(spec.DataFrame, pd.concat(dfs))
+    # TODO: add event args to empty dataframes
+    non_empty_dfs = [df for df in dfs if len(df) > 0]
+    if len(non_empty_dfs) > 0:
+        events = pl_utils.concat(non_empty_dfs)
     else:
-        events = pd.concat(dfs)
+        events = dfs[0]
 
     # format data
-    events = events.sort_index()
-    events = events[['contract_address', 'transaction_hash', 'arg__base_pool']]
+    events = events.sort('block_number')
+    events = events[['block_number', 'transaction_index', 'log_index', 'contract_address', 'transaction_hash', 'arg__base_pool']]
     events = events.rename(
-        columns={
+        {
             'contract_address': 'factory',
             'arg__base_pool': 'pool',
         }
@@ -361,7 +363,7 @@ async def async_get_plain_pools(
         ]
     ]
     events = events.rename(
-        columns={
+        {
             'contract_address': 'factory',
             'arg__coins': 'coins',
             'arg__A': 'A',
@@ -383,7 +385,7 @@ async def async_get_meta_pools(
     verbose: bool = False,
 ) -> spec.DataFrame:
 
-    import pandas as pd
+    from ctc.toolbox import pl_utils
 
     if factory is None:
         factory = pool_factory
@@ -421,15 +423,20 @@ async def async_get_meta_pools(
         coroutines.append(coroutine)
     dfs = await asyncio.gather(*coroutines)
 
-    if typing.TYPE_CHECKING:
-        events = typing.cast(spec.DataFrame, pd.concat(dfs))
+    # TODO: add empty args to dataframes
+    non_empty_dfs = [df for df in dfs if len(df) > 0]
+    if len(non_empty_dfs) > 0:
+        events = pl_utils.concat(non_empty_dfs)
     else:
-        events = pd.concat(dfs)
+        events = dfs[0]
 
     # format data
-    events = events.sort_index()
+    events = events.sort('block_number')
     events = events[
         [
+            'block_number',
+            'transaction_index',
+            'log_index',
             'transaction_hash',
             'contract_address',
             'arg__coin',
@@ -440,7 +447,7 @@ async def async_get_meta_pools(
         ]
     ]
     events = events.rename(
-        columns={
+        {
             'contract_address': 'factory',
             'arg__coin': 'coin',
             'arg__base_pool': 'base_pool',
