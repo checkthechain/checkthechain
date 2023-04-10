@@ -15,6 +15,12 @@ def get_context_chain_id(context: spec.Context) -> spec.ChainId:
     return chain_id
 
 
+def get_context_network_name(context: spec.Context) -> spec.ChainId:
+    """get network_name of a given context"""
+    chain_id = get_context_chain_id(context)
+    return evm.get_network_name(chain_id)
+
+
 def get_context_provider(context: spec.Context) -> spec.Provider | None:
     """get provider of a given context"""
 
