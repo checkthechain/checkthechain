@@ -155,9 +155,9 @@ def get_color_theme_name() -> str:
 def _is_jupyter_notebook() -> bool:
     """adapted from https://gist.github.com/thomasaarholt/e5e2da71ea3ee412616b27d364e3ae82"""
     try:
-        from IPython import get_ipython  # type: ignore
+        from IPython import get_ipython
 
-        if 'IPKernelApp' not in get_ipython().config:
+        if 'IPKernelApp' not in get_ipython().config:  # type: ignore
             raise ImportError("console")
             return False
         if 'VSCODE_PID' in os.environ:
