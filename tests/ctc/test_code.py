@@ -240,7 +240,6 @@ def test_max_positional_args():
 
     max_positional_args = 2
     allowed_exceptions = [
-        'ctc.toolbox.pd_utils.pandas_bin_utils.bin_data',
         'ctc.toolbox.chunk_utils.range_to_chunks',
     ]
 
