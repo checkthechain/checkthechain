@@ -18,6 +18,9 @@ def interpolate(
 
     index = df[index_column]
 
+    # remove redundant rows wrt index_column
+    df = df.filter(pl.col(index_column).cumcount().over(index_column) == 0)
+
     # validate index
     if index.dtype not in [pl.Int8, pl.Int16, pl.Int32, pl.Int64]:
         raise Exception('index must be an integer column')
@@ -42,7 +45,10 @@ def interpolate(
         initial_values[index_column] = [start_index]
         for column in df.columns:
             if column not in initial_values and column != index_column:
-                initial_values[column] = None
+                if df[column].dtype == pl.Object:
+                    initial_values[column] = [None for i in range(len(df))]
+                else:
+                    initial_values[column] = None
         initial_df = pl.DataFrame(initial_values, schema=df.schema)
         new_index = range(start_index + 1, end_index + 1)
     else:
@@ -55,6 +61,14 @@ def interpolate(
         pl.DataFrame(pl.Series(index_column, new_index))
         .filter(~pl.col(index_column).is_in(df[index_column]))[index_column]
     )
+    for column in df.columns:
+        if (
+            (pre_fill_values is None or column not in pre_fill_values)
+            and df[column].dtype == pl.Object
+        ):
+            new_data[column] = [
+                None for i in range(len(new_data[index_column]))
+            ]
     new_df = pl.DataFrame(new_data, schema=df.schema)
 
     # concat, sort, and fill
