@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import decimal
 
-from ctc.toolbox import validate_utils
 from . import cpmm_spec
 
 
@@ -36,10 +35,15 @@ def trade(
     # validate inputs
     if fee_rate is None:
         fee_rate = 0.003
-    value = validate_utils._ensure_exactly_one(
-        x_sold, x_bought, y_sold, y_bought, new_x_reserves, new_y_reserves
-    )
-    validate_utils._ensure_non_negative(value)
+    if sum([
+        x_sold is not None,
+        x_bought is not None,
+        y_sold is not None,
+        y_bought is not None,
+        new_x_reserves is not None,
+        new_y_reserves is not None,
+    ]) != 1:
+        raise Exception('must specify only one input value')
 
     kwargs = {
         'x_reserves': x_reserves,
@@ -53,21 +57,18 @@ def trade(
     }
 
     if x_sold is not None:
-
         # case: sell x for y, x specified
         x_bought = -x_sold
         y_bought = compute_y_bought_when_x_sold(x_sold=x_sold, **kwargs)
         y_sold = -y_bought
 
     elif y_sold is not None:
-
         # case: sell y for x, y specified
         y_bought = -y_sold
         x_bought = compute_y_bought_when_x_sold(x_sold=y_sold, **reverse_kwargs)
         x_sold = -x_bought
 
     elif x_bought is not None:
-
         # case: sell y for x, x specified
         x_sold = -x_bought
         y_sold = compute_x_sold_when_y_bought(
@@ -76,7 +77,6 @@ def trade(
         y_bought = -y_sold
 
     elif y_bought is not None:
-
         # case: sell y for x, x specified
         y_sold = -y_bought
         x_sold = compute_x_sold_when_y_bought(y_bought=y_bought, **kwargs)
@@ -110,9 +110,7 @@ def trade_to_target_reserves(
 
     # convert reserve targets to bought or sold amounts
     if new_x_reserves is not None:
-        if validate_utils._ensure_positive(
-            x_reserves - new_x_reserves, error=False
-        ):
+        if x_reserves - new_x_reserves > 0:
             x_bought = x_reserves - new_x_reserves
             return trade(
                 x_bought=x_bought,
@@ -129,9 +127,7 @@ def trade_to_target_reserves(
                 fee_rate=fee_rate,
             )
     elif new_y_reserves is not None:
-        if validate_utils._ensure_positive(
-            y_reserves - new_y_reserves, error=False
-        ):
+        if y_reserves - new_y_reserves > 0:
             y_bought = y_reserves - new_y_reserves
             return trade(
                 y_bought=y_bought,
@@ -161,13 +157,16 @@ def trade_to_price(
 ) -> cpmm_spec.Trade:
     """compute trade required to reach specific price"""
 
-    validate_utils._ensure_exactly_one(new_x_per_y, new_y_per_x)
+    if (new_x_per_y is not None and new_y_per_x is not None) or (
+        new_x_per_y is None and new_y_per_x is None
+    ):
+        raise Exception('must specify either new_x_per_y or new_y_per_x')
 
     # convert prices to x per y
     if new_x_per_y is None:
         if new_y_per_x is None:
             raise Exception('must specify x_per_y or y_per_x')
-        new_x_per_y = new_y_per_x ** -1
+        new_x_per_y = new_y_per_x**-1
 
     # compute trades
     if new_x_per_y >= x_reserves / y_reserves:
@@ -187,7 +186,7 @@ def trade_to_price(
     else:
         # case: sell y to decrease x per y
         y_sold = compute_x_sold_to_reach_price(
-            new_x_per_y=(new_x_per_y ** -1),
+            new_x_per_y=(new_x_per_y**-1),
             x_reserves=y_reserves,
             y_reserves=x_reserves,
             fee_rate=fee_rate,
@@ -219,7 +218,7 @@ def compute_x_sold_to_reach_price(
     if isinstance(gamma, decimal.Decimal):
         alpha = alpha.sqrt()
     else:
-        alpha = alpha ** 0.5
+        alpha = alpha**0.5
     alpha = alpha - gamma - 1
     alpha = alpha / 2 / gamma
     x_sold = alpha * x_reserves
@@ -236,7 +235,8 @@ def compute_y_bought_when_x_sold(
     """compute amount of y bought when selling x_sold amount of x"""
     if fee_rate is None:
         fee_rate = 0.003
-    validate_utils._ensure_non_negative(x_sold)
+    if x_sold < 0:
+        raise Exception('x_sold must be non-negative')
     alpha = x_sold / x_reserves
     gamma = 1 - fee_rate
     y_bought = alpha * gamma / (1 + alpha * gamma) * y_reserves
@@ -253,8 +253,10 @@ def compute_x_sold_when_y_bought(
     """compute amount of x that must be sold to buy y_bought amount of y"""
     if fee_rate is None:
         fee_rate = 0.003
-    validate_utils._ensure_non_negative(y_bought)
+    if y_bought < 0:
+        raise Exception('y_bought must be non-negative')
     beta = y_bought / y_reserves
     gamma = 1 - fee_rate
     x_sold = beta / (1 - beta) / gamma * x_reserves
     return x_sold
+

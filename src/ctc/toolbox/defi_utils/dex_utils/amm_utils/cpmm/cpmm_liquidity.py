@@ -3,7 +3,6 @@ from __future__ import annotations
 import decimal
 import math
 
-from ctc.toolbox import validate_utils
 from . import cpmm_spec
 
 
@@ -16,9 +15,16 @@ def mint_liquidity(
     y_deposited: int | float | None = None,
     lp_minted: int | float | None = None,
 ) -> cpmm_spec.Mint:
-
     # validate inputs
-    validate_utils._ensure_exactly_one(x_deposited, y_deposited, lp_minted)
+    non_none_inputs = [
+        x_deposited is not None,
+        y_deposited is not None,
+        lp_minted is not None,
+    ]
+    if sum(non_none_inputs) != 1:
+        raise Exception(
+            'must specify one of x_deposited, y_deposited, lp_minted'
+        )
 
     # compute alpha
     if x_deposited is not None:
@@ -60,9 +66,16 @@ def burn_liquidity(
     y_withdrawn: int | float | None = None,
     lp_burned: int | float | None = None,
 ) -> cpmm_spec.Burn:
-
     # validate inputs
-    validate_utils._ensure_exactly_one(x_withdrawn, y_withdrawn, lp_burned)
+    non_none_inputs = [
+        x_withdrawn is not None,
+        y_withdrawn is not None,
+        lp_burned is not None,
+    ]
+    if sum(non_none_inputs) != 1:
+        raise Exception(
+            'must specify one of x_withdrawn, y_withdrawn, lp_burned'
+        )
 
     # compute alpha
     if x_withdrawn is not None:
@@ -93,3 +106,4 @@ def burn_liquidity(
             'lp_total_supply': lp_total_supply_new,
         },
     }
+
