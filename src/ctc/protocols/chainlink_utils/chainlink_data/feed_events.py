@@ -114,7 +114,13 @@ async def async_get_full_feed_event_data(
             )
             coroutines.append(coroutine)
         results = await asyncio.gather(*coroutines)
-        df: pl.DataFrame = pl_utils.concat(results)
+
+        # currently need this check as empty results do not have arg columns
+        non_empty_results = [result for result in results if len(result) > 0]
+        if len(non_empty_results) == 0:
+            df = results[0]
+        else:
+            df: pl.DataFrame = pl_utils.concat(non_empty_results)
 
     else:
 
@@ -178,7 +184,7 @@ async def async_get_full_feed_event_data(
         end_block = await evm.async_block_number_to_int(
             end_block, context=context
         )
-        df = pl_utils.interpolate_dataframe(
+        df = pl_utils.interpolate(
             df, index_column='block_number', end_index=end_block
         )
 
@@ -201,6 +207,8 @@ async def async_get_answer_feed_event_data(
     context: spec.Context = None,
 ) -> spec.Series:
 
+    from ctc.toolbox import pl_utils
+
     df = await async_get_full_feed_event_data(
         feed=feed,
         start_block=start_block,
@@ -208,10 +216,16 @@ async def async_get_answer_feed_event_data(
         start_time=start_time,
         end_time=end_time,
         normalize=normalize,
-        interpolate=interpolate,
+        interpolate=False,
         context=context,
         invert=invert,
     )
 
-    return df[['block_number', 'answer']]
+    output = df[['block_number', 'answer']]
+
+    if interpolate:
+        # TODO: handle pl.Object in pl_utils.interpolate, so handle upstream
+        output = pl_utils.interpolate(output, index_column='block_number')
+
+    return output
 
