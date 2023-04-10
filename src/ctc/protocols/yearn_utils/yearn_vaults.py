@@ -202,7 +202,7 @@ async def async_print_vault_summary(
                 yearn_strategies.async_get_harvests(strategy=strategy)
                 for strategy in strategies
             ]
-            import pandas as pd
+            import pandas as pd  # type: ignore
 
             all_harvests = pd.concat(await asyncio.gather(*coroutines))
             all_harvests = all_harvests.sort_index()

@@ -19,10 +19,10 @@ def compute_ohlc(
     # TODO: add full support for non-integer bins
 
     import numpy as np
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     # assemble data
-    df = pd.DataFrame({'value': values}, index=indices)  # type: ignore
+    df = pd.DataFrame({'value': values}, index=indices)
     if volumes is not None:
         df['volume'] = volumes
 

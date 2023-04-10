@@ -78,7 +78,7 @@ async def async_balances_command(
 ) -> None:
 
     # REMOVE this
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     indent = None
     wallets = [wallet.lower() for wallet in wallets]
@@ -130,7 +130,7 @@ async def async_balances_command(
             ]
             if verbose:
                 row.append(usd_balances[b])
-                row.append(eth_usd[b])  # type: ignore
+                row.append(eth_usd[b])
             rows.append(row)
 
         labels = ['block', 'balance']
@@ -210,7 +210,7 @@ async def async_balances_command(
             toolstr.print(plot, indent=4)
 
         if export != 'stdout':
-            df = pd.DataFrame(balances, index=resolved_blocks)  # type: ignore
+            df = pd.DataFrame(balances, index=resolved_blocks)
             df.index.name = 'block'
             df.columns = ['balance']
             output_data: typing.Union[spec.DataFrame, spec.Series] = df
@@ -236,7 +236,7 @@ async def async_balances_command(
                 normalize=(not raw),
             )
 
-            series = pd.Series(balances, index=wallets)  # type: ignore
+            series = pd.Series(balances, index=wallets)
             series.name = 'balance'
             series.index.name = 'address'
             output_data = series

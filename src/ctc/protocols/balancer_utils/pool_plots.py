@@ -45,8 +45,8 @@ async def async_plot_lbp_summary(
         title = pool_name + ', in=' + in_token + ', out=' + out_token
 
         if oracle_data is not None:
-            min_block = swaps.index[0][0]  # type: ignore
-            max_block = swaps.index[-1][0]  # type: ignore
+            min_block = swaps.index[0][0]
+            max_block = swaps.index[-1][0]
             oracle_mask = (oracle_data.index >= min_block) & (
                 oracle_data.index <= max_block
             )
@@ -65,7 +65,7 @@ async def async_plot_lbp_summary(
                 raise Exception('invalid oracle_data')
             premium = []
             for index, row in summary[pair].iterrows():
-                block_number = index[0]  # type: ignore
+                block_number = index[0]
                 oracle_price = oracle_data[block_number]
                 actual_price = row['price_out_per_in']
                 premium.append(float(actual_price) / oracle_price - 1)

@@ -60,7 +60,7 @@ async def async_blocks_command(
     overwrite: bool,
     provider: typing.Optional[str],
 ) -> None:
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     if attributes is None:
         # gas stats as well

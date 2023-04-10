@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import typing
-from typing import Literal
 
 
 if typing.TYPE_CHECKING:
     import numpy
     import polars as pl
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     PolarsDataFrame = pl.DataFrame
     PandasDataFrame = pd.DataFrame
@@ -17,14 +16,17 @@ if typing.TYPE_CHECKING:
     DType = numpy.typing.DTypeLike
     NumpyArray = numpy.typing.NDArray  # type: ignore
 
-    IntegerOutputFormatScalar = Literal[int, object, pl.datatypes.DataTypeClass]
+    IntegerOutputFormatScalar = typing.Union[
+        type[pl.datatypes.DataTypeClass],
+        type[object],
+        type[int],
+    ]
     IntegerOutputFormat = typing.Union[
         IntegerOutputFormatScalar,
         typing.Mapping[str, IntegerOutputFormatScalar],
     ]
 
 else:
-
     DataFrame = typing.Any
     Series = typing.Any
     PandasIndex = typing.Any
@@ -49,3 +51,4 @@ Float = typing.Union[
 ]
 
 Number = typing.Union[Integer, Float]
+

@@ -159,7 +159,7 @@ class CurveDEX(dex_class.DEX):
         context: spec.Context = None,
     ) -> spec.RawDexTrades:
 
-        import pandas as pd
+        import polars as pl
 
         # get data
         trades = await evm.async_get_events(
@@ -200,8 +200,8 @@ class CurveDEX(dex_class.DEX):
                 include_timestamps=include_timestamps,
                 context=context,
             )
-            trades = pd.concat([trades, token_exchange_underlyings])
-            trades = trades.sort_index()
+            trades = pl.concat([trades, token_exchange_underlyings])
+            trades = trades.sort(['block_number', 'log_index'])
 
         # gather relevatn subset of data
         output: spec.RawDexTrades = {

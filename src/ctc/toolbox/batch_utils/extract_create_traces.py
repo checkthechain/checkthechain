@@ -39,7 +39,7 @@ async def async_trace_blocks(
         end_block=end_block,
         context=context,
     )
-    await ctc.rpc.async_close_http_session()  # type: ignore
+    await ctc.rpc.async_close_http_session()
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     temp_path = path + '_temp'

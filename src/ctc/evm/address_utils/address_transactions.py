@@ -92,7 +92,7 @@ async def async_get_transactions_from_address(
     if output_format == 'full':
         return transactions
     elif output_format == 'dataframe':
-        import pandas as pd
+        import pandas as pd  # type: ignore
 
         return pd.DataFrame(transactions)
     elif output_format == 'hashes':

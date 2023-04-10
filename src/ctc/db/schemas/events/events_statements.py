@@ -173,7 +173,7 @@ async def async_select_events(
     )
 
     # dispatch query
-    result = await toolsql.async_select(  # type: ignore
+    result = await toolsql.async_select(
         conn=conn,
         table=table,
         where_equals=where_equals,

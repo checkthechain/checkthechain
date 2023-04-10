@@ -39,13 +39,12 @@ class UniswapV3DEX(dex_class.DEX):
             end_block=end_block,
             start_time=start_time,
             end_time=end_time,
-            keep_multiindex=False,
             context=context,
         )
 
         dex_pools = []
         for index, row in df.iterrows():
-            block = int(index)  # type: ignore
+            block = int(index)
             dex_pool: spec.DexPool = {
                 'address': row['arg__pool'],
                 'factory': factory,
@@ -103,7 +102,6 @@ class UniswapV3DEX(dex_class.DEX):
             end_time=end_time,
             include_timestamps=include_timestamps,
             verbose=verbose,
-            keep_multiindex=False,
             context=context,
         )
 
@@ -119,6 +117,7 @@ class UniswapV3DEX(dex_class.DEX):
         )
 
         output: spec.RawDexTrades = {
+            'block_number': trades['block_number'],
             'transaction_hash': trades['transaction_hash'],
             'recipient': trades['arg__recipient'],
             'sold_id': sold_id,

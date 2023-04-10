@@ -36,7 +36,6 @@ class BalancerDEX(dex_class.DEX):
             end_block=end_block,
             start_time=start_time,
             end_time=end_time,
-            keep_multiindex=False,
             context=context,
         )
         token_registrations = (
@@ -49,9 +48,9 @@ class BalancerDEX(dex_class.DEX):
         )
 
         dex_pools = []
-        for index, row in balancer_pools.iterrows():
+        for row in balancer_pools.iter_rows(named=True):
 
-            block = int(index)  # type: ignore
+            block = int(row['block_number'])
 
             assets: typing.Sequence[str | None] = token_registrations.get(
                 row['arg__poolId'], []
@@ -130,7 +129,6 @@ class BalancerDEX(dex_class.DEX):
             start_time=start_time,
             end_time=end_time,
             verbose=verbose,
-            keep_multiindex=False,
         )
 
         assets = await cls.async_get_pool_assets(pool)
@@ -142,24 +140,23 @@ class BalancerDEX(dex_class.DEX):
         mask = trades['arg__poolId'] == pool_id
         trades = trades[mask]
 
-        import pandas as pd
+        import polars as pl
 
         output: spec.RawDexTrades = {
+            'block_number': trades['block_number'],
             'transaction_hash': trades['transaction_hash'],
             'recipient': None,
-            'sold_id': pd.Series(
+            'sold_id': pl.Series(
                 [
                     assets.index(address)
-                    for address in trades['arg__tokenIn'].values
+                    for address in trades['arg__tokenIn'].to_list()
                 ],
-                index=trades.index,
             ),
-            'bought_id': pd.Series(
+            'bought_id': pl.Series(
                 [
                     assets.index(address)
-                    for address in trades['arg__tokenOut'].values
+                    for address in trades['arg__tokenOut'].to_list()
                 ],
-                index=trades.index,
             ),
             'sold_amount': trades['arg__amountIn'].map(int),
             'bought_amount': trades['arg__amountOut'].map(int),
@@ -167,7 +164,7 @@ class BalancerDEX(dex_class.DEX):
 
         if include_timestamps:
             output['timestamp'] = await evm.async_get_block_timestamps(
-                blocks=trades.index.values,  # type: ignore
+                blocks=trades['block_number'],
                 context=context,
             )
 

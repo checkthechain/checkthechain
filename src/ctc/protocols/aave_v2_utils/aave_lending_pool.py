@@ -46,7 +46,6 @@ async def async_get_deposits(
         verbose=False,
         context=context,
     )
-    events['arg__amount'] = events['arg__amount'].map(int)
 
     return events
 
@@ -86,6 +85,5 @@ async def async_get_withdrawals(
         verbose=False,
         context=context,
     )
-    events['arg__amount'] = events['arg__amount'].map(int)
 
     return events

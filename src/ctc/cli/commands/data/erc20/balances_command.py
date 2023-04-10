@@ -85,7 +85,7 @@ async def async_balances_command(
     n: int | None,
 ) -> None:
 
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     if wallets is not None:
         wallets = await evm.async_resolve_addresses(wallets, block=block)
@@ -150,7 +150,7 @@ async def async_balances_command(
             )
             symbol = await symbol_coroutine
 
-            series = pd.Series(balances, index=wallets)  # type: ignore
+            series = pd.Series(balances, index=wallets)
             series.name = 'balance'
             series.index.name = 'address'
             output_data = series
@@ -182,7 +182,7 @@ async def async_balances_command(
                 normalize=False,
             )
             df = await evm.async_get_erc20_balances_from_transfers(
-                transfers=transfers, dtype=None, normalize=(not raw)
+                transfers=transfers, normalize=(not raw)
             )
             output_data = df
 
@@ -296,9 +296,9 @@ async def async_balances_command(
             return
 
         else:
-            df = pd.DataFrame(balances, index=resolved_blocks)  # type: ignore
+            df = pd.DataFrame(balances, index=resolved_blocks)
             df.index.name = 'block'
-            df.columns = ['balance']  # type: ignore
+            df.columns = ['balance']
             output_data = df
 
     else:

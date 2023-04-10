@@ -140,16 +140,16 @@ async def async_dex_pools_command(
         print(as_str)
         return
     if csv_output and export is None:
-        import pandas as pd
+        import polars as pl
 
-        df = pd.DataFrame(dex_pools)
-        csv_str = df.to_csv()
+        df = pl.DataFrame(dex_pools)
+        csv_str = df.write_csv(None)
         print(csv_str)
         return
     if export:
-        import pandas as pd
+        import polars as pl
 
-        df = pd.DataFrame(dex_pools)
+        df = pl.DataFrame(dex_pools)
         cli_utils.output_data(df, output=export, overwrite=overwrite)
         print('saved output to', export)
         return

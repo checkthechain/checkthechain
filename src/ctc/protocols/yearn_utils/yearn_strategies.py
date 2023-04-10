@@ -26,7 +26,6 @@ async def async_get_harvests(
         contract_address=strategy,
         event_name='Harvested',
         include_timestamps=True,
-        keep_multiindex=False,
         verbose=False,
         context=context,
     )
@@ -78,7 +77,7 @@ async def async_get_harvest_durations(
     context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
     blocks = harvests.index.values
-    timestamps = await evm.async_get_block_timestamps(blocks, context=context)  # type: ignore
+    timestamps = await evm.async_get_block_timestamps(blocks, context=context)
     durations = [float('inf')] + [
         after - before for after, before in zip(timestamps[1:], timestamps[:-1])
     ]

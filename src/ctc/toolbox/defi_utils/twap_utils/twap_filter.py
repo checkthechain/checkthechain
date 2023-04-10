@@ -16,7 +16,7 @@ def filter_twap(
     """convert raw value of a TWAP"""
 
     import numpy as np
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     # compute twap times
     timestamps_array: spec.NumpyArray = np.array(timestamps)

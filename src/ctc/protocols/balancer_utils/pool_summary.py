@@ -79,6 +79,8 @@ async def async_get_pool_swaps(
     context: spec.Context = None,
 ) -> spec.DataFrame:
 
+    import polars as pl
+
     event_abi: spec.EventABI = {
         'anonymous': False,
         'inputs': [
@@ -144,7 +146,7 @@ async def async_get_pool_swaps(
     )
 
     if pool_address is not None:
-        swaps = swaps[swaps['arg__poolId'].str.startswith(pool_address)]
+        swaps = swaps.filter(pl.col('arg__poolId').str.startswith(pool_address))
 
     return swaps
 
@@ -202,7 +204,7 @@ def summarize_pool_swaps(
             data['weight_' + str(c)] = pair_weights[weight_column].values
 
         if as_dataframe:
-            import pandas as pd
+            import pandas as pd  # type: ignore
 
             df = pd.DataFrame(data)
 

@@ -4,7 +4,7 @@ import asyncio
 import typing
 import types
 
-import pandas as pd
+import pandas as pd  # type: ignore
 import tooltime
 
 from ctc import evm
@@ -63,14 +63,14 @@ async def async_get_lending_flows(
 
     # queue tasks
     timestamps_coroutine = evm.async_get_block_timestamps(
-        blocks=blocks,  # type: ignore
+        blocks=blocks,
         context=context,
     )
     timestamps_task = asyncio.create_task(timestamps_coroutine)
     pool_token_balances_before_coroutine = evm.async_get_erc20_balance_by_block(
         token=pool_token,
         wallet=wallet,
-        blocks=blocks_before,  # type: ignore
+        blocks=blocks_before,
         context=context,
     )
     pool_token_balances_before_task = asyncio.create_task(
@@ -79,7 +79,7 @@ async def async_get_lending_flows(
     pool_token_balances_after_coroutine = evm.async_get_erc20_balance_by_block(
         token=pool_token,
         wallet=wallet,
-        blocks=blocks,  # type: ignore
+        blocks=blocks,
         context=context,
     )
     pool_token_balances_after_task = asyncio.create_task(
@@ -226,7 +226,7 @@ async def _async_create_raw_wallet_flows_df(
 
     if include_latest:
         block = await evm.async_get_latest_block_number(context=context)
-        raw_df.loc[block] = [0, 0]  # type: ignore
+        raw_df.loc[block] = [0, 0]
 
     return raw_df
 

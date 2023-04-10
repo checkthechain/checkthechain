@@ -334,7 +334,7 @@ def contract_abi_to_dataframe(
             if 'stateMutability' not in entry:
                 entry['stateMutability'] = ''
 
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     df = pd.DataFrame(contract_abi)
     df = df.reindex(

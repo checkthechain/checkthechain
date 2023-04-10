@@ -462,7 +462,7 @@ class DEX:
         context: spec.Context = None,
     ) -> spec.DataFrame:
 
-        import pandas as pd
+        import pandas as pd  # type: ignore
 
         # queue relevant label data
         if label == 'symbol':

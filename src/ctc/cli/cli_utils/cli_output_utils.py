@@ -57,7 +57,7 @@ def output_data(
     raw: bool = False,
 ) -> None:
 
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
     if output == 'stdout':
         import toolstr
@@ -66,7 +66,7 @@ def output_data(
         if isinstance(data, pd.DataFrame):
             iterator = data.iterrows()
         elif isinstance(data, pd.Series):
-            iterator = data.iteritems()  # type: ignore
+            iterator = data.iteritems()
         else:
             raise Exception('unknown data format')
 
@@ -82,7 +82,7 @@ def output_data(
             else:
                 # series
                 if raw:
-                    row.append(values)  # type: ignore
+                    row.append(values)
                 else:
                     row.append(toolstr.format(values, order_of_magnitude=True))
             rows.append(row)

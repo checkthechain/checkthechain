@@ -65,7 +65,7 @@ async def async_extract_native_transfers(
     df = pl.DataFrame(
         transfers,
         orient='row',
-        columns=[
+        schema=[
             ('block_number', pl.datatypes.Int32),
             ('transfer_index', pl.datatypes.Int32),
             ('transaction_hash', pl.datatypes.Utf8),

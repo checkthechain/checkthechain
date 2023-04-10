@@ -115,16 +115,13 @@ async def async_get_erc20_balances_from_transfers(
 
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
-            typing.cast(str, transfers['contract_address'].values[0]),
+            typing.cast(str, transfers['contract_address'][0]),
             context=context,
         )
         balances /= 10**decimals
 
     # sort
     balances = balances.sort_values(ascending=False)  # type: ignore
-
-    balances.name = 'balance'
-    balances.index.name = 'address'
 
     return balances
 

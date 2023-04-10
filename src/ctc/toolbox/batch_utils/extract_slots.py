@@ -28,7 +28,7 @@ def sync_extract_slots(
     end_block: int,
     job_name: str,
     path: str,
-    context: spec.context,
+    context: spec.Context,
 ) -> None:
     try:
         asyncio.run(

@@ -48,12 +48,9 @@ async def async_get_feed_answer_datum_by_block(
 
     # interpolate blocks
     if interpolate:
-        series = pl_utils.interpolate(df, index_column='block_number')
+        df = pl_utils.interpolate(df, index_column='block_number')
 
-    if typing.TYPE_CHECKING:
-        return typing.cast(spec.Series, series)
-    else:
-        return series
+    return df
 
 
 async def async_get_feed_full_datum_by_block(
