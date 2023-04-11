@@ -17,6 +17,7 @@ class BlockChunkJobs(tooljob.Batch):
     end_block: int
     chunk_size: int
     context: spec.Context | None = None
+    tracker: tooljob.trackers.file_tracker.FileTracker
 
     def __init__(
         self,
@@ -24,8 +25,8 @@ class BlockChunkJobs(tooljob.Batch):
         end_block: int,
         chunk_size: int,
         context: spec.Context | None = None,
-        **kwargs,
-    ):
+        **kwargs: typing.Any,
+    ) -> None:
         if end_block < start_block:
             raise Exception('start_block must be less than end_block')
         self.start_block = start_block
@@ -60,9 +61,9 @@ class BlockChunkJobs(tooljob.Batch):
 
     def get_job_name(
         self,
-        i: int,
+        i: int | None = None,
         *,
-        job_data: spec.JobData | None = None,
+        job_data: tooljob.JobData | None = None,
     ) -> str:
         if job_data is None:
             if i is None:
@@ -127,7 +128,7 @@ class BlockChunkJobs(tooljob.Batch):
             self.get_job_data(i)['start_block']
             for i in range(self.get_n_jobs())
         ]
-        columns = [
+        columns: typing.Sequence[pl.type_aliases.IntoExpr] = [
             pl.Series(start_blocks).alias('start_block'),
             (pl.col('jobs_per_second') * self.chunk_size).alias(
                 'blocks_per_second'

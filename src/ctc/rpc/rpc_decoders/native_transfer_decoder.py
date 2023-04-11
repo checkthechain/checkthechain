@@ -51,6 +51,12 @@ class RpcResult(msgspec.Struct):
     result: list[TransactionReplay]
 
 
+if typing.TYPE_CHECKING:
+    from . import create_trace_decoder
+
+    T = typing.TypeVar('T', CallTrace, create_trace_decoder.CreateTrace)
+
+
 decoder = msgspec.json.Decoder(RpcResult)
 
 
@@ -58,7 +64,6 @@ def decode_native_transfers(
     responses: typing.Sequence[str],
     block_numbers: typing.Sequence[int],
 ) -> typing.Sequence[typing.Any]:
-
     blocks_replays = [decoder.decode(response).result for response in responses]
 
     # transform replays into eth transfers
@@ -80,13 +85,12 @@ def decode_native_transfers(
     return transfers
 
 
-def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
-
+def filter_failed_traces(traces: list[T]) -> list[T]:
     keep = []
     in_error = False
     error_address = None
+    len_error_address = 0
     for t, trace in enumerate(traces):
-
         # restart fro each transaction
         if trace.trace_address == []:
             in_error = False
@@ -95,8 +99,8 @@ def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
         # if in an error, check if next trace is still in error
         if in_error:
             if (
-                len(trace.trace_address) >= len(error_address)
-                and trace.trace_address[: len(error_address)] == error_address
+                len(trace.trace_address) >= len_error_address
+                and trace.trace_address[:len_error_address] == error_address
             ):
                 keep.append(False)
                 continue
@@ -108,6 +112,7 @@ def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
         if trace.error not in [None, '', 'None']:
             in_error = True
             error_address = trace.trace_address
+            len_error_address = len(error_address)
             keep.append(False)
         else:
             keep.append(True)
@@ -118,7 +123,6 @@ def filter_failed_traces(traces: list[CallTrace]) -> list[CallTrace]:
 def native_transfer_from_call_trace(
     trace: CallTrace, block_number: int, transfer_index: int, tx_hash: str
 ) -> typing.Sequence[typing.Any] | None:
-
     ttype = trace.type
 
     # parse value
