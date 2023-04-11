@@ -32,9 +32,9 @@ command_index_by_category: dict[str, toolcli.CommandIndex] = {
             'tables',
         ): 'ctc.cli.commands.admin.db.create_tables_command',
         ('db', 'drop'): 'ctc.cli.commands.admin.db.drop_command',
+        ('db', 'login'): 'ctc.cli.commands.admin.db.login_command',
         ('log',): 'ctc.cli.commands.admin.log_command',
         ('setup',): 'ctc.cli.commands.admin.setup_command',
-        ('rechunk-events',): 'ctc.cli.commands.admin.rechunk_command',
         ('chains',): 'ctc.cli.commands.admin.chains_command',
     },
     'compute': {
