@@ -462,7 +462,7 @@ class DEX:
         context: spec.Context = None,
     ) -> spec.DataFrame:
 
-        import pandas as pd  # type: ignore
+        import polars as pl
 
         # queue relevant label data
         if label == 'symbol':
@@ -513,8 +513,8 @@ class DEX:
                 assets, context=context,
             )
 
-            sold_decimals = output['sold_id'].map(lambda i: decimals[i])
-            bought_decimals = output['bought_id'].map(lambda i: decimals[i])
+            sold_decimals = output['sold_id'].apply(lambda i: decimals[i])
+            bought_decimals = output['bought_id'].apply(lambda i: decimals[i])
             output['sold_amount'] /= 10**sold_decimals
             output['bought_amount'] /= 10**bought_decimals
 
@@ -527,10 +527,10 @@ class DEX:
             else:
                 raise Exception('unknown label format: ' + str(label))
 
-            output['bought_id'] = output['bought_id'].map(lambda i: new_ids[i])
-            output['sold_id'] = output['sold_id'].map(lambda i: new_ids[i])
+            output['bought_id'] = output['bought_id'].apply(lambda i: new_ids[i])
+            output['sold_id'] = output['sold_id'].apply(lambda i: new_ids[i])
 
-        df = pd.DataFrame(output)
+        df = pl.DataFrame(output)
 
         if include_prices:
             prices = cls.compute_trade_prices(df, normalized=normalize)
@@ -551,8 +551,7 @@ class DEX:
         df['sold_amount']
 
         all_ids = sorted(
-            set(df['sold_id'].value_counts().index)
-            | set(df['bought_id'].value_counts().index)
+            set(df['sold_id'].unique()) | set(df['bought_id'].unique())
         )
 
         volumes = {}
@@ -576,14 +575,14 @@ class DEX:
             raise Exception('including prices requires normalize=True')
 
         all_ids = sorted(
-            set(df['sold_id'].value_counts().index)
-            | set(df['bought_id'].value_counts().index)
+            set(df['sold_id'].unique())
+            | set(df['bought_id'].unique())
         )
         prices: typing.Mapping[str, spec.Series] = {}
 
         # pre-compute quantities
-        sold_amount = df['sold_amount'].map(float)
-        bought_amount = df['bought_amount'].map(float)
+        sold_amount = df['sold_amount'].apply(float)
+        bought_amount = df['bought_amount'].apply(float)
         sold_per_bought = sold_amount / bought_amount
         bought_per_sold = bought_amount / sold_amount
         sold_masks = {}

@@ -182,6 +182,8 @@ async def async_get_pool_state_per_log(
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
+    import polars as pl
+
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
@@ -189,10 +191,10 @@ async def async_get_pool_state_per_log(
             pool, context=context, **log_delta_kwargs
         )
 
-    state_per_log: spec.DataFrame = log_deltas[
-        ['delta_token0', 'delta_token1']
-    ].cumsum()
-    state_per_log.columns = ['token0_reserves', 'token1_reserves']
+    state_per_log = log_deltas.select(
+        pl.col('delta_token0').cumsum().alias('token0_reserves'),
+        pl.col('delta_token1').cumsum().alias('token1_reserves'),
+    )
 
     _put_price_in_state(state_per_log)
 
@@ -207,6 +209,8 @@ async def async_get_pool_state_per_transaction(
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
+    import polars as pl
+
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
@@ -218,10 +222,10 @@ async def async_get_pool_state_per_transaction(
         log_deltas=log_deltas, context=context, **log_delta_kwargs
     )
 
-    state_per_transaction: spec.DataFrame = transaction_deltas[
-        ['delta_token0', 'delta_token1']
-    ].cumsum()
-    state_per_transaction.columns = ['token0_reserves', 'token1_reserves']
+    state_per_transaction = transaction_deltas.select(
+        pl.col('delta_token0').cumsum().alias('token0_reserves'),
+        pl.col('delta_token1').cumsum().alias('token1_reserves'),
+    )
 
     _put_price_in_state(state_per_transaction)
 
@@ -237,6 +241,7 @@ async def async_integrate_pool_deltas(
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
+    import polars as pl
     from ctc.toolbox import pl_utils
 
     if log_deltas is None:
@@ -250,10 +255,10 @@ async def async_integrate_pool_deltas(
         log_deltas=log_deltas, context=context, **log_delta_kwargs
     )
 
-    state_per_block: spec.DataFrame = block_deltas[
-        ['delta_token0', 'delta_token1']
-    ].cumsum()
-    state_per_block.columns = ['token0_reserves', 'token1_reserves']
+    state_per_block: spec.DataFrame = block_deltas.select(
+        pl.col('delta_token0').cumsum().alias('token0_reserves'),
+        pl.col('delta_token1').cumsum().alias('token1_reserves'),
+    )
 
     _put_price_in_state(state_per_block)
 

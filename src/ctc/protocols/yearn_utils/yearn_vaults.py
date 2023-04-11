@@ -36,6 +36,8 @@ async def async_print_vault_summary(
     show_harvests: int | bool | None = None,
 ) -> None:
 
+    import polars as pl
+
     obtained = tooltime.create_timestamp_iso_pretty()
     vault = await yearn_web_api.async_get_yearn_api_vault(
         query, network=network
@@ -202,10 +204,10 @@ async def async_print_vault_summary(
                 yearn_strategies.async_get_harvests(strategy=strategy)
                 for strategy in strategies
             ]
-            import pandas as pd  # type: ignore
 
-            all_harvests = pd.concat(await asyncio.gather(*coroutines))
-            all_harvests = all_harvests.sort_index()
+            results = await asyncio.gather(*coroutines)
+            all_harvests = pl.concat(results)
+            all_harvests = all_harvests.sort('block_number', 'log_index')
         except Exception:
             print()
             toolstr.print(
@@ -213,9 +215,9 @@ async def async_print_vault_summary(
                 style=styles['content'],
                 indent=4,
             )
-            all_harvests = pd.DataFrame()
+            all_harvests = pl.DataFrame()
         rows = []
-        for block, harvest in all_harvests.iloc[-n_harvests:].iterrows():
+        for harvest in all_harvests[-n_harvests:].to_dicts():
             age = tooltime.get_age(harvest['timestamp'], 'TimelengthPhrase')
             age = ', '.join(age.split(', ')[:1])
             row = [

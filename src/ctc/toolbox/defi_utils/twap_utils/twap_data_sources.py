@@ -12,7 +12,7 @@ async def async_get_chainlink_data(
     start_block: typing.Optional[spec.BlockNumberReference] = None,
     end_block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
-) -> spec.Series:
+) -> spec.DataFrame:
 
     from ctc.protocols import chainlink_utils
 

@@ -83,7 +83,6 @@ async def async_print_safe_summary(
 async def async_print_safe_erc20s(
     address: spec.Address, *, context: spec.Context = None
 ) -> None:
-
     styles = cli.get_cli_styles()
 
     default_erc20s = await evm.async_get_default_erc20_tokens(context=context)
@@ -122,7 +121,6 @@ async def async_print_safe_erc20s(
 async def async_print_safe_executions(
     address: spec.Address, *, context: spec.Context = None
 ) -> None:
-
     executions = await safe_events.async_get_safe_executions(
         address, context=context
     )
@@ -144,11 +142,8 @@ async def async_print_safe_executions(
 
     rows = []
     for i in range(len(executions)):
-        row = [
-            i,
-            executions.index[i][0],
-        ]
-        row.append(executions['transaction_hash'].values[i])
+        row = [i, executions['block_number'][i].alias('block')]
+        row.append(executions['transaction_hash'][i])
         rows.append(row)
 
     toolstr.print_text_box('Safe Executions', style=styles['title'])
@@ -173,7 +168,6 @@ async def async_print_safe_owner_history(
     end_block: spec.BlockReference | None = None,
     context: spec.Context = None,
 ) -> None:
-
     if end_block is None:
         end_block = await evm.async_get_latest_block_number(context=context)
 
@@ -196,11 +190,11 @@ async def async_print_safe_owner_history(
     threshold_changes = await threshold_changes_coroutine
 
     changes: typing.Sequence[typing.Any] = (
-        list(owner_adds.itertuples())
-        + list(owner_removes.itertuples())
-        + list(threshold_changes.itertuples())
+        list(owner_adds.to_dicts())
+        + list(owner_removes.to_dicts())
+        + list(threshold_changes.to_dicts())
     )
-    changes = sorted(changes, key=lambda change: change.Index)  #  type: ignore
+    changes = sorted(changes, key=lambda change: change['block_number'])  # type: ignore
 
     styles = cli.get_cli_styles()
 
@@ -224,49 +218,49 @@ async def async_print_safe_owner_history(
         threshold = [await threshold_coroutine]
     diffs = ['safe initialized']
     for change in changes:
-        blocks.append(change.Index[0])
+        blocks.append(change['block_number'])
 
         # AddedOwner
         if (
-            change.event_hash
+            change['event_hash']
             == '0x9465fa0c962cc76958e6373a993326400c1c94f8be2fe3a952adfa7f60b2ea26'
         ):
             diffs.append(
                 'add owner '
-                + toolstr.add_style(change.arg__owner, styles['metavar'])
+                + toolstr.add_style(change['arg__owner'], styles['metavar'])
             )
             new_owners = set(owners[-1])
-            new_owners.add(change.arg__owner)
+            new_owners.add(change['arg__owner'])
             owners.append(new_owners)
             threshold.append(threshold[-1])
 
         # RemovedOwner
         elif (
-            change.event_hash
+            change['event_hash']
             == '0xf8d49fc529812e9a7c5c50e69c20f0dccc0db8fa95c98bc58cc9a4f1c1299eaf'
         ):
             diffs.append(
                 'remove owner '
-                + toolstr.add_style(change.arg__owner, styles['metavar'])
+                + toolstr.add_style(change['arg__owner'], styles['metavar'])
             )
             new_owners = set(owners[-1])
-            new_owners.remove(change.arg__owner)
+            new_owners.remove(change['arg__owner'])
             owners.append(new_owners)
             threshold.append(threshold[-1])
 
         # ChangedThreshold
         elif (
-            change.event_hash
+            change['event_hash']
             == '0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93'
         ):
             diffs.append(
                 'change signing threshold to '
                 + toolstr.add_style(
-                    str(change.arg__threshold), styles['description']
+                    str(change['arg__threshold']), styles['description']
                 )
             )
             owners.append(owners[-1])
-            threshold.append(change.arg__threshold)
+            threshold.append(change['arg__threshold'])
 
         else:
             raise Exception()

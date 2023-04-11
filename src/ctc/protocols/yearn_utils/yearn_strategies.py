@@ -68,10 +68,7 @@ async def async_get_harvest_aprs(
         * 86400
         * 365
     )
-    if typing.TYPE_CHECKING:
-        return typing.cast(spec.NumpyArray, aprs.values)
-    else:
-        return aprs.values
+    return aprs.to_numpy()
 
 
 async def async_get_harvest_durations(
@@ -79,7 +76,7 @@ async def async_get_harvest_durations(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
-    blocks = harvests.index.values
+    blocks = harvests['block_number'].to_list()
     timestamps = await evm.async_get_block_timestamps(blocks, context=context)
     durations = [float('inf')] + [
         after - before for after, before in zip(timestamps[1:], timestamps[:-1])
@@ -111,7 +108,7 @@ async def async_get_harvest_total_debts(
     total_debts = await rpc.async_batch_eth_call(
         to_address=strategy,
         function_abi=function_abi,
-        block_numbers=harvests.index.values,
+        block_numbers=harvests['block_number'].to_list(),
         context=context,
     )
     return [float('inf')] + total_debts[:-1]

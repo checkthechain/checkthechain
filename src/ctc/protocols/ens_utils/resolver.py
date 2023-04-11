@@ -171,7 +171,7 @@ async def async_get_text_records(
         text_changes = await async_get_text_changes(
             name=name, node=node, context=context
         )
-        keys = list(text_changes['arg__key'].values)
+        keys = text_changes['arg__key'].to_list()
 
     coroutines = [
         async_get_text_record(key=key, node=node, context=context)

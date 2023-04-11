@@ -15,38 +15,6 @@ if typing.TYPE_CHECKING:
     import tooltime
 
 
-@typing.overload
-async def async_get_feed_data(
-    feed: chainlink_spec._FeedReference,
-    *,
-    fields: typing.Literal['full'],
-    blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
-    start_block: spec.BlockNumberReference | None = None,
-    end_block: spec.BlockNumberReference | None = None,
-    invert: bool = False,
-    normalize: bool = True,
-    interpolate: bool = False,
-    context: spec.Context = None,
-) -> spec.DataFrame:
-    ...
-
-
-@typing.overload
-async def async_get_feed_data(
-    feed: chainlink_spec._FeedReference,
-    *,
-    fields: typing.Literal['answer'] = 'answer',
-    blocks: typing.Sequence[spec.BlockNumberReference] | None = None,
-    start_block: spec.BlockNumberReference | None = None,
-    end_block: spec.BlockNumberReference | None = None,
-    invert: bool = False,
-    normalize: bool = True,
-    interpolate: bool = False,
-    context: spec.Context = None,
-) -> spec.Series:
-    ...
-
-
 async def async_get_feed_data(
     feed: chainlink_spec._FeedReference,
     *,
@@ -60,7 +28,7 @@ async def async_get_feed_data(
     normalize: bool = True,
     interpolate: bool = False,
     context: spec.Context = None,
-) -> typing.Union[spec.DataFrame, spec.Series]:
+) -> spec.DataFrame:
 
     start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,

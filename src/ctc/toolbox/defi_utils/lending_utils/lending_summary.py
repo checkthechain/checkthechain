@@ -4,8 +4,8 @@ import asyncio
 import typing
 import types
 
-import pandas as pd  # type: ignore
 import tooltime
+import polars as pl
 
 from ctc import evm
 from ctc import spec
@@ -58,12 +58,13 @@ async def async_get_lending_flows(
     )
 
     # add time data
-    blocks = df.index.values
-    blocks_before = blocks - 1
+    blocks = df['block_number'].to_numpy()
+    blocks_before = list(blocks - 1)
+    blocks_list = list(blocks)
 
     # queue tasks
     timestamps_coroutine = evm.async_get_block_timestamps(
-        blocks=blocks,
+        blocks=blocks_list,
         context=context,
     )
     timestamps_task = asyncio.create_task(timestamps_coroutine)
@@ -79,7 +80,7 @@ async def async_get_lending_flows(
     pool_token_balances_after_coroutine = evm.async_get_erc20_balance_by_block(
         token=pool_token,
         wallet=wallet,
-        blocks=blocks,
+        blocks=blocks_list,
         context=context,
     )
     pool_token_balances_after_task = asyncio.create_task(
@@ -87,7 +88,7 @@ async def async_get_lending_flows(
     )
     asset_prices_coroutine = protocol_module.async_get_asset_price_by_block(
         asset=underlying,
-        blocks=blocks,
+        blocks=blocks_list,
         context=context,
     )
     asset_prices_task = asyncio.create_task(asset_prices_coroutine)
@@ -129,11 +130,10 @@ async def async_get_lending_flows(
 
     # compute time columns
     timestamps = await timestamps_task
-    df.insert(loc=0, column='timestamp', value=timestamps)
-    df.insert(
-        loc=1,
-        column='time',
-        value=df['timestamp'].map(tooltime.timestamp_to_iso),
+    df = df.insert_at_idx(0, pl.Series('timestamp', timestamps))
+    df = df.insert_at_idx(
+        1,
+        pl.Series('time', df['timestamp'].apply(tooltime.timestamp_to_iso)),
     )
 
     # add pool token balances
@@ -167,7 +167,7 @@ async def async_get_lending_flows(
                 rename_columns[column] = column.replace(
                     'pool_token', pool_token_symbol
                 )
-        df = df.rename(columns=rename_columns)
+        df = df.rename(rename_columns)
 
     return df
 
@@ -202,31 +202,30 @@ async def _async_create_raw_wallet_flows_df(
         if deposits is None:
             raise Exception('could not determine deposits')
         wallet_deposits = deposits[deposits['arg__user'] == wallet]
-    if isinstance(wallet_deposits.index, pd.MultiIndex):
-        wallet_deposits = wallet_deposits.groupby(level='block_number').sum()
-    if isinstance(wallet_deposits, pd.DataFrame):
+    wallet_deposits = wallet_deposits.groupby('block_number').agg(pl.sum('*'))
+    if spec.is_polars_dataframe(wallet_deposits):
         wallet_deposits_series = wallet_deposits['arg__amount']
     if wallet_withdrawals is None:
         if withdrawals is None:
             raise Exception('could not determine withdrawals')
-        wallet_withdrawals = withdrawals[withdrawals['arg__user'] == wallet]
-    if isinstance(wallet_withdrawals.index, pd.MultiIndex):
-        wallet_withdrawals = wallet_withdrawals.groupby(
-            level='block_number'
-        ).sum()
-    if isinstance(wallet_withdrawals, pd.DataFrame):
+        wallet_withdrawals = withdrawals.filter(withdrawals['arg__user'] == wallet)
+    wallet_withdrawals = wallet_withdrawals.groupby('block_number').agg(pl.sum('*'))
+    if spec.is_polars_dataframe(wallet_withdrawals):
         wallet_withdrawals_series = wallet_withdrawals['arg__amount']
 
     raw_data = {
+        'block_number': wallet_withdrawals['block_number'],
         'asset_deposit': wallet_deposits_series,
         'asset_withdrawal': wallet_withdrawals_series,
     }
-    raw_df = pd.DataFrame(raw_data)
-    raw_df = raw_df.fillna(0)
-
     if include_latest:
-        block = await evm.async_get_latest_block_number(context=context)
-        raw_df.loc[block] = [0, 0]
+        raise NotImplementedError()
+        # block = await evm.async_get_latest_block_number(context=context)
+        # raw_data['block_number'].insert(0, block)
+        # raw_data['asset_deposit'].insert(0, 0)
+        # raw_data['asset_withdrawal'].insert(0, 0)
+    raw_df = pl.DataFrame(raw_data)
+    raw_df = raw_df.fill_null(0)
 
     return raw_df
 

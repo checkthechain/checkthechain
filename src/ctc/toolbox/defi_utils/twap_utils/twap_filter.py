@@ -12,11 +12,11 @@ def filter_twap(
     raw_values: typing.Sequence[typing.Any],
     timestamps: typing.Sequence[typing.Any],
     filter_duration: tooltime.Timestamp,
-) -> spec.Series:
+) -> spec.DataFrame:
     """convert raw value of a TWAP"""
 
     import numpy as np
-    import pandas as pd  # type: ignore
+    import polars as pl
 
     # compute twap times
     timestamps_array: spec.NumpyArray = np.array(timestamps)
@@ -38,4 +38,5 @@ def filter_twap(
         twap_values.append(twap_value)
 
     # format as Series
-    return pd.Series(twap_values, index=twap_times)
+    return pl.DataFrame({'timestamp': twap_times, 'value': twap_values})
+

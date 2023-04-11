@@ -11,7 +11,7 @@ async def async_get_data_feed(
     start_block: int,
     end_block: int,
     context: spec.Context = None,
-) -> spec.Series:
+) -> spec.DataFrame:
     # acquire data
     protocol = data_source['protocol']
     if protocol == 'Chainlink':

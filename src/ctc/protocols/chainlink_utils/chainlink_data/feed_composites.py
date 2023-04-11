@@ -21,9 +21,10 @@ async def async_get_composite_feed_data(
     end_time: tooltime.Timestamp | None = None,
     invert: bool = False,
     context: spec.Context = None,
-) -> spec.Series:
+) -> spec.DataFrame:
     # TODO: other ways of specifying composites
     import asyncio
+    import polars as pl
 
     start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
@@ -49,7 +50,7 @@ async def async_get_composite_feed_data(
         )
         coroutines.append(coroutine)
 
-    datas: typing.Sequence[spec.Series] = await asyncio.gather(*coroutines)
+    datas: typing.Sequence[spec.DataFrame] = await asyncio.gather(*coroutines)
 
     # compute product
     product = datas[0] * datas[1]
@@ -70,6 +71,6 @@ async def async_get_composite_feed_data(
 
     # invert
     if invert:
-        product = 1 / product
+        product = product.with_columns(1 / pl.col('answer'))
 
     return product

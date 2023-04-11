@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import typing
 
 from ctc import evm
 from ctc import spec
@@ -11,7 +12,7 @@ async def async_get_safe_setup(
     safe_address: spec.Address,
     *,
     context: spec.Context = None,
-) -> spec.Series | None:
+) -> typing.Mapping[str, typing.Any] | None:
     creation_block = await evm.async_get_contract_creation_block(safe_address, context=context)
     events = await evm.async_get_events(
         safe_address,

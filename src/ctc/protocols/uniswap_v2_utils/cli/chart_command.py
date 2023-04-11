@@ -92,17 +92,17 @@ async def async_chart_command(
         swaps['block_number'].to_list()
     )
     ohlc = ohlc_utils.compute_ohlc(
-        values=prices,
+        values=list(prices),
         indices=block_timestamps,
         bin_size=candle_seconds,
-        volumes=x_volumes,
+        volumes=list(x_volumes),
     )
-    ohlc = ohlc.iloc[-n_candles:]
+    ohlc = ohlc[-n_candles:]
 
     min_price = min(prices)
     max_price = max(prices)
-    min_time = ohlc.index[0]
-    max_time = ohlc.index[-1] + candle_seconds
+    min_time = ohlc['bin'][0]
+    max_time = ohlc['bin'][-1] + candle_seconds
     render_grid = toolstr.create_grid(
         n_rows=20,
         n_columns=n_candles * 2,
@@ -112,7 +112,7 @@ async def async_chart_command(
         ymax=max_price + 0.05 * (max_price - min_price),
     )
     sample_grid = toolstr.create_grid(sample_mode='quadrants', **render_grid)
-    result = toolstr.raster_candlesticks(ohlc.values, sample_grid, render_grid)
+    result = toolstr.raster_candlesticks(ohlc.rows(), sample_grid, render_grid)
     raster = result['raster']
     color_grid = result['color_grid']
 
@@ -151,7 +151,10 @@ async def async_chart_command(
 
     # compute volume
     if not no_volume:
-        ymax = ohlc['volume'].max() * 1.1
+        max_volume = ohlc['volume'].max()
+        if max_volume is None:
+            max_volume = 100.0
+        ymax = float(max_volume) * 1.1  # type: ignore
         volume_render_grid = toolstr.create_grid(
             n_rows=5,
             n_columns=n_candles * 2,
@@ -165,7 +168,7 @@ async def async_chart_command(
             **volume_render_grid,
         )
         volume_raster = toolstr.raster_bar_chart(
-            values=ohlc['volume'],
+            values=ohlc['volume'].to_list(),
             grid=volume_sample_grid,
             bar_width=1,
             bar_gap=3,

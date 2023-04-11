@@ -27,7 +27,7 @@ async def async_get_twap(
     #
     # # other
     context: spec.Context = None,
-) -> spec.Series:
+) -> spec.DataFrame:
 
     # get block numbers and timestamps
     start_coroutine = evm.async_get_block_number_and_time(
@@ -64,7 +64,7 @@ async def async_get_twap(
         twap = data
     elif mode == 'raw':
         twap = twap_filter.filter_twap(
-            raw_values=typing.cast(typing.Sequence[typing.Any], data.values),
+            raw_values=data.rows(),
             timestamps=(await block_timestamps_task),
             filter_duration=filter_duration,
         )
@@ -98,4 +98,4 @@ async def async_get_twap_single_sample(
     elif len(series) > 1:
         raise Exception()
     else:
-        return typing.cast(float, series.values[0])
+        return typing.cast(float, series[0])

@@ -205,7 +205,7 @@ async def async_get_answer_feed_event_data(
     interpolate: bool = False,
     invert: bool = False,
     context: spec.Context = None,
-) -> spec.Series:
+) -> pl.DataFrame:
 
     from ctc.toolbox import pl_utils
 

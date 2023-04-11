@@ -158,12 +158,13 @@ def summarize_pool_swaps(
     as_dataframe: bool = True,
 ) -> typing.Mapping[tuple[str, str], spec.DataFrame]:
     import numpy as np
+    import polars as pl
 
     trade_pairs = set()
-    for i, row in swaps[['arg__tokenIn', 'arg__tokenOut']].iterrows():
-        trade_pairs.add(tuple(row.values))
+    for row in swaps[['arg__tokenIn', 'arg__tokenOut']].rows():
+        trade_pairs.add(tuple(row))
 
-    pair_data = {}
+    pair_data: typing.MutableMapping[tuple[str, str], spec.DataFrame] = {}
     for token_in, token_out in trade_pairs:
         mask = (swaps['arg__tokenIn'] == token_in) & (
             swaps['arg__tokenOut'] == token_out
@@ -201,12 +202,7 @@ def summarize_pool_swaps(
         for c, weight_column in enumerate(pair_weights.columns):
             data['weight_' + str(c)] = pair_weights[weight_column].values
 
-        if as_dataframe:
-            import pandas as pd  # type: ignore
-
-            df = pd.DataFrame(data)
-
-        pair_data[(token_in, token_out)] = df
+        pair_data[(token_in, token_out)] = pl.DataFrame(data)
 
     return pair_data
 
