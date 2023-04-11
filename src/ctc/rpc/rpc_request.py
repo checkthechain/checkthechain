@@ -22,12 +22,42 @@ def create(
     }
 
 
+@typing.overload
+async def async_send(
+    request: spec.RpcRequest,
+    *,
+    context: spec.Context = None,
+    raw_output: typing.Literal[True],
+) -> str:
+    ...
+
+
+@typing.overload
+async def async_send(
+    request: spec.RpcRequest,
+    *,
+    context: spec.Context = None,
+    raw_output: typing.Literal[False] = False,
+) -> spec.RpcResponse:
+    ...
+
+
+@typing.overload
+async def async_send(
+    request: spec.RpcRequest,
+    *,
+    context: spec.Context = None,
+    raw_output: bool,
+) -> str | spec.RpcResponse:
+    ...
+
+
 async def async_send(
     request: spec.RpcRequest,
     *,
     context: spec.Context = None,
     raw_output: bool = False,
-) -> spec.RpcResponse:
+) -> str | spec.RpcResponse:
     """send RPC request to RPC provider"""
 
     from ctc import config
@@ -115,6 +145,7 @@ async def async_send(
         import asyncio
 
         raw_response_chunks = await asyncio.gather(*coroutines)
+        raise Exception()
         if raw_output:
             return raw_response_chunks
         else:
@@ -156,24 +187,25 @@ async def async_send(
     return output
 
 
-@typing.overload
-async def async_send_raw(
-    request: spec.RpcSingularRequest, provider: spec.Provider
-) -> spec.RpcSingularResponseRaw:
-    ...
+# @typing.overload
+# async def async_send_raw(
+#     request: spec.RpcSingularRequest, provider: spec.Provider
+# ) -> spec.RpcSingularResponseRaw:
+#     ...
 
 
-@typing.overload
-async def async_send_raw(
-    request: spec.RpcPluralRequest, provider: spec.Provider
-) -> spec.RpcPluralResponseRaw:
-    ...
+# @typing.overload
+# async def async_send_raw(
+#     request: spec.RpcPluralRequest, provider: spec.Provider
+# ) -> spec.RpcPluralResponseRaw:
+#     ...
 
 
+# ) -> spec.RpcResponseRaw:
 async def async_send_raw(
     request: spec.RpcRequest,
     provider: spec.Provider,
-) -> spec.RpcResponseRaw:
+) -> str:
     """route RPC request to provider according to specified protocol"""
 
     if provider['protocol'] == 'http':

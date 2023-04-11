@@ -19,7 +19,7 @@ async def async_send_http(
     provider: spec.Provider,
     *,
     n_attempts: int = 8,
-) -> spec.RpcResponse:
+) -> str:
     session = get_async_http_session(provider=provider)
 
     headers = {'User-Agent': 'ctc'}
@@ -57,7 +57,7 @@ async def async_send_http(
         if response is None:
             status = 'None'
         else:
-            status = response.status
+            status = str(response.status)
         message = (
             'http rpc request failed after '
             + str(n_attempts)
