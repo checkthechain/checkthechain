@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from .. import block_utils
 
 
 async def async_trace_contract_creations(
@@ -11,10 +12,17 @@ async def async_trace_contract_creations(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[typing.Any]:
-
     import asyncio
     import ctc.rpc
     from ctc.rpc.rpc_decoders import create_trace_decoder
+
+    start_block, end_block = await block_utils.async_resolve_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        to_int=True,
+        allow_none=False,
+        context=context,
+    )
 
     blocks = list(range(start_block, end_block + 1))
 
@@ -47,11 +55,18 @@ async def async_trace_native_transfers(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[typing.Any]:
-
     # extract block replays from server
     import asyncio
     import ctc.rpc
     from ctc.rpc.rpc_decoders import native_transfer_decoder
+
+    start_block, end_block = await block_utils.async_resolve_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        to_int=True,
+        allow_none=False,
+        context=context,
+    )
 
     block_numbers = list(range(start_block, end_block + 1))
     coroutines = [
@@ -80,12 +95,19 @@ async def async_trace_slot_stats(
     *,
     context: spec.Context = None,
 ) -> spec.PolarsDataFrame:
-
     # extract block replays from server
     import asyncio
     import polars as pl
     import ctc.rpc
     from ctc.rpc.rpc_decoders import slot_diff_decoder
+
+    start_block, end_block = await block_utils.async_resolve_block_range(
+        start_block=start_block,
+        end_block=end_block,
+        to_int=True,
+        allow_none=False,
+        context=context,
+    )
 
     block_numbers = list(range(start_block, end_block + 1))
     coroutines = [

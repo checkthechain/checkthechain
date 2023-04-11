@@ -44,7 +44,7 @@ async def _async_plan_event_query(
         schema_name='events', context=context
     )
     if not read_cache:
-        db_queries = []
+        db_ranges: typing.Sequence[typing.Sequence[int]] = []
     else:
         db_queries = await db.async_query_event_queries(
             query_type=query_type,
@@ -58,21 +58,20 @@ async def _async_plan_event_query(
             end_block=end_block,
         )
         if db_queries is not None:
+            db_ranges = []
             for db_query in db_queries:
-                del db_query['query_id']
-                del db_query['query_type']  # type: ignore
-                if db_query['start_block'] <= start_block:
-                    db_query['start_block'] = start_block
-                if db_query['end_block'] >= end_block:
-                    db_query['end_block'] = end_block
+                db_start_block = db_query['start_block']
+                db_end_block = db_query['end_block']
+                if db_start_block <= start_block:
+                    db_start_block = start_block
+                if db_end_block >= end_block:
+                    db_end_block = end_block
+                db_ranges.append((db_start_block, db_end_block))
+
         else:
-            db_queries = []
+            db_ranges = []
 
     # get overlap between current query range and previous query ranges
-    db_ranges: typing.Sequence[typing.Sequence[int]] = [
-        [db_query['start_block'], db_query['end_block']]
-        for db_query in db_queries
-    ]
     db_ranges = range_utils.combine_overlapping_ranges(
         db_ranges,
         include_contiguous=True,
@@ -158,7 +157,7 @@ async def _async_query_events_from_node_and_db(
 
     # send db queries to db
     for query in queries['db']:
-        db_result = await db.async_query_events(
+        db_result: pl.DataFrame | None = await db.async_query_events(
             context=context,
             binary_output_format=binary_output_format,
             columns=columns_to_load,

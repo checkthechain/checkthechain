@@ -61,3 +61,19 @@ def get_event_indexed_types(
 ) -> list[spec.ABIDatumType]:
     """get list of indexed types in signature of event"""
     return [var['type'] for var in event_abi['inputs'] if var['indexed']]
+
+
+def get_event_schema(event_abi: spec.EventABI) -> spec.EventSchema:
+    indexed_names = get_event_indexed_names(event_abi)
+    indexed_types = get_event_indexed_types(event_abi)
+    unindexed_names = get_event_unindexed_names(event_abi)
+    unindexed_types = get_event_unindexed_types(event_abi)
+    return {
+        'indexed_names': indexed_names,
+        'indexed_types': indexed_types,
+        'unindexed_names': unindexed_names,
+        'unindexed_types': unindexed_types,
+        'names': indexed_names + unindexed_names,
+        'types': indexed_types + unindexed_types,
+    }
+

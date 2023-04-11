@@ -102,7 +102,7 @@ async def _async_query_events_from_node(
     # package result in dataframe
     result = [response for chunk in chunks for response in chunk]
     columns = event_query_utils.get_event_df_columns(binary_format='prefix_hex')
-    df = pl.DataFrame(result, columns=columns)
+    df = pl.DataFrame(result, schema=columns)
 
     # convert binary output columns
     if binary_output_format == 'prefix_hex':
@@ -122,10 +122,10 @@ async def _async_query_events_from_node(
 async def _async_query_node_events_chunk(
     *,
     contract_address: spec.Address | None,
-    event_hash: bytes | None,
-    topic1: bytes | None,
-    topic2: bytes | None,
-    topic3: bytes | None,
+    event_hash: bytes | str | None,
+    topic1: bytes | str | None,
+    topic2: bytes | str | None,
+    topic3: bytes | str | None,
     chunk_start: int,
     chunk_end: int,
     context: spec.Context,

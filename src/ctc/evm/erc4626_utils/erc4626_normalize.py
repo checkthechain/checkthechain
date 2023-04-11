@@ -6,6 +6,10 @@ from ctc import spec
 from .. import erc20_utils
 from . import erc4626_metadata
 
+if typing.TYPE_CHECKING:
+    import polars as pl
+
+
 #
 # # normalize shares
 #
@@ -26,12 +30,12 @@ async def async_normalize_erc4626_shares(
 @typing.overload
 async def async_normalize_erc4626_shares(
     token: spec.Address,
-    shares: spec.Series,
+    shares: pl.Series,
     *,
     block: spec.BlockNumberReference | None = None,
     decimals: typing.SupportsInt | None = None,
     context: spec.Context = None,
-) -> spec.Series:
+) -> pl.Series:
     ...
 
 
@@ -61,12 +65,12 @@ async def async_normalize_erc4626_shares(
 
 async def async_normalize_erc4626_shares(
     token: spec.Address,
-    shares: int | typing.Sequence[int] | spec.Series | spec.NumpyArray,
+    shares: int | typing.Sequence[int] | pl.Series | spec.NumpyArray,
     *,
     block: spec.BlockNumberReference | None = None,
     decimals: typing.SupportsInt | None = None,
     context: spec.Context = None,
-) -> float | typing.Sequence[float] | spec.Series | spec.NumpyArray:
+) -> float | typing.Sequence[float] | pl.Series | spec.NumpyArray:
     """normalize ERC-4626 vault shares (divide by 10 ** decimals)"""
 
     if hasattr(shares, '__iter__'):
@@ -127,12 +131,12 @@ async def async_normalize_erc4626_assets(
 @typing.overload
 async def async_normalize_erc4626_assets(
     token: spec.Address,
-    assets: spec.Series,
+    assets: pl.Series,
     *,
     block: spec.BlockNumberReference | None = None,
     decimals: typing.SupportsInt | None = None,
     context: spec.Context = None,
-) -> spec.Series:
+) -> pl.Series:
     ...
 
 
@@ -162,12 +166,12 @@ async def async_normalize_erc4626_assets(
 
 async def async_normalize_erc4626_assets(
     token: spec.Address,
-    assets: int | typing.Sequence[int] | spec.Series | spec.NumpyArray,
+    assets: int | typing.Sequence[int] | pl.Series | spec.NumpyArray,
     *,
     block: spec.BlockNumberReference | None = None,
     decimals: typing.SupportsInt | None = None,
     context: spec.Context = None,
-) -> float | typing.Sequence[float] | spec.Series | spec.NumpyArray:
+) -> float | typing.Sequence[float] | pl.Series | spec.NumpyArray:
     """normalize ERC-4626 vault assets (divide by 10 ** decimals)"""
 
     asset = await erc4626_metadata.async_get_erc4626_asset(

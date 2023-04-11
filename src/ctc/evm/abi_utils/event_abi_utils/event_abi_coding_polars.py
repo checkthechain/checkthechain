@@ -8,19 +8,20 @@ from . import event_abi_parsing
 from . import event_abi_queries
 
 if typing.TYPE_CHECKING:
-    from typing import Literal
+    from typing_extensions import Literal
     import polars as pl
+
+    EventABIList = typing.Sequence[spec.EventABI]
+    EventABIMap = typing.Mapping[str, spec.EventABI]
+    ColumnPrefixType = Literal['arg', 'event_name', 'event_hash']
 
 
 async def async_decode_events_dataframe(
     events: spec.PolarsDataFrame,
-    event_abis: typing.Sequence[spec.EventABI]
-    | typing.Mapping[str, spec.EventABI]
-    | None = None,
+    event_abis: EventABIList | EventABIMap | None = None,
     *,
     context: spec.Context,
-    column_prefix_type: Literal['arg', 'event_name', 'event_hash']
-    | None = None,
+    column_prefix_type: ColumnPrefixType | None = None,
     column_prefix: str | None = None,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     integer_output_format: spec.IntegerOutputFormat | None = None,
@@ -37,6 +38,182 @@ async def async_decode_events_dataframe(
     import polars as pl
     from ctc.toolbox import pl_utils
 
+    # get event abis
+    event_abis = await _async_get_events_abis(
+        events=events, event_abis=event_abis, context=context
+    )
+
+    # get event schemas
+    event_schemas = {
+        event_hash: event_abi_parsing.get_event_schema(event_abi)
+        for event_hash, event_abi in event_abis.items()
+    }
+
+    # create dataframe schema
+    df_schema, event_hash_offsets = _create_event_arg_schema(
+        event_abis=event_abis,
+        event_schemas=event_schemas,
+        column_prefix_type=column_prefix_type,
+        column_prefix=column_prefix,
+        integer_output_format=integer_output_format,
+    )
+
+    # create iterators for relevant columns
+    n_decode_topics = max(
+        len(event_schema['indexed_types'])
+        for event_schema in event_schemas.values()
+    )
+    if n_decode_topics >= 1:
+        topic1 = events['topic1'].to_list()
+    else:
+        topic1 = None
+    if n_decode_topics >= 2:
+        topic2 = events['topic2'].to_list()
+    else:
+        topic2 = None
+    if n_decode_topics >= 3:
+        topic3 = events['topic3'].to_list()
+    else:
+        topic3 = None
+    decode_unindexed = any(
+        len(event_schema['unindexed_types']) > 0
+        for event_schema in event_schemas.values()
+    )
+    if decode_unindexed:
+        unindexed = events['unindexed'].to_list()
+    topic_iterators = [topic1, topic2, topic3]
+
+    # decode
+    decoded_events: typing.Sequence[typing.MutableSequence[typing.Any]]
+    decoded_events = [[] for i in range(len(df_schema))]
+    for e, event_hash in enumerate(events['event_hash'].to_list()):
+        i = event_hash_offsets[event_hash]
+        event_schema = event_schemas[event_hash]
+
+        for c in range(i):
+            decoded_events[c].append(None)
+
+        # decode indexed data
+        for indexed_type, indexed_name, topic_iterator in zip(
+            event_schema['indexed_types'],
+            event_schema['indexed_names'],
+            topic_iterators,
+        ):
+            if topic_iterator is None:
+                raise Exception('topic_iterator not set')
+            if (
+                indexed_type in ['bytes', 'string']
+                or indexed_type.endswith(']')
+                or indexed_type.endswith(')')
+            ):
+                value = topic_iterator[e]
+            else:
+                value = abi_coding_utils.abi_decode(
+                    topic_iterator[e], indexed_type
+                )
+            decoded_events[i].append(value)
+            i = i + 1
+
+        # decode unindexed data
+        if len(event_schema['unindexed_types']) > 0:
+            unindexed_decoded = abi_coding_utils.abi_decode(
+                unindexed[e],
+                event_schema['unindexed_types'],
+            )
+            for value in unindexed_decoded:
+                decoded_events[i].append(value)
+                i = i + 1
+
+        for c in range(i, len(df_schema)):
+            decoded_events[c].append(None)
+
+    # convert to dataframe
+    decoded = pl.DataFrame(decoded_events, schema=df_schema, orient='col')  # type: ignore
+
+    # convert binary columns to hex
+    if binary_output_format == 'prefix_hex':
+        decoded = pl_utils.binary_columns_to_prefix_hex(decoded)
+
+    return decoded
+
+
+def _create_event_arg_schema(
+    event_abis: typing.Mapping[str, spec.EventABI],
+    event_schemas: typing.Mapping[str, spec.EventSchema],
+    column_prefix_type: ColumnPrefixType | None = None,
+    column_prefix: str | None = None,
+    integer_output_format: spec.IntegerOutputFormat | None = None,
+) -> tuple[
+    typing.Sequence[tuple[str, spec.IntegerOutputFormat]],
+    typing.Mapping[str, int],
+]:
+    """does not take binary_output_format into account, that happens later"""
+
+    # get column prefix
+    if column_prefix_type is None and column_prefix is None:
+        if len(event_abis) == 1:
+            column_prefix_type = 'arg'
+        else:
+            event_names = {
+                abi.get('name')
+                for abi in event_abis.values()
+                if abi.get('name') is not None
+            }
+            if len(event_names) == len(event_abis):
+                column_prefix_type = 'event_name'
+            else:
+                column_prefix_type = 'event_hash'
+    if column_prefix_type == 'arg':
+        column_prefix = 'arg__'
+    elif column_prefix_type == 'event_name':
+        column_prefix = '{event_name}__'
+    elif column_prefix_type == 'event_hash':
+        column_prefix = '{event_hash}__'
+    else:
+        if column_prefix is None:
+            column_prefix = ''
+
+    # create dataframe schema
+    df_schema = []
+    used_names = []
+    offsets = [0]
+    for event_hash in event_schemas.keys():
+        event_schema = event_schemas[event_hash]
+        if '{event_name}' in column_prefix:
+            if 'name' in event_abis[event_hash]:
+                event_name = event_abis[event_hash]['name']
+            else:
+                raise Exception('event name not specified in event abi')
+            used_column_prefix = column_prefix.format(
+                event_hash=event_hash,
+                event_name=event_name,
+            )
+        else:
+            used_column_prefix = column_prefix.format(event_hash=event_hash)
+        for abi_type, name in zip(event_schema['types'], event_schema['names']):
+            pl_type = _abi_type_to_polars_dtype(
+                abi_type,
+                name=name,
+                integer_output_format=integer_output_format,
+            )
+            name = used_column_prefix + name
+            if name in used_names:
+                raise Exception('naming conflict ' + str(name))
+
+            df_schema.append((name, pl_type))
+            used_names.append(name)
+        offsets.append(len(df_schema))
+    event_hash_offsets = dict(zip(event_schemas.keys(), offsets))
+
+    return df_schema, event_hash_offsets
+
+
+async def _async_get_events_abis(
+    events: spec.PolarsDataFrame,
+    event_abis: EventABIList | EventABIMap | None = None,
+    *,
+    context: spec.Context,
+) -> typing.Mapping[str, spec.EventABI]:
     # package input abi's
     if isinstance(event_abis, dict):
         abis: typing.MutableMapping[str, spec.EventABI] = event_abis
@@ -75,172 +252,24 @@ async def async_decode_events_dataframe(
     # remove unused abi's
     abis = {k: v for k, v in abis.items() if k in event_hashes}
 
-    # parse abi information
-    all_indexed_types = {}
-    all_indexed_names = {}
-    all_unindexed_types: typing.Mapping[str, list[str]] = {}
-    all_unindexed_types = {}
-    all_unindexed_names = {}
-    all_names = []
-    n_decode_topics = 0
-    decode_unindexed = False
-    for event_hash, event_abi in abis.items():
-
-        indexed_types = event_abi_parsing.get_event_indexed_types(event_abi)
-        indexed_names = event_abi_parsing.get_event_indexed_names(event_abi)
-        all_indexed_types[event_hash] = indexed_types
-        all_indexed_names[event_hash] = indexed_names
-        n_decode_topics = max(n_decode_topics, len(indexed_types))
-
-        unindexed_types = event_abi_parsing.get_event_unindexed_types(event_abi)
-        unindexed_names = event_abi_parsing.get_event_unindexed_names(event_abi)
-        all_unindexed_types[event_hash] = unindexed_types
-        all_unindexed_names[event_hash] = unindexed_names
-        if len(unindexed_types) > 0:
-            decode_unindexed = True
-
-        all_names.extend(indexed_names)
-        all_names.extend(unindexed_names)
-
-    # create dataframe schema
-    if column_prefix_type is None and column_prefix is None:
-        if len(abis) == 1:
-            column_prefix_type = 'arg'
-        else:
-            event_names = {
-                abi.get('name')
-                for abi in abis.values()
-                if abi.get('name') is not None
-            }
-            if len(event_names) == len(abis):
-                column_prefix_type = 'event_name'
-            else:
-                column_prefix_type = 'event_hash'
-    if column_prefix_type == 'arg':
-        column_prefix = 'arg__'
-    elif column_prefix_type == 'event_name':
-        column_prefix = '{event_name}__'
-    elif column_prefix_type == 'event_hash':
-        column_prefix = '{event_hash}__'
-    else:
-        if column_prefix is None:
-            column_prefix = ''
-    event_hashes = list(all_indexed_types.keys())
-    schema = []
-    used_names = []
-    offsets = [0]
-    for event_hash in event_hashes:
-        types = all_indexed_types[event_hash] + all_unindexed_types[event_hash]
-        names = all_indexed_names[event_hash] + all_unindexed_names[event_hash]
-        if '{event_name}' in column_prefix:
-            if 'name' in abis[event_hash]:
-                event_name = abis[event_hash]['name']
-            else:
-                raise Exception('event name not specified in event abi')
-            used_column_prefix = column_prefix.format(
-                event_hash=event_hash,
-                event_name=event_name,
-            )
-        else:
-            used_column_prefix = column_prefix.format(event_hash=event_hash)
-        for abi_type, name in zip(types, names):
-            pl_type = _abi_type_to_polars_dtype(
-                abi_type,
-                name=name,
-                integer_output_format=integer_output_format,
-            )
-            name = used_column_prefix + name
-            if name in used_names:
-                raise Exception('naming conflict ' + str(name))
-
-            schema.append((name, pl_type))
-            used_names.append(name)
-        offsets.append(len(schema))
-    event_hash_offsets = dict(zip(event_hashes, offsets))
-
-    # create iterators for relevant columns
-    if n_decode_topics >= 1:
-        topic1 = events['topic1'].to_list()
-    else:
-        topic1 = None
-    if n_decode_topics >= 2:
-        topic2 = events['topic2'].to_list()
-    else:
-        topic2 = None
-    if n_decode_topics >= 3:
-        topic3 = events['topic3'].to_list()
-    else:
-        topic3 = None
-    if decode_unindexed:
-        unindexed = events['unindexed'].to_list()
-    topics = [topic1, topic2, topic3]
-
-    # decode
-    decoded_events: typing.Sequence[typing.MutableSequence[typing.Any]] = [
-        [] for i in range(len(schema))
-    ]
-    for e, event_hash in enumerate(events['event_hash'].to_list()):
-
-        i = event_hash_offsets[event_hash]
-
-        for c in range(i):
-            decoded_events[c].append(None)
-
-        # decode indexed data
-        indexed_types = all_indexed_types[event_hash]
-        indexed_names = all_indexed_names[event_hash]
-        for indexed_type, indexed_name, topic in zip(
-            indexed_types, indexed_names, topics
-        ):
-            if (
-                indexed_type in ['bytes', 'string']
-                or indexed_type.endswith(']')
-                or indexed_type.endswith(')')
-            ):
-                value = topic[e]
-            else:
-                value = abi_coding_utils.abi_decode(topic[e], indexed_type)
-            decoded_events[i].append(value)
-            i = i + 1
-
-        # decode unindexed data
-        if len(all_unindexed_types[event_hash]) > 0:
-            unindexed_types = all_unindexed_types[event_hash]
-            unindexed_names = all_unindexed_names[event_hash]
-            unindexed_decoded = abi_coding_utils.abi_decode(
-                unindexed[e],
-                unindexed_types,
-            )
-            for value in unindexed_decoded:
-                decoded_events[i].append(value)
-                i = i + 1
-
-        for c in range(i, len(schema)):
-            decoded_events[c].append(None)
-
-    # convert to dataframe
-    decoded = pl.DataFrame(decoded_events, schema=schema, orient='col')
-
-    # convert binary columns to hex
-    if binary_output_format == 'prefix_hex':
-        decoded = pl_utils.binary_columns_to_prefix_hex(decoded)
-
-    return decoded
+    return abis
 
 
 def _abi_type_to_polars_dtype(
     abi_type: str,
     name: str,
     integer_output_format: spec.IntegerOutputFormat | None = None,
-) -> pl.datatypes.DataTypeClass:
+) -> type[object]:
     import polars as pl
 
     if (
-        (abi_type.startswith('int') or abi_type.startswith('uint'))
-        and integer_output_format is not None
-    ):
-        if isinstance(integer_output_format, dict) and name in integer_output_format:
-            return integer_output_format[name]
+        abi_type.startswith('int') or abi_type.startswith('uint')
+    ) and integer_output_format is not None:
+        if (
+            isinstance(integer_output_format, dict)
+            and name in integer_output_format
+        ):
+            return integer_output_format[name]  # type: ignore
         elif integer_output_format == int:
             return int
         elif integer_output_format == object:

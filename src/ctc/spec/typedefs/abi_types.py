@@ -41,6 +41,15 @@ class ABIEventArg(TypedDict, total=False):
     anonymous: NotRequired[bool]
 
 
+class EventSchema(TypedDict):
+    indexed_names: typing.Sequence[str]
+    indexed_types: typing.Sequence[ABIDatumType]
+    unindexed_names: typing.Sequence[str]
+    unindexed_types: typing.Sequence[ABIDatumType]
+    names: typing.Sequence[str]
+    types: typing.Sequence[ABIDatumType]
+
+
 class ErrorABI(TypedDict):
     type: typing.Literal['error']
     name: str
