@@ -60,7 +60,7 @@ async def async_blocks_command(
     overwrite: bool,
     provider: typing.Optional[str],
 ) -> None:
-    import pandas as pd  # type: ignore
+    import polars as pl
 
     if attributes is None:
         # gas stats as well
@@ -145,7 +145,7 @@ async def async_blocks_command(
     else:
 
         # format as dataframe
-        df = pd.DataFrame(blocks_data)
+        df = pl.DataFrame(blocks_data)
 
         # # special attribute: time
         # if 'time' in attributes:
@@ -159,3 +159,4 @@ async def async_blocks_command(
         # if 'number' in df:
         #     df = df.set_index('number')
         cli_utils.output_data(df, output=export, overwrite=overwrite)
+

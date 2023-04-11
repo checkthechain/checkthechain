@@ -85,7 +85,7 @@ async def async_balances_command(
     n: int | None,
 ) -> None:
 
-    import pandas as pd  # type: ignore
+    import polars as pl
 
     if wallets is not None:
         wallets = await evm.async_resolve_addresses(wallets, block=block)
@@ -115,8 +115,7 @@ async def async_balances_command(
         )
         symbols = await symbols_coroutine
         data = {'balance': balances, 'symbol': symbols, 'erc20_address': erc20s}
-        df = pd.DataFrame(data)
-        df = df.set_index('erc20_address')
+        df = pl.DataFrame(data)
         output_data: typing.Union[spec.DataFrame, spec.Series] = df
 
         toolstr.print_text_box('ERC20 balances in wallet')
@@ -150,10 +149,8 @@ async def async_balances_command(
             )
             symbol = await symbol_coroutine
 
-            series = pd.Series(balances, index=wallets)
-            series.name = 'balance'
-            series.index.name = 'address'
-            output_data = series
+            df = pl.DataFrame({'balance': balances, 'address': wallets})
+            output_data = df
 
             print()
             toolstr.print_text_box(symbol + ' Balances')
@@ -296,9 +293,7 @@ async def async_balances_command(
             return
 
         else:
-            df = pd.DataFrame(balances, index=resolved_blocks)
-            df.index.name = 'block'
-            df.columns = ['balance']
+            df = pl.DataFrame({'balance': balances, 'block': resolved_blocks})
             output_data = df
 
     else:

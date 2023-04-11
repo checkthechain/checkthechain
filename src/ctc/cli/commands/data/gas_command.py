@@ -255,13 +255,9 @@ async def async_gas_command(
         rows.append(row)
 
     if export != 'stdout':
-        import pandas as pd  # type: ignore
+        import polars as pl
 
-        final_df = pd.DataFrame(rows)
-        final_df.columns = labels
-        final_df = final_df.sort_values(by='time')
-        final_df = final_df.set_index('blocks')
-
+        final_df = pl.DataFrame(rows, labels, orient='row').sort('time')
         cli_utils.output_data(final_df, export, overwrite=overwrite)
     else:
         toolstr.print_table(

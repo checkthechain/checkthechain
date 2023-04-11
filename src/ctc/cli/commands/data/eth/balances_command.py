@@ -78,7 +78,7 @@ async def async_balances_command(
 ) -> None:
 
     # REMOVE this
-    import pandas as pd  # type: ignore
+    import polars as pl
 
     indent = None
     wallets = [wallet.lower() for wallet in wallets]
@@ -117,7 +117,7 @@ async def async_balances_command(
         print()
 
         if verbose:
-            eth_usd = (await eth_usd_task).values
+            eth_usd = (await eth_usd_task).to_numpy()
             usd_balances = [
                 balance * eth_price
                 for balance, eth_price in zip(balances, eth_usd)
@@ -210,9 +210,8 @@ async def async_balances_command(
             toolstr.print(plot, indent=4)
 
         if export != 'stdout':
-            df = pd.DataFrame(balances, index=resolved_blocks)
-            df.index.name = 'block'
-            df.columns = ['balance']
+            df = pl.DataFrame(balances, ['balance'])
+            df = df.with_columns(pl.Series('block', resolved_blocks))
             output_data: typing.Union[spec.DataFrame, spec.Series] = df
             cli_utils.output_data(
                 output_data, export, overwrite=overwrite, indent=indent, raw=raw
@@ -236,10 +235,9 @@ async def async_balances_command(
                 normalize=(not raw),
             )
 
-            series = pd.Series(balances, index=wallets)
-            series.name = 'balance'
-            series.index.name = 'address'
-            output_data = series
+            output_data = pl.DataFrame(
+                {'balance': balances, 'address': wallets}
+            )
 
         cli_utils.output_data(
             output_data, export, overwrite=overwrite, indent=indent, raw=raw

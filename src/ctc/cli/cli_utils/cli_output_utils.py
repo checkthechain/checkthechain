@@ -57,51 +57,16 @@ def output_data(
     raw: bool = False,
 ) -> None:
 
-    import pandas as pd  # type: ignore
-
     if output == 'stdout':
         import toolstr
 
-        rows = []
-        if isinstance(data, pd.DataFrame):
-            iterator = data.iterrows()
-        elif isinstance(data, pd.Series):
-            iterator = data.iteritems()
-        else:
-            raise Exception('unknown data format')
-
-        for index, values in iterator:
-            row = []
-            row.append(index)
-            if hasattr(values, 'values'):
-                # dataframe
-                for value in values.values:
-                    if value and not isinstance(value, str):
-                        value = toolstr.format(value)
-                    row.append(value)
-            else:
-                # series
-                if raw:
-                    row.append(values)
-                else:
-                    row.append(toolstr.format(values, order_of_magnitude=True))
-            rows.append(row)
-
         if top is not None:
-            if len(rows) > top:
-                rows = rows[:top]
-
-        if isinstance(data, pd.DataFrame):
-            columns = [data.index.name] + list(data.columns)
-        elif isinstance(data, pd.Series):
-            columns = [data.index.name, data.name]
-        else:
-            raise Exception('unknown data format')
-        toolstr.print_table(rows=rows, labels=columns, indent=indent)
+            data = data[:top]
+        toolstr.print_dataframe_as_table(data, indent=indent, )
 
     else:
-
         import toolcli
+        import polars as pl
 
         # check whether file exists
         if os.path.isfile(output):
@@ -112,11 +77,18 @@ def output_data(
             else:
                 raise Exception('aborting')
 
-        if output.endswith('.csv'):
-            data.to_csv(output)
+        if spec.is_polars_series(data):
+            df = pl.DataFrame(data)
+        elif spec.is_polars_dataframe(data):
+            df = data
+        else:
+            raise Exception('unknown data format')
 
+        if output.endswith('.parquet'):
+            df.write_parquet(output)
+        elif output.endswith('.csv'):
+            df.write_csv(output)
         elif output.endswith('.json'):
-            data.to_json(output)
-
+            df.write_json(output)
         else:
             raise Exception('unknown output format: ' + str(output))

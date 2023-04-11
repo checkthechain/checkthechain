@@ -69,6 +69,8 @@ async def async_events_command(
     verbose: bool,
 ) -> None:
 
+    import polars as pl
+
     contract = await evm.async_resolve_address(contract)
 
     if blocks is not None:
@@ -105,12 +107,6 @@ async def async_events_command(
 
         # output
         if not verbose:
-            data = [str(value) for value in events['block_number'].to_list()]
-            if typing.TYPE_CHECKING:
-                events.index = typing.cast(spec.PandasIndex, data)
-            else:
-                events.index = data
-            events.index.name = 'block'
             columns = [
                 column
                 for column in events.columns
@@ -125,7 +121,7 @@ async def async_events_command(
                 for old_column in events.columns
                 if old_column.startswith('arg__')
             }
-            events = events.rename(columns=new_column_names)
+            events = events.rename(new_column_names)
         if export == 'stdout' and include_timestamps:
-            events = events.astype({'timestamp': 'str'})
+            events = events.with_columns(pl.col('timestamp').cast(pl.Utf8))
         cli_utils.output_data(events, output=export, overwrite=overwrite)

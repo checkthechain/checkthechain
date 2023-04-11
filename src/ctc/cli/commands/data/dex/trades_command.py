@@ -78,9 +78,9 @@ async def async_trades_command(
         if not overwrite and os.path.isfile(export):
             raise Exception('file already exists, use --overwrite')
         if export.endswith('.csv'):
-            trades.to_csv(export)
+            trades.write_csv(export)
         elif export.endswith('.json'):
-            trades.to_json(export, orient='records')
+            trades.write_json(export, row_oriented=True)
         else:
             raise Exception('unknown export format')
     else:

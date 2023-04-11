@@ -497,11 +497,11 @@ async def async_perform_multi_contract_call(
         return None
 
     else:
-        import pandas as pd  # type: ignore
+        import polars as pl
 
-        df: spec.DataFrame = pd.DataFrame(results, index=addresses)
-        df.index.name = 'to_address'
-        df.columns = output_names
+        names = [name if name is not None else '' for name in output_names]
+        df = pl.DataFrame(results, names)
+        df.with_columns(pl.Series('to_address', addresses))
 
         return df
 
@@ -696,10 +696,9 @@ async def async_perform_multi_block_call(
         return None
 
     else:
-        import pandas as pd
+        import polars as pl
 
         # format into dataframe
-        df = pd.DataFrame(results, index=block_numbers)
-        df.index.name = 'block'
-        df.columns = output_names
+        df = pl.DataFrame(results, output_names)
+        df = df.insert_at_idx(0, pl.Series('block', block_numbers))
         return df
