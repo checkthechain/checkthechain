@@ -3,17 +3,19 @@ from __future__ import annotations
 import typing
 
 import polars as pl
+
+from ctc import spec
 from ctc.toolbox import pl_utils
 
 
 def interpolate(
-    df: pl.DataFrame,
+    df: spec.DataFrame,
     *,
     index_column: str,
     start_index: int | None = None,
     end_index: int | None = None,
     pre_fill_values: typing.Mapping[str, typing.Any] | None = None,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
     """interpolate values in dataframe according to index column"""
 
     index = df[index_column]

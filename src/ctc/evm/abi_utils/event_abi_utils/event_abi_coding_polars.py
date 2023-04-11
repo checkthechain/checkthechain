@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 
 async def async_decode_events_dataframe(
-    events: spec.PolarsDataFrame,
+    events: spec.DataFrame,
     event_abis: EventABIList | EventABIMap | None = None,
     *,
     context: spec.Context,
@@ -25,7 +25,7 @@ async def async_decode_events_dataframe(
     column_prefix: str | None = None,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     integer_output_format: spec.IntegerOutputFormat | None = None,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     """
 
     columns are prefixed according to input settings
@@ -209,7 +209,7 @@ def _create_event_arg_schema(
 
 
 async def _async_get_events_abis(
-    events: spec.PolarsDataFrame,
+    events: spec.DataFrame,
     event_abis: EventABIList | EventABIMap | None = None,
     *,
     context: spec.Context,

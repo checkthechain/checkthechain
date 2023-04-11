@@ -44,7 +44,7 @@ async def async_get_events(
     exclude_columns: typing.Sequence[str] | None = None,
     convert_ints: type | bool = False,
     max_blocks_per_request: int = 2000,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     """get events"""
 
     from . import event_hybrid_queries
@@ -114,7 +114,7 @@ async def async_get_events(
 
 async def _async_postprocess_query_result(
     *,
-    df: spec.PolarsDataFrame,
+    df: spec.DataFrame,
     event_abi: spec.EventABI | None,
     verbose: bool,
     columns_to_load: typing.Sequence[str],
@@ -126,7 +126,7 @@ async def _async_postprocess_query_result(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     integer_output_format: spec.IntegerOutputFormat | None = None,
     convert_ints: type | bool = False,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
 
     import polars as pl
 

@@ -4,11 +4,13 @@ import typing
 
 import polars as pl
 
+from ctc import spec
+
 
 def concat(
-    dfs: typing.Sequence[pl.DataFrame],
+    dfs: typing.Sequence[spec.DataFrame],
     **kwargs: typing.Any,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
     """like pl.concat, with support for objects"""
 
     # find object columns

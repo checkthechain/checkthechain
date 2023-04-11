@@ -8,9 +8,6 @@ from ctc import evm
 from .. import chainlink_spec
 from . import feed_datum
 
-if typing.TYPE_CHECKING:
-    import polars as pl
-
 
 async def async_get_feed_answer_datum_by_block(
     feed: chainlink_spec._FeedReference,
@@ -20,7 +17,7 @@ async def async_get_feed_answer_datum_by_block(
     normalize: bool = True,
     interpolate: bool = True,
     invert: bool = False,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
     import asyncio
     from ctc.toolbox import pl_utils
     import polars as pl

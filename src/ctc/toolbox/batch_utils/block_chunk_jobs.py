@@ -120,7 +120,7 @@ class BlockChunkJobs(tooljob.Batch):
 
     def summarize_blocks_per_second(
         self, sample_time: int = 60
-    ) -> pl.DataFrame:
+    ) -> spec.DataFrame:
         jobs_per_second = self.summarize_jobs_per_second(
             sample_time=sample_time
         )

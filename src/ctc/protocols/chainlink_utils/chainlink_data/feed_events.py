@@ -27,7 +27,7 @@ async def async_get_full_feed_event_data(
     interpolate: bool = False,
     context: spec.Context = None,
     invert: bool = False,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
     """
     TODO: be able to gather data across multiple aggregator changes
     """
@@ -118,7 +118,7 @@ async def async_get_full_feed_event_data(
         # currently need this check as empty results do not have arg columns
         non_empty_results = [result for result in results if len(result) > 0]
         if len(non_empty_results) == 0:
-            df: pl.DataFrame = results[0]
+            df: spec.DataFrame = results[0]
         else:
             df = pl_utils.concat(non_empty_results)
 
@@ -205,7 +205,7 @@ async def async_get_answer_feed_event_data(
     interpolate: bool = False,
     invert: bool = False,
     context: spec.Context = None,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
 
     from ctc.toolbox import pl_utils
 

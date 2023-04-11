@@ -7,7 +7,6 @@ if typing.TYPE_CHECKING:
     import numpy
     import polars as pl
 
-    PolarsDataFrame = pl.DataFrame
     DataFrame = pl.DataFrame
     Series = pl.Series
     DType = numpy.typing.DTypeLike

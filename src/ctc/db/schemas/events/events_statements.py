@@ -130,7 +130,7 @@ async def async_select_events(
     columns: typing.Sequence[str] | None = None,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     topic_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
-) -> pl.DataFrame:
+) -> spec.DataFrame:
     ...
 
 
@@ -150,7 +150,7 @@ async def async_select_events(
     output_format: Literal['polars'] = 'polars',
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     topic_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
-) -> pl.DataFrame:
+) -> spec.DataFrame:
     ...
 
 

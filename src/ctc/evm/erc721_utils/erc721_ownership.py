@@ -49,7 +49,7 @@ async def async_get_erc721_owners(
 
 
 def _get_erc721_owners_from_transfers(
-    transfers: spec.PolarsDataFrame,
+    transfers: spec.DataFrame,
     *,
     token_ids: typing.Sequence[int] | None = None,
 ) -> typing.Mapping[int, spec.Address]:

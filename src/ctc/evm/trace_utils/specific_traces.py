@@ -94,7 +94,7 @@ async def async_trace_slot_stats(
     end_block: spec.BlockNumberReference,
     *,
     context: spec.Context = None,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     # extract block replays from server
     import asyncio
     import polars as pl

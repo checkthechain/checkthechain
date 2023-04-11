@@ -1,12 +1,7 @@
 from __future__ import annotations
 
-import typing
-
 import ctc.config
 from ctc import spec
-
-if typing.TYPE_CHECKING:
-    import polars as pl
 
 
 # sources:
@@ -531,7 +526,7 @@ bnb_cexes = [
 ]
 
 
-def get_cex_addresses(context: spec.Context) -> pl.DataFrame:
+def get_cex_addresses(context: spec.Context) -> spec.DataFrame:
     import polars as pl
 
     chain_id = ctc.config.get_context_chain_id(context)

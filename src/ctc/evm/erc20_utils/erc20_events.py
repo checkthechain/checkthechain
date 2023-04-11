@@ -10,11 +10,10 @@ from . import erc20_metadata
 from . import erc20_spec
 
 if typing.TYPE_CHECKING:
-    import polars as pl
     import tooltime
 
 
-def _get_token_amount_column(df: spec.PolarsDataFrame) -> str:
+def _get_token_amount_column(df: spec.DataFrame) -> str:
     if 'arg__amount' in df:
         return 'arg__amount'
     elif 'arg__value' in df:
@@ -37,7 +36,7 @@ async def async_get_erc20_transfers(
     verbose: bool = False,
     context: spec.Context = None,
     **event_kwargs: typing.Any,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     """get transfer events of ERC20 token"""
 
     token_address = await erc20_metadata.async_get_erc20_address(
@@ -92,12 +91,12 @@ async def async_get_erc20_transfers(
 
 
 async def async_get_erc20_balances_from_transfers(
-    transfers: spec.PolarsDataFrame,
+    transfers: spec.DataFrame,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     normalize: bool = False,
     context: spec.Context = None,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     """compute ERC20 balance of each wallet using Transfer events"""
 
     import polars as pl
@@ -111,7 +110,7 @@ async def async_get_erc20_balances_from_transfers(
     # subtract transfers out from transfers in
     from_transfers = transfers.groupby('arg__from').agg(pl.sum(amount_key))
     to_transfers = transfers.groupby('arg__to').agg(pl.sum(amount_key))
-    balances: spec.PolarsDataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
+    balances: spec.DataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
 
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
@@ -126,7 +125,7 @@ async def async_get_erc20_balances_from_transfers(
     return balances
 
 
-def _decode_erc20_transfers(transfers: pl.DataFrame) -> pl.DataFrame:
+def _decode_erc20_transfers(transfers: spec.DataFrame) -> spec.DataFrame:
 
     import polars as pl
     from ctc.toolbox import pl_utils

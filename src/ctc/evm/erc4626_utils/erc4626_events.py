@@ -24,7 +24,7 @@ async def async_get_erc4626_deposits(
     convert_from_str: bool = True,
     context: spec.Context = None,
     **event_kwargs: typing.Any,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     """get Deposit events for ERC-4626 vault"""
 
     import polars as pl
@@ -84,7 +84,7 @@ async def async_get_erc4626_withdraws(
     normalize: bool = True,
     convert_from_str: bool = True,
     **event_kwargs: typing.Any,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
     """get Withdraw events for ERC-4626 vault"""
 
     event_abi = erc4626_spec.erc4626_event_abis['Withdraw']

@@ -1,15 +1,11 @@
 from __future__ import annotations
 
 import asyncio
-import typing
 
 from ctc import config
 from ctc import evm
 from ctc import spec
 from . import safe_spec
-
-if typing.TYPE_CHECKING:
-    import polars as pl
 
 
 async def async_get_all_safes(
@@ -17,7 +13,7 @@ async def async_get_all_safes(
     start_block: spec.BlockReference | None = None,
     end_block: spec.BlockReference | None = None,
     context: spec.Context = None,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
 
     import polars as pl
 
@@ -39,7 +35,7 @@ async def async_get_all_safes__1_1(
     start_block: spec.BlockReference | None = None,
     end_block: spec.BlockReference | None = None,
     context: spec.Context | None = None,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
 
     import polars as pl
 
@@ -93,7 +89,7 @@ async def async_get_all_safes__1_3(
     start_block: spec.BlockReference | None = None,
     end_block: spec.BlockReference | None = None,
     context: spec.Context = None,
-) -> pl.DataFrame:
+) -> spec.DataFrame:
 
     import polars as pl
 

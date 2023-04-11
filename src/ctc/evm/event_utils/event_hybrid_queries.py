@@ -128,7 +128,7 @@ async def _async_query_events_from_node_and_db(
     columns_to_load: typing.Sequence[str],
     binary_output_format: Literal['binary', 'prefix_hex'] = 'binary',
     max_blocks_per_request: int = 2000,
-) -> spec.PolarsDataFrame:
+) -> spec.DataFrame:
 
     import polars as pl
     from ctc import db
@@ -151,13 +151,13 @@ async def _async_query_events_from_node_and_db(
         print('- db queries:', len(queries['db']))
         print('- node queries:', len(queries['node']))
 
-    results: typing.MutableMapping[int, spec.PolarsDataFrame] = {}
+    results: typing.MutableMapping[int, spec.DataFrame] = {}
 
     # TODO: query from db and node in parallel
 
     # send db queries to db
     for query in queries['db']:
-        db_result: pl.DataFrame | None = await db.async_query_events(
+        db_result: spec.DataFrame | None = await db.async_query_events(
             context=context,
             binary_output_format=binary_output_format,
             columns=columns_to_load,

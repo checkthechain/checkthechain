@@ -8,7 +8,7 @@ from ctc import spec
 
 
 async def async_get_event_timestamps(
-    events: spec.PolarsDataFrame,
+    events: spec.DataFrame,
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[int]:
@@ -28,7 +28,7 @@ async def async_get_event_timestamps(
 
 
 async def _async_get_event_names_column(
-    events: spec.PolarsDataFrame,
+    events: spec.DataFrame,
     *,
     share_abis_across_contracts: bool = True,
     context: spec.Context = None,

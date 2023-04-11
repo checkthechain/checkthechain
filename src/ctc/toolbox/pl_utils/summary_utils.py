@@ -4,6 +4,8 @@ import typing
 
 import polars as pl
 
+from ctc import spec
+
 
 def set_column_display_width(width: int = 70) -> None:
     pl.Config.set_fmt_str_lengths(width)
@@ -20,7 +22,6 @@ def get_glob_total_bytes(path_template: str) -> int:
 
 
 def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
-
     import toolstr
 
     if series.dtype == pl.datatypes.Object:
@@ -148,13 +149,14 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
     }
 
 
-def create_dataframe_summary(df: pl.DataFrame) -> pl.DataFrame:
+def create_dataframe_summary(df: spec.DataFrame) -> spec.DataFrame:
     summary = [create_series_summary(df[column]) for column in df.columns]
     return pl.DataFrame(summary)
 
 
-def print_dataframe_summary(df: pl.DataFrame, title: str | None = None) -> None:
-
+def print_dataframe_summary(
+    df: spec.DataFrame, title: str | None = None
+) -> None:
     import toolstr
 
     summary = create_dataframe_summary(df)

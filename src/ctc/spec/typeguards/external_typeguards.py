@@ -2,17 +2,15 @@ from __future__ import annotations
 
 import typing
 
-if typing.TYPE_CHECKING:
-    import polars as pl
+from ctc import spec
 
+if typing.TYPE_CHECKING:
     from typing_extensions import TypeGuard
 
     from .. import typedefs
 
 
-def is_polars_dataframe(
-    item: typing.Any,
-) -> TypeGuard[pl.DataFrame]:
+def is_polars_dataframe(item: typing.Any) -> TypeGuard[spec.DataFrame]:
     """return whether input is a polars DataFrame"""
     item_type = type(item)
     return (
@@ -21,14 +19,11 @@ def is_polars_dataframe(
     )
 
 
-def is_polars_series(
-    item: typing.Any,
-) -> TypeGuard[pl.DataFrame]:
+def is_polars_series(item: typing.Any) -> TypeGuard[spec.DataFrame]:
     """return whether input is a polars DataFrame"""
     item_type = type(item)
-    return (
-        item_type.__name__ == 'Series'
-        and item_type.__module__.startswith('polars')
+    return item_type.__name__ == 'Series' and item_type.__module__.startswith(
+        'polars'
     )
 
 
