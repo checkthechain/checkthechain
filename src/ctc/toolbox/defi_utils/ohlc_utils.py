@@ -19,32 +19,33 @@ def compute_ohlc(
     import polars as pl
 
     # assemble data
-    df = pl.DataFrame({'index': indices, 'value': values})
+    df_raw = pl.DataFrame({'index': indices, 'value': values})
     if volumes is not None:
-        df = df.with_columns(pl.Series('volume', volumes))
+        df_raw = df_raw.with_columns(pl.Series('volume', volumes))
 
     # set bins
     if bins is None:
         if bin_size is None:
             raise Exception('must specify bins or bin_size')
-        bins_float = np.floor(df['index'].to_numpy() / bin_size) * bin_size
+        bins_float = np.floor(df_raw['index'].to_numpy() / bin_size) * bin_size
         bins = bins_float.astype(int)
     else:
         bin_size = bins[1] - bins[0]  # type: ignore
     if bin_size is None:
         raise Exception('bin_size could not be determined')
-    df = df.with_columns(pl.Series('bin', bins))
+    df_raw = df_raw.with_columns(pl.Series('bin', bins))
 
     # compute metrics
-    df = df.groupby('bin').agg(
+    columns = [
         pl.col('value').first().alias('open'),
         pl.col('value').max().alias('high'),
         pl.col('value').min().alias('low'),
         pl.col('value').last().alias('close'),
         pl.col('value').count().alias('count'),
-    )
+    ]
     if volumes is not None:
-        df = df.with_columns(pl.col('volume').sum().alias('volume'))
+        columns.append(pl.col('volume').sum().alias('volume'))
+    df = df_raw.groupby('bin').agg(columns)
 
     # fill in missing bins
     all_bins = np.arange(

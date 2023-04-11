@@ -276,7 +276,6 @@ class DEX:
         latest_block = await evm.async_get_latest_block_number(context=context)
 
         if last_scanned_block + 1 <= latest_block:
-
             new_pools = await cls.async_get_new_pools(
                 factory=factory,
                 start_block=last_scanned_block + 1,
@@ -307,7 +306,6 @@ class DEX:
         block: spec.BlockNumberReference | None = None,
         context: spec.Context = None,
     ) -> typing.Sequence[spec.Address]:
-
         return await cls._async_get_pool_assets_from_node(
             pool=pool,
             block=block,
@@ -339,7 +337,6 @@ class DEX:
         block: spec.BlockNumberReference | None = None,
         context: spec.Context = None,
     ) -> int | float:
-
         return await evm.async_get_erc20_balance(
             wallet=pool,
             token=asset,
@@ -358,8 +355,9 @@ class DEX:
         block: spec.BlockNumberReference | None = None,
         context: spec.Context = None,
     ) -> typing.Mapping[spec.Address, int | float]:
-
-        pool_tokens = await cls.async_get_pool_assets(pool=pool, context=context)
+        pool_tokens = await cls.async_get_pool_assets(
+            pool=pool, context=context
+        )
 
         if cls.async_get_pool_balance == DEX.async_get_pool_balance:
             balances = await evm.async_get_erc20s_balances(
@@ -395,7 +393,6 @@ class DEX:
         normalize: bool = True,
         context: spec.Context = None,
     ) -> typing.Sequence[int | float]:
-
         return await evm.async_get_erc20_balance_by_block(
             wallet=pool,
             token=asset,
@@ -414,7 +411,6 @@ class DEX:
         normalize: bool = True,
         context: spec.Context = None,
     ) -> typing.Mapping[str, typing.Sequence[int | float]]:
-
         if len(blocks) == 0:
             raise NotImplementedError('must specify blocks')
 
@@ -461,7 +457,6 @@ class DEX:
         include_volumes: bool = False,
         context: spec.Context = None,
     ) -> spec.DataFrame:
-
         import polars as pl
 
         # queue relevant label data
@@ -500,7 +495,6 @@ class DEX:
 
         # normalize
         if normalize:
-
             # test for metapools
             if max(output['sold_id']) >= len(assets) or max(
                 output['bought_id']
@@ -510,7 +504,8 @@ class DEX:
                 )
 
             decimals = await evm.async_get_erc20s_decimals(
-                assets, context=context,
+                assets,
+                context=context,
             )
 
             sold_decimals = output['sold_id'].apply(lambda i: decimals[i])
@@ -527,7 +522,9 @@ class DEX:
             else:
                 raise Exception('unknown label format: ' + str(label))
 
-            output['bought_id'] = output['bought_id'].apply(lambda i: new_ids[i])
+            output['bought_id'] = output['bought_id'].apply(
+                lambda i: new_ids[i]
+            )
             output['sold_id'] = output['sold_id'].apply(lambda i: new_ids[i])
 
         df = pl.DataFrame(output)
@@ -535,11 +532,11 @@ class DEX:
         if include_prices:
             prices = cls.compute_trade_prices(df, normalized=normalize)
             for key, value in prices.items():
-                df[key] = value
+                df = df.with_columns(pl.Series(key, value))
         if include_volumes:
             volumes = cls.compute_trade_volumes(df)
             for key, value in volumes.items():
-                df[key] = value
+                df = df.with_columns(pl.Series(key, value))
 
         return df
 
@@ -547,7 +544,6 @@ class DEX:
     def compute_trade_volumes(
         cls, df: spec.DataFrame
     ) -> typing.Mapping[str, spec.Series]:
-
         df['sold_amount']
 
         all_ids = sorted(
@@ -570,13 +566,13 @@ class DEX:
         df: spec.DataFrame,
         normalized: bool,
     ) -> typing.Mapping[str, spec.Series]:
+        import polars as pl
 
         if not normalized:
             raise Exception('including prices requires normalize=True')
 
         all_ids = sorted(
-            set(df['sold_id'].unique())
-            | set(df['bought_id'].unique())
+            set(df['sold_id'].unique()) | set(df['bought_id'].unique())
         )
         prices: typing.Mapping[str, spec.Series] = {}
 
@@ -594,7 +590,6 @@ class DEX:
         # compute combinations
         for lhs_id in all_ids:
             for rhs_id in all_ids:
-
                 if lhs_id == rhs_id:
                     continue
 
@@ -605,9 +600,16 @@ class DEX:
                 bought_lhs_mask = bought_masks[lhs_id]
                 bought_rhs_mask = bought_masks[rhs_id]
 
-                df[key] = (
-                    sold_lhs_mask * bought_rhs_mask * sold_per_bought
-                    + bought_lhs_mask * sold_rhs_mask * bought_per_sold
+                values = (
+                    sold_lhs_mask.cast(int)
+                    * bought_rhs_mask.cast(int)
+                    * sold_per_bought
+                    + bought_lhs_mask.cast(int)
+                    * sold_rhs_mask.cast(int)
+                    * bought_per_sold
+                )
+                df = df.with_columns(
+                    pl.Series(key, values)
                 )
                 if len(all_ids) > 2:
                     combined_mask = (
@@ -615,6 +617,8 @@ class DEX:
                         + bought_lhs_mask * sold_rhs_mask
                     )
                     df[key][~combined_mask] = float('nan')
+
+                prices[key] = values
 
         return prices
 
@@ -663,12 +667,10 @@ def _filter_pools(
     start_block: int | None = None,
     end_block: int | None = None,
 ) -> typing.Sequence[spec.DexPool]:
-
     filtered = []
 
     # filter the new pools according to input arguments
     for pool in pools:
-
         # check asset filter
         include = True
         if assets is not None:

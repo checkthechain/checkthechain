@@ -49,7 +49,7 @@ class UniswapV2DEX(dex_class.DEX):
                 'asset2': None,
                 'asset3': None,
                 'fee': int(0.003 * 1e8),
-                'creation_block': row['blockNumber'],
+                'creation_block': row['block_number'],
                 'additional_data': {},
             }
             dex_pools.append(dex_pool)
