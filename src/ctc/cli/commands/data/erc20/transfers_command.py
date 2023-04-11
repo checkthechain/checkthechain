@@ -67,6 +67,4 @@ async def async_transfers_command(
         include_timestamps=include_timestamps,
     )
 
-    if export == 'stdout' and include_timestamps:
-        transfers = transfers.astype({'timestamp': 'str'})
     cli_utils.output_data(transfers, output=export, overwrite=overwrite)

@@ -35,10 +35,10 @@ async def async_intake_encoded_events(
         return
     if query['end_block'] > latest_allowed_block:
         if isinstance(encoded_events[0], dict):
-            blocks = np.array([event['block_number'] for event in encoded_events])  # type: ignore
+            blocks = np.array([event['block_number'] for event in encoded_events])
             confirmed_mask = blocks <= latest_allowed_block
             encoded_events = [
-                event  # type: ignore
+                event
                 for event, confirmed in zip(encoded_events, confirmed_mask)
                 if confirmed
             ]
@@ -50,7 +50,7 @@ async def async_intake_encoded_events(
             ]
         else:
             raise Exception()
-        query = dict(query, end_block=latest_allowed_block)
+        query = dict(query, end_block=latest_allowed_block)  # type: ignore
 
     # return early if no events to intake
     if len(encoded_events) == 0:

@@ -137,7 +137,7 @@ def status_command(verbose: bool) -> None:
                 print()
                 print()
                 toolstr.print_header('Table Usage', style=styles['title'])
-                toolsql.print_db_usage(conn=conn, styles=styles['title'])
+                toolsql.print_db_usage(conn, styles=styles)
 
     else:
         toolstr.print_text_box('Schema Summary', style=styles['title'])

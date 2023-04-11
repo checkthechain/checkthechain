@@ -15,7 +15,7 @@ from .management import version_utils
 
 def connect(
     context: spec.Context,
-    schema: spec.SchemaName | None = None,
+    schema: spec.SchemaName,
     *,
     read_only: bool = False,
 ) -> toolsql.Connection:
@@ -30,7 +30,7 @@ def connect(
 
 def async_connect(
     context: spec.Context,
-    schema: spec.SchemaName | None = None,
+    schema: spec.SchemaName,
     *,
     read_only: bool = False,
 ) -> toolsql.AsyncConnection:

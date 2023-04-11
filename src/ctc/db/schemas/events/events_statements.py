@@ -9,7 +9,11 @@ from ctc import spec
 from ... import schema_utils
 from . import events_schema_defs
 
-from typing_extensions import Literal
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
+
+    import polars as pl
 
 
 async def async_upsert_events(
@@ -18,7 +22,6 @@ async def async_upsert_events(
     conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
-
     if len(encoded_events) == 0:
         return
 
@@ -74,7 +77,6 @@ async def async_upsert_event_query(
     conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
-
     # convert to binary as needed
     as_binary = evm.binarize_fields(
         event_query,
@@ -96,7 +98,6 @@ async def async_upsert_event_queries(
     conn: toolsql.AsyncConnection,
     context: spec.Context,
 ) -> None:
-
     as_binary = [
         evm.binarize_fields(
             event_query,
@@ -112,6 +113,65 @@ async def async_upsert_event_queries(
         rows=as_binary,
         upsert=True,
     )
+
+
+@typing.overload
+async def async_select_events(
+    *,
+    conn: toolsql.AsyncConnection,
+    context: spec.Context = None,
+    contract_address: spec.Address | None = None,
+    event_hash: typing.Any | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
+    start_block: int | None = None,
+    end_block: int | None = None,
+    columns: typing.Sequence[str] | None = None,
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    topic_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+) -> pl.DataFrame:
+    ...
+
+
+@typing.overload
+async def async_select_events(
+    *,
+    conn: toolsql.AsyncConnection,
+    context: spec.Context = None,
+    contract_address: spec.Address | None = None,
+    event_hash: typing.Any | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
+    start_block: int | None = None,
+    end_block: int | None = None,
+    columns: typing.Sequence[str] | None = None,
+    output_format: Literal['polars'] = 'polars',
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    topic_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+) -> pl.DataFrame:
+    ...
+
+
+@typing.overload
+async def async_select_events(
+    *,
+    conn: toolsql.AsyncConnection,
+    context: spec.Context = None,
+    contract_address: spec.Address | None = None,
+    event_hash: typing.Any | None = None,
+    topic1: typing.Any | None = None,
+    topic2: typing.Any | None = None,
+    topic3: typing.Any | None = None,
+    start_block: int | None = None,
+    end_block: int | None = None,
+    columns: typing.Sequence[str] | None = None,
+    output_format: toolsql.QueryOutputFormat = 'polars',
+    binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+    topic_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
+) -> toolsql.SelectOutputData:
+    ...
 
 
 async def async_select_events(
@@ -130,7 +190,6 @@ async def async_select_events(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     topic_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
 ) -> toolsql.SelectOutputData:
-
     # get table
     table = schema_utils.get_table_schema('events', context=context)
 
@@ -320,7 +379,6 @@ async def async_delete_event_query(
     conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
-
     table = schema_utils.get_table_schema('event_queries', context=context)
 
     await toolsql.async_delete(
@@ -336,7 +394,6 @@ async def async_delete_event_queries(
     conn: toolsql.AsyncConnection,
     context: spec.Context = None,
 ) -> None:
-
     table = schema_utils.get_table_schema('event_queries', context=context)
 
     await toolsql.async_delete(

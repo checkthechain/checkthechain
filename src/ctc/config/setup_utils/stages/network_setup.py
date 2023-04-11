@@ -324,6 +324,7 @@ async def async_collect_provider_metadata(
         'session_kwargs': {},
         'chunk_size': None,
         'convert_reverts_to_none': False,
+        'disable_batch_requests': False,
     }
     providers[name] = provider
 
