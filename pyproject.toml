@@ -196,7 +196,6 @@ deps =
     ;
     ; data science
     numpy==1.19.0
-    pandas==1.2.0
     ;
     ; data dependencies
     aiohttp==3.7.4

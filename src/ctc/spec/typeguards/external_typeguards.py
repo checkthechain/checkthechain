@@ -4,7 +4,6 @@ import typing
 
 if typing.TYPE_CHECKING:
     import polars as pl
-    import pandas as pd  # type: ignore
 
     from typing_extensions import TypeGuard
 
@@ -22,14 +21,14 @@ def is_polars_dataframe(
     )
 
 
-def is_pandas_dataframe(
+def is_polars_series(
     item: typing.Any,
-) -> TypeGuard[pd.DataFrame]:
-    """return whether input is a pandas DataFrame"""
+) -> TypeGuard[pl.DataFrame]:
+    """return whether input is a polars DataFrame"""
     item_type = type(item)
     return (
-        item_type.__name__ == 'DataFrame'
-        and item_type.__module__ == 'pandas.core.frame'
+        item_type.__name__ == 'Series'
+        and item_type.__module__.startswith('polars')
     )
 
 

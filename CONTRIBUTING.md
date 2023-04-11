@@ -37,10 +37,6 @@ These are strong suggestions rather than strict rules
     - validate simple datatypes
     - avoid validating `TypedDict` entries for now
         - wait until a good solution is created either in the python standard library or a 3rd party library
-- until mypy has a mature implementation of variadic generics, use:
-    - `spec.NumpyArray` for numpy arrays
-    - `spec.Series` for pandas Series
-    - `spec.DataFrame` for pandas DataFrames
 
 
 ## API guide

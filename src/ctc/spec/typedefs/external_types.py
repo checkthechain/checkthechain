@@ -6,13 +6,10 @@ import typing
 if typing.TYPE_CHECKING:
     import numpy
     import polars as pl
-    import pandas as pd  # type: ignore
 
     PolarsDataFrame = pl.DataFrame
-    PandasDataFrame = pd.DataFrame
-    DataFrame = pd.core.frame.DataFrame
-    Series = pd.core.series.Series[typing.Any]
-    PandasIndex = pd.core.indexes.base.Index
+    DataFrame = pl.DataFrame
+    Series = pl.Series
     DType = numpy.typing.DTypeLike
     NumpyArray = numpy.typing.NDArray  # type: ignore
 
@@ -29,7 +26,6 @@ if typing.TYPE_CHECKING:
 else:
     DataFrame = typing.Any
     Series = typing.Any
-    PandasIndex = typing.Any
     DType = typing.Any
     NumpyArray = typing.Any
 
