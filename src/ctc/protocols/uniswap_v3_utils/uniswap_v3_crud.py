@@ -85,6 +85,7 @@ async def async_get_pool_swaps(
 ) -> spec.DataFrame:
 
     import asyncio
+    import polars as pl
 
     if normalize or replace_symbols:
         metadata_task = asyncio.create_task(
@@ -118,7 +119,7 @@ async def async_get_pool_swaps(
         'arg__amount0': x_symbol + '_amount',
         'arg__amount1': y_symbol + '_amount',
     }
-    swaps = swaps.rename(columns=columns)
+    swaps = swaps.rename(columns)
 
     # normalize columns
     if normalize:
@@ -126,12 +127,10 @@ async def async_get_pool_swaps(
             tokens=[metadata['x_address'], metadata['y_address']],
             context=context,
         )
-        swaps[columns['arg__amount0']] = swaps[columns['arg__amount0']].astype(
-            float
-        ) / (10**x_decimals)
-        swaps[columns['arg__amount1']] = swaps[columns['arg__amount1']].astype(
-            float
-        ) / (10**y_decimals)
+        swaps = swaps.with_columns(
+            pl.col(columns['arg__amount0']).cast(float) / (10**x_decimals),
+            pl.col(columns['arg__amount1']).cast(float) / (10**y_decimals),
+        )
 
     return swaps
 

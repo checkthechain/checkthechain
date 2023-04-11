@@ -84,30 +84,30 @@ async def async_chart_command(
     )
 
     # compute candlesticks
-    prices = swaps['price__0__per__1'].values
-    x_volumes = swaps['volume__0'].values
+    prices = swaps['price__0__per__1'].to_numpy()
+    x_volumes = swaps['volume__0'].to_numpy()
     if invert:
-        prices = 1 / prices  # type: ignore
+        prices = 1 / prices
     block_timestamps = await evm.async_get_block_timestamps(
         swaps['block_number'].to_list()
     )
     ohlc = ohlc_utils.compute_ohlc(
-        values=prices,  # type: ignore
+        values=prices,
         indices=block_timestamps,
         bin_size=candle_seconds,
-        volumes=x_volumes,  # type: ignore
+        volumes=x_volumes,
     )
     ohlc = ohlc.iloc[-n_candles:]
 
     min_price = min(prices)
     max_price = max(prices)
     min_time = ohlc.index[0]
-    max_time = ohlc.index[-1] + candle_seconds  # type: ignore
+    max_time = ohlc.index[-1] + candle_seconds
     render_grid = toolstr.create_grid(
         n_rows=20,
         n_columns=n_candles * 2,
-        xmin=min_time - 0.05 * (max_time - min_time),  # type: ignore
-        xmax=max_time + 0.05 * (max_time - min_time),  # type: ignore
+        xmin=min_time - 0.05 * (max_time - min_time),
+        xmax=max_time + 0.05 * (max_time - min_time),
         ymin=min_price - 0.05 * (max_price - min_price),
         ymax=max_price + 0.05 * (max_price - min_price),
     )
@@ -126,14 +126,13 @@ async def async_chart_command(
     console = rich.console.Console(theme=rich.theme.Theme(inherit=False))
 
     styles = cli.get_cli_styles()
-    plot_styles = {
-        'tick_label_style': 'bold',
-        'chrome_style': '#888888',
-    }
+    tick_label_style = 'bold'
+    chrome_style = '#888888'
 
     y_axis = toolstr.render_y_axis(
         grid=render_grid,
-        **plot_styles,  # type: ignore
+        tick_label_style=tick_label_style,
+        chrome_style=chrome_style,
     )
     y_axis_width = rich.text.Text.from_markup(y_axis.split('\n')[0]).cell_len
     graph = toolstr.concatenate_blocks([y_axis, as_str])
@@ -145,7 +144,8 @@ async def async_chart_command(
     x_axis = toolstr.render_x_axis(
         grid=render_grid,
         formatter=formatter,
-        **plot_styles,  # type: ignore
+        tick_label_style=tick_label_style,
+        chrome_style=chrome_style,
     )
     x_axis = toolstr.indent_block(x_axis, indent=y_axis_width)
 
@@ -165,7 +165,7 @@ async def async_chart_command(
             **volume_render_grid,
         )
         volume_raster = toolstr.raster_bar_chart(
-            values=ohlc['volume'],  # type: ignore
+            values=ohlc['volume'],
             grid=volume_sample_grid,
             bar_width=1,
             bar_gap=3,
@@ -174,7 +174,8 @@ async def async_chart_command(
         volume_y_axis = toolstr.render_y_axis(
             grid=volume_render_grid,
             n_ticks=1,
-            **plot_styles,  # type: ignore
+            tick_label_style=tick_label_style,
+            chrome_style=chrome_style,
         )
 
     # wait for metadata

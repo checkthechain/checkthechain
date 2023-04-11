@@ -118,7 +118,7 @@ async def async_get_A_history(
 
     import asyncio
     import numpy as np
-    from ctc.toolbox import pd_utils
+    from ctc.toolbox import pl_utils
 
     start_block, end_block = await evm.async_resolve_block_range(
         start_block=start_block,
@@ -189,13 +189,13 @@ async def async_get_A_history(
     )
     initial_A_time = 0
     events.loc[start_block, 0, 0] = [initial_A, initial_A, initial_A_time, 0]  # type: ignore
-    events = events.sort_index()
+    events = events.sort('block_number', 'log_index')
 
     # interpolate per block
-    events = pd_utils.interpolate_dataframe(
+    events = pl_utils.interpolate(
         events,
+        index_column='block_number',
         end_index=latest_block,
-        level='block_number',
     )
 
     # get blocks timestamps

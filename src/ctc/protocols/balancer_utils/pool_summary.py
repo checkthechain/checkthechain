@@ -35,7 +35,6 @@ async def async_summarize_pool_state(
     *,
     context: spec.Context = None,
 ) -> BalancerPoolState:
-
     block = await evm.async_block_number_to_int(block, context=context)
 
     pool_tokens_coroutine = await pool_metadata.async_get_pool_tokens(
@@ -78,7 +77,6 @@ async def async_get_pool_swaps(
     include_timestamps: bool = False,
     context: spec.Context = None,
 ) -> spec.DataFrame:
-
     import polars as pl
 
     event_abi: spec.EventABI = {
@@ -146,7 +144,9 @@ async def async_get_pool_swaps(
     )
 
     if pool_address is not None:
-        swaps = swaps.filter(pl.col('arg__poolId').str.startswith(pool_address))
+        swaps = swaps.filter(
+            pl.col('arg__poolId').str.starts_with(pool_address)
+        )
 
     return swaps
 
@@ -157,7 +157,6 @@ def summarize_pool_swaps(
     *,
     as_dataframe: bool = True,
 ) -> typing.Mapping[tuple[str, str], spec.DataFrame]:
-
     import numpy as np
 
     trade_pairs = set()
@@ -166,7 +165,6 @@ def summarize_pool_swaps(
 
     pair_data = {}
     for token_in, token_out in trade_pairs:
-
         mask = (swaps['arg__tokenIn'] == token_in) & (
             swaps['arg__tokenOut'] == token_out
         )

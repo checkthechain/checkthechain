@@ -101,7 +101,7 @@ async def async_get_registration_block(
     if len(result) == 0:
         raise Exception('could not find registration')
 
-    block = result.iloc[0].name[0]  # type: ignore
+    block = result.iloc[0].name[0]
     block = int(block)
 
     if not isinstance(block, int):
@@ -142,6 +142,6 @@ async def async_get_registrations(
         verbose=False,
         context=context,
     )
-    new_owners['arg__parent_node'] = new_owners.pop('arg__node')
+    new_owners = new_owners.rename({'arg__node': 'arg__parent_node'})
     return new_owners
 

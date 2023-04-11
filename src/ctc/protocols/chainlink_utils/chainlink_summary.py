@@ -184,8 +184,8 @@ async def async_print_feed_summary(
     xvals = data['timestamp'].to_list()
     yvals = data['answer'].to_list()
     plot = toolstr.render_line_plot(
-        xvals=xvals,  # type: ignore
-        yvals=yvals,  # type: ignore
+        xvals=xvals,
+        yvals=yvals,
         n_rows=10,
         n_columns=60,
         line_style=styles['description'],

@@ -115,7 +115,7 @@ async def async_get_token_registrations(
     token_registrations_by_pool: typing.MutableMapping[
         str, typing.MutableSequence[str]
     ] = {}
-    for index, row in balancer_token_registrations.iterrows():
+    for row in balancer_token_registrations.to_dicts():
         pool = row['arg__poolId']
 
         token_registrations_by_pool.setdefault(pool, [])

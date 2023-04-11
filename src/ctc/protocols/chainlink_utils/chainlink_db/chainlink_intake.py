@@ -131,7 +131,7 @@ async def async_get_network_feed_data(
 async def async_import_networks_to_db(
     networks: typing.Sequence[ChainlinkNetworkName] | None = None,
     *,
-    db_config: toolsql.DBConfig = None,
+    db_config: toolsql.DBConfig,
     payload: ChainlinkFeedPayload | None = None,
     verbose: bool = True,
 ) -> None:

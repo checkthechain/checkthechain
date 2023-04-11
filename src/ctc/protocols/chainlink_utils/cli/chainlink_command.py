@@ -57,11 +57,6 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'help': 'interpolate all blocks in range',
                 'action': 'store_true',
             },
-            {
-                'name': '--shell',
-                'help': 'open shell with Chainlink data',
-                'action': 'store_true',
-            },
         ],
         'examples': [
             'DAI_USD',
@@ -83,7 +78,6 @@ async def async_chainlink_command(
     network: spec.NetworkReference | None,
     all_fields: bool | None,
     interpolate: bool,
-    shell: bool,
 ) -> None:
 
     context = config.create_user_input_context(
@@ -157,20 +151,6 @@ async def async_chainlink_command(
             context=context,
         )
         df = feed_data
-
-        if shell:
-            # explore more advanced functionality with https://ipython.readthedocs.io/en/stable/api/generated/IPython.terminal.embed.html
-            from IPython import embed  # type: ignore
-            import nest_asyncio  # type: ignore
-
-            nest_asyncio.apply()
-            print()
-            embed(
-                colors='neutral',
-                banner1='variable `feed_data` contains the data of interest\n',
-            )
-
-            return
 
         print()
         cli_utils.output_data(df, output=export, overwrite=overwrite, raw=True)

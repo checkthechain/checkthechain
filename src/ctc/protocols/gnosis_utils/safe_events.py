@@ -23,7 +23,7 @@ async def async_get_safe_setup(
     )
     if len(events) == 0:
         return None
-    setup: spec.Series = events.iloc[0].copy()
+    setup = events[:1].to_dicts()[0]
     setup['arg__owners'] = ast.literal_eval(setup['arg__owners'])
     return setup
 

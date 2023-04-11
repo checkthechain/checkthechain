@@ -23,7 +23,7 @@ async def async_get_pool_log_deltas(
     context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
-    import pandas as pd
+    import polars as pl
 
     # get start_block and initial conditions
     start_block, end_block = await evm.async_resolve_block_range(
@@ -79,22 +79,31 @@ async def async_get_pool_log_deltas(
 
     # gather as DataFrames
     dfs = [
-        pd.DataFrame(
+        pl.DataFrame(
             {
+                'block_number': mints['block_number'],
+                'transaction_index': mints['transaction_index'],
+                'log_index': mints['log_index'],
                 'event': 'Mint',
                 'delta_token0': mints['arg__amount0'],
                 'delta_token1': mints['arg__amount1'],
             }
         ),
-        pd.DataFrame(
+        pl.DataFrame(
             {
+                'block_number': mints['block_number'],
+                'transaction_index': mints['transaction_index'],
+                'log_index': mints['log_index'],
                 'event': 'Burn',
                 'delta_token0': -burns['arg__amount0'],
                 'delta_token1': -burns['arg__amount1'],
             }
         ),
-        pd.DataFrame(
+        pl.DataFrame(
             {
+                'block_number': mints['block_number'],
+                'transaction_index': mints['transaction_index'],
+                'log_index': mints['log_index'],
                 'event': 'Swap',
                 'delta_token0': swaps['x_sold'] - swaps['x_bought'],
                 'delta_token1': swaps['y_sold'] - swaps['y_bought'],
@@ -105,8 +114,11 @@ async def async_get_pool_log_deltas(
     # add initial point
     if initial_point_task is not None:
         initial_point = await initial_point_task
-        initial_point_df = pd.DataFrame(
+        initial_point_df = pl.DataFrame(
             {
+                'block_number': start_block,
+                'transaction_index': 0,
+                'log_index': 0,
                 'event': 'Initial',
                 'delta_token0': initial_point['x_reserves'],
                 'delta_token1': initial_point['y_reserves'],
@@ -114,8 +126,8 @@ async def async_get_pool_log_deltas(
         )
         dfs.append(initial_point_df)
 
-    df = pd.concat(dfs)
-    df = df.sort_index()
+    df = pl.concat(dfs)
+    df = df.sort('block_number', 'log_index')
 
     return df
 
@@ -180,7 +192,7 @@ async def async_get_pool_state_per_log(
     state_per_log: spec.DataFrame = log_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
-    state_per_log.columns = ['token0_reserves', 'token1_reserves']  # type: ignore
+    state_per_log.columns = ['token0_reserves', 'token1_reserves']
 
     _put_price_in_state(state_per_log)
 
@@ -209,7 +221,7 @@ async def async_get_pool_state_per_transaction(
     state_per_transaction: spec.DataFrame = transaction_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
-    state_per_transaction.columns = ['token0_reserves', 'token1_reserves']  # type: ignore
+    state_per_transaction.columns = ['token0_reserves', 'token1_reserves']
 
     _put_price_in_state(state_per_transaction)
 
@@ -225,6 +237,8 @@ async def async_integrate_pool_deltas(
     **log_delta_kwargs: typing.Any,
 ) -> spec.DataFrame:
 
+    from ctc.toolbox import pl_utils
+
     if log_deltas is None:
         if pool is None:
             raise Exception('must specify pool or log_deltas')
@@ -239,14 +253,14 @@ async def async_integrate_pool_deltas(
     state_per_block: spec.DataFrame = block_deltas[
         ['delta_token0', 'delta_token1']
     ].cumsum()
-    state_per_block.columns = ['token0_reserves', 'token1_reserves']  # type: ignore
+    state_per_block.columns = ['token0_reserves', 'token1_reserves']
 
     _put_price_in_state(state_per_block)
 
     if interpolate:
-        from ctc.toolbox import pd_utils
-
-        state_per_block = pd_utils.interpolate_dataframe(state_per_block)
+        state_per_block = pl_utils.interpolate(
+            state_per_block, index_column='block_number'
+        )
 
     return state_per_block
 

@@ -29,7 +29,6 @@ async def async_get_pool_swaps(
     verbose: bool = False,
     context: spec.Context = None,
 ) -> spec.DataFrame:
-
     from ctc.toolbox.defi_utils import dex_utils
 
     return await dex_utils.UniswapV2DEX.async_get_pool_trades(
@@ -87,18 +86,18 @@ async def async_get_pool_mints(
         verbose=verbose,
         context=context,
     )
-    mints['arg__amount0'] = mints['arg__amount0'].map(int)
-    mints['arg__amount1'] = mints['arg__amount1'].map(int)
+    mints['arg__amount0'] = mints['arg__amount0'].apply(int)
+    mints['arg__amount1'] = mints['arg__amount1'].apply(int)
 
     if normalize:
         decimals0, decimals1 = await decimals_task
         mints['arg__amount0'] = await evm.async_normalize_erc20_quantities(
-            quantities=mints['arg__amount0'].astype(float),
+            quantities=mints['arg__amount0'].apply(float),
             decimals=decimals0,
             context=context,
         )
         mints['arg__amount1'] = await evm.async_normalize_erc20_quantities(
-            quantities=mints['arg__amount1'].astype(float),
+            quantities=mints['arg__amount1'].apply(float),
             decimals=decimals1,
             context=context,
         )
@@ -109,7 +108,7 @@ async def async_get_pool_mints(
             'arg__amount0': symbol0 + '_amount',
             'arg__amount1': symbol1 + '_amount',
         }
-        mints = mints.rename(columns=new_names)
+        mints = mints.rename(new_names)
 
     return mints
 
@@ -128,6 +127,7 @@ async def async_get_pool_burns(
     context: spec.Context = None,
 ) -> spec.DataFrame:
     import asyncio
+    import polars as pl
 
     if normalize:
         decimals_task = asyncio.create_task(
@@ -142,6 +142,10 @@ async def async_get_pool_burns(
             )
         )
 
+    if normalize:
+        integer_output_format: spec.IntegerOutputFormat = float
+    else:
+        integer_output_format = int
     burns = await evm.async_get_events(
         event_abi=uniswap_v2_spec.pool_event_abis['Burn'],
         contract_address=pool_address,
@@ -152,21 +156,24 @@ async def async_get_pool_burns(
         include_timestamps=include_timestamps,
         context=context,
         verbose=verbose,
+        integer_output_format=integer_output_format,
     )
-    burns['arg__amount0'] = burns['arg__amount0'].map(int)
-    burns['arg__amount1'] = burns['arg__amount1'].map(int)
 
     if normalize:
         decimals0, decimals1 = await decimals_task
-        burns['arg__amount0'] = await evm.async_normalize_erc20_quantities(
-            quantities=burns['arg__amount0'].astype(float),
+        arg__amount0 = await evm.async_normalize_erc20_quantities(
+            quantities=burns['arg__amount0'],
             decimals=decimals0,
             context=context,
         )
-        burns['arg__amount1'] = await evm.async_normalize_erc20_quantities(
-            quantities=burns['arg__amount1'].astype(float),
+        arg__amount1 = await evm.async_normalize_erc20_quantities(
+            quantities=burns['arg__amount1'],
             decimals=decimals1,
             context=context,
+        )
+        burns = burns.with_columns(
+            pl.Series(arg__amount0, 'arg__amount0'),
+            pl.Series(arg__amount1, 'arg__amount1'),
         )
 
     if replace_symbols:
@@ -175,6 +182,7 @@ async def async_get_pool_burns(
             'arg__amount0': symbol0 + '_amount',
             'arg__amount1': symbol1 + '_amount',
         }
-        burns = burns.rename(columns=new_names)
+        burns = burns.rename(new_names)
 
     return burns
+

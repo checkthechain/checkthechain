@@ -22,6 +22,8 @@ async def async_get_harvests(
     include_aprs: bool = True,
     context: spec.Context = None,
 ) -> spec.DataFrame:
+    import polars as pl
+
     harvests = await evm.async_get_events(
         contract_address=strategy,
         event_name='Harvested',
@@ -29,12 +31,13 @@ async def async_get_harvests(
         verbose=False,
         context=context,
     )
-    harvests['arg__profit'] = harvests['arg__profit'].map(int)
+    harvests.with_columns(pl.col('arg__profit').apply(int))
 
     if include_aprs:
-        harvests['apr'] = await async_get_harvest_aprs(
+        aprs = await async_get_harvest_aprs(
             strategy=strategy, harvests=harvests, context=context
         )
+        harvests = harvests.with_columns(pl.Series('apr', aprs))
 
     return harvests
 

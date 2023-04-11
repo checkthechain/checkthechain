@@ -118,9 +118,9 @@ async def async_get_full_feed_event_data(
         # currently need this check as empty results do not have arg columns
         non_empty_results = [result for result in results if len(result) > 0]
         if len(non_empty_results) == 0:
-            df = results[0]
+            df: pl.DataFrame = results[0]
         else:
-            df: pl.DataFrame = pl_utils.concat(non_empty_results)
+            df = pl_utils.concat(non_empty_results)
 
     else:
 
@@ -170,7 +170,7 @@ async def async_get_full_feed_event_data(
         else:
 
             # add initial data
-            if start_block < df.index.values[0]:
+            if start_block < df['block_number'][0]:
                 initial_data = await feed_datum.async_get_feed_datum(
                     feed=feed,
                     block=start_block,
