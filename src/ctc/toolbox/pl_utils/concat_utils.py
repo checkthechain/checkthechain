@@ -5,7 +5,10 @@ import typing
 import polars as pl
 
 
-def concat(dfs: typing.Sequence[pl.DataFrame], **kwargs: typing.Any):
+def concat(
+    dfs: typing.Sequence[pl.DataFrame],
+    **kwargs: typing.Any,
+) -> pl.DataFrame:
     """like pl.concat, with support for objects"""
 
     # find object columns
@@ -30,3 +33,4 @@ def concat(dfs: typing.Sequence[pl.DataFrame], **kwargs: typing.Any):
     without_objects = [df[non_object_columns] for df in dfs]
     concated = pl.concat(without_objects, **kwargs)
     return concated.with_columns(object_series)
+

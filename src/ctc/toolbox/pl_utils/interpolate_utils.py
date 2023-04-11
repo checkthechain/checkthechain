@@ -40,8 +40,12 @@ def interpolate(
     # build new index and initial values
     if start_index < index[0]:
         if pre_fill_values is None:
-            raise Exception('must specify pre_fill_values if start_index < index[0]')
-        initial_values = {k: [v] for k, v in pre_fill_values.items()}
+            raise Exception(
+                'must specify pre_fill_values if start_index < index[0]'
+            )
+        initial_values: typing.MutableMapping[
+            str, None | typing.Sequence[typing.Any]
+        ] = {k: [v] for k, v in pre_fill_values.items()}
         initial_values[index_column] = [start_index]
         for column in df.columns:
             if column not in initial_values and column != index_column:
@@ -56,16 +60,16 @@ def interpolate(
         new_index = range(start_index, end_index + 1)
 
     # create interpolation rows
-    new_data = {column: None for column in df.columns if column != index_column}
-    new_data[index_column] = (
-        pl.DataFrame(pl.Series(index_column, new_index))
-        .filter(~pl.col(index_column).is_in(df[index_column]))[index_column]
-    )
+    new_data: typing.MutableMapping[str, typing.Any] = {
+        column: None for column in df.columns if column != index_column
+    }
+    new_data[index_column] = pl.DataFrame(
+        pl.Series(index_column, new_index)
+    ).filter(~pl.col(index_column).is_in(df[index_column]))[index_column]
     for column in df.columns:
-        if (
-            (pre_fill_values is None or column not in pre_fill_values)
-            and df[column].dtype == pl.Object
-        ):
+        if (pre_fill_values is None or column not in pre_fill_values) and df[
+            column
+        ].dtype == pl.Object:
             new_data[column] = [
                 None for i in range(len(new_data[index_column]))
             ]
