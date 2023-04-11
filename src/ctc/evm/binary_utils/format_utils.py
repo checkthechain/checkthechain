@@ -54,6 +54,7 @@ def to_hex(
     n_bytes: int | None = None,
     keep_leading_0: bool | None = None,
 ) -> str:
+    """convert hex, binary, or integer data to hex"""
     if prefix:
         output_format: typing.Literal['prefix_hex', 'raw_hex'] = 'prefix_hex'
     else:
@@ -72,6 +73,7 @@ def to_binary(
     n_bytes: int | None = None,
     keep_leading_0: bool | None = None,
 ) -> bytes:
+    """convert hex, binary, or integer data to binary"""
     return binary_convert(
         data=data,
         output_format='binary',

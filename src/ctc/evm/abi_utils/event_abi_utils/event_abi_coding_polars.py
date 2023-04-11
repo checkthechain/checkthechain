@@ -26,7 +26,7 @@ async def async_decode_events_dataframe(
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     integer_output_format: spec.IntegerOutputFormat | None = None,
 ) -> spec.DataFrame:
-    """
+    """decode a dataframe that contains raw logs
 
     columns are prefixed according to input settings
     - column_prefix_type == 'arg' --> use 'arg__' as prefix

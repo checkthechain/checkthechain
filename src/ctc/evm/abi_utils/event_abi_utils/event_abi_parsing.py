@@ -64,6 +64,7 @@ def get_event_indexed_types(
 
 
 def get_event_schema(event_abi: spec.EventABI) -> spec.EventSchema:
+    """return schema of types and names of event"""
     indexed_names = get_event_indexed_names(event_abi)
     indexed_types = get_event_indexed_types(event_abi)
     unindexed_names = get_event_unindexed_names(event_abi)

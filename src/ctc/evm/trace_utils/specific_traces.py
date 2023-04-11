@@ -12,6 +12,7 @@ async def async_trace_contract_creations(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[typing.Any]:
+    """collect contract creation traces"""
     import asyncio
     import ctc.rpc
     from ctc.rpc.rpc_decoders import create_trace_decoder
@@ -55,6 +56,7 @@ async def async_trace_native_transfers(
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[typing.Any]:
+    """collect native transfer traces"""
     # extract block replays from server
     import asyncio
     import ctc.rpc
@@ -95,6 +97,7 @@ async def async_trace_slot_stats(
     *,
     context: spec.Context = None,
 ) -> spec.DataFrame:
+    """collect slot stat traces"""
     # extract block replays from server
     import asyncio
     import polars as pl
