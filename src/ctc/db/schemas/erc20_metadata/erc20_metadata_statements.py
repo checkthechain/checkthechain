@@ -80,7 +80,7 @@ async def async_select_erc20_metadata(
     erc20_metadata: spec.ERC20Metadata = await toolsql.async_select(  # type: ignore
         conn=conn,
         table=table,
-        output_format='single_dict',
+        output_format='single_dict_or_none',
         **query,
     )
 
