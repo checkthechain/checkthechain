@@ -17,6 +17,7 @@ example_context_config = {
             'protocol': 'http',
             'session_kwargs': {},
             'url': 'http://1.infura.com',
+            'disable_batch_requests': False,
         },
         'infura__42161': {
             'chunk_size': None,
@@ -26,6 +27,7 @@ example_context_config = {
             'protocol': 'http',
             'session_kwargs': {},
             'url': 'http://42161.infura.com',
+            'disable_batch_requests': False,
         },
         'alchemy__1': {
             'chunk_size': None,
@@ -35,6 +37,7 @@ example_context_config = {
             'protocol': 'http',
             'session_kwargs': {},
             'url': 'http://1.alchemy.com',
+            'disable_batch_requests': False,
         },
         'alchemy__42161': {
             'chunk_size': None,
@@ -44,6 +47,7 @@ example_context_config = {
             'protocol': 'http',
             'session_kwargs': {},
             'url': 'http://42161.alchemy.com',
+            'disable_batch_requests': False,
         },
     },
 }

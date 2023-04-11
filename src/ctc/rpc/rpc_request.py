@@ -145,7 +145,6 @@ async def async_send(
         import asyncio
 
         raw_response_chunks = await asyncio.gather(*coroutines)
-        raise Exception()
         if raw_output:
             return raw_response_chunks
         else:

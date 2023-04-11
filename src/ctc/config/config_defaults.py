@@ -103,6 +103,7 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
             'session_kwargs': {},
             'chunk_size': None,
             'convert_reverts_to_none': False,
+            'disable_batch_requests': False,
         }
         default_config['default_providers'][chain_id] = provider_name  # type: ignore
 

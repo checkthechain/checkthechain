@@ -224,6 +224,7 @@ provider_keys = [
     'session_kwargs',
     'chunk_size',
     'convert_reverts_to_none',
+    'disable_batch_requests',
 ]
 
 default_provider_settings = {
@@ -236,6 +237,7 @@ default_provider_settings = {
     'session_kwargs': {},
     'chunk_size': None,
     'convert_reverts_to_none': False,
+    'disable_batch_requests': True,
 }
 
 

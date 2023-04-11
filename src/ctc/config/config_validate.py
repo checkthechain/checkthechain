@@ -6,9 +6,9 @@ import typing
 from ctc import spec
 
 
-def get_config_validators() -> typing.Mapping[
-    str, None | typing.Callable[..., None]
-]:
+def get_config_validators() -> (
+    typing.Mapping[str, None | typing.Callable[..., None]]
+):
     return {
         'config_spec_version': validate_config_spec_version,
         'data_dir': validate_data_dir,
@@ -25,9 +25,11 @@ def get_config_validators() -> typing.Mapping[
     }
 
 
-def get_config_base_types() -> typing.Mapping[
-    str, typing.Type[typing.Any] | tuple[typing.Type[typing.Any], ...]
-]:
+def get_config_base_types() -> (
+    typing.Mapping[
+        str, typing.Type[typing.Any] | tuple[typing.Type[typing.Any], ...]
+    ]
+):
     return {
         'config_spec_version': str,
         'data_dir': str,
@@ -57,7 +59,6 @@ def validate_config(config: typing.Mapping[typing.Any, typing.Any]) -> None:
 
     # check that each entry is valid
     for key, value in config.items():
-
         # check that key is allowed
         if key not in spec.config_keys:
             raise spec.ConfigInvalid('key not allowed in config: ' + str(key))
@@ -142,7 +143,6 @@ def validate_networks(
 def validate_providers(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     for provider_name, provider in value.items():
         if not isinstance(provider_name, str):
             raise spec.ConfigInvalid('provider name should be a str')
@@ -154,14 +154,16 @@ def validate_providers(
 def validate_provider(
     provider: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     if not isinstance(provider, dict):
         raise Exception('provider is not a dict')
 
     provider_keys = set(spec.provider_keys)
     if set(provider.keys()) != provider_keys:
         raise spec.ConfigInvalid(
-            'provider should have keys: ' + str(provider_keys)
+            'provider should have keys: '
+            + str(provider_keys)
+            + ', it has keys: '
+            + str(provider.keys())
         )
 
     url = provider['url']
@@ -195,7 +197,6 @@ def validate_provider(
 def validate_default_network(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     if value is None:
         return
 
@@ -208,7 +209,6 @@ def validate_default_network(
 def validate_default_providers(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     networks = config['networks']
     providers = config['providers']
     for chain_id, provider_name in value.items():
@@ -225,7 +225,6 @@ def validate_default_providers(
 def validate_db_configs(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     if not isinstance(value, dict):
         raise spec.ConfigInvalid('invalid format for db_config')
     if len(value) == 0:
@@ -239,13 +238,14 @@ def validate_db_configs(
                     'db config should have keys dbms and path'
                 )
         else:
-            raise spec.ConfigInvalid('unrecognized dbms: ' + str(db_config['dbms']))
+            raise spec.ConfigInvalid(
+                'unrecognized dbms: ' + str(db_config['dbms'])
+            )
 
 
 def validate_context_cache_rules(
     value: typing.Any, config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     if not isinstance(value, list):
         raise Exception('context_cache_rules must be a list of rules')
 
@@ -280,7 +280,6 @@ def validate_context_cache_rules(
 def validate_non_overlapping_identifiers(
     config: typing.Mapping[typing.Any, typing.Any]
 ) -> None:
-
     providers = config.get('providers')
     if not isinstance(providers, dict):
         raise Exception('invalid format for providers')

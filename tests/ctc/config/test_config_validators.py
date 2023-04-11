@@ -38,6 +38,7 @@ valid_values = {
                 'session_kwargs': {},
                 'chunk_size': None,
                 'convert_reverts_to_none': False,
+                'disable_batch_requests': True,
             },
         },
         {
@@ -49,6 +50,7 @@ valid_values = {
                 'session_kwargs': {},
                 'chunk_size': None,
                 'convert_reverts_to_none': False,
+                'disable_batch_requests': True,
             },
         },
     ],
@@ -89,6 +91,7 @@ invalid_values = {
                 'session_kwargs': {},
                 'chunk_size': None,
                 'convert_reverts_to_none': False,
+                'disable_batch_requests': True,
             },
         },
         {
@@ -100,6 +103,7 @@ invalid_values = {
                 'session_kwargs': {},
                 'chunk_size': None,
                 'convert_reverts_to_none': False,
+                'disable_batch_requests': True,
             },
         },
     ],
