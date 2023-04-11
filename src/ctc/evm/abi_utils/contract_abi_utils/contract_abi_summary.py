@@ -288,9 +288,10 @@ def contract_abi_to_dataframe(
     contract_abi: spec.ContractABI,
     human_readable: bool,
 ) -> spec.DataFrame:
-    """create pandas DataFrame representation of contract ABI"""
+    """create DataFrame representation of contract ABI"""
 
     import copy
+    import polars as pl
 
     contract_abi = copy.deepcopy(contract_abi)
     for entry in typing.cast(
@@ -334,18 +335,7 @@ def contract_abi_to_dataframe(
             if 'stateMutability' not in entry:
                 entry['stateMutability'] = ''
 
-    import pandas as pd  # type: ignore
-
-    df = pd.DataFrame(contract_abi)
-    df = df.reindex(
-        columns=[
-            'type',
-            'name',
-            'inputs',
-            'outputs',
-            'stateMutability',
-            'anonymous',
-        ]
-    )
+    df = pl.DataFrame(contract_abi)
 
     return df
+

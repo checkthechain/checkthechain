@@ -8,32 +8,17 @@ from ctc import spec
 
 
 async def async_get_event_timestamps(
-    events: spec.PolarsDataFrame | spec.PandasDataFrame,
+    events: spec.PolarsDataFrame,
     *,
     context: spec.Context = None,
 ) -> typing.Sequence[int]:
     """get timestamps of an events dataframe"""
 
     # get block_numbers
-    if spec.is_polars_dataframe(events):
-        block_numbers = typing.cast(
-            typing.Sequence[int],
-            events['block_number'].to_list(),
-        )
-    elif spec.is_pandas_dataframe(events):
-        multi_index = 'block_number' in events.index.names
-        if multi_index:
-            block_numbers = typing.cast(
-                typing.Sequence[int],
-                events.index.get_level_values('block_number'),
-            )
-        else:
-            block_numbers = typing.cast(
-                typing.Sequence[int],
-                events.index.values,
-            )
-    else:
-        raise Exception('unknown dataframe format')
+    block_numbers = typing.cast(
+        typing.Sequence[int],
+        events['block_number'].to_list(),
+    )
 
     # get timestamps
     return await block_utils.async_get_block_timestamps(
