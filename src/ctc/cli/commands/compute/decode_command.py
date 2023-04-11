@@ -25,5 +25,5 @@ for nested datatypes, enclose in quotes and quote contained addresses""",
 
 
 def decode_command(type: str, data: str) -> None:
-    decoded = evm.abi_decode(evm.binary_convert(data, 'binary'), type)
+    decoded = evm.abi_decode(evm.to_binary(data), type)
     print(decoded)

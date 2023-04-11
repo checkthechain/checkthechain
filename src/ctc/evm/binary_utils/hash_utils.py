@@ -67,7 +67,7 @@ def keccak(
             library = 'pycryptodome'
 
     # convert data to binary
-    data = format_utils.binary_convert(data, 'binary')
+    data = format_utils.to_binary(data)
 
     if library == 'pysha3':
         import sha3

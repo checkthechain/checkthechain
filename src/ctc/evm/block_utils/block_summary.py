@@ -90,7 +90,7 @@ async def async_print_block_summary(
 
     message = block['extra_data']
     try:
-        message = binary_utils.binary_convert(message, 'binary').decode()
+        message = binary_utils.to_binary(message).decode()
     except Exception:
         if len(message) > 80:
             message = message[:77] + '...'

@@ -148,13 +148,13 @@ async def _async_query_node_events_chunk(
 
     # encode topics
     if event_hash is not None:
-        event_hash = binary_utils.binary_convert(event_hash, 'prefix_hex')
+        event_hash = binary_utils.to_hex(event_hash)
     if topic1 is not None:
-        topic1 = binary_utils.binary_convert(topic1, 'prefix_hex')
+        topic1 = binary_utils.to_hex(topic1)
     if topic2 is not None:
-        topic2 = binary_utils.binary_convert(topic2, 'prefix_hex')
+        topic2 = binary_utils.to_hex(topic2)
     if topic3 is not None:
-        topic3 = binary_utils.binary_convert(topic3, 'prefix_hex')
+        topic3 = binary_utils.to_hex(topic3)
 
     # assemble topics
     if topic3 is not None:

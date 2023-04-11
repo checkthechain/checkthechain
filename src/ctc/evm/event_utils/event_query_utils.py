@@ -125,7 +125,7 @@ async def _async_parse_event_query_args(
     if event_abi is not None:
         event_hash = abi_utils.get_event_hash(event_abi)
     if event_hash is not None:
-        encoded_event_hash = binary_utils.binary_convert(event_hash, 'binary')
+        encoded_event_hash = binary_utils.to_binary(event_hash)
     else:
         encoded_event_hash = None
 
@@ -154,17 +154,17 @@ async def _async_parse_event_query_args(
         if not topic1_is_binary:
             topic1 = abi_utils.abi_encode(topic1, indexed_types[0])
         else:
-            topic1 = binary_utils.binary_convert(topic1, 'binary', n_bytes=32)
+            topic1 = binary_utils.to_binary(topic1, n_bytes=32)
     if topic2 is not None:
         if not topic2_is_binary:
             topic2 = abi_utils.abi_encode(topic2, indexed_types[1])
         else:
-            topic2 = binary_utils.binary_convert(topic2, 'binary', n_bytes=32)
+            topic2 = binary_utils.to_binary(topic2, n_bytes=32)
     if topic3 is not None:
         if not topic3_is_binary:
             topic3 = abi_utils.abi_encode(topic3, indexed_types[2])
         else:
-            topic3 = binary_utils.binary_convert(topic3, 'binary', n_bytes=32)
+            topic3 = binary_utils.to_binary(topic3, n_bytes=32)
 
     # return result
     return (encoded_event_hash, topic1, topic2, topic3), event_abi
@@ -294,7 +294,7 @@ def print_event_query_summary(
 
     cli.print_bullet(key='contract_address', value=contract_address)
     if event_hash is not None:
-        event_hash = binary_utils.binary_convert(event_hash, 'prefix_hex')
+        event_hash = binary_utils.to_hex(event_hash)
     cli.print_bullet(key='event_hash', value=event_hash)
     cli.print_bullet(key='topic1', value=topic1)
     cli.print_bullet(key='topic2', value=topic2)

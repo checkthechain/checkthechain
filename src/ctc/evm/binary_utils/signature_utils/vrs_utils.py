@@ -22,9 +22,9 @@ def pack_signature_vrs(
         v, r, s = vrs
 
     if v is not None and r is not None and s is not None:
-        v_bytes = format_utils.binary_convert(v, 'binary', n_bytes=1)
-        r_bytes = format_utils.binary_convert(r, 'binary', n_bytes=32)
-        s_bytes = format_utils.binary_convert(s, 'binary', n_bytes=32)
+        v_bytes = format_utils.to_binary(v, n_bytes=1)
+        r_bytes = format_utils.to_binary(r, n_bytes=32)
+        s_bytes = format_utils.to_binary(s, n_bytes=32)
     else:
         raise Exception('must specify v, r, and s')
 
@@ -36,7 +36,7 @@ def pack_signature_vrs(
     else:
         raise Exception('unknown vrs packing mode: ' + str(mode))
 
-    return format_utils.binary_convert(signature, 'prefix_hex')
+    return format_utils.to_hex(signature)
 
 
 def unpack_signature_vrs(signature: spec.Signature) -> tuple[int, int, int]:
@@ -46,7 +46,7 @@ def unpack_signature_vrs(signature: spec.Signature) -> tuple[int, int, int]:
         v, r, s = signature
 
     else:
-        bytes_signature = format_utils.binary_convert(signature, 'binary')
+        bytes_signature = format_utils.to_binary(signature)
 
         if len(bytes_signature) == 65:
             r = bytes_signature[:32]

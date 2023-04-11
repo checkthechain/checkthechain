@@ -11,16 +11,15 @@ rlp_examples = [
     # str
     [
         'dog',
-        evm.binary_convert(bytes.fromhex('83') + 'dog'.encode(), 'prefix_hex'),
+        evm.to_hex(bytes.fromhex('83') + 'dog'.encode()),
     ],
     [
         ['cat', 'dog'],
-        evm.binary_convert(
+        evm.to_hex(
             bytes.fromhex('c883')
             + 'cat'.encode()
             + bytes.fromhex('83')
-            + 'dog'.encode(),
-            'prefix_hex',
+            + 'dog'.encode()
         ),
     ],
     #
@@ -178,3 +177,4 @@ def test_rlp_encode_address_integer_tuples(test):
     nonce, target_encoding = test
 
     assert evm.rlp_encode([address, nonce], str_mode='hex') == target_encoding
+

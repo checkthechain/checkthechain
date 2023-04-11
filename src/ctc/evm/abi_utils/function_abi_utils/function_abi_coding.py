@@ -36,9 +36,7 @@ def encode_call_data(
         function_selector = function_abi_parsing.get_function_selector(
             function_abi
         )
-    function_selector = binary_utils.binary_convert(
-        function_selector, 'prefix_hex'
-    )
+    function_selector = binary_utils.to_hex(function_selector)
 
     # encode parameters
     if encoded_parameters is None:
@@ -47,9 +45,7 @@ def encode_call_data(
             parameter_types=parameter_types,
             function_abi=function_abi,
         )
-    encoded_parameters = binary_utils.binary_convert(
-        encoded_parameters, 'raw_hex'
-    )
+    encoded_parameters = binary_utils.to_hex(encoded_parameters, prefix=False)
 
     # join function selector with parameters
     return function_selector + encoded_parameters
@@ -64,10 +60,8 @@ def decode_call_data(
     """decode function call data using solidity-style ABI decoding"""
 
     # get function selector
-    call_data_bytes = binary_utils.binary_convert(call_data, 'binary')
-    function_selector = binary_utils.binary_convert(
-        call_data_bytes[:4], 'prefix_hex'
-    )
+    call_data_bytes = binary_utils.to_binary(call_data)
+    function_selector = binary_utils.to_hex(call_data_bytes[:4])
 
     # get function abi
     if function_abi is None:
@@ -150,7 +144,7 @@ def encode_function_parameters(
             parameter_type == 'bytes32'
             and binary_utils.get_binary_format(parameter) != 'binary'
         ):
-            parameter = binary_utils.binary_convert(parameter, 'binary')
+            parameter = binary_utils.to_binary(parameter)
         new_parameters.append(parameter)
     parameters = new_parameters
 
@@ -174,9 +168,7 @@ def decode_function_parameters(
     """decode function parameters using solidity-style ABI decoding"""
 
     parameter_types_str = '(' + ','.join(parameter_types) + ')'
-    encoded_parameters = binary_utils.binary_convert(
-        encoded_parameters, 'binary'
-    )
+    encoded_parameters = binary_utils.to_binary(encoded_parameters)
     parameters = abi_coding_utils.abi_decode(
         encoded_parameters, parameter_types_str
     )
@@ -236,7 +228,7 @@ def decode_function_output(
     output_types_str = '(' + ','.join(output_types) + ')'
 
     # decode
-    encoded_output = binary_utils.binary_convert(encoded_output, 'binary')
+    encoded_output = binary_utils.to_binary(encoded_output)
     decoded_output = abi_coding_utils.abi_decode(
         encoded_output, output_types_str
     )
@@ -248,7 +240,7 @@ def decode_function_output(
             # item = item.decode()
             item = item
         elif output_type == 'bytes32':
-            item = binary_utils.binary_convert(item, 'prefix_hex')
+            item = binary_utils.to_hex(item)
         new_decoded_output.append(item)
     decoded_output = new_decoded_output
 
@@ -265,3 +257,4 @@ def decode_function_output(
             decoded_output = dict(zip(names, decoded_output))
 
     return decoded_output
+

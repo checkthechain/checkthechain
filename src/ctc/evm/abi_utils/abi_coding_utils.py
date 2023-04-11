@@ -14,7 +14,7 @@ def abi_decode(
 
     import eth_abi_lite
 
-    data = binary_utils.binary_convert(data, 'binary')
+    data = binary_utils.to_binary(data)
 
     # hardcode some conversions for speed
     if types == 'address':

@@ -119,7 +119,7 @@ async def async_decode_call_command(
                 call_data = (
                     '0x'
                     + function_selector
-                    + evm.binary_convert(call_data, 'raw_hex')
+                    + evm.to_hex(call_data, prefix=False)
                 )
 
             decoded = evm.decode_call_data(
@@ -150,7 +150,7 @@ async def async_decode_call_command(
     if contract_known:
         print_bullet('to', contract_address, indent)
     print_bullet(
-        'n_bytes', len(evm.binary_convert(call_data, 'binary')), indent
+        'n_bytes', len(evm.to_binary(call_data)), indent
     )
     if send_value is not None:
         print_bullet('value', send_value, indent)
@@ -321,9 +321,7 @@ async def async_decode_call_command(
                 )
                 for subparameter in parameter:
                     if isinstance(subparameter, bytes):
-                        subparameter = evm.binary_convert(
-                            subparameter, 'prefix_hex'
-                        )
+                        subparameter = evm.to_hex(subparameter)
                     toolstr.print(
                         indent + '    ' + stringify(subparameter),
                         style=styles['description'],
@@ -334,7 +332,7 @@ async def async_decode_call_command(
                     )
             else:
                 if isinstance(parameter, bytes):
-                    parameter = evm.binary_convert(parameter, 'prefix_hex')
+                    parameter = evm.to_hex(parameter)
                 print_bullet(
                     input_name,
                     parameter,

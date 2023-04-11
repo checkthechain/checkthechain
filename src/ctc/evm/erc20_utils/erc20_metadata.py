@@ -19,7 +19,7 @@ async def async_get_erc20_address(
     """return address of input token, input as either symbol or address"""
 
     if isinstance(token, bytes):
-        token = binary_utils.binary_convert(token, 'prefix_hex')
+        token = binary_utils.to_hex(token)
 
     if address_utils.is_address_str(token):
         return token
@@ -324,7 +324,7 @@ def _decode_raw_symbol(data: str | None) -> str:
     elif len(data) == 0 or data == '0x':
         return ''
     else:
-        as_binary = binary_utils.binary_convert(data, 'binary')
+        as_binary = binary_utils.to_binary(data)
         as_str: str = abi_utils.abi_decode(as_binary, '(string)')[0]
         return as_str
 

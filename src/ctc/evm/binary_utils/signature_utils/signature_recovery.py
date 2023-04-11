@@ -75,11 +75,11 @@ def recover_signer_public_key(
         v = v - network_id * 2 - 8
 
     # get signer
-    message_hash = format_utils.binary_convert(message_hash, 'binary')
+    message_hash = format_utils.to_binary(message_hash)
     x, y = secp256k1_utils.ecdsa_raw_recover(message_hash, (v, r, s))
     signer = x.to_bytes(32, byteorder='big') + y.to_bytes(32, byteorder='big')
 
-    return format_utils.binary_convert(signer, 'prefix_hex')
+    return format_utils.to_hex(signer)
 
 
 def recover_signer_address(

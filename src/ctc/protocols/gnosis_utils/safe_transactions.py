@@ -13,7 +13,7 @@ def parse_safe_signatures(
     """
     reference: https://docs.gnosis-safe.io/contracts/signatures
     """
-    as_bytes = evm.binary_convert(signatures, 'binary')
+    as_bytes = evm.to_binary(signatures)
 
     eip_1271_positions = []
     eip_1271_indices = []
@@ -29,7 +29,7 @@ def parse_safe_signatures(
         if 31 > signature_type and signature_type > 26:
             parsed = {
                 'type': 'ecdsa',
-                'signature': evm.binary_convert(signature, 'prefix_hex'),
+                'signature': evm.to_hex(signature),
                 'r': evm.binary_convert(signature[:32], 'integer'),
                 's': evm.binary_convert(signature[32:64], 'integer'),
                 'v': evm.binary_convert(signature_type, 'integer'),
@@ -37,7 +37,7 @@ def parse_safe_signatures(
         elif signature_type > 30:
             parsed = {
                 'type': 'eth_sign',
-                'signature': evm.binary_convert(signature, 'prefix_hex'),
+                'signature': evm.to_hex(signature),
                 'r': evm.binary_convert(signature[:32], 'integer'),
                 's': evm.binary_convert(signature[32:64], 'integer'),
                 'v': evm.binary_convert(signature_type - 4, 'integer'),
@@ -45,10 +45,8 @@ def parse_safe_signatures(
         elif signature_type == 0:
             parsed = {
                 'type': 'eip1271',
-                'signature': evm.binary_convert(signature, 'prefix_hex'),
-                'verifier': evm.binary_convert(
-                    signature[:32][-20:], 'prefix_hex'
-                ),
+                'signature': evm.to_hex(signature),
+                'verifier': evm.to_hex(signature[:32][-20:]),
                 'position': evm.binary_convert(signature[32:64], 'integer'),
             }
             position: int = typing.cast(int, parsed['position'])
@@ -57,10 +55,8 @@ def parse_safe_signatures(
         elif signature_type == 1:
             parsed = {
                 'type': 'prevalidated',
-                'signature': evm.binary_convert(signature, 'prefix_hex'),
-                'validator': evm.binary_convert(
-                    signature[:32][-20:], 'prefix_hex'
-                ),
+                'signature': evm.to_hex(signature),
+                'validator': evm.to_hex(signature[:32][-20:]),
             }
         else:
             raise Exception('unknown signature type: ' + str(signature_type))

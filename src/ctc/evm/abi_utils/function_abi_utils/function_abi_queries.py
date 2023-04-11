@@ -19,9 +19,7 @@ def get_function_abi(
     """get function ABI from contract ABI"""
 
     if function_selector is not None:
-        function_selector = binary_utils.binary_convert(
-            function_selector, 'prefix_hex'
-        )
+        function_selector = binary_utils.to_hex(function_selector)
 
     candidates = []
     for item in contract_abi:
@@ -54,9 +52,7 @@ def get_function_abi(
             item_selector = function_abi_parsing.get_function_selector(
                 function_abi
             )
-            item_selector = binary_utils.binary_convert(
-                item_selector, 'prefix_hex'
-            )
+            item_selector = binary_utils.to_hex(item_selector)
             if item_selector != function_selector:
                 continue
         candidates.append(function_abi)

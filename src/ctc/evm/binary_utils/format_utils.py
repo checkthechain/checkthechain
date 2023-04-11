@@ -47,6 +47,39 @@ def get_binary_n_bytes(data: spec.GenericBinaryData) -> int:
 #
 
 
+def to_hex(
+    data: spec.GenericBinaryData,
+    *,
+    prefix: bool = True,
+    n_bytes: int | None = None,
+    keep_leading_0: bool | None = None,
+) -> str:
+    if prefix:
+        output_format: typing.Literal['prefix_hex', 'raw_hex'] = 'prefix_hex'
+    else:
+        output_format = 'raw_hex'
+    return binary_convert(
+        data=data,
+        output_format=output_format,
+        n_bytes=n_bytes,
+        keep_leading_0=keep_leading_0,
+    )
+
+
+def to_binary(
+    data: spec.GenericBinaryData,
+    *,
+    n_bytes: int | None = None,
+    keep_leading_0: bool | None = None,
+) -> bytes:
+    return binary_convert(
+        data=data,
+        output_format='binary',
+        n_bytes=n_bytes,
+        keep_leading_0=keep_leading_0,
+    )
+
+
 def text_to_binary(
     text: str,
     output_format: typing.Optional[spec.BinaryFormat] = None,

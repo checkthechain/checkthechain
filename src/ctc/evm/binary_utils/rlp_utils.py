@@ -70,7 +70,7 @@ def rlp_encode(
         if item == 0:
             item = bytes()
         else:
-            item = format_utils.binary_convert(item, 'binary')
+            item = format_utils.to_binary(item)
 
     if isinstance(item, (tuple, list)):
         output = _rlp_encode_list(item, str_mode=str_mode)
@@ -85,8 +85,7 @@ def rlp_encode(
 
 
 def _rlp_encode_bytes(data: bytes) -> bytes:
-
-    data = format_utils.binary_convert(data, 'binary')
+    data = format_utils.to_binary(data)
 
     length = len(data)
     if length == 0:
@@ -95,22 +94,17 @@ def _rlp_encode_bytes(data: bytes) -> bytes:
         return data
     elif length <= 55:
         prefix = 128 + length
-        return format_utils.binary_convert(prefix, 'binary') + data
+        return format_utils.to_binary(prefix) + data
     else:
-        length_as_bytes = format_utils.binary_convert(length, 'binary')
+        length_as_bytes = format_utils.to_binary(length)
         prefix = 183 + len(length_as_bytes)
-        return (
-            format_utils.binary_convert(prefix, 'binary')
-            + length_as_bytes
-            + data
-        )
+        return format_utils.to_binary(prefix) + length_as_bytes + data
 
 
 def _rlp_encode_list(
     items: typing.Sequence[typing.Any],
     str_mode: Literal['auto', 'text', 'hex'] | None = None,
 ) -> bytes:
-
     encoded_items = [
         rlp_encode(item, str_mode=str_mode, output_format='binary')
         for item in items
@@ -119,22 +113,16 @@ def _rlp_encode_list(
     total_payload_length = sum(item_lengths)
 
     if total_payload_length <= 55:
-        prefix = format_utils.binary_convert(
-            192 + total_payload_length, 'binary'
-        )
+        prefix = format_utils.to_binary(192 + total_payload_length)
         output = prefix
         for item in encoded_items:
             output = output + item
         return output
 
     else:
-        bytes_of_length = format_utils.binary_convert(
-            total_payload_length, 'binary'
-        )
+        bytes_of_length = format_utils.to_binary(total_payload_length)
         prefix_int = 247 + len(bytes_of_length)
-        output = (
-            format_utils.binary_convert(prefix_int, 'binary') + bytes_of_length
-        )
+        output = format_utils.to_binary(prefix_int) + bytes_of_length
         for item in encoded_items:
             output = output + item
         return output
@@ -144,7 +132,6 @@ def _rlp_encode_str(
     item: str,
     str_mode: Literal['auto', 'text', 'hex'] | None,
 ) -> bytes:
-
     if str_mode == 'auto':
         if item.startswith('0x'):
             str_mode = 'hex'
@@ -154,7 +141,7 @@ def _rlp_encode_str(
     if str_mode == 'text':
         as_bytes = item.encode()
     elif str_mode == 'hex':
-        as_bytes = format_utils.binary_convert(item, 'binary')
+        as_bytes = format_utils.to_binary(item)
     else:
         raise Exception('unknown str mode: ' + str(str_mode))
 
@@ -182,7 +169,7 @@ def rlp_decode(
     if types is not None:
         types = _process_rlp_types(types)
 
-    data = format_utils.binary_convert(data, 'binary')
+    data = format_utils.to_binary(data)
     decoded, remaining = _rlp_decode_chunk(data=data, types=types)
     if len(remaining) > 0:
         raise Exception('data contains extra bytes')
@@ -192,7 +179,6 @@ def rlp_decode(
 def _process_rlp_types(
     types: str | typing.Sequence[str],
 ) -> str | typing.Sequence[str]:
-
     allowed_types = [
         'prefix_hex',
         'raw_hex',
@@ -236,7 +222,6 @@ def _rlp_decode_primitive_chunk(
     data: bytes,
     types: RLPDecodeTypes,
 ) -> tuple[typing.Any, bytes]:
-
     first_byte = data[0]
 
     if first_byte <= 0x7F:
@@ -293,7 +278,6 @@ def _rlp_decode_list_chunk(
     data: bytes,
     types: RLPDecodeTypes,
 ) -> tuple[list[typing.Any], bytes]:
-
     first_byte = data[0]
 
     if first_byte <= 0xBF:
@@ -341,7 +325,6 @@ def _rlp_decode_list_chunk(
     remaining_payload = list_payload
     index = 0
     while len(remaining_payload) > 0:
-
         # get type of item
         if isinstance(types, (list, tuple)):
             if index >= len(types):
@@ -363,3 +346,4 @@ def _rlp_decode_list_chunk(
         index += 1
 
     return output, remaining
+

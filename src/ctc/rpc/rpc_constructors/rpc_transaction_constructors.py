@@ -27,7 +27,7 @@ def construct_eth_get_transaction_by_block_hash_and_index(
     block_hash: spec.BinaryData,
     transaction_index: spec.BinaryData,
 ) -> spec.RpcSingularRequest:
-    transaction_index = evm.binary_convert(transaction_index, 'prefix_hex')
+    transaction_index = evm.to_hex(transaction_index)
 
     return rpc_request.create(
         'eth_getTransactionByBlockHashAndIndex',
@@ -40,7 +40,7 @@ def construct_eth_get_transaction_by_block_number_and_index(
     transaction_index: spec.BinaryData,
 ) -> spec.RpcSingularRequest:
     block_number = evm.encode_block_number(block_number)
-    transaction_index = evm.binary_convert(transaction_index, 'prefix_hex')
+    transaction_index = evm.to_hex(transaction_index)
 
     return rpc_request.create(
         'eth_getTransactionByBlockNumberAndIndex',

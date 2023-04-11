@@ -13,8 +13,6 @@ from . import events_schema_defs
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
 
-    import polars as pl
-
 
 async def async_upsert_events(
     *,
@@ -203,7 +201,7 @@ async def async_select_events(
         'topic3': topic3,
     }
     where_equals = {
-        k: evm.binary_convert(v, 'binary')
+        k: evm.to_binary(v)
         for k, v in where_equals.items()
         if v is not None
     }
@@ -314,15 +312,15 @@ async def async_select_event_queries(
 
     # encode inputs
     if contract_address is not None:
-        contract_address = evm.binary_convert(contract_address, 'binary')
+        contract_address = evm.to_binary(contract_address)
     if event_hash is not None:
-        event_hash = evm.binary_convert(event_hash, 'binary')
+        event_hash = evm.to_binary(event_hash)
     if topic1 is not None:
-        topic1 = evm.binary_convert(topic1, 'binary')
+        topic1 = evm.to_binary(topic1)
     if topic2 is not None:
-        topic2 = evm.binary_convert(topic2, 'binary')
+        topic2 = evm.to_binary(topic2)
     if topic3 is not None:
-        topic3 = evm.binary_convert(topic3, 'binary')
+        topic3 = evm.to_binary(topic3)
 
     # create equality filters
     where_equals: typing.Mapping[str, typing.Any] | None

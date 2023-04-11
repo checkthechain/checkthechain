@@ -29,7 +29,7 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
     address_format = binary_utils.get_binary_format(address)
     if address_format not in ['prefix_hex', 'raw_hex']:
         raise Exception('checksum only relevant to hex formatted addresses')
-    address = binary_utils.binary_convert(address, 'raw_hex')
+    address = binary_utils.to_hex(address, prefix=False)
 
     # compute address hash
     address_hash = binary_utils.keccak_text(
@@ -50,6 +50,6 @@ def get_address_checksum(address: spec.Address) -> spec.Address:
     if address_format == 'raw_hex':
         return raw_checksum
     elif address_format == 'prefix_hex':
-        return binary_utils.binary_convert(raw_checksum, 'prefix_hex')
+        return binary_utils.to_hex(raw_checksum)
     else:
         raise Exception('checksum only relevant to hex formatted addresses')

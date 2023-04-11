@@ -53,5 +53,5 @@ def encode_command(*, type: str, data: str, packed: bool) -> None:
     else:
         encoded = evm.abi_encode(literal_data, type)
 
-    as_hex = evm.binary_convert(encoded, 'prefix_hex')
+    as_hex = evm.to_hex(encoded)
     print(as_hex)

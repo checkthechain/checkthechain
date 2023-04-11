@@ -14,11 +14,7 @@ def encode_block_number(block: spec.BlockNumberReference) -> str:
     if isinstance(standard_block, str):
         return standard_block
     elif isinstance(standard_block, int):
-        return binary_utils.binary_convert(
-            standard_block,
-            'prefix_hex',
-            keep_leading_0=False,
-        )
+        return binary_utils.to_hex(standard_block, keep_leading_0=False)
     else:
         raise Exception('could not encode block number')
 

@@ -61,10 +61,10 @@ def sign_message_hash(
 ) -> tuple[int, int, int]:
     """sign message hash using private key"""
 
-    message_hash = format_utils.binary_convert(message_hash, 'binary')
+    message_hash = format_utils.to_binary(message_hash)
 
     # compute signature
-    private_binary = format_utils.binary_convert(private_key, 'binary')
+    private_binary = format_utils.to_binary(private_key)
     v, r, s = secp256k1_utils.ecdsa_raw_sign(
         message_hash,
         priv=private_binary,
@@ -105,7 +105,7 @@ def _hash_data_message(
     mode: Literal['eth_sign', 'personal_sign'],
 ) -> bytes:
 
-    message = format_utils.binary_convert(message, 'binary')
+    message = format_utils.to_binary(message)
 
     # add prefix
     if mode == 'eth_sign':

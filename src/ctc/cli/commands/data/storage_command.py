@@ -50,6 +50,6 @@ async def async_storage_command(
     if datatype is None:
         print(result)
     else:
-        as_bytes = evm.binary_convert(result, 'binary')
+        as_bytes = evm.to_binary(result)
         decoded = evm.abi_decode(as_bytes, datatype)
         print(decoded)

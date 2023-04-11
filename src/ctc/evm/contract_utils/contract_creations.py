@@ -32,12 +32,10 @@ def get_created_address(
     elif salt is not None and init_code is not None:
         # create2
         data = (
-            binary_utils.binary_convert('0xff', 'raw_hex')
-            + binary_utils.binary_convert(sender, 'raw_hex')
-            + binary_utils.binary_convert(salt, 'raw_hex')
-            + binary_utils.binary_convert(
-                binary_utils.keccak(init_code), 'raw_hex'
-            )
+            binary_utils.to_hex('0xff', prefix=False)
+            + binary_utils.to_hex(sender, prefix=False)
+            + binary_utils.to_hex(salt, prefix=False)
+            + binary_utils.to_hex(binary_utils.keccak(init_code), prefix=False)
         )
     else:
         raise Exception('specify either {nonce} or {salt, init_code}')
