@@ -158,13 +158,13 @@ class BalancerDEX(dex_class.DEX):
                     for address in trades['arg__tokenOut'].to_list()
                 ],
             ),
-            'sold_amount': trades['arg__amountIn'].map(int),
-            'bought_amount': trades['arg__amountOut'].map(int),
+            'sold_amount': trades['arg__amountIn'].apply(int),
+            'bought_amount': trades['arg__amountOut'].apply(int),
         }
 
         if include_timestamps:
             output['timestamp'] = await evm.async_get_block_timestamps(
-                blocks=trades['block_number'],
+                blocks=trades['block_number'].to_list(),
                 context=context,
             )
 

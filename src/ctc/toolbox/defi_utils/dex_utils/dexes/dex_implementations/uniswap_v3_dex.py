@@ -43,8 +43,7 @@ class UniswapV3DEX(dex_class.DEX):
         )
 
         dex_pools = []
-        for index, row in df.iterrows():
-            block = int(index)
+        for row in df.to_dicts():
             dex_pool: spec.DexPool = {
                 'address': row['arg__pool'],
                 'factory': factory,
@@ -53,7 +52,7 @@ class UniswapV3DEX(dex_class.DEX):
                 'asset2': None,
                 'asset3': None,
                 'fee': row['arg__fee'] * 100,
-                'creation_block': block,
+                'creation_block': row['block_number'],
                 'additional_data': {},
             }
             dex_pools.append(dex_pool)

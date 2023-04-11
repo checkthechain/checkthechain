@@ -28,7 +28,6 @@ class UniswapV2DEX(dex_class.DEX):
         end_time: tooltime.Timestamp | None = None,
         context: spec.Context = None,
     ) -> typing.Sequence[spec.DexPool]:
-
         df = await evm.async_get_events(
             factory,
             event_abi=uniswap_v2_utils.factory_event_abis['PairCreated'],
@@ -41,8 +40,7 @@ class UniswapV2DEX(dex_class.DEX):
         )
 
         dex_pools = []
-        for index, row in df.iterrows():
-            block = int(index)
+        for row in df.to_dicts():
             dex_pool: spec.DexPool = {
                 'address': row['arg__pair'],
                 'factory': factory,
@@ -51,7 +49,7 @@ class UniswapV2DEX(dex_class.DEX):
                 'asset2': None,
                 'asset3': None,
                 'fee': int(0.003 * 1e8),
-                'creation_block': block,
+                'creation_block': row['blockNumber'],
                 'additional_data': {},
             }
             dex_pools.append(dex_pool)
@@ -65,7 +63,6 @@ class UniswapV2DEX(dex_class.DEX):
         block: spec.BlockNumberReference | None = None,
         context: spec.Context = None,
     ) -> tuple[str, str]:
-
         import asyncio
         from ctc.protocols import uniswap_v2_utils
 
@@ -97,6 +94,7 @@ class UniswapV2DEX(dex_class.DEX):
         context: spec.Context = None,
         verbose: bool = False,
     ) -> spec.RawDexTrades:
+        import polars as pl
 
         trades = await evm.async_get_events(
             event_abi=uniswap_v2_utils.pool_event_abis['Swap'],
@@ -110,25 +108,31 @@ class UniswapV2DEX(dex_class.DEX):
             context=context,
         )
 
-        sold_id = (trades['arg__amount0Out'].map(int) > 0).astype(int)
-        bought_id = (sold_id == 0).astype(int)
-        sold_amount = trades['arg__amount0In'].map(int) + trades[
-            'arg__amount1In'
-        ].map(int)
-        bought_amount = trades['arg__amount0Out'].map(int) + trades[
-            'arg__amount1Out'
-        ].map(int)
+        df = trades.select(
+            (pl.when(pl.col('arg__amount0Out') > 0).then(1).otherwise(0)).alias(
+                'sold_id'
+            ),
+            (pl.col('arg__amount0In') + pl.col('arg__amount1In')).alias(
+                'sold_amount'
+            ),
+            (pl.col('arg__amount0Out') + pl.col('arg__amount1Out')).alias(
+                'bought_amount'
+            ),
+        )
+        df = df.with_columns((1 - pl.col('sold_id')).alias('bought_id'))
 
         output: spec.RawDexTrades = {
+            'block_number': trades['block_number'],
             'transaction_hash': trades['transaction_hash'],
             'recipient': trades['arg__to'],
-            'sold_id': sold_id,
-            'bought_id': bought_id,
-            'sold_amount': sold_amount,
-            'bought_amount': bought_amount,
+            'sold_id': df['sold_id'],
+            'bought_id': df['bought_id'],
+            'sold_amount': df['sold_amount'],
+            'bought_amount': df['bought_amount'],
         }
 
         if include_timestamps:
             output['timestamp'] = trades['timestamp']
 
         return output
+

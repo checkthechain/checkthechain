@@ -205,12 +205,13 @@ class CurveDEX(dex_class.DEX):
 
         # gather relevatn subset of data
         output: spec.RawDexTrades = {
+            'block_number': trades['block_number'],
             'transaction_hash': trades['transaction_hash'],
             'recipient': trades['arg__buyer'],
             'sold_id': trades['arg__sold_id'],
             'bought_id': trades['arg__bought_id'],
-            'sold_amount': trades['arg__tokens_sold'].map(int),
-            'bought_amount': trades['arg__tokens_bought'].map(int),
+            'sold_amount': trades['arg__tokens_sold'],
+            'bought_amount': trades['arg__tokens_bought'],
         }
 
         if include_timestamps:

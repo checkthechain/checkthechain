@@ -7,7 +7,7 @@ from . import external_types
 
 
 class RawDexTrades(TypedDict):
-    # each should be  series indexed by block number
+    block_number: external_types.Series
     timestamp: NotRequired[external_types.Series | typing.Sequence[int] | None]
     transaction_hash: external_types.Series
     recipient: NotRequired[external_types.Series | None]
