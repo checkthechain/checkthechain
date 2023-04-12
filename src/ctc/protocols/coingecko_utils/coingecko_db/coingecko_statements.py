@@ -76,7 +76,7 @@ async def async_select_tokens(
     # symbol query
     if symbol_query is not None:
         symbol_filter: toolsql.WhereGroup | None = {
-            'where_ilike': {'symbol': {'%' + symbol_query.lower() + '%'}}
+            'where_ilike': {'symbol': '%' + symbol_query.lower() + '%'}
         }
     else:
         symbol_filter = None
@@ -84,7 +84,7 @@ async def async_select_tokens(
     # name query
     if name_query is not None:
         name_filter: toolsql.WhereGroup | None = {
-            'where_ilike': {'symbol': {'%' + name_query.lower() + '%'}}
+            'where_ilike': {'symbol': '%' + name_query.lower() + '%'}
         }
     else:
         name_filter = None
