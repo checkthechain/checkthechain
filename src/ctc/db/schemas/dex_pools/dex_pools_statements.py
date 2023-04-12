@@ -187,7 +187,6 @@ async def async_select_dex_pools(
         query.setdefault('where_in', {})
         query['where_in']['factory'] = factories
     if assets is not None:
-        query.setdefault('filters', [])
         for asset in assets:
             asset = asset.lower()
             query['where_or'] = [
