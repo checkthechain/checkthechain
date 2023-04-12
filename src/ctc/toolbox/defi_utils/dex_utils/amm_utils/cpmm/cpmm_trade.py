@@ -168,6 +168,15 @@ def trade_to_price(
             raise Exception('must specify x_per_y or y_per_x')
         new_x_per_y = new_y_per_x**-1
 
+    import numpy as np
+    if np.isclose(x_reserves / y_reserves, new_x_per_y):
+        return trade(
+            x_sold=0,
+            x_reserves=x_reserves,
+            y_reserves=y_reserves,
+            fee_rate=fee_rate,
+        )
+
     # compute trades
     if new_x_per_y >= x_reserves / y_reserves:
         # case: sell x to increase x per y
