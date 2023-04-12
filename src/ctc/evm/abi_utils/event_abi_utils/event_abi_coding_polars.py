@@ -37,10 +37,17 @@ async def async_decode_events_dataframe(
     import polars as pl
     from ctc.toolbox import pl_utils
 
+    if len(events) == 0:
+        return events
+
     # get event abis
     event_abis = await _async_get_events_abis(
         events=events, event_abis=event_abis, context=context
     )
+
+    # case: no events, only logs
+    if len(event_abis) == 0:
+        return events
 
     # get event schemas
     event_schemas = {
