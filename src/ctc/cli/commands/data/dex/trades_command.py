@@ -58,6 +58,8 @@ async def async_trades_command(
     verbose: bool,
 ) -> None:
 
+    import polars as pl
+
     if blocks is not None:
         start_block, end_block = await cli_utils.async_parse_block_range(blocks)
     else:
@@ -85,16 +87,16 @@ async def async_trades_command(
             raise Exception('unknown export format')
     else:
 
-        trades = trades.iloc[-100:]
-        trades = trades.reset_index()
+        trades = trades[-100:]
 
         block_timestamps = await evm.async_get_block_timestamps(
             trades['block_number']
         )
-        trades['timestamp'] = [
+        timestamp_list = [
             tooltime.timestamp_to_iso_pretty(timestamp)
             for timestamp in block_timestamps
         ]
+        trades = trades.with_columns(pl.Series('timestamp', timestamp_list))
 
         rename_columns = {
             key: key.replace('__', '\n') for key in list(trades.columns)
@@ -105,7 +107,7 @@ async def async_trades_command(
         for key, value in rename_columns.items():
             if value.startswith('price\n'):
                 rename_columns[key] = value[6:]
-        trades = trades.rename(columns=rename_columns)
+        trades = trades.rename(rename_columns)
 
         columns = list(trades.columns)
         if not verbose:

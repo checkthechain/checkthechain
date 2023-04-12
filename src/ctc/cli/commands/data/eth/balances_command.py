@@ -120,7 +120,7 @@ async def async_balances_command(
             eth_usd = (await eth_usd_task).to_numpy()
             usd_balances = [
                 balance * eth_price
-                for balance, eth_price in zip(balances, eth_usd)
+                for balance, eth_price in zip(balances, eth_usd[:, 0])
             ]
         rows = []
         for b in range(len(resolved_blocks)):

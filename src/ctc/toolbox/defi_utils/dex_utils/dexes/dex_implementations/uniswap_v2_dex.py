@@ -106,6 +106,7 @@ class UniswapV2DEX(dex_class.DEX):
             include_timestamps=include_timestamps,
             verbose=verbose,
             context=context,
+            integer_output_format=float,
         )
 
         df = trades.select(
