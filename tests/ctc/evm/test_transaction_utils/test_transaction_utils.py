@@ -34,7 +34,6 @@ async def test_verify_transaction_signature(test):
         signature=signature,
         transaction=transaction,
         address=transaction['from'],
-        chain_id=1,
     )
 
 

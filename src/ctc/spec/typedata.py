@@ -153,6 +153,20 @@ transaction_keys_eip2930 = (
     's',
 )
 
+transaction_keys_eip2930_camel = (
+    'chainId',
+    'nonce',
+    'gasPrice',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'accessList',
+    'v',
+    'r',
+    's',
+)
+
 transaction_keys_eip1559 = (
     'chain_id',
     'nonce',
@@ -163,6 +177,21 @@ transaction_keys_eip1559 = (
     'value',
     'input',
     'access_list',
+    'v',
+    'r',
+    's',
+)
+
+transaction_keys_eip1559_camel = (
+    'chainId',
+    'nonce',
+    'maxPriorityFeePerGas',
+    'maxFeePerGas',
+    'gas',
+    'to',
+    'value',
+    'input',
+    'accessList',
     'v',
     'r',
     's',

@@ -16,7 +16,7 @@ def serialize_unsigned_transaction(
 
     # collect keys for transaction type
     type = transaction_types.get_transaction_type(transaction)
-    keys = transaction_types.get_transaction_type_keys(type, signed=False)
+    keys = transaction_types.get_transaction_type_keys(transaction, signed=False)
 
     # represent as list
     as_list: list[typing.Any] = []
@@ -24,12 +24,26 @@ def serialize_unsigned_transaction(
         if key == 'chain_id':
             if transaction.get('chain_id') is not None:
                 as_list.append(transaction.get('chain_id'))
-            if transaction.get('chainId') is not None:
+            elif transaction.get('chainId') is not None:
                 as_list.append(transaction.get('chainId'))
             elif chain_id is not None:
                 as_list.append(chain_id)
             else:
                 raise Exception('must specify chain_id')
+        elif key in ['access_list', 'accessList']:
+            access_list = transaction[key]
+            if len(access_list) > 0 and isinstance(access_list[0], dict):
+                if 'storageKeys' in access_list[0]:
+                    access_list = [
+                        [item['address'], item['storageKeys']]
+                        for item in access_list
+                    ]
+                else:
+                    access_list = [
+                        [item['address'], item['storage_keys']]
+                        for item in access_list
+                    ]
+            as_list.append(access_list)
         else:
             as_list.append(transaction[key])  # type: ignore
 
@@ -62,7 +76,7 @@ def serialize_signed_transaction(
 
     # collect keys for transaction type
     type = transaction_types.get_transaction_type(transaction)
-    keys = transaction_types.get_transaction_type_keys(type, signed=True)
+    keys = transaction_types.get_transaction_type_keys(transaction, signed=True)
 
     # get list of fields
     as_list = [transaction[key] for key in keys]  # type: ignore

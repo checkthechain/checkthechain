@@ -53,21 +53,38 @@ def get_transaction_type_name(
 
 
 def get_transaction_type_keys(
-    transaction_or_type: typing.Mapping[str, typing.Any] | spec.Data,
+    transaction: typing.Mapping[str, typing.Any],
     *,
     signed: bool,
 ) -> tuple[str, ...]:
     """return list of keys that are used by a given transaction type"""
 
-    transaction_type = get_transaction_type(transaction_or_type)
+    transaction_type = get_transaction_type(transaction)
+
+    # determine whether camelcase
+    if transaction_type in [1, 2]:
+        if 'accessList' in transaction:
+            snake = False
+        elif 'access_list' in transaction:
+            snake = True
+        else:
+            raise Exception('transaction does not specify access_list or accessList')
+    elif transaction_type == 0:
+        snake = 'chain_id' in transaction
+    else:
+        raise Exception('unknown transaction type: ' + str(transaction_type))
 
     # get keys
     if transaction_type == 0:
         keys: tuple[str, ...] = spec.transaction_keys_legacy
-    elif transaction_type == 1:
+    elif transaction_type == 1 and snake:
         keys = spec.transaction_keys_eip2930
-    elif transaction_type == 2:
+    elif transaction_type == 1 and not snake:
+        keys = spec.transaction_keys_eip2930_camel
+    elif transaction_type == 2 and snake:
         keys = spec.transaction_keys_eip1559
+    elif transaction_type == 2 and not snake:
+        keys = spec.transaction_keys_eip1559_camel
     else:
         raise Exception('unknown transaction type: ' + str(transaction_type))
 

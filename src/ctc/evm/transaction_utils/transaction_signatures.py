@@ -21,6 +21,10 @@ def sign_transaction(
         tx_chain_id = transaction['chain_id']
         if tx_chain_id is not None:
             chain_id = binary_utils.binary_convert(tx_chain_id, 'integer')
+    elif chain_id is None and 'chainId' in transaction:
+        tx_chain_id = transaction['chainId']
+        if tx_chain_id is not None:
+            chain_id = binary_utils.binary_convert(tx_chain_id, 'integer')
     message = transaction_serialize.serialize_unsigned_transaction(
         transaction,
         chain_id=chain_id,
@@ -39,7 +43,6 @@ def verify_transaction_signature(
     signature: spec.Signature | None = None,
     public_key: spec.Data | None = None,
     address: spec.Data | None = None,
-    chain_id: int | None = None,
 ) -> bool:
     """verify that transaction was signed by given public key"""
 
@@ -56,7 +59,7 @@ def verify_transaction_signature(
 
     # get transaction hash
     transaction_hash = transaction_hashes.hash_unsigned_transaction(
-        transaction, chain_id=chain_id
+        transaction
     )
 
     # process signature
