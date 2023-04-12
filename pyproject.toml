@@ -196,12 +196,14 @@ deps =
     ;
     ; data science
     numpy==1.19.0
+    polars==0.16.10
     ;
     ; data dependencies
     aiohttp==3.7.4
     loguru==0.5.3
     toml==0.10.2
     connectorx==0.3.1
+    orjson==3.7.9
     ;
     ; tool suite
     toolcli==0.6.8
@@ -212,7 +214,7 @@ deps =
     ;
     ; EVM dependencies
     pycryptodome==3.9.1
-    eth_abi_lite==3.0.3
+    eth_abi_lite==3.1.0
     idna==2.10
 
 commands = pytest --disable-warnings
