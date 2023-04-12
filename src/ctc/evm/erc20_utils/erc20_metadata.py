@@ -191,7 +191,7 @@ async def async_get_erc20s_decimals(
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[int]:
+) -> typing.Sequence[int]:
     """get decimals of multiple erc20s"""
     return await erc20_generic.async_erc20s_eth_calls(
         function_name='decimals',
@@ -208,7 +208,7 @@ async def async_get_erc20_decimals_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[int]:
+) -> typing.Sequence[int]:
     """get decimals of an erc20 across multiple blocks"""
     return await erc20_generic.async_erc20_eth_call_by_block(
         function_name='decimals',
@@ -282,7 +282,7 @@ async def async_get_erc20s_names(
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[str]:
+) -> typing.Sequence[str]:
     """get name of multiple erc20s"""
     return await erc20_generic.async_erc20s_eth_calls(
         function_name='name',
@@ -299,7 +299,7 @@ async def async_get_erc20_name_by_block(
     blocks: typing.Iterable[spec.BlockNumberReference],
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[str]:
+) -> typing.Sequence[str]:
     """get name of an erc20 across multiple blocks"""
     return await erc20_generic.async_erc20_eth_call_by_block(
         function_name='name',
@@ -385,7 +385,7 @@ async def async_get_erc20s_symbols(
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[str]:
+) -> typing.Sequence[str]:
     """get symbol of multiple erc20s"""
     results = await erc20_generic.async_erc20s_eth_calls(
         function_name='symbol',
@@ -404,7 +404,7 @@ async def async_get_erc20_symbol_by_block(
     blocks: typing.Iterable[spec.BlockNumberReference],
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[str]:
+) -> typing.Sequence[str]:
     """get symbol of an erc20 across multiple blocks"""
     results = await erc20_generic.async_erc20_eth_call_by_block(
         function_name='symbol',

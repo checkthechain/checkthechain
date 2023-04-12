@@ -219,10 +219,11 @@ async def _async_get_pool_data(
         if coin
         not in ['0x0000000000000000000000000000000000000000', eth_address]
     ]
-    symbols = await evm.async_get_erc20s_symbols(
+    symbols_result = await evm.async_get_erc20s_symbols(
         valid_coins,
         context=context,
     )
+    symbols = typing.cast(list[str], symbols_result)
 
     if eth_address in coins:
         index = coins.index(eth_address)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import evm
 from ctc import rpc
 from ctc import spec
@@ -34,7 +36,7 @@ async def async_get_pool_symbols(
     x_address: spec.Address | None = None,
     y_address: spec.Address | None = None,
     context: spec.Context = None,
-) -> list[str]:
+) -> typing.Sequence[str]:
 
     if x_address is None or y_address is None:
         if pool is None:
@@ -55,7 +57,7 @@ async def async_get_pool_decimals(
     x_address: spec.Address | None = None,
     y_address: spec.Address | None = None,
     context: spec.Context = None,
-) -> list[int]:
+) -> typing.Sequence[int]:
 
     if x_address is None or y_address is None:
         if pool is None:

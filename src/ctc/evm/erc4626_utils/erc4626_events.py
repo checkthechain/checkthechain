@@ -116,21 +116,22 @@ async def async_get_erc4626_withdraws(
         if not convert_from_str:
             raise Exception('must convert from str with convert_from_str=True')
         blocks = withdraws['block_number'].to_list()
-        withdraws[
-            'arg__assets'
-        ] = await erc4626_normalize.async_normalize_erc4626_assets(
+
+        arg__assets = await erc4626_normalize.async_normalize_erc4626_assets(
             token=token,
             assets=withdraws['arg__assets'].to_list(),
             block=blocks[-1],
             context=context,
         )
-        withdraws[
-            'arg__shares'
-        ] = await erc4626_normalize.async_normalize_erc4626_shares(
+        arg__shares = await erc4626_normalize.async_normalize_erc4626_shares(
             token=token,
             shares=withdraws['arg__shares'].to_list(),
             block=blocks[-1],
             context=context,
+        )
+        withdraws = withdraws.with_columns(
+            pl.Series('arg__assets', arg__assets),
+            pl.Series('arg__shares', arg__shares),
         )
 
     return withdraws

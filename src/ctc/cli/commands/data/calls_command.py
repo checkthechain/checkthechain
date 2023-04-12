@@ -116,7 +116,6 @@ def get_command_help(parse_spec: toolcli.ParseSpec) -> str:
 
 
 def get_timestamp_format_table() -> str:
-
     rows = [
         [
             'number + letter\n[comment](one of {yMdhms})[/comment]',
@@ -168,7 +167,6 @@ def get_timestamp_format_table() -> str:
 
 
 def stylize_markdown(text: str, styles: toolcli.StyleTheme) -> str:
-
     import re
 
     lines = text.split('\n')
@@ -178,7 +176,6 @@ def stylize_markdown(text: str, styles: toolcli.StyleTheme) -> str:
 
     styled_lines = []
     for i, line in enumerate(lines):
-
         # stylize titles
         if line.startswith('#'):
             line = toolstr.add_style(line, styles['title'])
@@ -321,7 +318,6 @@ async def async_calls_command(
     normalize: typing.Sequence[str],
     blocks_gte_times: bool,
 ) -> None:
-
     # check whether using multi-contract query or multi-block query
     multi_contract_query = addresses is not None
     multi_block_query = blocks is not None or times is not None
@@ -380,7 +376,6 @@ async def async_perform_multi_contract_call(
     normalize: typing.Sequence[str],
     export: str,
 ) -> spec.DataFrame | None:
-
     if addresses is not None:
         addresses = await evm.async_resolve_addresses(addresses, block=block)
     if addresses is None:
@@ -422,9 +417,9 @@ async def async_perform_multi_contract_call(
             )
             for address in addresses
         ]
-        results = await asyncio.gather(*coroutines)
+        raw_results = await asyncio.gather(*coroutines)
     else:
-        results = await rpc.async_batch_eth_call(
+        raw_results = await rpc.async_batch_eth_call(
             to_addresses=addresses,
             function_abi=function_abi,
             function_parameters=function_parameters,
@@ -444,17 +439,21 @@ async def async_perform_multi_contract_call(
                     'can only normalize functions that have a single output'
                 )
             try:
-                results = await evm.async_normalize_erc20s_quantities(
-                    quantities=results,
+                results: typing.Sequence[
+                    typing.Any
+                ] = await evm.async_normalize_erc20s_quantities(
+                    quantities=raw_results,
                     tokens=addresses,
                 )
             except Exception:
-                results = [result / 1e18 for result in results]
+                results = [result / 1e18 for result in raw_results]
         elif len(normalize) == 1:
             factor = float(normalize[0])
-            results = [subresult / factor for subresult in results]
+            results = [subresult / factor for subresult in raw_results]
         else:
             raise Exception('--normalize should have at most 1 argument')
+    else:
+        results = raw_results
 
     styles = cli.get_cli_styles()
     toolstr.print_text_box('Multi-contract calls', style=styles['title'])
@@ -521,7 +520,6 @@ async def async_perform_multi_block_call(
     normalize: typing.Sequence[str],
     blocks_gte_times: bool,
 ) -> spec.DataFrame | None:
-
     # historical queries
     if block is not None:
         raise Exception(
@@ -544,12 +542,10 @@ async def async_perform_multi_block_call(
 
     # parse blocks or times
     if blocks is not None:
-
         # parse blocks
         block_numbers = await cli_utils.async_parse_block_slice(blocks, n=n)
 
     elif times is not None:
-
         # parse timestamps
         import tooltime
 
@@ -621,11 +617,9 @@ async def async_perform_multi_block_call(
     print()
 
     if export == 'stdout':
-
         import tooltime
 
         if not no_table:
-
             block_timestamps = await block_timestamps_task
 
             rows = []
@@ -670,7 +664,6 @@ async def async_perform_multi_block_call(
             )
 
         if not no_chart:
-
             xvals = block_numbers
             yvals = results
             plot = toolstr.render_line_plot(
@@ -702,3 +695,4 @@ async def async_perform_multi_block_call(
         df = pl.DataFrame(results, output_names)
         df = df.insert_at_idx(0, pl.Series('block', block_numbers))
         return df
+

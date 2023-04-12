@@ -54,7 +54,7 @@ async def async_get_erc20s_total_supplies(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get total supplies of ERC20s"""
 
     if block is None:
@@ -81,7 +81,7 @@ async def async_get_erc20_total_supply_by_block(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get historical total supply of ERC20 across multiple blocks"""
 
     total_supplies = await erc20_generic.async_erc20_eth_call_by_block(
@@ -158,7 +158,7 @@ async def async_get_erc20_balances_of_addresses(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get ERC20 balance of multiple addresses"""
 
     from ctc import rpc
@@ -182,11 +182,11 @@ async def async_get_erc20_balances_of_addresses(
     )
 
     if normalize:
-        balances = await erc20_normalize.async_normalize_erc20_quantities(
+        return await erc20_normalize.async_normalize_erc20_quantities(
             quantities=balances, token=token, context=context, block=block
         )
-
-    return balances
+    else:
+        return balances
 
 
 async def async_get_erc20s_balances(
@@ -197,7 +197,7 @@ async def async_get_erc20s_balances(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get ERC20 balance of wallet for multiple tokens"""
 
     from ctc import config
@@ -244,7 +244,7 @@ async def async_get_erc20_balance_by_block(
     context: spec.Context = None,
     empty_token: typing.Any = 0,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get historical ERC20 balance over multiple blocks"""
 
     wallet = await address_utils.async_resolve_address(
@@ -326,7 +326,7 @@ async def async_get_erc20_allowance_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     context: spec.Context = None,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get historical ERC20 allowance over range of blocks"""
 
     wallet = await address_utils.async_resolve_address(
@@ -363,7 +363,7 @@ async def async_get_erc20s_allowances(
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
-) -> typing.Union[list[int], list[float]]:
+) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get ERC20 allowance of wallet for multiple tokens"""
 
     wallet = await address_utils.async_resolve_address(
@@ -415,9 +415,9 @@ async def async_get_erc20_allowances_of_addresses(
     )
 
     if normalize:
-        allowances = await erc20_normalize.async_normalize_erc20_quantities(
+        return await erc20_normalize.async_normalize_erc20_quantities(
             quantities=allowances, token=token, context=context, block=block
         )
-
-    return allowances
+    else:
+        return allowances
 

@@ -38,7 +38,7 @@ async def async_erc20s_eth_calls(
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[typing.Any]:
+) -> typing.Sequence[typing.Any]:
     """perform eth_call for multiple erc20s"""
 
     import asyncio
@@ -65,7 +65,7 @@ async def async_erc20_eth_call_by_block(
     blocks: typing.Iterable[spec.BlockNumberReference],
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> list[typing.Any]:
+) -> typing.Sequence[typing.Any]:
     """perform eth_call for an erc20 across multiple blocks"""
 
     from ctc import rpc

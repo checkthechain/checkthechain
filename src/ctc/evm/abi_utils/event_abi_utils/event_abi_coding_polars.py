@@ -127,14 +127,14 @@ async def async_decode_events_dataframe(
         # decode unindexed data
         if len(event_schema['unindexed_types']) > 0:
             if len(event_schema['unindexed_types']) == 1:
-                types = event_schema['unindexed_types'][0]
-                unindexed_decoded = [
-                    abi_coding_utils.abi_decode(unindexed[e], types)
-                ]
+                result = abi_coding_utils.abi_decode(
+                    unindexed[e],
+                    event_schema['unindexed_types'][0],
+                )
+                unindexed_decoded = [result]
             else:
-                types = event_schema['unindexed_types']
                 unindexed_decoded = abi_coding_utils.abi_decode(
-                    unindexed[e], types
+                    unindexed[e], event_schema['unindexed_types']
                 )
             for value in unindexed_decoded:
                 decoded_events[i].append(value)

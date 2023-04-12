@@ -20,9 +20,9 @@ three_pool_coins = ['DAI', 'USDC', 'USDT']
 
 
 class CurvePoolMetadata(TypedDict):
-    token_addresses: list[spec.Address]
-    token_symbols: list[str]
-    token_decimals: list[int]
+    token_addresses: typing.Sequence[spec.Address]
+    token_symbols: typing.Sequence[str]
+    token_decimals: typing.Sequence[int]
     A: int
 
 

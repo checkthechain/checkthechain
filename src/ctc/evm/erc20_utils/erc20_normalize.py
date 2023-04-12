@@ -33,17 +33,41 @@ async def async_normalize_erc20_quantity(
         decimals_value = int(decimals)
 
     # normalize
-    return float(quantity) / int(10 ** decimals_value)
+    return float(quantity) / int(10**decimals_value)
 
 
+@typing.overload
 async def async_normalize_erc20_quantities(
-    quantities: typing.Sequence[typing.SupportsInt] | spec.Series,
+    quantities: typing.Sequence[typing.SupportsInt],
     token: spec.ERC20Address | None = None,
     *,
     context: spec.Context = None,
     decimals: typing.Optional[typing.SupportsInt] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
-) -> list[float]:
+) -> typing.Sequence[float]:
+    ...
+
+
+@typing.overload
+async def async_normalize_erc20_quantities(
+    quantities: typing.Sequence[typing.SupportsInt | None] | spec.Series,
+    token: spec.ERC20Address | None = None,
+    *,
+    context: spec.Context = None,
+    decimals: typing.Optional[typing.SupportsInt] = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> typing.Sequence[float | None]:
+    ...
+
+
+async def async_normalize_erc20_quantities(
+    quantities: typing.Sequence[typing.SupportsInt | None] | spec.Series,
+    token: spec.ERC20Address | None = None,
+    *,
+    context: spec.Context = None,
+    decimals: typing.Optional[typing.SupportsInt] = None,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+) -> typing.Sequence[float | None]:
     """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
 
     if all(quantity == 0 for quantity in quantities):
@@ -60,7 +84,10 @@ async def async_normalize_erc20_quantities(
     else:
         decimals = int(decimals)
 
-    return [quantity / (10 ** decimals) for quantity in quantities]
+    return [
+        quantity / (10**decimals) if quantity is not None else None
+        for quantity in quantities
+    ]
 
 
 async def async_normalize_erc20s_quantities(
@@ -70,7 +97,7 @@ async def async_normalize_erc20s_quantities(
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
-) -> list[float]:
+) -> typing.Sequence[float]:
     """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
 
     # take subset of non zero values
@@ -115,7 +142,7 @@ async def async_normalize_erc20s_quantities(
         use_decimals = new_use_decimals
 
     return [
-        quantity / (10 ** decimal)
+        quantity / (10**decimal)
         for quantity, decimal in zip(quantities, use_decimals)
     ]
 
@@ -127,7 +154,7 @@ async def async_normalize_erc20_quantities_by_block(
     token: typing.Optional[spec.ERC20Address] = None,
     decimals: typing.Optional[typing.Sequence[typing.SupportsInt]] = None,
     context: spec.Context = None,
-) -> list[float]:
+) -> typing.Sequence[float]:
     """normalize ERC20 quantites by adjusting radix by (10 ** decimals)"""
 
     # take subset of non zero values
@@ -170,6 +197,7 @@ async def async_normalize_erc20_quantities_by_block(
         use_decimals = new_use_decimals
 
     return [
-        quantity / (10 ** decimal)
+        quantity / (10**decimal)
         for quantity, decimal in zip(quantities, use_decimals)
     ]
+
