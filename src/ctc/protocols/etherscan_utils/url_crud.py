@@ -58,7 +58,7 @@ def get_api_subdomain(network: spec.NetworkReference) -> str:
 
 
 def create_abi_url(
-    address: spec.Address, network: spec.NetworkReference = 'mainnet'
+    address: spec.Address, network: spec.NetworkReference = 'ethereum'
 ) -> str:
     api_subdomain = get_api_subdomain(network)
     template = url_templates['abi']
@@ -67,7 +67,7 @@ def create_abi_url(
 
 def create_address_url(
     address: spec.Address,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['address']
@@ -76,7 +76,7 @@ def create_address_url(
 
 def create_address_erc20_transfers_url(
     address: spec.Address,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['address_erc20_transfers']
@@ -85,7 +85,7 @@ def create_address_erc20_transfers_url(
 
 def create_address_internal_txs_url(
     address: spec.Address,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['address_internal_txs']
@@ -94,7 +94,7 @@ def create_address_internal_txs_url(
 
 def create_address_holdings_url(
     address: spec.Address,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['address_holdings']
@@ -103,7 +103,7 @@ def create_address_holdings_url(
 
 def create_block_url(
     block: int,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['block']
@@ -112,7 +112,7 @@ def create_block_url(
 
 def create_token_url(
     token_address: spec.Address,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['token']
@@ -121,7 +121,7 @@ def create_token_url(
 
 def create_token_holders_url(
     token_address: spec.Address,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['token_holders']
@@ -130,7 +130,7 @@ def create_token_holders_url(
 
 def create_transaction_url(
     transaction_hash: str,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['transaction']
@@ -139,7 +139,7 @@ def create_transaction_url(
 
 def create_transaction_logs_url(
     transaction_hash: str,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['transaction_logs']
@@ -148,7 +148,7 @@ def create_transaction_logs_url(
 
 def create_transaction_state_changes_url(
     transaction_hash: str,
-    network: spec.NetworkReference = 'mainnet',
+    network: spec.NetworkReference = 'ethereum',
 ) -> str:
     hostname = get_hostname(network)
     template = url_templates['transaction_state_changes']

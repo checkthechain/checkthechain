@@ -119,7 +119,7 @@ def get_default_data_dir() -> str:
 
 def get_default_network_names_by_chain_id() -> typing.Mapping[int, str]:
     return {
-        1: 'mainnet',
+        1: 'ethereum',
         3: 'ropsten',
         4: 'rinkeby',
         5: 'goerli',
@@ -157,7 +157,7 @@ def get_default_chain_ids_by_network_name() -> typing.Mapping[str, int]:
 
 def get_default_block_explorers() -> typing.Mapping[str, str]:
     return {
-        'mainnet': 'etherscan.io',
+        'ethereum': 'etherscan.io',
         'ropsten': 'ropsten.etherscan.io',
         'rinkeby': 'rinkeby.etherscan.io',
         'goerli': 'goerli.etherscan.io',

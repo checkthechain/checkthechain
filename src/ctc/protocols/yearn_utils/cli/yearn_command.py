@@ -78,7 +78,7 @@ async def async_yearn_vaults_command(
         await yearn_utils.async_print_vault_summary(
             query=query,
             verbose=verbose,
-            network='mainnet',
+            network='ethereum',
             show_harvests=harvests,
         )
 
@@ -90,5 +90,5 @@ async def async_yearn_vaults_command(
             min_apr=min_apr,
             n=n,
             verbose=verbose,
-            network='mainnet',
+            network='ethereum',
         )

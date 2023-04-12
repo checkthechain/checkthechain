@@ -23,7 +23,7 @@ async def async_open_etherscan_in_browser(
     import ctc.config
 
     if ctc.config.get_context_chain_id(context) != 1:
-        raise NotImplementedError('only currently implemented for mainnet')
+        raise NotImplementedError('only currently implemented for ethereum')
 
     is_address = False
     if query.startswith('0x') and len(query) == 42:

@@ -85,7 +85,7 @@ async def test_blocks_crud():
     db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='blocks',
-        context=dict(network='mainnet'),
+        context=dict(network='ethereum'),
     )
     toolsql.create_db(
         db_config=db_config,

@@ -201,8 +201,11 @@ def upgrade__0_3_3__to__0_3_4(
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
     upgraded = dict(old_config)
     upgraded['config_spec_version'] = '0.3.4'
-    for provider in upgraded.get('providers').values():
+    for provider in upgraded['providers'].values():
         provider.setdefault('disable_batch_requests', False)
+    for network in upgraded['networks'].values():
+        if network['name'] == 'mainnet':
+            network['name'] = 'ethereum'
     return upgraded
 
 

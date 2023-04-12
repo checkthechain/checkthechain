@@ -13,8 +13,8 @@ def get_yearn_addresses(
     network: spec.NetworkReference,
 ) -> typing.Mapping[str, spec.Address]:
 
-    if network not in ('mainnet', 1):
-        raise NotImplementedError('non-mainnet address')
+    if network not in ('ethereum', 1):
+        raise NotImplementedError('non-ethereum address')
 
     mainnnet_addresses = {
         'Oracle': '0x83d95e0d5f402511db06817aff3f9ea88224b030',

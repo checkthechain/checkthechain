@@ -449,7 +449,7 @@ def specify_default_network(
         }
 
     # determine default choice
-    default = 'mainnet (chain_id = 1)'
+    default = 'ethereum (chain_id = 1)'
     if len(providers) == 1:
         provider = list(providers.values())[0]
         network = provider.get('network')
@@ -469,8 +469,8 @@ def specify_default_network(
                 break
     elif len(providers) > 1:
         for provider in providers.values():
-            if provider.get('network') in [1, 'mainnet']:
-                default = 'mainnet (chain_id = 1)'
+            if provider.get('network') in [1, 'ethereum']:
+                default = 'ethereum (chain_id = 1)'
 
     print()
     default_network_index = toolcli.input_number_choice(

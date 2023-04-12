@@ -10,8 +10,8 @@ from ctc.config import config_defaults
 @pytest.mark.parametrize(
     'test',
     [
-        [1, 'mainnet'],
-        ['mainnet', 'mainnet'],
+        [1, 'ethereum'],
+        ['ethereum', 'ethereum'],
         [3, 'ropsten'],
     ],
 )
@@ -26,7 +26,7 @@ def test_get_network_name(test):
     'test',
     [
         [1, 1],
-        ['mainnet', 1],
+        ['ethereum', 1],
         ['ropsten', 3],
     ],
 )
@@ -41,7 +41,7 @@ def test_get_chain_id(test):
 
 def test_get_network_metadata():
     metadata = evm.get_network_metadata(network=1)
-    assert metadata['name'] == 'mainnet'
+    assert metadata['name'] == 'ethereum'
     assert metadata['chain_id'] == 1
     assert metadata['block_explorer'] == 'etherscan.io'
 

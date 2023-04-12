@@ -345,7 +345,7 @@ async def async_print_token_markets_summary(
         max_table_width=max_width,
     )
     print()
-    toolstr.print('network = mainnet', style=styles['comment'])
+    toolstr.print('network = ethereum', style=styles['comment'])
 
 
 async def async_get_token_market_summary(

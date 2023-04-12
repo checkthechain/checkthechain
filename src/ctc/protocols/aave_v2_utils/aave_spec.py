@@ -11,7 +11,7 @@ def get_aave_address(
 
     network = config.get_context_chain_id(context)
     # TODO: move to directory
-    if network in ('mainnet', 1):
+    if network in ('ethereum', 1):
         if name == 'PriceOracle':
             return '0xa50ba011c48153de246e5192c8f9258a2ba79ca9'
         elif name == 'LendingPoolProvider':

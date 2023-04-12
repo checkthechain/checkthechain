@@ -8,7 +8,7 @@ from ctc import spec
 
 
 feed_registry = {
-    # mainnet
+    # ethereum
     1: '0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf',
     # kovan
     42: '0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0',

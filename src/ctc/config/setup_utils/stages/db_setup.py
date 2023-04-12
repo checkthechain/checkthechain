@@ -104,7 +104,7 @@ async def async_populate_db_tables(
     print('Populating database with metadata of common ERC20 tokens...')
     print()
     await default_erc20s.async_intake_default_erc20s(
-        context=dict(network='mainnet'),
+        context=dict(network='ethereum'),
     )
 
     # populate data: chainlink

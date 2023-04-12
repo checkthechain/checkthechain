@@ -27,7 +27,7 @@ async def test_contract_abis_crud():
     db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='contract_abis',
-        context=dict(network='mainnet'),
+        context=dict(network='ethereum'),
     )
     toolsql.create_db(
         db_config=db_config,

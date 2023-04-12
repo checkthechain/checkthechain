@@ -49,7 +49,7 @@ if typing.TYPE_CHECKING:
 
 # # legacy version of chainlink payload data
 # _legacy_network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, str]] = {
-#     'mainnet': ('ethereum-addresses', 'Ethereum Mainnet'),
+#     'ethereum': ('ethereum-addresses', 'Ethereum Mainnet'),
 #     'kovan': ('ethereum-addresses', 'Kovan Testnet'),
 #     'rinkeby': ('ethereum-addresses', 'Rinkeby Testnet'),
 #     'bnb': ('bnb-chain-addresses-price', 'BNB Chain Mainnet'),
@@ -74,7 +74,7 @@ if typing.TYPE_CHECKING:
 # }
 
 network_payload_locations: typing.Mapping[spec.NetworkName, tuple[str, int]] = {
-    'mainnet': ('ethereum', 0),
+    'ethereum': ('ethereum', 0),
     'goerli': ('ethereum', 1),
     'bnb': ('bnb-chain', 0),
     'bnb_testnet': ('bnb-chain', 1),

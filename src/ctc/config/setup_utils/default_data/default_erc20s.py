@@ -15,7 +15,7 @@ async def async_intake_default_erc20s(
 ) -> None:
 
     network = config.get_context_chain_id(context)
-    if network not in ['mainnet', 1]:
+    if network not in ['ethereum', 1]:
         print('No default tokens for network: ' + str(network))
         return
 
@@ -53,8 +53,8 @@ def load_default_erc20s(
 
     network = config.get_context_chain_id(context)
 
-    if network in ('mainnet', 1):
-        raw_csv_data = mainnet_erc20s_csv
+    if network in ('ethereum', 1):
+        raw_csv_data = etheruem_erc20s_csv
     else:
         raise NotImplementedError(
             'no erc20 defaults provided for network ' + str(network)
@@ -77,7 +77,7 @@ def load_default_erc20s(
 
 
 # from 1inch default token list
-mainnet_erc20s_csv = """address,decimals,name,symbol
+etheruem_erc20s_csv = """address,decimals,name,symbol
 0x006bea43baa3f7a6f765f14f10a1a1b08334ef45,18,Stox,STX
 0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd,18,PieDAOBTC++,BTC
 0x0417912b3a7af768051765040a55bb0925d4ddcf,18,LiquidityDividendsProtocol,LID
@@ -1192,7 +1192,7 @@ mainnet_erc20s_csv = """address,decimals,name,symbol
 0x8254e26e453eb5abd29b3c37ac9e8da32e5d3299,18,RBX,RBX"""
 
 
-mainnet_erc20s = """address,decimals,name,symbol
+ethereum_erc20s = """address,decimals,name,symbol
 0x006bea43baa3f7a6f765f14f10a1a1b08334ef45,18,Stox,STX
 0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd,18,PieDAOBTC++,BTC
 0x0417912b3a7af768051765040a55bb0925d4ddcf,18,LiquidityDividendsProtocol,LID

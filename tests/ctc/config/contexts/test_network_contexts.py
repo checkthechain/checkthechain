@@ -148,7 +148,7 @@ example_context_tests = [
     #
     # provider by network name
     {
-        'context': {'network': 'mainnet'},
+        'context': {'network': 'ethereum'},
         'chain_id': 1,
         'provider_url': 'http://1.alchemy.com',
     },

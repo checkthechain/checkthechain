@@ -16,7 +16,7 @@ def get_dex_names_of_factories(
     if network is None:
         network = config.get_context_chain_id(context)
 
-    if network in (1, 'mainnet'):
+    if network in (1, 'ethereum'):
         return {
             '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f': 'Uniswap V2',
             '0x1f98431c8ad98523631ae4a59f267346ea31f984': 'Uniswap V3',

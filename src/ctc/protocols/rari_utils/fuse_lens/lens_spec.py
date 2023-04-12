@@ -17,7 +17,7 @@ def get_lens_address(
     network = config.get_context_chain_id(context)
     network_name = evm.get_network_name(network)
 
-    if network_name == 'mainnet':
+    if network_name == 'ethereum':
 
         if lens_name == 'primary':
             return '0x6dc585ad66a10214ef0502492b0cc02f0e836eec'

@@ -5,7 +5,7 @@ from ctc import spec
 
 
 def get_etherscan_key(network: spec.NetworkName) -> str | None:
-    if network == 'mainnet':
+    if network == 'ethereum':
         key = os.environ.get('ETHERSCAN_API_KEY')
         if key == '':
             return None

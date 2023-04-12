@@ -111,7 +111,7 @@ async def async_dex_pools_command(
     sort: typing.Sequence[str] | None,
 ) -> None:
 
-    factory_dexes = dex_utils.get_dex_names_of_factories(network='mainnet')
+    factory_dexes = dex_utils.get_dex_names_of_factories(network='ethereum')
 
     coroutines = [evm.async_get_erc20_address(token) for token in tokens]
     assets = await asyncio.gather(*coroutines)

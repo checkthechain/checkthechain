@@ -16,12 +16,12 @@ async def test_populate_feeds():
     with toolsql.connect(db_config) as conn:
         db.initialize_schema(
             schema_name='chainlink',
-            context=dict(network='mainnet'),
+            context=dict(network='ethereum'),
             conn=conn,
         )
     async with toolsql.async_connect(db_config) as conn:
         await chainlink_db.async_import_network_to_db(
-            network='mainnet',
+            network='ethereum',
             conn=conn,
         )
 
@@ -55,7 +55,7 @@ async def test_chainlink_crud():
     db_config = conftest.get_test_db_config()
     db_schema = db.get_prepared_schema(
         schema_name='chainlink',
-        context=dict(network='mainnet'),
+        context=dict(network='ethereum'),
     )
     toolsql.create_db(
         db_config=db_config,
