@@ -49,6 +49,12 @@ async def async_select_blocks_transactions(
         return None
 
     table = schema_utils.get_table_schema('transactions', context=context)
+    columns = [
+        column['name']
+        for column in table['columns']
+        if column['name'] != 'access_list'
+    ]
+
     if block_numbers is not None:
         transactions: typing.Sequence[
             spec.DBTransaction
@@ -56,6 +62,7 @@ async def async_select_blocks_transactions(
             conn=conn,
             table=table,
             where_in={'block_number': blocks_present},
+            columns=columns,
         )
 
     else:
@@ -72,6 +79,7 @@ async def async_select_blocks_transactions(
             table=table,
             where_lte=where_lte,
             where_gte=where_gte,
+            columns=columns,
         )
 
     return transactions, blocks_present
