@@ -36,7 +36,6 @@ def test_ctc_functions_have_docstrings():
 
 
 def test_code_imports_future_annotations():
-
     phrase = 'from __future__ import annotations'
     root_path = ctc.__path__[0]
 
@@ -103,7 +102,6 @@ def test_function_names():
         prefix="ctc.",
         onerror=lambda x: None,
     ):
-
         # skip files that run a lot of code
         if modname.endswith('__main__'):
             continue
@@ -203,7 +201,6 @@ def iterate_package_functions(prefix):
         prefix=prefix,
         onerror=lambda x: None,
     ):
-
         # skip files that run a lot of code
         if modname.endswith('__main__'):
             continue
@@ -212,7 +209,6 @@ def iterate_package_functions(prefix):
         for attr_name in dir(module):
             module_attr = getattr(module, attr_name)
             if isinstance(module_attr, types.FunctionType):
-
                 function_data = {
                     'module_name': modname,
                     'function_name': attr_name,
@@ -286,7 +282,6 @@ def iterate_package_classes(prefix, include_methods=True):
         prefix=prefix,
         onerror=lambda x: None,
     ):
-
         # skip files that run a lot of code
         if modname.endswith('__main__'):
             continue
@@ -298,7 +293,6 @@ def iterate_package_classes(prefix, include_methods=True):
                 isinstance(module_attr, type)
                 and module_attr.__module__ == module.__name__
             ):
-
                 class_data = {
                     'module_name': modname,
                     'class_name': attr_name,
@@ -395,7 +389,6 @@ def test_async_functions_take_context():
             if name.startswith('async_') and isinstance(
                 value, types.FunctionType
             ):
-
                 # try exception list first
                 if module == ctc.rpc and name.startswith('async_batch_'):
                     continue
@@ -440,10 +433,10 @@ def test_async_functions_take_kw_only_context():
     failures = []
     for module in modules:
         for name, value in vars(module).items():
+
             if name.startswith('async_') and isinstance(
                 value, types.FunctionType
             ):
-
                 # try exception list first
                 if module == ctc.rpc and name.startswith('async_batch_'):
                     continue
@@ -459,7 +452,16 @@ def test_async_functions_take_kw_only_context():
 
                 argspec = inspect.getfullargspec(value)
                 if 'context' in argspec.args:
+
+                    # skip ctc.db.connect_utils.async_connect()
+                    if (
+                        value.__module__ == 'ctc.db.connect_utils'
+                        and name == 'async_connect'
+                    ):
+                        continue
+
                     failures.append(value.__module__ + '.' + name)
+
     if len(failures) > 0:
         raise Exception(
             str(len(failures))

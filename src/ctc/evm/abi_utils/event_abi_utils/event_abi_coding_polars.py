@@ -9,7 +9,6 @@ from . import event_abi_queries
 
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
-    import polars as pl
 
     EventABIList = typing.Sequence[spec.EventABI]
     EventABIMap = typing.Mapping[str, spec.EventABI]
@@ -108,18 +107,28 @@ async def async_decode_events_dataframe(
             ):
                 value = topic_iterator[e]
             else:
-                value = abi_coding_utils.abi_decode(
-                    topic_iterator[e], indexed_type
-                )
+                raw_value = topic_iterator[e]
+                if raw_value is not None:
+                    value = abi_coding_utils.abi_decode(
+                        topic_iterator[e], indexed_type
+                    )
+                else:
+                    value = raw_value
             decoded_events[i].append(value)
             i = i + 1
 
         # decode unindexed data
         if len(event_schema['unindexed_types']) > 0:
-            unindexed_decoded = abi_coding_utils.abi_decode(
-                unindexed[e],
-                event_schema['unindexed_types'],
-            )
+            if len(event_schema['unindexed_types']) == 1:
+                types = event_schema['unindexed_types'][0]
+                unindexed_decoded = [
+                    abi_coding_utils.abi_decode(unindexed[e], types)
+                ]
+            else:
+                types = event_schema['unindexed_types']
+                unindexed_decoded = abi_coding_utils.abi_decode(
+                    unindexed[e], types
+                )
             for value in unindexed_decoded:
                 decoded_events[i].append(value)
                 i = i + 1
@@ -214,6 +223,9 @@ async def _async_get_events_abis(
     *,
     context: spec.Context,
 ) -> typing.Mapping[str, spec.EventABI]:
+
+    import polars as pl
+
     # package input abi's
     if isinstance(event_abis, dict):
         abis: typing.MutableMapping[str, spec.EventABI] = event_abis

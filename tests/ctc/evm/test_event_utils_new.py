@@ -110,7 +110,7 @@ query_type_examples = [
             'end_block': end_block,
             'contract_address': contract_address,
             'event_abi': event_abi,
-            'encoded_topic1': '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            'topic1': '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
         },
         {
             'n_events': 5,
@@ -124,7 +124,7 @@ query_type_examples = [
             'start_block': start_block,
             'end_block': end_block,
             'event_abi': event_abi,
-            'encoded_topic1': '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            'topic1': '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
         },
         {
             'n_events': 8,
@@ -138,7 +138,7 @@ query_type_examples = [
             'start_block': start_block,
             'end_block': end_block,
             'contract_address': contract_address,
-            'encoded_topic1': '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            'topic1': '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
         },
         {
             'n_events': 5,
@@ -192,13 +192,13 @@ async def test_get_events_from_db(test):
 @pytest.mark.parametrize('test', query_type_examples)
 async def test_get_events_from_db_to_dict(test):
     query, target_result = test
-    actual_result = await event_utils.async_get_events(
+    df = await event_utils.async_get_events(
         verbose=2,
         decode=False,
         context={'cache': True},
-        output_format='dict',
         **query,
     )
+    actual_result = df.to_dicts()
 
     assert len(actual_result) == target_result['n_events']
     assert (

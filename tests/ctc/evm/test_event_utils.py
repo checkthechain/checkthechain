@@ -20,8 +20,7 @@ async def test_get_events():
         include_timestamps=True,
         event_name="Transfer",
     )
-    df = df.reset_index()
     assert len(df) == 6
-    assert df.iloc[0]["contract_address"] == DAI_CONTRACT
-    assert df.iloc[0]["block_number"] == START_BLOCK
-    assert df.iloc[0]["timestamp"] == START_TIMESTAMP
+    assert df["contract_address"][0] == DAI_CONTRACT
+    assert df["block_number"][0] == START_BLOCK
+    assert df["timestamp"][0] == START_TIMESTAMP

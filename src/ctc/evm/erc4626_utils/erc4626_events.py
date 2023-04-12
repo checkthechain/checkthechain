@@ -45,8 +45,10 @@ async def async_get_erc4626_deposits(
     )
 
     if convert_from_str:
-        deposits['arg__assets'] = deposits['arg__assets'].apply(int)
-        deposits['arg__shares'] = deposits['arg__shares'].apply(int)
+        deposits = deposits.with_columns(
+            pl.col('arg__assets').apply(int),
+            pl.col('arg__shares').apply(int),
+        )
 
     if normalize and len(deposits) > 0:
         if not convert_from_str:
@@ -87,6 +89,8 @@ async def async_get_erc4626_withdraws(
 ) -> spec.DataFrame:
     """get Withdraw events for ERC-4626 vault"""
 
+    import polars as pl
+
     event_abi = erc4626_spec.erc4626_event_abis['Withdraw']
 
     withdraws = await event_utils.async_get_events(
@@ -103,8 +107,10 @@ async def async_get_erc4626_withdraws(
     )
 
     if convert_from_str:
-        withdraws['arg__assets'] = withdraws['arg__assets'].apply(int)
-        withdraws['arg__shares'] = withdraws['arg__shares'].apply(int)
+        withdraws = withdraws.with_columns(
+            pl.col('arg__assets').apply(int),
+            pl.col('arg__shares').apply(int),
+        )
 
     if normalize and len(withdraws) > 0:
         if not convert_from_str:
