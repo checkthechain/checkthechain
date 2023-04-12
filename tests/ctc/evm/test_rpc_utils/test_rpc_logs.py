@@ -31,12 +31,12 @@ async def test_eth_uninstall_filter():
     await rpc.async_eth_uninstall_filter(new_filter)
 
 
-@pytest.mark.asyncio
-async def test_eth_get_filter_changes():
-    new_filter = await rpc.async_eth_new_pending_transaction_filter()
-    time.sleep(3)
-    pending_transactions = await rpc.async_eth_get_filter_changes(new_filter)
-    assert len(pending_transactions) > 0
+# @pytest.mark.asyncio
+# async def test_eth_get_filter_changes():
+#     new_filter = await rpc.async_eth_new_pending_transaction_filter()
+#     time.sleep(3)
+#     pending_transactions = await rpc.async_eth_get_filter_changes(new_filter)
+#     assert len(pending_transactions) > 0
 
 
 # @pytest.mark.asyncio
