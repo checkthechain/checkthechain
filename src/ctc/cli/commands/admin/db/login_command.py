@@ -9,6 +9,8 @@ import ctc
 def get_command_spec() -> toolcli.CommandSpec:
     return {
         'f': login_command,
+        'help': 'login to database with interactive shell',
+        'examples': [''],
     }
 
 
