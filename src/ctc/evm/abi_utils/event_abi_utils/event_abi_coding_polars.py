@@ -231,7 +231,6 @@ async def _async_get_events_abis(
     *,
     context: spec.Context,
 ) -> typing.Mapping[str, spec.EventABI]:
-
     import polars as pl
 
     # package input abi's
@@ -291,12 +290,23 @@ def _abi_type_to_polars_dtype(
             and name in integer_output_format
         ):
             return integer_output_format[name]  # type: ignore
-        elif integer_output_format == int:
+        elif integer_output_format in [int, 'integer']:
             return int
-        elif integer_output_format == object:
+        elif integer_output_format in [object, 'object']:
             return pl.Object
+        elif integer_output_format in [float, 'float']:
+            return pl.Float64
         elif isinstance(integer_output_format, pl.datatypes.DataTypeClass):
             return integer_output_format
+        elif (
+            integer_output_format == 'decimal'
+            or str(type(integer_output_format)) == "<class 'decimal.Decimal'>"
+        ):
+            return pl.Decimal
+        else:
+            raise Exception(
+                'invalid integer_output_format: ' + str(integer_output_format)
+            )
 
     if abi_type == 'bool':
         return pl.datatypes.Boolean
