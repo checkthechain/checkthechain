@@ -574,7 +574,7 @@ class DEX:
         all_ids = sorted(
             set(df['sold_id'].unique()) | set(df['bought_id'].unique())
         )
-        prices: typing.Mapping[str, spec.Series] = {}
+        prices: typing.MutableMapping[str, spec.Series] = {}
 
         # pre-compute quantities
         sold_amount = df['sold_amount'].apply(float)
