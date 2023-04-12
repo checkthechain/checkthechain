@@ -71,6 +71,7 @@ def decode_slot_stats(
 
 
 def _initialize_slot(
+    *,
     slots_data: SlotsData,
     key: tuple[str, str],
     slot_changes: typing.Mapping[str, typing.Any],
@@ -106,6 +107,7 @@ def _initialize_slot(
 
 
 def _integrate_slot_changes(
+    *,
     slots_data: SlotsData,
     key: tuple[str, str],
     slot_changes: typing.Mapping[str, typing.Any],

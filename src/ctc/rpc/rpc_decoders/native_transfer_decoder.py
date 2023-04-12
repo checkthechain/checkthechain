@@ -73,10 +73,10 @@ def decode_native_transfers(
         for tx_replay in block_replay:
             for trace in filter_failed_traces(tx_replay.trace):
                 transfer = native_transfer_from_call_trace(
-                    trace,
-                    block_number,
-                    transfer_index,
-                    tx_replay.transaction_hash,
+                    trace=trace,
+                    block_number=block_number,
+                    transfer_index=transfer_index,
+                    tx_hash=tx_replay.transaction_hash,
                 )
                 if transfer is not None:
                     transfers.append(transfer)
@@ -121,7 +121,7 @@ def filter_failed_traces(traces: list[T]) -> list[T]:
 
 
 def native_transfer_from_call_trace(
-    trace: CallTrace, block_number: int, transfer_index: int, tx_hash: str
+    *, trace: CallTrace, block_number: int, transfer_index: int, tx_hash: str
 ) -> typing.Sequence[typing.Any] | None:
     ttype = trace.type
 

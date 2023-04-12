@@ -24,6 +24,7 @@ class ExtractSlots(block_chunk_jobs.BlockChunkJobs):
 
 
 def sync_extract_slots(
+    *,
     start_block: int,
     end_block: int,
     job_name: str,
@@ -33,8 +34,8 @@ def sync_extract_slots(
     try:
         asyncio.run(
             async_extract_slots(
-                start_block,
-                end_block,
+                start_block=start_block,
+                end_block=end_block,
                 path=path,
                 context=context,
             )
@@ -44,6 +45,7 @@ def sync_extract_slots(
 
 
 async def async_extract_slots(
+    *,
     start_block: int,
     end_block: int,
     path: str,

@@ -28,12 +28,12 @@ class ExtractCreateTraces(block_chunk_jobs.BlockChunkJobs):
 
 
 async def async_trace_blocks(
+    *,
     start_block: int,
     end_block: int,
     path: str,
     context: spec.Context,
 ) -> None:
-
     create_traces = await ctc.async_trace_contract_creations(
         start_block=start_block,
         end_block=end_block,
@@ -50,6 +50,7 @@ async def async_trace_blocks(
 
 
 def sync_trace_blocks(
+    *,
     start_block: int,
     end_block: int,
     job_name: str,
@@ -59,7 +60,10 @@ def sync_trace_blocks(
     try:
         asyncio.run(
             async_trace_blocks(
-                start_block, end_block, path=path, context=context
+                start_block=start_block,
+                end_block=end_block,
+                path=path,
+                context=context,
             )
         )
     except Exception as e:

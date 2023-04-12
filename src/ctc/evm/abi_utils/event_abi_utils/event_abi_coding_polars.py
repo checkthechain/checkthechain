@@ -154,6 +154,7 @@ async def async_decode_events_dataframe(
 
 
 def _create_event_arg_schema(
+    *,
     event_abis: typing.Mapping[str, spec.EventABI],
     event_schemas: typing.Mapping[str, spec.EventSchema],
     column_prefix_type: ColumnPrefixType | None = None,
@@ -208,7 +209,7 @@ def _create_event_arg_schema(
             used_column_prefix = column_prefix.format(event_hash=event_hash)
         for abi_type, name in zip(event_schema['types'], event_schema['names']):
             pl_type = _abi_type_to_polars_dtype(
-                abi_type,
+                abi_type=abi_type,
                 name=name,
                 integer_output_format=integer_output_format,
             )
@@ -275,6 +276,7 @@ async def _async_get_events_abis(
 
 
 def _abi_type_to_polars_dtype(
+    *,
     abi_type: str,
     name: str,
     integer_output_format: spec.IntegerOutputFormat | None = None,

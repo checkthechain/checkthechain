@@ -26,6 +26,7 @@ class ExtractNativeTransfers(block_chunk_jobs.BlockChunkJobs):
 
 
 def sync_extract_native_transfers(
+    *,
     start_block: int,
     end_block: int,
     job_name: str,
@@ -35,8 +36,8 @@ def sync_extract_native_transfers(
     try:
         asyncio.run(
             async_extract_native_transfers(
-                start_block,
-                end_block,
+                start_block=start_block,
+                end_block=end_block,
                 path=path,
                 context=context,
             )
@@ -47,6 +48,7 @@ def sync_extract_native_transfers(
 
 
 async def async_extract_native_transfers(
+    *,
     start_block: int,
     end_block: int,
     path: str,

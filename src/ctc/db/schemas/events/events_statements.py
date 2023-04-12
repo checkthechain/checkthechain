@@ -245,6 +245,7 @@ async def async_select_events(
 
 
 def _get_columns(
+    *,
     columns: typing.Sequence[str] | None,
     table: toolsql.TableSchema,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
