@@ -17,12 +17,15 @@ def sign_transaction(
 ) -> tuple[int, int, int]:
     """sign transaction using private key"""
 
+    tx_chain_id: typing.Union[int, bytes, str, None]
     if chain_id is None and 'chain_id' in transaction:
         tx_chain_id = transaction['chain_id']
         if tx_chain_id is not None:
             chain_id = binary_utils.binary_convert(tx_chain_id, 'integer')
     elif chain_id is None and 'chainId' in transaction:
-        tx_chain_id = transaction['chainId']
+        tx_chain_id = typing.cast(
+            typing.Union[int, bytes, str, None], transaction.get('chainId')
+        )
         if tx_chain_id is not None:
             chain_id = binary_utils.binary_convert(tx_chain_id, 'integer')
     message = transaction_serialize.serialize_unsigned_transaction(
@@ -58,9 +61,7 @@ def verify_transaction_signature(
             raise Exception('must provide signature for transaction')
 
     # get transaction hash
-    transaction_hash = transaction_hashes.hash_unsigned_transaction(
-        transaction
-    )
+    transaction_hash = transaction_hashes.hash_unsigned_transaction(transaction)
 
     # process signature
     v, r, s = binary_utils.unpack_signature_vrs(signature)

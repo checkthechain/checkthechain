@@ -31,7 +31,7 @@ def serialize_unsigned_transaction(
             else:
                 raise Exception('must specify chain_id')
         elif key in ['access_list', 'accessList']:
-            access_list = transaction[key]
+            access_list = transaction[key]  # type: ignore
             if len(access_list) > 0 and isinstance(access_list[0], dict):
                 if 'storageKeys' in access_list[0]:
                     access_list = [

@@ -90,6 +90,7 @@ def test_function_names():
     async_exceptions = [
         '__aenter__',
         '__aexit__',
+        'async_connect',
     ]
 
     should_use_by_block = []
