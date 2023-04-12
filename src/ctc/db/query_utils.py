@@ -3,6 +3,8 @@ from __future__ import annotations
 import functools
 from typing import Callable, Coroutine, Any, TypeVar
 
+import toolsql
+
 from ctc import spec
 from . import connect_utils
 
@@ -20,6 +22,8 @@ def wrap_selector_with_connection(
     async def async_connected_f(
         *args: Any,
         context: spec.Context,
+        raise_if_cannot_connect: bool = False,
+        raise_if_table_dne: bool = False,
         **kwargs: Any,
     ) -> R | None:
 
@@ -35,12 +39,23 @@ def wrap_selector_with_connection(
         else:
             raise Exception('unknown schema_name format')
 
-        async with connect_utils.async_connect(
-            context=context,
-            schema=name,
-            read_only=True,
-        ) as conn:
-            return await async_f(*args, conn=conn, context=context, **kwargs)
+        try:
+            async with connect_utils.async_connect(
+                context=context,
+                schema=name,
+                read_only=True,
+            ) as conn:
+                return await async_f(*args, conn=conn, context=context, **kwargs)
+        except toolsql.CannotConnect as e:
+            if raise_if_cannot_connect:
+                raise e
+            else:
+                return None
+        except toolsql.TableDoesNotExist as e:
+            if raise_if_table_dne:
+                raise e
+            else:
+                return None
 
     return async_connected_f
 

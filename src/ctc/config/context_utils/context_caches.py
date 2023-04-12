@@ -10,19 +10,6 @@ from .. import config_values
 from . import context_sources
 
 
-def get_context_cache_backend(
-    *,
-    schema_name: spec.db_types.SchemaName,
-    context: spec.Context,
-) -> str | None:
-    """get backend schema cache for a given context"""
-    backend, _read, _write = _get_context_cache_settings(
-        schema_name=schema_name,
-        context=context,
-    )
-    return backend
-
-
 def get_context_db_config(
     *,
     schema_name: str,
@@ -40,6 +27,19 @@ def get_context_db_config(
             'no backend active for current context, cannot retrieve db_config'
         )
     return config_values.get_db_config(backend)
+
+
+def get_context_cache_backend(
+    *,
+    schema_name: spec.db_types.SchemaName,
+    context: spec.Context,
+) -> str | None:
+    """get backend schema cache for a given context"""
+    backend, _read, _write = _get_context_cache_settings(
+        schema_name=schema_name,
+        context=context,
+    )
+    return backend
 
 
 def get_context_cache_read_write(
@@ -113,7 +113,6 @@ def _extract_context_cache_rules(
             {'backend': context_cache},
         ]
     elif isinstance(context_cache, dict):
-
         keys = set(context_cache.keys())
 
         if keys.issubset({'filter', 'read', 'write', 'backend'}):
