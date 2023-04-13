@@ -222,6 +222,7 @@ async def _async_get_pool_data(
     symbols_result = await evm.async_get_erc20s_symbols(
         valid_coins,
         context=context,
+        convert_reverts_to='<UKNOWN>',
     )
     symbols = typing.cast(list[str], symbols_result)
 

@@ -315,10 +315,13 @@ async def async_get_erc20_name_by_block(
 #
 
 
-def _decode_raw_symbol(data: str | None) -> str:
+def _decode_raw_symbol(data: str | None, none_value: str | None = None) -> str:
     """special case decode of ancient non-compliant implementations of symbol"""
+
     if data is None:
-        return ''
+        if none_value is None:
+            none_value = ''
+        return none_value
     elif len(data) == 66:
         return binary_utils.binary_to_text(data).strip('\x00')
     elif len(data) == 0 or data == '0x':
@@ -334,6 +337,7 @@ async def async_get_erc20_symbol(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
+    convert_reverts_to: str | None = None,
     **rpc_kwargs: typing.Any,
 ) -> str:
     """get symbol of an erc20"""
@@ -360,9 +364,10 @@ async def async_get_erc20_symbol(
         block=block,
         decode_response=False,
         context=context,
+        convert_reverts_to_none=(convert_reverts_to is not None),
         **rpc_kwargs,
     )
-    symbol = _decode_raw_symbol(symbol_raw)
+    symbol = _decode_raw_symbol(symbol_raw, none_value=convert_reverts_to)
 
     if write_cache:
         if result is not None:
@@ -384,6 +389,7 @@ async def async_get_erc20s_symbols(
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
+    convert_reverts_to: str | None = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Sequence[str]:
     """get symbol of multiple erc20s"""
@@ -393,9 +399,13 @@ async def async_get_erc20s_symbols(
         block=block,
         decode_response=False,
         context=context,
+        convert_reverts_to_none=(convert_reverts_to is not None),
         **rpc_kwargs,
     )
-    return [_decode_raw_symbol(result) for result in results]
+    return [
+        _decode_raw_symbol(result, none_value=convert_reverts_to)
+        for result in results
+    ]
 
 
 async def async_get_erc20_symbol_by_block(
@@ -403,6 +413,7 @@ async def async_get_erc20_symbol_by_block(
     *,
     blocks: typing.Iterable[spec.BlockNumberReference],
     context: spec.Context = None,
+    convert_reverts_to: str | None = None,
     **rpc_kwargs: typing.Any,
 ) -> typing.Sequence[str]:
     """get symbol of an erc20 across multiple blocks"""
@@ -412,7 +423,11 @@ async def async_get_erc20_symbol_by_block(
         blocks=blocks,
         decode_response=False,
         context=context,
+        convert_reverts_to_none=(convert_reverts_to is not None),
         **rpc_kwargs,
     )
-    return [_decode_raw_symbol(result) for result in results]
+    return [
+        _decode_raw_symbol(result, none_value=convert_reverts_to)
+        for result in results
+    ]
 

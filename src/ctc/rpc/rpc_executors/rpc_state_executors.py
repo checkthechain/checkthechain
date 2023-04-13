@@ -28,6 +28,8 @@ async def async_eth_call(
     package_named_outputs: bool = False,
     fill_empty: bool = False,
     empty_token: typing.Any = None,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
     function_abi: spec.FunctionABI | None = None,
     function_name: typing.Optional[str] = None,
     contract_abi: typing.Optional[spec.ContractABI] = None,
@@ -35,7 +37,6 @@ async def async_eth_call(
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_selector: typing.Optional[spec.FunctionSelector] = None,
 ) -> spec.RpcSingularResponse:
-
     if function_abi is None:
         if call_data is None or decode_response:
             function_abi = await evm.async_get_function_abi(
@@ -62,7 +63,12 @@ async def async_eth_call(
     )
 
     # make request
-    response = await rpc_request.async_send(request, context=context)
+    response = await rpc_request.async_send(
+        request,
+        context=context,
+        convert_reverts_to_none=convert_reverts_to_none,
+        convert_reverts_to=convert_reverts_to,
+    )
 
     # digest response
     return rpc_digestors.digest_eth_call(
@@ -96,7 +102,6 @@ async def async_eth_estimate_gas(
     parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
     function_selector: typing.Optional[spec.FunctionSelector] = None,
 ) -> spec.RpcSingularResponse:
-
     if function_abi is None:
         function_abi = await evm.async_get_function_abi(
             contract_address=to_address,

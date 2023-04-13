@@ -28,6 +28,8 @@ async def async_send(
     *,
     context: spec.Context = None,
     raw_output: typing.Literal[True],
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
 ) -> str:
     ...
 
@@ -38,6 +40,8 @@ async def async_send(
     *,
     context: spec.Context = None,
     raw_output: typing.Literal[False] = False,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
 ) -> spec.RpcResponse:
     ...
 
@@ -48,6 +52,8 @@ async def async_send(
     *,
     context: spec.Context = None,
     raw_output: bool,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
 ) -> str | spec.RpcResponse:
     ...
 
@@ -57,6 +63,8 @@ async def async_send(
     *,
     context: spec.Context = None,
     raw_output: bool = False,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
 ) -> str | spec.RpcResponse:
     """send RPC request to RPC provider"""
 
@@ -72,7 +80,6 @@ async def async_send(
         logging_rpc_calls = False
 
     if isinstance(request, dict):
-
         if logging_rpc_calls:
             rpc_logging.log_rpc_request(request=request, provider=provider)
 
@@ -86,8 +93,10 @@ async def async_send(
             response = orjson.loads(raw_response)
 
         if 'result' not in response and 'error' in response:
-            if provider['convert_reverts_to_none']:
+            if provider['convert_reverts_to_none'] or convert_reverts_to_none:
                 output = None
+            elif convert_reverts_to is not None:
+                output = convert_reverts_to
             else:
                 if typing.TYPE_CHECKING:
                     response = typing.cast(
@@ -111,7 +120,6 @@ async def async_send(
             )
 
     elif isinstance(request, list):
-
         if len(request) == 0:
             return []
 
@@ -168,13 +176,21 @@ async def async_send(
         # reorder chunks
         plural_response = _reorder_response_chunks(response_chunks, request)
 
-        if provider['convert_reverts_to_none']:
+        if (
+            provider['convert_reverts_to_none']
+            or convert_reverts_to_none
+            or convert_reverts_to is not None
+        ):
+            if convert_reverts_to is not None:
+                revert_value = convert_reverts_to
+            else:
+                revert_value = None
             output = []
             for subresponse in plural_response:
                 if 'result' in subresponse:
                     output.append(subresponse['result'])
                 elif 'error' in subresponse:
-                    output.append(None)
+                    output.append(revert_value)
                 else:
                     raise Exception('could not process response')
         else:
@@ -233,7 +249,6 @@ def _reorder_response_chunks(
     response_chunks: list[spec.RpcPluralResponseRaw],
     request: spec.RpcPluralRequest,
 ) -> spec.RpcPluralResponse:
-
     responses_by_id = {
         response['id']: response
         for response_chunk in response_chunks
@@ -250,7 +265,6 @@ def _reorder_response_chunks(
 def _chunk_request(
     request: spec.RpcPluralRequest, provider: spec.Provider
 ) -> list[spec.RpcPluralRequest]:
-
     if provider['chunk_size'] is not None:
         return _chunk_request_by_size(request, provider['chunk_size'])
     else:
@@ -260,7 +274,6 @@ def _chunk_request(
 def _chunk_request_by_size(
     request: spec.RpcPluralRequest, chunk_size: int
 ) -> list[spec.RpcPluralRequest]:
-
     n_chunks = math.ceil(len(request) / chunk_size)
     return [
         request[slice(c * chunk_size, (c + 1) * chunk_size)]

@@ -16,6 +16,8 @@ if typing.TYPE_CHECKING:
         type[pl.datatypes.DataTypeClass],
         type[object],
         type[int],
+        type[float],
+        typing.Literal['decimal'],
     ]
     IntegerOutputFormat = typing.Union[
         IntegerOutputFormatScalar,

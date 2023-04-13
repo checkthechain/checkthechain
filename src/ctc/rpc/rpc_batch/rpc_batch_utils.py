@@ -79,6 +79,8 @@ async def async_batch_execute(
     method: str,
     *,
     context: spec.Context = None,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
     **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
     """execute batch rpc call asynchronously"""
@@ -88,7 +90,12 @@ async def async_batch_execute(
         kwargs=kwargs,
     )
     request = batch_construct(method=method, **constructor_kwargs)
-    response = await rpc_request.async_send(request=request, context=context)
+    response = await rpc_request.async_send(
+        request=request,
+        context=context,
+        convert_reverts_to_none=convert_reverts_to_none,
+        convert_reverts_to=convert_reverts_to,
+    )
     return batch_digest(response=response, method=method, **digestor_kwargs)
 
 
@@ -132,10 +139,10 @@ def batch_digest(
     method: str,
     **digestor_kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:
-
     digestor = rpc_registry.get_digestor(method)
     results = []
     for s, subresponse in enumerate(response):
         result = digestor(subresponse, **digestor_kwargs)
         results.append(result)
     return results
+
