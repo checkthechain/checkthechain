@@ -24,8 +24,12 @@ async def async_decode_events_dataframe(
     column_prefix: str | None = None,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     integer_output_format: spec.IntegerOutputFormat | None = None,
+    convert_invalid_str_to_none: bool = False,
+    convert_invalid_str_to: None | str = None,
 ) -> spec.DataFrame:
     """decode a dataframe that contains raw logs
+
+    TODO: specifically handle logs that do not provide event topics
 
     columns are prefixed according to input settings
     - column_prefix_type == 'arg' --> use 'arg__' as prefix
@@ -114,7 +118,10 @@ async def async_decode_events_dataframe(
                 raw_value = topic_iterator[e]
                 if raw_value is not None:
                     value = abi_coding_utils.abi_decode(
-                        topic_iterator[e], indexed_type
+                        topic_iterator[e],
+                        indexed_type,
+                        convert_invalid_str_to=convert_invalid_str_to,
+                        convert_invalid_str_to_none=convert_invalid_str_to_none,
                     )
                 else:
                     value = raw_value
@@ -123,15 +130,26 @@ async def async_decode_events_dataframe(
 
         # decode unindexed data
         if len(event_schema['unindexed_types']) > 0:
+            # unindexed_decoded = abi_coding_utils.abi_decode(
+            #     unindexed[e],
+            #     event_schema['unindexed_types'],
+            #     convert_invalid_str_to=convert_invalid_str_to,
+            #     convert_invalid_str_to_none=convert_invalid_str_to_none,
+            # )
             if len(event_schema['unindexed_types']) == 1:
                 result = abi_coding_utils.abi_decode(
                     unindexed[e],
                     event_schema['unindexed_types'][0],
+                    convert_invalid_str_to=convert_invalid_str_to,
+                    convert_invalid_str_to_none=convert_invalid_str_to_none,
                 )
                 unindexed_decoded = [result]
             else:
                 unindexed_decoded = abi_coding_utils.abi_decode(
-                    unindexed[e], event_schema['unindexed_types']
+                    unindexed[e],
+                    event_schema['unindexed_types'],
+                    convert_invalid_str_to=convert_invalid_str_to,
+                    convert_invalid_str_to_none=convert_invalid_str_to_none,
                 )
             for value in unindexed_decoded:
                 decoded_events[i].append(value)

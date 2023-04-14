@@ -43,6 +43,8 @@ async def async_get_events(
     only_columns: typing.Sequence[str] | None = None,
     exclude_columns: typing.Sequence[str] | None = None,
     convert_ints: type | bool = False,
+    convert_invalid_str_to_none: bool = False,
+    convert_invalid_str_to: None | str = None,
     max_blocks_per_request: int = 2000,
 ) -> spec.DataFrame:
     """get events"""
@@ -108,6 +110,8 @@ async def async_get_events(
         include_event_names=include_event_names,
         binary_output_format=binary_output_format,
         integer_output_format=integer_output_format,
+        convert_invalid_str_to_none=convert_invalid_str_to_none,
+        convert_invalid_str_to=convert_invalid_str_to,
         convert_ints=convert_ints,
     )
 
@@ -125,6 +129,8 @@ async def _async_postprocess_query_result(
     include_event_names: bool = False,
     binary_output_format: Literal['binary', 'prefix_hex'] = 'prefix_hex',
     integer_output_format: spec.IntegerOutputFormat | None = None,
+    convert_invalid_str_to_none: bool = False,
+    convert_invalid_str_to: None | str = None,
     convert_ints: type | bool = False,
 ) -> spec.DataFrame:
 
@@ -168,6 +174,8 @@ async def _async_postprocess_query_result(
             context=context,
             binary_output_format=binary_output_format,
             integer_output_format=integer_output_format,
+            convert_invalid_str_to_none=convert_invalid_str_to_none,
+            convert_invalid_str_to=convert_invalid_str_to,
         )
         df = df.with_columns(decoded)
         encoded_columns = ['topic1', 'topic2', 'topic3', 'unindexed']
