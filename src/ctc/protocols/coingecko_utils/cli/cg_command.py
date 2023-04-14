@@ -37,13 +37,13 @@ def get_command_spec() -> toolcli.CommandSpec:
                 'action': 'store_true',
             },
         ],
-        'examples': [
-            '',
-            'CRV -t 100d',
-            'ETH / BTC',
-            'LINK / ETH -t 24h',
-            '--update',
-        ],
+        'examples': {
+            '': {'runnable': False},
+            'CRV -t 100d': {'runnable': False},
+            'ETH / BTC': {'runnable': False},
+            'LINK / ETH -t 24h': {'runnable': False},
+            '--update': {'runnable': False},
+        },
     }
 
 
