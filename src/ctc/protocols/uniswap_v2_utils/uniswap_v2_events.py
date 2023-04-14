@@ -172,8 +172,8 @@ async def async_get_pool_burns(
             context=context,
         )
         burns = burns.with_columns(
-            pl.Series(arg__amount0, 'arg__amount0'),
-            pl.Series(arg__amount1, 'arg__amount1'),
+            pl.Series('arg__amount0', arg__amount0),
+            pl.Series('arg__amount1', arg__amount1),
         )
 
     if replace_symbols:

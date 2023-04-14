@@ -219,6 +219,7 @@ async def async_get_text_changes(
         start_block=9000000,
         verbose=2,
         context=context,
+        convert_invalid_str_to_none=True,
     )
 
     if node is None:
@@ -227,7 +228,7 @@ async def async_get_text_changes(
         node = hash_name(name)
 
     mask = events['arg__node'] == node
-    return events[mask]
+    return events.filter(mask)
 
 
 async def async_get_content_hash(

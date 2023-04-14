@@ -142,7 +142,7 @@ async def async_print_safe_executions(
 
     rows = []
     for i in range(len(executions)):
-        row = [i, executions['block_number'][i].alias('block')]
+        row = [i, executions['block_number'][i]]
         row.append(executions['transaction_hash'][i])
         rows.append(row)
 
