@@ -37,28 +37,25 @@ async def async_decode_events_dataframe(
     import polars as pl
     from ctc.toolbox import pl_utils
 
+    # handle case of no events
     if len(events) == 0:
-        return events
+        _, df_schema, _ = _create_event_arg_schema(
+            event_abis=event_abis,
+            column_prefix_type=column_prefix_type,
+            column_prefix=column_prefix,
+            integer_output_format=integer_output_format,
+        )
+        arg_df = pl.DataFrame(schema=df_schema)  # type: ignore
+        return pl.concat([events, arg_df], how='horizontal')
 
     # get event abis
     event_abis = await _async_get_events_abis(
         events=events, event_abis=event_abis, context=context
     )
 
-    # case: no events, only logs
-    if len(event_abis) == 0:
-        return events
-
-    # get event schemas
-    event_schemas = {
-        event_hash: event_abi_parsing.get_event_schema(event_abi)
-        for event_hash, event_abi in event_abis.items()
-    }
-
     # create dataframe schema
-    df_schema, event_hash_offsets = _create_event_arg_schema(
+    event_schemas, df_schema, event_hash_offsets = _create_event_arg_schema(
         event_abis=event_abis,
-        event_schemas=event_schemas,
         column_prefix_type=column_prefix_type,
         column_prefix=column_prefix,
         integer_output_format=integer_output_format,
@@ -155,16 +152,34 @@ async def async_decode_events_dataframe(
 
 def _create_event_arg_schema(
     *,
-    event_abis: typing.Mapping[str, spec.EventABI],
-    event_schemas: typing.Mapping[str, spec.EventSchema],
+    event_abis: EventABIList | EventABIMap | None = None,
     column_prefix_type: ColumnPrefixType | None = None,
     column_prefix: str | None = None,
     integer_output_format: spec.IntegerOutputFormat | None = None,
 ) -> tuple[
+    typing.Mapping[str, spec.EventSchema],
     typing.Sequence[tuple[str, spec.IntegerOutputFormat]],
     typing.Mapping[str, int],
 ]:
     """does not take binary_output_format into account, that happens later"""
+
+    # format event_abi's as dict
+    if not isinstance(event_abis, dict):
+        if isinstance(event_abis, (list, tuple)):
+            event_abis = {
+                event_abi_parsing.get_event_hash(event_abi): event_abi
+                for event_abi in event_abis
+            }
+        elif event_abis is None:
+            event_abis = {}
+        else:
+            raise Exception('unknown events format')
+
+    # get event schemas
+    event_schemas: typing.Mapping[str, spec.EventSchema] = {
+        event_hash: event_abi_parsing.get_event_schema(event_abi)
+        for event_hash, event_abi in event_abis.items()
+    }
 
     # get column prefix
     if column_prefix_type is None and column_prefix is None:
@@ -222,7 +237,7 @@ def _create_event_arg_schema(
         offsets.append(len(df_schema))
     event_hash_offsets = dict(zip(event_schemas.keys(), offsets))
 
-    return df_schema, event_hash_offsets
+    return event_schemas, df_schema, event_hash_offsets
 
 
 async def _async_get_events_abis(
