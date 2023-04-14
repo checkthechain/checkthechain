@@ -55,9 +55,9 @@ dependencies = [
     'orjson >=3.7.9, <4',
     #
     # tool suite
-    'toolcli >=0.6.8, <0.7',
+    'toolcli >=0.6.10, <0.7',
     'toolconf >=0.1.2, <0.2',
-    'toolsql >=0.4.0, <0.5',
+    'toolsql >=0.5.0, <0.6',
     'toolstr >=0.9.1, <0.10',
     'tooltime >=0.2.8, <0.3',
     #
@@ -206,9 +206,9 @@ deps =
     orjson==3.7.9
     ;
     ; tool suite
-    toolcli==0.6.8
+    toolcli==0.6.10
     toolconf==0.1.2
-    toolsql==0.4.0
+    toolsql==0.5.0
     toolstr==0.9.1
     tooltime==0.2.8
     ;
