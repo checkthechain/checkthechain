@@ -10,7 +10,7 @@ from ctc import cli
 from ctc import evm
 from ctc import spec
 from ctc.cli import cli_utils
-from ctc.toolbox.defi_utils import dex_utils
+from ctc.defi import dex_utils
 
 
 def get_command_spec() -> toolcli.CommandSpec:

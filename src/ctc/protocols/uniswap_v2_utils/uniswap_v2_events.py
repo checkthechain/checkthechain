@@ -29,7 +29,7 @@ async def async_get_pool_swaps(
     verbose: bool = False,
     context: spec.Context = None,
 ) -> spec.DataFrame:
-    from ctc.toolbox.defi_utils import dex_utils
+    from ctc.defi import dex_utils
 
     return await dex_utils.UniswapV2DEX.async_get_pool_trades(
         pool=pool,

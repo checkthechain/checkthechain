@@ -12,7 +12,7 @@ from ctc.cli import cli_utils
 from ctc import evm
 from ctc import config
 from ctc import spec
-from ctc.toolbox.defi_utils import dex_utils
+from ctc.defi import dex_utils
 
 
 help_message = """show information about a pool"""
@@ -146,7 +146,7 @@ async def async_dex_pool_command(
 
     if dex_name == 'UniswapV2':
         from ctc.protocols import uniswap_v2_utils
-        from ctc.toolbox.defi_utils.dex_utils.amm_utils import cpmm
+        from ctc.defi.dex_utils.amm_utils import cpmm
 
         print()
         toolstr.print_header('Pool State', style=styles['title'])

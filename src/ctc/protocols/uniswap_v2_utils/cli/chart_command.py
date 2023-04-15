@@ -11,7 +11,7 @@ import tooltime
 from ctc import cli
 from ctc import evm
 from ctc import spec
-from ctc.toolbox.defi_utils import ohlc_utils
+from ctc.defi import ohlc_utils
 from ctc.protocols import uniswap_v2_utils
 
 

@@ -13,8 +13,8 @@ import tooltime
 from ctc import cli
 from ctc import evm
 from ctc import spec
-from ctc.toolbox.defi_utils import dex_utils
-from ctc.toolbox.defi_utils import ohlc_utils
+from ctc.defi import dex_utils
+from ctc.defi import ohlc_utils
 
 
 def get_command_spec() -> toolcli.CommandSpec:
