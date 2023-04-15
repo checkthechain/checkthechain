@@ -223,14 +223,50 @@ async def async_get_erc20_decimals_by_block(
 # # name
 #
 
+@typing.overload
+async def async_get_erc20_name(
+    token: spec.ERC20Reference,
+    *,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
+    convert_reverts_to_none: typing.Literal[True],
+    **rpc_kwargs: typing.Any,
+) -> str | None:
+    ...
+
+
+@typing.overload
+async def async_get_erc20_name(
+    token: spec.ERC20Reference,
+    *,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
+    convert_reverts_to_none: typing.Literal[False] = False,
+    **rpc_kwargs: typing.Any,
+) -> str:
+    ...
+
+
+@typing.overload
+async def async_get_erc20_name(
+    token: spec.ERC20Reference,
+    *,
+    block: typing.Optional[spec.BlockNumberReference] = None,
+    context: spec.Context = None,
+    convert_reverts_to_none: bool,
+    **rpc_kwargs: typing.Any,
+) -> str | None:
+    ...
+
 
 async def async_get_erc20_name(
     token: spec.ERC20Reference,
     *,
     block: typing.Optional[spec.BlockNumberReference] = None,
     context: spec.Context = None,
+    convert_reverts_to_none: bool = False,
     **rpc_kwargs: typing.Any,
-) -> str:
+) -> str | None:
     """get name of an erc20"""
 
     from ctc import config
@@ -250,16 +286,14 @@ async def async_get_erc20_name(
         if result is not None and result['name'] is not None:
             return result['name']
 
-    rpc_result = await erc20_generic.async_erc20_eth_call(
+    rpc_result: str | None = await erc20_generic.async_erc20_eth_call(
         function_name='name',
         token=token,
         block=block,
         context=context,
         **rpc_kwargs,
     )
-    if not isinstance(rpc_result, str) and not rpc_kwargs.get(
-        'convert_reverts_to_none'
-    ):
+    if not isinstance(rpc_result, str) and not convert_reverts_to_none:
         raise Exception('invalid rpc result')
     name = rpc_result
 

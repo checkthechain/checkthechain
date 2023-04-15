@@ -18,7 +18,7 @@ def connect(
     schema: spec.SchemaName,
     *,
     read_only: bool = False,
-    db_config: toolsql.DBConfig = None,
+    db_config: toolsql.DBConfig | None = None,
 ) -> toolsql.Connection:
     if db_config is None:
         db_config = config.get_context_db_config(
@@ -35,7 +35,7 @@ def async_connect(
     schema: spec.SchemaName,
     *,
     read_only: bool = False,
-    db_config: toolsql.DBConfig = None,
+    db_config: toolsql.DBConfig | None = None,
 ) -> toolsql.AsyncConnection:
     if db_config is None:
         db_config = config.get_context_db_config(

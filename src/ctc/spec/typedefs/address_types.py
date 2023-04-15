@@ -36,5 +36,5 @@ class OracleFeedMetadata(AddressMetadata, total=True):
 class ERC20Metadata(TypedDict):
     symbol: str
     decimals: int
-    name: str
+    name: str | None
     address: str
