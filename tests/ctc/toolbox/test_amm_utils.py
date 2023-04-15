@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 
-from ctc.toolbox.defi_utils.dex_utils.amm_utils import cpmm
+from ctc.defi.dex_utils.amm_utils import cpmm
 
 
 x_reserves = 1e6

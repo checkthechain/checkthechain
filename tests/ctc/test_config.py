@@ -19,7 +19,7 @@ def test_tox_legacy_config():
         dep_name, version_tail = dep_str.split(' >=')
         min_version, max_version = version_tail.split(', <')
         current_deps[dep_name] = tuple(
-            int(number) for number in min_version.split('.')
+            number for number in min_version.split('.')
         )
 
     # load legacy deps
@@ -37,7 +37,7 @@ def test_tox_legacy_config():
 
         dep_name, version = legacy_dep_str.split('==')
         legacy_deps[dep_name] = tuple(
-            int(number) for number in version.split('.')
+            number for number in version.split('.')
         )
 
     # assert that legacy uses the min version number of each dependency

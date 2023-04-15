@@ -70,7 +70,7 @@ async def async_select_median_block_gas_fee(
         conn=conn,
         table=table,
         where_equals={'block_number': block_number},
-        output_format='single_dict',
+        output_format='single_dict_or_none',
     )
     return result
 

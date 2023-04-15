@@ -1,6 +1,6 @@
 import pytest
 
-from ctc.toolbox.defi_utils import dex_utils
+from ctc.defi import dex_utils
 
 
 dexes = [

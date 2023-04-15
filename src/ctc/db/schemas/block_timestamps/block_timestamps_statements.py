@@ -147,12 +147,21 @@ async def async_select_max_block_number(
 ) -> int | None:
 
     table = schema_utils.get_table_schema('block_timestamps', context=context)
-    result = await toolsql.async_select(
-        conn=conn,
-        table=table,
-        columns=['MAX(block_number)'],
-        output_format='cell_or_none',
-    )
+
+    # try-catch because connectorx panics on empty rows
+    try:
+        result = await toolsql.async_select(
+            conn=conn,
+            table=table,
+            columns=['MAX(block_number)'],
+            output_format='cell_or_none',
+        )
+    except RuntimeError as e:
+        if e.args == ('Cannot infer type from null for SQLite',):
+            return None
+        else:
+            raise e
+
     if result is None:
         return None
     elif isinstance(result, int):
@@ -168,12 +177,21 @@ async def async_select_max_block_timestamp(
 ) -> int | None:
 
     table = schema_utils.get_table_schema('block_timestamps', context=context)
-    result = await toolsql.async_select(
-        conn=conn,
-        table=table,
-        columns=['MAX(timestamp)'],
-        output_format='cell_or_none',
-    )
+
+    # try-catch because connectorx panics on empty rows
+    try:
+        result = await toolsql.async_select(
+            conn=conn,
+            table=table,
+            columns=['MAX(timestamp)'],
+            output_format='cell_or_none',
+        )
+    except RuntimeError as e:
+        if e.args == ('Cannot infer type from null for SQLite',):
+            return None
+        else:
+            raise e
+
     if result is None:
         return None
     elif isinstance(result, int):

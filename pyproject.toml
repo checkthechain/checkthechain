@@ -45,13 +45,13 @@ dependencies = [
     #
     # data science
     'numpy >=1.19.0, <1.24',
-    'polars >=0.16.10, <0.17',
+    'polars >=0.17.3, <0.18',
     #
     # io dependencies
     'aiohttp >=3.7.4, <4',
     'loguru >=0.5.3, <0.7',
     'toml >=0.10.2, <0.11',
-    'connectorx >=0.3.1, <0.4',
+    'connectorx >=0.3.2a3, <0.4',
     'orjson >=3.7.9, <4',
     #
     # tool suite
@@ -81,7 +81,6 @@ test = [
 performance = [
     'pysha3 ==1.0.2',  # for keccak()
     'scikit-image >=0.19.2',  # for console unicode drawing with toolstr
-    'orjson >=3.6.8',  # for json loading
 ]
 plots = [
     'matplotlib >=3.1.3',
@@ -196,13 +195,13 @@ deps =
     ;
     ; data science
     numpy==1.19.0
-    polars==0.16.10
+    polars==0.17.3
     ;
     ; data dependencies
     aiohttp==3.7.4
     loguru==0.5.3
     toml==0.10.2
-    connectorx==0.3.1
+    connectorx==0.3.2a3
     orjson==3.7.9
     ;
     ; tool suite
