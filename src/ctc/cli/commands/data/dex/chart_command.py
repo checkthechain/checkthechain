@@ -14,7 +14,7 @@ from ctc import cli
 from ctc import evm
 from ctc import spec
 from ctc.defi import dex_utils
-from ctc.defi import ohlc_utils
+from ctc.defi.metric_utils import ohlc_utils
 
 
 def get_command_spec() -> toolcli.CommandSpec:
