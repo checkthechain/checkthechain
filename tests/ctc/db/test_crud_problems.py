@@ -176,20 +176,17 @@ def test_all_evm_schemas_tested_for_problems():
 
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_db_folder_does_not_exist(schema_data):
-    import ctc
 
     dne_dir = os.path.join(tempfile.mkdtemp(), 'does', 'not', 'exist')
     assert not os.path.isdir(dne_dir)
     dne_path = os.path.join(dne_dir, 'ctc.db')
 
-    ctc.config.set_config_override(
-        'db_configs',
-        {'main': {'dbms': 'sqlite', 'path': dne_path}},
-    )
+    db_config = {'dbms': 'sqlite', 'path': dne_path}
 
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
             context=dict(network=1),
+            db_config=db_config,
             **schema_data['query'],
         )
 
@@ -198,9 +195,10 @@ async def test_select_when_db_folder_does_not_exist(schema_data):
 
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_db_file_does_not_exist(schema_data):
+    db_config = conftest.get_test_db_config()
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
-            context=dict(network=1), **schema_data['query']
+            context=dict(network=1), db_config=db_config, **schema_data['query']
         )
 
         assert result is None
@@ -208,6 +206,7 @@ async def test_select_when_db_file_does_not_exist(schema_data):
 
 @pytest.mark.parametrize('schema_data', schema_datas)
 async def test_select_when_schema_not_initialized(schema_data):
+
     db_config = conftest.get_test_db_config()
     with toolsql.connect(db_config) as conn:
         db.initialize_schema_versions(conn=conn)
@@ -247,6 +246,7 @@ async def test_query_when_schema_not_initialized(schema_data):
 
     if schema_data.get('queryer') is not None:
         result = await schema_data['queryer'](
+            db_config=db_config,
             **schema_data['query'],
             **network_kwargs,
         )
@@ -313,6 +313,7 @@ async def test_query_when_row_does_not_exist(schema_data):
             network_kwargs = {'context': None}
 
         result = await schema_data['queryer'](
+            db_config=db_config,
             **schema_data['query'],
             **network_kwargs,
         )

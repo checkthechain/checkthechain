@@ -257,7 +257,9 @@ async def async_get_erc20_name(
         context=context,
         **rpc_kwargs,
     )
-    if not isinstance(rpc_result, str):
+    if not isinstance(rpc_result, str) and not rpc_kwargs.get(
+        'convert_reverts_to_none'
+    ):
         raise Exception('invalid rpc result')
     name = rpc_result
 
