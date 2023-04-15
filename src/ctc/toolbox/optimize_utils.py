@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import typing
 
-from . import optimize_exceptions
+
+class BadSearchDomain(Exception):
+    pass
 
 
 async def async_bisect(
@@ -24,7 +26,7 @@ async def async_bisect(
 
     # ensure that bounds are valid
     if a > b:
-        raise optimize_exceptions.BadSearchDomain(
+        raise BadSearchDomain(
             'a must be less than b (' + str(a) + ' >= ' + str(b) + ')'
         )
 
@@ -52,7 +54,7 @@ async def async_bisect(
 
     # check that function has opposite signs at bounds
     if (f_a < 0 and f_b < 0) or (f_a > 0 and f_b > 0):
-        raise optimize_exceptions.BadSearchDomain(
+        raise BadSearchDomain(
             'function must have opposite signs at bounds, have:\n    f(a) = '
             + str(f_a)
             + '\n    f(b) = '
