@@ -22,6 +22,7 @@ def wrap_selector_with_connection(
     async def async_connected_f(
         *args: Any,
         context: spec.Context,
+        db_config: toolsql.DBConfig | None = None,
         raise_if_cannot_connect: bool = False,
         raise_if_table_dne: bool = False,
         **kwargs: Any,
@@ -39,13 +40,17 @@ def wrap_selector_with_connection(
         else:
             raise Exception('unknown schema_name format')
 
+        # try to query data
         try:
             async with connect_utils.async_connect(
                 context=context,
+                db_config=db_config,
                 schema=name,
                 read_only=True,
             ) as conn:
                 return await async_f(*args, conn=conn, context=context, **kwargs)
+
+        # handle errors, either by returning None or raising exceptions
         except toolsql.CannotConnect as e:
             if raise_if_cannot_connect:
                 raise e
@@ -57,5 +62,6 @@ def wrap_selector_with_connection(
             else:
                 return None
 
+    # return decorated function
     return async_connected_f
 

@@ -18,10 +18,12 @@ def connect(
     schema: spec.SchemaName,
     *,
     read_only: bool = False,
+    db_config: toolsql.DBConfig = None,
 ) -> toolsql.Connection:
-    db_config = config.get_context_db_config(
-        context=context, schema_name=schema
-    )
+    if db_config is None:
+        db_config = config.get_context_db_config(
+            context=context, schema_name=schema
+        )
     if read_only:
         db_config = db_config.copy()
         db_config['driver'] = 'connectorx'
@@ -33,10 +35,12 @@ def async_connect(
     schema: spec.SchemaName,
     *,
     read_only: bool = False,
+    db_config: toolsql.DBConfig = None,
 ) -> toolsql.AsyncConnection:
-    db_config = config.get_context_db_config(
-        context=context, schema_name=schema
-    )
+    if db_config is None:
+        db_config = config.get_context_db_config(
+            context=context, schema_name=schema
+        )
     if read_only:
         db_config = db_config.copy()
         db_config['driver'] = 'connectorx'
