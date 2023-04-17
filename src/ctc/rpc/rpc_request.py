@@ -127,7 +127,13 @@ async def async_send(
             import asyncio
 
             coroutines = [
-                async_send(subrequest, context=context, raw_output=raw_output)
+                async_send(
+                    subrequest,
+                    context=context,
+                    raw_output=raw_output,
+                    convert_reverts_to=convert_reverts_to,
+                    convert_reverts_to_none=convert_reverts_to_none,
+                )
                 for subrequest in request
             ]
             return await asyncio.gather(*coroutines)
