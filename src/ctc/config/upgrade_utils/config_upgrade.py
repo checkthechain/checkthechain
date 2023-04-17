@@ -26,7 +26,7 @@ def get_config_upgrade_functions() -> typing.Mapping[
 
 
 def upgrade_config(
-    old_config: typing.MutableMapping[typing.Any, typing.Any]
+    old_config: typing.Mapping[typing.Any, typing.Any]
 ) -> typing.MutableMapping[str, typing.Any]:
     """upgrade config to latest version as much as possible"""
 
@@ -45,7 +45,7 @@ def upgrade_config(
         )
         return dict(config_defaults.get_default_config())
 
-    new_config = old_config
+    new_config: typing.MutableMapping[typing.Any, typing.Any] = dict(old_config)
     config_version = version
     current_version_clean = ctc.__version__.rstrip(string.ascii_letters)
     upgrade_functions = get_config_upgrade_functions()

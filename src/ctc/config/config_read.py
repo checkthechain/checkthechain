@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import functools
 import sys
 import typing
-from typing_extensions import TypedDict
-
-if typing.TYPE_CHECKING:
-    import toolconfig
 
 import ctc
 from ctc import spec
@@ -19,60 +16,47 @@ from . import config_validate
 from . import upgrade_utils
 
 
-class _ToolconfigKwargs(TypedDict):
-    config_path_env_var: str
-    default_config_path: str
-
-
-_kwargs: _ToolconfigKwargs = {
-    'config_path_env_var': config_spec.config_path_env_var,
-    'default_config_path': config_spec.default_config_path,
-}
-
-
 def get_config_path(*, raise_if_dne: bool = True) -> str:
-    import toolconfig
 
-    return toolconfig.get_config_path(raise_if_dne=raise_if_dne, **_kwargs)
+    config_path_env_var = config_spec.config_path_env_var
+    default_config_path = config_spec.default_config_path
 
+    # get config_path from environmental variable
+    if config_path_env_var is not None:
+        config_path = os.environ.get(config_path_env_var)
+        if config_path == '':
+            config_path = None
 
-def config_path_exists() -> bool:
-    import toolconfig
+    # use default config path if not specified
+    if config_path is None and default_config_path is not None:
+        config_path = default_config_path
 
-    return toolconfig.config_path_exists(**_kwargs)
+    # validate config_path
+    if config_path is None:
+        raise spec.ConfigPathNotSet('config path is not set')
+    else:
+        if raise_if_dne and not os.path.isfile(config_path):
+            raise spec.ConfigDoesNotExist(
+                'config at path does not exist: ' + str(config_path)
+            )
 
-
-@typing.overload
-def get_config(
-    validate: typing.Literal['raise'] = 'raise',
-    warn_if_dne: bool = True,
-) -> spec.Config:
-    ...
-
-
-@typing.overload
-def get_config(
-    validate: typing.Literal['warn', False],
-    warn_if_dne: bool = True,
-) -> typing.MutableMapping[str, typing.Any]:
-    ...
+    return config_path
 
 
 @functools.lru_cache()
 def get_config(
-    validate: toolconfig.ValidationOption = False,
     warn_if_dne: bool = True,
     warn_if_outdated: bool = True,
-) -> typing.Union[spec.Config, typing.MutableMapping[str, typing.Any]]:
-
-    import toolconfig
+) -> spec.Config:
 
     # load from file
     try:
-        raw_config = toolconfig.get_config(
-            config_spec=None, validate=validate, **_kwargs
-        )
-    except toolconfig.ConfigDoesNotExist:
+        config_path = get_config_path()
+        with open(config_path, 'r') as f:
+            import json
+
+            raw_config = json.load(f)
+    except spec.ConfigDoesNotExist:
         from . import config_defaults
 
         if warn_if_dne:
@@ -82,9 +66,7 @@ def get_config(
                 ' use `ctc setup` on command line to generate a config file',
                 file=sys.stderr,
             )
-        raw_config = config_defaults.get_default_config(
-            use_env_variables=True,
-        )  # type: ignore
+        raw_config = config_defaults.get_default_config(use_env_variables=True)
 
     # auto-upgrade config if need be
     config_version = raw_config.get('config_spec_version')
@@ -121,14 +103,7 @@ def get_config(
 
     # validate
     config_validate.validate_config(raw_config)
-
-    if validate == 'raise':
-        if typing.TYPE_CHECKING:
-            return typing.cast(spec.Config, raw_config)
-        else:
-            return raw_config
-    else:
-        return raw_config
+    return raw_config  # type: ignore
 
 
 def get_config_version_tuple(
@@ -159,14 +134,5 @@ def get_config_version_tuple(
 
 
 def reset_config_cache() -> None:
-    for cache_function in _get_config_cache_functions():
-        cache_function.cache_clear()
-
-
-def _get_config_cache_functions() -> typing.Sequence[
-    functools._lru_cache_wrapper[typing.Any]
-]:
-    return [
-        get_config,  # type: ignore
-    ]
+    get_config.cache_clear()
 

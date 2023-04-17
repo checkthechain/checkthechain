@@ -7,3 +7,12 @@ class ConfigUpgradeError(Exception):
 
 class ConfigInvalid(ValueError):
     pass
+
+
+class ConfigDoesNotExist(FileNotFoundError):
+    pass
+
+
+class ConfigPathNotSet(Exception):
+    pass
+

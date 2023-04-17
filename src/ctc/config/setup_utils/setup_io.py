@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import json
 import os
 import typing
 
 import toolcli
-import toolconfig
 import toolstr
 
 import ctc
+import ctc.config
 from ctc import spec
 from ctc.cli import cli_utils
 from .. import config_spec
@@ -26,7 +27,8 @@ def load_old_config(
 
     # load old config file
     if isinstance(config_path, str) and os.path.isfile(config_path):
-        old_config = toolconfig.load_config_file(config_path)
+        with open(config_path) as f:
+            old_config: typing.Mapping[typing.Any, typing.Any] = json.load(f)
     else:
         old_config = {}
 
