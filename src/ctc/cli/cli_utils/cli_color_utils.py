@@ -154,6 +154,11 @@ def get_color_theme_name() -> str:
 
 def _is_jupyter_notebook() -> bool:
     """adapted from https://gist.github.com/thomasaarholt/e5e2da71ea3ee412616b27d364e3ae82"""
+    import sys
+
+    if 'jupyter_client' not in sys.modules:
+        return False
+
     try:
         from IPython import get_ipython
 
