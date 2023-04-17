@@ -1,12 +1,30 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 
 from ctc import rpc
 from ctc import spec
 
 from .. import uniswap_v3_spec
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class UniswapV3Ticks(TypedDict):
+        liquidity_gross: int
+        liquidity_net: int
+        fee_growth_outside_0_x128: int
+        fee_growth_outside_1_x128: int
+        tick_cummulative_outside: int
+        seconds_per_liquidity_outside_x128: int
+        seconds_outside: int
+        initialized: bool
+
+    class UniswapV3Observations(TypedDict):
+        block_timestamp: int
+        tick_cummulative: int
+        seconds_per_liquidity_cummulative_x128: int
+        initialized: bool
 
 
 async def async_pool_slot0(
@@ -122,17 +140,6 @@ async def async_pool_liquidity(
     return result
 
 
-class UniswapV3Ticks(TypedDict):
-    liquidity_gross: int
-    liquidity_net: int
-    fee_growth_outside_0_x128: int
-    fee_growth_outside_1_x128: int
-    tick_cummulative_outside: int
-    seconds_per_liquidity_outside_x128: int
-    seconds_outside: int
-    initialized: bool
-
-
 async def async_pool_ticks(
     tick: int,
     pool: spec.Address,
@@ -208,13 +215,6 @@ async def async_pool_positions(
         'tokens_owed_0': result[3],
         'tokens_owed_1': result[4],
     }
-
-
-class UniswapV3Observations(TypedDict):
-    block_timestamp: int
-    tick_cummulative: int
-    seconds_per_liquidity_cummulative_x128: int
-    initialized: bool
 
 
 async def async_pool_observations(

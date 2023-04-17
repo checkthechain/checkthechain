@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import typing
 
-from typing_extensions import Literal
-
 import toolstr
 
 import ctc.config
 from ctc import cli
 from . import llama_requests
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 #
 # # pool comparison and aggregation

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import typing
 
+from typing_extensions import TypedDict, NotRequired
+
 from . import address_types
 from . import binary_types
-
-from typing_extensions import TypedDict, NotRequired
 
 
 class EncodedEvent(TypedDict):

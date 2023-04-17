@@ -1,8 +1,24 @@
 from __future__ import annotations
 
 import os
+import typing
 
-from typing_extensions import TypedDict
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class Entry(TypedDict):
+        id: int
+        created_at: str
+        text_signature: str
+        hex_signature: str
+        bytes_signature: str
+
+    class PartialEntry(TypedDict, total=False):
+        id: int
+        created_at: str
+        text_signature: str
+        hex_signature: str
+        bytes_signature: str
 
 
 root_url = 'https://www.4byte.directory'
@@ -24,22 +40,6 @@ endpoints = {
 }
 
 
-class Entry(TypedDict):
-    id: int
-    created_at: str
-    text_signature: str
-    hex_signature: str
-    bytes_signature: str
-
-
-class PartialEntry(TypedDict, total=False):
-    id: int
-    created_at: str
-    text_signature: str
-    hex_signature: str
-    bytes_signature: str
-
-
 def get_default_path(datatype: str) -> str:
     import ctc.config
 
@@ -51,3 +51,4 @@ def get_default_path(datatype: str) -> str:
         '4byte',
         datatype + '.json',
     )
+

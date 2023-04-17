@@ -14,8 +14,6 @@ import typing
 import os
 
 if typing.TYPE_CHECKING:
-    from typing_extensions import Literal
-
     import toolcli
     import toolsql
     import toolstr

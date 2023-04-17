@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import typing
-if typing.TYPE_CHECKING:
-    from typing_extensions import Literal
-
-    import tooltime
 
 from ctc import spec
 from .. import dex_class
 from .. import dex_class_utils
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
+
+    import tooltime
 
 
 async def async_get_pool_trades(

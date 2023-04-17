@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import Literal
 
 import toolcli
 
 from .. import llama_yields
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 
 def get_command_spec() -> toolcli.CommandSpec:

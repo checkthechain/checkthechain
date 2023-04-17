@@ -3,11 +3,13 @@ from __future__ import annotations
 import functools
 import os
 import typing
-from typing_extensions import Literal
 
 from ctc import config
 from ctc import evm
 from ctc import spec
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 
 def resolve_provider(

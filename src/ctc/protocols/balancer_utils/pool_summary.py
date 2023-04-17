@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import decimal
 import typing
-from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import spec
@@ -12,21 +11,23 @@ from . import pool_metadata
 from . import pool_state
 
 if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
     import tooltime
 
 
-class BalancerPoolState(TypedDict):
-    block: int
-    pool_tokens: typing.Sequence[spec.Address]
-    pool_fees: typing.Union[int, float]
-    pool_weights: typing.Union[
-        dict[spec.ContractAddress, int],
-        dict[spec.ContractAddress, float],
-    ]
-    pool_balances: typing.Union[
-        dict[spec.Address, int],
-        dict[spec.Address, float],
-    ]
+    class BalancerPoolState(TypedDict):
+        block: int
+        pool_tokens: typing.Sequence[spec.Address]
+        pool_fees: typing.Union[int, float]
+        pool_weights: typing.Union[
+            dict[spec.ContractAddress, int],
+            dict[spec.ContractAddress, float],
+        ]
+        pool_balances: typing.Union[
+            dict[spec.Address, int],
+            dict[spec.Address, float],
+        ]
 
 
 async def async_summarize_pool_state(

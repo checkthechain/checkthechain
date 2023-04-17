@@ -5,6 +5,7 @@ import typing
 if typing.TYPE_CHECKING:
 
     from typing_extensions import TypedDict
+
     import toolsql
 
     class CoingeckoToken(TypedDict):

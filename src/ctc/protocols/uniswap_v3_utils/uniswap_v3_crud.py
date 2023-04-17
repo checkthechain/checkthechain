@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
@@ -11,15 +10,16 @@ from . import contracts
 from . import uniswap_v3_spec
 
 if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
     import tooltime
 
-
-class UniswapV3PoolMetadata(TypedDict):
-    x_symbol: str
-    y_symbol: str
-    x_address: str
-    y_address: str
-    fee: int
+    class UniswapV3PoolMetadata(TypedDict):
+        x_symbol: str
+        y_symbol: str
+        x_address: str
+        y_address: str
+        fee: int
 
 
 #
@@ -83,7 +83,6 @@ async def async_get_pool_swaps(
     normalize: bool = True,
     context: spec.Context = None,
 ) -> spec.DataFrame:
-
     import asyncio
     import polars as pl
 

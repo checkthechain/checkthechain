@@ -5,13 +5,13 @@ from __future__ import annotations
 
 import typing
 
-if typing.TYPE_CHECKING:
-    from typing_extensions import Literal
-
 from ctc import config
 from ctc import spec
 from . import event_node_utils
 from . import event_query_utils
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 
 async def _async_plan_event_query(

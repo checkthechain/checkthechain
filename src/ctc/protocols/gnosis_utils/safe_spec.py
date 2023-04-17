@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import typing
 from ctc import spec
-from typing_extensions import TypedDict, Literal
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict, Literal
 
 
 if typing.TYPE_CHECKING:

@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 
-if typing.TYPE_CHECKING:
-    from typing_extensions import NotRequired
+from typing_extensions import NotRequired
+from typing_extensions import TypedDict
 
 
 class FunctionABI(TypedDict, total=False):

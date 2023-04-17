@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import typing
-from typing_extensions import TypedDict
 
 from ctc import rpc
 from ctc import spec
@@ -10,6 +9,13 @@ from ctc import spec
 from .. import fuse_queries
 from . import lens_abis
 from . import lens_spec
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class _ReturnPoolSummaryOrError(TypedDict):
+        summary: typing.Optional[lens_spec.ReturnPoolSummary]
+        error: typing.Optional[str]
 
 
 async def async_get_public_pools_with_data(
@@ -43,11 +49,6 @@ async def async_get_public_pools_with_data(
         'data': summaries,
         'errored': errors,
     }
-
-
-class _ReturnPoolSummaryOrError(TypedDict):
-    summary: typing.Optional[lens_spec.ReturnPoolSummary]
-    error: typing.Optional[str]
 
 
 async def _async_get_pool_summary_or_error(
@@ -188,7 +189,6 @@ async def async_get_public_pool_users_with_data(
     context: spec.Context = None,
     block: typing.Optional[spec.BlockNumberReference] = None,
 ) -> lens_spec.ReturnPublicPoolUsersWithData:
-
     if lens_address is None:
         lens_address = lens_spec.get_lens_address('primary', context=context)
 

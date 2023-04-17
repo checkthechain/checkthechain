@@ -2,14 +2,21 @@ from __future__ import annotations
 
 import asyncio
 import typing
-from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
 from ctc import spec
 
 if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
     import tooltime
+
+    class CurvePoolData(TypedDict):
+        address: spec.Address
+        tokens: typing.Sequence[spec.Address]
+        symbols: typing.Sequence[str]
+        balances: typing.Sequence[int | float | None]
 
 
 # factories
@@ -184,13 +191,6 @@ async def async_get_factory_pool_data(
     return await asyncio.gather(*coroutines)
 
 
-class CurvePoolData(TypedDict):
-    address: spec.Address
-    tokens: typing.Sequence[spec.Address]
-    symbols: typing.Sequence[str]
-    balances: typing.Sequence[int | float | None]
-
-
 async def _async_get_pool_data(
     p: int,
     factory: spec.Address,
@@ -222,7 +222,7 @@ async def _async_get_pool_data(
     symbols_result = await evm.async_get_erc20s_symbols(
         valid_coins,
         context=context,
-        convert_reverts_to='<UKNOWN>',
+        convert_reverts_to='<UNKNOWN>',
     )
     symbols = typing.cast(list[str], symbols_result)
 

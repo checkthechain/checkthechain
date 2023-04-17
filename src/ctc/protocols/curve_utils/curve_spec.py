@@ -4,9 +4,23 @@ see https://github.com/curvefi/curve-pool-registry
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
 
 from ctc import spec
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class CurvePoolMetadata(TypedDict):
+        token_addresses: typing.Sequence[spec.Address]
+        token_symbols: typing.Sequence[str]
+        token_decimals: typing.Sequence[int]
+        A: int
+
+    class CurveTrade(TypedDict):
+        token_sold: spec.Address
+        token_bought: spec.Address
+        amount_sold: typing.Union[int, float]
+        amount_bought: typing.Union[int, float]
 
 
 three_pool_lp = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
@@ -17,20 +31,6 @@ three_pool_token_index = {
     'USDT': 2,
 }
 three_pool_coins = ['DAI', 'USDC', 'USDT']
-
-
-class CurvePoolMetadata(TypedDict):
-    token_addresses: typing.Sequence[spec.Address]
-    token_symbols: typing.Sequence[str]
-    token_decimals: typing.Sequence[int]
-    A: int
-
-
-class CurveTrade(TypedDict):
-    token_sold: spec.Address
-    token_bought: spec.Address
-    amount_sold: typing.Union[int, float]
-    amount_bought: typing.Union[int, float]
 
 
 pool_function_abis: typing.Mapping[str, spec.FunctionABI] = {
@@ -220,3 +220,4 @@ pool_event_abis: typing.Mapping[str, spec.EventABI] = {
         'type': 'event',
     },
 }
+

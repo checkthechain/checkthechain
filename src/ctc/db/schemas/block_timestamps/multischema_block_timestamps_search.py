@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import typing
-from typing_extensions import Literal
 
 import toolsql
 
@@ -14,6 +13,9 @@ from . import block_timestamps_statements
 from .multischema_block_timestamps_statements import (
     async_select_block_timestamp,
 )
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
 
 
 async def async_select_timestamp_block(

@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import time
 import typing
-from typing_extensions import TypedDict
-
-if typing.TYPE_CHECKING:
-    import asyncio
 
 from .. import fourbyte_spec
 
+if typing.TYPE_CHECKING:
+    import asyncio
+    from typing_extensions import TypedDict
 
-class FourbyteRatelimit(TypedDict):
-    requests_per_second: int | float
-    last_request_time: int | float
-    lock: asyncio.Lock | None
+    class FourbyteRatelimit(TypedDict):
+        requests_per_second: int | float
+        last_request_time: int | float
+        lock: asyncio.Lock | None
 
 
 _4byte_ratelimit: FourbyteRatelimit = {
@@ -30,7 +29,6 @@ async def async_query_remote_function_signatures(
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
 ) -> typing.Sequence[fourbyte_spec.Entry]:
-
     import aiohttp
 
     # get url template
@@ -78,7 +76,6 @@ async def async_query_remote_function_signatures(
 
         # perform request
         async with aiohttp.ClientSession() as session:
-
             # acquire, and retry if initial bad response
             async with session.get(url) as response:
                 if response.status == 502:
@@ -104,7 +101,6 @@ async def async_query_remote_event_signatures(
     bytes_signature: typing.Optional[str] = None,
     text_signature: typing.Optional[str] = None,
 ) -> typing.Sequence[fourbyte_spec.Entry]:
-
     import aiohttp
 
     # get url template
@@ -134,3 +130,4 @@ async def async_query_remote_event_signatures(
                 return [result]
             else:
                 return result['results']  # type: ignore
+

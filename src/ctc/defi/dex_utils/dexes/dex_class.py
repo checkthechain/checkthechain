@@ -3,13 +3,13 @@ from __future__ import annotations
 import asyncio
 import typing
 
+from ctc import evm
+from ctc import spec
+
 if typing.TYPE_CHECKING:
     from typing_extensions import Literal
 
     import tooltime
-
-from ctc import evm
-from ctc import spec
 
 
 class DEX:

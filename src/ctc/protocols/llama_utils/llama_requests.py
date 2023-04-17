@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import typing
 
+import aiohttp
+
 if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
     from typing_extensions import TypedDict
 
     class TVLTimeseries(TypedDict):
@@ -13,11 +16,6 @@ if typing.TYPE_CHECKING:
         timestamp: typing.Sequence[int]
         tvl: typing.Sequence[int | float]
         apy: typing.Sequence[int | float]
-
-
-from typing_extensions import Literal
-
-import aiohttp
 
 
 tvl_url_root = 'https://api.llama.fi'

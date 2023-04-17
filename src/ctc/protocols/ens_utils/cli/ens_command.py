@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import typing
 
 import toolcli
 import toolstr
 import tooltime
-from typing_extensions import TypedDict
 
 from ctc import cli
 from ctc import evm
@@ -13,13 +13,15 @@ from ctc import spec
 
 from ctc.protocols import ens_utils
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
 
-class ENSResult(TypedDict):
-    address: spec.Address | None
-    name: str | None
-    owner: str | None
-    expiration: int | None
-    resolver: str | None
+    class ENSResult(TypedDict):
+        address: spec.Address | None
+        name: str | None
+        owner: str | None
+        expiration: int | None
+        resolver: str | None
 
 
 def get_command_spec() -> toolcli.CommandSpec:
@@ -53,7 +55,6 @@ async def async_ens_command(
     block: spec.BlockNumberReference,
     verbose: bool,
 ) -> None:
-
     if block is not None:
         block = evm.standardize_block_number(block)
 
@@ -63,7 +64,6 @@ async def async_ens_command(
     results = await asyncio.gather(*coroutines)
 
     for r, result in enumerate(results):
-
         if r > 0:
             print()
 
@@ -110,7 +110,6 @@ async def async_ens_command(
 async def async_process_ens_arg(
     arg: str, block: spec.BlockNumberReference
 ) -> ENSResult:
-
     if '.' in arg:
         name = arg
         address = None
@@ -150,3 +149,4 @@ async def async_process_ens_arg(
         'expiration': expiration,
         'resolver': resolver,
     }
+

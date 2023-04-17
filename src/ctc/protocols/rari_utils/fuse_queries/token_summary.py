@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from typing_extensions import TypedDict
-
 from ctc import spec
 from ctc.toolbox import nested_utils
 from . import directory_metadata
@@ -11,26 +9,26 @@ from . import pool_metadata
 from . import token_metadata
 from . import token_state
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
 
-class CTokenMetricSpec(TypedDict, total=False):
-    tvl: bool
-    tvb: bool
-    supply_apy: bool
-    borrow_apy: bool
+    class CTokenMetricSpec(TypedDict, total=False):
+        tvl: bool
+        tvb: bool
+        supply_apy: bool
+        borrow_apy: bool
 
+    class CTokenMetrics(TypedDict, total=False):
+        tvl: spec.Number
+        tvb: spec.Number
+        supply_apy: spec.Number | None
+        borrow_apy: spec.Number | None
 
-class CTokenMetrics(TypedDict, total=False):
-    tvl: spec.Number
-    tvb: spec.Number
-    supply_apy: spec.Number | None
-    borrow_apy: spec.Number | None
-
-
-class CTokenMetricsByBlock(TypedDict, total=False):
-    tvl: typing.Sequence[spec.Number]
-    tvb: typing.Sequence[spec.Number]
-    supply_apy: typing.Sequence[spec.Number | None]
-    borrow_apy: typing.Sequence[spec.Number | None]
+    class CTokenMetricsByBlock(TypedDict, total=False):
+        tvl: typing.Sequence[spec.Number]
+        tvb: typing.Sequence[spec.Number]
+        supply_apy: typing.Sequence[spec.Number | None]
+        borrow_apy: typing.Sequence[spec.Number | None]
 
 
 async def async_get_token_multipool_history(
@@ -198,3 +196,4 @@ async def async_get_ctoken_state(
         output['borrow_apy'] = await borrow_task
 
     return output
+

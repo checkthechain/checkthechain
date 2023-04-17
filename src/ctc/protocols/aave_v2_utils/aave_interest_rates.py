@@ -7,13 +7,48 @@ from __future__ import annotations
 
 import asyncio
 import typing
-from typing_extensions import TypedDict
 
 from ctc import evm
 from ctc import rpc
 from ctc import spec
 from ctc.toolbox import nested_utils
 from . import aave_pool_tokens
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    class AaveV2ReserveData(TypedDict):
+        configuration: int
+        liquidity_index: int
+        variable_borrow_index: int
+        current_liquidity_rate: int
+        current_variable_borrow_rate: int
+        current_stable_borrow_rate: int
+        last_update_timestamp: int
+        atoken_address: spec.Address
+        stable_debt_token_address: spec.Address
+        variable_debt_token_address: spec.Address
+        interest_rate_strategy_address: spec.Address
+        id: int
+
+    class AaveV2ReserveListData(TypedDict):
+        configuration: list[int]
+        liquidity_index: list[int]
+        variable_borrow_index: list[int]
+        current_liquidity_rate: list[int]
+        current_variable_borrow_rate: list[int]
+        current_stable_borrow_rate: list[int]
+        last_update_timestamp: list[int]
+        atoken_address: list[spec.Address]
+        stable_debt_token_address: list[spec.Address]
+        variable_debt_token_address: list[spec.Address]
+        interest_rate_strategy_address: list[spec.Address]
+        id: list[int]
+
+    class AaveV2TokenMarket(TypedDict):
+        underlying: spec.Address
+        symbol: str
+        reserve_data: AaveV2ReserveData
 
 
 ray = 10**27
@@ -22,49 +57,12 @@ seconds_per_year = 31536000
 aave_lending_pool = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
 
 
-class AaveV2ReserveData(TypedDict):
-    configuration: int
-    liquidity_index: int
-    variable_borrow_index: int
-    current_liquidity_rate: int
-    current_variable_borrow_rate: int
-    current_stable_borrow_rate: int
-    last_update_timestamp: int
-    atoken_address: spec.Address
-    stable_debt_token_address: spec.Address
-    variable_debt_token_address: spec.Address
-    interest_rate_strategy_address: spec.Address
-    id: int
-
-
-class AaveV2ReserveListData(TypedDict):
-    configuration: list[int]
-    liquidity_index: list[int]
-    variable_borrow_index: list[int]
-    current_liquidity_rate: list[int]
-    current_variable_borrow_rate: list[int]
-    current_stable_borrow_rate: list[int]
-    last_update_timestamp: list[int]
-    atoken_address: list[spec.Address]
-    stable_debt_token_address: list[spec.Address]
-    variable_debt_token_address: list[spec.Address]
-    interest_rate_strategy_address: list[spec.Address]
-    id: list[int]
-
-
-class AaveV2TokenMarket(TypedDict):
-    underlying: spec.Address
-    symbol: str
-    reserve_data: AaveV2ReserveData
-
-
 async def async_get_reserve_data(
     asset: spec.Address,
     block: spec.BlockNumberReference | None = None,
     *,
     context: spec.Context = None,
 ) -> AaveV2ReserveData:
-
     result = await rpc.async_eth_call(
         to_address=aave_lending_pool,
         function_name='getReserveData',
@@ -95,17 +93,13 @@ async def async_get_reserve_data_by_block(
     *,
     context: spec.Context = None,
 ) -> AaveV2ReserveListData:
-
     coroutines = [
         async_get_reserve_data(asset, block=block, context=context)
         for block in blocks
     ]
 
     results = await asyncio.gather(*coroutines)
-    return typing.cast(
-        AaveV2ReserveListData,
-        nested_utils.list_of_dicts_to_dict_of_lists(results),
-    )
+    return nested_utils.list_of_dicts_to_dict_of_lists(results)  # type: ignore
 
 
 async def async_get_reserves_data(
@@ -114,7 +108,6 @@ async def async_get_reserves_data(
     block: spec.BlockNumberReference | None = None,
     context: spec.Context = None,
 ) -> typing.Sequence[AaveV2ReserveData]:
-
     if reserves_list is None:
         reserves_list = await aave_pool_tokens.async_get_reserves_list(
             block=block,
@@ -154,7 +147,6 @@ async def async_get_token_markets(
     block: spec.BlockNumberReference | None = None,
     context: spec.Context = None,
 ) -> typing.Sequence[AaveV2TokenMarket]:
-
     if reserves_list is None:
         reserves_list = await aave_pool_tokens.async_get_reserves_list(
             block=block, context=context
@@ -190,7 +182,6 @@ async def async_get_interest_rates(
     reserve_data: AaveV2ReserveData | None = None,
     context: spec.Context = None,
 ) -> dict[str, float]:
-
     if reserve_data is None:
         if token is None:
             raise Exception('must specify token or reserve_data')

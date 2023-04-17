@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import Literal
-
-if typing.TYPE_CHECKING:
-    import polars as pl
 
 from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import binary_utils
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import Literal
+    import polars as pl
 
 
 def get_event_df_columns(

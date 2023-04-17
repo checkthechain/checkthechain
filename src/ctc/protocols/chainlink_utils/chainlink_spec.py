@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import os
 import typing
-from typing_extensions import TypedDict
 
 from ctc import spec
 
 if typing.TYPE_CHECKING or os.environ.get('BUILDING_SPHINX') == '1':
+    from typing_extensions import TypedDict
+
     _FeedReference = typing.Union[spec.Address, str]
 
     class FeedRoundData(TypedDict):
@@ -102,3 +103,4 @@ aggregator_event_abis: dict[str, spec.EventABI] = {
         'type': 'event',
     },
 }
+

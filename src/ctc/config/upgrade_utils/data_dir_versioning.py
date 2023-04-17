@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import os
 import typing
-from typing_extensions import TypedDict
-
 
 if typing.TYPE_CHECKING:
+
+    from typing_extensions import TypedDict
 
     DirectoryTree = typing.Mapping[str, typing.Mapping[str, typing.Any]]
 

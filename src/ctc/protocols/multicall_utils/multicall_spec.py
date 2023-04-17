@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import typing
-from typing_extensions import TypedDict
-
-if typing.TYPE_CHECKING:
-    from typing_extensions import NotRequired
 
 from ctc import spec
+
+if typing.TYPE_CHECKING:
+    from typing_extensions import TypedDict
+    from typing_extensions import NotRequired
 
 
 #
