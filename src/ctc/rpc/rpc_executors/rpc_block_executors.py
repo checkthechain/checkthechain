@@ -8,14 +8,25 @@ from .. import rpc_request
 
 
 async def async_eth_block_number(
-    *, context: spec.Context = None, decode_response: bool = True
+    *,
+    context: spec.Context = None,
+    decode_response: bool = True,
+    raw_output: bool = False,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_block_number()
-    response = await rpc_request.async_send(request, context=context)
-    return rpc_digestors.digest_eth_block_number(
-        response=response,
-        decode_response=decode_response,
+    response = await rpc_request.async_send(
+        request,
+        context=context,
+        raw_output=raw_output,
     )
+
+    if raw_output:
+        return response
+    else:
+        return rpc_digestors.digest_eth_block_number(
+            response=response,
+            decode_response=decode_response,
+        )
 
 
 async def async_eth_get_block_by_hash(
@@ -45,17 +56,26 @@ async def async_eth_get_block_by_number(
     decode_response: bool = True,
     context: spec.Context = None,
     snake_case_response: bool = True,
+    raw_output: bool = False,
 ) -> spec.RpcSingularResponse:
     request = rpc_constructors.construct_eth_get_block_by_number(
         block_number=block_number,
         include_full_transactions=include_full_transactions,
     )
-    response = await rpc_request.async_send(request, context=context)
-    return rpc_digestors.digest_eth_get_block_by_number(
-        response=response,
-        decode_response=decode_response,
-        snake_case_response=snake_case_response,
+    response = await rpc_request.async_send(
+        request,
+        context=context,
+        raw_output=raw_output,
     )
+
+    if raw_output:
+        return response
+    else:
+        return rpc_digestors.digest_eth_get_block_by_number(
+            response=response,
+            decode_response=decode_response,
+            snake_case_response=snake_case_response,
+        )
 
 
 async def async_eth_get_uncle_count_by_block_hash(
