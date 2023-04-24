@@ -62,6 +62,7 @@ def repartition_files(
     row_group_size: int | None = None,
     verbose: bool | int = True,
     skip_existing: bool = False,
+    columns_in_partition_names: bool = True,
 ) -> None:
     """
     Reindexing methods
@@ -123,6 +124,7 @@ def repartition_files(
             input_template=input_template,
             output_template=output_template,
             skip_existing=skip_existing,
+            columns_in_partition_names=columns_in_partition_names,
         )
     elif method == 'chunked':
         _repartition_files_chunked(
@@ -143,6 +145,7 @@ def repartition_files(
             row_group_size=row_group_size,
             verbose=verbose,
             skip_existing=skip_existing,
+            columns_in_partition_names=columns_in_partition_names,
         )
     else:
         raise Exception('invalid method: ' + str(method))
@@ -171,6 +174,7 @@ def _repartition_files_chunked(
     row_group_size: int | None,
     verbose: bool | int,
     skip_existing: bool,
+    columns_in_partition_names: bool,
 ) -> None:
     if temporary_dir is None:
         temporary_dir = tempfile.mkdtemp()
@@ -281,6 +285,7 @@ def _repartition_files_chunked(
             input_template=input_template,
             output_template=partition_output_template,
             skip_existing=skip_existing,
+            columns_in_partition_names=columns_in_partition_names,
         )
 
         # record file paths
@@ -362,12 +367,18 @@ def _files_to_partitions(
     input_template: str,
     output_template: str,
     skip_existing: bool,
+    columns_in_partition_names: bool,
 ) -> typing.MutableMapping[str, typing.Sequence[str]]:
-
     # create output paths
     paths_per_partition: typing.MutableMapping[str, typing.Sequence[str]] = {}
     for p, label in enumerate(labels):
-        paths_per_partition[label] = [output_template.format(partition=label)]
+        if columns_in_partition_names:
+            partition_name = column + '_' + label
+        else:
+            partition_name = label
+        paths_per_partition[label] = [
+            output_template.format(partition=partition_name)
+        ]
 
     # skip if paths already exist
     if skip_existing and all(
