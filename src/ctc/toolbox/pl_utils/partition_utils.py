@@ -150,6 +150,7 @@ def repartition_files(
 
 
 def _repartition_files_chunked(
+    *,
     all_files: typing.Sequence[str],
     bounds: typing.Sequence[int],
     labels: typing.Sequence[str],
@@ -337,6 +338,7 @@ def _repartition_files_chunked(
 
 
 def _files_to_partitions(
+    *,
     paths: typing.Sequence[str],
     bounds: typing.Sequence[int],
     labels: typing.Sequence[str],
