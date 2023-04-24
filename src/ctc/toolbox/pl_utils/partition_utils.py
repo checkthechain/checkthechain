@@ -61,6 +61,7 @@ def repartition_files(
     n_row_groups_per_partition: int | None = None,
     row_group_size: int | None = None,
     verbose: bool | int = True,
+    skip_existing: bool = False,
 ) -> None:
     """
     Reindexing methods
@@ -121,6 +122,7 @@ def repartition_files(
             output_dir=output_dir,
             input_template=input_template,
             output_template=output_template,
+            skip_existing=skip_existing,
         )
     elif method == 'chunked':
         _repartition_files_chunked(
@@ -140,6 +142,7 @@ def repartition_files(
             n_row_groups_per_partition=n_row_groups_per_partition,
             row_group_size=row_group_size,
             verbose=verbose,
+            skip_existing=skip_existing,
         )
     else:
         raise Exception('invalid method: ' + str(method))
@@ -167,6 +170,7 @@ def _repartition_files_chunked(
     n_row_groups_per_partition: int | None,
     row_group_size: int | None,
     verbose: bool | int,
+    skip_existing: bool,
 ) -> None:
     if temporary_dir is None:
         temporary_dir = tempfile.mkdtemp()
@@ -276,6 +280,7 @@ def _repartition_files_chunked(
             output_dir=temporary_dir,
             input_template=input_template,
             output_template=partition_output_template,
+            skip_existing=skip_existing,
         )
 
         # record file paths
@@ -299,6 +304,16 @@ def _repartition_files_chunked(
             values={},
         )
         output_path = os.path.join(output_dir, output_path)
+
+        if skip_existing and os.path.isfile(output_path):
+            if verbose:
+                print(
+                    'skipping',
+                    partition,
+                    '(partition',
+                    str(p + 1) + ' / ' + str(len(labels)) + ')',
+                )
+            continue
         if verbose >= 2:
             print(
                 'writing',
@@ -346,7 +361,22 @@ def _files_to_partitions(
     output_dir: str,
     input_template: str,
     output_template: str,
+    skip_existing: bool,
 ) -> typing.MutableMapping[str, typing.Sequence[str]]:
+
+    # create output paths
+    paths_per_partition: typing.MutableMapping[str, typing.Sequence[str]] = {}
+    for p, label in enumerate(labels):
+        paths_per_partition[label] = [output_template.format(partition=label)]
+
+    # skip if paths already exist
+    if skip_existing and all(
+        os.path.isfile(path)
+        for path_list in paths_per_partition.values()
+        for path in path_list
+    ):
+        return paths_per_partition
+
     # load files
     df = pl.concat([pl.scan_parquet(path) for path in paths]).collect(
         streaming=True
@@ -370,10 +400,8 @@ def _files_to_partitions(
     partitions = binned_rows['category'].cast(int)
 
     # write partitioned files, and record path of each partition
-    paths_per_partition: typing.MutableMapping[str, typing.Sequence[str]] = {}
     for p, label in enumerate(labels):
-        output_path = output_template.format(partition=label)
-        paths_per_partition[label] = [output_path]
+        output_path = paths_per_partition[label][0]
         partition_df = df.filter(partitions == p + 1)
         pl_utils.write_df(
             df=partition_df,
