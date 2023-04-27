@@ -42,7 +42,7 @@ def convert_rpc_transaction_to_db_transaction(
         'gas_limit': transaction['gas'],
         'gas_priority': transaction.get('max_priority_fee_per_gas'),
         'gas_price_max': transaction.get('max_fee_per_gas'),
-        'status': receipt['status'],
+        'status': bool(receipt['status']),
     }
     return tx
 

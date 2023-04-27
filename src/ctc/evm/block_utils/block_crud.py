@@ -53,7 +53,7 @@ async def _async_get_block_by_number(
         schema_name='blocks', context=context
     )
 
-    if read_cache:
+    if read_cache and isinstance(block, int):
         db_block_data = await db.async_query_block(
             block_number=block,
             context=context,

@@ -13,35 +13,30 @@ example_data = [
         'created_at': '2016-07-09T03:58:28.234977Z',
         'text_signature': 'transfer(address,uint256)',
         'hex_signature': '0xa9059cbb',
-        'bytes_signature': '©\x05\x9c»',
     },
     {
         'id': 179,
         'created_at': '2016-07-09T03:58:45.230129Z',
         'hex_signature': '0x18160ddd',
         'text_signature': 'totalSupply()',
-        'bytes_signature': '\x18\x16\rÝ',
     },
     {
         'id': 31780,
         'created_at': '2018-05-11T08:39:29.708250Z',
         'text_signature': 'many_msg_babbage(bytes1)',
         'hex_signature': '0xa9059cbb',
-        'bytes_signature': '©\x05\x9c»',
     },
     {
         'id': 161159,
         'created_at': '2019-03-22T19:13:17.314877Z',
         'text_signature': 'transfer(bytes4[9],bytes5[6],int48[11])',
         'hex_signature': '0xa9059cbb',
-        'bytes_signature': '©\x05\x9c»',
     },
     {
         'id': 313067,
         'created_at': '2021-10-20T05:29:13.555535Z',
         'text_signature': 'func_2093253501(bytes)',
         'hex_signature': '0xa9059cbb',
-        'bytes_signature': '©\x05\x9c»',
     },
 ]
 

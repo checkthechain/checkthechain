@@ -59,7 +59,12 @@ events_schema: toolsql.DBSchemaShorthand = {
         },
         'event_queries': {
             'columns': [
-                {'name': 'query_id', 'type': 'Integer', 'primary': True},
+                {
+                    'name': 'query_id',
+                    'type': 'Integer',
+                    'primary': True,
+                    'autoincrement': True,
+                },
                 {'name': 'contract_address', 'type': 'Binary', 'index': True},
                 {
                     'name': 'start_block',

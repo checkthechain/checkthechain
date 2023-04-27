@@ -11,6 +11,10 @@ from ctc.spec.typedefs import db_types
 
 from . import schemas
 
+#
+# # schema lists
+#
+
 
 def get_admin_schema_names() -> tuple[db_types.AdminSchemaName]:
     return db_types.AdminSchemaName.__args__  # type: ignore
@@ -33,7 +37,13 @@ def get_all_schema_names() -> typing.Sequence[db_types.SchemaName]:
     return typing.cast(typing.Sequence[db_types.SchemaName], schema_names)
 
 
+#
+# # raw schemas
+#
+
+
 def get_raw_schema(schema_name: str) -> toolsql.DBSchema:
+    """get raw schema, a set of tables not customized for any network"""
     schema: toolsql.DBSchemaShorthand
     if schema_name == 'block_timestamps':
         schema = schemas.block_timestamps_schema
@@ -78,10 +88,16 @@ def get_raw_schema(schema_name: str) -> toolsql.DBSchema:
     return toolsql.normalize_shorthand_db_schema(schema)
 
 
+#
+# # prepared schemas
+#
+
+
 def get_prepared_schema(
     schema_name: str,
     context: spec.Context = None,
 ) -> toolsql.DBSchema:
+    """get prepared schema, a set of tables customized for a specific network"""
 
     # get schema
     schema = get_raw_schema(schema_name)
@@ -89,7 +105,9 @@ def get_prepared_schema(
 
     # add network to table name
     for table_name, table in list(schema['tables'].items()):
-        full_name = get_table_name(context=context, table_name=table_name)
+        full_name = get_prepared_table_name(
+            context=context, table_name=table_name
+        )
         if table.get('name') is not None:
             table['name'] = full_name
         schema['tables'][full_name] = schema['tables'].pop(table_name)  # type: ignore
@@ -101,13 +119,19 @@ def get_table_schema(
     table_name: str,
     context: spec.Context = None,
 ) -> toolsql.TableSchema:
-    schema_name = get_schema_of_raw_table(table_name)
-    schema = get_prepared_schema(schema_name=schema_name, context=context)
-    prepared_name = get_table_name(context=context, table_name=table_name)
-    return schema['tables'][prepared_name]
+    schema_name = _get_schema_of_raw_table(table_name)
+    if schema_name in get_generic_schema_names():
+        schema = get_raw_schema(schema_name=schema_name)
+        return schema['tables'][table_name]
+    else:
+        schema = get_prepared_schema(schema_name=schema_name, context=context)
+        prepared_name = get_prepared_table_name(
+            context=context, table_name=table_name
+        )
+        return schema['tables'][prepared_name]
 
 
-def get_table_name(
+def get_prepared_table_name(
     table_name: str,
     context: spec.Context = None,
 ) -> str:
@@ -116,8 +140,7 @@ def get_table_name(
     return 'network_' + str(chain_id) + '__' + table_name
 
 
-def get_schema_of_raw_table(table: str) -> spec.SchemaName:
-
+def _get_schema_of_raw_table(table: str) -> spec.SchemaName:
     candidates = []
     for schema_name in get_all_schema_names():
         raw_schema = get_raw_schema(schema_name)
@@ -133,46 +156,4 @@ def get_schema_of_raw_table(table: str) -> spec.SchemaName:
         )
     else:
         raise Exception('found multiple schemas containing table ' + str(table))
-
-
-def get_complete_prepared_schema(
-    networks: typing.Sequence[spec.NetworkReference] | None = None,
-) -> toolsql.DBSchema:
-
-    # include network schemas
-    if networks is None:
-        networks = config.get_networks_that_have_providers()
-    schema_name: db_types.SchemaName
-    all_schemas = []
-    for network in networks:
-        for schema_name in get_network_schema_names():
-            schema = get_prepared_schema(
-                context=dict(network=network), schema_name=schema_name
-            )
-            all_schemas.append(schema)
-
-    # include generic schemas
-    for schema_name in get_generic_schema_names():
-        schema = get_raw_schema(schema_name)
-        all_schemas.append(schema)
-
-    # include admin schemas
-    for schema_name in get_admin_schema_names():
-        schema = get_raw_schema(schema_name)
-        all_schemas.append(schema)
-
-    return _combine_db_schemas(all_schemas)
-
-
-def _combine_db_schemas(
-    db_schemas: typing.Sequence[toolsql.DBSchema],
-) -> toolsql.DBSchema:
-    tables: typing.MutableMapping[str, toolsql.TableSchema] = {}
-    for db_schema in db_schemas:
-        for table_name, table_spec in db_schema.get('tables', {}).items():
-            if table_name in tables:
-                raise Exception('table name collision')
-            tables[table_name] = table_spec
-    combined_schema: toolsql.DBSchema = {'name': 'ctc', 'tables': tables}
-    return combined_schema
 
