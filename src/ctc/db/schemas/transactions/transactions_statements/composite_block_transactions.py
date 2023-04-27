@@ -45,7 +45,7 @@ async def async_select_blocks_transactions(
         conn=conn,
         context=context,
     )
-    if blocks_present is None:
+    if blocks_present is None or len(blocks_present) == 0:
         return None
 
     table = schema_utils.get_table_schema('transactions', context=context)

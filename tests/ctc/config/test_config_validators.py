@@ -6,7 +6,9 @@ from ctc.config import config_defaults
 from ctc.config import config_validate
 
 
-default_db_configs = config_defaults.get_default_db_configs('/path/to/data')
+default_db_configs = config_defaults.get_default_db_configs(
+    data_dir='/path/to/data'
+)
 
 valid_values = {
     'config_spec_version': ['0.3.1'],
@@ -128,7 +130,6 @@ def test_every_config_key_has_validator_entry():
 
 @pytest.mark.parametrize('item', list(valid_values.items()))
 def test_validate_valid_config_values(item):
-
     key, values = item
 
     base_type = config_validate.get_config_base_types()[key]
@@ -155,3 +156,4 @@ def test_validate_invalid_config_values(item):
         if validator is not None:
             with pytest.raises(spec.ConfigInvalid):
                 validator(value, default_config)
+

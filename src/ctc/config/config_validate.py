@@ -237,6 +237,18 @@ def validate_db_configs(
                 raise spec.ConfigInvalid(
                     'db config should have keys dbms and path'
                 )
+        elif db_config['dbms'] == 'postgresql':
+            if set(db_config.keys()) != {
+                'dbms',
+                'database',
+                'hostname',
+                'port',
+                'username',
+                'password',
+            }:
+                raise spec.ConfigInvalid(
+                    'db config should have keys dbms and path'
+                )
         else:
             raise spec.ConfigInvalid(
                 'unrecognized dbms: ' + str(db_config['dbms'])

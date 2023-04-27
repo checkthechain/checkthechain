@@ -41,20 +41,10 @@ def status_command(verbose: bool) -> None:
         return
 
     toolstr.print_header('Database Config', style=styles['title'])
-    toolstr.print(
-        toolstr.add_style('- dbms:', styles['option']),
-        toolstr.add_style(db_config['dbms'], styles['description']),
-    )
-    if db_config['dbms'] == 'sqlite':
-        path = db_config['path']
-        if path is None:
-            raise Exception('sqlite path not specified')
-        toolstr.print(
-            toolstr.add_style('- path:', styles['option']),
-            toolstr.add_style(path, styles['metavar'] + ' bold'),
-        )
-    else:
-        raise NotImplementedError()
+    for key, value in db_config.items():
+        if key == 'password':
+            value = '********'
+        cli.print_bullet(key=key, value=value)
 
     # print data being stored
     active_schemas = db.get_active_schemas()

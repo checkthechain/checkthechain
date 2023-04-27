@@ -206,7 +206,7 @@ def get_default_networks_metadata() -> typing.Mapping[
 #
 
 
-def get_default_db_config(data_dir: str) -> toolsql.DBConfig:
+def get_default_db_config(*, data_dir: str) -> toolsql.DBConfig:
     return {
         'dbms': 'sqlite',
         'path': os.path.join(data_dir, 'dbs/ctc.db'),
@@ -214,6 +214,7 @@ def get_default_db_config(data_dir: str) -> toolsql.DBConfig:
 
 
 def get_default_db_configs(
+    *,
     data_dir: str,
 ) -> typing.Mapping[str, toolsql.DBConfig]:
     return {'main': get_default_db_config(data_dir=data_dir)}

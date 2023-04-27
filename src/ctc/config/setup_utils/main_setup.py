@@ -89,13 +89,15 @@ async def async_setup_ctc(
             data_dir=data_dir_data['data_dir'],
             network_data=network_data,
             styles=styles,
+            headless=headless,
+            old_db_configs=old_config.get('db_configs'),
         )
     else:
         from ctc.config import config_defaults
 
         db_data = {
             'db_configs': config_defaults.get_default_db_configs(
-                data_dir_data['data_dir']
+                data_dir=data_dir_data['data_dir']
             ),
         }
 

@@ -234,7 +234,7 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                                     str(subsubkey), description_style
                                 )
                                 + toolstr.add_style(':', chrome_style),
-                                toolstr.add_style(subsubvalue, style),
+                                toolstr.add_style(str(subsubvalue), style),
                             )
                     else:
                         toolstr.print(
