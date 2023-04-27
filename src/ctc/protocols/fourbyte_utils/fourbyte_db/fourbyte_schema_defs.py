@@ -32,7 +32,7 @@ fourbyte_schema: toolsql.DBSchemaShorthand = {
                 },
                 {
                     'name': 'bytes_signature',
-                    'type': 'Text',
+                    'type': 'Binary',
                     'index': True,
                 },
             ],
@@ -61,7 +61,7 @@ fourbyte_schema: toolsql.DBSchemaShorthand = {
                 },
                 {
                     'name': 'bytes_signature',
-                    'type': 'Text',
+                    'type': 'Binary',
                     'index': True,
                 },
             ],
