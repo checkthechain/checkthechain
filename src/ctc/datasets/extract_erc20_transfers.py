@@ -4,13 +4,16 @@ import asyncio
 import typing
 import shutil
 
-
 import ctc.rpc
 from ctc import spec
-from . import block_chunk_jobs
+
+try:
+    import pdp
+except ImportError:
+    raise Exception('install pdp for dataset functionality')
 
 
-class ExtractErc20Transfers(block_chunk_jobs.BlockChunkJobs):
+class ExtractErc20Transfers(pdp.BlockChunkJobs):
     def execute_job(self, i: int) -> typing.Any:
         job_data = self.get_job_data(i)
         job_name = self.get_job_name(i)

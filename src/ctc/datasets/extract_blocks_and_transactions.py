@@ -10,10 +10,14 @@ import polars as pl
 import ctc.rpc
 from ctc import spec
 from ctc.toolbox import pl_utils
-from . import block_chunk_jobs
+
+try:
+    import pdp
+except ImportError:
+    raise Exception('install pdp for dataset functionality')
 
 
-class ExtractBlocksAndTransactions(block_chunk_jobs.BlockChunkJobs):
+class ExtractBlocksAndTransactions(pdp.BlockChunkJobs):
     extract_blocks: bool
     extract_transactions: bool
 
