@@ -14,6 +14,43 @@ from .. import rpc_provider
 _http_sessions: dict[spec.ProviderId, aiohttp.ClientSession] = {}
 
 
+def sync_send_http(
+    request: spec.RpcRequest,
+    provider: spec.Provider,
+    *,
+    n_attempts: int = 8,
+) -> str:
+    import requests
+    import json
+
+    headers = {'Content-Type': 'application/json', 'User-Agent': 'ctc'}
+    data = json.dumps(request)
+    for attempt in range(n_attempts):
+        try:
+            response = requests.post(
+                provider['url'],
+                data=data,
+                headers=headers,
+            )
+            return response.text
+        except Exception:
+            import time
+
+            time.sleep(0.250)
+    else:
+        if response is None:
+            status = 'None'
+        else:
+            status = str(response.status_code)
+        message = (
+            'http rpc request failed after '
+            + str(n_attempts)
+            + ' retries, status_code = '
+            + str(status)
+        )
+        raise Exception(message)
+
+
 async def async_send_http(
     request: spec.RpcRequest,
     provider: spec.Provider,
@@ -25,7 +62,6 @@ async def async_send_http(
     headers = {'User-Agent': 'ctc'}
     response = None
     for attempt in range(n_attempts):
-
         try:
             async with session.post(
                 provider['url'], json=request, headers=headers
@@ -70,7 +106,6 @@ async def async_send_http(
 def get_async_http_session(
     provider: spec.Provider, create: bool = True
 ) -> aiohttp.ClientSession:
-
     provider_id = rpc_provider._get_provider_id(provider)
     if provider_id not in _http_sessions:
         if create:
@@ -92,7 +127,6 @@ def get_async_http_session(
 async def async_close_http_session(
     context: spec.Context = None,
 ) -> None:
-
     import asyncio
 
     if len(_http_sessions) == 0:
@@ -109,7 +143,11 @@ async def async_close_http_session(
         if provider is None:
             raise Exception('no provider available')
         session = get_async_http_session(provider=provider)
-        session_keys = [key for key, value in _http_sessions.items() if id(session) == id(value)]
+        session_keys = [
+            key
+            for key, value in _http_sessions.items()
+            if id(session) == id(value)
+        ]
         if len(session_keys) != 1:
             raise Exception('unknown session')
         else:

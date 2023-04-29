@@ -1,1 +1,1 @@
-from .rpc_http_async import async_close_http_session
+from .rpc_http import async_close_http_session

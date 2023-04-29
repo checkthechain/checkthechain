@@ -7,43 +7,7 @@ from .. import rpc_logging
 from . import request_utils
 
 
-@typing.overload
-async def async_send(
-    request: spec.RpcRequest,
-    *,
-    context: spec.Context = None,
-    raw_output: typing.Literal[True],
-    convert_reverts_to: typing.Any = None,
-    convert_reverts_to_none: bool = False,
-) -> str:
-    ...
-
-
-@typing.overload
-async def async_send(
-    request: spec.RpcRequest,
-    *,
-    context: spec.Context = None,
-    raw_output: typing.Literal[False] = False,
-    convert_reverts_to: typing.Any = None,
-    convert_reverts_to_none: bool = False,
-) -> spec.RpcResponse:
-    ...
-
-
-@typing.overload
-async def async_send(
-    request: spec.RpcRequest,
-    *,
-    context: spec.Context = None,
-    raw_output: bool,
-    convert_reverts_to: typing.Any = None,
-    convert_reverts_to_none: bool = False,
-) -> str | spec.RpcResponse:
-    ...
-
-
-async def async_send(
+def sync_send(
     request: spec.RpcRequest,
     *,
     context: spec.Context = None,
@@ -72,7 +36,7 @@ async def async_send(
             rpc_logging.log_rpc_request(request=request, provider=provider)
 
         # send request
-        raw_response = await async_send_raw(request=request, provider=provider)
+        raw_response = sync_send_raw(request=request, provider=provider)
 
         # process response
         output = request_utils._postprocess_response(
@@ -86,7 +50,6 @@ async def async_send(
         )
 
     elif isinstance(request, list):
-        import asyncio
 
         # circuit break for empty batch request
         if len(request) == 0:
@@ -94,17 +57,17 @@ async def async_send(
 
         # break into individual requests if batch disabled
         if provider.get('disable_batch_requests'):
-            coroutines = [
-                async_send(
+            results = []
+            for subrequest in request:
+                result = sync_send(
                     subrequest,
                     context=context,
                     raw_output=raw_output,
                     convert_reverts_to=convert_reverts_to,
                     convert_reverts_to_none=convert_reverts_to_none,
                 )
-                for subrequest in request
-            ]
-            return await asyncio.gather(*coroutines)
+                results.append(result)
+            return results
 
         # chunk request
         request_chunks = request_utils._chunk_request(request=request, provider=provider)
@@ -117,11 +80,10 @@ async def async_send(
                 )
 
         # send request chunks
-        coroutines = []
+        raw_response_chunks = []
         for request_chunk in request_chunks:
-            coroutine = async_send_raw(request=request_chunk, provider=provider)
-            coroutines.append(coroutine)
-        raw_response_chunks = await asyncio.gather(*coroutines)
+            result = sync_send_raw(request=request_chunk, provider=provider)
+            raw_response_chunks.append(result)
 
         # process responses
         output = request_utils._postprocess_plural_response(
@@ -141,7 +103,7 @@ async def async_send(
     return output
 
 
-async def async_send_raw(
+def sync_send_raw(
     request: spec.RpcRequest,
     provider: spec.Provider,
 ) -> str:
@@ -150,7 +112,7 @@ async def async_send_raw(
     if provider['protocol'] == 'http':
         from ..rpc_protocols import rpc_http
 
-        return await rpc_http.async_send_http(
+        return rpc_http.sync_send_http(
             request=request,
             provider=provider,
         )
@@ -158,7 +120,7 @@ async def async_send_raw(
     elif provider['protocol'] == 'wss':
         from ..rpc_protocols import rpc_websocket
 
-        return await rpc_websocket.async_send_websocket(
+        return rpc_websocket.sync_send_websocket(
             request=request,
             provider=provider,
         )

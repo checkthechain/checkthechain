@@ -55,7 +55,7 @@ def _sync_beacon_request(
     params: typing.Mapping[str, typing.Any] | None = None,
     context: spec.Context = None,
 ) -> typing.Any:
-    import requests  # type: ignore
+    import requests
 
     url = _build_consensus_url(
         endpoint=endpoint, context=context, params=params
