@@ -1,7 +1,8 @@
 from .rpc_batch import *
 from .rpc_constructors import *
 from .rpc_digestors import *
-from .rpc_executors import *
+from .rpc_executors_async import *
+from .rpc_executors_sync import *
 from .rpc_protocols import *
 
 from .rpc_lifecycle import *

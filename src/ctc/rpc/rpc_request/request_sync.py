@@ -7,6 +7,42 @@ from .. import rpc_logging
 from . import request_utils
 
 
+@typing.overload
+def sync_send(
+    request: spec.RpcRequest,
+    *,
+    context: spec.Context = None,
+    raw_output: typing.Literal[True],
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
+) -> str:
+    ...
+
+
+@typing.overload
+def sync_send(
+    request: spec.RpcRequest,
+    *,
+    context: spec.Context = None,
+    raw_output: typing.Literal[False] = False,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
+) -> spec.RpcResponse:
+    ...
+
+
+@typing.overload
+def sync_send(
+    request: spec.RpcRequest,
+    *,
+    context: spec.Context = None,
+    raw_output: bool,
+    convert_reverts_to: typing.Any = None,
+    convert_reverts_to_none: bool = False,
+) -> str | spec.RpcResponse:
+    ...
+
+
 def sync_send(
     request: spec.RpcRequest,
     *,
@@ -30,7 +66,6 @@ def sync_send(
         logging_rpc_calls = False
 
     if isinstance(request, dict):
-
         # log request
         if logging_rpc_calls:
             rpc_logging.log_rpc_request(request=request, provider=provider)
@@ -50,7 +85,6 @@ def sync_send(
         )
 
     elif isinstance(request, list):
-
         # circuit break for empty batch request
         if len(request) == 0:
             return []
@@ -70,7 +104,9 @@ def sync_send(
             return results
 
         # chunk request
-        request_chunks = request_utils._chunk_request(request=request, provider=provider)
+        request_chunks = request_utils._chunk_request(
+            request=request, provider=provider
+        )
 
         # log requests
         if logging_rpc_calls:
