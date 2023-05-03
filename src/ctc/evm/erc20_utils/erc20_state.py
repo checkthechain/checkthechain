@@ -35,8 +35,8 @@ async def async_get_erc20_total_supply(
         context=context,
         **rpc_kwargs,
     )
-    if not isinstance(result, int):
-        raise Exception('invalid rpc result')
+    if rpc_kwargs.get('convert_reverts_to_none') and result is None:
+        return result
     total_supply: int | float = result
 
     if normalize:
