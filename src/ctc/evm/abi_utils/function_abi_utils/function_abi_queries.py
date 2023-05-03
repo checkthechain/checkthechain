@@ -73,6 +73,24 @@ def get_function_abi(
         raise Exception('internal error')
 
 
+def sync_get_function_abi(
+    *,
+    function_name: typing.Optional[str] = None,
+    contract_abi: typing.Optional[spec.ContractABI] = None,
+    contract_address: typing.Optional[spec.Address] = None,
+    n_parameters: typing.Optional[int] = None,
+    parameter_types: typing.Optional[list[spec.ABIDatumType]] = None,
+    function_selector: typing.Optional[spec.FunctionSelector] = None,
+    context: spec.Context = None,
+) -> spec.FunctionABI:
+    raise NotImplementedError('sync version of get_function_abi')
+    # necessary functions to replace:
+    # - contract_utils.async_get_proxy_implementation
+    # - etherscan_utils.async_get_contract_abi
+    # - db.async_query_contract_ab
+    # - db.async_intake_contract_abi
+
+
 async def async_get_function_abi(
     *,
     function_name: typing.Optional[str] = None,
