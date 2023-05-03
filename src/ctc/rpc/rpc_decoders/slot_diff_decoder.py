@@ -22,7 +22,9 @@ if typing.TYPE_CHECKING:
 
 SlotAddress = str
 ChangeType = str
-SlotChanges = typing.Mapping[ChangeType, str | typing.Mapping[str, str]]
+SlotChanges = typing.Mapping[
+    ChangeType, typing.Union[str, typing.Mapping[str, str]]
+]
 
 
 class ContractStateDiff(msgspec.Struct):
