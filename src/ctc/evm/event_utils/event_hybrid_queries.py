@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import spec
 from . import event_node_utils
 from . import event_query_utils
@@ -27,6 +26,7 @@ async def _async_plan_event_query(
 ) -> spec.EventQueryPlan:
     """plan which parts of query should be dispatched to db vs node"""
 
+    from ctc import config
     from ctc import db
     from ctc.toolbox import range_utils
 

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from ctc import config
 from ctc import spec
 from .. import abi_utils
 from .. import binary_utils
@@ -185,6 +184,7 @@ async def async_scrub_db_queries(
 
     import toolsql
 
+    from ctc import config
     from ctc import db
     from ctc.toolbox import range_utils
 
