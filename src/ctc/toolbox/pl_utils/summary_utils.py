@@ -21,6 +21,21 @@ def get_glob_total_bytes(path_template: str) -> int:
     return total_size
 
 
+def get_series_distribution(series: spec.Series) -> spec.DataFrame:
+    dist = (
+        series.value_counts()
+        .sort('counts', descending=True)
+        .rename({'counts': 'count'})
+    )
+    dist = dist.with_columns(
+        pl.col('count').cumsum().alias('cumcount'),
+        (pl.col('count') / series.shape[0]).alias('pdf'),
+    )
+    dist = dist.with_columns(pl.col('pdf').cumsum().alias('cdf'))
+    dist.insert_at_idx(1, dist.with_row_count()['row_nr'].alias('rank') + 1)
+    return dist
+
+
 def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
     import toolstr
 
