@@ -20,11 +20,13 @@ if typing.TYPE_CHECKING:
 #     omit_defaults=True,
 # )
 
-SlotChanges = typing.Mapping[str, str]
+SlotAddress = str
+ChangeType = str
+SlotChanges = typing.Mapping[ChangeType, str | typing.Mapping[str, str]]
 
 
 class ContractStateDiff(msgspec.Struct):
-    storage: typing.Mapping[str, SlotChanges]
+    storage: typing.Mapping[SlotAddress, SlotChanges]
 
 
 class TraceResult(msgspec.Struct, rename='camel'):

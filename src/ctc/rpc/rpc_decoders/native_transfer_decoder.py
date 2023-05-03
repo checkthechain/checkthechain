@@ -33,7 +33,7 @@ CallResult = msgspec.defstruct(
 )
 
 
-class CallTrace(msgspec.Struct):
+class CallTrace(msgspec.Struct, rename='camel'):
     type: str
     action: CallAction  # type: ignore
     subtraces: int
