@@ -310,8 +310,11 @@ async def async_get_erc20_allowance(
         context=context,
         **rpc_kwargs,
     )
-    if not isinstance(result, int):
-        raise Exception('invalid rpc result')
+    if result is None:
+        if not rpc_kwargs.get('convert_reverts_to_none'):
+            raise Exception('invalid result')
+        return result
+
     allowance: int | float = result
 
     if normalize:
