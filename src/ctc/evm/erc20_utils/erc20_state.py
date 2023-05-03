@@ -283,7 +283,8 @@ async def async_get_erc20_balance_by_block(
 
 async def async_get_erc20_allowance(
     token: spec.ERC20Reference,
-    wallet: spec.Address,
+    owner: spec.Address,
+    spender: spec.Address,
     *,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
@@ -294,8 +295,8 @@ async def async_get_erc20_allowance(
     if block is None:
         block = 'latest'
 
-    wallet = await address_utils.async_resolve_address(
-        wallet,
+    owner = await address_utils.async_resolve_address(
+        owner,
         block=block,
         context=context,
     )
@@ -304,7 +305,7 @@ async def async_get_erc20_allowance(
         token=token,
         function_name='allowance',
         block=block,
-        function_parameters=[wallet],
+        function_parameters=[owner, spender],
         context=context,
     )
     if not isinstance(result, int):
@@ -321,7 +322,8 @@ async def async_get_erc20_allowance(
 
 async def async_get_erc20_allowance_by_block(
     token: spec.ERC20Reference,
-    wallet: spec.Address,
+    owner: spec.Address,
+    spender: spec.Address,
     *,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
@@ -329,8 +331,8 @@ async def async_get_erc20_allowance_by_block(
 ) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get historical ERC20 allowance over range of blocks"""
 
-    wallet = await address_utils.async_resolve_address(
-        wallet,
+    owner = await address_utils.async_resolve_address(
+        owner,
         block=blocks[-1],
         context=context,
     )
@@ -339,7 +341,7 @@ async def async_get_erc20_allowance_by_block(
         token=token,
         function_name='allowance',
         blocks=blocks,
-        function_parameters=[wallet],
+        function_parameters=[owner, spender],
         context=context,
     )
 
@@ -358,7 +360,8 @@ async def async_get_erc20_allowance_by_block(
 
 async def async_get_erc20s_allowances(
     tokens: typing.Sequence[spec.ERC20Reference],
-    wallet: spec.Address,
+    owner: spec.Address,
+    spender: spec.Address,
     *,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
@@ -366,8 +369,8 @@ async def async_get_erc20s_allowances(
 ) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get ERC20 allowance of wallet for multiple tokens"""
 
-    wallet = await address_utils.async_resolve_address(
-        wallet,
+    owner = await address_utils.async_resolve_address(
+        owner,
         block=block,
         context=context,
     )
@@ -376,7 +379,7 @@ async def async_get_erc20s_allowances(
         tokens=tokens,
         function_name='allowance',
         block=block,
-        function_parameters=[wallet],
+        function_parameters=[owner, spender],
         context=context,
     )
 
@@ -388,20 +391,21 @@ async def async_get_erc20s_allowances(
     return allowances
 
 
-async def async_get_erc20_allowances_of_addresses(
+async def async_get_erc20_allowances_of_owners(
     token: spec.ERC20Reference,
-    wallets: typing.Sequence[spec.Address],
+    owners: typing.Sequence[spec.Address],
+    spender: spec.Address,
     *,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
 ) -> typing.Sequence[int | float]:
-    """get ERC20 allowance of multiple addresses"""
+    """get ERC20 allowance of multiple owners"""
 
     from ctc import rpc
 
-    wallets = await address_utils.async_resolve_addresses(
-        wallets,
+    owners = await address_utils.async_resolve_addresses(
+        owners,
         block=block,
         context=context,
     )
@@ -410,7 +414,42 @@ async def async_get_erc20_allowances_of_addresses(
         to_address=token,
         block_number=block,
         function_abi=erc20_spec.erc20_function_abis['allowance'],
-        function_parameter_list=[[wallet] for wallet in wallets],
+        function_parameter_list=[[owner, spender] for owner in owners],
+        context=context,
+    )
+
+    if normalize:
+        return await erc20_normalize.async_normalize_erc20_quantities(
+            quantities=allowances, token=token, context=context, block=block
+        )
+    else:
+        return allowances
+
+
+async def async_get_erc20_allowances_of_spenders(
+    token: spec.ERC20Reference,
+    owner: spec.Address,
+    spenders: typing.Sequence[spec.Address],
+    *,
+    block: spec.BlockNumberReference | None = None,
+    normalize: bool = True,
+    context: spec.Context = None,
+) -> typing.Sequence[int | float]:
+    """get ERC20 allowance of multiple spenders"""
+
+    from ctc import rpc
+
+    owner = await address_utils.async_resolve_address(
+        owner,
+        block=block,
+        context=context,
+    )
+
+    allowances = await rpc.async_batch_eth_call(
+        to_address=token,
+        block_number=block,
+        function_abi=erc20_spec.erc20_function_abis['allowance'],
+        function_parameter_list=[[owner, spender] for spender in spenders],
         context=context,
     )
 
