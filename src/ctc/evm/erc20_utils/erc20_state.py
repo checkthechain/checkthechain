@@ -289,6 +289,7 @@ async def async_get_erc20_allowance(
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
+    **rpc_kwargs: typing.Any,
 ) -> typing.Union[int, float]:
     """get ERC20 allowance"""
 
@@ -307,6 +308,7 @@ async def async_get_erc20_allowance(
         block=block,
         function_parameters=[owner, spender],
         context=context,
+        **rpc_kwargs,
     )
     if not isinstance(result, int):
         raise Exception('invalid rpc result')
@@ -328,6 +330,7 @@ async def async_get_erc20_allowance_by_block(
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     context: spec.Context = None,
+    **rpc_kwargs: typing.Any,
 ) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get historical ERC20 allowance over range of blocks"""
 
@@ -343,6 +346,7 @@ async def async_get_erc20_allowance_by_block(
         blocks=blocks,
         function_parameters=[owner, spender],
         context=context,
+        **rpc_kwargs,
     )
 
     if normalize:
@@ -366,6 +370,7 @@ async def async_get_erc20s_allowances(
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
+    **rpc_kwargs: typing.Any,
 ) -> typing.Union[typing.Sequence[int], typing.Sequence[float]]:
     """get ERC20 allowance of wallet for multiple tokens"""
 
@@ -381,6 +386,7 @@ async def async_get_erc20s_allowances(
         block=block,
         function_parameters=[owner, spender],
         context=context,
+        **rpc_kwargs,
     )
 
     if normalize:
@@ -399,6 +405,7 @@ async def async_get_erc20_allowances_of_owners(
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
+    **rpc_kwargs: typing.Any,
 ) -> typing.Sequence[int | float]:
     """get ERC20 allowance of multiple owners"""
 
@@ -416,6 +423,7 @@ async def async_get_erc20_allowances_of_owners(
         function_abi=erc20_spec.erc20_function_abis['allowance'],
         function_parameter_list=[[owner, spender] for owner in owners],
         context=context,
+        **rpc_kwargs,
     )
 
     if normalize:
@@ -434,6 +442,7 @@ async def async_get_erc20_allowances_of_spenders(
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
+    **rpc_kwargs: typing.Any,
 ) -> typing.Sequence[int | float]:
     """get ERC20 allowance of multiple spenders"""
 
@@ -451,6 +460,7 @@ async def async_get_erc20_allowances_of_spenders(
         function_abi=erc20_spec.erc20_function_abis['allowance'],
         function_parameter_list=[[owner, spender] for spender in spenders],
         context=context,
+        **rpc_kwargs,
     )
 
     if normalize:
