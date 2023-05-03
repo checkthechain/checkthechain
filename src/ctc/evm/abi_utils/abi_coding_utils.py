@@ -19,6 +19,10 @@ def abi_decode(
 
     data = binary_utils.to_binary(data)
 
+    # TODO: more general left padding for irregular sized data
+    if data == b'':
+        data = b'\x00' * 32
+
     # hardcode some conversions for speed
     if types == 'address':
         return '0x' + data[-20:].hex()

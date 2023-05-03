@@ -83,6 +83,8 @@ async def async_get_pool_state(
     # await results
     token_x_reserves, token_y_reserves = await reserves_task
     lp_total_supply = await lp_total_supply_task
+    if lp_total_supply is None:
+        raise Exception('invalid value for lp_total_supply')
 
     output: uniswap_v2_spec.PoolState = {
         'x_reserves': token_x_reserves,

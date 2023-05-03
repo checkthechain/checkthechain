@@ -22,7 +22,7 @@ async def async_get_erc20_total_supply(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[int, float]:
+) -> typing.Union[int, float] | None:
     """get total supply of ERC20"""
 
     if block is None:
