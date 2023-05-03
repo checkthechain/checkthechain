@@ -118,7 +118,7 @@ async def async_get_erc20_balance(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[int, float]:
+) -> typing.Union[int, float] | None:
     """get ERC20 balance"""
 
     if block is None:
@@ -138,8 +138,10 @@ async def async_get_erc20_balance(
         context=context,
         **rpc_kwargs,
     )
-    if not isinstance(result, int):
-        raise Exception('invalid rpc result')
+    if result is None:
+        if not rpc_kwargs.get('convert_reverts_to_none'):
+            raise Exception('invalid result')
+        return result
     balance: int | float = result
 
     if normalize:
@@ -290,7 +292,7 @@ async def async_get_erc20_allowance(
     normalize: bool = True,
     context: spec.Context = None,
     **rpc_kwargs: typing.Any,
-) -> typing.Union[int, float]:
+) -> typing.Union[int, float] | None:
     """get ERC20 allowance"""
 
     if block is None:

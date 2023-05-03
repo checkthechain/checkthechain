@@ -337,13 +337,16 @@ class DEX:
         block: spec.BlockNumberReference | None = None,
         context: spec.Context = None,
     ) -> int | float:
-        return await evm.async_get_erc20_balance(
+        result = await evm.async_get_erc20_balance(
             wallet=pool,
             token=asset,
             normalize=normalize,
             block=block,
             context=context,
         )
+        if result is None:
+            raise Exception('invalid result for pool balance')
+        return result
 
     @classmethod
     async def async_get_pool_balances(
