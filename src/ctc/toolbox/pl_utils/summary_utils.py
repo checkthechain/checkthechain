@@ -26,6 +26,8 @@ def create_series_summary(series: pl.Series) -> typing.Mapping[str, typing.Any]:
 
     if series.dtype == pl.datatypes.Object:
         n_unique = len(set(series.to_list()))
+    elif isinstance(series.dtype, pl.List):
+        n_unique = len(set(tuple(item) for item in series.to_list()))
     else:
         n_unique = series.n_unique()
     n_rows = len(series)
