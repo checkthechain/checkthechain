@@ -284,8 +284,8 @@ async def async_get_erc20_balance_by_block(
 async def async_get_erc20_allowance(
     token: spec.ERC20Reference,
     owner: spec.Address,
-    spender: spec.Address,
     *,
+    spender: spec.Address,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
@@ -323,8 +323,8 @@ async def async_get_erc20_allowance(
 async def async_get_erc20_allowance_by_block(
     token: spec.ERC20Reference,
     owner: spec.Address,
-    spender: spec.Address,
     *,
+    spender: spec.Address,
     blocks: typing.Sequence[spec.BlockNumberReference],
     normalize: bool = True,
     context: spec.Context = None,
@@ -361,8 +361,8 @@ async def async_get_erc20_allowance_by_block(
 async def async_get_erc20s_allowances(
     tokens: typing.Sequence[spec.ERC20Reference],
     owner: spec.Address,
-    spender: spec.Address,
     *,
+    spender: spec.Address,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
@@ -394,8 +394,8 @@ async def async_get_erc20s_allowances(
 async def async_get_erc20_allowances_of_owners(
     token: spec.ERC20Reference,
     owners: typing.Sequence[spec.Address],
-    spender: spec.Address,
     *,
+    spender: spec.Address,
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,
@@ -429,8 +429,8 @@ async def async_get_erc20_allowances_of_owners(
 async def async_get_erc20_allowances_of_spenders(
     token: spec.ERC20Reference,
     owner: spec.Address,
-    spenders: typing.Sequence[spec.Address],
     *,
+    spenders: typing.Sequence[spec.Address],
     block: spec.BlockNumberReference | None = None,
     normalize: bool = True,
     context: spec.Context = None,

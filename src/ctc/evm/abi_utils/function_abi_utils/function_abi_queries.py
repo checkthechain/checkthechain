@@ -83,6 +83,7 @@ def sync_get_function_abi(
     function_selector: typing.Optional[spec.FunctionSelector] = None,
     context: spec.Context = None,
 ) -> spec.FunctionABI:
+    """get function abi from ABI source"""
     raise NotImplementedError('sync version of get_function_abi')
     # necessary functions to replace:
     # - contract_utils.async_get_proxy_implementation
