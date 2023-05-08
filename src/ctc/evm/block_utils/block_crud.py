@@ -236,3 +236,17 @@ async def async_get_latest_block_number(
 
             return result
 
+
+def sync_get_latest_block_number(
+    *,
+    context: spec.Context = None,
+    use_cache: bool = True,
+    cache_time: int | float = 1,
+) -> int:
+    from ctc import rpc
+
+    result = rpc.sync_eth_block_number(context=context)
+    if not isinstance(result, int):
+        raise Exception('invalid rpc result')
+    return result
+

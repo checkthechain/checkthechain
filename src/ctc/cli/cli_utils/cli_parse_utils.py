@@ -62,6 +62,80 @@ async def async_parse_block_range(
     return start_block, end_block
 
 
+async def async_parse_block_chunks(
+    text: str,
+    *,
+    default_interval: int | None = None,
+    context: spec.Context = None,
+) -> tuple(int, int, int):
+    """
+
+    Examples
+    14_000_000:14_000_100:10
+    14M:14.1M:1K
+    10:100:50
+    14M:latest:500k
+    """
+    if text.count(':') == 2:
+        start_block, end_block, interval = text.split(':')
+    elif text.count(':') == 1:
+        start_block, end_block = text.split(':')
+        interval = None
+    else:
+        raise Exception(
+            'block chunks must be specified as start_block:end_block:chunk_size'
+        )
+    start_block_int = await _async_resolve_single_block(
+        start_block, context=context
+    )
+    end_block_int = await _async_resolve_single_block(
+        end_block, context=context
+    )
+    if interval is not None:
+        interval_int = await _async_resolve_single_block(
+            interval, context=context
+        )
+    else:
+        if default_interval is None:
+            raise Exception('must specify default_interval')
+        interval_int = default_interval
+    return start_block_int, end_block_int, interval_int
+
+
+def sync_parse_block_chunks(
+    text: str,
+    *,
+    default_interval: int | None = None,
+    context: spec.Context = None,
+) -> tuple(int, int, int):
+    """
+
+    Examples
+    14_000_000:14_000_100:10
+    14M:14.1M:1K
+    10:100:50
+    14M:latest:500k
+    """
+    if text.count(':') == 2:
+        start_block, end_block, interval = text.split(':')
+    elif text.count(':') == 1:
+        start_block, end_block = text.split(':')
+        interval = None
+    else:
+        raise Exception(
+            'block chunks must be specified as start_block:end_block:chunk_size'
+        )
+    start_block_int = _sync_resolve_single_block(start_block, context=context)
+    end_block_int = _sync_resolve_single_block(end_block, context=context)
+    if interval is not None:
+        interval_int = _sync_resolve_single_block(interval, context=context)
+    else:
+        if default_interval is None:
+            raise Exception('must specify default_interval')
+        interval_int = default_interval
+    return start_block_int, end_block_int, interval_int
+
+
 async def async_parse_block_slice(
     text: str | typing.Sequence[str],
     n: int | None = None,
@@ -85,7 +159,6 @@ async def async_parse_block_slice(
 
     # list of blocks
     if isinstance(text, (list, tuple)):
-
         blocks: list[int] = []
         for subtext in text:
             subblocks = await async_parse_block_slice(
@@ -95,7 +168,6 @@ async def async_parse_block_slice(
         return blocks
 
     elif isinstance(text, str):
-
         # single block
         if text == 'latest':
             return [await evm.async_get_latest_block_number(context=context)]
@@ -169,11 +241,66 @@ async def _async_resolve_single_block(
     text: str,
     context: spec.Context = None,
 ) -> int:
-    if text.isnumeric():
+    chars = set(text)
+    numbers = set('0123456789')
+
+    if set(text) in numbers:
         return int(text)
+    elif set(text) in (numbers | {'_'}):
+        import ast
+
+        return ast.literal_eval(text)
+    elif len(text) > 1 and set(text[:-1]) in chars:
+        if text[-1].lower() == 'b':
+            factor = 1_000_000_000
+        elif text[-1].lower() == 'm':
+            factor = 1_000_000
+        elif text[-1].lower() == 'k':
+            factor = 1_000
+        else:
+            raise Exception('unknown suffix')
+        return int(text[:-1]) * factor
     elif text == 'latest':
         return await evm.async_get_latest_block_number(context=context)
     else:
+        # scentific notation
+        try:
+            as_float = float(text)
+            as_int = int(as_float)
+            if abs(as_float - as_int) > 0.00000001:
+                raise Exception('must specify integer block values')
+            return as_int
+        except ValueError:
+            raise Exception('could not parse block: ' + str(text))
+
+
+def _sync_resolve_single_block(
+    text: str,
+    context: spec.Context = None,
+) -> int:
+    chars = set(text)
+    numbers = set('0123456789')
+
+    if set(text) in numbers:
+        return int(text)
+    elif set(text) in (numbers | {'_'}):
+        import ast
+
+        return ast.literal_eval(text)
+    elif len(text) > 1 and set(text[:-1]) in chars:
+        if text[-1].lower() == 'b':
+            factor = 1_000_000_000
+        elif text[-1].lower() == 'm':
+            factor = 1_000_000
+        elif text[-1].lower() == 'k':
+            factor = 1_000
+        else:
+            raise Exception('unknown suffix')
+        return int(text[:-1]) * factor
+    elif text == 'latest':
+        return evm.sync_get_latest_block_number(context=context)
+    else:
+        # scentific notation
         try:
             as_float = float(text)
             as_int = int(as_float)
