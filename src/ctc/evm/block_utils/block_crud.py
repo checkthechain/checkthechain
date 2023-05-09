@@ -243,6 +243,7 @@ def sync_get_latest_block_number(
     use_cache: bool = True,
     cache_time: int | float = 1,
 ) -> int:
+    """get latest block number"""
     from ctc import rpc
 
     result = rpc.sync_eth_block_number(context=context)
