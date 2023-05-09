@@ -67,7 +67,7 @@ async def async_parse_block_chunks(
     *,
     default_interval: int | None = None,
     context: spec.Context = None,
-) -> tuple(int, int, int):
+) -> tuple[int, int, int]:
     """
 
     Examples
@@ -107,7 +107,7 @@ def sync_parse_block_chunks(
     *,
     default_interval: int | None = None,
     context: spec.Context = None,
-) -> tuple(int, int, int):
+) -> tuple[int, int, int]:
     """
 
     Examples
@@ -244,13 +244,14 @@ async def _async_resolve_single_block(
     chars = set(text)
     numbers = set('0123456789')
 
-    if set(text) in numbers:
+    if chars.issubset(numbers):
         return int(text)
-    elif set(text) in (numbers | {'_'}):
+    elif chars.issubset(numbers | {'_'}):
         import ast
 
-        return ast.literal_eval(text)
-    elif len(text) > 1 and set(text[:-1]) in chars:
+        result: int = ast.literal_eval(text)
+        return result
+    elif len(text) > 1 and set(text[:-1]).issubset(numbers):
         if text[-1].lower() == 'b':
             factor = 1_000_000_000
         elif text[-1].lower() == 'm':
@@ -281,13 +282,14 @@ def _sync_resolve_single_block(
     chars = set(text)
     numbers = set('0123456789')
 
-    if set(text) in numbers:
+    if chars.issubset(numbers):
         return int(text)
-    elif set(text) in (numbers | {'_'}):
+    elif chars.issubset(numbers | {'_'}):
         import ast
 
-        return ast.literal_eval(text)
-    elif len(text) > 1 and set(text[:-1]) in chars:
+        result: int = ast.literal_eval(text)
+        return result
+    elif len(text) > 1 and set(text[:-1]).issubset(numbers):
         if text[-1].lower() == 'b':
             factor = 1_000_000_000
         elif text[-1].lower() == 'm':
