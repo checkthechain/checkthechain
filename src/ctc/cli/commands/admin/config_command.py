@@ -41,7 +41,6 @@ def get_command_spec() -> toolcli.CommandSpec:
 
 
 def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
-
     env_var = ctc.config.config_path_env_var
 
     if as_json:
@@ -57,7 +56,6 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
             rich.print(config)
 
     else:
-
         # get styles
         if no_color:
             title_style = None
@@ -78,7 +76,9 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
 
             path_style = path_style + ' bold'
 
-        toolstr.print('# Config Summary', style=title_style)
+        toolstr.print_text_box(
+            'Config Summary', style=title_style, text_style=path_style
+        )
 
         # print config path
         env_var_value = os.environ.get(env_var)
@@ -99,13 +99,31 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
             )
 
         print()
-        toolstr.print('## Config Values', style=title_style)
+        print()
+        toolstr.print_header(
+            'Environment Variables', style=title_style, text_style=path_style
+        )
+        for env_var in [
+            ctc.config.config_path_env_var,
+            ctc.config.provider_env_var,
+            ctc.config.network_env_var,
+            ctc.config.cache_env_var,
+        ]:
+            toolstr.print_bullet(
+                key=env_var, value=os.environ.get(env_var), styles=styles
+            )
+        toolstr.print('(these are all optional)', style=chrome_style)
+
+        print()
+        print()
+        toolstr.print_header(
+            'Config Values', style=title_style, text_style=path_style
+        )
         config = typing.cast(
             typing.Mapping[str, typing.Any], ctc.config.get_config()
         )
 
         for key in sorted(config.keys()):
-
             if key == 'cli_color_theme':
                 toolstr.print(
                     toolstr.add_style('-', chrome_style),
@@ -222,7 +240,6 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                             + toolstr.add_style(':', chrome_style),
                         )
                         for subsubkey, subsubvalue in subvalue.items():
-
                             if key == 'db_configs' and subsubkey == 'path':
                                 style = path_style
                             else:
@@ -245,7 +262,6 @@ def config_command(*, reveal: bool, as_json: bool, no_color: bool) -> None:
                         )
 
             elif key == 'context_cache_rules':
-
                 rules = config[key]
                 rows = []
                 for rule in rules:
