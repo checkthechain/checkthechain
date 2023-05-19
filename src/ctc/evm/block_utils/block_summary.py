@@ -41,10 +41,13 @@ async def async_print_block_summary(
         gas_prices.append(transaction['gas_price'] / 1e9)
     import numpy as np
 
-    gas_percentiles = np.percentile(
-        gas_prices,
-        percentiles,
-    )
+    if len(gas_prices) > 0:
+        gas_percentiles = np.percentile(
+            gas_prices,
+            percentiles,
+        )
+    else:
+        gas_percentiles = [None] * len(percentiles)
 
     title = 'Block ' + str(block['number'])
     styles = cli.get_cli_styles()
