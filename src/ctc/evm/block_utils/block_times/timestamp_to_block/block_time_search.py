@@ -5,7 +5,7 @@ import functools
 import typing
 
 from ctc import spec
-from .. import block_crud
+from ... import block_crud
 
 if typing.TYPE_CHECKING:
     from typing_extensions import TypedDict, Literal

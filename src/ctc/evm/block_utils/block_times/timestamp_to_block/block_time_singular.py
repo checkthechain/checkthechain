@@ -6,7 +6,7 @@ if typing.TYPE_CHECKING:
     import tooltime
 
 from ctc import spec
-from .. import block_crud
+from ... import block_crud
 from . import block_time_search
 
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing
 
+import ctc
 from ctc import spec
-from . import block_times
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -47,14 +47,14 @@ async def async_get_block_intervals(
     if start_block is not None:
         if len(contexts) != 1:
             raise Exception('invalid context for using start_block')
-        start_time = await block_times.async_get_block_timestamp(
+        start_time = await ctc.async_get_block_timestamp(
             start_block,
             context=contexts[0],
         )
     if end_block is not None:
         if len(contexts) != 1:
             raise Exception('invalid context for using end_block')
-        end_time = await block_times.async_get_block_timestamp(
+        end_time = await ctc.async_get_block_timestamp(
             end_block,
             context=contexts[0],
         )
