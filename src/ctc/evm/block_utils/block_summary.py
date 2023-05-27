@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 import time
 
 from ctc import spec
@@ -41,6 +42,7 @@ async def async_print_block_summary(
         gas_prices.append(transaction['gas_price'] / 1e9)
     import numpy as np
 
+    gas_percentiles: typing.Sequence[typing.Any] | spec.NumpyArray
     if len(gas_prices) > 0:
         gas_percentiles = np.percentile(
             gas_prices,

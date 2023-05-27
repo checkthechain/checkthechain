@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from . import block_times
 
 if typing.TYPE_CHECKING:
     import tooltime
@@ -11,10 +12,12 @@ if typing.TYPE_CHECKING:
 async def async_get_block_intervals(
     interval_size: tooltime.Timelength,
     *,
-    start_time: typing.Optional[tooltime.Timestamp] = None,
-    end_time: typing.Optional[tooltime.Timestamp] = None,
-    n_intervals: typing.Optional[int] = None,
-    window_size: typing.Optional[tooltime.Timelength] = None,
+    start_time: tooltime.Timestamp | None = None,
+    end_time: tooltime.Timestamp | None = None,
+    start_block: spec.BlockNumberReference | None = None,
+    end_block: spec.BlockNumberReference | None = None,
+    n_intervals: int | None = None,
+    window_size: tooltime.Timelength | None = None,
     blocks_at: typing.Literal['start', 'middle', 'end'] = 'middle',
     context: spec.Context | None = None,
     contexts: typing.Sequence[spec.Context] | spec.Context | None = None,
@@ -27,14 +30,6 @@ async def async_get_block_intervals(
     import tooltime
     import polars as pl
 
-    df = tooltime.get_interval_df(
-        interval_size=interval_size,
-        start_time=start_time,
-        end_time=end_time,
-        n_intervals=n_intervals,
-        window_size=window_size,
-    )
-
     # organize contexts
     if contexts is None:
         contexts = [context]
@@ -45,6 +40,29 @@ async def async_get_block_intervals(
             contexts = [context]
     else:
         raise Exception("unknown contexts format: " + str(type(contexts)))
+
+    if start_block is not None:
+        if len(contexts) != 1:
+            raise Exception('invalid context for using start_block')
+        start_time = await block_times.async_get_block_timestamp(
+            start_block,
+            context=contexts[0],
+        )
+    if end_block is not None:
+        if len(contexts) != 1:
+            raise Exception('invalid context for using end_block')
+        end_time = await block_times.async_get_block_timestamp(
+            end_block,
+            context=contexts[0],
+        )
+
+    df = tooltime.get_interval_df(
+        interval_size=interval_size,
+        start_time=start_time,
+        end_time=end_time,
+        n_intervals=n_intervals,
+        window_size=window_size,
+    )
 
     # get blocks
     if blocks_at == 'start':
