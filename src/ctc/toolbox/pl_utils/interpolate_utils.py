@@ -18,6 +18,9 @@ def interpolate(
 ) -> spec.DataFrame:
     """interpolate values in dataframe according to index column"""
 
+    if len(df) == 0:
+        return df
+
     index = df[index_column]
 
     # remove redundant rows wrt index_column
