@@ -85,5 +85,20 @@ def interpolate(
         dfs = [initial_df, df, new_df]
     else:
         dfs = [df, new_df]
-    return pl_utils.concat(dfs).sort(index_column).fill_null(strategy='forward')
+    concated = pl_utils.concat(dfs).sort(index_column)
 
+    # handle pl.Object columns separately
+    filled = {}
+    for column in concated.columns:
+        if concated[column].dtype == pl.Object:
+            new = []
+            current = None
+            for item in concated[column].to_list():
+                if item is not None:
+                    current = item
+                new.append(current)
+            filled[column] = pl.Series(new, dtype=pl.Object)
+        else:
+            filled[column] = concated[column].fill_null(strategy='forward')
+
+    return pl.DataFrame(filled)
