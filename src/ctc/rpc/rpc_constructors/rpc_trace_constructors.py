@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from ctc import spec
+from ctc import evm
 from .. import rpc_request
 
 
@@ -145,6 +146,7 @@ def construct_trace_filter(
 def construct_trace_block(
     block_number: spec.BlockNumberReference,
 ) -> spec.RpcSingularRequest:
+    block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
         'trace_block',
         [block_number],
@@ -155,6 +157,7 @@ def construct_trace_replay_block_transactions(
     block_number: spec.BlockNumberReference,
     trace_type: typing.Sequence[spec.TraceOutputType] | None,
 ) -> spec.RpcSingularRequest:
+    block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
         'trace_replayBlockTransactions',
         [block_number, trace_type],
@@ -218,7 +221,8 @@ def construct_debug_trace_call_many(
         if call.get('trace_type') is not None:
             subrequest = construct_debug_trace_call(**call)
         subrequest = construct_debug_trace_call(
-            trace_type=trace_type, **call
+            trace_type=trace_type, **call,
+            block_number=block_number
         )
 
         # parse out call
@@ -245,6 +249,7 @@ def construct_debug_trace_block_by_number(
     block_number: spec.BlockNumberReference,
     trace_type: spec.TraceOutputType | None = None,
 ) -> spec.RpcSingularRequest:
+    block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
         'debug_traceBlockByNumber',
         [block_number, trace_type],
