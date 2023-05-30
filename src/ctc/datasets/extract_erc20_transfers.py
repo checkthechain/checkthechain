@@ -6,6 +6,7 @@ import shutil
 
 import ctc.rpc
 from ctc import spec
+import tooljob
 
 try:
     import pdp
@@ -14,6 +15,8 @@ except ImportError:
 
 
 class ExtractErc20Transfers(pdp.BlockChunkJobs):
+    tracker: tooljob.trackers.file_tracker.FileTracker
+
     def execute_job(self, i: int) -> typing.Any:
         job_data = self.get_job_data(i)
         job_name = self.get_job_name(i)

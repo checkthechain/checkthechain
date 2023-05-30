@@ -13,6 +13,7 @@ from ctc.toolbox import pl_utils
 
 try:
     import pdp
+    import tooljob.trackers.multifile_tracker
 except ImportError:
     raise Exception('install pdp for dataset functionality')
 
@@ -20,6 +21,7 @@ except ImportError:
 class ExtractBlocksAndTransactions(pdp.BlockChunkJobs):
     extract_blocks: bool
     extract_transactions: bool
+    tracker: tooljob.trackers.multifile_tracker.MultifileTracker
 
     def __init__(
         self,
@@ -29,17 +31,17 @@ class ExtractBlocksAndTransactions(pdp.BlockChunkJobs):
     ) -> None:
         self.extract_blocks = extract_blocks
         self.extract_transactions = extract_transactions
-        super().__init__(**kwargs)
+        super().__init__(outputs=['blocks', 'transactions'], **kwargs)
 
     def execute_job(self, i: int) -> typing.Any:
         job_data = self.get_job_data(i)
         job_name = self.get_job_name(i)
-        path = self.tracker.get_job_output_path(i)
+        paths = self.tracker.get_job_output_paths(i)
         sync_extract_blocks_and_transactions(
             start_block=job_data['start_block'],
             end_block=job_data['end_block'],
             job_name=job_name,
-            path=path,
+            paths=paths,
             context=self.context,
             extract_blocks=self.extract_blocks,
             extract_transactions=self.extract_transactions,
@@ -51,7 +53,7 @@ def sync_extract_blocks_and_transactions(
     start_block: int,
     end_block: int,
     job_name: str,
-    path: str,
+    paths: typing.Mapping[str, str],
     context: spec.Context,
     extract_blocks: bool,
     extract_transactions: bool,
@@ -60,7 +62,7 @@ def sync_extract_blocks_and_transactions(
         coroutine = async_extract_blocks_and_transactions(
             start_block=start_block,
             end_block=end_block,
-            path=path,
+            paths=paths,
             context=context,
             extract_blocks=extract_blocks,
             extract_transactions=extract_transactions,
@@ -75,22 +77,14 @@ async def async_extract_blocks_and_transactions(
     *,
     start_block: int,
     end_block: int,
-    path: str,
+    paths: typing.Mapping[str, str],
     context: spec.Context,
     extract_blocks: bool,
     extract_transactions: bool,
 ) -> None:
 
     # get paths
-    paths = {}
-    dirname, filename = os.path.split(path)
-    blocks_filename = filename.replace('blocks_and_transactions', 'blocks')
-    paths['blocks'] = os.path.join(dirname, blocks_filename)
-    transactions_filename = filename.replace(
-        'blocks_and_transactions', 'transactions'
-    )
-    paths['transactions'] = os.path.join(dirname, transactions_filename)
-    if all(os.path.isfile(subpath) for subpath in paths.values()):
+    if all(os.path.isfile(path) for path in paths.values()):
         return
 
     # collect data
@@ -188,7 +182,7 @@ def raw_transactions_to_dataframe(
                 'nonce': raw_tx['nonce'],
                 'transaction_type': raw_tx['type'],
                 'gas_limit': raw_tx['gas'],
-                'gas_priority': raw_tx.get('max_priority_fee_per_gas'),
+                'gas_priority_max': raw_tx.get('max_priority_fee_per_gas'),
                 'gas_price_max': raw_tx.get('max_fee_per_gas'),
             }
             transactions.append(transaction)
@@ -206,7 +200,7 @@ def raw_transactions_to_dataframe(
         'nonce': pl.UInt32,
         'transaction_type': pl.UInt8,
         'gas_limit': pl.Int64,
-        'gas_priority': pl.Int64,
+        'gas_priority_max': pl.Int64,
         'gas_price_max': pl.Int64,
     }
     transactions_df = pl.DataFrame(transactions, schema=transactions_schema)
