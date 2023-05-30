@@ -8,7 +8,7 @@ from .. import rpc_request
 
 
 def construct_trace_transaction(
-    transaction_hash: str,
+        transaction_hash: str,
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_transaction',
@@ -17,8 +17,8 @@ def construct_trace_transaction(
 
 
 def construct_trace_replay_transaction(
-    transaction_hash: str,
-    trace_type: typing.Sequence[spec.TraceOutputType],
+        transaction_hash: str,
+        trace_type: typing.Sequence[spec.TraceOutputType],
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_replayTransaction',
@@ -27,8 +27,8 @@ def construct_trace_replay_transaction(
 
 
 def construct_trace_raw_transaction(
-    call_data: str,
-    trace_type: typing.Sequence[spec.TraceOutputType],
+        call_data: str,
+        trace_type: typing.Sequence[spec.TraceOutputType],
 ) -> spec.RpcSingularRequest:
     raise NotImplementedError()
 
@@ -39,21 +39,20 @@ def construct_trace_raw_transaction(
 
 
 def construct_trace_call(
-    to_address: spec.BinaryData,
-    *,
-    from_address: spec.BinaryData | None = None,
-    gas: spec.BinaryData | None = None,
-    gas_price: spec.BinaryData | None = None,
-    value_sent: spec.BinaryData | None = None,
-    call_data: spec.BinaryData | None = None,
-    function_parameters: typing.Sequence[typing.Any]
-    | typing.Mapping[str, typing.Any]
-    | None = None,
-    function_abi: spec.FunctionABI | None = None,
-    block_number: spec.BlockNumberReference | None = None,
-    trace_type: typing.Sequence[spec.TraceOutputType],
+        to_address: spec.BinaryData,
+        *,
+        from_address: spec.BinaryData | None = None,
+        gas: spec.BinaryData | None = None,
+        gas_price: spec.BinaryData | None = None,
+        value_sent: spec.BinaryData | None = None,
+        call_data: spec.BinaryData | None = None,
+        function_parameters: typing.Sequence[typing.Any]
+                             | typing.Mapping[str, typing.Any]
+                             | None = None,
+        function_abi: spec.FunctionABI | None = None,
+        block_number: spec.BlockNumberReference | None = None,
+        trace_type: typing.Sequence[spec.TraceOutputType],
 ) -> spec.RpcSingularRequest:
-
     from . import rpc_state_constructors
 
     call = rpc_state_constructors.construct_eth_call(
@@ -74,10 +73,10 @@ def construct_trace_call(
 
 
 def construct_trace_call_many(
-    calls: typing.Sequence[typing.Mapping[str, typing.Any]],
-    trace_type: typing.Sequence[spec.TraceOutputType] | None,
-    *,
-    block_number: spec.BlockNumberReference | None = None,
+        calls: typing.Sequence[typing.Mapping[str, typing.Any]],
+        trace_type: typing.Sequence[spec.TraceOutputType] | None,
+        *,
+        block_number: spec.BlockNumberReference | None = None,
 ) -> spec.RpcSingularRequest:
     """not an efficient implementation"""
 
@@ -110,8 +109,8 @@ def construct_trace_call_many(
 
 
 def construct_trace_get(
-    transaction_hash: str,
-    trace_indices: typing.Sequence[int],
+        transaction_hash: str,
+        trace_indices: typing.Sequence[int],
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'trace_get',
@@ -120,13 +119,13 @@ def construct_trace_get(
 
 
 def construct_trace_filter(
-    *,
-    start_block: spec.BlockNumberReference | None = None,
-    end_block: spec.BlockNumberReference | None = None,
-    from_addresses: spec.Address | None = None,
-    to_addresses: spec.Address | None = None,
-    after: int | None = None,
-    count: int | None = None,
+        *,
+        start_block: spec.BlockNumberReference | None = None,
+        end_block: spec.BlockNumberReference | None = None,
+        from_addresses: spec.Address | None = None,
+        to_addresses: spec.Address | None = None,
+        after: int | None = None,
+        count: int | None = None,
 ) -> spec.RpcSingularRequest:
     payload = {
         'start_block': start_block,
@@ -144,7 +143,7 @@ def construct_trace_filter(
 
 
 def construct_trace_block(
-    block_number: spec.BlockNumberReference,
+        block_number: spec.BlockNumberReference,
 ) -> spec.RpcSingularRequest:
     block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
@@ -154,8 +153,8 @@ def construct_trace_block(
 
 
 def construct_trace_replay_block_transactions(
-    block_number: spec.BlockNumberReference,
-    trace_type: typing.Sequence[spec.TraceOutputType] | None,
+        block_number: spec.BlockNumberReference,
+        trace_type: typing.Sequence[spec.TraceOutputType] | None,
 ) -> spec.RpcSingularRequest:
     block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
@@ -170,21 +169,20 @@ def construct_trace_replay_block_transactions(
 
 
 def construct_debug_trace_call(
-    to_address: spec.BinaryData,
-    *,
-    from_address: spec.BinaryData | None = None,
-    gas: spec.BinaryData | None = None,
-    gas_price: spec.BinaryData | None = None,
-    value_sent: spec.BinaryData | None = None,
-    call_data: spec.BinaryData | None = None,
-    function_parameters: typing.Sequence[typing.Any]
-    | typing.Mapping[str, typing.Any]
-    | None = None,
-    function_abi: spec.FunctionABI | None = None,
-    block_number: spec.BlockNumberReference | None = None,
-    trace_type: spec.TraceOutputType | None,
+        to_address: spec.BinaryData,
+        *,
+        from_address: spec.BinaryData | None = None,
+        gas: spec.BinaryData | None = None,
+        gas_price: spec.BinaryData | None = None,
+        value_sent: spec.BinaryData | None = None,
+        call_data: spec.BinaryData | None = None,
+        function_parameters: typing.Sequence[typing.Any]
+                             | typing.Mapping[str, typing.Any]
+                             | None = None,
+        function_abi: spec.FunctionABI | None = None,
+        block_number: spec.BlockNumberReference | None = None,
+        trace_type: spec.TraceOutputType | None,
 ) -> spec.RpcSingularRequest:
-
     from . import rpc_state_constructors
 
     call = rpc_state_constructors.construct_eth_call(
@@ -205,10 +203,10 @@ def construct_debug_trace_call(
 
 
 def construct_debug_trace_call_many(
-    calls: typing.Sequence[typing.Mapping[str, typing.Any]],
-    trace_type: spec.TraceOutputType | None,
-    *,
-    block_number: spec.BlockNumberReference | None = None,
+        calls: typing.Sequence[typing.Mapping[str, typing.Any]],
+        trace_type: spec.TraceOutputType | None,
+        *,
+        block_number: spec.BlockNumberReference | None = None,
 ) -> spec.RpcSingularRequest:
     """not an efficient implementation"""
 
@@ -236,8 +234,8 @@ def construct_debug_trace_call_many(
 
 
 def construct_debug_trace_transaction(
-    transaction_hash: str,
-    trace_type: spec.TraceOutputType | None = None,
+        transaction_hash: str,
+        trace_type: spec.TraceOutputType | None = None,
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'debug_traceTransaction',
@@ -246,8 +244,8 @@ def construct_debug_trace_transaction(
 
 
 def construct_debug_trace_block_by_number(
-    block_number: spec.BlockNumberReference,
-    trace_type: spec.TraceOutputType | None = None,
+        block_number: spec.BlockNumberReference,
+        trace_type: spec.TraceOutputType | None = None,
 ) -> spec.RpcSingularRequest:
     block_number = evm.encode_block_number(block_number)
     return rpc_request.create(
@@ -257,10 +255,9 @@ def construct_debug_trace_block_by_number(
 
 
 def construct_debug_trace_block_by_hash(
-    block_hash: str,
+        block_hash: str,
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'debug_traceBlockByHash',
         [block_hash],
     )
-
