@@ -131,6 +131,7 @@ async def async_get_full_feed_event_data(
             end_block=end_block,
             verbose=False,
             context=context,
+            integer_output_format={'updatedAt': pl.Int64},
         )
 
     # rename columns
@@ -170,7 +171,7 @@ async def async_get_full_feed_event_data(
         else:
 
             # add initial data
-            if start_block < df['block_number'][0]:
+            if len(df) == 0 or start_block < df['block_number'][0]:
                 initial_data = await feed_datum.async_get_feed_datum(
                     feed=feed,
                     block=start_block,
@@ -178,7 +179,17 @@ async def async_get_full_feed_event_data(
                     fields='full',
                     context=context,
                 )
-                initial_df = pl.DataFrame(initial_data)
+                schema = {
+                    'block_number': pl.Int64,
+                    'timestamp': pl.Int64,
+                    'round_id': pl.Object,
+                }
+                if normalize:
+                    schema['answer'] = pl.Float64
+                else:
+                    schema['answer'] = pl.Decimal
+                initial_data['block_number'] = start_block
+                initial_df = pl.DataFrame(initial_data, schema=schema)
                 df = pl_utils.concat([initial_df, df])
 
         end_block = await evm.async_block_number_to_int(
@@ -216,16 +227,12 @@ async def async_get_answer_feed_event_data(
         start_time=start_time,
         end_time=end_time,
         normalize=normalize,
-        interpolate=False,
+        interpolate=interpolate,
         context=context,
         invert=invert,
     )
 
     output = df[['block_number', 'answer']]
-
-    if interpolate:
-        # TODO: handle pl.Object in pl_utils.interpolate, so handle upstream
-        output = pl_utils.interpolate(output, index_column='block_number')
 
     return output
 

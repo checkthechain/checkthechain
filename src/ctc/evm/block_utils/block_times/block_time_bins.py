@@ -9,21 +9,23 @@ if typing.TYPE_CHECKING:
     import tooltime
 
 
-async def async_compute_block_months(
-    block_numbers: typing.Sequence[int] | spec.Series,
-) -> spec.Series:
-    return await async_compute_block_time_bins(
-        block_numbers,
-        interval_size='1M',
-    )
-
-
 async def async_compute_block_years(
     block_numbers: typing.Sequence[int] | spec.Series,
 ) -> spec.Series:
     return await async_compute_block_time_bins(
         block_numbers,
         interval_size='1y',
+        alias='year',
+    )
+
+
+async def async_compute_block_months(
+    block_numbers: typing.Sequence[int] | spec.Series,
+) -> spec.Series:
+    return await async_compute_block_time_bins(
+        block_numbers,
+        interval_size='1M',
+        alias='month',
     )
 
 
@@ -33,6 +35,7 @@ async def async_compute_block_weeks(
     return await async_compute_block_time_bins(
         block_numbers,
         interval_size='1w',
+        alias='week',
     )
 
 
@@ -42,6 +45,7 @@ async def async_compute_block_days(
     return await async_compute_block_time_bins(
         block_numbers,
         interval_size='1d',
+        alias='day',
     )
 
 
@@ -51,6 +55,7 @@ async def async_compute_block_hours(
     return await async_compute_block_time_bins(
         block_numbers,
         interval_size='1h',
+        alias='hour',
     )
 
 
@@ -60,6 +65,7 @@ async def async_compute_block_minutes(
     return await async_compute_block_time_bins(
         block_numbers,
         interval_size='1m',
+        alias='minute',
     )
 
 
@@ -95,6 +101,8 @@ def compute_block_time_bins(
         block_numbers = pl.Series(block_numbers)
     if alias is None:
         alias = _compute_block_intervals_alias(block_intervals)
+    if alias is None:
+        raise Exception('could not determine name of time bin')
 
     return (
         block_numbers.cut(
@@ -109,12 +117,16 @@ def compute_block_time_bins(
 def _compute_block_intervals_alias(
     block_intervals: spec.DataFrame,
 ) -> str:
+
+    if len(block_intervals) < 2:
+        return None
+
     timestamps = block_intervals['start_timestamp']
     interval_sizes = set(timestamps[1:] - timestamps[:-1])
 
     if interval_sizes.issubset({365 * 86400, 366 * 86400}):
         return 'year'
-    if interval_sizes.issubset(
+    elif interval_sizes.issubset(
         {28 * 86400, 29 * 86400, 30 * 86400, 31 * 86400}
     ):
         return 'month'
