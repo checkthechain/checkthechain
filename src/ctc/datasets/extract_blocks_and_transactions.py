@@ -87,25 +87,28 @@ async def async_extract_blocks_and_transactions(
     if all(os.path.isfile(path) for path in paths.values()):
         return
 
+    extract_blocks &= not os.path.isfile(paths['blocks'])
+    extract_transactions &= not os.path.isfile(paths['transactions'])
+
     # collect data
     coroutines = []
     for block_number in range(start_block, end_block + 1):
         coroutine = ctc.rpc.async_eth_get_block_by_number(
             block_number=block_number,
             context=context,
-            include_full_transactions=True,
+            include_full_transactions=extract_transactions,
         )
         coroutines.append(coroutine)
     raw_blocks = await asyncio.gather(*coroutines)
     await ctc.rpc.async_close_http_session(context=context)
 
     # extract blocks
-    if extract_blocks and not os.path.isfile(paths['blocks']):
+    if extract_blocks:
         blocks_df = raw_blocks_to_dataframe(raw_blocks)
         pl_utils.write_df(df=blocks_df, path=paths['blocks'])
 
     # extract transactions
-    if extract_transactions and not os.path.isfile(paths['transactions']):
+    if extract_transactions:
         transactions_df = raw_transactions_to_dataframe(raw_blocks)
         pl_utils.write_df(df=transactions_df, path=paths['transactions'])
 
@@ -171,7 +174,7 @@ def raw_transactions_to_dataframe(
             if to is None:
                 to = '0x0000000000000000000000000000000000000000'
             transaction = {
-                'hash': raw_tx['hash'],
+                'transaction_hash': raw_tx['hash'],
                 'block_number': raw_tx['block_number'],
                 'transaction_index': raw_tx['transaction_index'],
                 'to_address': to,
@@ -184,12 +187,13 @@ def raw_transactions_to_dataframe(
                 'gas_limit': raw_tx['gas'],
                 'gas_priority_max': raw_tx.get('max_priority_fee_per_gas'),
                 'gas_price_max': raw_tx.get('max_fee_per_gas'),
+                'gas_price': raw_tx.get('gas_price'),
             }
             transactions.append(transaction)
 
     # create dataframe
     transactions_schema = {
-        'hash': pl.Utf8,
+        'transaction_hash': pl.Utf8,
         'block_number': pl.UInt32,
         'transaction_index': pl.UInt32,
         'to_address': pl.Utf8,
@@ -202,12 +206,13 @@ def raw_transactions_to_dataframe(
         'gas_limit': pl.Int64,
         'gas_priority_max': pl.Int64,
         'gas_price_max': pl.Int64,
+        'gas_price': pl.Int64,
     }
     transactions_df = pl.DataFrame(transactions, schema=transactions_schema)
 
     # convert binary fields
     binary_fields = [
-        'hash',
+        'transaction_hash',
         'to_address',
         'from_address',
         'input',
