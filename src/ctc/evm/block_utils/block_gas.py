@@ -250,9 +250,9 @@ def compute_transactions_median_gas_fee(
     # compute median
     median = float(np.median(gas_fees))
 
-    # normalize
-    if normalize:
-        median = median / 1e9
+    # # normalize
+    # if normalize:
+    #     median = median / 1e9
 
     return median
 
