@@ -158,6 +158,17 @@ async def async_decode_events_dataframe(
         for c in range(i, len(df_schema)):
             decoded_events[c].append(None)
 
+    # convert decimals (can remove if polars allows direct creation in future)
+    new_columns = []
+    for column, (column_name, dtype) in zip(decoded_events, df_schema):
+        if dtype == pl.Decimal:
+            import decimal
+
+            new_columns.append([decimal.Decimal(value) for value in column])
+        else:
+            new_columns.append(column)
+    decoded_events = new_columns
+
     # convert to dataframe
     decoded = pl.DataFrame(decoded_events, schema=df_schema, orient='col')  # type: ignore
 
