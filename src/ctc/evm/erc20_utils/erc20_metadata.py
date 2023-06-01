@@ -167,7 +167,9 @@ async def async_get_erc20_decimals(
         context=context,
         **rpc_kwargs,
     )
-    if not isinstance(decimals_result, int):
+    if not isinstance(decimals_result, int) and not rpc_kwargs.get(
+        'convert_reverts_to_none'
+    ):
         raise Exception('invalid rpc result')
     decimals = decimals_result
 
@@ -222,6 +224,7 @@ async def async_get_erc20_decimals_by_block(
 #
 # # name
 #
+
 
 @typing.overload
 async def async_get_erc20_name(
