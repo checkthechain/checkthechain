@@ -234,28 +234,38 @@ def construct_debug_trace_call_many(
 
 def construct_debug_trace_transaction(
     transaction_hash: str,
-    trace_type: spec.TraceOutputType | None = None,
+    trace_opts: spec.GethTracingOptions | None = None,
 ) -> spec.RpcSingularRequest:
+    if trace_opts is None:
+        trace_opts = {}
+    trace_opts = {k: v for k, v in trace_opts.items() if v is not None}
     return rpc_request.create(
         'debug_traceTransaction',
-        [transaction_hash, trace_type],
+        [transaction_hash, trace_opts],
     )
 
 
 def construct_debug_trace_block_by_number(
     block_number: spec.BlockNumberReference,
-    trace_type: spec.TraceOutputType | None = None,
+    trace_opts: spec.GethTracingOptions | None = None,
 ) -> spec.RpcSingularRequest:
     block_number = evm.encode_block_number(block_number)
+    if trace_opts is None:
+        trace_opts = {}
+    trace_opts = {k: v for k, v in trace_opts.items() if v is not None}
     return rpc_request.create(
         'debug_traceBlockByNumber',
-        [block_number, trace_type],
+        [block_number, trace_opts],
     )
 
 
 def construct_debug_trace_block_by_hash(
     block_hash: str,
+    trace_opts: spec.GethTracingOptions | None = None,
 ) -> spec.RpcSingularRequest:
+    if trace_opts is None:
+        trace_opts = {}
+    trace_opts = {k: v for k, v in trace_opts.items() if v is not None}
     return rpc_request.create(
         'debug_traceBlockByHash',
         [block_hash],
