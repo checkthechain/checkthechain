@@ -22,6 +22,7 @@ def get_config_upgrade_functions() -> typing.Mapping[
         '0.3.1': upgrade__0_3_1__to__0_3_2,
         '0.3.2': upgrade__0_3_2__to__0_3_3,
         '0.3.3': upgrade__0_3_3__to__0_3_4,
+        '0.3.4': upgrade__0_3_4__to__0_3_5,
     }
 
 
@@ -206,6 +207,14 @@ def upgrade__0_3_3__to__0_3_4(
     for network in upgraded['networks'].values():
         if network['name'] == 'mainnet':
             network['name'] = 'ethereum'
+    return upgraded
+
+
+def upgrade__0_3_4__to__0_3_5(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+    upgraded = dict(old_config)
+    upgraded['config_spec_version'] = '0.3.5'
     return upgraded
 
 
