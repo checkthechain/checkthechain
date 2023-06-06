@@ -50,7 +50,7 @@ dependencies = [
     #
     # io dependencies
     'aiohttp >=3.7.4, <4',
-    'connectorx >=0.3.2a3, <0.4',
+    'connectorx==0.3.2a5',
     'loguru >=0.5.3, <0.7',
     'msgspec >=0.14.1, <0.15',
     'orjson >=3.7.9, <4',
@@ -60,7 +60,7 @@ dependencies = [
     # tool suite
     'toolcli >=0.6.13, <0.7',
     'toolconf >=0.1.2, <0.2',
-    'toolsql >=0.5.2, <0.6',
+    'toolsql >=0.6.0, <0.7',
     'toolstr >=0.9.3, <0.10',
     'tooltime >=0.2.10, <0.3',
     #
