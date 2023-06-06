@@ -59,7 +59,7 @@ dependencies = [
     # tool suite
     'toolcli >=0.6.13, <0.7',
     'toolconf >=0.1.2, <0.2',
-    'toolsql >=0.6.0, <0.7',
+    'toolsql >=0.6.1, <0.7',
     'toolstr >=0.9.3, <0.10',
     'tooltime >=0.2.10, <0.3',
     #
