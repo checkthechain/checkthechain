@@ -50,7 +50,6 @@ dependencies = [
     #
     # io dependencies
     'aiohttp >=3.7.4, <4',
-    'connectorx==0.3.2a5',
     'loguru >=0.5.3, <0.7',
     'msgspec >=0.14.1, <0.15',
     'orjson >=3.7.9, <4',
