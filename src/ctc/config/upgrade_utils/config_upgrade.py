@@ -9,13 +9,15 @@ from .. import config_defaults
 from . import version_utils
 
 
-def get_config_upgrade_functions() -> typing.Mapping[
-    str,
-    typing.Callable[
-        [typing.MutableMapping[typing.Any, typing.Any]],
-        typing.MutableMapping[typing.Any, typing.Any],
-    ],
-]:
+def get_config_upgrade_functions() -> (
+    typing.Mapping[
+        str,
+        typing.Callable[
+            [typing.MutableMapping[typing.Any, typing.Any]],
+            typing.MutableMapping[typing.Any, typing.Any],
+        ],
+    ]
+):
     return {
         '0.2.': upgrade__0_2_0__to__0_3_0,
         '0.3.0': upgrade__0_3_0__to__0_3_1,
@@ -23,6 +25,7 @@ def get_config_upgrade_functions() -> typing.Mapping[
         '0.3.2': upgrade__0_3_2__to__0_3_3,
         '0.3.3': upgrade__0_3_3__to__0_3_4,
         '0.3.4': upgrade__0_3_4__to__0_3_5,
+        '0.3.5': upgrade__0_3_5__to__0_3_6,
     }
 
 
@@ -82,7 +85,6 @@ def upgrade_config(
 def upgrade__0_2_0__to__0_3_0(
     old_config: typing.MutableMapping[typing.Any, typing.Any]
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
-
     upgraded = dict(old_config)
     network_defaults = upgraded.pop('network_defaults', {})
     upgraded['default_network'] = network_defaults.get('default_network')
@@ -151,7 +153,6 @@ def upgrade__0_2_0__to__0_3_0(
 def upgrade__0_3_0__to__0_3_1(
     old_config: typing.MutableMapping[typing.Any, typing.Any]
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
-
     upgraded = dict(old_config)
     if 'cli_color_theme' not in upgraded:
         upgraded[
@@ -169,7 +170,6 @@ def upgrade__0_3_0__to__0_3_1(
 def upgrade__0_3_1__to__0_3_2(
     old_config: typing.MutableMapping[typing.Any, typing.Any]
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
-
     upgraded = dict(old_config)
     default_config: typing.Mapping[
         str, typing.Any
@@ -191,7 +191,6 @@ def upgrade__0_3_1__to__0_3_2(
 def upgrade__0_3_2__to__0_3_3(
     old_config: typing.MutableMapping[typing.Any, typing.Any]
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
-
     upgraded = dict(old_config)
     upgraded['config_spec_version'] = '0.3.3'
     return upgraded
@@ -215,6 +214,14 @@ def upgrade__0_3_4__to__0_3_5(
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
     upgraded = dict(old_config)
     upgraded['config_spec_version'] = '0.3.5'
+    return upgraded
+
+
+def upgrade__0_3_5__to__0_3_6(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+    upgraded = dict(old_config)
+    upgraded['config_spec_version'] = '0.3.6'
     return upgraded
 
 
