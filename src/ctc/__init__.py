@@ -3,7 +3,7 @@
 from .evm import *
 
 
-__version__ = '0.3.6'
+__version__ = '0.3.7'
 
 
 def _clean_package_imports() -> None:
