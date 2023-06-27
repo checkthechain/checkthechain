@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import typing
+
+import ctc
 from ctc import evm
 from ctc import spec
 
@@ -25,7 +28,6 @@ def construct_eth_get_block_by_number(
     *,
     include_full_transactions: bool = False,
 ) -> spec.RpcSingularRequest:
-
     encoded_block_number = evm.encode_block_number(block_number)
 
     parameters = [encoded_block_number, include_full_transactions]
@@ -58,7 +60,6 @@ def construct_eth_get_uncle_count_by_block_number(
 def construct_eth_get_uncle_by_block_hash_and_index(
     block_hash: spec.BinaryData, uncle_index: spec.BinaryData
 ) -> spec.RpcSingularRequest:
-
     encoded_block_hash = evm.to_hex(block_hash)
     encoded_uncle_index = evm.to_hex(uncle_index, keep_leading_0=False)
 
@@ -71,12 +72,30 @@ def construct_eth_get_uncle_by_block_hash_and_index(
 def construct_eth_get_uncle_by_block_number_and_index(
     block_number: spec.BlockNumberReference, uncle_index: spec.BinaryData
 ) -> spec.RpcSingularRequest:
-
     encoded_block_number = evm.encode_block_number(block_number)
     encoded_uncle_index = evm.to_hex(uncle_index, keep_leading_0=False)
 
     return rpc_request.create(
         method='eth_getUncleByBlockNumberAndIndex',
         parameters=[encoded_block_number, encoded_uncle_index],
+    )
+
+
+def construct_eth_fee_history(
+    block_number: spec.BlockNumberReference = 'latest',
+    block_count: int = 1024,
+    *,
+    reward_percentiles: typing.Sequence[float] | None = None,
+) -> spec.RpcSingularRequest:
+    encoded_block_number = evm.encode_block_number(block_number)
+    if reward_percentiles is None:
+        reward_percentiles = []
+    return rpc_request.create(
+        method='eth_feeHistory',
+        parameters=[
+            ctc.to_hex(block_count, keep_leading_0=False),
+            encoded_block_number,
+            reward_percentiles,
+        ],
     )
 

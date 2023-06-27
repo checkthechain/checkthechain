@@ -245,6 +245,14 @@ async def async_batch_eth_get_uncle_by_block_number_and_index(
     )
 
 
+async def async_batch_eth_get_fee_history(
+    **kwargs: typing.Any,
+) -> spec.RpcPluralResponse:
+    return await rpc_batch_utils.async_batch_execute(
+        'eth_feeHistory', **kwargs
+    )
+
+
 async def async_batch_eth_get_uncle_count_by_block_hash(
     **kwargs: typing.Any,
 ) -> spec.RpcPluralResponse:

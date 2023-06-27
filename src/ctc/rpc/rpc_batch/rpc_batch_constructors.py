@@ -224,6 +224,14 @@ def batch_construct_eth_get_uncle_by_block_number_and_index(
     )
 
 
+def batch_construct_eth_fee_history(
+    **constructor_kwargs: typing.Any,
+) -> spec.RpcPluralRequest:
+    return rpc_batch_utils.batch_construct(
+        method='eth_fee_history', **constructor_kwargs
+    )
+
+
 def batch_construct_eth_get_uncle_count_by_block_hash(
     **constructor_kwargs: typing.Any,
 ) -> spec.RpcPluralRequest:

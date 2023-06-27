@@ -117,3 +117,22 @@ def digest_eth_get_uncle_by_block_number_and_index(
         response = rpc_format.keys_to_snake_case(response)
 
     return response
+
+
+def digest_eth_fee_history(
+    response: spec.RpcSingularResponse,
+    *,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+    if decode_response:
+        response = dict(
+            response,
+            oldestBlock=int(response['oldestBlock'], 16),
+            baseFeePerGas=[int(value, base=16) for value in response['baseFeePerGas']],
+        )
+
+    if snake_case_response:
+        response = rpc_format.keys_to_snake_case(response)
+
+    return response

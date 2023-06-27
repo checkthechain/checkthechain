@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 from ctc import spec
 
 from .. import rpc_constructors
@@ -146,6 +148,29 @@ async def async_eth_get_uncle_by_block_number_and_index(
     )
     response = await rpc_request.async_send(request, context=context)
     return rpc_digestors.digest_eth_get_uncle_by_block_number_and_index(
+        response=response,
+        decode_response=decode_response,
+        snake_case_response=snake_case_response,
+    )
+
+
+async def async_eth_fee_history(
+    block_number: spec.BlockNumberReference = 'latest',
+    block_count: int = 1024,
+    *,
+    reward_percentiles: typing.Sequence[float] | None = None,
+    context: spec.Context = None,
+    decode_response: bool = True,
+    snake_case_response: bool = True,
+) -> spec.RpcSingularResponse:
+    request = (
+        rpc_constructors.construct_eth_fee_history(
+            block_number=block_number,
+            block_count=block_count,
+        )
+    )
+    response = await rpc_request.async_send(request, context=context)
+    return rpc_digestors.digest_eth_fee_history(
         response=response,
         decode_response=decode_response,
         snake_case_response=snake_case_response,
