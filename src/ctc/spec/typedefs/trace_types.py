@@ -204,7 +204,31 @@ class TraceReplayResult(TypedDict):
 
 #
 # # debug traces
-#
+
+class GethCallTracerConfig(TypedDict):
+    only_top_call: bool
+    with_log: bool
+
+class GethPreStateTracerConfig(TypedDict):
+    diff_mode: bool
+    
+
+GethDebugBuiltInTracerType = Literal['4byteTracer', 'callTracer', 'prestateTracer', 'noopTracer']
+GethDebugBuiltinTracerConfig = typing.Union[GethCallTracerConfig, GethPreStateTracerConfig]
+
+class GethTracingOptions(TypedDict):
+    enable_memory: bool
+    disable_memory: bool
+    disable_stack: bool
+    disable_storage: bool
+    enable_return_data: bool
+    disable_return_data: bool
+    debug: bool
+    limit: bool
+    # builtin tracer or javascript code
+    tracer: typing.Union[GethDebugBuiltInTracerType, str]
+    tracer_config: typing.Union[GethDebugBuiltinTracerConfig, object]
+    timeout: str
 
 
 class DebugTransactionTrace(TypedDict):
