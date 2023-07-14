@@ -148,7 +148,7 @@ def digest_trace_raw_transaction(
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
-    raise NotImplementedError()
+    return response
 
 
 #

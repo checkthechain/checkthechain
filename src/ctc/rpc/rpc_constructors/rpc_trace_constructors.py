@@ -30,7 +30,10 @@ def construct_trace_raw_transaction(
     call_data: str,
     trace_type: typing.Sequence[spec.TraceOutputType],
 ) -> spec.RpcSingularRequest:
-    raise NotImplementedError()
+    return rpc_request.create(
+        'trace_rawTransaction',
+        [call_data, trace_type],
+    )
 
 
 #
@@ -255,9 +258,10 @@ def construct_debug_trace_block_by_number(
 
 def construct_debug_trace_block_by_hash(
     block_hash: str,
+    trace_type: spec.TraceOutputType | None = None,
 ) -> spec.RpcSingularRequest:
     return rpc_request.create(
         'debug_traceBlockByHash',
-        [block_hash],
+        [block_hash, trace_type],
     )
 

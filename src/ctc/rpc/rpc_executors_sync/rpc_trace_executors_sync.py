@@ -54,7 +54,15 @@ def sync_trace_raw_transaction(
     decode_response: bool = True,
     snake_case_response: bool = True,
 ) -> spec.RpcSingularResponse:
-    raise NotImplementedError()
+    request = rpc_constructors.construct_trace_raw_transaction(
+        call_data=call_data, trace_type=trace_type
+    )
+    response = rpc_request.sync_send(request, context=context)
+    return rpc_digestors.digest_trace_raw_transaction(
+        response=response,
+        decode_response=decode_response,
+        snake_case_response=snake_case_response,
+    )
 
 
 #

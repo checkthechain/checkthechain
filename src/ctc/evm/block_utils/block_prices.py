@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import typing
+
+from ctc import spec
+
 
 async def async_compute_block_eth_prices(
     blocks: typing.Sequence[int] | spec.Series,
