@@ -26,6 +26,9 @@ def get_config_upgrade_functions() -> (
         '0.3.3': upgrade__0_3_3__to__0_3_4,
         '0.3.4': upgrade__0_3_4__to__0_3_5,
         '0.3.5': upgrade__0_3_5__to__0_3_6,
+        '0.3.6': upgrade__0_3_6__to__0_3_7,
+        '0.3.7': upgrade__0_3_7__to__0_3_8,
+        '0.3.8': upgrade__0_3_8__to__0_3_9,
     }
 
 
@@ -43,10 +46,11 @@ def upgrade_config(
 
     # perform upgrade
     if not isinstance(version, str):
-        print(
-            'old_config has unknown version, using default config',
-            file=sys.stderr,
-        )
+        if old_config != {}:
+            print(
+                'old_config has unknown version, using default config',
+                file=sys.stderr,
+            )
         return dict(config_defaults.get_default_config())
 
     new_config: typing.MutableMapping[typing.Any, typing.Any] = dict(old_config)
@@ -222,6 +226,30 @@ def upgrade__0_3_5__to__0_3_6(
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
     upgraded = dict(old_config)
     upgraded['config_spec_version'] = '0.3.6'
+    return upgraded
+
+
+def upgrade__0_3_6__to__0_3_7(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+    upgraded = dict(old_config)
+    upgraded['config_spec_version'] = '0.3.7'
+    return upgraded
+
+
+def upgrade__0_3_7__to__0_3_8(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+    upgraded = dict(old_config)
+    upgraded['config_spec_version'] = '0.3.8'
+    return upgraded
+
+
+def upgrade__0_3_8__to__0_3_9(
+    old_config: typing.MutableMapping[typing.Any, typing.Any]
+) -> typing.MutableMapping[typing.Any, typing.Any]:
+    upgraded = dict(old_config)
+    upgraded['config_spec_version'] = '0.3.9'
     return upgraded
 
 

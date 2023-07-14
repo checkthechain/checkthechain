@@ -33,6 +33,9 @@ data_spec_order = [
     '0.3.4',
     '0.3.5',
     '0.3.6',
+    '0.3.7',
+    '0.3.8',
+    '0.3.9',
 ]
 
 _0_3_0_spec: DataDirSpec = {
@@ -58,6 +61,9 @@ data_dir_specs: typing.Mapping[DataSpecVersion, DataDirSpec] = {
     '0.3.4': _0_3_0_spec,
     '0.3.5': _0_3_0_spec,
     '0.3.6': _0_3_0_spec,
+    '0.3.7': _0_3_0_spec,
+    '0.3.8': _0_3_0_spec,
+    '0.3.9': _0_3_0_spec,
 }
 
 

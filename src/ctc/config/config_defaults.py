@@ -77,13 +77,18 @@ def add_env_var_rpc_provider(default_config: spec.Config) -> None:
             try:
                 from ctc.rpc import rpc_provider
 
+                if not eth_rpc_url.startswith('http') and not eth_rpc_url.startswith('ws'):
+                    eth_rpc_url = 'http://' + eth_rpc_url
+
                 chain_id = rpc_provider._sync_get_chain_id(eth_rpc_url)
-            except Exception:
+
+            except Exception as e:
                 print(
                     '[WARNING] not using value in ETH_RPC_URL because could not determine its chain_id (value = '
                     + str(eth_rpc_url)
                     + ')'
                 )
+                print(e)
                 return
         if chain_id not in default_config['networks']:
             raise Exception(

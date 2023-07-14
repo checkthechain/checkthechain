@@ -171,7 +171,7 @@ async def async_get_erc20_decimals(
         'convert_reverts_to_none'
     ):
         raise Exception('invalid rpc result')
-    decimals = decimals_result
+    decimals: int = decimals_result
 
     if write_cache:
         if result is not None:
