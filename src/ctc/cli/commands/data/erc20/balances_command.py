@@ -284,7 +284,7 @@ async def async_balances_command(
             print()
             print()
             toolstr.print(
-                toolstr.hjustify('ETH balance over time', 'center', 70),
+                toolstr.hjustify('ERC20 balance over time', 'center', 70),
                 indent=4,
                 style=styles['title'],
             )
