@@ -22,7 +22,7 @@ For detailed information check out [the documentation](https://ctc.readthedocs.i
 ## Contents
 1. [**Example Usage**](#example-usage)
     1. [**ERC20**: get all token transfers and balances of an ERC20](#get-all-token-transfers-of-an-erc20)
-    2. [**Uniswap**: get swaps, mints, and burns of a Uniswap pair](#get-swaps-mints-and-burns-for-a-uniswap-pair)
+    2. [**Uniswap**: get swaps, mints, and burns of a Uniswap pair](#get-swaps-mints-and-burns-of-a-uniswap-pool)
     3. [**Chainlink**: get historical data for a Chainlink feed](#get-historical-data-for-a-chainlink-feed)
     4. [**DAO**: get DAO proposals and votes](#get-dao-proposals-and-votes)
 2. [**Installation**](#installation)
