@@ -39,6 +39,10 @@ async def async_get_erc20_transfers(
 ) -> spec.DataFrame:
     """get transfer events of ERC20 token"""
 
+    import polars as pl
+    import numpy as np
+
+
     token_address = await erc20_metadata.async_get_erc20_address(
         token, context=context
     )
@@ -72,12 +76,11 @@ async def async_get_erc20_transfers(
     column = 'arg__amount'
     transfers = transfers.rename({old_column: column})
 
+    casted = np.array(transfers[column].to_list(), dtype=float)
+    transfers = transfers.with_columns(pl.Series(column, casted))
+
     # normalize
     if normalize and len(transfers) > 0:
-
-        import polars as pl
-        import numpy as np
-
         decimals = await erc20_metadata.async_get_erc20_decimals(
             token=token_address,
             block=transfers['block_number'][0],
@@ -110,17 +113,17 @@ async def async_get_erc20_balances_from_transfers(
     # subtract transfers out from transfers in
     from_transfers = transfers.groupby('arg__from').agg(pl.sum(amount_key))
     to_transfers = transfers.groupby('arg__to').agg(pl.sum(amount_key))
-    balances: spec.DataFrame = to_transfers.sub(from_transfers, fill_value=0)  # type: ignore
-
+    balances: spec.DataFrame = to_transfers.join(from_transfers, left_on="arg__to", right_on="arg__from", how="outer").fill_null(0).select(pl.col("arg__to"), pl.col("arg__amount") - pl.col("arg__amount_right"))
+    
     if normalize:
         decimals = await erc20_metadata.async_get_erc20_decimals(
             typing.cast(str, transfers['contract_address'][0]),
             context=context,
         )
-        balances /= 10**decimals
+        balances = balances.with_columns(pl.col("arg__amount") / 10**decimals)
 
     # sort
-    balances = balances.sort_values(ascending=False)  # type: ignore
+    balances = balances.sort(by=pl.col("arg__amount"), descending=True)
 
     return balances
 
