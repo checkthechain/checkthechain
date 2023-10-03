@@ -25,7 +25,7 @@ def get_command_spec() -> toolcli.CommandSpec:
         ],
         'help': 'drop schema from db',
         'examples': [
-            'blocks mainnnet',
+            'blocks mainnet',
             'blocks arbitrum',
         ],
         'hidden': True,

@@ -158,7 +158,7 @@ Detailed instructions can be found in the [installation documentation](https://c
 
 ## FAQ
 - What are the goals of `ctc`?
-    1. **Treat historical data as a first-class feature**: This means having historical data functionality well-integrated into each part of the of the API. It also means optimizing the codebase with historical data workloads in mind.
+    1. **Treat historical data as a first-class feature**: This means having historical data functionality well-integrated into each part of the API. It also means optimizing the codebase with historical data workloads in mind.
     2. **Protocol-specific functionality**: This means having built-in support for popular on-chain protocols.
     3. **Terminal-based block explorer**: This means supporting as many block explorer tasks as possible from the terminal. And doing so in a way that is faster than can be done with a web browser.
     4. **Clean API emphasizing UX**: With `ctc` most data queries can be obtained with a single function call. No need to instantiate objects. RPC inputs/outputs are automatically encoded/decoded by default.
