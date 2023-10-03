@@ -6,7 +6,7 @@
     - Otherwise can add conversion to `ctc.config.config_read.get_config()`
 - **Defaults**: Add default values for key to `ctc.config.config_defaults.get_default_config()`
 - **Getters**: Add appropriate getter functions to `ctc.config.config_values`
-- **Validation**: Add necessary validation funcitons to `ctc.config.config_validate.get_config_validators()` and add base types to `ctc.config.config_validate.get_config_base_types()`
+- **Validation**: Add necessary validation functions to `ctc.config.config_validate.get_config_validators()` and add base types to `ctc.config.config_validate.get_config_base_types()`
 - **Versioning**: Increase ctc version (see guide on "How to upgrade ctc version")
 - **Upgrades**: Create new config version upgrade function in `ctc.config.upgrade_utils`
     - Include new key in upgrade function
